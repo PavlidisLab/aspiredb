@@ -1,0 +1,5 @@
+subjectid,chrom,start,end,function_prediction,exonic_function,genotype_quality,indel_length
+ind1,10,1,5,exonic,frameshift,99,200
+ind2,2,2,6,exonic,nonframeshift,81,
+ind3,2,3,7,exonic,nonframeshift,99,400
+ind4,17,4,8,bla,nonframeshift,99,

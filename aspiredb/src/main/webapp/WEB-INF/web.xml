@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
+	<welcome-file-list>
+		<welcome-file>aspiredb/home.jsp</welcome-file>
+	</welcome-file-list>
+
+	<context-param>
+		<param-name>log4jConfigLocation</param-name>
+		<param-value>WEB-INF/classes/log4j.properties</param-value>
+	</context-param>
+	<listener>
+		<listener-class>org.springframework.web.util.Log4jConfigListener
+		</listener-class>
+	</listener>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			WEB-INF/classes/application-context.xml,			
+			WEB-INF/classes/production-data-source.xml,
+			WEB-INF/classes/applicationContext-security.xml
+		</param-value>
+	</context-param>
+	
+	<!--listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener-->
+
+	<listener>
+	   <listener-class>ubc.pavlab.aspiredb.client.listener.StartupListener</listener-class>
+    </listener>
+
+	<servlet>
+		<servlet-name>springGwtRemoteServiceServlet</servlet-name>
+		<servlet-class>org.spring4gwt.server.SpringGwtRemoteServiceServlet
+		</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>springGwtRemoteServiceServlet</servlet-name>
+		<url-pattern>/aspiredb/springGwtServices/*</url-pattern>
+	</servlet-mapping>
+
+	<!-- web services -->
+	<servlet>
+		<servlet-name>rest-ws-servlet</servlet-name>
+		<servlet-class>
+			com.sun.jersey.spi.spring.container.servlet.SpringServlet
+		</servlet-class>
+		<init-param>
+			<param-name>com.sun.jersey.config.property.packages</param-name>
+			<param-value>ubc.pavlab.aspiredb.server.ws</param-value>
+		</init-param>
+		<init-param>
+			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>rest-ws-servlet</servlet-name>
+		<url-pattern>/rest/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+        <servlet-name>uploadprogress</servlet-name>
+        <servlet-class>ubc.pavlab.aspiredb.server.fileuploader.UploadProgressServlet</servlet-class>
+    </servlet>
+  
+    <servlet-mapping>
+        <servlet-name>uploadprogress</servlet-name>
+        <url-pattern>/aspiredb/uploadprogress</url-pattern>
+    </servlet-mapping>
+  
+    <servlet>
+        <servlet-name>upload</servlet-name>
+        <servlet-class>ubc.pavlab.aspiredb.server.fileuploader.UploadServlet</servlet-class>
+    </servlet>
+  
+    <servlet-mapping>
+        <servlet-name>upload</servlet-name>
+        <url-pattern>/aspiredb/upload</url-pattern>
+    </servlet-mapping>
+
+<!--  
+    <servlet>
+        <servlet-name>download</servlet-name>
+        <servlet-class>ubc.pavlab.aspiredb.server.fileuploader.DownloadServlet</servlet-class>
+    </servlet>
+  
+    <servlet-mapping>
+        <servlet-name>download</servlet-name>
+        <url-pattern>/aspiredb/download</url-pattern>
+    </servlet-mapping>
+-->	
+
+	<filter>
+ 		<filter-name>noCacheHTTPHeaderFilter</filter-name>
+ 		<filter-class>ubc.pavlab.aspiredb.server.filter.NoCacheHTTPHeaderFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+ 		<filter-name>noCacheHTTPHeaderFilter</filter-name>
+ 		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy
+		</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<session-config>
+    	<session-timeout>60</session-timeout>
+	</session-config>
+
+</web-app>

@@ -1,0 +1,14 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:grid="urn:import:com.sencha.gxt.widget.core.client.grid"
+        >
+	
+	<g:FlowPanel ui:field="main">
+		<grid:Grid ui:field="grid"/>
+		<!--  
+		<toolbar:PagingToolBar ui:field="pagingToolbar" pageSize="300" height="30" />
+				-->
+	</g:FlowPanel>
+	
+</ui:UiBinder> 

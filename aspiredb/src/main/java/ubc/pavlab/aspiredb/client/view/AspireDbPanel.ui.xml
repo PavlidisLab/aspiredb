@@ -1,0 +1,98 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:my="urn:import:ubc.pavlab.aspiredb.client.view"
+             xmlns:my_common="urn:import:ubc.pavlab.aspiredb.client.view.common"
+             xmlns:button="urn:import:com.sencha.gxt.widget.core.client.button"
+        >
+
+	<ui:style>
+		.northPanel {
+			height: 50px;
+		}
+
+		.toolPanel {
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-left: 20px;
+            /*
+			margin: 18px 0 0 50px;
+*/
+			float: left;
+		}
+
+		.southPanel {
+			font-family: sans-serif;
+			font-size: 10px;
+			margin-left: 5px;
+		}
+		
+		.centerPanel {
+			margin: 3px;
+			body: none;
+		}
+		
+		.login {
+			margin: 2px;
+			padding-top: 2px;
+			padding-right: 2px;
+			float: right;
+		}
+		
+		.logout {
+			margin-right: 2px;
+			padding-top: 2px;
+			padding-right: 2px;
+			float: right;
+		}
+		
+		.logo {
+			float: left;
+			/*width: 270px;*/
+			/*height: 50px;*/
+            padding: 5px;
+        }
+
+        .button {
+            font-size: 20px;
+        }
+
+		.introtext {
+			margin-left:auto;
+			margin-right:auto;
+			width:40%;
+			font-family: sans-serif;
+			font-size: 16px;
+		}
+	</ui:style>
+
+	<g:DockLayoutPanel unit='PX'>
+		<!-- Header -->
+		<g:north size='50'>
+			<g:HTMLPanel ui:field="header" styleName="{style.northPanel}">
+				<g:Image url="aspiredb-logo-smaller.png" styleName="{style.logo}" />
+				<g:HTMLPanel ui:field="toolPanel" styleName="{style.toolPanel}" visible="false">				
+					<button:TextButton ui:field="filterButton" text="Filter..." height="30px" />
+                    <button:TextButton ui:field="clearFilterButton" text="Clear filter" height="30px" toolTip="Clear filters" />
+					<button:TextButton ui:field="dashboardButton" height="30px" text="Dashboard"  />
+					<button:TextButton ui:field="helpButton" height="30px" text="Help"  />
+				</g:HTMLPanel>
+				<!-- FIXME: we need a more elegant way to show this. -->
+				<my_common:LogoutForm ui:field="logoutForm" visible="false"
+					styleName="{style.logout}" />
+			</g:HTMLPanel>		
+		</g:north>
+		<!-- Content -->
+		<g:center>
+			<my:MainPanel ui:field="mainPanel" visible="false" />
+		</g:center>
+		<!-- Footer -->
+		<g:south size='14'>
+			<g:FlowPanel styleName="{style.southPanel}">
+				<g:HTML ui:field="copyRight" 
+					wordWrap="false" />
+			</g:FlowPanel>
+		</g:south>
+
+	</g:DockLayoutPanel>
+</ui:UiBinder> 

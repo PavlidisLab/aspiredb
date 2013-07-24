@@ -1,0 +1,4 @@
+subjectid,chrom,start,end,ref_base,obs_base,damaging,validated,genotype_quality
+snv1,1,1,2,C,T,NA,1,67
+snv2,13,3,5,G,A,y,2,40
+snv3,15,10,15,G,A,NA,3,36

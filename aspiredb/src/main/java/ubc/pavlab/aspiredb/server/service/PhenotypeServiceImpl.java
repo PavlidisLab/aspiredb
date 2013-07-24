@@ -1,0 +1,427 @@
+/*
+ * The aspiredb project
+ * 
+ * Copyright (c) 2012 University of British Columbia
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+package ubc.pavlab.aspiredb.server.service;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.time.StopWatch;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import ubc.pavlab.aspiredb.client.exceptions.NotLoggedInException;
+import ubc.pavlab.aspiredb.client.service.PhenotypeService;
+import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
+import ubc.pavlab.aspiredb.server.dao.ProjectDao;
+import ubc.pavlab.aspiredb.server.model.Phenotype;
+import ubc.pavlab.aspiredb.server.model.PhenotypeValueType;
+import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.ontology.OntologyService;
+import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
+import ubc.pavlab.aspiredb.shared.PhenotypeEnrichmentValueObject;
+import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
+import ubc.pavlab.aspiredb.shared.query.PhenotypeProperty;
+import ubc.pavlab.aspiredb.shared.query.PropertyValue;
+import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
+import ubic.basecode.math.MultipleTestCorrection;
+import ubic.basecode.math.SpecFunc;
+import ubic.basecode.ontology.model.OntologyResource;
+import ubic.basecode.ontology.model.OntologyTerm;
+import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
+import cern.colt.list.DoubleArrayList;
+
+@Component("phenotypeService")
+public class PhenotypeServiceImpl extends GwtService implements PhenotypeService {
+
+    protected static Log log = LogFactory.getLog( PhenotypeServiceImpl.class );
+
+    private static final String HUMAN_PHENOTYPE_URI_PREFIX = "http://purl.org/obo/owl/HP#";
+    
+
+    DecimalFormat dformat = new DecimalFormat("#.#####");
+
+    @Autowired
+    PhenotypeDao phenotypeDao;
+    @Autowired
+    OntologyService ontologyService;
+    @Autowired
+    ProjectDao projectDao;
+
+    public boolean setNameUriValueType( Phenotype phenotype, String key ) {
+
+        if ( isUri( key ) ) {
+
+            phenotype.setUri( key );
+
+            OntologyResource resource = ontologyService.getTerm( HUMAN_PHENOTYPE_URI_PREFIX + key );
+
+            if ( resource == null ) {
+                log.error( "No ontology resource for " + key );
+                return false;
+            }
+
+            phenotype.setName( resource.getLabel() );
+            phenotype.setType( PhenotypeValueType.HPONTOLOGY.toString() );
+
+        } else if ( key.trim().equalsIgnoreCase( "GENDER" ) ) {
+            phenotype.setName( key );
+            phenotype.setType( PhenotypeValueType.GENDER.toString() );
+
+        } else {
+            phenotype.setName( key );
+            phenotype.setType( PhenotypeValueType.CUSTOM.toString() );
+        }
+
+        return true;
+    }
+
+    public boolean setValue( Phenotype phenotype, String value ) {
+        if ( phenotype.getType().equals( PhenotypeValueType.HPONTOLOGY.toString() ) ) {
+            phenotype.setValue( convertValueToHPOntologyStandardValue( value ) );
+        } else if ( phenotype.getType().equals( PhenotypeValueType.GENDER.toString() ) ) {
+
+            value = value.trim().toUpperCase();
+
+            if ( value.equals( "M" ) || value.equals( "F" ) ) {
+
+                phenotype.setValue( value );
+
+            } else {
+                log.error( "Invalid GENDER: " + value );
+                return false;
+            }
+        } else {
+            phenotype.setValue( value );
+        }
+
+        return true;
+    }
+
+    public String convertValueToHPOntologyStandardValue( String value ) {
+        try {
+            Integer.parseInt( value );
+        } catch ( NumberFormatException nfe ) {
+            if ( value != null && value.trim().equalsIgnoreCase( "Y" ) ) {
+                return "1";
+            } else {
+                return "0";
+            }
+        }
+
+        return value;
+    }
+
+    public static boolean isUri( String uriOrName ) {
+        if ( uriOrName == null ) return false;
+
+        return uriOrName.trim().startsWith( "HP_" );
+    }
+
+    @Override
+    @Transactional
+    public Map<String, PhenotypeValueObject> getPhenotypes( Long subjectId ) throws NotLoggedInException {
+        throwGwtExceptionIfNotLoggedIn();
+
+        log.info( "getPhenotypes" );
+
+        StopWatch timer = new StopWatch();
+        timer.start();
+
+        Collection<Phenotype> phenotypes = phenotypeDao.findBySubjectId( subjectId );
+
+        if ( timer.getTime() > 100 ) {
+            log.info( "loading phenotypes for subjectId: " + subjectId + " took " + timer.getTime() + "ms" );
+        }
+
+        // Insert phenotype loaded from DB.
+        Map<String, PhenotypeValueObject> valueObjectsMap = new HashMap<String, PhenotypeValueObject>();
+        for ( Phenotype phenotype : phenotypes ) {
+            valueObjectsMap.put( phenotype.getName(), phenotype.convertToValueObject() );
+        }
+
+        // FIXME: disabled temporarily
+        // Insert inferred phenotype values using Ontology.
+        // valueObjectsMap = addDescendantsAndAncestors(valueObjectsMap);
+        // propagateAbsentPresentValues(valueObjectsMap);
+
+        return valueObjectsMap;
+    }
+
+    @Override
+    public Collection<PhenotypeProperty> suggestPhenotypes( SuggestionContext suggestionContext )
+            throws NotLoggedInException {
+        return null;
+    }
+
+    @Override
+    public Collection<PropertyValue> suggestPhenotypeValues( PhenotypeProperty property,
+            SuggestionContext suggestionContext ) throws NotLoggedInException {
+        return null; // To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    /**
+     * Expand map by adding rows for descendants/ancestors of terms currently in the map(from db).
+     * 
+     * @param phenotypeMap
+     */
+    private Map<String, PhenotypeValueObject> addDescendantsAndAncestors( Map<String, PhenotypeValueObject> phenotypeMap ) {
+        // Pre-condition:
+        // db phenotypes are loaded into phenotypeMap
+        HumanPhenotypeOntologyService hpoService = ontologyService.getHumanPhenotypeOntologyService();
+
+        Map<String, PhenotypeValueObject> inferredPhenotypeMap = new HashMap<String, PhenotypeValueObject>();
+
+        for ( PhenotypeValueObject phenotype : phenotypeMap.values() ) {
+            // Create full ontology tree branch (up and down from current term)
+            Long subjectId = phenotype.getSubjectId();
+
+            OntologyTerm ontologyTerm = hpoService.getTerm( PhenotypeUtil.HUMAN_PHENOTYPE_URI_PREFIX
+                    + phenotype.getUri() );
+
+            if ( ontologyTerm == null ) continue;
+
+            Collection<OntologyTerm> descendantsTerms = ontologyTerm.getChildren( false );
+
+            // Add descendants (some are present in db some are not) to each phenotype object.
+            for ( OntologyTerm descendantTerm : descendantsTerms ) {
+                PhenotypeValueObject childPhenotype = phenotypeMap.get( descendantTerm.getLabel() );
+                if ( childPhenotype == null ) {
+                    childPhenotype = inferredPhenotypeMap.get( descendantTerm.getLabel() );
+                    if ( childPhenotype == null ) {
+                        childPhenotype = createPhenotypeValueObject( subjectId, descendantTerm );
+                        inferredPhenotypeMap.put( childPhenotype.getName(), childPhenotype );
+                    }
+                }
+            }
+
+            // Ancestors
+            Collection<OntologyTerm> ancestorTerms = ontologyTerm.getParents( false );
+            for ( OntologyTerm ancestorTerm : ancestorTerms ) {
+                PhenotypeValueObject ancestorPhenotype = phenotypeMap.get( ancestorTerm.getLabel() );
+                if ( ancestorPhenotype == null ) {
+                    ancestorPhenotype = inferredPhenotypeMap.get( ancestorTerm.getLabel() );
+                    if ( ancestorPhenotype == null ) {
+                        ancestorPhenotype = createPhenotypeValueObject( subjectId, ancestorTerm );
+                        inferredPhenotypeMap.put( ancestorTerm.getLabel(), ancestorPhenotype );
+                    }
+                }
+            }
+        }
+
+        // Add inferred terms not stored in database.
+        inferredPhenotypeMap.putAll( phenotypeMap );
+        phenotypeMap = inferredPhenotypeMap;
+
+        for ( PhenotypeValueObject phenotype : phenotypeMap.values() ) {
+            // Create full ontology tree branch (up and down from current term)
+
+            OntologyTerm ontologyTerm = hpoService.getTerm( PhenotypeUtil.HUMAN_PHENOTYPE_URI_PREFIX
+                    + phenotype.getUri() );
+
+            if ( ontologyTerm == null ) {
+                ontologyTerm = hpoService.getTerm( phenotype.getUri() );
+                if ( ontologyTerm == null ) {
+                    continue;
+                }
+            }
+
+            Collection<OntologyTerm> descendantsTerms = ontologyTerm.getChildren( false );
+
+            // Add descendants (some are present in db some are not) to each phenotype object.
+            for ( OntologyTerm descendantTerm : descendantsTerms ) {
+                PhenotypeValueObject childPhenotype = phenotypeMap.get( descendantTerm.getLabel() );
+                if ( childPhenotype != null ) {
+                    phenotype.addChildIfAbsent( childPhenotype );
+                }
+            }
+
+            // Ancestors
+            Collection<OntologyTerm> ancestorTerms = ontologyTerm.getParents( false );
+            for ( OntologyTerm ancestorTerm : ancestorTerms ) {
+                PhenotypeValueObject ancestorPhenotype = phenotypeMap.get( ancestorTerm.getLabel() );
+                if ( ancestorPhenotype != null ) {
+                    ancestorPhenotype.addChildIfAbsent( phenotype );
+                }
+            }
+        }
+        return phenotypeMap;
+    }
+
+    private PhenotypeValueObject createPhenotypeValueObject( Long subjectId, OntologyTerm ontologyTerm ) {
+        return new PhenotypeValueObject( subjectId, ontologyTerm.getUri(), ontologyTerm.getLabel(), "Unknown" );
+    }
+
+    /**
+     * Propagate absent/present values to ancestors/descendants.
+     * 
+     * @param phenotypeMap
+     */
+    private void propagateAbsentPresentValues( Map<String, PhenotypeValueObject> phenotypeMap ) {
+        for ( PhenotypeValueObject phenotype : phenotypeMap.values() ) {
+            for ( PhenotypeValueObject child : phenotype.getDescendantPhenotypes().values() ) {
+                // Propagate 'Present' (1) values to ancestor.
+                if ( child.getDbValue() != null && phenotype.getDbValue() == null ) {
+                    if ( child.getDbValue().equals( "1" ) ) {
+                        phenotype.setInferredValue( "1" );
+                        continue;
+                    }
+                }
+                // Propagate 'Absent' (0) values to descendants.
+                if ( phenotype.getDbValue() != null && child.getDbValue() == null ) {
+                    if ( phenotype.getDbValue().equals( "0" ) ) {
+                        child.setInferredValue( "0" );
+                    }
+                }
+            }
+        }
+    }
+
+    @Transactional
+    public List<PhenotypeEnrichmentValueObject> getPhenotypeEnrichmentValueObjects( Collection<Long> activeProjects,
+            Collection<Long> subjectIds ) throws NotLoggedInException {
+
+        ArrayList<PhenotypeEnrichmentValueObject> list = new ArrayList<PhenotypeEnrichmentValueObject>();
+
+        Project activeProject = projectDao.load( activeProjects.iterator().next() );
+
+        List<Subject> subjectList = activeProject.getSubjects();
+        List<Long> complementSubjectIds = new ArrayList<Long>();
+
+        for ( Subject s : subjectList ) {
+            if ( !subjectIds.contains( s.getId() ) ) {
+                complementSubjectIds.add( s.getId() );
+            }
+        }
+
+        Collection<String> distinctUris = phenotypeDao.getDistinctOntologyUris( activeProjects );
+
+        for ( String uri : distinctUris ) {
+            //TODO change this fetching to be more efficient when we make this functionality more robust(currently it grabs all phenotypes in the projects for a specific uri
+            //change later to grab only for subjectIds and complementSubjectIds)
+            Collection<Phenotype> phenotypes = phenotypeDao.findPresentByProjectIdsAndUri( activeProjects, uri );
+            PhenotypeEnrichmentValueObject pevo = getPhenotypeEnrichment( phenotypes, subjectIds, complementSubjectIds );
+            
+            if (pevo!=null){
+                list.add(pevo );
+            }
+            
+
+        }
+        
+        multipleTestCorrectionForPhenotypeEnrichmentList(list);
+
+        return list;
+    }
+
+    /**
+     * TODO make this work with ontology propagation
+     * 
+     * @param uriPhenotypes -all the phenotypes for a specific uri in the db for subjectIds and complementSubjectIds 
+     * @param subjectIds
+     * @param complementSubjectIds
+     */
+    public PhenotypeEnrichmentValueObject getPhenotypeEnrichment( Collection<Phenotype> uriPhenotypes,
+            Collection<Long> subjectIds, Collection<Long> complementSubjectIds ) {
+
+        Integer successes = 0;
+        
+        Integer compSuccesses = 0;
+        
+        Integer positives = 0;
+
+        Integer n = subjectIds.size();
+        
+        Integer complementGroupSize = complementSubjectIds.size();
+
+        Integer totalSize = subjectIds.size() + complementSubjectIds.size();
+
+        for ( Phenotype p : uriPhenotypes ) {
+            //this should always be true the way we are currently using this method.
+            if ( p.getValue().equals( "1" ) ) {
+
+                positives++;
+
+                if ( subjectIds.contains( p.getSubject().getId() ) ) {
+                    successes++;
+                }
+                
+                if ( complementSubjectIds.contains( p.getSubject().getId() ) ) {
+                    compSuccesses++;
+                }
+
+            }
+        }
+        
+        if (successes==0 || successes==n){
+            return null;
+        }
+
+        // do it this way because of possible unobserved phenotypes(no recorded value) for certain subjects, this could
+        // be wrong
+        Integer negatives = totalSize - positives;
+
+        // note lower.tail: logical; if TRUE (default), probabilities are P[X <= x],
+        // otherwise, P[X > x].
+        // Since we want P[X >= x], we want to set x = x - 1 and lower.tail false
+        double pValue;
+        
+        pValue = SpecFunc.phyper( successes - 1, positives, negatives, n, false );
+        
+        PhenotypeEnrichmentValueObject vo = new PhenotypeEnrichmentValueObject();
+        
+        vo.setPValue( pValue );
+
+        Phenotype valueGrabber = uriPhenotypes.iterator().next();
+        vo.setUri( valueGrabber.getUri() );
+        vo.setName( valueGrabber.getName() );
+        vo.setInGroupTotal( successes );
+        vo.setOutGroupTotal( compSuccesses );
+        vo.setTotal( totalSize );
+        
+        vo.setInGroupTotalString( vo.getInGroupTotal().toString()+"/"+n.toString() );
+        vo.setOutGroupTotalString( vo.getOutGroupTotal().toString()+"/"+complementGroupSize.toString() );
+        
+        vo.setPValueString( dformat.format( pValue ) );
+
+        return vo;
+
+    }
+    
+    public void multipleTestCorrectionForPhenotypeEnrichmentList(List<PhenotypeEnrichmentValueObject> list){
+        
+        DoubleArrayList doubleArrayList = new DoubleArrayList();
+        
+        for (PhenotypeEnrichmentValueObject pvo: list){           
+            doubleArrayList.add( pvo.getPValue() );            
+        }
+        
+        doubleArrayList = MultipleTestCorrection.benjaminiHochberg( doubleArrayList );
+        
+        for (int i=0; i<doubleArrayList.size();i++){        
+            list.get( i ).setPValueCorrected( doubleArrayList.get( i ) );
+            list.get( i ).setPValueCorrectedString( dformat.format( doubleArrayList.get( i ) ) );
+        }
+        
+    }
+
+}

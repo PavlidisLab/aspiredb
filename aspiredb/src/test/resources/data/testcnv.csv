@@ -1,0 +1,4 @@
+subjectid,chrom,start,end,Markers,type,Inheritance,Common CNV
+temp1,1,1000,2000,1,loss,unclassified,Y
+temp2,X,3000,5000,1,loss,unclassified,Y
+temp3,Y,60000,700000,1,gain,blah,N

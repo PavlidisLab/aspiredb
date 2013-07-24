@@ -1,0 +1,50 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:my="urn:import:ubc.pavlab.aspiredb.client.view"
+             xmlns:button="urn:import:com.sencha.gxt.widget.core.client.button"
+             xmlns:form="urn:import:com.sencha.gxt.widget.core.client.form"
+        >
+
+	<ui:style>
+		.mainPanel {
+			background-color: white;
+			padding: 6px 12px;
+		}
+		.panel {
+			font-family: sans-serif;
+			font-size: 12px;
+			margin: 3px;
+		}
+		.projectSelection {
+			padding-bottom: 3px;	
+		}
+		.projectDataFirstLabel {
+			padding-left: 5px;
+		}
+		.projectData {
+			padding-left: 2px;
+			padding-right: 50px;
+			font-weight: bold;
+		}
+	</ui:style>
+
+	<g:FlowPanel styleName="{style.mainPanel}" width="450px" height="170px">
+		<g:HorizontalPanel verticalAlignment="ALIGN_MIDDLE" spacing="6" >	
+			<g:Label text="Active project" />
+			<my:ProjectSelectionWidget ui:field ="projectSelection"></my:ProjectSelectionWidget>
+		</g:HorizontalPanel>
+
+		<form:FieldSet headingText="Project information" >	
+			<g:HorizontalPanel>
+				<g:Label styleName="{style.projectDataFirstLabel}" text="Number of Subjects: " />
+				<g:Label styleName="{style.projectData}" ui:field ="numberOfSubjects"/>
+				<g:Label text="Number of Variants: " />
+				<g:Label styleName="{style.projectData}" ui:field ="numberOfVariants"/>			
+			</g:HorizontalPanel>
+		</form:FieldSet>
+			
+		<button:TextButton ui:field="showFileUpload" text="Show file uploader" visible="false"/>
+		<g:FlowPanel ui:field = "flowPanel" styleName="{style.panel}" />
+	</g:FlowPanel>
+
+</ui:UiBinder> 

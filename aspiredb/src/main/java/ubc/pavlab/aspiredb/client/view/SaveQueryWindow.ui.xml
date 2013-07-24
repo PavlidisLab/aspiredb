@@ -1,0 +1,22 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+        >
+
+	<ui:style>
+		.button {
+			margin: 9px 0px 0px 3px;
+			padding: 3px;
+		}
+	</ui:style>
+
+    <g:VerticalPanel width="100%" >
+        <g:TextBox width="100%" ui:field="textBox"/>
+		<g:cell width="100%" horizontalAlignment="ALIGN_RIGHT" verticalAlignment="ALIGN_BOTTOM">
+	    	<g:HorizontalPanel>
+		        <g:Button ui:field="okButton" styleName="{style.button}" text="OK"/>
+		        <g:Button ui:field="cancelButton" styleName="{style.button}" text="Cancel"/>
+	    	</g:HorizontalPanel>
+		</g:cell>
+	</g:VerticalPanel>
+</ui:UiBinder>

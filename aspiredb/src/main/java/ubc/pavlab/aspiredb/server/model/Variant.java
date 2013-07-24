@@ -1,0 +1,165 @@
+/*
+ * The aspiredb project
+ * 
+ * Copyright (c) 2012 University of British Columbia
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+package ubc.pavlab.aspiredb.server.model;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import ubc.pavlab.aspiredb.server.ValueObjectConvertible;
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.SecuredNotChild;
+import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
+import ubc.pavlab.aspiredb.shared.GenomicRange;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
+
+import javax.persistence.*;
+import java.util.*;
+
+/**
+ * Variant class TODO add platform
+ * 
+ * @author ?
+ * @version $Id: Variant.java,v 1.19 2013/06/11 22:55:59 anton Exp $
+ */
+@Entity
+@Table(name = "VARIANT")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "discriminator", discriminatorType = DiscriminatorType.STRING)
+public abstract class Variant implements SecuredNotChild, ValueObjectConvertible<VariantValueObject> {
+
+    @Id
+    @GeneratedValue
+    @Column(name = "ID")
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "PATIENT_ID")
+    private Subject subject;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @Cascade(CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "GENOMELOC_ID")
+    private GenomicLocation location;
+
+    @OneToMany(cascade = javax.persistence.CascadeType.ALL)
+    @JoinTable(name = "VARIANT_CHARACTERISTIC", joinColumns = { @JoinColumn(name = "VARIANT_FK") }, inverseJoinColumns = { @JoinColumn(name = "CHARACTERISTIC_FK") })
+    private List<Characteristic> characteristics;
+
+    @ManyToMany
+    @JoinTable(name = "VARIANT_LABEL", joinColumns = { @JoinColumn(name = "VARIANT_FK", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "LABEL_FK", referencedColumnName = "ID") })
+    private Set<Label> labels = new HashSet<Label>();
+
+    @Column(name = "USERVARIANTID")
+    private String userVariantId;
+
+    @Column(name = "DESCRIPTION")
+    private String description;
+
+    @Column(name = "EXTERNALID")
+    private String externalId;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setSubject( Subject subject ) {
+        this.subject = subject;
+    }
+
+    public Subject getSubject() {
+        return subject;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public GenomicLocation getLocation() {
+        return location;
+    }
+
+    public void setLocation( GenomicLocation location ) {
+        this.location = location;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription( String description ) {
+        this.description = description;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId( String externalId ) {
+        this.externalId = externalId;
+    }
+
+    public List<Characteristic> getCharacteristics() {
+        return characteristics;
+    }
+
+    public void setCharacteristics( List<Characteristic> characteristics ) {
+        this.characteristics = characteristics;
+    }
+
+    public Collection<Label> getLabels() {
+        return labels;
+    }
+
+    public void setLabels( Set<Label> labels ) {
+        this.labels = labels;
+    }
+
+    public String getUserVariantId() {
+        return userVariantId;
+    }
+
+    public void setUserVariantId( String userVariantId ) {
+        this.userVariantId = userVariantId;
+    }
+
+    @Override
+    public VariantValueObject toValueObject() {
+        VariantValueObject vo = new VariantValueObject();
+        vo.setId( this.getId() );
+        vo.setVariantType( this.getClass().getSimpleName() );
+        vo.setPatientId( this.getSubject().getPatientId() );
+        vo.setSubjectId( this.getSubject().getId() );
+
+        GenomicRange genomicRange = new GenomicRange( this.getLocation().getChromosome(),
+                this.getLocation().getStart(), this.getLocation().getEnd() );
+        vo.setGenomicRange( genomicRange );
+        Collection<CharacteristicValueObject> characteristicValueObjects = Characteristic
+                .toValueObjects( this.characteristics );
+        Map<String, CharacteristicValueObject> map = new HashMap<String, CharacteristicValueObject>();
+        for ( CharacteristicValueObject characteristicValueObject : characteristicValueObjects ) {
+            map.put( characteristicValueObject.getKey(), characteristicValueObject );
+        }
+        vo.setCharacteristics( map );
+        vo.setLabels( Label.toValueObjects( this.labels ) );
+        return vo;
+    }
+
+    // TODO: has to be unique
+    public void addLabel( Label label ) {
+        this.labels.add( label );
+    }
+
+    public void removeLabel( Label label ) {
+        this.labels.remove( label );
+    }
+}

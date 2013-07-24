@@ -1,0 +1,32 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:subject="urn:import:ubc.pavlab.aspiredb.client.view.subject"
+             xmlns:variant="urn:import:ubc.pavlab.aspiredb.client.view.variant"
+             xmlns:phenotype="urn:import:ubc.pavlab.aspiredb.client.view.phenotype"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+        >
+
+	<ui:style>
+		.details {
+			font-family: sans-serif;
+			font-size: 12px;
+		}
+		.splitLayoutPanel {
+			border: 2px solid #92C1F0;
+		}
+	</ui:style>
+
+	<g:SplitLayoutPanel styleName="{style.splitLayoutPanel}">
+		<g:west size="300">
+			<subject:SubjectGrid ui:field="subjectGrid" />
+		</g:west>
+		<g:center>
+			<variant:VariantGrid ui:field="variantGrid" />
+		</g:center>
+		<g:east size="700">		
+			<phenotype:PhenotypeGrid ui:field="phenotypeGrid" />
+		</g:east>
+	</g:SplitLayoutPanel>
+		
+</ui:UiBinder> 
+

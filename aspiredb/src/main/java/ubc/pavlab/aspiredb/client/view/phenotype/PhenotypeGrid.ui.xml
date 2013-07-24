@@ -1,0 +1,32 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client"
+	xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
+	xmlns:grid="urn:import:com.sencha.gxt.widget.core.client.grid"
+	xmlns:button="urn:import:com.sencha.gxt.widget.core.client.button"
+	xmlns:toolbar="urn:import:com.sencha.gxt.widget.core.client.toolbar">
+
+    <ui:with type="ubc.pavlab.aspiredb.client.resources.AspireImageResources" field="images" />
+
+    <gxt:FramedPanel bodyStyle="background-color:white;" headingText="Phenotypes" ui:field="main">
+				<container:VerticalLayoutContainer>
+					<container:child>
+						<toolbar:ToolBar spacing="1" minButtonWidth="40" ui:field="toolbar" height="35" width="100" >
+						
+							<button:TextButton ui:field="showEnrichmentButton" text="Analyze" toolTip="If you have a filtered subject group, compute that group's phenotype enrichment"/>
+                            
+                            <toolbar:SeparatorToolItem />
+                            
+                            <button:TextButton ui:field="downloadAllButton" icon="{images.downloadIcon}" iconAlign="TOP"
+                                               toolTip="Download table contents as text" />
+                            
+                        </toolbar:ToolBar>
+					</container:child>
+					<container:child>
+						<grid:Grid ui:field="phenotypeGrid" height="200" />
+					</container:child>
+				</container:VerticalLayoutContainer>
+			</gxt:FramedPanel>
+
+</ui:UiBinder> 
+

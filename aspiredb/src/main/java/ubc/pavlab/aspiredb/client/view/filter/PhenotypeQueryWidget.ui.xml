@@ -1,0 +1,25 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:form="urn:import:com.sencha.gxt.widget.core.client.form"
+        >
+
+	<ui:style>
+		.image {
+			padding: 2px 2px 2px 2px;
+		}
+		.filter-body {
+			margin: 2px 2px 2px 2px;
+			padding: 1px 1px 1px 1px;
+		}
+	</ui:style>
+
+	<g:VerticalPanel styleName="{style.filter-body}">
+		<g:HorizontalPanel>
+			<form:ComboBox ui:field="phenotypeComboBox" emptyText="phenotype" width="500px"/>
+			<form:SimpleComboBox ui:field="value" emptyText="value" />
+			<g:Image width="10px" visible="false" ui:field="removeImage" altText="Remove filter" title="Remove filter" url="cross.png" styleName="gwt-Hyperlink {style.image}"/>
+		</g:HorizontalPanel>
+	</g:VerticalPanel>
+
+</ui:UiBinder> 

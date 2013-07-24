@@ -1,0 +1,75 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:c="urn:import:com.sencha.gxt.widget.core.client" 
+	xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
+	xmlns:form="urn:import:com.sencha.gxt.widget.core.client.form" 
+	xmlns:button="urn:import:com.sencha.gxt.widget.core.client.button">
+
+	<ui:style>
+		.greeting {
+			margin: 10px 0 0 10px;
+		}
+        .message {
+            font-family: sans-serif;
+            font-size: 10px;
+            color: red;
+        }
+
+        .box {
+            border: 1px #000000;
+        }
+        
+.helpButton {
+	float: left;
+}
+    </ui:style>
+
+	<!--<ui:with type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData" field="layoutData">-->
+		<!--<ui:attributes width="1" height="-1" />-->
+	<!--</ui:with>-->
+
+	<g:VerticalPanel>
+		<g:Label text="Welcome, please login." styleName="{style.greeting}"></g:Label>
+		<g:HorizontalPanel spacing="10" styleName="{style.box}">
+			<c:ContentPanel width="300" bodyStyle="padding: 5px;" headerVisible="false">
+				<container:VerticalLayoutContainer>
+	
+					<container:child>
+						<form:FieldLabel text="Username">
+							<form:widget>
+								<form:TextField ui:field="username" allowBlank="false" />
+							</form:widget>
+						</form:FieldLabel>
+					</container:child>
+	
+					<container:child>  <!--layoutData="{layoutData}"-->
+						<form:FieldLabel text="Password">
+							<form:widget>
+								<form:PasswordField ui:field="password" name="password" allowBlank="false" />
+							</form:widget>
+						</form:FieldLabel>
+					</container:child>
+	
+					<container:child>
+						<g:HTML ui:field="message" text="Login failed. Username or password incorrect"
+	                            visible="false" styleName="{style.message}" />
+					</container:child>
+	
+				</container:VerticalLayoutContainer>
+	
+				<c:button>
+					<button:TextButton ui:field="help" text="Help"  styleName="{style.helpButton}" />
+				</c:button>
+
+				<c:button>
+					<button:TextButton ui:field="clear" text="Clear" />
+				</c:button>
+	
+				<c:button>
+					<button:TextButton ui:field="login" text="Login" />
+				</c:button>
+			</c:ContentPanel>
+		</g:HorizontalPanel>
+	</g:VerticalPanel>
+</ui:UiBinder>

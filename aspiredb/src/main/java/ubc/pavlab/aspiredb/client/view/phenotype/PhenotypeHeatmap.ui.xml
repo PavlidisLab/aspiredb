@@ -1,0 +1,14 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client.container"
+	xmlns:gx="urn:import:com.google.gwt.canvas.client">
+
+	<ui:style>
+		
+	</ui:style>
+
+	<gxt:SimpleContainer ui:field="panel">
+		<gx:Canvas ui:field="canvasBox" width="600px" height="600px"/>
+	</gxt:SimpleContainer>	
+	
+</ui:UiBinder> 
