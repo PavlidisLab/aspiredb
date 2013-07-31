@@ -1,0 +1,54 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dwr="http://www.directwebremoting.org/schema/spring-dwr"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans     
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.directwebremoting.org/schema/spring-dwr
+    	http://www.directwebremoting.org/schema/spring-dwr-2.0.xsd">
+
+	<context:component-scan base-package="ubc.pavlab.aspiredb.server" />
+
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix">
+			<value>/WEB-INF/pages/</value>
+		</property>
+		<property name="suffix">
+			<value>.jsp</value>
+		</property>
+	</bean>
+
+	<dwr:controller id="dwrController" debug="true" >
+	
+		<dwr:config-param name="generateDtoClasses" value="dtoall" />
+		<dwr:config-param name="allowScriptTagRemoting" value="true" />
+		<dwr:config-param name="crossDomainSessionSecurity" value="false" />
+	</dwr:controller>	
+
+	<bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property value="true" name="alwaysUseFullPath"></property>
+		<property name="mappings">
+			<props>
+				<prop key="/dwr/**/*">dwrController</prop>
+				<prop key="/home.html">homeController</prop>
+			</props>
+		</property>
+	</bean>
+
+
+	<bean id="homeController" class="ubc.pavlab.aspiredb.server.controller.HomeController">
+		<dwr:remote javascript="HomeController">
+			<dwr:include method="getTestValueObject" />
+		</dwr:remote>
+	</bean>
+	<dwr:configuration>
+		<dwr:convert type="bean"
+			class="ubc.pavlab.aspiredb.server.valueobjects.TestValueObject"
+			javascript="TestValueObject" />
+
+	</dwr:configuration>
+
+</beans>
