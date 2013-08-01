@@ -18,7 +18,8 @@
  */
 package ubc.pavlab.aspiredb.client.view;
 
-import com.google.gwt.core.client.GWT;
+import ubc.pavlab.aspiredb.client.service.ProjectServiceAsync;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -27,12 +28,10 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.sencha.gxt.widget.core.client.Window;
-import ubc.pavlab.aspiredb.client.service.ProjectServiceOld;
-import ubc.pavlab.aspiredb.client.service.ProjectServiceAsync;
 
 public class AdminToolsWindow extends Window {
 
-    private final ProjectServiceAsync projectService = GWT.create( ProjectServiceOld.class );
+    private final ProjectServiceAsync projectService = null;// GWT.create( ProjectServiceOld.class );
 
     public TextBox createUserName = new TextBox();
     public TextBox createUserPassword = new TextBox();

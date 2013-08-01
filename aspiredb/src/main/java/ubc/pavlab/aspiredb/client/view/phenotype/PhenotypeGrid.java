@@ -26,7 +26,6 @@ import ubc.pavlab.aspiredb.client.events.LogoutEvent;
 import ubc.pavlab.aspiredb.client.handlers.LogoutEventHandler;
 import ubc.pavlab.aspiredb.client.service.PhenotypeService;
 import ubc.pavlab.aspiredb.client.service.PhenotypeServiceAsync;
-import ubc.pavlab.aspiredb.client.service.ProjectServiceOld;
 import ubc.pavlab.aspiredb.client.service.ProjectServiceAsync;
 import ubc.pavlab.aspiredb.client.service.SubjectService;
 import ubc.pavlab.aspiredb.client.service.SubjectServiceAsync;
@@ -74,7 +73,7 @@ public class PhenotypeGrid extends ResizeComposite {
     private final PhenotypeSummaryProperties phenotypeProperties = GWT.create( PhenotypeSummaryProperties.class );
     public ListStore<PhenotypeSummaryValueObject> phenotypeStore;
 
-    private final ProjectServiceAsync projectService = GWT.create( ProjectServiceOld.class );
+    private final ProjectServiceAsync projectService=null;// = GWT.create( ProjectServiceOld.class );
 
     private RowExpander<PhenotypeSummaryValueObject> expander = new PhenotypeGridRowExpander();
 

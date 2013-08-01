@@ -18,6 +18,17 @@
  */
 package ubc.pavlab.aspiredb.client.view;
 
+import ubc.pavlab.aspiredb.client.ActiveProjectSettings;
+import ubc.pavlab.aspiredb.client.aspiredb;
+import ubc.pavlab.aspiredb.client.callback.AspireAsyncCallback;
+import ubc.pavlab.aspiredb.client.events.LoginEvent;
+import ubc.pavlab.aspiredb.client.events.ProjectSelectionEvent;
+import ubc.pavlab.aspiredb.client.handlers.LoginEventHandler;
+import ubc.pavlab.aspiredb.client.service.LoginStatusService;
+import ubc.pavlab.aspiredb.client.service.LoginStatusServiceAsync;
+import ubc.pavlab.aspiredb.client.service.ProjectServiceAsync;
+import ubc.pavlab.aspiredb.client.view.fileuploader.UploadProgressView;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -30,18 +41,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
-
-import ubc.pavlab.aspiredb.client.ActiveProjectSettings;
-import ubc.pavlab.aspiredb.client.aspiredb;
-import ubc.pavlab.aspiredb.client.callback.AspireAsyncCallback;
-import ubc.pavlab.aspiredb.client.events.LoginEvent;
-import ubc.pavlab.aspiredb.client.events.ProjectSelectionEvent;
-import ubc.pavlab.aspiredb.client.handlers.LoginEventHandler;
-import ubc.pavlab.aspiredb.client.service.LoginStatusService;
-import ubc.pavlab.aspiredb.client.service.LoginStatusServiceAsync;
-import ubc.pavlab.aspiredb.client.service.ProjectServiceOld;
-import ubc.pavlab.aspiredb.client.service.ProjectServiceAsync;
-import ubc.pavlab.aspiredb.client.view.fileuploader.UploadProgressView;
 
 /**
  * Dashboard Dialog
@@ -76,7 +75,7 @@ public class DashboardDialog extends Dialog {
 
     private final LoginStatusServiceAsync loginStatusService = GWT.create( LoginStatusService.class );
 
-    private final ProjectServiceAsync projectService = GWT.create( ProjectServiceOld.class );
+    private final ProjectServiceAsync projectService = null;// GWT.create( ProjectServiceOld.class );
 
     public DashboardDialog() {
         setModal( true );

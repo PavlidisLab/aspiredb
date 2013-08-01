@@ -15,6 +15,17 @@
 
 package ubc.pavlab.aspiredb.client.view;
 
+import java.util.List;
+
+import ubc.pavlab.aspiredb.client.ActiveProjectSettings;
+import ubc.pavlab.aspiredb.client.HasProjectSelectionHandlers;
+import ubc.pavlab.aspiredb.client.aspiredb;
+import ubc.pavlab.aspiredb.client.callback.AspireAsyncCallback;
+import ubc.pavlab.aspiredb.client.events.ProjectSelectionEvent;
+import ubc.pavlab.aspiredb.client.handlers.ProjectSelectionHandler;
+import ubc.pavlab.aspiredb.client.service.ProjectServiceAsync;
+import ubc.pavlab.aspiredb.shared.ProjectValueObjectOld;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -25,17 +36,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
-import ubc.pavlab.aspiredb.client.ActiveProjectSettings;
-import ubc.pavlab.aspiredb.client.HasProjectSelectionHandlers;
-import ubc.pavlab.aspiredb.client.aspiredb;
-import ubc.pavlab.aspiredb.client.callback.AspireAsyncCallback;
-import ubc.pavlab.aspiredb.client.events.ProjectSelectionEvent;
-import ubc.pavlab.aspiredb.client.handlers.ProjectSelectionHandler;
-import ubc.pavlab.aspiredb.client.service.ProjectServiceOld;
-import ubc.pavlab.aspiredb.client.service.ProjectServiceAsync;
-import ubc.pavlab.aspiredb.shared.ProjectValueObjectOld;
-
-import java.util.List;
 
 public class ProjectSelectionWidget extends Composite implements HasProjectSelectionHandlers {
 
@@ -47,7 +47,7 @@ public class ProjectSelectionWidget extends Composite implements HasProjectSelec
     @UiField
     ListBox listBox;
 
-    private final ProjectServiceAsync projectService = GWT.create( ProjectServiceOld.class );
+    private final ProjectServiceAsync projectService = null;// GWT.create( ProjectServiceOld.class );
 
     public ProjectSelectionWidget() {
         initWidget( uiBinder.createAndBindUi( this ) );

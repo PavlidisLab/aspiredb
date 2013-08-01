@@ -18,19 +18,22 @@
  */
 package ubc.pavlab.aspiredb.client.view;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.*;
-import com.sencha.gxt.widget.core.client.Window;
-import ubc.pavlab.aspiredb.client.service.ProjectServiceOld;
 import ubc.pavlab.aspiredb.client.service.ProjectServiceAsync;
 import ubc.pavlab.aspiredb.shared.VariantType;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.sencha.gxt.widget.core.client.Window;
+
 public class FileUploadWindow extends Window {
 
-    private final ProjectServiceAsync projectService = GWT.create( ProjectServiceOld.class );
+    private final ProjectServiceAsync projectService=null;// = GWT.create( ProjectServiceOld.class );
 
     ListBox fileTypeBox;
     public TextBox projectName;
