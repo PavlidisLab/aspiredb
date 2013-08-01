@@ -41,7 +41,7 @@ public interface SecurableDaoBase<T extends Securable> {
     @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
     public T load( Long id );
     
-    //@Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<T> loadAll();
 
     @Secured({ "GROUP_USER", "ACL_SECURABLE_EDIT" })

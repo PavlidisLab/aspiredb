@@ -16,11 +16,14 @@
 			WEB-INF/classes/applicationContext-security.xml
 		</param-value>
 	</context-param>
-
+<!--  
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
+-->
 
+ <listener> <listener-class>ubc.pavlab.aspiredb.client.listener.StartupListener</listener-class> 
+		</listener>
 
 	<servlet>
 		<servlet-name>aspiredb</servlet-name>
@@ -38,8 +41,7 @@
 		<url-pattern>/dwr/*</url-pattern>
 	</servlet-mapping>
 
-	<!-- <listener> <listener-class>ubc.pavlab.aspiredb.client.listener.StartupListener</listener-class> 
-		</listener> -->
+	
 
 
 	<!-- web services -->
@@ -61,7 +63,7 @@
 
 	<filter-mapping>
 		<filter-name>springSecurityFilterChain</filter-name>
-		<url-pattern>/secure/</url-pattern>
+		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
 	<session-config>
