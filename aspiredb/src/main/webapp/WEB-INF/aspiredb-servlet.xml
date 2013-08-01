@@ -7,7 +7,7 @@
         http://www.springframework.org/schema/context 
         http://www.springframework.org/schema/context/spring-context-3.0.xsd
         http://www.directwebremoting.org/schema/spring-dwr
-    	http://www.directwebremoting.org/schema/spring-dwr-2.0.xsd">
+    	http://www.directwebremoting.org/schema/spring-dwr-3.0.xsd">
 
 	<context:component-scan base-package="ubc.pavlab.aspiredb.server" />
 
@@ -37,18 +37,9 @@
 			</props>
 		</property>
 	</bean>
+	
+	<dwr:annotation-config id="dwrAnnotationConfig" />
+  	<dwr:annotation-scan base-package="ubc.pavlab.aspiredb.server" scanDataTransferObject="true" scanRemoteProxy="true" />
 
-
-	<bean id="homeController" class="ubc.pavlab.aspiredb.server.controller.HomeController">
-		<dwr:remote javascript="HomeController">
-			<dwr:include method="getTestValueObject" />
-		</dwr:remote>
-	</bean>
-	<dwr:configuration>
-		<dwr:convert type="bean"
-			class="ubc.pavlab.aspiredb.server.valueobjects.TestValueObject"
-			javascript="TestValueObject" />
-
-	</dwr:configuration>
 
 </beans>

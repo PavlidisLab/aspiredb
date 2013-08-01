@@ -1,5 +1,7 @@
 package ubc.pavlab.aspiredb.server.valueobjects;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /*
  * The aspiredb project
  * 
@@ -22,9 +24,9 @@ package ubc.pavlab.aspiredb.server.valueobjects;
 
 
 /**
- * author: anton
- * date: 11/04/13
+ * Just a copy of the LabelValueObject for testing out the dwr config, delete later
  */
+@DataTransferObject 
 public class TestValueObject  {
     private static final long serialVersionUID = 5912945308104924604L;
 

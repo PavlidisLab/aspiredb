@@ -1,5 +1,7 @@
-<script src="dwr/interface/HomeController.js"></script>
 <script type="text/javascript" src="dwr/engine.js"></script>
+
+<script src="dwr/interface/HomeController.js"></script>
+
 
 
 <script src="/aspiredb/scripts/lib/ext-all-debug-w-comments.js"></script>

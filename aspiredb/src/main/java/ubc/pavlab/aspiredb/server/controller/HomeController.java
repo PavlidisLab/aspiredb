@@ -1,6 +1,8 @@
 package ubc.pavlab.aspiredb.server.controller;
 
 
+import org.directwebremoting.annotations.RemoteMethod;
+import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +12,7 @@ import ubc.pavlab.aspiredb.server.valueobjects.TestValueObject;
 
  
 @Controller
+@RemoteProxy
 @RequestMapping("/home.html")
 public class HomeController {
  
@@ -21,7 +24,7 @@ public class HomeController {
  
 	}
 	
-	
+	@RemoteMethod
 	public TestValueObject getTestValueObject(){
 		
 		
