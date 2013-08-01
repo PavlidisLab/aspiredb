@@ -28,8 +28,8 @@ import java.util.List;
  * @author ??
  * @version $Id: ProjectService.java,v 1.4 2013/06/11 22:30:38 anton Exp $
  */
-@RemoteServiceRelativePath("springGwtServices/projectService")
-public interface ProjectServiceOld extends RemoteService {        
+
+public interface ProjectServiceOld  {        
     
     public List<ProjectValueObjectOld> getProjects( ) throws NotLoggedInException;
     
