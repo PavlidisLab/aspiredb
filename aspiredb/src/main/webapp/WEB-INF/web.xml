@@ -16,15 +16,15 @@
 			WEB-INF/classes/applicationContext-security.xml
 		</param-value>
 	</context-param>
-<!--  
+
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
--->
 
+<!--  
  <listener> <listener-class>ubc.pavlab.aspiredb.client.listener.StartupListener</listener-class> 
 		</listener>
-
+-->
 	<servlet>
 		<servlet-name>aspiredb</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
