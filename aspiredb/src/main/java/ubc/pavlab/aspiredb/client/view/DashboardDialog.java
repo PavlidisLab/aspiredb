@@ -39,7 +39,7 @@ import ubc.pavlab.aspiredb.client.events.ProjectSelectionEvent;
 import ubc.pavlab.aspiredb.client.handlers.LoginEventHandler;
 import ubc.pavlab.aspiredb.client.service.LoginStatusService;
 import ubc.pavlab.aspiredb.client.service.LoginStatusServiceAsync;
-import ubc.pavlab.aspiredb.client.service.ProjectService;
+import ubc.pavlab.aspiredb.client.service.ProjectServiceOld;
 import ubc.pavlab.aspiredb.client.service.ProjectServiceAsync;
 import ubc.pavlab.aspiredb.client.view.fileuploader.UploadProgressView;
 
@@ -76,7 +76,7 @@ public class DashboardDialog extends Dialog {
 
     private final LoginStatusServiceAsync loginStatusService = GWT.create( LoginStatusService.class );
 
-    private final ProjectServiceAsync projectService = GWT.create( ProjectService.class );
+    private final ProjectServiceAsync projectService = GWT.create( ProjectServiceOld.class );
 
     public DashboardDialog() {
         setModal( true );

@@ -27,12 +27,12 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.sencha.gxt.widget.core.client.Window;
-import ubc.pavlab.aspiredb.client.service.ProjectService;
+import ubc.pavlab.aspiredb.client.service.ProjectServiceOld;
 import ubc.pavlab.aspiredb.client.service.ProjectServiceAsync;
 
 public class AdminToolsWindow extends Window {
 
-    private final ProjectServiceAsync projectService = GWT.create( ProjectService.class );
+    private final ProjectServiceAsync projectService = GWT.create( ProjectServiceOld.class );
 
     public TextBox createUserName = new TextBox();
     public TextBox createUserPassword = new TextBox();

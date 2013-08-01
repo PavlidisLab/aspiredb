@@ -24,13 +24,13 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import com.sencha.gxt.widget.core.client.Window;
-import ubc.pavlab.aspiredb.client.service.ProjectService;
+import ubc.pavlab.aspiredb.client.service.ProjectServiceOld;
 import ubc.pavlab.aspiredb.client.service.ProjectServiceAsync;
 import ubc.pavlab.aspiredb.shared.VariantType;
 
 public class FileUploadWindow extends Window {
 
-    private final ProjectServiceAsync projectService = GWT.create( ProjectService.class );
+    private final ProjectServiceAsync projectService = GWT.create( ProjectServiceOld.class );
 
     ListBox fileTypeBox;
     public TextBox projectName;

@@ -14,12 +14,22 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.directwebremoting.annotations.RemoteMethod;
+import org.directwebremoting.annotations.RemoteProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import ubc.pavlab.aspiredb.client.exceptions.NotLoggedInException;
-import ubc.pavlab.aspiredb.client.service.ProjectService;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadServiceResult;
@@ -29,22 +39,15 @@ import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.FileUploadUtil;
-import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
-import ubc.pavlab.aspiredb.shared.ProjectValueObject;
+import ubc.pavlab.aspiredb.server.valueobjects.ProjectValueObject;
+
 import ubc.pavlab.aspiredb.shared.VariantType;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+@Service
+@RemoteProxy
+public class ProjectService {
 
-@Service("projectService")
-public class ProjectServiceImpl extends GwtService implements ProjectService {
-
-    private static Logger log = LoggerFactory.getLogger( ProjectServiceImpl.class );
+    private static Logger log = LoggerFactory.getLogger( ProjectService.class );
 
     @Autowired
     ProjectDao projectDao;
@@ -58,10 +61,9 @@ public class ProjectServiceImpl extends GwtService implements ProjectService {
     @Autowired
     PhenotypeUploadService phenotypeUploadService;
 
-    @Override
-    public List<ProjectValueObject> getProjects() throws NotLoggedInException {
-
-        throwGwtExceptionIfNotLoggedIn();
+    @RemoteMethod 
+    public List<ProjectValueObject> getProjects(){
+        
 
         Collection<Project> projects = projectDao.loadAll();
         List<ProjectValueObject> vos = new ArrayList<ProjectValueObject>();
@@ -76,10 +78,9 @@ public class ProjectServiceImpl extends GwtService implements ProjectService {
     /*
      * TODO eventually we want this to work with a collection of projectIds
      */
-    @Override
-    public Integer numSubjects( Long projectId ) throws NotLoggedInException {
+   
+    public Integer numSubjects( Long projectId ) {
 
-        throwGwtExceptionIfNotLoggedIn();
 
         Project project = this.projectDao.load( projectId );
 
@@ -89,10 +90,9 @@ public class ProjectServiceImpl extends GwtService implements ProjectService {
     /*
      * TODO eventually we want this to work with a collection of projectIds
      */
-    @Override
-    public Integer numVariants( Long projectId ) throws NotLoggedInException {
+    
+    public Integer numVariants( Long projectId ) {
 
-        throwGwtExceptionIfNotLoggedIn();
 
         Collection<Long> projectCollection = new ArrayList<Long>();
         projectCollection.add( projectId );
@@ -100,14 +100,13 @@ public class ProjectServiceImpl extends GwtService implements ProjectService {
         return this.projectDao.getVariantCountForProjects( projectCollection );
     }
 
-    @Override
+    
     // TODO change return type to some object that can contain more relevant information, handle other exceptions
-    public String processUploadedFile( String projectName, String filename, VariantType v ) throws NotLoggedInException {
+    public String processUploadedFile( String projectName, String filename, VariantType v )  {
 
         log.info( " In processUploadedFile projectName:" + projectName + " filename:" + filename + " varianttype:"
                 + v.name() );
 
-        throwGwtExceptionIfNotAdmin();
 
         try {
             Class.forName( "org.relique.jdbc.csv.CsvDriver" );
@@ -162,13 +161,12 @@ public class ProjectServiceImpl extends GwtService implements ProjectService {
 
     }
 
-    @Override
+   
     // TODO change return type to some object that can contain more relevant information, handle other exceptions
-    public String processUploadedPhenotypeFile( String projectName, String filename ) throws NotLoggedInException {
+    public String processUploadedPhenotypeFile( String projectName, String filename )  {
 
         log.info( " In processUploadedPhenotypeFile projectName:" + projectName + " filename:" + filename );
 
-        throwGwtExceptionIfNotAdmin();
 
         try {
             Class.forName( "org.relique.jdbc.csv.CsvDriver" );
@@ -220,12 +218,9 @@ public class ProjectServiceImpl extends GwtService implements ProjectService {
 
     }
 
-    @Override
-    public String deleteProject( String projectName ) throws NotLoggedInException {
+    public String deleteProject( String projectName )  {
 
         log.info( " In deleteProject projectName:" + projectName );
-
-        throwGwtExceptionIfNotAdmin();
 
         Project proj = projectDao.findByProjectName( projectName );
 
@@ -250,7 +245,6 @@ public class ProjectServiceImpl extends GwtService implements ProjectService {
         log.info( " In alterGroupPermissions projectName:" + projectName + " group name: " + groupName + " grant:"
                 + grant );
 
-        throwGwtExceptionIfNotAdmin();
 
         if ( projectName == null || groupName == null ) {
             log.error( "null projectName or groupName options" );
@@ -279,8 +273,6 @@ public class ProjectServiceImpl extends GwtService implements ProjectService {
             throws NotLoggedInException {
 
         log.info( " In createUserAndAssignToGroup userName:" + userName + " group name: " + groupName );
-
-        throwGwtExceptionIfNotAdmin();
 
         return projectManager.createUserAndAssignToGroup( userName, password, groupName );
 

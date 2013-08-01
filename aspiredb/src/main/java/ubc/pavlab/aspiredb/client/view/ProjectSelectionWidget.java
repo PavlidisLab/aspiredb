@@ -31,9 +31,9 @@ import ubc.pavlab.aspiredb.client.aspiredb;
 import ubc.pavlab.aspiredb.client.callback.AspireAsyncCallback;
 import ubc.pavlab.aspiredb.client.events.ProjectSelectionEvent;
 import ubc.pavlab.aspiredb.client.handlers.ProjectSelectionHandler;
-import ubc.pavlab.aspiredb.client.service.ProjectService;
+import ubc.pavlab.aspiredb.client.service.ProjectServiceOld;
 import ubc.pavlab.aspiredb.client.service.ProjectServiceAsync;
-import ubc.pavlab.aspiredb.shared.ProjectValueObject;
+import ubc.pavlab.aspiredb.shared.ProjectValueObjectOld;
 
 import java.util.List;
 
@@ -47,13 +47,13 @@ public class ProjectSelectionWidget extends Composite implements HasProjectSelec
     @UiField
     ListBox listBox;
 
-    private final ProjectServiceAsync projectService = GWT.create( ProjectService.class );
+    private final ProjectServiceAsync projectService = GWT.create( ProjectServiceOld.class );
 
     public ProjectSelectionWidget() {
         initWidget( uiBinder.createAndBindUi( this ) );
     }
 
-    AsyncCallback<List<ProjectValueObject>> getProjectsCallback = new AsyncCallback<List<ProjectValueObject>>() {
+    AsyncCallback<List<ProjectValueObjectOld>> getProjectsCallback = new AsyncCallback<List<ProjectValueObjectOld>>() {
 
         @Override
         public void onFailure( Throwable caught ) {
@@ -61,11 +61,11 @@ public class ProjectSelectionWidget extends Composite implements HasProjectSelec
         }
 
         @Override
-        public void onSuccess( List<ProjectValueObject> projects ) {
+        public void onSuccess( List<ProjectValueObjectOld> projects ) {
 
             listBox.clear();
 
-            for ( ProjectValueObject pvo : projects ) {
+            for ( ProjectValueObjectOld pvo : projects ) {
                 listBox.addItem( pvo.getName(), pvo.getId().toString() );
                 listBox.getItemCount();
             }
@@ -96,7 +96,7 @@ public class ProjectSelectionWidget extends Composite implements HasProjectSelec
     };
 
     public void getProjects() {
-        projectService.getProjects( new AspireAsyncCallback<List<ProjectValueObject>>( getProjectsCallback ) );
+        projectService.getProjects( new AspireAsyncCallback<List<ProjectValueObjectOld>>( getProjectsCallback ) );
 
     }
 

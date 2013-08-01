@@ -16,7 +16,7 @@ package ubc.pavlab.aspiredb.client.service;
 
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import ubc.pavlab.aspiredb.shared.ProjectValueObject;
+import ubc.pavlab.aspiredb.shared.ProjectValueObjectOld;
 import ubc.pavlab.aspiredb.shared.VariantType;
 
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.List;
  */
 public interface ProjectServiceAsync {
 
-    public void getProjects( AsyncCallback<List<ProjectValueObject>> callback );
+    public void getProjects( AsyncCallback<List<ProjectValueObjectOld>> callback );
     
     public void numSubjects( Long projectId, AsyncCallback<Integer> callback );
     

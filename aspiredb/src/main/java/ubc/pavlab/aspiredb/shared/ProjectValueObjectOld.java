@@ -20,7 +20,7 @@ import java.io.Serializable;
  * 
  * 
  */
-public class ProjectValueObject implements Serializable {
+public class ProjectValueObjectOld implements Serializable {
     
     /**
      * 
@@ -33,7 +33,7 @@ public class ProjectValueObject implements Serializable {
     
     private String description;
 
-    public ProjectValueObject() {
+    public ProjectValueObjectOld() {
     }
 
     public void setId( Long id ) {

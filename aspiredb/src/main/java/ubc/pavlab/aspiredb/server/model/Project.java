@@ -15,7 +15,8 @@
 package ubc.pavlab.aspiredb.server.model;
 
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
-import ubc.pavlab.aspiredb.shared.ProjectValueObject;
+import ubc.pavlab.aspiredb.server.valueobjects.ProjectValueObject;
+
 
 import javax.persistence.*;
 import java.util.ArrayList;

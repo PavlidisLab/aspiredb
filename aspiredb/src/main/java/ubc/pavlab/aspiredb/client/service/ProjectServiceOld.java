@@ -17,7 +17,7 @@ package ubc.pavlab.aspiredb.client.service;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import ubc.pavlab.aspiredb.client.exceptions.NotLoggedInException;
-import ubc.pavlab.aspiredb.shared.ProjectValueObject;
+import ubc.pavlab.aspiredb.shared.ProjectValueObjectOld;
 import ubc.pavlab.aspiredb.shared.VariantType;
 
 import java.util.List;
@@ -29,9 +29,9 @@ import java.util.List;
  * @version $Id: ProjectService.java,v 1.4 2013/06/11 22:30:38 anton Exp $
  */
 @RemoteServiceRelativePath("springGwtServices/projectService")
-public interface ProjectService extends RemoteService {        
+public interface ProjectServiceOld extends RemoteService {        
     
-    public List<ProjectValueObject> getProjects( ) throws NotLoggedInException;
+    public List<ProjectValueObjectOld> getProjects( ) throws NotLoggedInException;
     
     public Integer numSubjects( Long projectId) throws NotLoggedInException;
     

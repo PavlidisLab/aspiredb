@@ -2,6 +2,8 @@
 
 <script src="dwr/interface/HomeController.js"></script>
 
+<script src="dwr/interface/ProjectService.js"></script>
+
 
 
 <script src="/aspiredb/scripts/lib/ext-all-debug-w-comments.js"></script>
@@ -11,6 +13,12 @@
 	HomeController.getTestValueObject( {
 		callback : function(testvo) {
 			alert(testvo.name);
+		}
+	});
+	
+	ProjectService.getProjects( {
+		callback : function(projCollection) {
+			alert(projCollection[0].name);
 		}
 	});
 
