@@ -4,36 +4,53 @@ Ext.require(['Ext.Component',
 
 
 Ext.define('ASPIREdb.common.MultiValueCombobox', {
-    extend: 'Ext.Component',
+    extend: 'Ext.Container',
     alias: 'widget.multivalue_combo',
-    html: '<ul class="multiValueSuggestBox-list"></ul>',
-
+    layout: 'column',
+    autoEl:{
+      tag:  'ul'
+    },
+    cls: 'multiValueSuggestBox-list',
     width: 300,
-    height: 20,
+   // height: 20,
 
     addItem: function(item) {
-
     },
 
     initComponent: function() {
+        this.callParent();
+        this.items.add(new Ext.Container(
+            {
+                autoEl: 'li',
+                cls: 'multiValueSuggestBox-token',
+                resizable: false,
+                items: [
+                    {
+                        xtype:'component',
+                        autoEl: {
+                            tag:'p',
+                            html:'meow'
+                        },
+                        cls: 'multiValueSuggestBox-token-label'
+                    },
+                    {
+                        xtype:'component',
+                        autoEl: {
+                            tag:'span',
+                            html:'x'
+                        },
+                        cls: 'multiValueSuggestBox-token-close'
+                    }
+                ]
+            }
+        ));
+
+        this.items.add(new Ext.form.ComboBox(
+            {
+                hideTrigger: true,
+                cls: 'multiValueSuggestBox-list-input'
+        }));
+
 
     }
-
-//    autoEl: {
-//        tag: 'input',
-//        type: 'text'
-//    },
-
-//    initComponent: function() {
-//        this.callParent();
-//        this.on('render', function(component) {
-//            var element = component.getEl();
-//            var dom = Ext.getDom(element);
-//            $(dom).tokenInput([
-//                {"id":"8","name":"House"},
-//                {"id":"15","name":"WAAAAAAH"}
-//            ], {theme:'facebook'});
-//        });
-//    }
-
 });

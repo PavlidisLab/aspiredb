@@ -2,7 +2,9 @@
 ul.multiValueSuggestBox-list {
     overflow: hidden;
     height: auto !important;
+/*
     height: 1%;
+*/
     border: 1px solid #8496ba;
     cursor: text;
     font-size: 12px;
@@ -12,25 +14,37 @@ ul.multiValueSuggestBox-list {
     margin: 0;
     padding: 0;
     background-color: #fff;
-}
-
-ul.multiValueSuggestBox-list {
     list-style-type: none;
 }
 
-ul.multiValueSuggestBox-list li input {
-    border: 0;
+/*ul.multiValueSuggestBox-list li input {*/
+    /*border: 0;*/
+    /*background: none;*/
+    /*width: 100px;*/
+    /*padding: 1px 8px;*/
+    /*background-color: white;*/
+    /*margin: 0px;*/
+/*}*/
+
+.multiValueSuggestBox-list-input {
+    border-width: 0px;
     background: none;
-    width: 100px;
+/*
+    width: 50px;
+*/
+    width: auto;
     padding: 1px 8px;
     background-color: white;
     margin: 0px;
+    float: left;
 }
 
 li.multiValueSuggestBox-token {
     overflow: hidden;
     height: auto !important;
+/*
     height: 1%;
+*/
     margin: 3px;
     padding: 1px 3px;
     background-color: #eff2f7;
@@ -44,20 +58,20 @@ li.multiValueSuggestBox-token {
     float: left;
 }
 
-li.multiValueSuggestBox-token p {
+p.multiValueSuggestBox-token-label {
     display: inline;
     padding: 0;
     margin: 0;
 }
 
-li.multiValueSuggestBox-token span {
+span.multiValueSuggestBox-token-close {
     color: #a6b3cf;
     margin-left: 5px;
     font-weight: bold;
     cursor: pointer;
 }
 
-li.multiValueSuggestBox-token-selected {
+/*li.multiValueSuggestBox-token-selected {
     background-color: #5670a6;
     border: 1px solid #3b5998;
     color: #fff;
@@ -65,5 +79,5 @@ li.multiValueSuggestBox-token-selected {
 
 li.multiValueSuggestBox-input-token {
     float: left;
-}
+}*/
 /* MultiValueSuggestBox (END) */
