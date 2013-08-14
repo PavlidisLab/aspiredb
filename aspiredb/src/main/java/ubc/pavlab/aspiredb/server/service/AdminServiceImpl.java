@@ -16,8 +16,7 @@ package ubc.pavlab.aspiredb.server.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ubc.pavlab.aspiredb.client.exceptions.NotLoggedInException;
-import ubc.pavlab.aspiredb.client.service.AdminService;
+import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.util.CacheMonitor;
 
 /**
@@ -38,7 +37,5 @@ public class AdminServiceImpl extends GwtService implements AdminService {
 		throwGwtExceptionIfNotLoggedIn();
 
 		return cacheMonitor.getStats();
-
 	}
-
 }

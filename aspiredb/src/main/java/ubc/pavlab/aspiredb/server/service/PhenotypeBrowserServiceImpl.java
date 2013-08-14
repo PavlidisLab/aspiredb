@@ -19,8 +19,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ubc.pavlab.aspiredb.client.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
+import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
@@ -47,7 +47,7 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService  {
     @Autowired private NeurocartaQueryService neurocartaQueryService;
     
 	public List<PhenotypeSummaryValueObject> getPhenotypesBySubjectIds(Collection<Long> subjectIds,
-            Collection<Long> projectIds) throws NeurocartaServiceException{
+            Collection<Long> projectIds) throws NeurocartaServiceException {
 		
 		Collection<Phenotype> phenotypes = loadPhenotypesBySubjectIds( subjectIds );	       
 

@@ -1,8 +1,11 @@
 package ubc.pavlab.aspiredb.shared;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.io.Serializable;
 import java.util.*;
 
+@DataTransferObject
 public class PhenotypeSummaryValueObject implements Serializable, Comparable<PhenotypeSummaryValueObject> {
 
 	private static final long serialVersionUID = 5581881760734417223L;

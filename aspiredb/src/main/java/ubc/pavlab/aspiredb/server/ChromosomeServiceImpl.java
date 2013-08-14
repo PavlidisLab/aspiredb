@@ -20,7 +20,7 @@ package ubc.pavlab.aspiredb.server;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ubc.pavlab.aspiredb.client.service.ChromosomeService;
+import ubc.pavlab.aspiredb.server.service.ChromosomeService;
 import ubc.pavlab.aspiredb.shared.ChromosomeValueObject;
 
 import java.util.HashMap;

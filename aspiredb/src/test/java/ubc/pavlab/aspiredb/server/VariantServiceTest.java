@@ -30,12 +30,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import ubc.pavlab.aspiredb.client.exceptions.NotLoggedInException;
-import ubc.pavlab.aspiredb.client.service.VariantService;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
+import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
+import ubc.pavlab.aspiredb.server.service.VariantService;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;

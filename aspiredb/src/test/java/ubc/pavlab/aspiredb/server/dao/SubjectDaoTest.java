@@ -28,14 +28,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import ubc.pavlab.aspiredb.client.exceptions.BioMartServiceException;
-import ubc.pavlab.aspiredb.client.exceptions.NeurocartaServiceException;
-import ubc.pavlab.aspiredb.client.exceptions.NotLoggedInException;
-import ubc.pavlab.aspiredb.client.service.SubjectService;
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
+import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.service.SubjectService;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.TextValue;

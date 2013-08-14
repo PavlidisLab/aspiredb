@@ -25,15 +25,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ubc.pavlab.aspiredb.client.exceptions.NeurocartaServiceException;
-import ubc.pavlab.aspiredb.client.exceptions.NotLoggedInException;
-import ubc.pavlab.aspiredb.client.service.SubjectService;
 import ubc.pavlab.aspiredb.server.dao.CNVDao;
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
+import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Subject;
-import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;

@@ -22,7 +22,6 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
-import ubc.pavlab.aspiredb.client.service.GeneService;
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;

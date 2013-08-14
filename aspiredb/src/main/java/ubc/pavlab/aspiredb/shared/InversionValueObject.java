@@ -14,11 +14,14 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * 
  * 
  * @version $Id: InversionValueObject.java,v 1.1 2013/04/23 00:20:20 cmcdonald Exp $
  */
+@DataTransferObject
 public class InversionValueObject extends VariantValueObject {
 	
     /**

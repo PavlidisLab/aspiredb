@@ -14,6 +14,7 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import org.directwebremoting.annotations.DataTransferObject;
 import ubc.pavlab.aspiredb.shared.query.*;
 
 import java.io.Serializable;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+@DataTransferObject
 public class VariantValueObject implements Serializable {
 
 	private static final long serialVersionUID = -5007872164222760764L;

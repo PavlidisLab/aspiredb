@@ -15,7 +15,6 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import org.springframework.stereotype.Service;
-import ubc.pavlab.aspiredb.client.service.LoginStatusService;
 import ubc.pavlab.aspiredb.server.security.SecurityServiceImpl;
 
 /**
@@ -42,5 +41,4 @@ public class LoginStatusServiceImpl implements LoginStatusService {
    public String getCurrentUsername() {
        return SecurityServiceImpl.getCurrentUsername();
    }
-
 }

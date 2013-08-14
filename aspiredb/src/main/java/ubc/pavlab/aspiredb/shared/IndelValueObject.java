@@ -14,6 +14,7 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import org.directwebremoting.annotations.DataTransferObject;
 import ubc.pavlab.aspiredb.shared.query.IndelLengthProperty;
 import ubc.pavlab.aspiredb.shared.query.Property;
 
@@ -22,6 +23,7 @@ import ubc.pavlab.aspiredb.shared.query.Property;
  * 
  * @version $Id: IndelValueObject.java,v 1.2 2013/07/04 17:26:00 anton Exp $
  */
+@DataTransferObject
 public class IndelValueObject extends VariantValueObject {
 
 	/**

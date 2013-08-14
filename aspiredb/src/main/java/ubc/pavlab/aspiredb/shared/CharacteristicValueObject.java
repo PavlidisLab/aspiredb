@@ -18,12 +18,15 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.io.Serializable;
 
 /**
  * author: anton
  * date: 11/04/13
  */
+@DataTransferObject
 public class CharacteristicValueObject implements Serializable {
 
     private Long id;

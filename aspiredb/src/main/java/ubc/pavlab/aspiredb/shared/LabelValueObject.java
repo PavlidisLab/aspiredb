@@ -18,10 +18,13 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * author: anton
  * date: 11/04/13
  */
+@DataTransferObject
 public class LabelValueObject implements GwtSerializable {
     private static final long serialVersionUID = 5912945308104924604L;
 

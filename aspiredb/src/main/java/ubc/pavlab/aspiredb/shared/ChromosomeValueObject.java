@@ -18,6 +18,8 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -25,6 +27,7 @@ import java.util.Map;
  * author: anton
  * date: 19/02/13
  */
+@DataTransferObject
 public class ChromosomeValueObject implements Serializable {
 
     private String name;

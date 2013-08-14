@@ -14,7 +14,7 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
-import ubc.pavlab.aspiredb.client.view.suggestBox.Displayable;
+import org.directwebremoting.annotations.DataTransferObject;
 
 /**
  * TODO Document Me
@@ -22,6 +22,8 @@ import ubc.pavlab.aspiredb.client.view.suggestBox.Displayable;
  
  * @version $Id: PhenotypeEnrichmentValueObject.java,v 1.2 2013/07/09 21:43:18 cmcdonald Exp $
  */
+
+@DataTransferObject
 public class PhenotypeEnrichmentValueObject implements Displayable, GwtSerializable {
 
     

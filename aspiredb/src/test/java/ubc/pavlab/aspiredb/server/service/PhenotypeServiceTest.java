@@ -30,7 +30,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
-import ubc.pavlab.aspiredb.client.service.PhenotypeService;
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 
 

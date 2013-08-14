@@ -22,7 +22,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ubc.pavlab.aspiredb.client.service.QueryService;
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.QueryTestUtils;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;

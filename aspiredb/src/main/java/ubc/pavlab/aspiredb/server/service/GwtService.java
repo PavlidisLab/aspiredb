@@ -16,7 +16,7 @@ package ubc.pavlab.aspiredb.server.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ubc.pavlab.aspiredb.client.exceptions.NotLoggedInException;
+import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.security.SecurityServiceImpl;
 
 /**

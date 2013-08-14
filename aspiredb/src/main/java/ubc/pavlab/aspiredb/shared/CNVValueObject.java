@@ -14,6 +14,7 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import org.directwebremoting.annotations.DataTransferObject;
 import ubc.pavlab.aspiredb.shared.query.CNVTypeProperty;
 import ubc.pavlab.aspiredb.shared.query.CnvLengthProperty;
 import ubc.pavlab.aspiredb.shared.query.CopyNumberProperty;
@@ -24,6 +25,7 @@ import ubc.pavlab.aspiredb.shared.query.Property;
  * 
  * @version $Id: CNVValueObject.java,v 1.29 2013/07/10 20:16:10 anton Exp $
  */
+@DataTransferObject
 public class CNVValueObject extends VariantValueObject {
 
 	private static final long serialVersionUID = 9123410174130882307L;

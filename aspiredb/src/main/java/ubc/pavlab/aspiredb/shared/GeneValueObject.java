@@ -14,7 +14,7 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
-import ubc.pavlab.aspiredb.client.view.suggestBox.Displayable;
+import org.directwebremoting.annotations.DataTransferObject;
 
 /**
  * TODO Document Me
@@ -22,6 +22,7 @@ import ubc.pavlab.aspiredb.client.view.suggestBox.Displayable;
  * @author Paul
  * @version $Id: GeneValueObject.java,v 1.10 2013/06/11 22:30:57 anton Exp $
  */
+@DataTransferObject
 public class GeneValueObject implements Displayable, GwtSerializable {
 
     private static final long serialVersionUID = -7411514301896256147L;

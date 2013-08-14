@@ -27,8 +27,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import ubc.pavlab.aspiredb.client.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
+import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;

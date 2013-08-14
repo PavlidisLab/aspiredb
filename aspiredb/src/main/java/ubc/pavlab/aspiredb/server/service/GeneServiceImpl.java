@@ -21,12 +21,11 @@ package ubc.pavlab.aspiredb.server.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ubc.pavlab.aspiredb.client.exceptions.BioMartServiceException;
-import ubc.pavlab.aspiredb.client.exceptions.ExternalDependencyException;
-import ubc.pavlab.aspiredb.client.exceptions.NotLoggedInException;
-import ubc.pavlab.aspiredb.client.service.GeneService;
 import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
+import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
+import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
 import ubc.pavlab.aspiredb.server.model.GenomicLocation;
 import ubc.pavlab.aspiredb.server.model.Variant;
@@ -51,7 +50,7 @@ public class GeneServiceImpl extends GwtService implements GeneService {
     @Override
     @Transactional(readOnly = true)
     public List<GeneValueObject> getGenesInsideVariants(Collection<Long> ids)
-            throws NotLoggedInException, BioMartServiceException{
+            throws NotLoggedInException, BioMartServiceException {
         throwGwtExceptionIfNotLoggedIn();
 
         // Used to remove duplicates
@@ -77,5 +76,4 @@ public class GeneServiceImpl extends GwtService implements GeneService {
 
         return this.neurocartaQueryService.fetchGenesAssociatedWithPhenotype(phenotypeValueUri);
     }
-
 }

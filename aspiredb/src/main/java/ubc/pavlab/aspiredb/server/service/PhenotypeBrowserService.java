@@ -14,7 +14,7 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import ubc.pavlab.aspiredb.client.exceptions.NeurocartaServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
 
 import java.util.Collection;

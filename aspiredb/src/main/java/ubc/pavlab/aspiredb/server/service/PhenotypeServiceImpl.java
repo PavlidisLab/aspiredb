@@ -28,10 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import ubc.pavlab.aspiredb.client.exceptions.NotLoggedInException;
-import ubc.pavlab.aspiredb.client.service.PhenotypeService;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
+import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.PhenotypeValueType;
 import ubc.pavlab.aspiredb.server.model.Project;

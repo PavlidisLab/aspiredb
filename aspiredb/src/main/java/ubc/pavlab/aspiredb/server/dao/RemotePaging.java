@@ -16,8 +16,8 @@ package ubc.pavlab.aspiredb.server.dao;
 
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
-import ubc.pavlab.aspiredb.client.exceptions.BioMartServiceException;
-import ubc.pavlab.aspiredb.client.exceptions.NeurocartaServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 
 import java.util.Collection;

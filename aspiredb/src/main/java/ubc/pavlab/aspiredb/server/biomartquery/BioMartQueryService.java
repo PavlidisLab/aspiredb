@@ -14,7 +14,7 @@
  */
 package ubc.pavlab.aspiredb.server.biomartquery;
 
-import ubc.pavlab.aspiredb.client.exceptions.BioMartServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 

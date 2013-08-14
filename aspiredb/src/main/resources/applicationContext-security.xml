@@ -17,17 +17,14 @@
 	<aop:aspectj-autoproxy />	
 
 	<!-- Spring Security configuration -->
-	
-	<s:http auto-config="true" access-decision-manager-ref="httpAccessDecisionManager">
-	
-	<s:anonymous granted-authority="GROUP_ANONYMOUS" />
 
-		<s:intercept-url pattern="/**/*.html" access="IS_AUTHENTICATED_ANONYMOUSLY" />
-		<s:intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
-		
-	</s:http>
-	
-	<!-- works with the HttpSessionEventPublisher configured in web.xml -->
+    <s:http auto-config="true" access-decision-manager-ref="httpAccessDecisionManager">
+        <s:anonymous granted-authority="GROUP_ANONYMOUS"/>
+        <s:intercept-url pattern="/**/*.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <s:intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+    </s:http>
+
+    <!-- works with the HttpSessionEventPublisher configured in web.xml -->
 	<bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
 	
 	<bean id="httpAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">

@@ -14,6 +14,7 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import org.directwebremoting.annotations.DataTransferObject;
 import ubc.pavlab.aspiredb.shared.query.DbSnpIdProperty;
 import ubc.pavlab.aspiredb.shared.query.ObservedBaseProperty;
 import ubc.pavlab.aspiredb.shared.query.Property;
@@ -24,6 +25,7 @@ import ubc.pavlab.aspiredb.shared.query.ReferenceBaseProperty;
  * 
  * @version $Id: SNVValueObject.java,v 1.4 2013/07/04 17:26:00 anton Exp $
  */
+@DataTransferObject
 public class SNVValueObject extends VariantValueObject {
 
 	/**

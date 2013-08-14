@@ -18,9 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ubc.pavlab.aspiredb.client.exceptions.NotLoggedInException;
-import ubc.pavlab.aspiredb.client.service.ProjectServiceOld;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
+import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadServiceResult;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadService;
@@ -28,8 +27,7 @@ import ubc.pavlab.aspiredb.server.fileupload.VariantUploadServiceResult;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
-import ubc.pavlab.aspiredb.server.util.FileUploadUtil;
-import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
+//import ubc.pavlab.aspiredb.server.util.FileUploadUtil;
 import ubc.pavlab.aspiredb.shared.ProjectValueObjectOld;
 import ubc.pavlab.aspiredb.shared.VariantType;
 
@@ -111,7 +109,8 @@ public class ProjectServiceOldImpl extends GwtService implements ProjectServiceO
 
         try {
             Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + FileUploadUtil.getUploadPath() );
+            Connection conn = null;
+//            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + FileUploadUtil.getUploadPath() );
 
             if ( filename.endsWith( ".csv" ) ) {
                 filename = filename.substring( 0, filename.length() - 4 );
@@ -175,7 +174,8 @@ public class ProjectServiceOldImpl extends GwtService implements ProjectServiceO
 
             // create a connection
             // arg[0] is the directory in which the .csv files are held
-            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + FileUploadUtil.getUploadPath() );
+            Connection conn = null;
+//            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + FileUploadUtil.getUploadPath() );
 
             if ( filename.endsWith( ".csv" ) ) {
                 filename = filename.substring( 0, filename.length() - 4 );

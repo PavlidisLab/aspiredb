@@ -26,10 +26,10 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ubc.pavlab.aspiredb.client.exceptions.BioMartServiceException;
-import ubc.pavlab.aspiredb.client.exceptions.NeurocartaServiceException;
-import ubc.pavlab.aspiredb.client.util.GemmaURLUtils;
 import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
+import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
+import ubc.pavlab.aspiredb.server.util.GemmaURLUtils;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
 
@@ -63,7 +63,7 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
     private static String sendRequest( String urlSuffix, MultivaluedMap<String, String> queryParams ) throws NeurocartaServiceException {
         Client client = Client.create();
 
-        WebResource resource = client.resource( GemmaURLUtils.makeWebServiceUrl( urlSuffix ) ).queryParams( queryParams );
+        WebResource resource = client.resource( GemmaURLUtils.makeWebServiceUrl(urlSuffix) ).queryParams( queryParams );
 
         ClientResponse response = resource.type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
                 .get( ClientResponse.class );

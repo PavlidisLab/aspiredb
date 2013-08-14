@@ -23,7 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ubc.pavlab.aspiredb.client.exceptions.BioMartServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 

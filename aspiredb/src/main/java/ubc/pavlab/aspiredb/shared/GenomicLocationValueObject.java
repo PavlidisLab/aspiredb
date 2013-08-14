@@ -1,7 +1,10 @@
 package ubc.pavlab.aspiredb.shared;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.io.Serializable;
 
+@DataTransferObject
 public class GenomicLocationValueObject implements Serializable {
 
     /**

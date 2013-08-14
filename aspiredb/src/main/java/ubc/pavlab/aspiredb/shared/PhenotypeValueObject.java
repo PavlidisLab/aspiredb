@@ -14,6 +14,8 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +23,7 @@ import java.util.Map;
  * @author ?
  * 
  */
+@DataTransferObject
 public class PhenotypeValueObject implements Comparable<PhenotypeValueObject>, GwtSerializable {
 
     private static final long serialVersionUID = 1418662231622360485L;

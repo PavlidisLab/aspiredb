@@ -21,7 +21,6 @@ package ubc.pavlab.aspiredb.server.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ubc.pavlab.aspiredb.client.service.LabelService;
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
