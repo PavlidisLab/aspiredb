@@ -1,10 +1,17 @@
 Ext.require([
     'Ext.panel.Panel',
-    'Ext.Component'
+    'Ext.Component',
+    'ASPIREdb.view.ideogram.ColourLegend'
 ]);
 
 // TODO: events: GenomeRegionSelectionEvent
 //
+
+// TODO: valueobjects from backend
+var PropertyValueObject = function(){};
+var VariantTypeProperty = function(){};
+VariantTypeProperty.prototype = new PropertyValueObject();
+var VariantValueObject = function(){};
 
 Ext.define('ASPIREdb.view.Ideogram', {
     extend: 'Ext.panel.Panel',
@@ -37,7 +44,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
             width: 600,
             height: 600,
             style: {
-                'z-index': '0'
+                'z-index': '1'
             }
         }
     ],
@@ -48,13 +55,13 @@ Ext.define('ASPIREdb.view.Ideogram', {
         this.width = Math.round(850 * this.zoom);
         this.height = Math.round(this.boxHeight * this.zoom);
 
-        this.colourLegend = new ColourLegend();
+        this.colourLegend = Ext.create('ASPIREdb.view.ideogram.ColourLegend');
 
         this.fetchChromosomeInfo();
 
         this.setDisplayedProperty(new VariantTypeProperty());
 
-        this.on('afterrender', this.afterRender, this);
+        this.on('afterrender', this.registerMouseEventListeners, this);
     },
 
     /**
@@ -131,20 +138,20 @@ Ext.define('ASPIREdb.view.Ideogram', {
     /**
      * @private
      */
-    afterRender: function() {
-        this.canvasBoxOverlay = this.getComponent("canvasBoxOverlay");
-        this.canvasBoxOverlay = this.getComponent("canvasBox");
+    registerMouseEventListeners: function() {
+        var me = this;
+        var canvasBoxOverlay = me.getComponent("canvasBoxOverlay");
 
         // Register event listeners
-        this.canvasBoxOverlay.getEl().on('mouseout', this.onMouseOut, this);
-        this.canvasBoxOverlay.getEl().on('mousemove', this.onMouseMove, this);
-        this.canvasBoxOverlay.getEl().on('mouseup', this.onMouseUp, this);
-        this.canvasBoxOverlay.getEl().on('mousedown', this.onMouseDown, this);
+        me.mon(canvasBoxOverlay.getEl(), 'mouseout', me.onMouseOut, me);
+        canvasBoxOverlay.getEl().on('mousemove', this.onMouseMove, this);
+        canvasBoxOverlay.getEl().on('mouseup', this.onMouseUp, this);
+        canvasBoxOverlay.getEl().on('mousedown', this.onMouseDown, this);
     },
 
     /**
      */
-    onMouseOut: function (event) {
+    onMouseOut: function () {
         if (this.previousChromosome != null) {
             this.previousChromosome.clearCursor();
         }
@@ -213,7 +220,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
         var chromosomeIdeogram = this.findChromosomeIdeogram(x, y);
         if (chromosomeIdeogram != null) {
             chromosomeIdeogram.finishSelection(y);
-            this.fireEvent(new GenomeRegionSelectionEvent(chromosomeIdeogram.getSelection()));
+            this.fireEvent('GenomeRegionSelectionEvent', chromosomeIdeogram.getSelection());
         }
     },
 
@@ -264,6 +271,8 @@ Ext.define('ASPIREdb.view.Ideogram', {
      * @public
      */
     fetchChromosomeInfo: function () {
+        //TODO: fixme
+        var ChromosomeService = {getChromosomes:function(cb){}};
         ChromosomeService.getChromosomes({
             onFailure: function (error) {
                 // throw new ChromosomeServiceException;

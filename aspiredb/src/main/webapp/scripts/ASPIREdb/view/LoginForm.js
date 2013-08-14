@@ -59,6 +59,7 @@ Ext.define('ASPIREdb.view.LoginForm', {
             itemId: 'loginButton',
             text: 'Login',
             handler: function() {
+                var me = this.ownerCt.ownerCt;
                 Ext.Ajax.request({
                     url: '/j_spring_security_check',
                     method: 'POST',
@@ -68,11 +69,12 @@ Ext.define('ASPIREdb.view.LoginForm', {
                     params: Ext.Object.toQueryString(
                         {
                             'j_username' : this.ownerCt.ownerCt.getComponent('username').getValue(),
-                            'j_password' : this.ownerCt.ownerCt.getComponent('password').getValue()
+                            'j_password' : this.ownerCt.ownerCt.getComponent('password').getValue(),
+                            'ajaxLoginTrue' : true
                         }
                     ),
                     success: function(response, opts) {
-                        window.alert("YAY!" + response);
+                        me.fireEvent('login');
 /*
                         username.clear();
                         password.clear();

@@ -22,11 +22,21 @@
         <s:anonymous granted-authority="GROUP_ANONYMOUS"/>
         <s:intercept-url pattern="/**/*.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
         <s:intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+
+        <s:form-login authentication-success-handler-ref="ajaxAuthenticationSuccessHandler"
+                      authentication-failure-handler-ref="ajaxAuthenticationFailureHandler" />
     </s:http>
+
+    <bean id="ajaxAuthenticationFailureHandler" class="ubc.pavlab.aspiredb.server.security.authentication.AjaxAuthenticationFailureHandler">
+    </bean>
+
+    <bean id="ajaxAuthenticationSuccessHandler" class="ubc.pavlab.aspiredb.server.security.authentication.AjaxAuthenticationSuccessHandler">
+        <property name="alwaysUseDefaultTargetUrl" value="false"></property>
+    </bean>
 
     <!-- works with the HttpSessionEventPublisher configured in web.xml -->
 	<bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
-	
+
 	<bean id="httpAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
 		<property name="allowIfAllAbstainDecisions" value="true" />
 		<property name="decisionVoters">

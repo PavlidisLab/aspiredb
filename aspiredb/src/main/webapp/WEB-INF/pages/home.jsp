@@ -13,14 +13,12 @@
     Ext.application({
         name: 'ASPIREdb',
         appFolder: 'scripts/ASPIREdb',
-        controllers: ['Login'],
 
         launch: function () {
-//            var viewport = Ext.create('Ext.container.Viewport', {
-
-//            });
             var win = Ext.create('ASPIREdb.view.LoginForm');
-//            viewport.add(win);
+            var viewport = Ext.create('ASPIREdb.AspireDbPanel', {
+                loginForm: win
+            });
             win.show();
         }
     });
@@ -43,8 +41,5 @@
 
 <html>
 <body>
-	<h1>HOME</h1>
-	
-	<div id="testwidget" align="left"></div>
 </body>
 </html>
