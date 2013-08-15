@@ -20,12 +20,14 @@ import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.shared.*;
+import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.QueryValueObject;
 import ubc.pavlab.aspiredb.shared.suggestions.PhenotypeSuggestion;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -36,7 +38,7 @@ public interface QueryService {
     public PagingLoadResult<SubjectValueObject> querySubjects(AspireDbPagingLoadConfig config)
             throws NotLoggedInException, ExternalDependencyException, NotLoggedInException, ExternalDependencyException;
 
-    public PagingLoadResult<VariantValueObject> queryVariants(AspireDbPagingLoadConfig config)
+    public BoundedList<VariantValueObject> queryVariants(Set<AspireDbFilterConfig> filters)
             throws NotLoggedInException, ExternalDependencyException;
 
     public int getSubjectCount(AspireDbPagingLoadConfig config)

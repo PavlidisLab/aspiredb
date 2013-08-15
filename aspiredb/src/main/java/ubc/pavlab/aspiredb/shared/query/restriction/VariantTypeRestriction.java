@@ -18,12 +18,14 @@
  */
 package ubc.pavlab.aspiredb.shared.query.restriction;
 
+import org.directwebremoting.annotations.DataTransferObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
 
 /**
  * author: anton
  * date: 07/05/13
  */
+@DataTransferObject(javascript = "VariantTypeRestriction")
 public class VariantTypeRestriction implements RestrictionExpression {
     private VariantType type;
 
@@ -31,6 +33,10 @@ public class VariantTypeRestriction implements RestrictionExpression {
     }
 
     public VariantTypeRestriction(VariantType type) {
+        this.type = type;
+    }
+
+    public void setType(VariantType type) {
         this.type = type;
     }
 

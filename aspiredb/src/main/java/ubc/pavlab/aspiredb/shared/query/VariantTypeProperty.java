@@ -18,12 +18,14 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * @author anton
  */
+@DataTransferObject(javascript = "VariantTypeProperty")
 public class VariantTypeProperty extends TextProperty {
     public VariantTypeProperty() {
         super("Variant Type", "");
     }
-
 }

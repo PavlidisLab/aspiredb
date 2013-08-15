@@ -1,11 +1,13 @@
 package ubc.pavlab.aspiredb.shared;
 
 import com.sencha.gxt.data.shared.loader.PagingLoadConfigBean;
+import org.directwebremoting.annotations.DataTransferObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@DataTransferObject
 public class AspireDbPagingLoadConfigBean extends PagingLoadConfigBean implements AspireDbPagingLoadConfig {
 
 	private static final long serialVersionUID = 1795348301253031445L;

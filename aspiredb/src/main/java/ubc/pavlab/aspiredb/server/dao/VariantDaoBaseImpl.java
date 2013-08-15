@@ -112,6 +112,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
     }    
 
     @Override
+    @Transactional(readOnly = true)
     public Page<? extends T> loadPage( int offset, int limit,
             String sortField, String sortDirection,
             Set<AspireDbFilterConfig> filters ) throws BioMartServiceException, NeurocartaServiceException

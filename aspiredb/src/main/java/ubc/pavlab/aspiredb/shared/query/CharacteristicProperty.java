@@ -18,15 +18,18 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.util.Arrays;
 
 /**
  * author: anton
  * date: 07/05/13
  */
+@DataTransferObject(javascript = "CharacteristicProperty")
 public class CharacteristicProperty extends Property<DataType> {
 
-    public CharacteristicProperty(){
+    public CharacteristicProperty() {
         this.operators = Arrays.asList((Operator[]) SetOperator.values());
     }
 

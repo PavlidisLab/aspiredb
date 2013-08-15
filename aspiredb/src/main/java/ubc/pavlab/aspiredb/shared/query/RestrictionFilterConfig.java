@@ -14,11 +14,13 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
 import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
 
 /**
  *
  */
+@DataTransferObject
 public abstract class RestrictionFilterConfig extends AspireDbFilterConfig {
 	private static final long serialVersionUID = -4256615467308247969L;
 

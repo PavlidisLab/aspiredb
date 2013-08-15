@@ -14,8 +14,11 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.io.Serializable;
 
+@DataTransferObject
 public abstract class AspireDbFilterConfig implements Serializable {
 	private static final long serialVersionUID = 2621587187020538685L;
 

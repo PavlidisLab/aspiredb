@@ -14,10 +14,13 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  *
  * @author anton
  */
+@DataTransferObject
 public class GenomicRange implements GwtSerializable, Comparable<GenomicRange> {
 
 	private static final long serialVersionUID = 6917870790522866428L;

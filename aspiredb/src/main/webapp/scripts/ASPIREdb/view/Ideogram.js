@@ -9,11 +9,6 @@ Ext.require([
 //
 
 // TODO: valueobjects from backend
-var PropertyValueObject = function(){};
-var VariantTypeProperty = function(){};
-VariantTypeProperty.prototype = new PropertyValueObject();
-var VariantValueObject = function(){};
-
 Ext.define('ASPIREdb.view.Ideogram', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.ideogram',
@@ -67,6 +62,18 @@ Ext.define('ASPIREdb.view.Ideogram', {
                 me.drawChromosomes();
             }
         });
+        QueryService.queryVariants([{
+            $dwrClassName:'VariantFilterConfig',
+            restriction: {
+                $dwrClassName:'VariantTypeRestriction',
+                type:'CNV'
+            }}], {
+            callback : function(pageLoad) {
+                var variants = pageLoad.items;
+                me.drawVariants(variants);
+            }
+        });
+
     },
 
     /**
@@ -372,7 +379,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
         this.sortVariantsBySize(variants);
         for (var i = 0; i < variants.length; i++) {
             var variant = variants[i];
-            var chrName = variant.getGenomicRange().getChromosome();
+            var chrName = variant.genomicRange.chromosome;
             /*ChromosomeIdeogram */
             var chrIdeogram = this.chromosomeIdeograms[chrName];
             chrIdeogram.drawVariant(variant, this.displayedProperty);
@@ -385,8 +392,8 @@ Ext.define('ASPIREdb.view.Ideogram', {
      */
     sortVariantsBySize: function (variants) {
         variants.sort(function compare(/*@type VariantValueObject*/ variant1, /*@type VariantValueObject*/ variant2) {
-            var size1 = variant1.getGenomicRange().getBaseEnd() - variant1.getGenomicRange().getBaseStart();
-            var size2 = variant2.getGenomicRange().getBaseEnd() - variant2.getGenomicRange().getBaseStart();
+            var size1 = variant1.genomicRange.baseEnd - variant1.genomicRange.baseStart;
+            var size2 = variant2.genomicRange.baseEnd - variant2.genomicRange.baseStart;
             return size2 - size1;
         });
     },
@@ -396,17 +403,17 @@ Ext.define('ASPIREdb.view.Ideogram', {
      * @param subjectId
      * @param {VariantValueObject[]} variantValueObjects
      */
-    drawVariants: function (subjectId, variantValueObjects) {
+    drawVariantsWithSubjectHighlighted: function (subjectId, variantValueObjects) {
         /*List<VariantValueObject>*/
         var variants = variantValueObjects.slice(); // copy array
         this.sortVariantsBySize( variants );
 
         for (var i = 0; i < variants.length; i++) {
             var variant = variants[i];
-            var chrName = variant.getGenomicRange().getChromosome();
+            var chrName = variant.genomicRange.chromosome;
             /*ChromosomeIdeogram*/
             var chrIdeogram = this.chromosomeIdeograms[chrName];
-            if (variant.getSubjectId() === subjectId) {
+            if (variant.subjectId === subjectId) {
                 chrIdeogram.drawHighlightedVariant( variant, this.displayedProperty );
             } else {
                 chrIdeogram.drawDimmedVariant( variant );
@@ -468,7 +475,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
         this.initCanvasSize();
 
         this.drawChromosomes();
-        this.drawVariants(subjectId, variants);
+        this.drawVariantsWithSubjectHighlighted(subjectId, variants);
 
         this.doneDrawing = true;
     },

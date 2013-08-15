@@ -1,10 +1,10 @@
 <script type="text/javascript" src="dwr/engine.js"></script>
 
 <script src="dwr/interface/HomeController.js"></script>
-
 <script src="dwr/interface/ProjectService.js"></script>
-
 <script src="dwr/interface/ChromosomeService.js"></script>
+<script src="dwr/interface/QueryService.js"></script>
+<script src="dwr/dtoall.js"></script>
 
 <script src="scripts/lib/ext-all-debug-w-comments.js"></script>
 
@@ -15,6 +15,14 @@
 <script src="scripts/ASPIREdb/view/ideogram/ChromosomeIdeogram.js"></script>
 
 <script>
+/*
+
+    ProjectService.getProjects( {
+        callback : function(projCollection) {
+            alert(projCollection[0].name);
+        }
+    });
+*/
 
     Ext.application({
         name: 'ASPIREdb',
@@ -36,11 +44,6 @@
             }
         });
 
-        ProjectService.getProjects( {
-            callback : function(projCollection) {
-                alert(projCollection[0].name);
-            }
-        });
     */
 
 </script>

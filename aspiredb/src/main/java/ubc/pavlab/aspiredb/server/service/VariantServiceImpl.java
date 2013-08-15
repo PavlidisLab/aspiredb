@@ -16,6 +16,8 @@ package ubc.pavlab.aspiredb.server.service;
 
 import com.sencha.gxt.data.shared.SortInfo;
 import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
+import org.directwebremoting.annotations.RemoteMethod;
+import org.directwebremoting.annotations.RemoteProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,7 @@ import java.util.Map;
  * @author ??
  * @version $Id: VariantServiceImpl.java,v 1.39 2013/07/02 18:20:21 anton Exp $
  */
+@RemoteProxy(name="VariantService")
 @Service("variantService")
 public class VariantServiceImpl extends GwtService implements VariantService {
     
@@ -82,6 +85,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     }
 
     @Override
+    @RemoteMethod
     @Transactional(readOnly = true)
     public Collection<Property> suggestProperties(VariantType variantType) {
         Collection<Property> properties = new ArrayList<Property>();
@@ -124,6 +128,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     }
 
     @Override
+    @RemoteMethod
     @Transactional(readOnly = true)
     public Collection<Property> suggestProperties() throws NotLoggedInException {
         Collection<Property> properties = new ArrayList<Property>();
@@ -142,6 +147,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     }
 
     @Override
+    @RemoteMethod
     @Transactional(readOnly = true)
     public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext) throws NotLoggedInException {
         List<PropertyValue> values = new ArrayList<PropertyValue>();
@@ -168,12 +174,14 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     }
 
     @Override
+    @RemoteMethod
     @Transactional(readOnly = true)
     public Collection<String> suggestCharacteristicPropertyValues(CharacteristicProperty property) {
         return characteristicDao.getValuesForKey(property.getName());
     }
 
     @Override
+    @RemoteMethod
     @Transactional(readOnly = true)
 	public VariantValueObject getVariant(Long id) throws NotLoggedInException {
         throwGwtExceptionIfNotLoggedIn();
@@ -183,6 +191,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
 	}
 
     @Override
+    @RemoteMethod
     public Collection<Property> suggestVariantLocationProperties() throws NotLoggedInException {
         Collection<Property> properties = new ArrayList<Property>();
 
@@ -194,6 +203,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     }
 
     @Override
+    @RemoteMethod
     public Collection<PropertyValue> suggestVariantLocationValues(Property property, SuggestionContext suggestionContext)
             throws NotLoggedInException, BioMartServiceException, NeurocartaServiceException {
         Collection<PropertyValue> values = new ArrayList<PropertyValue>();

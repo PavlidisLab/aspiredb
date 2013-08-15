@@ -18,6 +18,8 @@ import com.sencha.gxt.data.shared.SortInfo;
 import com.sencha.gxt.data.shared.loader.PagingLoadResult;
 import com.sencha.gxt.data.shared.loader.PagingLoadResultBean;
 import org.apache.commons.lang.time.StopWatch;
+import org.directwebremoting.annotations.RemoteMethod;
+import org.directwebremoting.annotations.RemoteProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +55,7 @@ import java.util.*;
  * @author anton
  */
 @Service("queryService")
+@RemoteProxy(name="QueryService")
 public class QueryServiceImpl extends GwtService implements QueryService {
     
     private static Logger log = LoggerFactory.getLogger( QueryServiceImpl.class );
@@ -226,12 +229,13 @@ public class QueryServiceImpl extends GwtService implements QueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public PagingLoadResult<VariantValueObject> queryVariants( AspireDbPagingLoadConfig config )
+    @RemoteMethod
+    public BoundedList<VariantValueObject> queryVariants( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException {
         throwGwtExceptionIfNotLoggedIn();
 
         // TODO: move this?
-        for (AspireDbFilterConfig filter : config.getFilters()) {
+        for (AspireDbFilterConfig filter : filters) {
             if (filter instanceof VariantFilterConfig) {
                 RestrictionExpression expression = ((VariantFilterConfig) filter).getRestriction();
                 addGenomicLocations( expression );
@@ -246,7 +250,7 @@ public class QueryServiceImpl extends GwtService implements QueryService {
         Page<? extends Variant> page = variantDao.loadPage(
                 0, 2000,
                 sortProperty, sortDirection,
-                config.getFilters() );
+                filters );
 
         if ( timer.getTime() > 100 ) {
             log.info( "loading variants took " + timer.getTime() + "ms" );
@@ -257,7 +261,7 @@ public class QueryServiceImpl extends GwtService implements QueryService {
 
         List<VariantValueObject> vos = convertToValueObjects( variants );
 
-        return new PagingLoadResultBean<VariantValueObject>( vos, totalLength, config.getOffset() );
+        return new BoundedList<VariantValueObject>( vos );
     }
 
     @Override
@@ -269,7 +273,7 @@ public class QueryServiceImpl extends GwtService implements QueryService {
     @Override
     @Transactional(readOnly = true)
     public int getVariantCount(AspireDbPagingLoadConfig config) throws NotLoggedInException, ExternalDependencyException {
-        return queryVariants( config ).getTotalLength();
+        return queryVariants( config.getFilters() ).getTotalSize();
     }
 
     private List<VariantValueObject> convertToValueObjects (Collection<Variant> variants) {

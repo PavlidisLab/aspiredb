@@ -16,42 +16,42 @@
  * limitations under the License.
  *
  */
-package ubc.pavlab.aspiredb.shared.query;
+package ubc.pavlab.aspiredb.shared;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
- * author: anton
- * date: 07/05/13
+ * @author anton
  */
-@DataTransferObject(javascript = "PropertyValueObject")
-public abstract class Property<D extends DataType> implements Serializable {
-    protected String name;
-    protected String displayName;
-    protected D dataType;
-    protected String exampleValues;
-    protected Collection<Operator> operators;
+@DataTransferObject
+public class BoundedList<T> {
+    private static int MAX_SIZE = 1000;
+    private List<T> items = new ArrayList<T>();
+    private boolean moreResultsAvailable = false;
+    private int totalSize;
 
-    public String getName() {
-        return name;
+    public BoundedList(List<T> items) {
+        this.items.addAll(items.subList(0, Math.min(MAX_SIZE, items.size())));
+        if (items.size() > MAX_SIZE) {
+            moreResultsAvailable = true;
+        }
+        this.totalSize = items.size();
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public List<T> getItems() {
+        return items;
     }
 
-    public D getDataType() {
-        return dataType;
+    public boolean isMoreResultsAvailable() {
+        return moreResultsAvailable;
     }
 
-    public String getExampleValues() {
-        return exampleValues;
+    public int getTotalSize() {
+        return totalSize;
     }
 
-    public Collection<Operator> getOperators() {
-        return operators;
-    }
 }
