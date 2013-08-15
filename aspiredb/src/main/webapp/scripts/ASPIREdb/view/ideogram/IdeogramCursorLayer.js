@@ -97,11 +97,11 @@ var IdeogramCursorLayer = function (ctx, leftX, chromosomeData, chromosomeLayer)
         },
 
         getTop: function () {
-            return Math.min(start, end);
+            return Math.min(this.start, this.end);
         },
 
         getBottom: function () {
-            return Math.max(start, end);
+            return Math.max(this.start, this.end);
         },
 
         setStart: function (start) {
@@ -115,17 +115,21 @@ var IdeogramCursorLayer = function (ctx, leftX, chromosomeData, chromosomeLayer)
         setEnd: function (end) {
             this.end = end;
 
-            if (Math.abs(start - end) <= 1) {
-                this.clearSelection();
+            if (Math.abs(this.start - end) <= 1) {
+                me.clearSelection();
             } else {
                 var selectedStartBase;
                 var selectedEndBase;
 
-                selectedStartBase = chromosomeLayer.convertToBaseCoordinate(getTop());
-                selectedEndBase = chromosomeLayer.convertToBaseCoordinate(getBottom());
+                selectedStartBase = chromosomeLayer.convertToBaseCoordinate(this.getTop());
+                selectedEndBase = chromosomeLayer.convertToBaseCoordinate(this.getBottom());
 
-                var selectedChromosome = chromosomeData.getName();
-                this.setSelectedRange(new GenomicRange(selectedChromosome, selectedStartBase, selectedEndBase));
+                var selectedChromosome = chromosomeData.name;
+                this.setSelectedRange({
+                    chromosome: selectedChromosome,
+                    baseStart: selectedStartBase,
+                    baseEnd: selectedEndBase
+                });
             }
         },
         render: function () {
@@ -151,27 +155,35 @@ IdeogramCursorLayer.prototype.getSelectedRange = function () {
 };
 
 IdeogramCursorLayer.prototype.renderCursor = function (y) {
-    function getBandName(y) {
-        var base = this.chromosomeLayer.convertToBaseCoordinate(y);
-        return this.chromosomeData.getBandName(base);
-    }
+    var me = this;
+    var getBandName = function (y) {
+        var base = me.chromosomeLayer.convertToBaseCoordinate(y);
+        for (var bandName in me.chromosomeData.bands) {
+            var band = me.chromosomeData.bands[bandName];
+            if (band.start < base && band.end > base) {
+                return band.name;
+            }
+        }
+        return "";
+    };
 
     this.ctx.fillStyle = "red";
     this.ctx.fillRect(this.getLeftX(), y, 29, 1);
 
-    var cursorLabel = this.chromosomeData.getName() + ":" + getBandName(y);
+    var cursorLabel = this.chromosomeData.name + ":" + getBandName(y);
 
     this.ctx.strokeStyle = "black";
     this.ctx.strokeText(cursorLabel, this.getLeftX() + 30, y);
 };
 
 IdeogramCursorLayer.prototype.drawCursor = function (y) {
+    var me = this;
     function drawSelection(y) {
-        this.selectionBackground.restore();
+        me.selectionBackground.restore();
 
-        this.selection.setCurrent(y);
-        this.selectionBackground.save(this.selection.getTop() - 10, this.selection.getBottom() + 3);
-        this.selection.render();
+        me.selection.setCurrent(y);
+        me.selectionBackground.save(me.selection.getTop() - 10, me.selection.getBottom() + 3);
+        me.selection.render();
     }
 
     if (this.isSelectionMode) {

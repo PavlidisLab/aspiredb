@@ -1,7 +1,8 @@
 Ext.require([
     'Ext.panel.Panel',
     'Ext.Component',
-    'ASPIREdb.view.ideogram.ColourLegend'
+    'ASPIREdb.view.ideogram.ColourLegend',
+    'ASPIREdb.view.ideogram.VariantLayer'
 ]);
 
 // TODO: events: GenomeRegionSelectionEvent
@@ -29,8 +30,6 @@ Ext.define('ASPIREdb.view.Ideogram', {
             itemId: 'canvasBox',
             x: 0,
             y: 0,
-            width: 600,
-            height: 600,
             style: {
                 'z-index': '0'
             }
@@ -41,8 +40,6 @@ Ext.define('ASPIREdb.view.Ideogram', {
             itemId: 'canvasBoxOverlay',
             x: 0,
             y: 0,
-            width: 600,
-            height: 600,
             style: {
                 'z-index': '1'
             }
@@ -62,6 +59,14 @@ Ext.define('ASPIREdb.view.Ideogram', {
         this.setDisplayedProperty(new VariantTypeProperty());
 
         this.on('afterrender', this.registerMouseEventListeners, this);
+
+        var me = this;
+        ChromosomeService.getChromosomes( {
+            callback : function(chromosomeValueObjects) {
+                me.chromosomeValueObjects = chromosomeValueObjects;
+                me.drawChromosomes();
+            }
+        });
     },
 
     /**
@@ -160,19 +165,19 @@ Ext.define('ASPIREdb.view.Ideogram', {
 
     /**
      */
-    onMouseMove: function (event) {
+    onMouseMove: function (event, target) {
         if (!this.doneDrawing) return;
 
         // Determine chromosome we are in.
-        var x = event.getX();
-        var y = event.getY();
+        var x = event.browserEvent.offsetX;
+        var y = event.browserEvent.offsetY;
         /*ChromosomeIdeogram */
         var chromosomeIdeogram = this.findChromosomeIdeogram(x, y);
 
         // If we moved from one chromosome to another, clear cursor from the previous one.
         if (chromosomeIdeogram != null) {
             if (this.previousChromosome != null) {
-                if (!this.previousChromosome.equals(chromosomeIdeogram)) {
+                if (this.previousChromosome  !== chromosomeIdeogram) {
                     this.previousChromosome.clearCursor();
                 }
             }
@@ -191,8 +196,8 @@ Ext.define('ASPIREdb.view.Ideogram', {
         if (!this.doneDrawing) return;
 
         // Determine chromosome
-        var x = event.getX();
-        var y = event.getY();
+        var x = event.browserEvent.offsetX;
+        var y = event.browserEvent.offsetY;
         var chromosomeIdeogram = this.findChromosomeIdeogram(x, y);
 
         if (chromosomeIdeogram != null) {
@@ -214,8 +219,8 @@ Ext.define('ASPIREdb.view.Ideogram', {
         if (!this.doneDrawing) return;
 
         // Determine chromosome
-        var x = event.getX();
-        var y = event.getY();
+        var x = event.browserEvent.offsetX;
+        var y = event.browserEvent.offsetY;
         /*ChromosomeIdeogram */
         var chromosomeIdeogram = this.findChromosomeIdeogram(x, y);
         if (chromosomeIdeogram != null) {
@@ -300,12 +305,12 @@ Ext.define('ASPIREdb.view.Ideogram', {
             /* ChromosomeValueObject */
             var chromosomeInfo = this.chromosomeValueObjects[name];
             /*Map < String, ChromosomeBand > */
-            var size = chromosomeInfo.getSize();
-            var centromereLocation = chromosomeInfo.getCentromereLocation();
+            var size = chromosomeInfo.size;
+            var centromereLocation = chromosomeInfo.centromereLocation;
             var leftX = Math.round(5 + index * 35 * this.zoom);
             /*ChromosomeIdeogram */
-            var chromosomeIdeogram =
-                new ChromosomeIdeogram(name, size, centromereLocation, topY, leftX, displayScaleFactor,
+            var chromosomeIdeogram = new ChromosomeIdeogram
+                (name, size, centromereLocation, topY, leftX, displayScaleFactor,
                     this.ctx, this.ctxOverlay, chromosomeInfo, this.zoom);
             this.chromosomeIdeograms[name] = chromosomeIdeogram;
         }
@@ -317,14 +322,14 @@ Ext.define('ASPIREdb.view.Ideogram', {
         var canvasBox = this.getComponent("canvasBox");
         var overlayCanvasBox = this.getComponent("canvasBoxOverlay");
 
-        this.ctx = canvasBox.getContext('2d');
-        this.ctxOverlay = overlayCanvasBox.getContext('2d');
+        this.ctx = canvasBox.getEl().dom.getContext('2d');
+        this.ctxOverlay = overlayCanvasBox.getEl().dom.getContext('2d');
 
-        canvasBox.setHeight(this.height + "px");
-        canvasBox.setWidth(this.width + "px");
+        canvasBox.getEl().dom.height = this.height; //+ "px";
+        canvasBox.getEl().dom.width = this.width; // + "px";
 
-        overlayCanvasBox.setHeight(this.height + "px");
-        overlayCanvasBox.setWidth(this.width + "px");
+        overlayCanvasBox.getEl().dom.height = this.height;// + "px";
+        overlayCanvasBox.getEl().dom.width = this.width;// + "px";
 
         this.ctx.clearRect(0, 0, this.width, this.height);
         this.ctxOverlay.clearRect(0, 0, this.width, this.height);
@@ -415,7 +420,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
      */
     setDisplayedProperty: function (displayedProperty) {
         this.displayedProperty = displayedProperty;
-        VariantLayer.resetDisplayProperty();
+        ASPIREdb.view.ideogram.VariantLayer.resetDisplayProperty();
     },
 
     /**
@@ -423,7 +428,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
      * @return {Object.<string,string>}
      */
     getColourLegend: function () {
-        return VariantLayer.valueToColourMap;
+        return ASPIREdb.view.ideogram.VariantLayer.valueToColourMap;
     },
 
     /**
@@ -432,7 +437,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
     redraw: function () {
         this.drawChromosomes();
         this.drawVariants(variants);
-        this.colourLegend.update(VariantLayer.valueToColourMap, displayedProperty);
+        this.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap, this.displayedProperty);
     },
 
     /**

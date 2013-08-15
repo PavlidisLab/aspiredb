@@ -129,7 +129,7 @@ ChromosomeLayer.prototype.drawChromosome = function () {
 
     this.ctx.save();
     this.ctx.strokeStyle = "rgba(0,0,0,1)";
-    this.ctx.strokeText(name, this.xPosition, this.yPosition - 5);
+    this.ctx.strokeText(this.name, this.xPosition, this.yPosition - 5);
 
     this.ctx.strokeStyle = "rgba(0,0,0,0.2)";
     this.ctx.translate(this.xPosition, this.yPosition);
@@ -161,16 +161,16 @@ ChromosomeLayer.prototype.drawBands = function (ctx, displayScaleFactor) {
     for (/*ChromosomeBand*/ var bandName in this.bands )
     {
         var band = this.bands[bandName];
-        var yStart = this.convertToDisplayCoordinates(band.getStart(), displayScaleFactor);
-        var yEnd = this.convertToDisplayCoordinates(band.getEnd(), displayScaleFactor);
+        var yStart = this.convertToDisplayCoordinates(band.start, displayScaleFactor);
+        var yEnd = this.convertToDisplayCoordinates(band.end, displayScaleFactor);
 
-        if (band.getStaining().equals("acen") || band.getStaining().equals("gneg")) continue; //skip
-        if (band.getStaining().equals("gvar")) {
+        if (band.staining === "acen" || band.staining === "gneg") continue; //skip
+        if (band.staining === "gvar") {
             this.drawVarBand(yStart, yEnd, ctx);
             continue;
         }
 
-        var color = ChromosomeLayer.stainToColor[band.getStaining()];
+        var color = ChromosomeLayer.stainToColor[band.staining];
         ctx.save();
         ctx.fillStyle = color;
         ctx.translate(this.getLeftX(), yStart);

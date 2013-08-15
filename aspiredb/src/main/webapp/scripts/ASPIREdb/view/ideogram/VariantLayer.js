@@ -239,11 +239,11 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
          * @param {VariantSegment} segment
          */
         TrackLayer.prototype.insert = function (segment) {
-            this.segments.add(segment);
+            this.segments.push(segment);
         };
 
         for (var i = 0; i < numberOfTracks; i++) {
-            this.trackLayers.add(new TrackLayer(i));
+            this.trackLayers.push(new TrackLayer(i));
         }
     },
 

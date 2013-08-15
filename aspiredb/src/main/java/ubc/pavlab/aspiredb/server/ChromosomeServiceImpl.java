@@ -33,7 +33,7 @@ import java.util.Map;
  * author: anton
  * date: 19/02/13
  */
-@RemoteProxy
+@RemoteProxy(name="ChromosomeService")
 @Service("chromosomeService")
 public class ChromosomeServiceImpl implements ChromosomeService {
 

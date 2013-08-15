@@ -1,5 +1,6 @@
 Ext.require([
-    'Ext.panel.Panel'
+    'Ext.panel.Panel',
+    'ASPIREdb.view.Ideogram'
 ]);
 
 Ext.define('ASPIREdb.MainPanel',{
@@ -15,7 +16,7 @@ Ext.define('ASPIREdb.MainPanel',{
         },
         {
             region: 'center',
-            xtype:'panel',
+            xtype: 'ideogram',
             title:'Variant'
         },
         {

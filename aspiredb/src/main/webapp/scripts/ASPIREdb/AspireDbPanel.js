@@ -104,7 +104,7 @@ Ext.define('ASPIREdb.AspireDbPanel', {
                         xtype:'button',
                         text:'Admin Tools',
                         itemId:'adminToolsButton',
-                        hidden: true,
+                        hidden: true
                     }
                 ]
             }

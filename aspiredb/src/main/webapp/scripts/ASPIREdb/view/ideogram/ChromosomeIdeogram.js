@@ -49,14 +49,20 @@ var ChromosomeIdeogram = function(name, baseSize, centromerePosition, topY, left
     /*ChromosomeLayer */
     this.chromosomeLayer = new ChromosomeLayer(name, baseSize, centromerePosition, topY, leftX,
         displayScaleFactor, ctx,
-        chromosomeData.getBands(), zoom);
+        chromosomeData.bands, zoom);
     this.chromosomeData = chromosomeData;
     this.zoom = zoom;
 
     /*@type {VariantLayer}*/
-    this.variantLayer = new VariantLayer(ctx, leftX, displayScaleFactor, chromosomeLayer, zoom);
+    this.variantLayer = Ext.create('ASPIREdb.view.ideogram.VariantLayer', {
+        ctx: ctx,
+        leftX: leftX,
+        displayScaleFactor: displayScaleFactor,
+        chromosomeLayer: this.chromosomeLayer,
+        zoom: zoom
+    });
     /*@type {IdeogramCursorLayer}*/
-    this.cursorLayer = new IdeogramCursorLayer(overlayCtx, leftX, chromosomeData, chromosomeLayer);
+    this.cursorLayer = new IdeogramCursorLayer(overlayCtx, leftX, chromosomeData, this.chromosomeLayer);
 };
 
 /**
