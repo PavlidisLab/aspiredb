@@ -39,7 +39,7 @@
 	</bean>
 	
 	<dwr:annotation-config id="dwrAnnotationConfig" />
-  	<dwr:annotation-scan base-package="ubc.pavlab.aspiredb.server" scanDataTransferObject="true" scanRemoteProxy="true" />
+  	<dwr:annotation-scan base-package="ubc.pavlab.aspiredb" scanDataTransferObject="true" scanRemoteProxy="true" />
 
 
 </beans>

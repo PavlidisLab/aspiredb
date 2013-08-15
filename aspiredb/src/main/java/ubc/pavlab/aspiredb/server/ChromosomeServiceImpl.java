@@ -18,7 +18,10 @@
  */
 package ubc.pavlab.aspiredb.server;
 
+import org.directwebremoting.annotations.RemoteMethod;
+import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ubc.pavlab.aspiredb.server.service.ChromosomeService;
 import ubc.pavlab.aspiredb.shared.ChromosomeValueObject;
@@ -30,11 +33,13 @@ import java.util.Map;
  * author: anton
  * date: 19/02/13
  */
+@RemoteProxy
 @Service("chromosomeService")
 public class ChromosomeServiceImpl implements ChromosomeService {
 
     @Autowired private GenomeCoordinateConverter genomeCoordinateConverter;
 
+    @RemoteMethod
     @Override
     public Map<String, ChromosomeValueObject> getChromosomes() {
         Map<String,Chromosome> chromosomes = genomeCoordinateConverter.getChromosomes();

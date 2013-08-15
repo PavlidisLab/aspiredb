@@ -4,11 +4,19 @@
 
 <script src="dwr/interface/ProjectService.js"></script>
 
+<script src="dwr/interface/ChromosomeServiceImpl.js"></script>
+
 <script src="scripts/lib/ext-all-debug-w-comments.js"></script>
 
 <link href="http://cdn.sencha.com/ext/gpl/4.2.0/resources/css/ext-all.css" rel="stylesheet" />
 
 <script>
+
+    ChromosomeServiceImpl.getChromosomes({
+        callback: function(chrs) {
+            alert("Call succeeded.")
+        }
+    });
 
     Ext.application({
         name: 'ASPIREdb',
