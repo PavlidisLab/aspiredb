@@ -51,9 +51,9 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
  * @author Paul
  * @version $Id: SubjectServiceImpl.java,v 1.36 2013/06/24 23:26:39 cmcdonald Exp $
  */
-@Service("subjectService")
-public class SubjectServiceImpl extends GwtService implements SubjectService {
-	protected static Log log = LogFactory.getLog( SubjectServiceImpl.class );
+@Service("subjectServiceOld")
+public class SubjectServiceOldImpl extends GwtService implements SubjectServiceOld {
+	protected static Log log = LogFactory.getLog( SubjectServiceOldImpl.class );
 
     @Autowired private SubjectDao subjectDao;
     
