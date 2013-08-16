@@ -4,7 +4,9 @@
 <script src="dwr/interface/ProjectService.js"></script>
 <script src="dwr/interface/ChromosomeService.js"></script>
 <script src="dwr/interface/QueryService.js"></script>
+<script src="dwr/interface/SubjectService.js"></script>
 <script src="dwr/dtoall.js"></script>
+
 
 <script src="scripts/lib/ext-all-debug-w-comments.js"></script>
 
@@ -44,7 +46,28 @@
             }
         });
 
-    */
+        ProjectService.getProjects( {
+            callback : function(projCollection) {
+                alert(projCollection[0].name);
+            }
+        });
+        
+
+        SubjectService.getSubjects( {
+            callback : function(subjectCollection) {
+                alert("getSubjects[0] id=" + subjectCollection[0].id  + " patientId=" + subjectCollection[0].patientId);
+            }
+        });
+
+        projectId = 3
+        subjectId = 530
+        SubjectService.getSubject(projectId, subjectId, {
+            callback : function(subjectCollection) {
+                alert("getSubject id=" + subjectCollection.id  + " patientId=" + subjectCollection.patientId);
+            }
+        });
+    
+     */
 
 </script>
 

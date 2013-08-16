@@ -40,7 +40,7 @@ import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
-import ubc.pavlab.aspiredb.server.service.SubjectService;
+import ubc.pavlab.aspiredb.server.service.SubjectServiceOld;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.TextValue;
@@ -59,7 +59,7 @@ public class SubjectServiceTest extends BaseSpringContextTest {
     private LabelDao labelDao;
 
     @Autowired
-    private SubjectService subjectService;
+    private SubjectServiceOld subjectService;
 
     @Autowired
     private SubjectDao subjectDao;
