@@ -1,5 +1,6 @@
 Ext.require([
-    'ASPIREdb.MainPanel'
+    'ASPIREdb.MainPanel',
+    'ASPIREdb.EVENT_BUS'
 ]);
 
 /**
@@ -15,13 +16,14 @@ Ext.define('ASPIREdb.AspireDbPanel', {
     },
     initComponent: function() {
         this.callParent();
-        this.relayEvents(this.getLoginForm(), ['login','logout']);
-    },
-    listeners: {
-        login: {
-            fn:function(event) {
-                this.getLoginForm().hide();
-                this.getComponent('topToolbar').getComponent('logoutForm').show();
+
+        var aspireDbPanel = this;
+
+        // TODO: finish me
+        ASPIREdb.EVENT_BUS.on('login',
+            function(event) {
+                aspireDbPanel.getLoginForm().hide();
+                aspireDbPanel.getComponent('topToolbar').getComponent('logoutForm').show();
 /*
                 loginForm.setVisible( false );
                 logoutForm.setVisible( true );
@@ -32,19 +34,21 @@ Ext.define('ASPIREdb.AspireDbPanel', {
                 me.parseUrlParametersAndRedirect();
 */
             }
-        },
-        logout: {
-            fn:function(event) {
-/*
-                loginForm.setVisible( true );
-                logoutForm.setVisible( false );
+        );
 
-                toolPanel.setVisible( false );
-                mainPanel.setVisible( false );
-                dashboard.hide();
-*/
+        // TODO: finish me
+        ASPIREdb.EVENT_BUS.on('logout',
+            function(event) {
+                /*
+                 loginForm.setVisible( true );
+                 logoutForm.setVisible( false );
+
+                 toolPanel.setVisible( false );
+                 mainPanel.setVisible( false );
+                 dashboard.hide();
+                 */
             }
-        }
+        );
     },
     items: [{
         region: 'north',

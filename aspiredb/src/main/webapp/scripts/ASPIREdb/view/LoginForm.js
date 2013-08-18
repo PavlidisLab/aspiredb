@@ -1,5 +1,6 @@
 Ext.require([
-    'Ext.layout.container.*'
+    'Ext.layout.container.*',
+    'ASPIREdb.EVENT_BUS'
 ]);
 
 /*
@@ -74,7 +75,8 @@ Ext.define('ASPIREdb.view.LoginForm', {
                         }
                     ),
                     success: function(response, opts) {
-                        me.fireEvent('login');
+                        ASPIREdb.EVENT_BUS.fireEvent('login');
+                        //TODO: finish me
 /*
                         username.clear();
                         password.clear();

@@ -6,7 +6,7 @@ Ext.require([
 Ext.define('ASPIREdb.view.PropertyFilter', {
     extend: 'Ext.Container',
     alias: 'widget.filter_property',
-    width: 590,
+    width: 690,
     ref: 'widgetContainer',
     layout: {
         type: 'hbox'
@@ -20,7 +20,12 @@ Ext.define('ASPIREdb.view.PropertyFilter', {
         },
         {
             xtype: 'combo',
-            itemId: 'operatorComboBox'
+            itemId: 'operatorComboBox',
+            store: [
+                {value:'1',text: 'AAAAA'},
+                {value:'2',text: 'BBBB'}
+            ]
+
         },
         {
             /* multi value vs single value  */
@@ -31,7 +36,7 @@ Ext.define('ASPIREdb.view.PropertyFilter', {
             items: [
                 {
                     xtype: 'multivalue_combo',
-                    width: 200,
+                    width: 400,
                     height: 20
                 },
                 {
