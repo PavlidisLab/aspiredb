@@ -44,7 +44,6 @@ public class AjaxAuthenticationFailureHandler extends SimpleUrlAuthenticationFai
         String ajaxLoginTrue = request.getParameter( "ajaxLoginTrue" );
 
         if ( ajaxLoginTrue != null && ajaxLoginTrue.equals( "true" ) ) {
-
             JSONUtil jsonUtil = new JSONUtil( request, response );
             String jsonText = null;
 
@@ -53,7 +52,6 @@ public class AjaxAuthenticationFailureHandler extends SimpleUrlAuthenticationFai
                 @Override
                 public void sendRedirect( HttpServletRequest re, HttpServletResponse res, String s ) {
                     // do nothing, no redirect to make it work with extjs
-
                 }
             } );
 
@@ -62,14 +60,9 @@ public class AjaxAuthenticationFailureHandler extends SimpleUrlAuthenticationFai
             jsonText = "{success:false}";
             jsonUtil.writeToResponse( jsonText );
 
-        }
-
-        else {
-
+        } else {
             this.setRedirectStrategy( new DefaultRedirectStrategy() );
-
             super.onAuthenticationFailure( request, response, exception );
-
         }
     }
 }

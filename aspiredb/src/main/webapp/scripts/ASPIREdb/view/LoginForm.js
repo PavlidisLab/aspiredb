@@ -3,17 +3,6 @@ Ext.require([
     'ASPIREdb.EVENT_BUS'
 ]);
 
-/*
-    <g:HorizontalPanel spacing="10" styleName="{style.box}">
-        <c:ContentPanel width="300" bodyStyle="padding: 5px;" headerVisible="false">
-
-                <container:child>
-                    <g:HTML ui:field="message" text="Login failed. Username or password incorrect"
-                    visible="false" styleName="{style.message}" />
-                </container:child>
-
-*/
-
 Ext.define('ASPIREdb.view.LoginForm', {
     extend: 'Ext.window.Window',
     title: 'Welcome, please login.',
@@ -37,6 +26,13 @@ Ext.define('ASPIREdb.view.LoginForm', {
             fieldLabel: 'Password',
             inputType: 'password',
             allowBlank: false
+        },
+        {
+            xtype: 'label',
+            itemId: 'message',
+            style: 'font-family: sans-serif; font-size: 10px; color: red;',
+            text: 'Login failed. Username or password incorrect.',
+            hidden: true
         }
     ],
 
@@ -69,25 +65,25 @@ Ext.define('ASPIREdb.view.LoginForm', {
                     },
                     params: Ext.Object.toQueryString(
                         {
-                            'j_username' : this.ownerCt.ownerCt.getComponent('username').getValue(),
-                            'j_password' : this.ownerCt.ownerCt.getComponent('password').getValue(),
+                            'j_username' : me.getComponent('username').getValue(),
+                            'j_password' : me.getComponent('password').getValue(),
                             'ajaxLoginTrue' : true
                         }
                     ),
-                    success: function(response, opts) {
-                        ASPIREdb.EVENT_BUS.fireEvent('login');
-                        //TODO: finish me
-/*
-                        username.clear();
-                        password.clear();
+                    success: function(response) {
+                        var messageLabel = me.getComponent('message');
+                        var usernameTextfield = me.getComponent('username');
+                        var passwordTextfield = me.getComponent('password');
 
-                        if ( result ) {
-                            aspiredb.EVENT_BUS.fireEvent( new LoginEvent() );
-                            message.setVisible( false );
+                        usernameTextfield.clear();
+                        passwordTextfield.clear();
+
+                        if ( response.success ) {
+                            ASPIREdb.EVENT_BUS.fireEvent('login');
+                            messageLabel.hide();
                         } else {
-                            message.setVisible( true );
+                            messageLabel.show();
                         }
-*/
                     },
                     failure: function(response, opts) {
 

@@ -16,23 +16,31 @@ Ext.define('ASPIREdb.common.MultiValueCombobox', {
     width: 200,
 
     addItem: function(item) {
+        var comboBox = this.getComponent('invisibleCombo');
+        var items = this.items;
+        items.insert(items.getCount() - 1,
+            Ext.create('ASPIREdb.common.multicombo.Item',
+                {
+                    text: item.raw[0]
+                }
+            )
+        );
+        comboBox.clearValue();
+        this.doLayout();
     },
 
-    removeItem: function() {
-        var comboBox = this.getComponent('invisibleCombo');
-        if (comboBox.getRawValue() === "") {
-            if (this.items.getCount() > 1) {
-                // second before last
-                var item = this.items.removeAt(this.items.getCount()-2);
-                item.destroy();
-                this.doLayout();
-            }
+    removeItem: function () {
+        if (this.items.getCount() > 1) {
+            // second before last
+            var item = this.items.removeAt(this.items.getCount() - 2);
+            item.destroy();
+            this.doLayout();
         }
     },
 
     initComponent: function() {
         this.callParent();
-
+        var multiCombo = this;
         this.items.add(
             Ext.create('ASPIREdb.common.multicombo.Item',
                 {
@@ -56,21 +64,16 @@ Ext.define('ASPIREdb.common.MultiValueCombobox', {
 
         comboBox.on('keydown', function(obj, event) {
             if (event.getKey() === event.BACKSPACE) {
-                this.removeItem();
+                if (comboBox.getRawValue() === "") {
+                    multiCombo.removeItem();
+                    comboBox.collapse();
+                }
             }
-        }, this);
+        });
 
         comboBox.on('select', function(obj, records) {
-            this.items.insert(this.items.getCount() - 1,
-                Ext.create('ASPIREdb.common.multicombo.Item',
-                    {
-                        text: records[0].raw[0]
-                    }
-                )
-            );
-            comboBox.clearValue();
-            this.doLayout();
-        }, this);
+            multiCombo.addItem(records[0]);
+        });
 
 
         this.on('afterrender', function() {
