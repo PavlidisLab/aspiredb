@@ -1,9 +1,9 @@
 Ext.require([
     'Ext.layout.container.*',
-    'ASPIREdb.common.MultiValueCombobox'
+    'ASPIREdb.view.filter.multicombo.MultiValueCombobox'
 ]);
 
-Ext.define('ASPIREdb.view.PropertyFilter', {
+Ext.define('ASPIREdb.view.filter.PropertyFilter', {
     extend: 'Ext.Container',
     alias: 'widget.filter_property',
     width: 690,

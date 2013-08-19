@@ -1,23 +1,16 @@
 Ext.require([
     'Ext.layout.container.*',
-    'ASPIREdb.view.PropertyFilter'
+    'ASPIREdb.view.filter.OrFilterContainer'
 ]);
 
-Ext.define('ASPIREdb.view.OrFilterContainer', {
-    extend: 'Ext.Panel',
-    alias: 'widget.filter_or',
-    closable: true,
-    title: 'OR Filter Container',
+Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
+    extend: 'Ext.Container',
+    alias: 'widget.filter_and',
     layout: {
         type: 'vbox'
     },
-/*
-    border: 1,
-    style: {
-        border: "1px solid lightgray"
-    },
-*/
-    items: [ {
+    items: [
+        {
             xtype: 'container',
             itemId: 'filterContainer',
             layout: {
@@ -28,26 +21,35 @@ Ext.define('ASPIREdb.view.OrFilterContainer', {
                     left: 5,
                     bottom: 5
                 }
-            },
-            items: [
-                {
-                    xtype: 'filter_property'
-                }
-            ]
-        }, {
+            }
+        },
+        {
             xtype: 'button',
             itemId: 'addButton',
-            text: 'OR'
+            text: 'AND'
         }
     ],
 
-    initComponent: function() {
+    filterItemType: null,
+
+    getNewItem: function () {
+        return Ext.create(this.filterItemType);
+    },
+
+    initComponent: function () {
         this.callParent();
+
         var me = this;
+        var filterContainer = this.getComponent("filterContainer");
+
+        // Add first item.
+        this.insert(0, this.getNewItem());
+
+        // Attach button listener
         me.getComponent("addButton").on('click', function (button, event) {
-            var filterContainer = me.getComponent("filterContainer");
-            filterContainer.add(Ext.create('ASPIREdb.view.PropertyFilter'));
+            filterContainer.add(me.getNewItem());
             filterContainer.doLayout();
         });
     }
+
 });

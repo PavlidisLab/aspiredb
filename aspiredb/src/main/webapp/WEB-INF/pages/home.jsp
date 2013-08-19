@@ -5,11 +5,14 @@
 <script src="dwr/interface/ChromosomeService.js"></script>
 <script src="dwr/interface/QueryService.js"></script>
 <script src="dwr/interface/SubjectService.js"></script>
+<script src="dwr/interface/VariantService.js"></script>
 <script src="dwr/dtoall.js"></script>
 
 <script src="scripts/lib/ext-all-debug-w-comments.js"></script>
+<script src="scripts/lib/DwrProxy.js"></script>
 
 <link href="http://cdn.sencha.com/ext/gpl/4.2.0/resources/css/ext-all.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="scripts/ASPIREdb/resources/css/multivaluecombo.css" />
 
 <script src="scripts/ASPIREdb/view/ideogram/IdeogramCursorLayer.js"></script>
 <script src="scripts/ASPIREdb/view/ideogram/ChromosomeLayer.js"></script>

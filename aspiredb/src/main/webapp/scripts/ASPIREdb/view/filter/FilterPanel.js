@@ -2,7 +2,7 @@ Ext.require([
     'Ext.layout.container.*'
 ]);
 
-Ext.define('ASPIREdb.common.FilterPanel', {
+Ext.define('ASPIREdb.view.filter.FilterPanel', {
     extend: 'Ext.Panel',
     closable: true,
     collapsible: true,

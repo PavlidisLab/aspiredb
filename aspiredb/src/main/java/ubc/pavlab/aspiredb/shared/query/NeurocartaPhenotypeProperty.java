@@ -18,12 +18,15 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.util.Arrays;
 
 /**
  * author: anton
  * date: 24/05/13
  */
+@DataTransferObject
 public class NeurocartaPhenotypeProperty extends Property<GenomicRangeDataType> {
     private static final long serialVersionUID = 718213962710902188L;
 

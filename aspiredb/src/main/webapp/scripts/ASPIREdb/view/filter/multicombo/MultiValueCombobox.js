@@ -1,11 +1,12 @@
 Ext.require([
     'Ext.Component',
     'Ext.form.field.Text',
-    'ASPIREdb.common.multicombo.Item'
+    'ASPIREdb.view.filter.multicombo.Item',
+    'ASPIREdb.model.Property'
 ]);
 
 
-Ext.define('ASPIREdb.common.MultiValueCombobox', {
+Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
     extend: 'Ext.Container',
     alias: 'widget.multivalue_combo',
     layout: 'column',
@@ -19,9 +20,10 @@ Ext.define('ASPIREdb.common.MultiValueCombobox', {
         var comboBox = this.getComponent('invisibleCombo');
         var items = this.items;
         items.insert(items.getCount() - 1,
-            Ext.create('ASPIREdb.common.multicombo.Item',
+            Ext.create('ASPIREdb.view.filter.multicombo.Item',
                 {
-                    text: item.raw[0]
+                    text: item.data.displayName,
+                    value: item.data
                 }
             )
         );
@@ -42,24 +44,38 @@ Ext.define('ASPIREdb.common.MultiValueCombobox', {
         this.callParent();
         var multiCombo = this;
         this.items.add(
-            Ext.create('ASPIREdb.common.multicombo.Item',
+            Ext.create('ASPIREdb.view.filter.multicombo.Item',
                 {
                     text:'meow'
                 }
         ));
+
+        var testStore = Ext.create('Ext.data.Store', {
+            proxy : {
+                type: 'dwr',
+                dwrFunction : VariantService.suggestVariantLocationProperties,
+                model: 'ASPIREdb.model.Property',
+                reader : {
+                    type: 'json',
+                    root: 'data',
+                    totalProperty: 'count'
+                }
+            }
+        });
 
         var comboBox = new Ext.form.field.ComboBox({
             itemId:'invisibleCombo',
             hideTrigger: true,
             cls: 'multiValueSuggestBox-list-input',
             triggerAction: 'all',
-            displayField: 'text',
-            store: [
-                'AAAAA',
-                'BBBB'
-            ],
+            displayField: 'displayName',
             autoSelect: true,
-            enableKeyEvents: true
+            enableKeyEvents: true,
+            listConfig: {
+                loadingText: 'Searching...',
+                emptyText: 'No results found.'
+            },
+            store: testStore
         });
 
         comboBox.on('keydown', function(obj, event) {
@@ -75,13 +91,11 @@ Ext.define('ASPIREdb.common.MultiValueCombobox', {
             multiCombo.addItem(records[0]);
         });
 
-
         this.on('afterrender', function() {
             this.getEl().on('click', function() {
                 comboBox.focus();
             });
         }, this);
-
 
         this.items.add(comboBox);
     }

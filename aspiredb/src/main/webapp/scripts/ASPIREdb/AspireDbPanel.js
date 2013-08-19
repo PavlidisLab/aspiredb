@@ -1,6 +1,7 @@
 Ext.require([
     'ASPIREdb.MainPanel',
-    'ASPIREdb.EVENT_BUS'
+    'ASPIREdb.EVENT_BUS',
+    'ASPIREdb.view.filter.FilterWindow'
 ]);
 
 /**
@@ -25,9 +26,6 @@ Ext.define('ASPIREdb.AspireDbPanel', {
                 aspireDbPanel.getLoginForm().hide();
                 aspireDbPanel.getComponent('topToolbar').getComponent('logoutForm').show();
 /*
-                loginForm.setVisible( false );
-                logoutForm.setVisible( true );
-
                 toolPanel.setVisible( false );
                 mainPanel.setVisible( false );
                 dashboard.show();
@@ -68,7 +66,10 @@ Ext.define('ASPIREdb.AspireDbPanel', {
                 xtype: 'button',
                 text: 'Filter...',
                 itemId: 'filterButton',
-                height: 30
+                height: 30,
+                handler: function() {
+                    ASPIREdb.view.filter.FilterWindow.show();
+                }
             },
             {
                 xtype: 'button',

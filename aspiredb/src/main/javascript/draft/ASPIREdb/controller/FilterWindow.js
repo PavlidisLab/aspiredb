@@ -1,7 +1,7 @@
 Ext.require([
-    'ASPIREdb.view.VariantFilterPanel',
-    'ASPIREdb.view.SubjectFilterPanel',
-    'ASPIREdb.view.PhenotypeFilterPanel'
+    'ASPIREdb.view.filter.VariantFilterPanel',
+    'ASPIREdb.view.filter.SubjectFilterPanel',
+    'ASPIREdb.view.filter.PhenotypeFilterPanel'
 ]);
 
 Ext.define('ASPIREdb.controller.FilterWindow', {

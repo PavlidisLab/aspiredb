@@ -4,7 +4,7 @@ Ext.require([
 ]);
 
 //TODO: use tpl to render, extend Component?
-Ext.define('ASPIREdb.common.multicombo.Item', {
+Ext.define('ASPIREdb.view.filter.multicombo.Item', {
     config: {
         text : null
     },

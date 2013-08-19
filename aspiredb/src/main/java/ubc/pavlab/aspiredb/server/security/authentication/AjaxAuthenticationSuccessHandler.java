@@ -59,7 +59,7 @@ public class AjaxAuthenticationSuccessHandler extends SavedRequestAwareAuthentic
             super.onAuthenticationSuccess( request, response, authentication );
             authentication.getName();
 
-            jsonText = "{success:true,user:\'" + authentication.getName() + "\'}";
+            jsonText = "success";
             jsonUtil.writeToResponse( jsonText );
         } else {
 

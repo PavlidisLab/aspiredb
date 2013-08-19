@@ -1,19 +1,19 @@
 Ext.require([
     'Ext.layout.container.*',
-    'ASPIREdb.view.AndFilterContainer',
-    'ASPIREdb.view.OrFilterContainer',
-    'ASPIREdb.common.FilterPanel'
+    'ASPIREdb.view.filter.AndFilterContainer',
+    'ASPIREdb.view.filter.OrFilterContainer',
+    'ASPIREdb.view.filter.FilterPanel'
 ]);
 
-Ext.define('ASPIREdb.view.SubjectFilterPanel', {
-    extend: 'ASPIREdb.common.FilterPanel',
+Ext.define('ASPIREdb.view.filter.SubjectFilterPanel', {
+    extend: 'ASPIREdb.view.filter.FilterPanel',
     alias: 'widget.filter_subject',
     title: 'Subject Filter',
     bodyStyle: 'background: #FFE5B4;',
     items: {
         xtype: 'filter_and',
         itemId: 'subjectFilterContainer',
-        filterItemType: 'ASPIREdb.view.PropertyFilter'
+        filterItemType: 'ASPIREdb.view.filter.PropertyFilter'
     },
 
     initComponent: function () {

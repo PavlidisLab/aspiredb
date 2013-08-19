@@ -75,10 +75,10 @@ Ext.define('ASPIREdb.view.LoginForm', {
                         var usernameTextfield = me.getComponent('username');
                         var passwordTextfield = me.getComponent('password');
 
-                        usernameTextfield.clear();
-                        passwordTextfield.clear();
+                        usernameTextfield.reset();
+                        passwordTextfield.reset();
 
-                        if ( response.success ) {
+                        if ( response.responseText === 'success' ) {
                             ASPIREdb.EVENT_BUS.fireEvent('login');
                             messageLabel.hide();
                         } else {

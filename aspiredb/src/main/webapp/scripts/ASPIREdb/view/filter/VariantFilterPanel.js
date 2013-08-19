@@ -1,12 +1,12 @@
 Ext.require([
     'Ext.layout.container.*',
-    'ASPIREdb.view.AndFilterContainer',
-    'ASPIREdb.view.OrFilterContainer',
-    'ASPIREdb.common.FilterPanel'
+    'ASPIREdb.view.filter.AndFilterContainer',
+    'ASPIREdb.view.filter.OrFilterContainer',
+    'ASPIREdb.view.filter.FilterPanel'
 ]);
 
-Ext.define('ASPIREdb.view.VariantFilterPanel', {
-    extend: 'ASPIREdb.common.FilterPanel',
+Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
+    extend: 'ASPIREdb.view.filter.FilterPanel',
     alias: 'widget.filter_variant',
     title: 'Variant Filter',
     bodyStyle: 'background: #FFFFD0;',
@@ -15,7 +15,7 @@ Ext.define('ASPIREdb.view.VariantFilterPanel', {
             xtype: 'filter_and',
             title: 'Variant Location:',
             itemId: 'locationFilterContainer',
-            filterItemType: 'ASPIREdb.view.OrFilterContainer'
+            filterItemType: 'ASPIREdb.view.filter.OrFilterContainer'
         },
         {
             xtype: 'label',
@@ -31,7 +31,7 @@ Ext.define('ASPIREdb.view.VariantFilterPanel', {
             items: {
                 xtype: 'filter_and',
                 itemId: 'cnvCharacteristicFilterContainer',
-                filterItemType: 'ASPIREdb.view.PropertyFilter'
+                filterItemType: 'ASPIREdb.view.filter.PropertyFilter'
             }
         },
         {
@@ -44,7 +44,7 @@ Ext.define('ASPIREdb.view.VariantFilterPanel', {
             items: {
                 xtype: 'filter_and',
                 itemId: 'indelCharacteristicFilterContainer',
-                filterItemType: 'ASPIREdb.view.PropertyFilter'
+                filterItemType: 'ASPIREdb.view.filter.PropertyFilter'
             }
         }
     ],

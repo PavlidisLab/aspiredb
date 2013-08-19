@@ -18,6 +18,8 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -25,5 +27,6 @@ import java.util.Collection;
  * author: anton
  * date: 07/05/13
  */
+@DataTransferObject
 public interface DataType extends Serializable {
 }

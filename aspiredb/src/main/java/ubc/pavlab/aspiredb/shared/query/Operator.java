@@ -19,12 +19,15 @@
 package ubc.pavlab.aspiredb.shared.query;
 
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.io.Serializable;
 
 /**
  * author: anton
  * date: 07/05/13
  */
+@DataTransferObject(javascript = "OperatorValueObject")
 public interface Operator extends Serializable {
     public String getDisplayLabel();
 }

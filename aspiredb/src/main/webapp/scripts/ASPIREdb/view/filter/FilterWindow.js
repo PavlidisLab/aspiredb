@@ -1,16 +1,16 @@
 Ext.require([
     'Ext.window.*',
     'Ext.layout.container.Border',
-    'ASPIREdb.view.AndFilterContainer',
-    'ASPIREdb.view.VariantFilterPanel',
-    'ASPIREdb.view.SubjectFilterPanel',
-    'ASPIREdb.view.PhenotypeFilterPanel'
+    'ASPIREdb.view.filter.AndFilterContainer',
+    'ASPIREdb.view.filter.VariantFilterPanel',
+    'ASPIREdb.view.filter.SubjectFilterPanel',
+    'ASPIREdb.view.filter.PhenotypeFilterPanel'
 ]);
 
-Ext.define('ASPIREdb.view.FilterWindow', {
+Ext.define('ASPIREdb.view.filter.FilterWindow', {
         extend: 'Ext.Window',
         alias: 'widget.filterwindow',
-
+        singleton: true,
         title: 'Filter',
         closable: true,
         closeAction: 'hide',
@@ -47,9 +47,9 @@ Ext.define('ASPIREdb.view.FilterWindow', {
                                 value : 'FILTER_PLACEHOLDER',
                                 store: [
                                     ['FILTER_PLACEHOLDER','<Filter>'],
-                                    ['ASPIREdb.view.SubjectFilterPanel', 'Subject Filter'],
-                                    ['ASPIREdb.view.VariantFilterPanel', 'Variant Filter'],
-                                    ['ASPIREdb.view.PhenotypeFilterPanel', 'Phenotype Filter']
+                                    ['ASPIREdb.view.filter.SubjectFilterPanel', 'Subject Filter'],
+                                    ['ASPIREdb.view.filter.VariantFilterPanel', 'Variant Filter'],
+                                    ['ASPIREdb.view.filter.PhenotypeFilterPanel', 'Phenotype Filter']
                                 ]
                             },
                             {
@@ -166,6 +166,16 @@ Ext.define('ASPIREdb.view.FilterWindow', {
 
         initComponent: function () {
             this.callParent();
+            var filterTypeComboBox = this.down('#filterTypeComboBox');
+            var filterContainer = this.down('#filterContainer');
+
+            filterTypeComboBox.on('select', function (combo, records) {
+                var record = records[0];
+                filterContainer.add(
+                    Ext.create(record.raw[0])
+                );
+                filterTypeComboBox.setValue('FILTER_PLACEHOLDER');
+            });
         },
 
         initializeFilterProperties: function () {
