@@ -58,7 +58,7 @@ Ext.define('ASPIREdb.view.LoginForm', {
             handler: function() {
                 var me = this.ownerCt.ownerCt;
                 Ext.Ajax.request({
-                    url: '/j_spring_security_check',
+                    url: 'j_spring_security_check',
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
