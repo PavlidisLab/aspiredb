@@ -26,8 +26,6 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.VariantTypeProperty;
 
-import java.util.*;
-
 public class IdeogramPanel extends Composite implements HasGenomeRegionSelectionHandler {
 
     private Property displayedProperty;

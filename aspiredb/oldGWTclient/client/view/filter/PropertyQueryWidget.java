@@ -15,13 +15,10 @@
 package ubc.pavlab.aspiredb.client.view.filter;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -99,7 +96,7 @@ public abstract class PropertyQueryWidget extends NonExpandableQueryWidget {
     
     public PropertyQueryWidget(Collection<Property> properties) {
     	ListStore<Property> propertyListStore = new ListStore<Property>(new ModelKeyProvider<Property>() {
-    		public String getKey(Property property) { return property.getName(); } 
+    		public String getKey(Property property) { return property.getName(); }
     	}); 	
     	propertyComboBox = constructComboBox(propertyListStore, new LabelProvider<Property>() {
     		public String getLabel(Property property) { return property.getDisplayName(); }

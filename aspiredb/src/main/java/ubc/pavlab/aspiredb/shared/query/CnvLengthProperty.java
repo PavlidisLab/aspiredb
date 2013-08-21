@@ -18,9 +18,12 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * @author anton
  */
+@DataTransferObject(javascript = "CnvLengthProperty")
 public class CnvLengthProperty extends NumericProperty {
     public CnvLengthProperty() {
         super("Length","cnvLength");

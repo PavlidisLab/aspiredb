@@ -18,12 +18,15 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.util.Arrays;
 
 /**
  * author: anton
  * date: 07/05/13
  */
+@DataTransferObject(javascript = "NumericProperty")
 public class NumericProperty extends Property<NumericalDataType> {
     public NumericProperty() {
         this.dataType = new NumericalDataType();

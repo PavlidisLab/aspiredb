@@ -26,14 +26,19 @@ import java.util.Collection;
 /**
  * author: anton
  * date: 07/05/13
+ *
+ * Class is concrete because I couldn't get DWR to see it when it is abstract.
  */
-@DataTransferObject(javascript = "PropertyValueObject")
-public abstract class Property<D extends DataType> implements Serializable {
+@DataTransferObject(javascript = "Property")
+public class Property<D extends DataType> implements Serializable {
     protected String name;
     protected String displayName;
     protected D dataType;
     protected String exampleValues;
     protected Collection<Operator> operators;
+
+    public Property() {
+    }
 
     public String getName() {
         return name;
@@ -53,5 +58,25 @@ public abstract class Property<D extends DataType> implements Serializable {
 
     public Collection<Operator> getOperators() {
         return operators;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public void setDataType(D dataType) {
+        this.dataType = dataType;
+    }
+
+    public void setExampleValues(String exampleValues) {
+        this.exampleValues = exampleValues;
+    }
+
+    public void setOperators(Collection<Operator> operators) {
+        this.operators = operators;
     }
 }

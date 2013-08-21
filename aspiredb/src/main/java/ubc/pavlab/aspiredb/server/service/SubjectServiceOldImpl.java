@@ -36,12 +36,8 @@ import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.TextValue;
-import ubc.pavlab.aspiredb.shared.query.ExternalSubjectIdProperty;
-import ubc.pavlab.aspiredb.shared.query.LabelProperty;
+import ubc.pavlab.aspiredb.shared.query.*;
 import ubc.pavlab.aspiredb.shared.query.Property;
-import ubc.pavlab.aspiredb.shared.query.PropertyValue;
-import ubc.pavlab.aspiredb.shared.query.SubjectLabelProperty;
-import ubc.pavlab.aspiredb.shared.query.TextProperty;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 /**

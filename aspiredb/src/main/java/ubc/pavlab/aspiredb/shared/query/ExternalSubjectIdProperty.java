@@ -18,10 +18,13 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * author: anton
  * date: 10/05/13
  */
+@DataTransferObject(javascript = "ExternalSubjectIdProperty")
 public class ExternalSubjectIdProperty extends TextProperty {
     private static final long serialVersionUID = -7978558476634942160L;
 

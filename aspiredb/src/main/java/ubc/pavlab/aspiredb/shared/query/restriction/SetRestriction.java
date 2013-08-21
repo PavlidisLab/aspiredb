@@ -18,10 +18,10 @@
  */
 package ubc.pavlab.aspiredb.shared.query.restriction;
 
-import ubc.pavlab.aspiredb.shared.GwtSerializable;
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.Property;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,24 +32,24 @@ import java.util.Set;
 public class SetRestriction implements RestrictionExpression {
     protected Property property;
     protected Operator operator;
-    protected Set<GwtSerializable> values = new HashSet<GwtSerializable>();
+    protected Set<Serializable> values = new HashSet<Serializable>();
 
     public SetRestriction() {
     }
 
-    public SetRestriction(Property property, Operator operator, Set<? extends GwtSerializable> values) {
+    public SetRestriction(Property property, Operator operator, Set<? extends Serializable> values) {
         this.property = property;
         this.operator = operator;
         this.values.addAll(values);
     }
 
-    public SetRestriction(Property property, Operator operator, GwtSerializable value) {
+    public SetRestriction(Property property, Operator operator, Serializable value) {
         this.property = property;
         this.operator = operator;
         this.values.add(value);
     }
 
-    public Set<? extends GwtSerializable> getValues() {
+    public Set<? extends Serializable> getValues() {
         return values;
     }
 

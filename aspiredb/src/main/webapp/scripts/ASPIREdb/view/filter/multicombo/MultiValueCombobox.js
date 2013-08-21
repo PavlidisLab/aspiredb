@@ -2,35 +2,47 @@ Ext.require([
     'Ext.Component',
     'Ext.form.field.Text',
     'ASPIREdb.view.filter.multicombo.Item',
-    'ASPIREdb.model.Property'
+    'ASPIREdb.model.Property',
+    'ASPIREdb.model.PropertyValue',
+    'ASPIREdb.ValueSuggestionStore'
 ]);
-
 
 Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
     extend: 'Ext.Container',
     alias: 'widget.multivalue_combo',
     layout: 'column',
-    autoEl:{
+    autoEl: {
       tag:  'ul'
     },
     cls: 'multiValueSuggestBox-list',
     width: 200,
 
+    /**
+     * @private
+     * @param item
+     */
     addItem: function(item) {
+        var itemElement = Ext.create('ASPIREdb.view.filter.multicombo.Item',
+            {
+                text: item.data.displayValue,
+                value: item.raw
+            }
+        );
+        itemElement.on('remove', function(itemToRemove) {
+            this.items.remove(itemToRemove);
+            itemToRemove.destroy();
+        },this);
+
         var comboBox = this.getComponent('invisibleCombo');
         var items = this.items;
-        items.insert(items.getCount() - 1,
-            Ext.create('ASPIREdb.view.filter.multicombo.Item',
-                {
-                    text: item.data.displayName,
-                    value: item.data
-                }
-            )
-        );
+        items.insert(items.getCount() - 1, itemElement);
         comboBox.clearValue();
         this.doLayout();
     },
 
+    /**
+     * @private
+     */
     removeItem: function () {
         if (this.items.getCount() > 1) {
             // second before last
@@ -41,42 +53,32 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
     },
 
     initComponent: function() {
-        this.callParent();
-        var multiCombo = this;
-        this.items.add(
-            Ext.create('ASPIREdb.view.filter.multicombo.Item',
-                {
-                    text:'meow'
-                }
-        ));
-
-        var testStore = Ext.create('Ext.data.Store', {
-            proxy : {
-                type: 'dwr',
-                dwrFunction : VariantService.suggestVariantLocationProperties,
-                model: 'ASPIREdb.model.Property',
-                reader : {
-                    type: 'json',
-                    root: 'data',
-                    totalProperty: 'count'
+        this.items = [
+            {
+                xtype: 'combo',
+                itemId:'invisibleCombo',
+                hideTrigger: true,
+                cls: 'multiValueSuggestBox-list-input',
+                triggerAction: 'query',
+                autoSelect: true,
+                enableKeyEvents: true,
+                displayField: 'displayValue',
+                store: Ext.create('ASPIREdb.ValueSuggestionStore'),
+                listConfig: {
+                    loadingText: 'Searching...',
+                    emptyText: 'No results found.'
                 }
             }
-        });
+        ];
 
-        var comboBox = new Ext.form.field.ComboBox({
-            itemId:'invisibleCombo',
-            hideTrigger: true,
-            cls: 'multiValueSuggestBox-list-input',
-            triggerAction: 'all',
-            displayField: 'displayName',
-            autoSelect: true,
-            enableKeyEvents: true,
-            listConfig: {
-                loadingText: 'Searching...',
-                emptyText: 'No results found.'
-            },
-            store: testStore
-        });
+        this.callParent();
+
+        var multiCombo = this;
+        var comboBox = this.getComponent('invisibleCombo');
+
+        var store = comboBox.getStore();
+        store.setActiveProjectIds([1]);
+        store.setProperty(new GeneProperty());
 
         comboBox.on('keydown', function(obj, event) {
             if (event.getKey() === event.BACKSPACE) {
@@ -96,7 +98,5 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
                 comboBox.focus();
             });
         }, this);
-
-        this.items.add(comboBox);
     }
 });

@@ -15,7 +15,19 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
             xtype: 'filter_and',
             title: 'Variant Location:',
             itemId: 'locationFilterContainer',
-            filterItemType: 'ASPIREdb.view.filter.OrFilterContainer'
+            filterItemType: 'ASPIREdb.view.filter.OrFilterContainer',
+            propertyStore: {
+                proxy : {
+                    type: 'dwr',
+                    dwrFunction : VariantService.suggestVariantLocationProperties,
+                    model: 'ASPIREdb.model.Property',
+                    reader : {
+                        type: 'json',
+                        root: 'data',
+                        totalProperty: 'count'
+                    }
+                }
+            }
         },
         {
             xtype: 'label',
@@ -31,6 +43,19 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
             items: {
                 xtype: 'filter_and',
                 itemId: 'cnvCharacteristicFilterContainer',
+                propertyStore: {
+                    proxy : {
+                        type: 'dwr',
+                        dwrFunction : VariantService.suggestProperties2,
+                        dwrParams: ['CNV'],
+                        model: 'ASPIREdb.model.Property',
+                        reader : {
+                            type: 'json',
+                            root: 'data',
+                            totalProperty: 'count'
+                        }
+                    }
+                },
                 filterItemType: 'ASPIREdb.view.filter.PropertyFilter'
             }
         },
@@ -44,6 +69,19 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
             items: {
                 xtype: 'filter_and',
                 itemId: 'indelCharacteristicFilterContainer',
+                propertyStore: {
+                    proxy : {
+                        type: 'dwr',
+                        dwrFunction : VariantService.suggestProperties2,
+                        dwrParams: ['INDEL'],
+                        model: 'ASPIREdb.model.Property',
+                        reader : {
+                            type: 'json',
+                            root: 'data',
+                            totalProperty: 'count'
+                        }
+                    }
+                },
                 filterItemType: 'ASPIREdb.view.filter.PropertyFilter'
             }
         }
@@ -51,7 +89,6 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 
     initComponent: function() {
         this.callParent();
-//        this.getComponent("locationFilterContainer").add(Ext.create('ASPIREdb.view.OrFilterContainer'));
     }
 
 });

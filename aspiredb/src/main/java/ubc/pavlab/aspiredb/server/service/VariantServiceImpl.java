@@ -87,7 +87,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<Property> suggestProperties(VariantType variantType) {
+    public Collection<Property> suggestProperties2(VariantType variantType) {
         Collection<Property> properties = new ArrayList<Property>();
 
         properties.add( new VariantLabelProperty() );
@@ -149,7 +149,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext) throws NotLoggedInException {
+    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext) throws NotLoggedInException, BioMartServiceException {
         List<PropertyValue> values = new ArrayList<PropertyValue>();
         if (property instanceof CharacteristicProperty) {
             Collection<String> stringValues = characteristicDao.getValuesForKey(property.getName());
@@ -160,6 +160,14 @@ public class VariantServiceImpl extends GwtService implements VariantService {
             List<LabelValueObject> labels = suggestLabels(suggestionContext);
             for (LabelValueObject label : labels) {
                 values.add( new PropertyValue<LabelValueObject>(label) );
+            }
+        } else if (property instanceof GeneProperty) {
+            String query = suggestionContext.getValuePrefix();
+            if (query.length() > 2) {
+                final Collection<GeneValueObject> genes = bioMartQueryService.findGenes(query);
+                for (GeneValueObject gene : genes) {
+                    values.add( new PropertyValue<GeneValueObject>(gene));
+                }
             }
         } else if (property instanceof TextProperty) {
             Collection<String> stringValues = ((TextProperty) property).getDataType().getAllowedValues();

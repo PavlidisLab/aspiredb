@@ -21,13 +21,12 @@ package ubc.pavlab.aspiredb.shared.query;
 import org.directwebremoting.annotations.DataTransferObject;
 
 import java.util.Arrays;
-import java.util.Collection;
 
 /**
  * author: anton
  * date: 23/05/13
  */
-@DataTransferObject
+@DataTransferObject(javascript = "GenomicLocationProperty")
 public class GenomicLocationProperty extends Property<GenomicRangeDataType> {
     private static final long serialVersionUID = -1272375656961236482L;
 

@@ -18,13 +18,13 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
-import java.util.Arrays;
-import java.util.Collection;
+import org.directwebremoting.annotations.DataTransferObject;
 
 /**
  * author: anton
  * date: 07/05/13
  */
+@DataTransferObject(javascript = "NumericalDataType")
 public class NumericalDataType implements DataType {
     private static final long serialVersionUID = 2050952799877732163L;
 

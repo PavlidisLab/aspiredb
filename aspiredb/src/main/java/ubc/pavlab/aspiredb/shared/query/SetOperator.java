@@ -24,7 +24,7 @@ import org.directwebremoting.annotations.DataTransferObject;
  * author: anton
  * date: 24/05/13
  */
-@DataTransferObject(type="enum")
+@DataTransferObject
 public enum SetOperator implements Operator {
     IS_IN("is in"),
     IS_NOT_IN("is not in");

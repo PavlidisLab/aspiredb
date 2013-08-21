@@ -9,6 +9,10 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
     layout: {
         type: 'vbox'
     },
+    config: {
+        propertyStore: null,
+        filterItemType: null
+    },
     items: [
         {
             xtype: 'container',
@@ -30,10 +34,8 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
         }
     ],
 
-    filterItemType: null,
-
     getNewItem: function () {
-        return Ext.create(this.filterItemType);
+        return Ext.create(this.getFilterItemType(),{propertyStore: this.getPropertyStore()});
     },
 
     initComponent: function () {

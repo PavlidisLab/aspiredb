@@ -18,7 +18,6 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
-import org.hibernate.Criteria;
 import org.hibernate.criterion.*;
 import org.hibernate.criterion.Junction;
 import ubc.pavlab.aspiredb.server.model.CnvType;
@@ -31,6 +30,7 @@ import ubc.pavlab.aspiredb.shared.query.restriction.Conjunction;
 import ubc.pavlab.aspiredb.shared.query.restriction.Disjunction;
 import ubc.pavlab.aspiredb.shared.query.restriction.*;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -98,14 +98,14 @@ public class CriteriaBuilder {
     private static Criterion processRestrictionExpression(SetRestriction setRestriction, EntityType target) {
         Property property = setRestriction.getProperty();
         SetOperator operator = (SetOperator) setRestriction.getOperator();
-        Set<? extends GwtSerializable> values = setRestriction.getValues();
+        Set<? extends Serializable> values = setRestriction.getValues();
 
         DetachedCriteria subquery = DetachedCriteria.forClass(target.clazz);
 
         Junction criteriaDisjunction = Restrictions.disjunction();
 
         if ( property instanceof CharacteristicProperty ) {
-            for (GwtSerializable value: values) {
+            for (Serializable value: values) {
                 criteriaDisjunction.add( createCharacteristicCriterion (
                                 ( CharacteristicProperty ) property,
                                 TextOperator.EQUAL,
@@ -113,7 +113,7 @@ public class CriteriaBuilder {
                                 target ));
             }
         } else if ( property instanceof LabelProperty ) {
-            for (GwtSerializable value: values) {
+            for (Serializable value: values) {
                 criteriaDisjunction.add( createLabelCriterion(
                         ( LabelProperty ) property,
                         TextOperator.EQUAL,
@@ -121,7 +121,7 @@ public class CriteriaBuilder {
             }
         } else if ( property instanceof CNVTypeProperty ) {
             EntityType propertyOf = EntityType.VARIANT;
-            for (GwtSerializable value: values) {
+            for (Serializable value: values) {
                 criteriaDisjunction.add( createCNVTypeCriterion(
                         TextOperator.EQUAL,
                         fullEntityPropertyName(target, propertyOf, property),
@@ -129,7 +129,7 @@ public class CriteriaBuilder {
             }
         } else if ( property instanceof ExternalSubjectIdProperty ) {
             EntityType propertyOf = EntityType.SUBJECT;
-            for (GwtSerializable value: values) {
+            for (Serializable value: values) {
                 criteriaDisjunction.add( createTextCriterion(
                         TextOperator.EQUAL,
                         fullEntityPropertyName(target, propertyOf, property),
@@ -137,23 +137,23 @@ public class CriteriaBuilder {
             }
         } else if ( property instanceof TextProperty ) {
             EntityType propertyOf = EntityType.VARIANT;
-            for (GwtSerializable value: values) {
+            for (Serializable value: values) {
                 criteriaDisjunction.add( createTextCriterion(
                         TextOperator.EQUAL,
                         fullEntityPropertyName(target, propertyOf, property),
                         ( ( TextValue ) value ).getValue() ));
             }
         } else if ( property instanceof GenomicLocationProperty ) {
-            for (GwtSerializable value: values) {
+            for (Serializable value: values) {
                 criteriaDisjunction.add( overlapsGenomicRegionCriterion( (GenomicRange) value ) );
             }
         } else if ( property instanceof GeneProperty ) {
-            for (GwtSerializable value: values) {
+            for (Serializable value: values) {
                 GeneValueObject gene = ( GeneValueObject ) value;
                 criteriaDisjunction.add( overlapsGenomicRegionCriterion( gene.getGenomicRange() ) );
             }
         } else if ( property instanceof NeurocartaPhenotypeProperty ) {
-            for (GwtSerializable value : values) {
+            for (Serializable value : values) {
                 NeurocartaPhenotypeValueObject neurocartaPhenotype = ( NeurocartaPhenotypeValueObject ) value;
                 for ( GeneValueObject gene : neurocartaPhenotype.getGenes() ) {
                     criteriaDisjunction.add( overlapsGenomicRegionCriterion(gene.getGenomicRange()) );
@@ -201,7 +201,7 @@ public class CriteriaBuilder {
     private static Criterion processRestrictionExpression( SimpleRestriction restriction, EntityType target ) {
         Property property = restriction.getProperty();
         Operator operator = restriction.getOperator();
-        GwtSerializable value = restriction.getValue();
+        Serializable value = restriction.getValue();
 
         if ( property instanceof CharacteristicProperty ) {
             return createCharacteristicCriterion( ( CharacteristicProperty ) property, operator, ( TextValue ) value,

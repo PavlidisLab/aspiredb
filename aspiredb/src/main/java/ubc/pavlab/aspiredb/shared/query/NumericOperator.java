@@ -18,10 +18,13 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * author: anton
  * date: 07/05/13
  */
+@DataTransferObject
 public enum NumericOperator implements Operator {
 
     GREATER(">"),

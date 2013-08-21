@@ -18,10 +18,13 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * author: anton
  * date: 07/06/13
  */
+@DataTransferObject(javascript = "PhenotypeProperty")
 public class PhenotypeProperty extends Property {
     private static final long serialVersionUID = -8724559011217298269L;
 

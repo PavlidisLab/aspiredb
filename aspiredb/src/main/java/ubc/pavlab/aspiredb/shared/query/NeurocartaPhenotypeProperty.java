@@ -26,7 +26,7 @@ import java.util.Arrays;
  * author: anton
  * date: 24/05/13
  */
-@DataTransferObject
+@DataTransferObject(javascript = "NeurocartaPhenotypeProperty")
 public class NeurocartaPhenotypeProperty extends Property<GenomicRangeDataType> {
     private static final long serialVersionUID = 718213962710902188L;
 

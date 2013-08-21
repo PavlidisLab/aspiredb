@@ -18,11 +18,16 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * author: anton
  * date: 08/05/13
+ *
+ * Class is concrete because I couldn't get DWR to see it when it is abstract.
  */
-public abstract class LabelProperty extends TextProperty {
+@DataTransferObject(javascript = "LabelProperty")
+public class LabelProperty extends TextProperty {
 
     protected LabelProperty() {
     }

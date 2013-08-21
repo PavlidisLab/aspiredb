@@ -16,13 +16,14 @@ package ubc.pavlab.aspiredb.shared;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
+import java.io.Serializable;
+
 /**
  *
  * @author anton
  */
-@DataTransferObject
-public class GenomicRange implements GwtSerializable, Comparable<GenomicRange> {
-
+@DataTransferObject(javascript = "GenomicRange")
+public class GenomicRange implements Serializable, Comparable<GenomicRange> {
 	private static final long serialVersionUID = 6917870790522866428L;
     
 	private String chromosome;

@@ -18,10 +18,13 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * author: anton
  * date: 10/05/13
  */
+@DataTransferObject(javascript = "CopyNumberProperty")
 public class IndelLengthProperty extends NumericProperty {
     public IndelLengthProperty() {
         super("Indel Length", "indelLength");

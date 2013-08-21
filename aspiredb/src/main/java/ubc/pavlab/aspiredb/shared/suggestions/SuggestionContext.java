@@ -18,6 +18,8 @@
  */
 package ubc.pavlab.aspiredb.shared.suggestions;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -25,6 +27,7 @@ import java.util.Collection;
  * author: anton
  * date: 02/05/13
  */
+@DataTransferObject(javascript = "SuggestionContext")
 public class SuggestionContext implements Serializable {
     private static final long serialVersionUID = 6089979800051229965L;
 

@@ -22,7 +22,7 @@ import org.directwebremoting.annotations.DataTransferObject;
  * @author Paul
  * @version $Id: GeneValueObject.java,v 1.10 2013/06/11 22:30:57 anton Exp $
  */
-@DataTransferObject
+@DataTransferObject(javascript = "GeneValueObject")
 public class GeneValueObject implements Displayable, GwtSerializable {
 
     private static final long serialVersionUID = -7411514301896256147L;

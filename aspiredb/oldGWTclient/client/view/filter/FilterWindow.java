@@ -19,7 +19,6 @@
 package ubc.pavlab.aspiredb.client.view.filter;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
@@ -123,7 +122,7 @@ public class FilterWindow extends Window implements HasSubjectFilterHandlers {
     private boolean runPreviewQuery = false;
 
 	private Collection<Property> subjectProperties;
-	private Map<String, Collection<Property>> variantProperties; 
+	private Map<String, Collection<Property>> variantProperties;
 	private Collection<Property> variantLocationProperties;
 	
 	private ListStore<QueryValueObject> savedQueryListStore;

@@ -18,6 +18,7 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
 import ubc.pavlab.aspiredb.shared.GwtSerializable;
 
 import java.io.Serializable;
@@ -26,15 +27,26 @@ import java.io.Serializable;
  * author: anton
  * date: 13/05/13
  */
-public class PropertyValue<T extends GwtSerializable> implements Serializable {
+@DataTransferObject
+public class PropertyValue<T> implements Serializable {
     private static final long serialVersionUID = 6092519749465884432L;
 
     private T value;
+    private String displayValue;
 
     public PropertyValue() {}
 
     public PropertyValue(T value) {
         this.value = value;
+        this.displayValue = value.toString();
+    }
+
+    public String getDisplayValue() {
+        return displayValue;
+    }
+
+    public void setDisplayValue(String displayValue) {
+        this.displayValue = displayValue;
     }
 
     public String toString() {

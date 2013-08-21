@@ -14,7 +14,6 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
@@ -48,14 +47,14 @@ public interface VariantService {
     public Collection<PropertyValue> suggestVariantLocationValues(Property property, SuggestionContext suggestionContext)
             throws NotLoggedInException, BioMartServiceException, NeurocartaServiceException, BioMartServiceException, NeurocartaServiceException;
 
-    public Collection<Property> suggestProperties(VariantType variantType)
+    public Collection<Property> suggestProperties2(VariantType variantType)
             throws NotLoggedInException;
 
     public Collection<Property> suggestProperties()
             throws NotLoggedInException, NotLoggedInException;
 
     public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext)
-            throws NotLoggedInException;
+            throws NotLoggedInException, BioMartServiceException;
 
     @Deprecated
     public Collection<String> suggestCharacteristicPropertyValues(CharacteristicProperty property)

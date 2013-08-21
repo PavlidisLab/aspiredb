@@ -18,10 +18,13 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * author: anton
  * date: 10/05/13
  */
+@DataTransferObject(javascript = "TranslocationTypeProperty")
 public class TranslocationTypeProperty extends TextProperty {
     public TranslocationTypeProperty() {
         super("Translocation Type", "type");

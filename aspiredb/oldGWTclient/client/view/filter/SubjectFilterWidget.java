@@ -35,7 +35,7 @@ public class SubjectFilterWidget extends FilterWidget {
 	private static final String WIDGET_TITLE = "Subject Filter";
 	private static final String WIDGET_BACKGROUND_COLOR = "#FFE5B4";
 
-    private Collection<Property> properties;    
+    private Collection<Property> properties;
 
     public SubjectFilterWidget(Collection<Property> properties) {
     	this.properties = properties;
