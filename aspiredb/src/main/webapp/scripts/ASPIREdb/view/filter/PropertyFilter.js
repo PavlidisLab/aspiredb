@@ -16,23 +16,19 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
         propertyStore: null   /* property suggestions */
     },
 
-    /**
-     * @private
-     * @param obj
-     */
-    pickSuggestionFunction: function (obj) {
-        if (obj instanceof GeneProperty) {
-            return function (prefix, callback) {
-                VariantService.suggestValues(
-                    {
-                        $dwrClassName: 'GeneProperty'
-                    }, {
-                        valuePrefix: prefix,
-                        $dwrClassName: 'SuggestionContext'
-                    }, callback
-                );
-            }
-        }
+    selectedProperty: null,
+
+    getRestrictionExpression: function() {
+        var propertyComboBox = this.getComponent("propertyComboBox");
+        var operatorComboBox = this.getComponent("operatorComboBox");
+        var multicombo_container = this.getComponent("multicombo_container");
+        var multicombo = multicombo_container.getComponent("multicombo");
+
+        var setRestriction = new SetRestriction();
+        setRestriction.property = this.selectedProperty;
+        setRestriction.operator = operatorComboBox.getValue();
+        setRestriction.values = multicombo.getValues();
+        return setRestriction;
     },
 
     initComponent: function () {
@@ -96,18 +92,24 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 
         me.getComponent("propertyComboBox").on('select',
             function(obj, records) {
+                var record = records[0];
+
                 // update examples
-                var queryExample = records[0].data.exampleValues;
+                var queryExample = record.data.exampleValues;
                 example.setText(queryExample, false);
 
                 // update operators
-                var operators = records[0].data.operators;
+                var operators = record.data.operators;
+                var operatorModels = Ext.Array.map ( operators, function(x) {
+                    return {displayLabel: x, operator: x};
+                });
                 var store = operatorComboBox.getStore();
                 store.removeAll();
-                store.add( operators );
+                store.add( operatorModels );
 
                 // update multicombobox
-
+                multicombo.setProperty(record.raw);
+                me.selectedProperty = record.raw;
             }
         );
 

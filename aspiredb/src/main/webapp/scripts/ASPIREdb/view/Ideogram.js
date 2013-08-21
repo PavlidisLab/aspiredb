@@ -62,6 +62,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
                 me.drawChromosomes();
             }
         });
+
         QueryService.queryVariants([{
             $dwrClassName:'VariantFilterConfig',
             restriction: {
@@ -74,6 +75,14 @@ Ext.define('ASPIREdb.view.Ideogram', {
             }
         });
 
+        ASPIREdb.EVENT_BUS.on('filter_submit', function(filterConfigs) {
+            QueryService.queryVariants(filterConfigs, {
+                callback : function(pageLoad) {
+                    var variants = pageLoad.items;
+                    me.drawVariants(variants);
+                }
+            });
+        });
     },
 
     /**

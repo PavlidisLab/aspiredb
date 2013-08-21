@@ -31,6 +31,7 @@ public class CharacteristicProperty extends Property<DataType> {
 
     public CharacteristicProperty() {
         this.operators = Arrays.asList((Operator[]) SetOperator.values());
+        this.supportsSuggestions = true;
     }
 
     public CharacteristicProperty(String name) {

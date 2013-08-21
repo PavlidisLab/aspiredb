@@ -325,6 +325,7 @@ public class QueryServiceImpl extends GwtService implements QueryService {
 	}
 
 	@Override
+    @Deprecated
 	public Collection<NeurocartaPhenotypeValueObject> getNeurocartaPhenotypeSuggestions(String query) throws NeurocartaServiceException {
         if (query.length() < 3) {
             return new ArrayList<NeurocartaPhenotypeValueObject>();

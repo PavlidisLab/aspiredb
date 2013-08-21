@@ -34,6 +34,7 @@ public class TextProperty extends Property<TextDataType> {
     public TextProperty() {
         this.dataType = new TextDataType();
         this.operators = Arrays.asList((Operator[]) SetOperator.values());
+        this.supportsSuggestions = true;
     }
 
     public TextProperty (String displayName, String name) {

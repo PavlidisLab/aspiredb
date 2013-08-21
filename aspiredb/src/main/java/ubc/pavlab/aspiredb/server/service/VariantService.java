@@ -54,7 +54,7 @@ public interface VariantService {
             throws NotLoggedInException, NotLoggedInException;
 
     public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext)
-            throws NotLoggedInException, BioMartServiceException;
+            throws NotLoggedInException, BioMartServiceException, NeurocartaServiceException;
 
     @Deprecated
     public Collection<String> suggestCharacteristicPropertyValues(CharacteristicProperty property)

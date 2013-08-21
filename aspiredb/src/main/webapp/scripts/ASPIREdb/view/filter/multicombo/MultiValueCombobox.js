@@ -17,6 +17,27 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
     cls: 'multiValueSuggestBox-list',
     width: 200,
 
+    setProperty: function(propertyObj) {
+        var comboBox = this.getComponent('invisibleCombo');
+
+        var store = comboBox.getStore();
+        store.setActiveProjectIds([1]);
+        store.setProperty(propertyObj);
+    },
+
+    /**
+     * @returns {Array}
+     */
+    getValues: function() {
+        var values = [];
+        this.items.each(function(item){
+            if (item instanceof ASPIREdb.view.filter.multicombo.Item) {
+                values.push(item.getValue());
+            }
+        });
+        return values;
+    },
+
     /**
      * @private
      * @param item
@@ -57,6 +78,9 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
             {
                 xtype: 'combo',
                 itemId:'invisibleCombo',
+                width: 100,
+                minChars: 0,
+                matchFieldWidth: false,
                 hideTrigger: true,
                 cls: 'multiValueSuggestBox-list-input',
                 triggerAction: 'query',
@@ -75,10 +99,6 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
 
         var multiCombo = this;
         var comboBox = this.getComponent('invisibleCombo');
-
-        var store = comboBox.getStore();
-        store.setActiveProjectIds([1]);
-        store.setProperty(new GeneProperty());
 
         comboBox.on('keydown', function(obj, event) {
             if (event.getKey() === event.BACKSPACE) {

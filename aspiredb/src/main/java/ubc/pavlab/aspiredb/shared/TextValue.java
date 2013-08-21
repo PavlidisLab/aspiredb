@@ -18,11 +18,16 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
+import java.io.Serializable;
+
 /**
  * author: anton
  * date: 11/06/13
  */
-public class TextValue implements GwtSerializable {
+@DataTransferObject
+public class TextValue implements Displayable, Serializable {
     private static final long serialVersionUID = 7360784861732610669L;
     private String value;
 
@@ -43,5 +48,20 @@ public class TextValue implements GwtSerializable {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    @Override
+    public String getLabel() {
+        return value;
+    }
+
+    @Override
+    public String getHtmlLabel() {
+        return value;
+    }
+
+    @Override
+    public String getTooltip() {
+        return value;
     }
 }

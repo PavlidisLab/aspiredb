@@ -23,7 +23,7 @@ import java.io.Serializable;
  * @author anton
  */
 @DataTransferObject(javascript = "GenomicRange")
-public class GenomicRange implements Serializable, Comparable<GenomicRange> {
+public class GenomicRange implements Displayable, Serializable, Comparable<GenomicRange> {
 	private static final long serialVersionUID = 6917870790522866428L;
     
 	private String chromosome;
@@ -164,5 +164,20 @@ public class GenomicRange implements Serializable, Comparable<GenomicRange> {
         else {
             return Integer.parseInt(chr);
         }
+    }
+
+    @Override
+    public String getLabel() {
+        return toString();
+    }
+
+    @Override
+    public String getHtmlLabel() {
+        return toString();
+    }
+
+    @Override
+    public String getTooltip() {
+        return toString();
     }
 }

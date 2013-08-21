@@ -14,10 +14,13 @@
  */
 package ubc.pavlab.aspiredb.shared.query.restriction;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.io.Serializable;
 
 /**
  * Marker interface for expression specifying query restrictions.
  */
+@DataTransferObject(javascript = "RestrictionExpression")
 public interface RestrictionExpression extends Serializable {
 }

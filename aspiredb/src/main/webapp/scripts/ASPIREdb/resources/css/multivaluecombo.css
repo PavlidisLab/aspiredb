@@ -21,7 +21,9 @@ ul.multiValueSuggestBox-list {
 
 .multiValueSuggestBox-list-input input {
     border: 0;
-    width: 100px;
+/*
+    width: 700px;
+*/
     padding: 1px 3px;
     background: white none;
     margin: 0;

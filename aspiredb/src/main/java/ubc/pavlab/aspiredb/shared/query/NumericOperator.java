@@ -24,15 +24,17 @@ import org.directwebremoting.annotations.DataTransferObject;
  * author: anton
  * date: 07/05/13
  */
-@DataTransferObject
+@DataTransferObject(type="enum")
 public enum NumericOperator implements Operator {
-
     GREATER(">"),
     LESS("<"),
     EQUAL("="),
     NOT_EQUAL("!=");
 
     private String displayLabel;
+
+    NumericOperator() {
+    }
 
     NumericOperator(String displayLabel) {
         this.displayLabel = displayLabel;

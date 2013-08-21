@@ -38,6 +38,7 @@ public class PhenotypeProperty extends Property {
         this.name = name;
         this.displayName = name;
         this.dataType = datatype;
+        this.supportsSuggestions = true;
     }
 
     public boolean isOntologyTerm() {

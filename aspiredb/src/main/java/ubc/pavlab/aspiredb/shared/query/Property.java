@@ -35,9 +35,18 @@ public class Property<D extends DataType> implements Serializable {
     protected String displayName;
     protected D dataType;
     protected String exampleValues;
-    protected Collection<Operator> operators;
+    protected Collection<? extends Operator> operators;
+    protected boolean supportsSuggestions = false;
 
     public Property() {
+    }
+
+    public boolean isSupportsSuggestions() {
+        return supportsSuggestions;
+    }
+
+    public void setSupportsSuggestions(boolean supportsSuggestions) {
+        this.supportsSuggestions = supportsSuggestions;
     }
 
     public String getName() {
@@ -56,7 +65,7 @@ public class Property<D extends DataType> implements Serializable {
         return exampleValues;
     }
 
-    public Collection<Operator> getOperators() {
+    public Collection<? extends Operator> getOperators() {
         return operators;
     }
 

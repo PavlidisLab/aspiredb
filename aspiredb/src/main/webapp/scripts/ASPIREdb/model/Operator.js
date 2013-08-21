@@ -2,7 +2,6 @@
 Ext.define('ASPIREdb.model.Operator', {
     extend: 'Ext.data.Model',
     fields: [
-        {name: 'displayLabel',  type: 'string'},
-        {name: 'operator',  type: 'string'}
+        {name: 'displayLabel',  type: 'string'}
     ]
 });

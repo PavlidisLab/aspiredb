@@ -35,5 +35,6 @@ public class NeurocartaPhenotypeProperty extends Property<GenomicRangeDataType> 
         this.displayName = "Neurocarta Phenotype";
         this.exampleValues = "Examples: <b>autism spectrum disorder</b>, <b>colon cancer</b>";
         this.operators = Arrays.asList((Operator[]) SetOperator.values());
+        this.supportsSuggestions = true;
     }
 }

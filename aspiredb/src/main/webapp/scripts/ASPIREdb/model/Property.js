@@ -7,6 +7,7 @@ Ext.define('ASPIREdb.model.Property', {
     fields: [
         {name: 'displayName',  type: 'string'},
         {name: 'exampleValues',   type: 'string'},
-        {name: 'operators', type: 'ASPIREdb.model.Operator'}
+        {name: 'supportsSuggestions', type: 'boolean'},
+        {name: 'operators', type: 'auto'}
     ]
 });

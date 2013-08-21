@@ -20,6 +20,11 @@ Ext.define('ASPIREdb.view.filter.OrFilterContainer', {
         border: "1px solid lightgray"
     },
 */
+    getRestrictionExpression: function () {
+        var filterContainer = this.getComponent('filterContainer');
+        return filterContainer.getRestrictionExpression();
+    },
+
     initComponent: function() {
         var me = this;
         this.items = [ {
@@ -34,6 +39,15 @@ Ext.define('ASPIREdb.view.filter.OrFilterContainer', {
                     bottom: 5
                 }
             },
+            getRestrictionExpression: function () {
+                var disjunction = new Disjunction();
+                disjunction.restrictions = [];
+                this.items.each(function(item, index, length) {
+                    disjunction.restrictions.push(item.getRestrictionExpression());
+                });
+                return disjunction;
+            },
+
             items: [
                 {
                     xtype: 'filter_property',

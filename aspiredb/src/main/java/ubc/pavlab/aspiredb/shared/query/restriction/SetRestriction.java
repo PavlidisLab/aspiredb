@@ -18,6 +18,7 @@
  */
 package ubc.pavlab.aspiredb.shared.query.restriction;
 
+import org.directwebremoting.annotations.DataTransferObject;
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.Property;
 
@@ -29,6 +30,7 @@ import java.util.Set;
  * author: anton
  * date: 26/04/13
  */
+@DataTransferObject(javascript = "SetRestriction")
 public class SetRestriction implements RestrictionExpression {
     protected Property property;
     protected Operator operator;
@@ -47,6 +49,18 @@ public class SetRestriction implements RestrictionExpression {
         this.property = property;
         this.operator = operator;
         this.values.add(value);
+    }
+
+    public void setProperty(Property property) {
+        this.property = property;
+    }
+
+    public void setOperator(Operator operator) {
+        this.operator = operator;
+    }
+
+    public void setValues(Set<Serializable> values) {
+        this.values = values;
     }
 
     public Set<? extends Serializable> getValues() {
