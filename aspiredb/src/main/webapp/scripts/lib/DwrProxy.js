@@ -73,6 +73,12 @@ Ext.define('Ext.ux.DwrProxy', {
         if (typeof (me.dwrParams) === 'object') {
             dwrParams = dwrParams.concat(me.dwrParams);
         }
+/*
+        var loadParams = operation.dwrParams || me.dwrParams;
+        if (typeof (loadParams) === 'object') {
+            dwrParams = dwrParams.concat(loadParams);
+        }
+*/
 
         dwrParams.push({
             callback : function(x) {

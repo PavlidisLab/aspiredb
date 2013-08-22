@@ -20,7 +20,7 @@ import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
 /**
  *
  */
-@DataTransferObject
+@DataTransferObject(javascript = "RestrictionFilterConfig")
 public abstract class RestrictionFilterConfig extends AspireDbFilterConfig {
 	private static final long serialVersionUID = -4256615467308247969L;
 

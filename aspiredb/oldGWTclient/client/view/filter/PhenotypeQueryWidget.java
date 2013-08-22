@@ -213,7 +213,7 @@ public class PhenotypeQueryWidget extends NonExpandableQueryWidget {
 		if (restriction instanceof PhenotypeRestriction) {
 			PhenotypeRestriction phenotypeRestriction = (PhenotypeRestriction)restriction;
 
-			this.phenotypeComboBox.setValue(new PhenotypeSuggestion(phenotypeRestriction.getPhenotypeName(), phenotypeRestriction.getUri()));
+			this.phenotypeComboBox.setValue(new PhenotypeSuggestion(phenotypeRestriction.getName(), phenotypeRestriction.getUri()));
 			this.value.setValue(phenotypeRestriction.getValue());
 		}
 	}

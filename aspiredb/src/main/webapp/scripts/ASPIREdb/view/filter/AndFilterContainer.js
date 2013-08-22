@@ -9,6 +9,11 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
     layout: {
         type: 'vbox'
     },
+    config: {
+        propertyStore: null,
+        suggestValuesRemoteFunction: null,
+        filterItemType: null
+    },
     items: [
         {
             xtype: 'container',
@@ -21,6 +26,14 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
                     left: 5,
                     bottom: 5
                 }
+            },
+            getRestrictionExpression: function () {
+                var conjunction = new Conjunction();
+                conjunction.restrictions = [];
+                this.items.each(function(item, index, length) {
+                    conjunction.restrictions.push(item.getRestrictionExpression());
+                });
+                return conjunction;
             }
         },
         {
@@ -30,10 +43,16 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
         }
     ],
 
-    filterItemType: null,
+    getRestrictionExpression: function () {
+        var filterContainer = this.getComponent('filterContainer');
+        return filterContainer.getRestrictionExpression();
+    },
 
     getNewItem: function () {
-        return Ext.create(this.filterItemType);
+        return Ext.create(this.getFilterItemType(),{
+            propertyStore: this.getPropertyStore(),
+            suggestValuesRemoteFunction: this.getSuggestValuesRemoteFunction()
+        });
     },
 
     initComponent: function () {
@@ -43,7 +62,7 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
         var filterContainer = this.getComponent("filterContainer");
 
         // Add first item.
-        this.insert(0, this.getNewItem());
+        filterContainer.insert(0, this.getNewItem());
 
         // Attach button listener
         me.getComponent("addButton").on('click', function (button, event) {

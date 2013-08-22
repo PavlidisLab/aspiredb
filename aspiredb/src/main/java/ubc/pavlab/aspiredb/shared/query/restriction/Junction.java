@@ -18,6 +18,8 @@
  */
 package ubc.pavlab.aspiredb.shared.query.restriction;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -25,8 +27,13 @@ import java.util.List;
 /**
  * Superclass of Disjunction (OR-expression) and Conjunction (AND-expression).
  */
+@DataTransferObject
 public abstract class Junction implements RestrictionExpression {
     protected List<RestrictionExpression> restrictions = new ArrayList<RestrictionExpression>();
+
+    public void setRestrictions(List<RestrictionExpression> restrictions) {
+        this.restrictions = restrictions;
+    }
 
     public Collection<RestrictionExpression> getRestrictions() {
         return this.restrictions;

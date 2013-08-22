@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
+import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.TextOperator;
 import ubc.pavlab.aspiredb.shared.query.VariantLabelProperty;
 import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
@@ -44,7 +45,7 @@ public class VariantDaoImpl extends VariantDaoBaseImpl<Variant> implements Varia
     @Override
     public Collection<Variant> findByLabel(LabelValueObject label) {
         Criteria criteria = currentSession().createCriteria(Variant.class);
-        SimpleRestriction restrictionExpression = new SimpleRestriction(new VariantLabelProperty(), TextOperator.EQUAL, label);
+        SimpleRestriction restrictionExpression = new SimpleRestriction(new VariantLabelProperty(), Operator.TEXT_EQUAL, label);
         Criterion criterion = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
                 CriteriaBuilder.EntityType.VARIANT );
         criteria.add( criterion );

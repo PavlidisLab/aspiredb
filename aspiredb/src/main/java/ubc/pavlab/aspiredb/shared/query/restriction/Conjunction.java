@@ -18,8 +18,11 @@
  */
 package ubc.pavlab.aspiredb.shared.query.restriction;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  *  Represents RestrictionExpressions joined by AND.
  */
+@DataTransferObject(javascript = "Conjunction")
 public class Conjunction extends Junction {
 }

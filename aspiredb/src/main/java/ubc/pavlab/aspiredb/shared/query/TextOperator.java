@@ -18,21 +18,24 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * author: anton
  * date: 07/05/13
  */
-public enum TextOperator implements Operator {
+public enum TextOperator {
     EQUAL("="),
     NOT_EQUAL("!=");
 
     private String displayLabel;
 
+    TextOperator(){}
+
     TextOperator(String displayLabel) {
         this.displayLabel = displayLabel;
     }
 
-    @Override
     public String getDisplayLabel() {
         return displayLabel;
     }

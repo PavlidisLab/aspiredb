@@ -26,7 +26,7 @@ import java.util.Arrays;
  * author: anton
  * date: 24/05/13
  */
-@DataTransferObject
+@DataTransferObject(javascript = "NeurocartaPhenotypeProperty")
 public class NeurocartaPhenotypeProperty extends Property<GenomicRangeDataType> {
     private static final long serialVersionUID = 718213962710902188L;
 
@@ -34,6 +34,7 @@ public class NeurocartaPhenotypeProperty extends Property<GenomicRangeDataType> 
         this.dataType = new GenomicRangeDataType();
         this.displayName = "Neurocarta Phenotype";
         this.exampleValues = "Examples: <b>autism spectrum disorder</b>, <b>colon cancer</b>";
-        this.operators = Arrays.asList((Operator[]) SetOperator.values());
+        this.operators = Arrays.asList(Operator.IS_IN_SET, Operator.IS_NOT_IN_SET);
+        this.supportsSuggestions = true;
     }
 }

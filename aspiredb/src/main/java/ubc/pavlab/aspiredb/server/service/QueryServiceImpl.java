@@ -325,6 +325,7 @@ public class QueryServiceImpl extends GwtService implements QueryService {
 	}
 
 	@Override
+    @Deprecated
 	public Collection<NeurocartaPhenotypeValueObject> getNeurocartaPhenotypeSuggestions(String query) throws NeurocartaServiceException {
         if (query.length() < 3) {
             return new ArrayList<NeurocartaPhenotypeValueObject>();
@@ -464,15 +465,15 @@ public class QueryServiceImpl extends GwtService implements QueryService {
             SetRestriction restriction = (SetRestriction) restrictionExpression;
             // Expand NeurocartaPhenotype node -> set of genes.
             if (restriction.getProperty() instanceof NeurocartaPhenotypeProperty) {
-                Collection<? extends GwtSerializable> values = restriction.getValues();
-                for (GwtSerializable value : values) {
+                Collection<Object> values = restriction.getValues();
+                for (Object value : values) {
                     NeurocartaPhenotypeValueObject vo = (NeurocartaPhenotypeValueObject) value;
                     Collection<GeneValueObject> geneValueObjects = this.neurocartaQueryService.fetchGenesAssociatedWithPhenotype(vo.getUri());
                     vo.setGenes(geneValueObjects);
                 }
             } else  if (restriction.getProperty() instanceof GeneProperty) {
-                Collection<? extends GwtSerializable> values = restriction.getValues();
-                for (GwtSerializable value : values) {
+                Collection<Object> values = restriction.getValues();
+                for (Object value : values) {
                     GeneValueObject vo = (GeneValueObject) value;
                     if (vo.getGenomicRange() == null) {
                         throw new IllegalStateException("Genomic range wasn't set in GeneValueObject.");

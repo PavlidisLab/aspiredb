@@ -44,39 +44,46 @@ import java.util.Map;
 
 /**
  * TODO Document Me
+ *
  * @author ??
  * @version $Id: VariantServiceImpl.java,v 1.39 2013/07/02 18:20:21 anton Exp $
  */
-@RemoteProxy(name="VariantService")
+@RemoteProxy(name = "VariantService")
 @Service("variantService")
 public class VariantServiceImpl extends GwtService implements VariantService {
-    
-    private static Logger log = LoggerFactory.getLogger( VariantServiceImpl.class );
 
-    @Autowired private VariantDao variantDao;
-    @Autowired private LabelDao labelDao;
-    @Autowired private CharacteristicDao characteristicDao;
-    @Autowired private BioMartQueryService bioMartQueryService;
-    @Autowired private NeurocartaQueryService neurocartaQueryService;
-    @Autowired private ChromosomeService chromosomeService;
+    private static Logger log = LoggerFactory.getLogger(VariantServiceImpl.class);
 
-    private String getSortColumn (PagingLoadConfig config) {
+    @Autowired
+    private VariantDao variantDao;
+    @Autowired
+    private LabelDao labelDao;
+    @Autowired
+    private CharacteristicDao characteristicDao;
+    @Autowired
+    private BioMartQueryService bioMartQueryService;
+    @Autowired
+    private NeurocartaQueryService neurocartaQueryService;
+    @Autowired
+    private ChromosomeService chromosomeService;
+
+    private String getSortColumn(PagingLoadConfig config) {
         // default value
         String property = "id";
-        
+
         if (config.getSortInfo() != null && !config.getSortInfo().isEmpty()) {
             SortInfo sortInfo = config.getSortInfo().iterator().next();
             property = sortInfo.getSortField();
         }
-                
+
 //      String columnName = propertyToColumnName.get( property );
         return "id";
     }
-    
-    private String getSortDirection (PagingLoadConfig config) {
+
+    private String getSortDirection(PagingLoadConfig config) {
         // default value
         String direction = "ASC";
-        
+
         if (config.getSortInfo() != null && !config.getSortInfo().isEmpty()) {
             SortInfo sortInfo = config.getSortInfo().iterator().next();
             direction = sortInfo.getSortDir().toString();
@@ -87,16 +94,16 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<Property> suggestProperties(VariantType variantType) {
+    public Collection<Property> suggestProperties2(VariantType variantType) {
         Collection<Property> properties = new ArrayList<Property>();
 
-        properties.add( new VariantLabelProperty() );
+        properties.add(new VariantLabelProperty());
 
-        properties.addAll( suggestEntityProperties(variantType) );
+        properties.addAll(suggestEntityProperties(variantType));
 
         Collection<String> characteristics = characteristicDao.getKeysMatching("");
         for (String characteristic : characteristics) {
-            properties.add( new CharacteristicProperty( characteristic ) );
+            properties.add(new CharacteristicProperty(characteristic));
         }
         return properties;
     }
@@ -106,22 +113,22 @@ public class VariantServiceImpl extends GwtService implements VariantService {
 
         switch (variantType) {
             case CNV:
-                properties.add( new CopyNumberProperty() );
-                properties.add( new CNVTypeProperty() );
-                properties.add( new CnvLengthProperty() );
+                properties.add(new CopyNumberProperty());
+                properties.add(new CNVTypeProperty());
+                properties.add(new CnvLengthProperty());
                 break;
             case SNV:
-                properties.add( new DbSnpIdProperty() );
-                properties.add( new ObservedBaseProperty() );
-                properties.add( new ReferenceBaseProperty() );
+                properties.add(new DbSnpIdProperty());
+                properties.add(new ObservedBaseProperty());
+                properties.add(new ReferenceBaseProperty());
                 break;
             case INDEL:
-                properties.add( new IndelLengthProperty() );
+                properties.add(new IndelLengthProperty());
                 break;
             case INVERSION:
                 break;
             case TRANSLOCATION:
-                properties.add( new TranslocationTypeProperty() );
+                properties.add(new TranslocationTypeProperty());
                 break;
         }
         return properties;
@@ -136,11 +143,11 @@ public class VariantServiceImpl extends GwtService implements VariantService {
             properties.addAll(suggestEntityProperties(type));
         }
 
-        properties.add( new VariantLabelProperty() );
+        properties.add(new VariantLabelProperty());
 
         Collection<String> characteristics = characteristicDao.getKeysMatching("");
         for (String characteristic : characteristics) {
-            properties.add( new CharacteristicProperty( characteristic ) );
+            properties.add(new CharacteristicProperty(characteristic));
         }
 
         return properties;
@@ -149,25 +156,43 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext) throws NotLoggedInException {
+    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext) throws NotLoggedInException, BioMartServiceException, NeurocartaServiceException {
         List<PropertyValue> values = new ArrayList<PropertyValue>();
         if (property instanceof CharacteristicProperty) {
             Collection<String> stringValues = characteristicDao.getValuesForKey(property.getName());
             for (String stringValue : stringValues) {
-                values.add( new PropertyValue<TextValue>(new TextValue(stringValue)) );
+                values.add(new PropertyValue<TextValue>(new TextValue(stringValue)));
             }
         } else if (property instanceof LabelProperty) {
             List<LabelValueObject> labels = suggestLabels(suggestionContext);
             for (LabelValueObject label : labels) {
-                values.add( new PropertyValue<LabelValueObject>(label) );
+                values.add(new PropertyValue<LabelValueObject>(label));
             }
+        } else if (property instanceof GeneProperty) {
+            String query = suggestionContext.getValuePrefix();
+            if (query.length() >= 2) {
+                final Collection<GeneValueObject> genes = bioMartQueryService.findGenes(query);
+                for (GeneValueObject gene : genes) {
+                    values.add(new PropertyValue<GeneValueObject>(gene));
+                }
+            }
+        } else if (property instanceof NeurocartaPhenotypeProperty) {
+            String query = suggestionContext.getValuePrefix();
+            if (query.length() >= 3) {
+                final Collection<NeurocartaPhenotypeValueObject> phenotypes = neurocartaQueryService.findPhenotypes(query);
+                for (NeurocartaPhenotypeValueObject phenotype : phenotypes) {
+                    values.add(new PropertyValue<NeurocartaPhenotypeValueObject>(phenotype));
+                }
+            }
+        } else if (property instanceof GenomicLocationProperty) {
+            values.addAll(suggestVariantLocationValues(property, suggestionContext));
         } else if (property instanceof TextProperty) {
             Collection<String> stringValues = ((TextProperty) property).getDataType().getAllowedValues();
             if (stringValues.isEmpty()) {
                 stringValues = variantDao.suggestValuesForEntityProperty(property, suggestionContext);
             }
             for (String stringValue : stringValues) {
-                values.add( new PropertyValue<TextValue>(new TextValue(stringValue)) );
+                values.add(new PropertyValue<TextValue>(new TextValue(stringValue)));
             }
         }
         return values;
@@ -183,21 +208,21 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-	public VariantValueObject getVariant(Long id) throws NotLoggedInException {
+    public VariantValueObject getVariant(Long id) throws NotLoggedInException {
         throwGwtExceptionIfNotLoggedIn();
 
-		Variant variant = variantDao.load(id);
-		return variant.toValueObject();
-	}
+        Variant variant = variantDao.load(id);
+        return variant.toValueObject();
+    }
 
     @Override
     @RemoteMethod
     public Collection<Property> suggestVariantLocationProperties() throws NotLoggedInException {
         Collection<Property> properties = new ArrayList<Property>();
 
-        properties.add( new GenomicLocationProperty() );
-        properties.add( new GeneProperty() );
-        properties.add( new NeurocartaPhenotypeProperty() );
+        properties.add(new GenomicLocationProperty());
+        properties.add(new GeneProperty());
+        properties.add(new NeurocartaPhenotypeProperty());
 
         return properties;
     }
@@ -240,9 +265,9 @@ public class VariantServiceImpl extends GwtService implements VariantService {
                     suggestions.add(new PropertyValue<GenomicRange>(new GenomicRange(chromosome)));
                 }
             }
-        } else if( state == GenomicRangeParser.State.COORDINATE) {
+        } else if (state == GenomicRangeParser.State.COORDINATE) {
             if (parseResult.isBase()) {
-                suggestions.add (new PropertyValue<GenomicRange>(new GenomicRange(
+                suggestions.add(new PropertyValue<GenomicRange>(new GenomicRange(
                         parseResult.getChromosome(), parseResult.getStartBase(), parseResult.getEndBase())));
                 return suggestions;
             }
@@ -285,20 +310,20 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     public LabelValueObject addLabel(Long id, LabelValueObject label) throws NotLoggedInException {
         throwGwtExceptionIfNotLoggedIn();
         Variant variant = variantDao.load(id);
-        Label labelEntity = labelDao.findOrCreate( label );
-        variant.addLabel( labelEntity );
+        Label labelEntity = labelDao.findOrCreate(label);
+        variant.addLabel(labelEntity);
         return labelEntity.toValueObject();
     }
 
     @Override
     @Transactional
-    public LabelValueObject addLabel(Collection<Long> ids, LabelValueObject label) throws NotLoggedInException{
+    public LabelValueObject addLabel(Collection<Long> ids, LabelValueObject label) throws NotLoggedInException {
         throwGwtExceptionIfNotLoggedIn();
         Collection<Variant> variants = variantDao.load(ids);
-        Label labelEntity = labelDao.findOrCreate( label );
+        Label labelEntity = labelDao.findOrCreate(label);
         for (Variant variant : variants) {
-            variant.addLabel( labelEntity );
-            variantDao.update( variant );
+            variant.addLabel(labelEntity);
+            variantDao.update(variant);
         }
         return labelEntity.toValueObject();
     }
@@ -309,7 +334,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
         Variant variant = variantDao.load(id);
         Label labelEntity = labelDao.load(label.getId());
         variant.removeLabel(labelEntity);
-        variantDao.update( variant );
+        variantDao.update(variant);
     }
 
     @Override
@@ -328,7 +353,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
         Collection<Label> labels = labelDao.getVariantLabels();
         List<LabelValueObject> vos = new ArrayList<LabelValueObject>();
         for (Label label : labels) {
-            vos.add( label.toValueObject() );
+            vos.add(label.toValueObject());
         }
         return vos;
     }

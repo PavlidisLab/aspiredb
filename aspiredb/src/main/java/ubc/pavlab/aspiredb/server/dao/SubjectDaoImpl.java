@@ -114,7 +114,7 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
     @Override
     public Collection<Subject> findByLabel(LabelValueObject label) {
         Criteria criteria = currentSession().createCriteria(Subject.class);
-        SimpleRestriction restrictionExpression = new SimpleRestriction(new SubjectLabelProperty(), TextOperator.EQUAL, label);
+        SimpleRestriction restrictionExpression = new SimpleRestriction(new SubjectLabelProperty(), Operator.TEXT_EQUAL, label);
         Criterion criterion = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
                 CriteriaBuilder.EntityType.SUBJECT );
         criteria.add( criterion );

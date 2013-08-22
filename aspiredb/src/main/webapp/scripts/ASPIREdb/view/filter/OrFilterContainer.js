@@ -11,13 +11,24 @@ Ext.define('ASPIREdb.view.filter.OrFilterContainer', {
     layout: {
         type: 'vbox'
     },
+    config: {
+        propertyStore: null,
+        suggestValuesRemoteFunction: null
+    },
 /*
     border: 1,
     style: {
         border: "1px solid lightgray"
     },
 */
-    items: [ {
+    getRestrictionExpression: function () {
+        var filterContainer = this.getComponent('filterContainer');
+        return filterContainer.getRestrictionExpression();
+    },
+
+    initComponent: function() {
+        var me = this;
+        this.items = [ {
             xtype: 'container',
             itemId: 'filterContainer',
             layout: {
@@ -29,9 +40,20 @@ Ext.define('ASPIREdb.view.filter.OrFilterContainer', {
                     bottom: 5
                 }
             },
+            getRestrictionExpression: function () {
+                var disjunction = new Disjunction();
+                disjunction.restrictions = [];
+                this.items.each(function(item, index, length) {
+                    disjunction.restrictions.push(item.getRestrictionExpression());
+                });
+                return disjunction;
+            },
+
             items: [
                 {
-                    xtype: 'filter_property'
+                    xtype: 'filter_property',
+                    propertyStore: me.getPropertyStore(),
+                    suggestValuesRemoteFunction: me.getSuggestValuesRemoteFunction()
                 }
             ]
         }, {
@@ -39,14 +61,16 @@ Ext.define('ASPIREdb.view.filter.OrFilterContainer', {
             itemId: 'addButton',
             text: 'OR'
         }
-    ],
+        ];
 
-    initComponent: function() {
         this.callParent();
-        var me = this;
+
         me.getComponent("addButton").on('click', function (button, event) {
             var filterContainer = me.getComponent("filterContainer");
-            filterContainer.add(Ext.create('ASPIREdb.view.filter.PropertyFilter'));
+            filterContainer.add(Ext.create('ASPIREdb.view.filter.PropertyFilter',{
+                propertyStore: me.getPropertyStore(),
+                suggestValuesRemoteFunction: me.getSuggestValuesRemoteFunction()
+            }));
             filterContainer.doLayout();
         });
     }

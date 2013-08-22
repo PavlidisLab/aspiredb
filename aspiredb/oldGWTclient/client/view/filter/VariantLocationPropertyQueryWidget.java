@@ -16,9 +16,7 @@ import ubc.pavlab.aspiredb.client.service.QueryServiceAsync;
 import ubc.pavlab.aspiredb.client.view.common.EditTextWindow;
 import ubc.pavlab.aspiredb.client.view.suggestBox.Displayable;
 import ubc.pavlab.aspiredb.shared.GwtSerializable;
-import ubc.pavlab.aspiredb.shared.query.*;
-
-import java.util.*;
+import ubc.pavlab.aspiredb.shared.query.Property;
 
 public class VariantLocationPropertyQueryWidget extends PropertyQueryWidget {
     private static final String EDIT_FILTER_WINDOW_TITLE = "Enter list";

@@ -14,7 +14,9 @@
  */
 package ubc.pavlab.aspiredb.shared.query.restriction;
 
+import org.directwebremoting.annotations.DataTransferObject;
 
+@DataTransferObject(javascript = "PhenotypeRestriction")
 public class PhenotypeRestriction implements RestrictionExpression {
 	private static final long serialVersionUID = -4503829624276270831L;
 
@@ -43,7 +45,15 @@ public class PhenotypeRestriction implements RestrictionExpression {
         this.uri = uri;
     }
 
-    public String getPhenotypeName() {
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getName() {
 		return this.name;
 	}
 	

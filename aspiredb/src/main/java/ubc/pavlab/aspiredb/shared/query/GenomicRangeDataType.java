@@ -27,6 +27,6 @@ import java.util.Collection;
  * author: anton
  * date: 23/05/13
  */
-@DataTransferObject
-public class GenomicRangeDataType implements DataType {
+@DataTransferObject(javascript = "GenomicRangeDataType")
+public class GenomicRangeDataType extends DataType {
 }

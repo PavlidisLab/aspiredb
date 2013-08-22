@@ -26,7 +26,7 @@ import java.util.Arrays;
  * author: anton
  * date: 24/05/13
  */
-@DataTransferObject
+@DataTransferObject(javascript = "GeneProperty")
 public class GeneProperty extends Property<GenomicRangeDataType> {
     private static final long serialVersionUID = 7298503620718797616L;
 
@@ -34,6 +34,7 @@ public class GeneProperty extends Property<GenomicRangeDataType> {
         this.dataType = new GenomicRangeDataType();
         this.displayName = "Gene";
         this.exampleValues = "Gene symbols or description - Examples: <b>AHSA2</b>, <b>BNIP3P1</b>, <b>shock</b>";
-        this.operators = Arrays.asList((Operator[]) SetOperator.values());
+        this.operators = Arrays.asList(Operator.IS_IN_SET, Operator.IS_NOT_IN_SET);
+        this.supportsSuggestions = true;
     }
 }

@@ -22,12 +22,18 @@ import java.io.Serializable;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
+import java.io.Serializable;
+
 /**
  * author: anton
  * date: 11/04/13
  */
 @DataTransferObject
+<<<<<<< HEAD
 public class LabelValueObject implements Serializable {
+=======
+public class LabelValueObject implements Displayable, Serializable {
+>>>>>>> b9b15d0dcc1855e942705523ab69771c5729c81b
     private static final long serialVersionUID = 5912945308104924604L;
 
     private String name;
@@ -77,5 +83,20 @@ public class LabelValueObject implements Serializable {
 
     public String toString() {
     	return this.getName();
+    }
+
+    @Override
+    public String getLabel() {
+        return name;
+    }
+
+    @Override
+    public String getHtmlLabel() {
+        return "";
+    }
+
+    @Override
+    public String getTooltip() {
+        return "";
     }
 }

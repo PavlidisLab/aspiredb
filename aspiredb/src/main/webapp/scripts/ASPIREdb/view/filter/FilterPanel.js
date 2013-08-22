@@ -6,7 +6,7 @@ Ext.define('ASPIREdb.view.filter.FilterPanel', {
     extend: 'Ext.Panel',
     closable: true,
     collapsible: true,
-    width: 700,
+    width: 800,
     layout: {
         type: 'vbox',
         align: 'stretch'

@@ -138,10 +138,10 @@ public class SubjectDaoTest extends BaseSpringContextTest {
 
     public RestrictionExpression makeTestRestrictionExpression() {
         RestrictionExpression labelRestriction = new SimpleRestriction(new SubjectLabelProperty(),
-                TextOperator.EQUAL, new LabelValueObject(label.getId(), "SUBJECT_TEST_LABEL"));
+                Operator.TEXT_EQUAL, new LabelValueObject(label.getId(), "SUBJECT_TEST_LABEL"));
 
         RestrictionExpression patientIdRestriction =
-                new SimpleRestriction(new ExternalSubjectIdProperty(), TextOperator.EQUAL, new TextValue("testPatientId"));
+                new SimpleRestriction(new ExternalSubjectIdProperty(), Operator.TEXT_EQUAL, new TextValue("testPatientId"));
 
         Conjunction restriction = new Conjunction();
         restriction.add(patientIdRestriction);
@@ -153,14 +153,14 @@ public class SubjectDaoTest extends BaseSpringContextTest {
     public RestrictionExpression makeTestRestrictionExpressionWithSets() {
         final Set<LabelValueObject> values = new HashSet<LabelValueObject>();
         values.add( new LabelValueObject( label.getId(), "SUBJECT_TEST_LABEL" ) );
-        RestrictionExpression labelRestriction = new SetRestriction( new SubjectLabelProperty(), SetOperator.IS_IN,
+        RestrictionExpression labelRestriction = new SetRestriction( new SubjectLabelProperty(), Operator.IS_IN_SET,
                 values );
 
         Set <TextValue> textValues = new HashSet<TextValue>();
         textValues.add(new TextValue("testPatientId"));
         
         RestrictionExpression patientIdRestriction = new SetRestriction( new ExternalSubjectIdProperty(),
-                SetOperator.IS_IN, textValues );
+                Operator.IS_IN_SET, textValues );
 
         Conjunction restriction = new Conjunction();
         restriction.add(patientIdRestriction);

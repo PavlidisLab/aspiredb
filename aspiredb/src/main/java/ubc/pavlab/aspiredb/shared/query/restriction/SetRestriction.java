@@ -18,10 +18,11 @@
  */
 package ubc.pavlab.aspiredb.shared.query.restriction;
 
-import ubc.pavlab.aspiredb.shared.GwtSerializable;
+import org.directwebremoting.annotations.DataTransferObject;
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.Property;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,27 +30,40 @@ import java.util.Set;
  * author: anton
  * date: 26/04/13
  */
+@DataTransferObject(javascript = "SetRestriction")
 public class SetRestriction implements RestrictionExpression {
     protected Property property;
     protected Operator operator;
-    protected Set<GwtSerializable> values = new HashSet<GwtSerializable>();
+    protected Set<Object> values = new HashSet<Object>();
 
     public SetRestriction() {
     }
 
-    public SetRestriction(Property property, Operator operator, Set<? extends GwtSerializable> values) {
+    public SetRestriction(Property property, Operator operator, Set<? extends Serializable> values) {
         this.property = property;
         this.operator = operator;
         this.values.addAll(values);
     }
 
-    public SetRestriction(Property property, Operator operator, GwtSerializable value) {
+    public SetRestriction(Property property, Operator operator, Serializable value) {
         this.property = property;
         this.operator = operator;
         this.values.add(value);
     }
 
-    public Set<? extends GwtSerializable> getValues() {
+    public void setProperty(Property property) {
+        this.property = property;
+    }
+
+    public void setOperator(Operator operator) {
+        this.operator = operator;
+    }
+
+    public void setValues(Set<Object> values) {
+        this.values = values;
+    }
+
+    public Set<Object> getValues() {
         return values;
     }
 

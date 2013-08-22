@@ -22,6 +22,8 @@ import ubc.pavlab.aspiredb.shared.GwtSerializable;
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.Property;
 
+import java.io.Serializable;
+
 /**
  * author: anton
  * date: 07/05/13
@@ -29,18 +31,18 @@ import ubc.pavlab.aspiredb.shared.query.Property;
 public class SimpleRestriction implements RestrictionExpression {
     protected Property property;
     protected Operator operator;
-    protected GwtSerializable value;
+    protected Serializable value;
 
     public SimpleRestriction() {
     }
 
-    public SimpleRestriction(Property property, Operator operator, GwtSerializable value) {
+    public SimpleRestriction(Property property, Operator operator, Serializable value) {
         this.property = property;
         this.operator = operator;
         this.value = value;
     }
 
-    public GwtSerializable getValue() {
+    public Serializable getValue() {
         return value;
     }
 

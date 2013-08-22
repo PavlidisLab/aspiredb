@@ -74,8 +74,10 @@ public interface QueryService {
     public void deleteQuery(QueryValueObject query);
 
     // TODO: To be removed
-	public Collection<GeneValueObject> getGeneSuggestions(String query) throws BioMartServiceException;
+    @Deprecated
+    public Collection<GeneValueObject> getGeneSuggestions(String query) throws BioMartServiceException;
 	
     // TODO: To be removed
-	public Collection<NeurocartaPhenotypeValueObject> getNeurocartaPhenotypeSuggestions(String query) throws NeurocartaServiceException;
+    @Deprecated
+    public Collection<NeurocartaPhenotypeValueObject> getNeurocartaPhenotypeSuggestions(String query) throws NeurocartaServiceException;
 }

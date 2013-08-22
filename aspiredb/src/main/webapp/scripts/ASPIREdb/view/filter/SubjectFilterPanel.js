@@ -13,14 +13,30 @@ Ext.define('ASPIREdb.view.filter.SubjectFilterPanel', {
     items: {
         xtype: 'filter_and',
         itemId: 'subjectFilterContainer',
-        filterItemType: 'ASPIREdb.view.filter.PropertyFilter'
+        filterItemType: 'ASPIREdb.view.filter.PropertyFilter',
+        suggestValuesRemoteFunction: SubjectServiceOld.suggestValues,
+        propertyStore: {
+            proxy : {
+                type: 'dwr',
+                dwrFunction : SubjectServiceOld.suggestProperties,
+                model: 'ASPIREdb.model.Property',
+                reader : {
+                    type: 'json',
+                    root: 'data',
+                    totalProperty: 'count'
+                }
+            }
+        }
+    },
+
+    getFilterConfig: function() {
+        var config = new SubjectFilterConfig();
+        var subjectFilterContainer = this.getComponent('subjectFilterContainer');
+        config.restriction = subjectFilterContainer.getRestrictionExpression();
+        return config;
     },
 
     initComponent: function () {
         this.callParent();
-        var filterContainer = this.getComponent('subjectFilterContainer');
-
-
     }
-
 });

@@ -6,7 +6,8 @@ Ext.require([
 //TODO: use tpl to render, extend Component?
 Ext.define('ASPIREdb.view.filter.multicombo.Item', {
     config: {
-        text : null
+        text : null,
+        value: null
     },
     extend: 'Ext.container.Container',
     autoEl: 'li',
@@ -28,6 +29,15 @@ Ext.define('ASPIREdb.view.filter.multicombo.Item', {
                 autoEl: {
                     tag: 'span',
                     html: 'x'
+                },
+                listeners: {
+                    click : {
+                        element:'el',
+                        fn: function() {
+                            this.fireEvent('remove', this);
+                        },
+                        scope: this
+                    }
                 },
                 cls: 'multiValueSuggestBox-token-close'
             }

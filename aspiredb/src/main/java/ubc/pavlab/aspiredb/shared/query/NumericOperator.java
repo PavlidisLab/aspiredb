@@ -18,12 +18,13 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * author: anton
  * date: 07/05/13
  */
-public enum NumericOperator implements Operator {
-
+public enum NumericOperator {
     GREATER(">"),
     LESS("<"),
     EQUAL("="),
@@ -31,11 +32,13 @@ public enum NumericOperator implements Operator {
 
     private String displayLabel;
 
+    NumericOperator() {
+    }
+
     NumericOperator(String displayLabel) {
         this.displayLabel = displayLabel;
     }
 
-    @Override
     public String getDisplayLabel() {
         return displayLabel;
     }

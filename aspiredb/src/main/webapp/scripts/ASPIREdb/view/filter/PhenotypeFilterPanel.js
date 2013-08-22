@@ -13,18 +13,18 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilterPanel', {
     items: {
         xtype: 'filter_and',
         itemId: 'phenotypeFilterContainer',
-        filterItemType: 'ASPIREdb.view.filter.PropertyFilter'
-/*
+        filterItemType: 'ASPIREdb.view.filter.PhenotypeFilter'
+    },
 
-        getNewItem: function () {
-            return Ext.create('ASPIREdb.view.PropertyFilter');
-        }
-*/
+    getFilterConfig: function() {
+        var config = new PhenotypeFilterConfig();
+        var phenotypeFilterContainer = this.getComponent('phenotypeFilterContainer');
+        config.restriction = phenotypeFilterContainer.getRestrictionExpression();
+        return config;
     },
 
     initComponent: function () {
         this.callParent();
-//        this.getComponent("locationFilterContainer").add(Ext.create('ASPIREdb.view.OrFilterContainer'));
     }
 
 });

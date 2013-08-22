@@ -59,7 +59,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
 
     @Override
     public Collection<T> findByGenomicLocation(GenomicRange range, Collection<Long> activeProjectIds) {
-        SimpleRestriction restriction = new SimpleRestriction(new GenomicLocationProperty(), SetOperator.IS_IN, range);
+        SimpleRestriction restriction = new SimpleRestriction(new GenomicLocationProperty(), Operator.IS_IN_SET, range);
 
         Session session = this.getSessionFactory().getCurrentSession();
         Criteria criteria = session.createCriteria( this.elementClass );

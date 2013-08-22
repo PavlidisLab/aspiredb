@@ -18,12 +18,15 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.util.Arrays;
 
 /**
  * author: anton
  * date: 07/05/13
  */
+@DataTransferObject(javascript = "CNVTypeProperty")
 public class CNVTypeProperty extends TextProperty {
     public CNVTypeProperty() {
         super("CNV Type", "type", Arrays.asList("LOSS","GAIN"));

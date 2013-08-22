@@ -135,9 +135,9 @@ public class PhenotypeDaoImpl extends SecurableDaoBaseImpl<Phenotype> implements
     }
 
 	@Override
-	public List<String> getExistingValues( String ontologyTermUri ) {
-		Query query = currentSession().createQuery( "select distinct p.value from Phenotype as p where p.name=:uri" );
-		query.setParameter( "uri", ontologyTermUri );
+	public List<String> getExistingValues( String name ) {
+		Query query = currentSession().createQuery( "select distinct p.value from Phenotype as p where p.name=:name" );
+		query.setParameter( "name", name );
 		return query.list();
 	}
 

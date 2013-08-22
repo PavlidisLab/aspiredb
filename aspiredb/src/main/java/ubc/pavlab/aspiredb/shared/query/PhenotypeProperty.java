@@ -18,15 +18,19 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * author: anton
  * date: 07/06/13
  */
+@DataTransferObject(javascript = "PhenotypeProperty")
 public class PhenotypeProperty extends Property {
     private static final long serialVersionUID = -8724559011217298269L;
 
     private boolean isOntologyTerm;
     private String uri;
+    private boolean existInDatabase;
 
     public PhenotypeProperty() {
     }
@@ -35,6 +39,7 @@ public class PhenotypeProperty extends Property {
         this.name = name;
         this.displayName = name;
         this.dataType = datatype;
+        this.supportsSuggestions = true;
     }
 
     public boolean isOntologyTerm() {
@@ -51,5 +56,13 @@ public class PhenotypeProperty extends Property {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public void setExistInDatabase(boolean existInDatabase) {
+        this.existInDatabase = existInDatabase;
+    }
+
+    public boolean isExistInDatabase() {
+        return existInDatabase;
     }
 }

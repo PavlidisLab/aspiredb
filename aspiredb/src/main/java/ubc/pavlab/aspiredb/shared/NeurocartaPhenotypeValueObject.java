@@ -24,7 +24,7 @@ import java.util.Collection;
  * @author frances
  * @version $Id: NeurocartaPhenotypeValueObject.java,v 1.6 2013/06/11 22:30:57 anton Exp $
  */
-@DataTransferObject
+@DataTransferObject(javascript = "NeurocartaPhenotypeValueObject")
 public class NeurocartaPhenotypeValueObject extends PhenotypeValueObject implements Displayable {
 
 	private static final long serialVersionUID = -7292996170070245025L;

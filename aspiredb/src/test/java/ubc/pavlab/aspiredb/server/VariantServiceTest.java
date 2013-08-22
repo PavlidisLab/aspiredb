@@ -32,6 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
+import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
@@ -96,12 +98,12 @@ public class VariantServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testSuggestProperties() throws NotLoggedInException {
-        Collection<Property> suggestions = variantService.suggestProperties(VariantType.CNV);
+        Collection<Property> suggestions = variantService.suggestProperties2(VariantType.CNV);
         assertTrue(suggestions.size() > 2); //TODO: test more thoroughly
     }
 
     @Test
-    public void testSuggestValues() throws NotLoggedInException {
+    public void testSuggestValues() throws NotLoggedInException, BioMartServiceException, NeurocartaServiceException {
         SuggestionContext suggestionContext = new SuggestionContext();
         CharacteristicProperty property = new CharacteristicProperty("BENIGN");
         Collection<PropertyValue> suggestions = variantService.suggestValues(property, suggestionContext);
