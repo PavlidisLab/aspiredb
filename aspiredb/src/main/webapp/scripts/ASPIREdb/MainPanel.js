@@ -19,7 +19,7 @@ Ext.define('ASPIREdb.MainPanel',{
         },
         {
             region: 'center',
-            xtype: 'panel',
+            xtype: 'ideogram',
             title:'Variant'
         },
         {
