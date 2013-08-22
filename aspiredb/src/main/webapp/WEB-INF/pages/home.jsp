@@ -9,10 +9,14 @@
 <script src="dwr/dtoall.js"></script>
 
 <script src="scripts/lib/ext-all-debug-w-comments.js"></script>
+<script type="text/javascript" src="scripts/lib/ext-theme-neptune.js"></script>
+
 <script src="scripts/lib/DwrProxy.js"></script>
 
 <link href="http://cdn.sencha.com/ext/gpl/4.2.0/resources/css/ext-all.css" rel="stylesheet" />
 <link rel="stylesheet" type="text/css" href="scripts/ASPIREdb/resources/css/multivaluecombo.css" />
+<link rel="stylesheet" type="text/css" href="scripts/lib/resources/css/ext-all-neptune.css">
+<link rel="icon" type="image/x-icon" href="scripts/ASPIREdb/resources/images/favicon.ico" />
 
 <script src="scripts/ASPIREdb/view/ideogram/IdeogramCursorLayer.js"></script>
 <script src="scripts/ASPIREdb/view/ideogram/ChromosomeLayer.js"></script>
