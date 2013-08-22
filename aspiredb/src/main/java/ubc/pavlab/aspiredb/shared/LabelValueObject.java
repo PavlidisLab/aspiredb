@@ -18,6 +18,8 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import java.io.Serializable;
+
 import org.directwebremoting.annotations.DataTransferObject;
 
 import java.io.Serializable;
@@ -27,7 +29,11 @@ import java.io.Serializable;
  * date: 11/04/13
  */
 @DataTransferObject
+<<<<<<< HEAD
+public class LabelValueObject implements Serializable {
+=======
 public class LabelValueObject implements Displayable, Serializable {
+>>>>>>> b9b15d0dcc1855e942705523ab69771c5729c81b
     private static final long serialVersionUID = 5912945308104924604L;
 
     private String name;

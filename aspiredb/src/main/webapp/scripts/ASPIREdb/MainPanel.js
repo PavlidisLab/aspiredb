@@ -1,6 +1,7 @@
 Ext.require([
     'Ext.panel.Panel',
-    'ASPIREdb.view.Ideogram'
+    'ASPIREdb.view.Ideogram',
+    'ASPIREdb.view.subject.SubjectGrid'
 ]);
 
 Ext.define('ASPIREdb.MainPanel',{
@@ -10,8 +11,10 @@ Ext.define('ASPIREdb.MainPanel',{
     items:[
         {
             region: 'west',
-            xtype:'panel',
+            xtype:'subjectGrid',
             width: 300,
+            collapsible: true,
+            split: true,
             title:'Subject'
         },
         {
@@ -23,6 +26,8 @@ Ext.define('ASPIREdb.MainPanel',{
             region: 'east',
             xtype:'panel',
             width: 700,
+            collapsible: true,
+            split: true,
             title:'Phenotype'
         }
     ]
