@@ -201,7 +201,7 @@ public class CriteriaBuilder {
     private static Criterion processRestrictionExpression( SimpleRestriction restriction, EntityType target ) {
         Property property = restriction.getProperty();
         Operator operator = restriction.getOperator();
-        Serializable value = restriction.getValue();
+        Object value = restriction.getValue();
 
         if ( property instanceof CharacteristicProperty ) {
             return createCharacteristicCriterion( ( CharacteristicProperty ) property, operator, ( TextValue ) value,

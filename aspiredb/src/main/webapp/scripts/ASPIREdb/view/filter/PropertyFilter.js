@@ -16,6 +16,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
         suggestValuesRemoteFunction: null
     },
 
+    isMultiValue: true,
     selectedProperty: null,
 
     getRestrictionExpression: function() {
@@ -23,12 +24,23 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
         var operatorComboBox = this.getComponent("operatorComboBox");
         var multicombo_container = this.getComponent("multicombo_container");
         var multicombo = multicombo_container.getComponent("multicombo");
+        var singleValueField = multicombo_container.getComponent("singleValueField");
 
-        var setRestriction = new SetRestriction();
-        setRestriction.property = this.selectedProperty;
-        setRestriction.operator = operatorComboBox.getValue();
-        setRestriction.values = multicombo.getValues();
-        return setRestriction;
+        if (this.isMultiValue) {
+            var setRestriction = new SetRestriction();
+            setRestriction.property = this.selectedProperty;
+            setRestriction.operator = operatorComboBox.getValue();
+            setRestriction.values = multicombo.getValues();
+            return setRestriction;
+        } else {
+            var simpleRestriction = new SimpleRestriction();
+            simpleRestriction.property = this.selectedProperty;
+            simpleRestriction.operator = operatorComboBox.getValue();
+            var value = new NumericValue();
+            value.value = singleValueField.getValue();
+            simpleRestriction.value = value;
+            return simpleRestriction;
+        }
     },
 
     initComponent: function () {
@@ -68,6 +80,13 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
                         suggestValuesRemoteFunction: me.getSuggestValuesRemoteFunction()
                     },
                     {
+                        xtype: 'textfield',
+                        itemId: 'singleValueField',
+                        width: 400,
+                        height: 20,
+                        hidden: true
+                    },
+                    {
                         xtype: 'label',
                         itemId: 'example',
                         style: {
@@ -89,6 +108,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
         var multicombo_container = me.getComponent("multicombo_container");
         var operatorComboBox = me.getComponent("operatorComboBox");
         var multicombo = multicombo_container.getComponent("multicombo");
+        var singleValueField = multicombo_container.getComponent("singleValueField");
         var example = multicombo_container.getComponent("example");
 
         me.getComponent("propertyComboBox").on('select',
@@ -108,9 +128,22 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
                 store.removeAll();
                 store.add( operatorModels );
 
-                // update multicombobox
-                multicombo.setProperty(record.raw);
-                me.selectedProperty = record.raw;
+                var property = record.raw;
+                if (property.dataType instanceof NumericalDataType) {
+                    me.isMultiValue = false;
+                    multicombo.hide();
+                    singleValueField.reset();
+                    singleValueField.show();
+                } else {
+                    me.isMultiValue = true;
+                    // update multicombobox
+                    multicombo.setProperty(property);
+                    multicombo.reset();
+                    multicombo.show();
+                    singleValueField.hide();
+                }
+
+                me.selectedProperty = property;
             }
         );
 

@@ -18,25 +18,28 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * author: anton
  * date: 11/06/13
  */
-public class NumericValue implements GwtSerializable {
-    private Number value;
+@DataTransferObject(javascript = "NumericValue")
+public class NumericValue {
+    private Integer value;
 
     public NumericValue() {
     }
 
-    public NumericValue(Number value) {
+    public NumericValue(Integer value) {
         this.value = value;
     }
 
-    public Number getValue() {
+    public Integer getValue() {
         return value;
     }
 
-    public void setValue(Number value) {
+    public void setValue(Integer value) {
         this.value = value;
     }
 
