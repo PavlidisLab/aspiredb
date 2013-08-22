@@ -22,7 +22,6 @@ package ubc.pavlab.aspiredb.server.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
@@ -63,10 +62,11 @@ public class SubjectService {
     private LabelDao labelDao;
 
     @RemoteMethod
-    public List<SubjectValueObject> getSubjects() {
+    @Transactional(readOnly = true)
+    public Collection<SubjectValueObject> getSubjects() {
 
         Collection<Subject> subjects = subjectDao.loadAll();
-        List<SubjectValueObject> vos = new ArrayList<SubjectValueObject>();
+        Collection<SubjectValueObject> vos = new ArrayList<SubjectValueObject>();
 
         for ( Subject s : subjects ) {
             SubjectValueObject vo = Subject.convertToValueObject( s );
@@ -78,15 +78,15 @@ public class SubjectService {
 
     @RemoteMethod
     @Transactional(readOnly = true)
-    public SubjectValueObject getSubject(Long projectId, Long subjectId ) {
+    public SubjectValueObject getSubject( Long projectId, Long subjectId ) {
         Subject subject = subjectDao.load( subjectId );
         if ( subject == null ) return null;
 
         SubjectValueObject vo = Subject.convertToValueObject( subject );
-        
+
         // TODO add variants
-        //Integer numVariants = cnvDao.findBySubjectId( subject.getPatientId() ).size();
-        //vo.setVariants( numVariants != null ? numVariants : 0 );
+        // Integer numVariants = cnvDao.findBySubjectId( subject.getPatientId() ).size();
+        // vo.setVariants( numVariants != null ? numVariants : 0 );
 
         return vo;
     }
