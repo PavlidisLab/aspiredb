@@ -30,7 +30,7 @@ import java.util.Arrays;
 public class CharacteristicProperty extends Property<DataType> {
 
     public CharacteristicProperty() {
-        this.operators = Arrays.asList((Operator[]) SetOperator.values());
+        this.operators =  Arrays.asList(Operator.IS_IN_SET, Operator.IS_NOT_IN_SET);
         this.supportsSuggestions = true;
     }
 
@@ -47,5 +47,4 @@ public class CharacteristicProperty extends Property<DataType> {
         this.displayName = name;
         this.dataType = dataType;
     }
-
 }

@@ -35,7 +35,7 @@ public class Property<D extends DataType> implements Serializable {
     protected String displayName;
     protected D dataType;
     protected String exampleValues;
-    protected Collection<? extends Operator> operators;
+    protected Collection<Operator> operators;
     protected boolean supportsSuggestions = false;
 
     public Property() {
@@ -65,7 +65,7 @@ public class Property<D extends DataType> implements Serializable {
         return exampleValues;
     }
 
-    public Collection<? extends Operator> getOperators() {
+    public Collection<Operator> getOperators() {
         return operators;
     }
 

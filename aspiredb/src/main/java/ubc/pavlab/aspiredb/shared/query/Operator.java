@@ -20,12 +20,18 @@ package ubc.pavlab.aspiredb.shared.query;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
-import java.io.Serializable;
-
 /**
  * author: anton
  * date: 07/05/13
  */
-public interface Operator extends Serializable {
-    public String getDisplayLabel();
+@DataTransferObject(type="enum")
+public enum Operator  {
+    IS_IN_SET,
+    IS_NOT_IN_SET,
+    NUMERIC_GREATER,
+    NUMERIC_LESS,
+    NUMERIC_EQUAL,
+    NUMERIC_NOT_EQUAL,
+    TEXT_EQUAL,
+    TEXT_NOT_EQUAL;
 }

@@ -31,15 +31,15 @@ import java.util.*;
 public class QueryTestUtils {
 
     public static RestrictionExpression makeTestVariantRestrictionExpression(Long labelId) {
-        RestrictionExpression location = new SimpleRestriction(new GenomicLocationProperty(), SetOperator.IS_IN, new GenomicRange("X", 56600000, 56800000));
+        RestrictionExpression location = new SimpleRestriction(new GenomicLocationProperty(), Operator.IS_IN_SET, new GenomicRange("X", 56600000, 56800000));
         RestrictionExpression type = new VariantTypeRestriction(VariantType.CNV);
-        RestrictionExpression cnvType = new SimpleRestriction(new CNVTypeProperty(), TextOperator.EQUAL, new TextValue("LOSS"));
+        RestrictionExpression cnvType = new SimpleRestriction(new CNVTypeProperty(), Operator.TEXT_EQUAL, new TextValue("LOSS"));
         RestrictionExpression labelRestriction = new SimpleRestriction(new VariantLabelProperty(),
-                TextOperator.EQUAL, new LabelValueObject(labelId, "CNV_TEST_LABEL"));
+                Operator.TEXT_EQUAL, new LabelValueObject(labelId, "CNV_TEST_LABEL"));
 
-        RestrictionExpression copyNumber = new SimpleRestriction(new CopyNumberProperty(), NumericOperator.EQUAL, new NumericValue(2));
+        RestrictionExpression copyNumber = new SimpleRestriction(new CopyNumberProperty(), Operator.NUMERIC_EQUAL, new NumericValue(2));
         RestrictionExpression characteristic = new SimpleRestriction(
-                new CharacteristicProperty("BENIGN"), TextOperator.EQUAL, new TextValue("YES"));
+                new CharacteristicProperty("BENIGN"), Operator.TEXT_EQUAL, new TextValue("YES"));
 
         Conjunction restriction = new Conjunction();
         restriction.add(location);
@@ -53,15 +53,15 @@ public class QueryTestUtils {
     }
 
     public static RestrictionExpression makeTestVariantRestrictionExpressionWithSets(Long labelId) {
-        RestrictionExpression location = new SetRestriction(new GenomicLocationProperty(), SetOperator.IS_IN, new GenomicRange("X", 56600000, 56800000));
+        RestrictionExpression location = new SetRestriction(new GenomicLocationProperty(), Operator.IS_IN_SET, new GenomicRange("X", 56600000, 56800000));
         RestrictionExpression type = new VariantTypeRestriction(VariantType.CNV);
-        RestrictionExpression cnvType = new SetRestriction(new CNVTypeProperty(), SetOperator.IS_IN, new TextValue("LOSS"));
+        RestrictionExpression cnvType = new SetRestriction(new CNVTypeProperty(), Operator.IS_IN_SET, new TextValue("LOSS"));
         RestrictionExpression labelRestriction = new SetRestriction(new VariantLabelProperty(),
-                SetOperator.IS_IN, new LabelValueObject(labelId, "CNV_TEST_LABEL"));
+                Operator.IS_IN_SET, new LabelValueObject(labelId, "CNV_TEST_LABEL"));
 
-        RestrictionExpression copyNumber = new SimpleRestriction(new CopyNumberProperty(), NumericOperator.EQUAL, new NumericValue(2));
+        RestrictionExpression copyNumber = new SimpleRestriction(new CopyNumberProperty(), Operator.NUMERIC_EQUAL, new NumericValue(2));
         RestrictionExpression characteristic = new SetRestriction(
-                new CharacteristicProperty("BENIGN"), SetOperator.IS_IN, new TextValue("YES"));
+                new CharacteristicProperty("BENIGN"), Operator.IS_IN_SET, new TextValue("YES"));
 
         Conjunction restriction = new Conjunction();
         restriction.add(location);
@@ -76,9 +76,9 @@ public class QueryTestUtils {
 
     public static RestrictionExpression makeTestVariantRestrictionExpression() {
         RestrictionExpression type = new VariantTypeRestriction(VariantType.CNV);
-        RestrictionExpression copyNumber = new SimpleRestriction(new CopyNumberProperty(), NumericOperator.EQUAL, new NumericValue(2));
+        RestrictionExpression copyNumber = new SimpleRestriction(new CopyNumberProperty(), Operator.NUMERIC_EQUAL, new NumericValue(2));
         RestrictionExpression characteristic = new SimpleRestriction(
-                new CharacteristicProperty("BENIGN"), TextOperator.EQUAL, new TextValue("YES"));
+                new CharacteristicProperty("BENIGN"), Operator.TEXT_EQUAL, new TextValue("YES"));
 
         Conjunction restriction = new Conjunction();
         restriction.add(type);

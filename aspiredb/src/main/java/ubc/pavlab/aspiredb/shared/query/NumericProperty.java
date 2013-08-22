@@ -30,7 +30,9 @@ import java.util.Arrays;
 public class NumericProperty extends Property<NumericalDataType> {
     public NumericProperty() {
         this.dataType = new NumericalDataType();
-        this.operators = Arrays.asList((Operator[]) NumericOperator.values());
+        this.operators = Arrays.asList(
+                Operator.NUMERIC_EQUAL,Operator.NUMERIC_GREATER,
+                Operator.NUMERIC_LESS, Operator.NUMERIC_NOT_EQUAL);
     }
 
     public NumericProperty(String displayName, String name) {

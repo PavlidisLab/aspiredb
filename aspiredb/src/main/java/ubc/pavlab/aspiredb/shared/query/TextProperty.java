@@ -33,7 +33,7 @@ public class TextProperty extends Property<TextDataType> {
 
     public TextProperty() {
         this.dataType = new TextDataType();
-        this.operators = Arrays.asList((Operator[]) SetOperator.values());
+        this.operators = Arrays.asList(Operator.IS_IN_SET, Operator.IS_NOT_IN_SET);
         this.supportsSuggestions = true;
     }
 

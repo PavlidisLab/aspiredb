@@ -465,15 +465,15 @@ public class QueryServiceImpl extends GwtService implements QueryService {
             SetRestriction restriction = (SetRestriction) restrictionExpression;
             // Expand NeurocartaPhenotype node -> set of genes.
             if (restriction.getProperty() instanceof NeurocartaPhenotypeProperty) {
-                Collection<? extends Serializable> values = restriction.getValues();
-                for (Serializable value : values) {
+                Collection<Object> values = restriction.getValues();
+                for (Object value : values) {
                     NeurocartaPhenotypeValueObject vo = (NeurocartaPhenotypeValueObject) value;
                     Collection<GeneValueObject> geneValueObjects = this.neurocartaQueryService.fetchGenesAssociatedWithPhenotype(vo.getUri());
                     vo.setGenes(geneValueObjects);
                 }
             } else  if (restriction.getProperty() instanceof GeneProperty) {
-                Collection<? extends Serializable> values = restriction.getValues();
-                for (Serializable value : values) {
+                Collection<Object> values = restriction.getValues();
+                for (Object value : values) {
                     GeneValueObject vo = (GeneValueObject) value;
                     if (vo.getGenomicRange() == null) {
                         throw new IllegalStateException("Genomic range wasn't set in GeneValueObject.");

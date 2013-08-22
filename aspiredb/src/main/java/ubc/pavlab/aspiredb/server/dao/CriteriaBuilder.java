@@ -97,63 +97,63 @@ public class CriteriaBuilder {
 
     private static Criterion processRestrictionExpression(SetRestriction setRestriction, EntityType target) {
         Property property = setRestriction.getProperty();
-        SetOperator operator = (SetOperator) setRestriction.getOperator();
-        Set<? extends Serializable> values = setRestriction.getValues();
+        Operator operator = setRestriction.getOperator();
+        Set<Object> values = setRestriction.getValues();
 
         DetachedCriteria subquery = DetachedCriteria.forClass(target.clazz);
 
         Junction criteriaDisjunction = Restrictions.disjunction();
 
         if ( property instanceof CharacteristicProperty ) {
-            for (Serializable value: values) {
+            for (Object value: values) {
                 criteriaDisjunction.add( createCharacteristicCriterion (
                                 ( CharacteristicProperty ) property,
-                                TextOperator.EQUAL,
+                                Operator.TEXT_EQUAL,
                                 ( TextValue ) value,
                                 target ));
             }
         } else if ( property instanceof LabelProperty ) {
-            for (Serializable value: values) {
+            for (Object value: values) {
                 criteriaDisjunction.add( createLabelCriterion(
                         ( LabelProperty ) property,
-                        TextOperator.EQUAL,
+                        Operator.TEXT_EQUAL,
                         ( LabelValueObject ) value, target ));
             }
         } else if ( property instanceof CNVTypeProperty ) {
             EntityType propertyOf = EntityType.VARIANT;
-            for (Serializable value: values) {
+            for (Object value: values) {
                 criteriaDisjunction.add( createCNVTypeCriterion(
-                        TextOperator.EQUAL,
+                        Operator.TEXT_EQUAL,
                         fullEntityPropertyName(target, propertyOf, property),
                         ( TextValue ) value ));
             }
         } else if ( property instanceof ExternalSubjectIdProperty ) {
             EntityType propertyOf = EntityType.SUBJECT;
-            for (Serializable value: values) {
+            for (Object value: values) {
                 criteriaDisjunction.add( createTextCriterion(
-                        TextOperator.EQUAL,
+                        Operator.TEXT_EQUAL,
                         fullEntityPropertyName(target, propertyOf, property),
                         ( ( TextValue ) value ).getValue() ));
             }
         } else if ( property instanceof TextProperty ) {
             EntityType propertyOf = EntityType.VARIANT;
-            for (Serializable value: values) {
+            for (Object value: values) {
                 criteriaDisjunction.add( createTextCriterion(
-                        TextOperator.EQUAL,
+                        Operator.TEXT_EQUAL,
                         fullEntityPropertyName(target, propertyOf, property),
                         ( ( TextValue ) value ).getValue() ));
             }
         } else if ( property instanceof GenomicLocationProperty ) {
-            for (Serializable value: values) {
+            for (Object value: values) {
                 criteriaDisjunction.add( overlapsGenomicRegionCriterion( (GenomicRange) value ) );
             }
         } else if ( property instanceof GeneProperty ) {
-            for (Serializable value: values) {
+            for (Object value: values) {
                 GeneValueObject gene = ( GeneValueObject ) value;
                 criteriaDisjunction.add( overlapsGenomicRegionCriterion( gene.getGenomicRange() ) );
             }
         } else if ( property instanceof NeurocartaPhenotypeProperty ) {
-            for (Serializable value : values) {
+            for (Object value : values) {
                 NeurocartaPhenotypeValueObject neurocartaPhenotype = ( NeurocartaPhenotypeValueObject ) value;
                 for ( GeneValueObject gene : neurocartaPhenotype.getGenes() ) {
                     criteriaDisjunction.add( overlapsGenomicRegionCriterion(gene.getGenomicRange()) );
@@ -167,9 +167,9 @@ public class CriteriaBuilder {
         subquery.setProjection(Projections.distinct(Projections.id()));
 
         switch (operator) {
-            case IS_IN:
+            case IS_IN_SET:
                 return Subqueries.propertyIn( "id", subquery );
-            case IS_NOT_IN:
+            case IS_NOT_IN_SET:
                 return Subqueries.propertyNotIn("id", subquery);
             default:
                 throw new IllegalArgumentException("Operator not supported.");
@@ -207,35 +207,35 @@ public class CriteriaBuilder {
             return createCharacteristicCriterion( ( CharacteristicProperty ) property, operator, ( TextValue ) value,
                     target );
         } else if ( property instanceof LabelProperty ) {
-            return createLabelCriterion( ( LabelProperty ) property, ( TextOperator ) operator,
+            return createLabelCriterion( ( LabelProperty ) property, operator,
                     ( LabelValueObject ) value, target );
         } else if ( property instanceof CNVTypeProperty ) {
             EntityType propertyOf = EntityType.VARIANT;
-            return createCNVTypeCriterion( ( TextOperator ) operator,
+            return createCNVTypeCriterion( operator,
                     fullEntityPropertyName(target, propertyOf, property), ( TextValue ) value );
         } else if ( property instanceof ExternalSubjectIdProperty ) {
             EntityType propertyOf = EntityType.SUBJECT;
-            return createTextCriterion( ( TextOperator ) operator,
+            return createTextCriterion( operator,
                     fullEntityPropertyName(target, propertyOf, property), ( ( TextValue ) value ).getValue() );
         } else if ( property instanceof NumericProperty ) {
             EntityType propertyOf = EntityType.VARIANT;
-            return createNumericalCriterion( ( NumericOperator ) operator, propertyPrefix( target, propertyOf )
+            return createNumericalCriterion( operator, propertyPrefix( target, propertyOf )
                     + property.getName(), ( NumericValue ) value );
         } else if ( property instanceof TextProperty ) {
             EntityType propertyOf = EntityType.VARIANT;
-            return createTextCriterion( ( TextOperator ) operator,
+            return createTextCriterion( operator,
                     fullEntityPropertyName(target, propertyOf, property),
                     ( ( TextValue ) value ).getValue() );
         } else if ( property instanceof GenomicLocationProperty ) {
-            return createGenomicRangeCriterion( (SetOperator) operator, ( GenomicRange ) value, target );
+            return createGenomicRangeCriterion( operator, ( GenomicRange ) value, target );
         } else if ( property instanceof GeneProperty ) {
             GeneValueObject gene = ( GeneValueObject ) value;
-            return createGenomicRangeCriterion( (SetOperator) operator, gene.getGenomicRange(), target );
+            return createGenomicRangeCriterion( operator, gene.getGenomicRange(), target );
         } else if ( property instanceof NeurocartaPhenotypeProperty ) {
             NeurocartaPhenotypeValueObject neurocartaPhenotype = ( NeurocartaPhenotypeValueObject ) value;
             Junction criteriaDisjunction = Restrictions.disjunction();
             for ( GeneValueObject gene : neurocartaPhenotype.getGenes() ) {
-                criteriaDisjunction.add( createGenomicRangeCriterion( (SetOperator) operator,
+                criteriaDisjunction.add( createGenomicRangeCriterion( operator,
                         gene.getGenomicRange(), target ) );
             }
             return criteriaDisjunction;
@@ -275,7 +275,7 @@ public class CriteriaBuilder {
         return rangeCriterion;
     }
 
-    private static Criterion createGenomicRangeCriterion( SetOperator operator, GenomicRange range, EntityType target ) {
+    private static Criterion createGenomicRangeCriterion( Operator operator, GenomicRange range, EntityType target ) {
         DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
 
         addLocationAlias( subquery, target );
@@ -284,9 +284,9 @@ public class CriteriaBuilder {
 
         subquery.setProjection( Projections.distinct( Projections.id() ) );
         switch (operator) {
-            case IS_IN:
+            case IS_IN_SET:
                 return Subqueries.propertyIn( "id", subquery );
-            case IS_NOT_IN:
+            case IS_NOT_IN_SET:
                 return Subqueries.propertyNotIn("id", subquery);
             default:
                 throw new IllegalArgumentException("Operator not supported.");
@@ -300,12 +300,12 @@ public class CriteriaBuilder {
         }
     }
 
-    private static Criterion createCNVTypeCriterion( TextOperator operator, String property, TextValue value ) {
+    private static Criterion createCNVTypeCriterion( Operator operator, String property, TextValue value ) {
         CnvType enumValue = CnvType.valueOf( value.toString() );
         return createTextCriterion( operator, property, enumValue );
     }
 
-    private static Criterion createLabelCriterion( LabelProperty property, TextOperator operator,
+    private static Criterion createLabelCriterion( LabelProperty property, Operator operator,
             LabelValueObject value, EntityType target ) {
         DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
         
@@ -319,9 +319,9 @@ public class CriteriaBuilder {
 
         subquery.setProjection( Projections.distinct( Projections.id() ) );
 
-        if ( operator == TextOperator.EQUAL ) {
+        if ( operator == Operator.TEXT_EQUAL ) {
             return Subqueries.propertyIn( "id", subquery );
-        } else if ( operator == TextOperator.NOT_EQUAL ) {
+        } else if ( operator == Operator.TEXT_NOT_EQUAL ) {
             return Subqueries.propertyNotIn( "id", subquery );
         }
 
@@ -363,15 +363,22 @@ public class CriteriaBuilder {
         Junction conjunction = Restrictions.conjunction().add(
                 Restrictions.eq( "characteristic.key", property.getName() ) );
 
-        if ( operator instanceof NumericOperator ) {
-            NumericValue numValue = new NumericValue( Integer.valueOf( value.getValue() ) );
-            conjunction
-                    .add( createNumericalCriterion( ( NumericOperator ) operator, "characteristic.value", numValue ) );
-        } else if ( operator instanceof TextOperator ) {
-            conjunction
-                    .add( createTextCriterion( ( TextOperator ) operator, "characteristic.value", value.toString() ) );
-        } else {
-            throw new IllegalArgumentException( "Operator type not supported." );
+        switch(operator) {
+            case TEXT_EQUAL:
+            case TEXT_NOT_EQUAL:
+                conjunction
+                        .add( createTextCriterion( operator, "characteristic.value", value.toString() ) );
+                break;
+            case NUMERIC_EQUAL:
+            case NUMERIC_GREATER:
+            case NUMERIC_LESS:
+            case NUMERIC_NOT_EQUAL:
+                NumericValue numValue = new NumericValue( Integer.valueOf( value.getValue() ) );
+                conjunction
+                        .add( createNumericalCriterion( operator, "characteristic.value", numValue ) );
+                break;
+            default:
+                throw new IllegalArgumentException( "Operator type not supported." );
         }
 
         subquery.add( conjunction );
@@ -387,19 +394,19 @@ public class CriteriaBuilder {
      * @param value
      * @return
      */
-    private static Criterion createNumericalCriterion( NumericOperator operator, String property, NumericValue value ) {
+    private static Criterion createNumericalCriterion( Operator operator, String property, NumericValue value ) {
         Criterion criterion;
         switch ( operator ) {
-            case GREATER:
+            case NUMERIC_GREATER:
                 criterion = Restrictions.gt( property, value.getValue() );
                 break;
-            case LESS:
+            case NUMERIC_LESS:
                 criterion = Restrictions.lt( property, value.getValue() );
                 break;
-            case EQUAL:
+            case NUMERIC_EQUAL:
                 criterion = Restrictions.eq( property, value.getValue() );
                 break;
-            case NOT_EQUAL:
+            case NUMERIC_NOT_EQUAL:
                 criterion = Restrictions.ne( property, value.getValue() );
                 break;
             default:
@@ -416,13 +423,13 @@ public class CriteriaBuilder {
      * @param value text value
      * @return Hibernate criterion
      */
-    private static Criterion createTextCriterion( TextOperator operator, String property, Object value ) {
+    private static Criterion createTextCriterion( Operator operator, String property, Object value ) {
         Criterion criterion;
         switch ( operator ) {
-            case EQUAL:
+            case TEXT_EQUAL:
                 criterion = Restrictions.eq( property, value );
                 break;
-            case NOT_EQUAL:
+            case TEXT_NOT_EQUAL:
                 criterion = Restrictions.ne( property, value );
                 break;
             default:

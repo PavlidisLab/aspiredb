@@ -34,7 +34,7 @@ import java.util.Set;
 public class SetRestriction implements RestrictionExpression {
     protected Property property;
     protected Operator operator;
-    protected Set<Serializable> values = new HashSet<Serializable>();
+    protected Set<Object> values = new HashSet<Object>();
 
     public SetRestriction() {
     }
@@ -59,11 +59,11 @@ public class SetRestriction implements RestrictionExpression {
         this.operator = operator;
     }
 
-    public void setValues(Set<Serializable> values) {
+    public void setValues(Set<Object> values) {
         this.values = values;
     }
 
-    public Set<? extends Serializable> getValues() {
+    public Set<Object> getValues() {
         return values;
     }
 

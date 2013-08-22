@@ -26,7 +26,6 @@ import java.io.Serializable;
  */
 @DataTransferObject(javascript = "GeneValueObject")
 public class GeneValueObject implements Displayable, Serializable {
-
     private static final long serialVersionUID = -7411514301896256147L;
 
     private String key;
@@ -37,8 +36,10 @@ public class GeneValueObject implements Displayable, Serializable {
     private String linkToGemma;
     private String geneBioType;
     private GenomicRange genomicRange;
-    
-    
+
+    public GeneValueObject() {
+    }
+
     public String getSymbol() {
         return symbol;
     }
@@ -53,9 +54,6 @@ public class GeneValueObject implements Displayable, Serializable {
 
     public void setName( String name ) {
         this.name = name;
-    }
-
-    public GeneValueObject() {
     }
 
     public String getGeneBioType() {

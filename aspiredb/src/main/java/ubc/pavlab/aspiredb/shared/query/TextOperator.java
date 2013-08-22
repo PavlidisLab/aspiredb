@@ -24,8 +24,7 @@ import org.directwebremoting.annotations.DataTransferObject;
  * author: anton
  * date: 07/05/13
  */
-@DataTransferObject(type = "enum")
-public enum TextOperator implements Operator {
+public enum TextOperator {
     EQUAL("="),
     NOT_EQUAL("!=");
 
@@ -37,7 +36,6 @@ public enum TextOperator implements Operator {
         this.displayLabel = displayLabel;
     }
 
-    @Override
     public String getDisplayLabel() {
         return displayLabel;
     }

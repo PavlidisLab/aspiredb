@@ -46,7 +46,7 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
         var itemElement = Ext.create('ASPIREdb.view.filter.multicombo.Item',
             {
                 text: item.data.displayValue,
-                value: item.raw
+                value: item.raw.value
             }
         );
         itemElement.on('remove', function(itemToRemove) {
