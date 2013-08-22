@@ -16,8 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require([ 'ASPIREdb.view.common.PagingGridPanel', 'Ext.grid.Panel',
-		'Ext.Panel', 'Ext.data.ArrayStore' ]);
+Ext.require([ 'Ext.grid.Panel', 'Ext.Panel', 'Ext.data.ArrayStore' ]);
 
 /**
  * Queries Subject values and loads them into a {@link PagingGridPanel}
@@ -63,6 +62,11 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 				dataIndex : 'subjectId',
 				flex : 1,
 				width : 50
+			}, {
+				text : "Labels",
+				dataIndex : 'label',
+				flex : 1,
+				width : 50
 			}, ],
 		});
 
@@ -81,7 +85,8 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 
 		for ( var key in subjectValueObjects) {
 			var val = subjectValueObjects[key];
-			var row = [ val.patientId ];
+			var visibleLabels = val.labels.join();
+			var row = [ val.patientId, visibleLabels ];
 			data.push(row);
 		}
 
@@ -89,6 +94,8 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 
 			fields : [ {
 				name : 'subjectId'
+			}, {
+				name : 'label'
 			} ],
 			data : data,
 			storeId : 'subjectStore'
