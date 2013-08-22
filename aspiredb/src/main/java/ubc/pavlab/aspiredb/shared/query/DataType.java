@@ -28,5 +28,5 @@ import java.util.Collection;
  * date: 07/05/13
  */
 @DataTransferObject(javascript = "DataType")
-public interface DataType extends Serializable {
+public class DataType {
 }

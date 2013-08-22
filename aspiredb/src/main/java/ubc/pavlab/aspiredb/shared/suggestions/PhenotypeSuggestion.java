@@ -1,7 +1,10 @@
 package ubc.pavlab.aspiredb.shared.suggestions;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.io.Serializable;
 
+@DataTransferObject(javascript = "PhenotypeSuggestion")
 public class PhenotypeSuggestion implements Serializable {
 
     private String name;

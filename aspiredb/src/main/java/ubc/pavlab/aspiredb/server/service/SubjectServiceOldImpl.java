@@ -21,6 +21,8 @@ import java.util.List;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.directwebremoting.annotations.RemoteMethod;
+import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +50,7 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
  * @version $Id: SubjectServiceImpl.java,v 1.36 2013/06/24 23:26:39 cmcdonald Exp $
  */
 @Service("subjectServiceOld")
+@RemoteProxy(name="SubjectServiceOld")
 public class SubjectServiceOldImpl extends GwtService implements SubjectServiceOld {
 	protected static Log log = LogFactory.getLog( SubjectServiceOldImpl.class );
 
@@ -72,6 +75,7 @@ public class SubjectServiceOldImpl extends GwtService implements SubjectServiceO
     }
 
     @Override
+    @RemoteMethod
     public Collection<Property> suggestProperties() {
         Collection<Property> properties = new ArrayList<Property>();
         properties.add( new ExternalSubjectIdProperty() );
@@ -80,6 +84,7 @@ public class SubjectServiceOldImpl extends GwtService implements SubjectServiceO
     }
 
     @Override
+    @RemoteMethod
     @Transactional(readOnly = true)
     public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext) throws NotLoggedInException {
         List<PropertyValue> values = new ArrayList<PropertyValue>();

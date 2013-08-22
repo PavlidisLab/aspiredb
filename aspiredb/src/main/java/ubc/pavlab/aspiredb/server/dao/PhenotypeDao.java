@@ -37,7 +37,7 @@ public interface PhenotypeDao extends SecurableDaoBase<Phenotype> {
     @Secured({"GROUP_USER"})
     public Collection<Phenotype> loadBySubjectIds( Collection<Long> subjectIds );
 
-    public List<String> getExistingValues( String ontologyTermUri );
+    public List<String> getExistingValues( String name );
 
     // TODO: reuse for suggestions
     @Transactional(readOnly = true)

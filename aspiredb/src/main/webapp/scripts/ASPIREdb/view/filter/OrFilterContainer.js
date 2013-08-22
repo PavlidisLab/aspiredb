@@ -12,7 +12,8 @@ Ext.define('ASPIREdb.view.filter.OrFilterContainer', {
         type: 'vbox'
     },
     config: {
-        propertyStore: null
+        propertyStore: null,
+        suggestValuesRemoteFunction: null
     },
 /*
     border: 1,
@@ -51,7 +52,8 @@ Ext.define('ASPIREdb.view.filter.OrFilterContainer', {
             items: [
                 {
                     xtype: 'filter_property',
-                    propertyStore: this.getPropertyStore()
+                    propertyStore: me.getPropertyStore(),
+                    suggestValuesRemoteFunction: me.getSuggestValuesRemoteFunction()
                 }
             ]
         }, {
@@ -65,7 +67,10 @@ Ext.define('ASPIREdb.view.filter.OrFilterContainer', {
 
         me.getComponent("addButton").on('click', function (button, event) {
             var filterContainer = me.getComponent("filterContainer");
-            filterContainer.add(Ext.create('ASPIREdb.view.filter.PropertyFilter'));
+            filterContainer.add(Ext.create('ASPIREdb.view.filter.PropertyFilter',{
+                propertyStore: me.getPropertyStore(),
+                suggestValuesRemoteFunction: me.getSuggestValuesRemoteFunction()
+            }));
             filterContainer.doLayout();
         });
     }

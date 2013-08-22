@@ -24,8 +24,11 @@ import java.util.Map;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.directwebremoting.annotations.RemoteMethod;
+import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
@@ -39,8 +42,10 @@ import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.PhenotypeEnrichmentValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
+import ubc.pavlab.aspiredb.shared.TextValue;
 import ubc.pavlab.aspiredb.shared.query.PhenotypeProperty;
 import ubc.pavlab.aspiredb.shared.query.PropertyValue;
+import ubc.pavlab.aspiredb.shared.suggestions.PhenotypeSuggestion;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 import ubic.basecode.math.MultipleTestCorrection;
 import ubic.basecode.math.SpecFunc;
@@ -49,13 +54,13 @@ import ubic.basecode.ontology.model.OntologyTerm;
 import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
 import cern.colt.list.DoubleArrayList;
 
-@Component("phenotypeService")
+@RemoteProxy(name="PhenotypeService")
+@Service("phenotypeService")
 public class PhenotypeServiceImpl extends GwtService implements PhenotypeService {
 
     protected static Log log = LogFactory.getLog( PhenotypeServiceImpl.class );
 
     private static final String HUMAN_PHENOTYPE_URI_PREFIX = "http://purl.org/obo/owl/HP#";
-    
 
     DecimalFormat dformat = new DecimalFormat("#.#####");
 
@@ -67,7 +72,6 @@ public class PhenotypeServiceImpl extends GwtService implements PhenotypeService
     ProjectDao projectDao;
 
     public boolean setNameUriValueType( Phenotype phenotype, String key ) {
-
         if ( isUri( key ) ) {
 
             phenotype.setUri( key );
@@ -167,15 +171,93 @@ public class PhenotypeServiceImpl extends GwtService implements PhenotypeService
     }
 
     @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
     public Collection<PhenotypeProperty> suggestPhenotypes( SuggestionContext suggestionContext )
             throws NotLoggedInException {
-        return null;
+        //        HumanPhenotypeOntologyService HPOService = ontologyService.getHumanPhenotypeOntologyService();
+
+        Collection<PhenotypeProperty> phenotypes = new ArrayList<PhenotypeProperty>();
+
+        List<String> names = phenotypeDao.getExistingPhenotypes(suggestionContext.getValuePrefix(), false, suggestionContext.getActiveProjectIds());
+        for (String name : names) {
+            PhenotypeProperty phenotypeProperty = new PhenotypeProperty();
+            phenotypeProperty.setExistInDatabase(true);
+            phenotypeProperty.setName(name);
+            phenotypeProperty.setDisplayName(name);
+            phenotypes.add(phenotypeProperty);
+        }
+
+        // Bug 3647: Disabled Ontology suggestions for now since phenotype inference has been disabled
+/*
+        String ontologyQuery = query;
+		if (isExactMatch) {
+			ontologyQuery = "\"" + ontologyQuery + "\"";
+		} else {
+	        ontologyQuery = ontologyQuery.trim();
+	        String[] queryTerms = ontologyQuery.split(" ");
+	        if (queryTerms.length > 1) {
+	            String lastTerm = queryTerms[queryTerms.length-1];
+	            String completePhrase = "";
+	            for (int i=0; i < queryTerms.length - 1; i++) {
+	                completePhrase+=queryTerms[i]+" ";
+	            }
+	            completePhrase = completePhrase.trim();
+	            completePhrase = "+\""+completePhrase +"\"";
+	            ontologyQuery = completePhrase + " +" + lastTerm + "*";
+	        } else {
+	            ontologyQuery += "*";
+	        }
+		}
+        Collection<OntologyTerm> terms = HPOService.findTerm( ontologyQuery );
+
+//        if (terms.size() > 100) {
+//            List<PhenotypeSuggestion> suggestions = new ArrayList<PhenotypeSuggestion>( phenotypeSuggestions.values() );
+//            return  new PagingLoadResultBean<PhenotypeSuggestion>( suggestions , 0, 0 );
+//        }
+
+        // Include parents and children of phenotypes we have in database.
+        for (OntologyTerm term : terms) {
+        	// If exact match is needed, make sure that if the query string
+        	// does not have spaces, term does not have spaces either.
+			if (isExactMatch && (!ontologyQuery.contains(" ")) && term.getLabel().contains(" ")) {
+				continue;
+			}
+
+            if ( phenotypeSuggestions.containsKey( term.getLabel() ) ) {
+                PhenotypeSuggestion phenotypeSuggestion = phenotypeSuggestions.get( term.getLabel() );
+                phenotypeSuggestion.setOntologyTerm( true );
+                phenotypeSuggestion.setUri( term.getUri() );
+            } else {
+                // isParent or isChild
+                Map<String, OntologyTerm> childTerms = toMap( term.getChildren( false ) );
+                Map<String, OntologyTerm> parentTerms = toMap( term.getParents( false ) );
+                Collection<String> termsToCheckInDB = new ArrayList<String>();
+                termsToCheckInDB.addAll( childTerms.keySet() );
+                termsToCheckInDB.addAll( parentTerms.keySet() );
+
+                if ( phenotypeDao.isInDatabase( termsToCheckInDB ) ) {
+                    PhenotypeSuggestion phenotypeSuggestion = new PhenotypeSuggestion( term.getLabel(), term.getUri() );
+                    phenotypeSuggestion.setOntologyTerm( true );
+                    phenotypeSuggestions.put( term.getLabel(), phenotypeSuggestion );
+                }
+            }
+        }
+*/
+        return phenotypes;
     }
 
     @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
     public Collection<PropertyValue> suggestPhenotypeValues( PhenotypeProperty property,
             SuggestionContext suggestionContext ) throws NotLoggedInException {
-        return null; // To change body of implemented methods use File | Settings | File Templates.
+        Collection<PropertyValue> propertyValues = new ArrayList<PropertyValue>();
+        List<String> results = phenotypeDao.getExistingValues( property.getName() );
+        for (String result : results) {
+            propertyValues.add(new PropertyValue<TextValue>(new TextValue(result)));
+        }
+            return propertyValues;
     }
 
     /**

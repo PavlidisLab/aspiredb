@@ -182,7 +182,7 @@ public class CriteriaBuilder {
         addPhenotypeAlias(subquery, target);
 
         subquery.add( Restrictions.conjunction()
-                .add( Restrictions.eq( "phenotype.name", restriction.getPhenotypeName() ) )
+                .add( Restrictions.eq( "phenotype.name", restriction.getName() ) )
                 .add( Restrictions.eq( "phenotype.value", restriction.getValue() ) ) );
 
         subquery.setProjection( Projections.distinct( Projections.id() ) );

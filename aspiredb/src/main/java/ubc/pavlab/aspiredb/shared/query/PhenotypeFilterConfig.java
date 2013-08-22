@@ -14,23 +14,15 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
 import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
 
 import java.util.Collection;
 
-
+@DataTransferObject(javascript = "PhenotypeFilterConfig")
 public class PhenotypeFilterConfig extends RestrictionFilterConfig {
 	private static final long serialVersionUID = -6273822469846069494L;
 
-    private Collection<PhenotypeRestriction> phenotypeRestrictions;
-
 	public PhenotypeFilterConfig() {}
 
-    public PhenotypeFilterConfig(Collection<PhenotypeRestriction> restrictions) {
-        this.phenotypeRestrictions = restrictions;
-    }
-
-    public Collection<PhenotypeRestriction> getRestrictions() {
-        return this.phenotypeRestrictions;
-    }
 }

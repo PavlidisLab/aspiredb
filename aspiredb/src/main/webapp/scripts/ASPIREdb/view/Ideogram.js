@@ -79,6 +79,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
             QueryService.queryVariants(filterConfigs, {
                 callback : function(pageLoad) {
                     var variants = pageLoad.items;
+                    me.drawChromosomes();
                     me.drawVariants(variants);
                 }
             });

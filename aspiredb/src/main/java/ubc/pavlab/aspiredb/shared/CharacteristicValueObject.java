@@ -26,8 +26,8 @@ import java.io.Serializable;
  * author: anton
  * date: 11/04/13
  */
-@DataTransferObject
-public class CharacteristicValueObject implements Serializable {
+@DataTransferObject(javascript = "CharacteristicValueObject")
+public class CharacteristicValueObject implements Displayable {
 
     private Long id;
     private String key;
@@ -69,5 +69,20 @@ public class CharacteristicValueObject implements Serializable {
     @Override
     public String toString() {
         return key+"="+value;
+    }
+
+    @Override
+    public String getLabel() {
+        return value;
+    }
+
+    @Override
+    public String getHtmlLabel() {
+        return value;
+    }
+
+    @Override
+    public String getTooltip() {
+        return value;
     }
 }

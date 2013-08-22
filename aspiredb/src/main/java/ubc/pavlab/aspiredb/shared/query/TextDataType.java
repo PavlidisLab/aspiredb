@@ -29,7 +29,7 @@ import java.util.Collection;
  * date: 07/05/13
  */
 @DataTransferObject(javascript = "TextDataType")
-public class TextDataType implements DataType  {
+public class TextDataType extends DataType  {
     private static final long serialVersionUID = -6610724309760895447L;
 
     protected Collection<String> allowedValues = new ArrayList<String>();

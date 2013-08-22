@@ -3,18 +3,16 @@ Ext.require([
     'ASPIREdb.model.PropertyValue'
 ]);
 
-
-Ext.define('ASPIREdb.ValueSuggestionStore', {
+Ext.define('ASPIREdb.PhenotypeSuggestionStore', {
     extend:'Ext.data.Store',
-    model: 'ASPIREdb.model.PropertyValue',
+    model: 'ASPIREdb.model.PhenotypeProperty',
 
     suggestionContext: null,
-    property: null,
 
     constructor: function (config) {
         config.proxy = {
             type: 'dwr',
-            dwrFunction: config.remoteFunction,
+            dwrFunction: PhenotypeService.suggestPhenotypes,
             reader: {
                 type: 'json',
                 root: 'data',
@@ -22,6 +20,7 @@ Ext.define('ASPIREdb.ValueSuggestionStore', {
             }
         };
         this.callParent(arguments);
+        this.setActiveProjectIds([1]);
     },
 
     setActiveProjectIds: function(activeProjectIds) {
@@ -29,13 +28,9 @@ Ext.define('ASPIREdb.ValueSuggestionStore', {
         this.suggestionContext.activeProjectIds = activeProjectIds;
     },
 
-    setProperty: function(propertyObj) {
-        this.property = propertyObj;
-    },
-
     load: function(options) {
         this.suggestionContext.valuePrefix = options.params.query;
-        this.proxy.dwrParams = [this.property, this.suggestionContext];
+        this.proxy.dwrParams = [this.suggestionContext];
         this.callParent(options);
     }
 });

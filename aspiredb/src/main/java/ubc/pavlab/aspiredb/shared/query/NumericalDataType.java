@@ -25,7 +25,7 @@ import org.directwebremoting.annotations.DataTransferObject;
  * date: 07/05/13
  */
 @DataTransferObject(javascript = "NumericalDataType")
-public class NumericalDataType implements DataType {
+public class NumericalDataType extends DataType {
     private static final long serialVersionUID = 2050952799877732163L;
 
     public NumericalDataType() {}

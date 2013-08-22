@@ -11,6 +11,7 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
     },
     config: {
         propertyStore: null,
+        suggestValuesRemoteFunction: null,
         filterItemType: null
     },
     items: [
@@ -48,7 +49,10 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
     },
 
     getNewItem: function () {
-        return Ext.create(this.getFilterItemType(),{propertyStore: this.getPropertyStore()});
+        return Ext.create(this.getFilterItemType(),{
+            propertyStore: this.getPropertyStore(),
+            suggestValuesRemoteFunction: this.getSuggestValuesRemoteFunction()
+        });
     },
 
     initComponent: function () {

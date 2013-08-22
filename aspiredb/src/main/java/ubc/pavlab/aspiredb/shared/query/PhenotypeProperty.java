@@ -30,6 +30,7 @@ public class PhenotypeProperty extends Property {
 
     private boolean isOntologyTerm;
     private String uri;
+    private boolean existInDatabase;
 
     public PhenotypeProperty() {
     }
@@ -55,5 +56,13 @@ public class PhenotypeProperty extends Property {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public void setExistInDatabase(boolean existInDatabase) {
+        this.existInDatabase = existInDatabase;
+    }
+
+    public boolean isExistInDatabase() {
+        return existInDatabase;
     }
 }

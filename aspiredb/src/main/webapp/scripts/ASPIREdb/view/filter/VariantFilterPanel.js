@@ -16,6 +16,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
             title: 'Variant Location:',
             itemId: 'locationFilterContainer',
             filterItemType: 'ASPIREdb.view.filter.OrFilterContainer',
+            suggestValuesRemoteFunction: VariantService.suggestValues,
             propertyStore: {
                 proxy : {
                     type: 'dwr',
@@ -48,6 +49,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
             items: {
                 xtype: 'filter_and',
                 itemId: 'cnvCharacteristicFilterContainer',
+                suggestValuesRemoteFunction: VariantService.suggestValues,
                 propertyStore: {
                     proxy : {
                         type: 'dwr',
@@ -79,6 +81,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
             items: {
                 xtype: 'filter_and',
                 itemId: 'indelCharacteristicFilterContainer',
+                suggestValuesRemoteFunction: VariantService.suggestValues,
                 propertyStore: {
                     proxy : {
                         type: 'dwr',

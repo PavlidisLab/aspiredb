@@ -26,7 +26,7 @@ import java.io.Serializable;
  * author: anton
  * date: 11/06/13
  */
-@DataTransferObject
+@DataTransferObject(javascript = "TextValue")
 public class TextValue implements Displayable, Serializable {
     private static final long serialVersionUID = 7360784861732610669L;
     private String value;

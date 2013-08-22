@@ -16,6 +16,9 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
     },
     cls: 'multiValueSuggestBox-list',
     width: 200,
+    config: {
+        suggestValuesRemoteFunction: null
+    },
 
     setProperty: function(propertyObj) {
         var comboBox = this.getComponent('invisibleCombo');
@@ -87,7 +90,9 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
                 autoSelect: true,
                 enableKeyEvents: true,
                 displayField: 'displayValue',
-                store: Ext.create('ASPIREdb.ValueSuggestionStore'),
+                store: Ext.create('ASPIREdb.ValueSuggestionStore',{
+                    remoteFunction: this.getSuggestValuesRemoteFunction()
+                }),
                 listConfig: {
                     loadingText: 'Searching...',
                     emptyText: 'No results found.'

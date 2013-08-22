@@ -8,12 +8,12 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
     extend: 'Ext.Container',
     alias: 'widget.filter_property',
     width: 690,
-    ref: 'widgetContainer',
     layout: {
         type: 'hbox'
     },
     config: {
-        propertyStore: null   /* property suggestions */
+        propertyStore: null, /* property suggestions */
+        suggestValuesRemoteFunction: null
     },
 
     selectedProperty: null,
@@ -64,7 +64,8 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
                         xtype: 'multivalue_combo',
                         itemId: 'multicombo',
                         width: 400,
-                        height: 20
+                        height: 20,
+                        suggestValuesRemoteFunction: me.getSuggestValuesRemoteFunction()
                     },
                     {
                         xtype: 'label',
