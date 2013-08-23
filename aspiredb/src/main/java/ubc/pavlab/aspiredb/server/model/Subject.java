@@ -212,8 +212,8 @@ public class Subject implements Serializable, Securable {
         this.labels.remove( label );
     }
 
-    public static ubc.pavlab.aspiredb.server.valueobjects.SubjectValueObject convertToValueObject( Subject subject ) {
-        ubc.pavlab.aspiredb.server.valueobjects.SubjectValueObject valueObject = new ubc.pavlab.aspiredb.server.valueobjects.SubjectValueObject();
+    public static SubjectValueObject convertToValueObject( Subject subject ) {
+        SubjectValueObject valueObject = new SubjectValueObject();
         valueObject.setId( subject.getId() );
         valueObject.setPatientId( subject.getPatientId() );
         valueObject.setLabels( Label.toValueObjects( subject.getLabels() ) );

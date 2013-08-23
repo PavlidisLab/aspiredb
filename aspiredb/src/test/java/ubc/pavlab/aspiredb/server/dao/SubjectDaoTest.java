@@ -35,7 +35,8 @@ import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
-import ubc.pavlab.aspiredb.server.service.SubjectServiceOld;
+import ubc.pavlab.aspiredb.server.service.SubjectService;
+
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.TextValue;
@@ -56,7 +57,7 @@ public class SubjectDaoTest extends BaseSpringContextTest {
     private SubjectDao subjectDao;
 
     @Autowired
-    private SubjectServiceOld subjectService;
+    private SubjectService subjectService;
 
     @Autowired
     private LabelDao labelDao;
