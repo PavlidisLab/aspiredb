@@ -48,6 +48,9 @@ public interface SubjectService {
     public List<PhenotypeSummaryValueObject> getPhenotypeSummaries(List<Long> subjectIds, Collection<Long> projectIds)
             throws NotLoggedInException, ExternalDependencyException;
     
+    public List<PhenotypeSummaryValueObject> getAllPhenotypeSummaries(Collection<Long> projectIds)
+            throws NotLoggedInException, ExternalDependencyException;
+    
     public List<SubjectValueObject> getSubjectsWithPhenotypesBySubjectIds(List<Long> subjectIds)
             throws NotLoggedInException;
 

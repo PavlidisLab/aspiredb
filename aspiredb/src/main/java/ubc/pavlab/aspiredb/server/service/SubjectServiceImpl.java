@@ -129,6 +129,33 @@ public class SubjectServiceImpl implements SubjectService {
     
     @Override
     @RemoteMethod
+    @Transactional
+	public List<PhenotypeSummaryValueObject> getAllPhenotypeSummaries(Collection<Long> projectIds )
+            throws NotLoggedInException, NeurocartaServiceException {
+        
+        // This should throw AccessDenied exception if user isn't allowed to view the subjects
+        // (there is a better way to test security, this method is probably going to disappear)
+        Collection<Subject> subjects = subjectDao.loadAll();
+        
+        Collection<Long> subjectIds = new ArrayList<Long>();
+        
+        for (Subject s: subjects){        	
+        	subjectIds.add(s.getId());        	
+        }
+        
+        StopWatch timer = new StopWatch();
+        timer.start();
+
+        log.info( "loading phenotypeSummaries for "+subjectIds.size()+" subjects" );
+        List<PhenotypeSummaryValueObject> phenotypeSummaries =
+                phenotypeBrowserService.getPhenotypesBySubjectIds(subjectIds, projectIds);
+        log.info( "processing phenotypeSummaries for "+subjectIds.size()+" subjects took " + timer.getTime() + "ms" );
+        
+        return phenotypeSummaries;
+	}
+    
+    @Override
+    @RemoteMethod
     public Collection<Property> suggestProperties() {
         Collection<Property> properties = new ArrayList<Property>();
         properties.add( new ExternalSubjectIdProperty() );
