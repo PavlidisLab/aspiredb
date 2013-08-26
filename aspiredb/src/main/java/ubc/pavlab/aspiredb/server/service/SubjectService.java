@@ -1,7 +1,6 @@
 /*
  * The aspiredb project
  * 
-<<<<<<< HEAD
  * Copyright (c) 2013 University of British Columbia
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,8 +33,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ubc.pavlab.aspiredb.server.dao.CNVDao;
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
+import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.valueobjects.SubjectValueObject;
+import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 /**
  * TODO Document Me
@@ -46,8 +47,6 @@ import ubc.pavlab.aspiredb.server.valueobjects.SubjectValueObject;
 @Service
 @RemoteProxy
 public class SubjectService {
-
-    private static Logger log = LoggerFactory.getLogger( SubjectService.class );
 
     @Autowired
     private SubjectDao subjectDao;
@@ -91,4 +90,16 @@ public class SubjectService {
         return vo;
     }
 
+    @RemoteMethod
+    @Transactional
+    public LabelValueObject addLabel(Collection<Long> subjectIds, LabelValueObject labelVO) {
+        Collection<Subject> subjects = subjectDao.load(subjectIds);
+        Label label = labelDao.findOrCreate( labelVO );
+        for (Subject subject : subjects) {
+            subject.addLabel( label );
+            subjectDao.update( subject );
+        }
+        return label.toValueObject();
+    }
+    
 }
