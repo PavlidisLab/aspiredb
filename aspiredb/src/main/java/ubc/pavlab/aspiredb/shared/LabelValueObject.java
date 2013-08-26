@@ -22,14 +22,12 @@ import java.io.Serializable;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
-import java.io.Serializable;
-
 /**
  * author: anton
  * date: 11/04/13
  */
-@DataTransferObject
-public class LabelValueObject implements Serializable, Displayable {
+@DataTransferObject(javascript = "LabelValueObject")
+public class LabelValueObject implements Displayable, Serializable {
     private static final long serialVersionUID = 5912945308104924604L;
 
     private String name;

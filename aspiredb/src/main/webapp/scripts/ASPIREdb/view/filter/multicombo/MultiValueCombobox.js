@@ -24,7 +24,6 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
         var comboBox = this.getComponent('invisibleCombo');
 
         var store = comboBox.getStore();
-        store.setActiveProjectIds([1]);
         store.setProperty(propertyObj);
     },
 
@@ -39,6 +38,15 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
             }
         });
         return values;
+    },
+
+    reset: function() {
+        var numItems = this.items.getCount() - 1;
+        for (var i = 0; i < numItems.length; i++) {
+            var item = this.items.removeAt(i);
+            item.destroy();
+        }
+        this.doLayout();
     },
 
     /**

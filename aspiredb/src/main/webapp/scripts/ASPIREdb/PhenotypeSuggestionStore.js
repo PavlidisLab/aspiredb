@@ -1,6 +1,7 @@
 Ext.require([
     'Ext.data.Store',
-    'ASPIREdb.model.PropertyValue'
+    'ASPIREdb.model.PropertyValue',
+    'ASPIREdb.ActiveProjectSettings'
 ]);
 
 Ext.define('ASPIREdb.PhenotypeSuggestionStore', {
@@ -20,15 +21,11 @@ Ext.define('ASPIREdb.PhenotypeSuggestionStore', {
             }
         };
         this.callParent(arguments);
-        this.setActiveProjectIds([1]);
-    },
-
-    setActiveProjectIds: function(activeProjectIds) {
-        this.suggestionContext = new SuggestionContext();
-        this.suggestionContext.activeProjectIds = activeProjectIds;
     },
 
     load: function(options) {
+        this.suggestionContext = new SuggestionContext();
+        this.suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds() ;
         this.suggestionContext.valuePrefix = options.params.query;
         this.proxy.dwrParams = [this.suggestionContext];
         this.callParent(options);

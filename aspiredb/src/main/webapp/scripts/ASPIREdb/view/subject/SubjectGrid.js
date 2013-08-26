@@ -66,6 +66,7 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 		this.callParent();
 
 		var me = this;
+<<<<<<< HEAD
 		
 		// grid panel
 		SubjectService.getSubjects({
@@ -77,13 +78,34 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 		
 		// add handlers to buttons
 		Ext.getCmp('addLabelButton').on('click', this.onMakeLabelClick);
+=======
+
+        ASPIREdb.EVENT_BUS.on('filter_submit', function(filterConfigs) {
+            QueryService.querySubjects(filterConfigs, {
+                callback : function(pageLoad) {
+                    var subjectValueObjects = pageLoad.items;
+                    //TODO: fix me (define grid/store in initComponent)
+                    me.items.removeAll();
+                    me.subjectValueObjects = subjectValueObjects;
+                    me.add(me.createGrid(subjectValueObjects));
+
+                    var ids = [];
+                    for (var i = 0; i < subjectValueObjects.length; i++) {
+                        var o = subjectValueObjects[i];
+                        ids.push(o.id);
+                    }
+                    ASPIREdb.EVENT_BUS.fireEvent('subjects_loaded', ids );
+                }
+            });
+        });
+>>>>>>> branch 'master' of https://github.com/ppavlidis/aspiredb.git
 	},
 
 	/**
 	 * 
 	 * @param subjectValueObjects
 	 *            {@link SubjectValueObject}
-	 * @returns
+	 * @return
 	 */
 	createGrid : function(subjectValueObjects) {
 		var store = this.createStore(subjectValueObjects);
@@ -102,8 +124,12 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 				dataIndex : 'label',
 				flex : 1,
 				width : 50
+<<<<<<< HEAD
 			}, ],
 			
+=======
+			}, ]
+>>>>>>> branch 'master' of https://github.com/ppavlidis/aspiredb.git
 		});
 
 		return grid;
@@ -135,7 +161,7 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 	 * 
 	 * @param subjectValueObjects
 	 *            {@link SubjectValueObject}
-	 * @returns
+	 * @return
 	 */
 	createStore : function(subjectValueObjects) {
 
@@ -159,8 +185,7 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 			data : data,
 			storeId : 'subjectStore'
 		});
-
 		return store;
-	},
+	}
 
 });

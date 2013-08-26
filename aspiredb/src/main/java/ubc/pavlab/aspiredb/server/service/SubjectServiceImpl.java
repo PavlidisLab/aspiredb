@@ -1,0 +1,255 @@
+/*
+ * The aspiredb project
+ * 
+<<<<<<< HEAD
+ * Copyright (c) 2013 University of British Columbia
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package ubc.pavlab.aspiredb.server.service;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.apache.commons.lang.time.StopWatch;
+import org.directwebremoting.annotations.RemoteMethod;
+import org.directwebremoting.annotations.RemoteProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import ubc.pavlab.aspiredb.server.dao.CNVDao;
+import ubc.pavlab.aspiredb.server.dao.LabelDao;
+import ubc.pavlab.aspiredb.server.dao.SubjectDao;
+import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
+import ubc.pavlab.aspiredb.server.model.Label;
+import ubc.pavlab.aspiredb.server.model.Subject;
+
+import ubc.pavlab.aspiredb.shared.LabelValueObject;
+import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
+import ubc.pavlab.aspiredb.shared.SubjectValueObject;
+import ubc.pavlab.aspiredb.shared.TextValue;
+import ubc.pavlab.aspiredb.shared.query.ExternalSubjectIdProperty;
+import ubc.pavlab.aspiredb.shared.query.LabelProperty;
+import ubc.pavlab.aspiredb.shared.query.Property;
+import ubc.pavlab.aspiredb.shared.query.PropertyValue;
+import ubc.pavlab.aspiredb.shared.query.SubjectLabelProperty;
+import ubc.pavlab.aspiredb.shared.query.TextProperty;
+import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
+
+/**
+ * TODO Document Me
+ * 
+ * @author ptan
+ * @version $Id$
+ */
+@Service("subjectService")
+@RemoteProxy(name="SubjectService")
+public class SubjectServiceImpl implements SubjectService {
+
+    private static Logger log = LoggerFactory.getLogger( SubjectService.class );
+
+    @Autowired
+    private SubjectDao subjectDao;
+
+    @Autowired
+    private CNVDao cnvDao;
+
+    @Autowired
+    private PhenotypeBrowserService phenotypeBrowserService;
+
+    @Autowired
+    private LabelDao labelDao;
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<SubjectValueObject> getSubjects() {
+
+        Collection<Subject> subjects = subjectDao.loadAll();
+        Collection<SubjectValueObject> vos = new ArrayList<SubjectValueObject>();
+
+        for ( Subject s : subjects ) {
+            SubjectValueObject vo = Subject.convertToValueObject( s );
+            vos.add( vo );
+        }
+
+        return vos;
+    }
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public SubjectValueObject getSubject( Long projectId, Long subjectId ) {
+        Subject subject = subjectDao.load( subjectId );
+        if ( subject == null ) return null;
+
+        SubjectValueObject vo = Subject.convertToValueObject( subject );
+
+        // TODO add variants
+        // Integer numVariants = cnvDao.findBySubjectId( subject.getPatientId() ).size();
+        // vo.setVariants( numVariants != null ? numVariants : 0 );
+
+        return vo;
+    }
+    @Override
+    @RemoteMethod
+    @Transactional
+	public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
+            throws NotLoggedInException, NeurocartaServiceException {
+        
+        // This should throw AccessDenied exception if user isn't allowed to view the subjects
+        // (there is a better way to test security, this method is probably going to disappear)
+        Collection<Subject> subjects = subjectDao.load(subjectIds);
+        
+        StopWatch timer = new StopWatch();
+        timer.start();
+
+        log.info( "loading phenotypeSummaries for "+subjectIds.size()+" subjects" );
+        List<PhenotypeSummaryValueObject> phenotypeSummaries =
+                phenotypeBrowserService.getPhenotypesBySubjectIds(subjectIds, projectIds);
+        log.info( "processing phenotypeSummaries for "+subjectIds.size()+" subjects took " + timer.getTime() + "ms" );
+        
+        return phenotypeSummaries;
+	}
+    
+    @Override
+    @RemoteMethod
+    @Transactional
+	public List<PhenotypeSummaryValueObject> getAllPhenotypeSummaries(Collection<Long> projectIds )
+            throws NotLoggedInException, NeurocartaServiceException {
+        
+        // This should throw AccessDenied exception if user isn't allowed to view the subjects
+        // (there is a better way to test security, this method is probably going to disappear)
+        Collection<Subject> subjects = subjectDao.loadAll();
+        
+        Collection<Long> subjectIds = new ArrayList<Long>();
+        
+        for (Subject s: subjects){        	
+        	subjectIds.add(s.getId());        	
+        }
+        
+        StopWatch timer = new StopWatch();
+        timer.start();
+
+        log.info( "loading phenotypeSummaries for "+subjectIds.size()+" subjects" );
+        List<PhenotypeSummaryValueObject> phenotypeSummaries =
+                phenotypeBrowserService.getPhenotypesBySubjectIds(subjectIds, projectIds);
+        log.info( "processing phenotypeSummaries for "+subjectIds.size()+" subjects took " + timer.getTime() + "ms" );
+        
+        return phenotypeSummaries;
+	}
+    
+    @Override
+    @RemoteMethod
+    public Collection<Property> suggestProperties() {
+        Collection<Property> properties = new ArrayList<Property>();
+        properties.add( new ExternalSubjectIdProperty() );
+        properties.add( new SubjectLabelProperty() );
+        return properties;
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext) throws NotLoggedInException {
+        List<PropertyValue> values = new ArrayList<PropertyValue>();
+        if (property instanceof LabelProperty) {
+            List<LabelValueObject> labels = suggestLabels(suggestionContext);
+            for (LabelValueObject label : labels) {
+                values.add( new PropertyValue<LabelValueObject>(label) );
+            }
+        } else if (property instanceof TextProperty) {
+            Collection<String> stringValues = ((TextProperty) property).getDataType().getAllowedValues();
+            if (stringValues.isEmpty()) {
+                stringValues = subjectDao.suggestValuesForEntityProperty(property, suggestionContext);
+            }
+            for (String stringValue : stringValues) {
+                values.add( new PropertyValue<TextValue>(new TextValue(stringValue)) );
+            }
+        }
+        return values;
+    }
+    
+    @Override
+    @Transactional
+    public List<LabelValueObject> suggestLabels(SuggestionContext suggestionContext) {
+        // TODO: filter out labels non-applicable to subjects
+        // labelDao.getLabelsMatching(partialName);
+        Collection<Label> labels = labelDao.getSubjectLabels();
+        List<LabelValueObject> vos = new ArrayList<LabelValueObject>();
+        for (Label label : labels) {
+            vos.add( label.toValueObject() );
+        }
+        return vos;
+    }
+    
+    @Override
+    @Transactional
+    public List<SubjectValueObject> getSubjectsWithPhenotypesBySubjectIds( List<Long> subjectIds)
+            throws NotLoggedInException {
+         
+        
+        StopWatch timer = new StopWatch();
+        timer.start();
+        
+        List<SubjectValueObject> svoList = new ArrayList<SubjectValueObject>();
+        
+        Collection<Subject> subjectList = subjectDao.load( subjectIds );
+        
+        for (Subject s: subjectList){            
+            SubjectValueObject svo = s.convertToValueObjectWithPhenotypes();
+            svoList.add( svo );            
+        }
+        
+        return svoList;
+    }
+
+    @Override
+    @Transactional
+    public LabelValueObject addLabel(Collection<Long> subjectIds, LabelValueObject labelVO) throws NotLoggedInException {
+        
+        Collection<Subject> subjects = subjectDao.load(subjectIds);
+        Label label = labelDao.findOrCreate( labelVO );
+        for (Subject subject : subjects) {
+            subject.addLabel( label );
+            subjectDao.update( subject );
+        }
+        return label.toValueObject();
+    }
+
+    @Override
+    @Transactional
+    public void removeLabel(Long id, LabelValueObject label) throws NotLoggedInException {
+        
+        Subject subject = subjectDao.load(id);
+        Label labelEntity = labelDao.load(label.getId());
+        subject.removeLabel(labelEntity);
+        subjectDao.update( subject );
+    }
+
+    @Override
+    @Transactional
+    public void removeLabel(Collection<Long> subjectIds, LabelValueObject label) throws NotLoggedInException {
+        
+        for (Long subjectId : subjectIds) {
+            removeLabel(subjectId, label);
+        }
+    }
+
+
+}

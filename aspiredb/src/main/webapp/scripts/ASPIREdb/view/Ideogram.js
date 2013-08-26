@@ -63,18 +63,6 @@ Ext.define('ASPIREdb.view.Ideogram', {
             }
         });
 
-        QueryService.queryVariants([{
-            $dwrClassName:'VariantFilterConfig',
-            restriction: {
-                $dwrClassName:'VariantTypeRestriction',
-                type:'CNV'
-            }}], {
-            callback : function(pageLoad) {
-                var variants = pageLoad.items;
-                me.drawVariants(variants);
-            }
-        });
-
         ASPIREdb.EVENT_BUS.on('filter_submit', function(filterConfigs) {
             QueryService.queryVariants(filterConfigs, {
                 callback : function(pageLoad) {

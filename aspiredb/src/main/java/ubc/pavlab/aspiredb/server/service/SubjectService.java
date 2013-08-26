@@ -43,9 +43,11 @@ import ubc.pavlab.aspiredb.shared.LabelValueObject;
  * 
  * @author ptan
  * @version $Id$
+ *
+ * TODO: delete this and drop 'Old' from *ServiceOld
+ *
  */
-@Service
-@RemoteProxy
+@Deprecated
 public class SubjectService {
 
     @Autowired
@@ -60,7 +62,6 @@ public class SubjectService {
     @Autowired
     private LabelDao labelDao;
 
-    @RemoteMethod
     @Transactional(readOnly = true)
     public Collection<SubjectValueObject> getSubjects() {
 
@@ -75,7 +76,6 @@ public class SubjectService {
         return vos;
     }
 
-    @RemoteMethod
     @Transactional(readOnly = true)
     public SubjectValueObject getSubject( Long projectId, Long subjectId ) {
         Subject subject = subjectDao.load( subjectId );

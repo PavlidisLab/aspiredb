@@ -14,11 +14,11 @@ Ext.define('ASPIREdb.view.filter.SubjectFilterPanel', {
         xtype: 'filter_and',
         itemId: 'subjectFilterContainer',
         filterItemType: 'ASPIREdb.view.filter.PropertyFilter',
-        suggestValuesRemoteFunction: SubjectServiceOld.suggestValues,
+        suggestValuesRemoteFunction: SubjectService.suggestValues,
         propertyStore: {
             proxy : {
                 type: 'dwr',
-                dwrFunction : SubjectServiceOld.suggestProperties,
+                dwrFunction : SubjectService.suggestProperties,
                 model: 'ASPIREdb.model.Property',
                 reader : {
                     type: 'json',

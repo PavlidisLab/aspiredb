@@ -50,7 +50,7 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
  * @version $Id: SubjectServiceImpl.java,v 1.36 2013/06/24 23:26:39 cmcdonald Exp $
  */
 @Service("subjectServiceOld")
-@RemoteProxy(name="SubjectServiceOld")
+@RemoteProxy(name="SubjectService")
 public class SubjectServiceOldImpl extends GwtService implements SubjectServiceOld {
 	protected static Log log = LogFactory.getLog( SubjectServiceOldImpl.class );
 
@@ -61,6 +61,7 @@ public class SubjectServiceOldImpl extends GwtService implements SubjectServiceO
     @Autowired private LabelDao labelDao;
 
     @Override
+    @RemoteMethod
     @Transactional(readOnly = true)
     public SubjectValueObject getSubject(Long projectId, Long subjectId ) throws NotLoggedInException {
         throwGwtExceptionIfNotLoggedIn();
@@ -106,6 +107,7 @@ public class SubjectServiceOldImpl extends GwtService implements SubjectServiceO
     }
 
     @Override
+    @RemoteMethod
     @Transactional
 	public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
             throws NotLoggedInException, NeurocartaServiceException {
@@ -126,6 +128,7 @@ public class SubjectServiceOldImpl extends GwtService implements SubjectServiceO
 	}
     
     @Override
+    @RemoteMethod
     @Transactional
     public List<SubjectValueObject> getSubjectsWithPhenotypesBySubjectIds( List<Long> subjectIds)
             throws NotLoggedInException {
@@ -147,6 +150,7 @@ public class SubjectServiceOldImpl extends GwtService implements SubjectServiceO
     }
 
     @Override
+    @RemoteMethod
     @Transactional
     public LabelValueObject addLabel(Collection<Long> subjectIds, LabelValueObject labelVO) throws NotLoggedInException {
         throwGwtExceptionIfNotLoggedIn();
@@ -160,6 +164,7 @@ public class SubjectServiceOldImpl extends GwtService implements SubjectServiceO
     }
 
     @Override
+    @RemoteMethod
     @Transactional
     public void removeLabel(Long id, LabelValueObject label) throws NotLoggedInException {
         throwGwtExceptionIfNotLoggedIn();
@@ -170,6 +175,7 @@ public class SubjectServiceOldImpl extends GwtService implements SubjectServiceO
     }
 
     @Override
+    @RemoteMethod
     @Transactional
     public void removeLabel(Collection<Long> subjectIds, LabelValueObject label) throws NotLoggedInException {
         throwGwtExceptionIfNotLoggedIn();
@@ -179,6 +185,7 @@ public class SubjectServiceOldImpl extends GwtService implements SubjectServiceO
     }
 
     @Override
+    @RemoteMethod
     @Transactional
     public List<LabelValueObject> suggestLabels(SuggestionContext suggestionContext) {
         // TODO: filter out labels non-applicable to subjects

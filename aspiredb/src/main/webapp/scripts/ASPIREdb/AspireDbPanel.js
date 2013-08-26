@@ -1,7 +1,8 @@
 Ext.require([
     'ASPIREdb.MainPanel',
     'ASPIREdb.EVENT_BUS',
-    'ASPIREdb.view.filter.FilterWindow'
+    'ASPIREdb.view.filter.FilterWindow',
+    'ASPIREdb.ActiveProjectSettings'
 ]);
 
 /**
@@ -31,7 +32,13 @@ Ext.define('ASPIREdb.AspireDbPanel', {
                 dashboard.show();
                 me.parseUrlParametersAndRedirect();
 */
-            }
+
+                var filterConfigs = [];
+                var activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+                var projectFilter = new ProjectFilterConfig;
+                projectFilter.projectIds = activeProjectIds;
+                filterConfigs.push(projectFilter);
+                ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);            }
         );
 
         // TODO: finish me
@@ -48,6 +55,25 @@ Ext.define('ASPIREdb.AspireDbPanel', {
             }
         );
     },
+
+    parseUrlParametersAndRedirect: function () {
+        var parsedParams = Ext.Object.fromQueryString(location.search);
+        var variantId = parsedParams.variantId;
+        if ( variantId != null && !variantId.isEmpty() ) {
+            // Grab genomic range
+            VariantService.getVariant(Long.parseLong(variantId), function callback(vo) {
+                    var filterConfig = new VariantFilterConfig();
+                    var genomicRangeRestriction = new SimpleRestriction();
+                    genomicRangeRestriction.propery = new GenomicLocationProperty();
+                    genomicRangeRestriction.operator = 'IS_IN';
+                    genomicRangeRestriction.value = vo.genomicRange;
+                    filterConfig.restriction(genomicRangeRestriction);
+                    ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfig);
+//                    mainPanel.resizeMe();
+            });
+        }
+    },
+
     items: [{
         region: 'north',
         itemId: 'topToolbar',
