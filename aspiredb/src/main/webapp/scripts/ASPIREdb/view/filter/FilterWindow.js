@@ -191,6 +191,9 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
              * @type {Array.RestrictionFilterConfig}
              */
             var filterConfigs = [];
+            var projectFilter = new ProjectFilterConfig;
+            projectFilter.projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+            filterConfigs.push(projectFilter);
             var filterContainer = this.down('#filterContainer');
             filterContainer.items.each(function (item, index, length) {
                 filterConfigs.push(item.getFilterConfig());
@@ -199,7 +202,45 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
             return filterConfigs;
         },
 
-        initializeFilterProperties: function () {
+        /**
+         *
+         */
+//        updateResultCounts: function() {
+//            numPreviewQueriesInProgress = 2;
+//            numberOfSubjectsLabel.setText("...");
+//            numberOfVariantsLabel.setText("...");
+//
+//            AspireDbPagingLoadConfig config = new AspireDbPagingLoadConfigBean();
+//            config.getFilters().add( new ProjectFilterConfig( ActiveProjectSettings.getActiveProjects() ) );
+//            config.setOffset(0);
+//            config.setLimit(2000);
+//            config.getFilters().addAll( getFilterConfigs() );
+//            queryService.getSubjectCount(config, new AspireAsyncCallback<Integer>(){
+//            @Override
+//            public void onSuccess(Integer count) {
+//                numberOfSubjectsLabel.setText(count.toString());
+//                numPreviewQueriesInProgress--;
+//                if (numPreviewQueriesInProgress == 0 && runPreviewQuery) {
+//                    updateResultCounts();
+//                    runPreviewQuery = false;
+//                }
+//            }
+//        });
+//
+//        queryService.getVariantCount(config, new AspireAsyncCallback<Integer>(){
+//            @Override
+//            public void onSuccess(Integer count) {
+//                numberOfVariantsLabel.setText(count.toString());
+//                numPreviewQueriesInProgress--;
+//                if (numPreviewQueriesInProgress == 0 && runPreviewQuery) {
+//                    updateResultCounts();
+//                    runPreviewQuery = false;
+//                }
+//            }
+//        });
+//    },
+
+initializeFilterProperties: function () {
             var filterWindow = this;
 
             var callback = {

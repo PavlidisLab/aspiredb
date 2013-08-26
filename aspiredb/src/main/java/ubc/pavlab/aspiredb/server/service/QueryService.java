@@ -35,8 +35,8 @@ import java.util.Set;
  */
 public interface QueryService {
 
-    public PagingLoadResult<SubjectValueObject> querySubjects(AspireDbPagingLoadConfig config)
-            throws NotLoggedInException, ExternalDependencyException, NotLoggedInException, ExternalDependencyException;
+    public BoundedList<SubjectValueObject> querySubjects(Set<AspireDbFilterConfig> filters)
+            throws NotLoggedInException, ExternalDependencyException;
 
     public BoundedList<VariantValueObject> queryVariants(Set<AspireDbFilterConfig> filters)
             throws NotLoggedInException, ExternalDependencyException;
@@ -73,11 +73,11 @@ public interface QueryService {
 
     public void deleteQuery(QueryValueObject query);
 
-    // TODO: To be removed
-    @Deprecated
-    public Collection<GeneValueObject> getGeneSuggestions(String query) throws BioMartServiceException;
-	
-    // TODO: To be removed
-    @Deprecated
-    public Collection<NeurocartaPhenotypeValueObject> getNeurocartaPhenotypeSuggestions(String query) throws NeurocartaServiceException;
+//    // TODO: To be removed
+//    @Deprecated
+//    public Collection<GeneValueObject> getGeneSuggestions(String query) throws BioMartServiceException;
+//
+//    // TODO: To be removed
+//    @Deprecated
+//    public Collection<NeurocartaPhenotypeValueObject> getNeurocartaPhenotypeSuggestions(String query) throws NeurocartaServiceException;
 }

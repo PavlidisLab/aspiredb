@@ -14,8 +14,11 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.util.Collection;
 
+@DataTransferObject(javascript = "ProjectFilterConfig")
 public class ProjectFilterConfig extends AspireDbFilterConfig {
 	
 	/**

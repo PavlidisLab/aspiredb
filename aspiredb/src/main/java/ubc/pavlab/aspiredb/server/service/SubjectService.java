@@ -1,66 +1,94 @@
 /*
  * The aspiredb project
  * 
- * Copyright (c) 2012 University of British Columbia
+<<<<<<< HEAD
+ * Copyright (c) 2013 University of British Columbia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
+
 package ubc.pavlab.aspiredb.server.service;
 
-import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
-import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
-import ubc.pavlab.aspiredb.shared.LabelValueObject;
-import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
-import ubc.pavlab.aspiredb.shared.SubjectValueObject;
-import ubc.pavlab.aspiredb.shared.query.Property;
-import ubc.pavlab.aspiredb.shared.query.PropertyValue;
-import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
-
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+
+import org.directwebremoting.annotations.RemoteMethod;
+import org.directwebremoting.annotations.RemoteProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import ubc.pavlab.aspiredb.server.dao.CNVDao;
+import ubc.pavlab.aspiredb.server.dao.LabelDao;
+import ubc.pavlab.aspiredb.server.dao.SubjectDao;
+import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.valueobjects.SubjectValueObject;
 
 /**
  * TODO Document Me
  * 
- * @author ??
- * @version $Id: SubjectService.java,v 1.16 2013/06/24 23:26:40 cmcdonald Exp $
+ * @author ptan
+ * @version $Id$
+ *
+ * TODO: delete this and drop 'Old' from *ServiceOld
+ *
  */
-public interface SubjectService {
+@Deprecated
+public class SubjectService {
 
-    public SubjectValueObject getSubject(Long projectId, Long subjectId)
-            throws NotLoggedInException;
-    
-    public Collection<SubjectValueObject> getSubjects();
+    private static Logger log = LoggerFactory.getLogger( SubjectService.class );
 
-    public Collection<Property> suggestProperties()
-        throws NotLoggedInException;
+    @Autowired
+    private SubjectDao subjectDao;
 
-    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext)
-            throws NotLoggedInException;
+    @Autowired
+    private CNVDao cnvDao;
 
-    public List<PhenotypeSummaryValueObject> getPhenotypeSummaries(List<Long> subjectIds, Collection<Long> projectIds)
-            throws NotLoggedInException, ExternalDependencyException;
-    
-    public List<PhenotypeSummaryValueObject> getAllPhenotypeSummaries(Collection<Long> projectIds)
-            throws NotLoggedInException, ExternalDependencyException;
-    
-    public List<SubjectValueObject> getSubjectsWithPhenotypesBySubjectIds(List<Long> subjectIds)
-            throws NotLoggedInException;
+    @Autowired
+    private PhenotypeBrowserService phenotypeBrowserService;
 
-    public LabelValueObject addLabel(Collection<Long> subjectIds, LabelValueObject label) throws NotLoggedInException;
+    @Autowired
+    private LabelDao labelDao;
 
-    public void removeLabel(Collection<Long> subjectIds, LabelValueObject label)
-            throws NotLoggedInException;
+    @Transactional(readOnly = true)
+    public Collection<SubjectValueObject> getSubjects() {
 
-    public void removeLabel(Long subjectId, LabelValueObject label)
-            throws NotLoggedInException;
+        Collection<Subject> subjects = subjectDao.loadAll();
+        Collection<SubjectValueObject> vos = new ArrayList<SubjectValueObject>();
 
-    public List<LabelValueObject> suggestLabels(SuggestionContext suggestionContext) throws NotLoggedInException;
+        for ( Subject s : subjects ) {
+            SubjectValueObject vo = Subject.convertToValueObject( s );
+            vos.add( vo );
+        }
+
+        return vos;
+    }
+
+    @Transactional(readOnly = true)
+    public SubjectValueObject getSubject( Long projectId, Long subjectId ) {
+        Subject subject = subjectDao.load( subjectId );
+        if ( subject == null ) return null;
+
+        SubjectValueObject vo = Subject.convertToValueObject( subject );
+
+        // TODO add variants
+        // Integer numVariants = cnvDao.findBySubjectId( subject.getPatientId() ).size();
+        // vo.setVariants( numVariants != null ? numVariants : 0 );
+
+        return vo;
+    }
+
 }

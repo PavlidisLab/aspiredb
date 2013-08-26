@@ -37,19 +37,32 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 
 		// DWR
 		var me = this;
-		SubjectService.getSubjects({
-			callback : function(subjectValueObjects) {
-				me.subjectValueObjects = subjectValueObjects;
-				me.add(me.createGrid(subjectValueObjects));
-			}
-		});
+
+        ASPIREdb.EVENT_BUS.on('filter_submit', function(filterConfigs) {
+            QueryService.querySubjects(filterConfigs, {
+                callback : function(pageLoad) {
+                    var subjectValueObjects = pageLoad.items;
+                    //TODO: fix me (define grid/store in initComponent)
+                    me.items.removeAll();
+                    me.subjectValueObjects = subjectValueObjects;
+                    me.add(me.createGrid(subjectValueObjects));
+
+                    var ids = [];
+                    for (var i = 0; i < subjectValueObjects.length; i++) {
+                        var o = subjectValueObjects[i];
+                        ids.push(o.id);
+                    }
+                    ASPIREdb.EVENT_BUS.fireEvent('subjects_loaded', ids );
+                }
+            });
+        });
 	},
 
 	/**
 	 * 
 	 * @param subjectValueObjects
 	 *            {@link SubjectValueObject}
-	 * @returns
+	 * @return
 	 */
 	createGrid : function(subjectValueObjects) {
 		var store = this.createStore(subjectValueObjects);
@@ -67,7 +80,7 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 				dataIndex : 'label',
 				flex : 1,
 				width : 50
-			}, ],
+			}, ]
 		});
 
 		return grid;
@@ -77,7 +90,7 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 	 * 
 	 * @param subjectValueObjects
 	 *            {@link SubjectValueObject}
-	 * @returns
+	 * @return
 	 */
 	createStore : function(subjectValueObjects) {
 
@@ -100,8 +113,7 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 			data : data,
 			storeId : 'subjectStore'
 		});
-
 		return store;
-	},
+	}
 
 });

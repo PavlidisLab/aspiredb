@@ -1,6 +1,7 @@
 Ext.require([
     'Ext.data.Store',
-    'ASPIREdb.model.PropertyValue'
+    'ASPIREdb.model.PropertyValue',
+    'ASPIREdb.ActiveProjectSettings'
 ]);
 
 
@@ -25,8 +26,6 @@ Ext.define('ASPIREdb.ValueSuggestionStore', {
     },
 
     setActiveProjectIds: function(activeProjectIds) {
-        this.suggestionContext = new SuggestionContext();
-        this.suggestionContext.activeProjectIds = activeProjectIds;
     },
 
     setProperty: function(propertyObj) {
@@ -34,6 +33,8 @@ Ext.define('ASPIREdb.ValueSuggestionStore', {
     },
 
     load: function(options) {
+        this.suggestionContext = new SuggestionContext();
+        this.suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
         this.suggestionContext.valuePrefix = options.params.query;
         this.proxy.dwrParams = [this.property, this.suggestionContext];
         this.callParent(options);

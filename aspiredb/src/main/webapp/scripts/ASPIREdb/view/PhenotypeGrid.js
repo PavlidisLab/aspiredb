@@ -17,7 +17,10 @@
  *
  */
 
-Ext.require([ 'ASPIREdb.store.PhenotypeStore' ]);
+Ext.require([
+    'ASPIREdb.store.PhenotypeStore',
+    'ASPIREdb.ActiveProjectSettings'
+]);
 
 //TODO js documentation
 Ext.define('ASPIREdb.view.PhenotypeGrid', {
@@ -50,23 +53,23 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 
 		var ref = this;
 
-		// TODO change to function call with dynamic list of subjectids plus
-		// projectids, once filter code is finished
-		SubjectService.getAllPhenotypeSummaries([ 1 ], {
-			callback : function(vos) {
+		ASPIREdb.EVENT_BUS.on('subjects_loaded', function(subjectIds){
+            SubjectService.getPhenotypeSummaries(subjectIds, ASPIREdb.ActiveProjectSettings.getActiveProjectIds() , {
+                callback : function(vos) {
 
-				var data = [];
-				for ( var key in vos) {
-					var phenSummary = vos[key];
+                    var data = [];
+                    for ( var key in vos) {
+                        var phenSummary = vos[key];
 
-					var row = [ phenSummary.name,
-							ref.getSubjectValue(phenSummary) ];
-					data.push(row);
-				}
+                        var row = [ phenSummary.name,
+                            ref.getSubjectValue(phenSummary) ];
+                        data.push(row);
+                    }
 
-				ref.store.loadData(data);
-			}
-		});
+                    ref.store.loadData(data);
+                }
+            });
+        });
 
 	},
 

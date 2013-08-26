@@ -179,30 +179,31 @@ public class QueryServiceImpl extends GwtService implements QueryService {
     }
 
     @Override
+    @RemoteMethod
     @Transactional(readOnly = true)
-    public PagingLoadResult<SubjectValueObject> querySubjects( AspireDbPagingLoadConfig config )
+    public BoundedList<SubjectValueObject> querySubjects( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException
     {
         throwGwtExceptionIfNotLoggedIn();
 
         // TODO: Add pre-processing steps here
         // - fill in genomic locations, etc
-        preProcessFilters( config.getFilters() );
+        preProcessFilters( filters );
 
         // Default sort
         String sortField = "id";
         String sortDir = "ASC";
 
-        if ( config.getSortInfo() != null && !config.getSortInfo().isEmpty() ) {
-            SortInfo sortInfo = config.getSortInfo().iterator().next();
-            sortField = sortInfo.getSortField();
-            sortDir = sortInfo.getSortDir().toString();
-        }
+//        if ( config.getSortInfo() != null && !config.getSortInfo().isEmpty() ) {
+//            SortInfo sortInfo = config.getSortInfo().iterator().next();
+//            sortField = sortInfo.getSortField();
+//            sortDir = sortInfo.getSortDir().toString();
+//        }
 
         Page<Subject> subjects = (Page<Subject>) subjectDao.loadPage(
                 0, 2000,
                 sortField, sortDir,
-                config.getFilters() );
+                filters );
 
         long totalLength = subjects.getTotalCount();
 
@@ -213,7 +214,7 @@ public class QueryServiceImpl extends GwtService implements QueryService {
             vos.add( vo );
         }
 
-        return new PagingLoadResultBean<SubjectValueObject>( vos, ( int ) totalLength, config.getOffset() );
+        return new BoundedList<SubjectValueObject>( vos );
     }
 
     // Expand terms, fill in missing data.
@@ -267,7 +268,7 @@ public class QueryServiceImpl extends GwtService implements QueryService {
     @Override
     @Transactional(readOnly = true)
     public int getSubjectCount(AspireDbPagingLoadConfig config) throws NotLoggedInException, ExternalDependencyException {
-        return querySubjects( config ).getTotalLength();
+        return querySubjects( config.getFilters() ).getTotalSize();
     }
 
     @Override
@@ -304,14 +305,6 @@ public class QueryServiceImpl extends GwtService implements QueryService {
         return new PagingLoadResultBean<GeneValueObject>( new ArrayList<GeneValueObject>(this.bioMartQueryService.findGenes(query)), 0, 0 );
 	}
 	
-	@Override
-	public Collection<GeneValueObject> getGeneSuggestions(String query) throws BioMartServiceException {
-        if (query.length() < 2) {
-            return new ArrayList<GeneValueObject>();
-        }
-
-        return this.bioMartQueryService.findGenes(query);
-	}
 
 	@Override
 	public PagingLoadResult<NeurocartaPhenotypeValueObject> getNeurocartaPhenotypeSuggestionLoadResult(String query)
@@ -322,16 +315,6 @@ public class QueryServiceImpl extends GwtService implements QueryService {
 
         return new PagingLoadResultBean<NeurocartaPhenotypeValueObject>(
                 new ArrayList<NeurocartaPhenotypeValueObject>( this.neurocartaQueryService.findPhenotypes(query)), 0, 0 );
-	}
-
-	@Override
-    @Deprecated
-	public Collection<NeurocartaPhenotypeValueObject> getNeurocartaPhenotypeSuggestions(String query) throws NeurocartaServiceException {
-        if (query.length() < 3) {
-            return new ArrayList<NeurocartaPhenotypeValueObject>();
-        }
-
-        return new ArrayList<NeurocartaPhenotypeValueObject>(this.neurocartaQueryService.findPhenotypes(query));
 	}
 
     @Transactional
@@ -486,4 +469,27 @@ public class QueryServiceImpl extends GwtService implements QueryService {
             }
         }
     }
+
+        /*
+	@Override
+    @Deprecated
+	public Collection<NeurocartaPhenotypeValueObject> getNeurocartaPhenotypeSuggestions(String query) throws NeurocartaServiceException {
+        if (query.length() < 3) {
+            return new ArrayList<NeurocartaPhenotypeValueObject>();
+        }
+
+        return new ArrayList<NeurocartaPhenotypeValueObject>(this.neurocartaQueryService.findPhenotypes(query));
+	}
+    */
+
+    /*
+	@Override
+	public Collection<GeneValueObject> getGeneSuggestions(String query) throws BioMartServiceException {
+        if (query.length() < 2) {
+            return new ArrayList<GeneValueObject>();
+        }
+
+        return this.bioMartQueryService.findGenes(query);
+	}
+    */
 }

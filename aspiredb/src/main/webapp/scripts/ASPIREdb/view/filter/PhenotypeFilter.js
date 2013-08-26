@@ -29,7 +29,6 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
                         fn: function(obj, records) {
                             var record = records[0];
                             var valueCombo = this.getComponent('valueCombo');
-                            valueCombo.getStore().setActiveProjectIds([1]);
                             valueCombo.getStore().setProperty(record.raw);
                         },
                         scope: this

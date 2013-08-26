@@ -24,7 +24,6 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
         var comboBox = this.getComponent('invisibleCombo');
 
         var store = comboBox.getStore();
-        store.setActiveProjectIds([1]);
         store.setProperty(propertyObj);
     },
 
