@@ -16,18 +16,48 @@
  * limitations under the License.
  *
  */
-Ext.require([ 'Ext.grid.Panel', 'Ext.Panel', 'Ext.data.ArrayStore' ]);
+Ext.require([ 'Ext.grid.Panel', 'Ext.toolbar.Toolbar', 'Ext.grid.*', 'Ext.ComponentQuery', 'Ext.Panel', 'Ext.panel.Panel','Ext.data.ArrayStore' ]);
 
 /**
  * Queries Subject values and loads them into a {@link PagingGridPanel}
  * 
  */
 Ext.define('ASPIREdb.view.subject.SubjectGrid', {
-	extend : 'Ext.Panel',
+	extend : 'Ext.panel.Panel',
 	alias : 'widget.subjectGrid',
 	title : 'Subject',
 	layout : 'fit',
-
+	dockedItems: [{
+		xtype: 'toolbar',
+		items: [{
+			id: 'addLabelButton',
+			text: '',
+			tooltip: 'Add a new Label',
+			icon: 'scripts/ASPIREdb/resources/images/icons/add.png',
+		}, {
+			id: 'configLabelButton',
+			text: '',
+			tooltip: 'Configure Labels',
+			icon: 'scripts/ASPIREdb/resources/images/icons/wrench.png',
+			listeners: {
+				click: function() {
+					alert("Clicked Configure Labels");
+				}
+			}
+		}, {
+			xtype: 'tbfill'
+		}, {
+			text: '',
+			tooltip: 'Download table contents as text',
+			icon: 'scripts/ASPIREdb/resources/images/icons/disk.png',
+			listeners: {
+				click: function() {
+					alert("Clicked Save");
+				}
+			}
+		}]
+	}],
+	
 	/**
 	 * 
 	 */
@@ -35,14 +65,18 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 
 		this.callParent();
 
-		// DWR
 		var me = this;
+		
+		// grid panel
 		SubjectService.getSubjects({
 			callback : function(subjectValueObjects) {
 				me.subjectValueObjects = subjectValueObjects;
 				me.add(me.createGrid(subjectValueObjects));
 			}
 		});
+		
+		// add handlers to buttons
+		Ext.getCmp('addLabelButton').on('click', this.onMakeLabelClick);
 	},
 
 	/**
@@ -56,10 +90,11 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 
 		var grid = Ext.create('Ext.grid.Panel', {
 			store : store,
-			border : false,
+			id: 'subjectGrid',
+			multiSelect: true,
 			columns : [ {
 				text : "Subject Id",
-				dataIndex : 'subjectId',
+				dataIndex : 'patientId',
 				flex : 1,
 				width : 50
 			}, {
@@ -68,11 +103,34 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 				flex : 1,
 				width : 50
 			}, ],
+			
 		});
 
 		return grid;
 	},
 
+	/**
+	 * 
+	 */
+	onMakeLabelClick : function() {
+		// http://docs.sencha.com/extjs/4.2.1/extjs-build/examples/grid/grid-plugins.js
+		
+		var ids = [];
+		var grid = Ext.getCmp('subjectGrid');
+		var selSubjects = grid.getSelectionModel().getSelection();
+		alert("Clicked Add Label, selected " + grid.getSelectionModel().getCount());
+		for (var i = 0; i < selSubjects.length; i++) {
+			ids.push(selSubjects[i].get('id'));
+		}
+
+		var theLabel = "FooBarLabel"; 
+		//SubjectService.addLabel(ids, theLabel);
+		
+		
+		//Collection<SubjectValueObject> subjects = subjectGrid.grid.getSelectionModel().getSelection();
+		//console.log("ids[0]="+ids[0]+"; label="+selSubjects[0].get('label'));
+	},
+	
 	/**
 	 * 
 	 * @param subjectValueObjects
@@ -83,17 +141,18 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 
 		var data = [];
 
-		for ( var key in subjectValueObjects) {
-			var val = subjectValueObjects[key];
+		for ( var i = 0; i < subjectValueObjects.length; i++) {
+			var val = subjectValueObjects[i];
 			var visibleLabels = val.labels.join();
-			var row = [ val.patientId, visibleLabels ];
+			var row = [ val.id, val.patientId, visibleLabels ];
 			data.push(row);
 		}
 
 		var store = Ext.create('Ext.data.ArrayStore', {
 
-			fields : [ {
-				name : 'subjectId'
+			fields : [ { name: 'id' },
+			           {
+				name : 'patientId'
 			}, {
 				name : 'label'
 			} ],
