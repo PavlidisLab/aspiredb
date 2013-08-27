@@ -55,7 +55,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
                     autoLoad: true,
                     proxy : {
                         type: 'dwr',
-                        dwrFunction : VariantService.suggestProperties2,
+                        dwrFunction : VariantService.suggestPropertiesForVariantType,
                         dwrParams: ['CNV'],
                         model: 'ASPIREdb.model.Property',
                         reader : {
@@ -88,7 +88,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
                     autoLoad: true,
                     proxy : {
                         type: 'dwr',
-                        dwrFunction : VariantService.suggestProperties2,
+                        dwrFunction : VariantService.suggestPropertiesForVariantType,
                         dwrParams: ['INDEL'],
                         model: 'ASPIREdb.model.Property',
                         reader : {
