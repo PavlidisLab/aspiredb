@@ -41,12 +41,19 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
     },
 
     reset: function() {
-        var numItems = this.items.getCount() - 1;
-        for (var i = 0; i < numItems.length; i++) {
-            var item = this.items.removeAt(i);
-            item.destroy();
-        }
+
+        this.items = this.items.filterBy(function(item){
+            if (item instanceof ASPIREdb.view.filter.multicombo.Item) {
+                item.destroy();
+                return false;
+            }
+            return true;
+        });
+
         this.doLayout();
+
+        var comboBox = this.getComponent('invisibleCombo');
+        comboBox.lastQuery = null;
     },
 
     /**
