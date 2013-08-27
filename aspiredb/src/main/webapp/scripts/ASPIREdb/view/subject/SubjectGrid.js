@@ -157,9 +157,7 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 
 		// update local store
 		for ( var i = 0; i < selSubjects.length; i++) {
-			var oldLabels = selSubjects[i].get('label');
-			oldLabels.push(theLabel);
-			selSubjects[i].set('label', oldLabels);
+			selSubjects[i].get('label').push(theLabel);
 		}
 
 		// refresh grid
