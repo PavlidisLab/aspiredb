@@ -110,8 +110,9 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
         var multicombo = multicombo_container.getComponent("multicombo");
         var singleValueField = multicombo_container.getComponent("singleValueField");
         var example = multicombo_container.getComponent("example");
+        var propertyComboBox = me.getComponent("propertyComboBox");
 
-        me.getComponent("propertyComboBox").on('select',
+        propertyComboBox.on('select',
             function(obj, records) {
                 var record = records[0];
 
@@ -127,6 +128,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
                 var store = operatorComboBox.getStore();
                 store.removeAll();
                 store.add( operatorModels );
+                operatorComboBox.select(store.getAt(0));
 
                 var property = record.raw;
                 if (property.dataType instanceof NumericalDataType) {
@@ -153,6 +155,11 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
             var filterContainer = item.ownerCt;
             filterContainer.remove(item);
             filterContainer.doLayout();
+        });
+
+        propertyComboBox.getStore().on('load', function(store, records, successful) {
+            propertyComboBox.select(store.getAt(0));
+            propertyComboBox.fireEvent('select', propertyComboBox, [store.getAt(0)]);
         });
     }
 });

@@ -25,11 +25,9 @@ Ext.define('ASPIREdb.ValueSuggestionStore', {
         this.callParent(arguments);
     },
 
-    setActiveProjectIds: function(activeProjectIds) {
-    },
-
     setProperty: function(propertyObj) {
         this.property = propertyObj;
+        this.removeAll();
     },
 
     load: function(options) {

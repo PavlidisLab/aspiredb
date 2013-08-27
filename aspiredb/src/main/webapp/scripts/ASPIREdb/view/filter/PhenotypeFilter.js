@@ -29,6 +29,8 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
                         fn: function(obj, records) {
                             var record = records[0];
                             var valueCombo = this.getComponent('valueCombo');
+                            valueCombo.clearValue();
+                            valueCombo.lastQuery = null;
                             valueCombo.getStore().setProperty(record.raw);
                         },
                         scope: this
@@ -39,6 +41,12 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
                 xtype: 'combo',
                 itemId: 'valueCombo',
                 displayField: 'displayValue',
+                triggerAction: 'query',
+                minChars: 0,
+                matchFieldWidth: false,
+                hideTrigger: true,
+                autoSelect: true,
+                enableKeyEvents: true,
                 store: Ext.create('ASPIREdb.ValueSuggestionStore',{
                     remoteFunction: PhenotypeService.suggestPhenotypeValues
                 }),
@@ -46,10 +54,25 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
                     loadingText: 'Searching...',
                     emptyText: 'No results found.'
                 }
+            },
+            {
+                xtype: 'button',
+                itemId: 'removeButton',
+                text: 'X'
             }
         ];
 
         this.callParent();
+
+
+        this.getComponent("removeButton").on('click', function (button, event) {
+            // TODO: fix with custom events
+            var item = button.ownerCt;
+            var filterContainer = item.ownerCt;
+            filterContainer.remove(item);
+            filterContainer.doLayout();
+        });
+
     },
 
     getRestrictionExpression: function() {

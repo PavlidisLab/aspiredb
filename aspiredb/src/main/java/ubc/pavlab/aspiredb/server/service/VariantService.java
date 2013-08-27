@@ -47,7 +47,7 @@ public interface VariantService {
     public Collection<PropertyValue> suggestVariantLocationValues(Property property, SuggestionContext suggestionContext)
             throws NotLoggedInException, BioMartServiceException, NeurocartaServiceException, BioMartServiceException, NeurocartaServiceException;
 
-    public Collection<Property> suggestProperties2(VariantType variantType)
+    public Collection<Property> suggestPropertiesForVariantType(VariantType variantType)
             throws NotLoggedInException;
 
     public Collection<Property> suggestProperties()

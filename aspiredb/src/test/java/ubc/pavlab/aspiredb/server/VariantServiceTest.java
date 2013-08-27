@@ -98,7 +98,7 @@ public class VariantServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testSuggestProperties() throws NotLoggedInException {
-        Collection<Property> suggestions = variantService.suggestProperties2(VariantType.CNV);
+        Collection<Property> suggestions = variantService.suggestPropertiesForVariantType(VariantType.CNV);
         assertTrue(suggestions.size() > 2); //TODO: test more thoroughly
     }
 

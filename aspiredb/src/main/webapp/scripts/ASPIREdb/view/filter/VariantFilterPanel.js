@@ -18,6 +18,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
             filterItemType: 'ASPIREdb.view.filter.OrFilterContainer',
             suggestValuesRemoteFunction: VariantService.suggestValues,
             propertyStore: {
+                autoLoad: true,
                 proxy : {
                     type: 'dwr',
                     dwrFunction : VariantService.suggestVariantLocationProperties,
@@ -51,9 +52,10 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
                 itemId: 'cnvCharacteristicFilterContainer',
                 suggestValuesRemoteFunction: VariantService.suggestValues,
                 propertyStore: {
+                    autoLoad: true,
                     proxy : {
                         type: 'dwr',
-                        dwrFunction : VariantService.suggestProperties2,
+                        dwrFunction : VariantService.suggestPropertiesForVariantType,
                         dwrParams: ['CNV'],
                         model: 'ASPIREdb.model.Property',
                         reader : {
@@ -83,9 +85,10 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
                 itemId: 'indelCharacteristicFilterContainer',
                 suggestValuesRemoteFunction: VariantService.suggestValues,
                 propertyStore: {
+                    autoLoad: true,
                     proxy : {
                         type: 'dwr',
-                        dwrFunction : VariantService.suggestProperties2,
+                        dwrFunction : VariantService.suggestPropertiesForVariantType,
                         dwrParams: ['INDEL'],
                         model: 'ASPIREdb.model.Property',
                         reader : {

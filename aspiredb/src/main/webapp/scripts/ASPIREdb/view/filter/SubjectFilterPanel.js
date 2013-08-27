@@ -16,6 +16,7 @@ Ext.define('ASPIREdb.view.filter.SubjectFilterPanel', {
         filterItemType: 'ASPIREdb.view.filter.PropertyFilter',
         suggestValuesRemoteFunction: SubjectService.suggestValues,
         propertyStore: {
+            autoLoad: true,
             proxy : {
                 type: 'dwr',
                 dwrFunction : SubjectService.suggestProperties,

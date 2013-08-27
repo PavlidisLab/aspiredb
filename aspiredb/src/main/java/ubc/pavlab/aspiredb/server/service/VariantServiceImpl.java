@@ -94,7 +94,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<Property> suggestProperties2(VariantType variantType) {
+    public Collection<Property> suggestPropertiesForVariantType(VariantType variantType) {
         Collection<Property> properties = new ArrayList<Property>();
 
         properties.add(new VariantLabelProperty());
