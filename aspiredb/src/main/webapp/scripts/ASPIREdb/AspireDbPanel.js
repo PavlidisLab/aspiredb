@@ -38,7 +38,16 @@ Ext.define('ASPIREdb.AspireDbPanel', {
                 var projectFilter = new ProjectFilterConfig;
                 projectFilter.projectIds = activeProjectIds;
                 filterConfigs.push(projectFilter);
-                ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);            }
+                ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);
+                
+                // TODO
+                LoginStatusService.getCurrentUsername(function callback(username) {
+                	var messageItem = aspireDbPanel.items.get('topToolbar').items.get('logoutForm').items.get('message');
+                    messageItem.setText("Project id = " + activeProjectIds[0] + 
+                    		", Logged in as " + username );
+                });
+                
+            }
         );
 
         // TODO: finish me

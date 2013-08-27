@@ -16,48 +16,83 @@
  * limitations under the License.
  *
  */
-Ext.require([ 'Ext.grid.Panel', 'Ext.toolbar.Toolbar', 'Ext.grid.*', 'Ext.ComponentQuery', 'Ext.Panel', 'Ext.panel.Panel','Ext.data.ArrayStore' ]);
+Ext.require([ 'ASPIREdb.store.SubjectStore',
+				'ASPIREdb.ActiveProjectSettings' ]);
 
 /**
- * Queries Subject values and loads them into a {@link PagingGridPanel}
+ * Queries Subject values and loads them into a {@link Ext.grid.Panel}
  * 
  */
 Ext.define('ASPIREdb.view.subject.SubjectGrid', {
-	extend : 'Ext.panel.Panel',
+	extend : 'Ext.grid.Panel',
 	alias : 'widget.subjectGrid',
 	title : 'Subject',
-	layout : 'fit',
-	dockedItems: [{
-		xtype: 'toolbar',
-		items: [{
-			id: 'addLabelButton',
-			text: '',
-			tooltip: 'Add a new Label',
-			icon: 'scripts/ASPIREdb/resources/images/icons/add.png',
-		}, {
-			id: 'configLabelButton',
-			text: '',
-			tooltip: 'Configure Labels',
-			icon: 'scripts/ASPIREdb/resources/images/icons/wrench.png',
-			listeners: {
-				click: function() {
-					alert("Clicked Configure Labels");
-				}
+	multiSelect : true,
+	store : Ext.create('ASPIREdb.store.SubjectStore'),
+
+	columns : [
+			{
+				text : "Subject Id",
+				dataIndex : 'patientId',
+				flex : 1
+			},
+			{
+				text : "Labels",
+				dataIndex : 'label',
+				renderer : function(value) {
+					var ret = "";
+					for ( var i = 0; i < value.length; i++) {
+						ret += "<span style='background-color: "
+								+ value[i].colour + "'>" + value[i].name
+								+ "</span>&nbsp;";
+					}
+					return ret;
+				},
+				flex : 1
+			}, ],
+
+	tbar : [ {
+		xtype : 'button',
+		id : 'addLabelButton',
+		text : '',
+		tooltip : 'Add a new Label',
+		icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
+	}, {
+		xtype : 'button',
+		id : 'removeLabelButton',
+		text : '',
+		tooltip : 'Remove labels from a Subject',
+		icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
+		listeners : {
+			click : function() {
+				alert("Clicked Remove Labels");
 			}
-		}, {
-			xtype: 'tbfill'
-		}, {
-			text: '',
-			tooltip: 'Download table contents as text',
-			icon: 'scripts/ASPIREdb/resources/images/icons/disk.png',
-			listeners: {
-				click: function() {
-					alert("Clicked Save");
-				}
+		}
+	}, {
+		xtype : 'button',
+		id : 'configLabelButton',
+		text : '',
+		tooltip : 'Configure Labels',
+		icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
+		listeners : {
+			click : function() {
+				alert("Clicked Configure Labels");
 			}
-		}]
-	}],
-	
+		}
+	}, {
+		xtype : 'tbfill'
+	}, {
+		xtype : 'button',
+		text : '',
+		tooltip : 'Download table contents as text',
+		icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
+		listeners : {
+			click : function() {
+				alert("Clicked Save");
+			}
+		}
+	} ],
+
 	/**
 	 * 
 	 */
@@ -66,126 +101,70 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 		this.callParent();
 
 		var me = this;
-<<<<<<< HEAD
-		
-		// grid panel
-		SubjectService.getSubjects({
-			callback : function(subjectValueObjects) {
-				me.subjectValueObjects = subjectValueObjects;
-				me.add(me.createGrid(subjectValueObjects));
-			}
+
+		ASPIREdb.EVENT_BUS.on('filter_submit', function(filterConfigs) {
+			QueryService.querySubjects(filterConfigs, {
+				callback : function(pageLoad) {
+					var subjectValueObjects = pageLoad.items;
+					
+					// TODO: fix me (define grid/store in initComponent)
+					// me.items.removeAll();
+
+					var data = [];
+					for ( var i = 0; i < subjectValueObjects.length; i++) {
+						var val = subjectValueObjects[i];
+						var row = [ val.id, val.patientId, val.labels ];
+						data.push(row);
+					}
+					me.store.loadData(data);
+
+					var ids = [];
+					for ( var i = 0; i < subjectValueObjects.length; i++) {
+						var o = subjectValueObjects[i];
+						ids.push(o.id);
+					}
+					ASPIREdb.EVENT_BUS.fireEvent('subjects_loaded', ids);
+
+				}
+			});
 		});
-		
-		// add handlers to buttons
+
+		// add event handlers to buttons
 		Ext.getCmp('addLabelButton').on('click', this.onMakeLabelClick);
-=======
-
-        ASPIREdb.EVENT_BUS.on('filter_submit', function(filterConfigs) {
-            QueryService.querySubjects(filterConfigs, {
-                callback : function(pageLoad) {
-                    var subjectValueObjects = pageLoad.items;
-                    //TODO: fix me (define grid/store in initComponent)
-                    me.items.removeAll();
-                    me.subjectValueObjects = subjectValueObjects;
-                    me.add(me.createGrid(subjectValueObjects));
-
-                    var ids = [];
-                    for (var i = 0; i < subjectValueObjects.length; i++) {
-                        var o = subjectValueObjects[i];
-                        ids.push(o.id);
-                    }
-                    ASPIREdb.EVENT_BUS.fireEvent('subjects_loaded', ids );
-                }
-            });
-        });
->>>>>>> branch 'master' of https://github.com/ppavlidis/aspiredb.git
 	},
 
 	/**
+	 * Assigns a Label to a Subject
 	 * 
-	 * @param subjectValueObjects
-	 *            {@link SubjectValueObject}
-	 * @return
+	 * @param event
 	 */
-	createGrid : function(subjectValueObjects) {
-		var store = this.createStore(subjectValueObjects);
+	onMakeLabelClick : function(event) {
 
-		var grid = Ext.create('Ext.grid.Panel', {
-			store : store,
-			id: 'subjectGrid',
-			multiSelect: true,
-			columns : [ {
-				text : "Subject Id",
-				dataIndex : 'patientId',
-				flex : 1,
-				width : 50
-			}, {
-				text : "Labels",
-				dataIndex : 'label',
-				flex : 1,
-				width : 50
-<<<<<<< HEAD
-			}, ],
-			
-=======
-			}, ]
->>>>>>> branch 'master' of https://github.com/ppavlidis/aspiredb.git
-		});
-
-		return grid;
-	},
-
-	/**
-	 * 
-	 */
-	onMakeLabelClick : function() {
-		// http://docs.sencha.com/extjs/4.2.1/extjs-build/examples/grid/grid-plugins.js
-		
 		var ids = [];
-		var grid = Ext.getCmp('subjectGrid');
+		var grid = this.findParentByType('grid');
 		var selSubjects = grid.getSelectionModel().getSelection();
-		alert("Clicked Add Label, selected " + grid.getSelectionModel().getCount());
-		for (var i = 0; i < selSubjects.length; i++) {
+		for ( var i = 0; i < selSubjects.length; i++) {
 			ids.push(selSubjects[i].get('id'));
 		}
 
-		var theLabel = "FooBarLabel"; 
-		//SubjectService.addLabel(ids, theLabel);
-		
-		
-		//Collection<SubjectValueObject> subjects = subjectGrid.grid.getSelectionModel().getSelection();
-		//console.log("ids[0]="+ids[0]+"; label="+selSubjects[0].get('label'));
-	},
-	
-	/**
-	 * 
-	 * @param subjectValueObjects
-	 *            {@link SubjectValueObject}
-	 * @return
-	 */
-	createStore : function(subjectValueObjects) {
+		// TODO replace with input from user
+		var theLabel = new LabelValueObject();
+		theLabel.name = 'aa';
+		theLabel.colour = 'FFB6C1';
 
-		var data = [];
+		// store in database
+		SubjectService.addLabel(ids, theLabel);
 
-		for ( var i = 0; i < subjectValueObjects.length; i++) {
-			var val = subjectValueObjects[i];
-			var visibleLabels = val.labels.join();
-			var row = [ val.id, val.patientId, visibleLabels ];
-			data.push(row);
+		// update local store
+		for ( var i = 0; i < selSubjects.length; i++) {
+			var oldLabels = selSubjects[i].get('label');
+			oldLabels.push(theLabel);
+			selSubjects[i].set('label', oldLabels);
 		}
 
-		var store = Ext.create('Ext.data.ArrayStore', {
-
-			fields : [ { name: 'id' },
-			           {
-				name : 'patientId'
-			}, {
-				name : 'label'
-			} ],
-			data : data,
-			storeId : 'subjectStore'
-		});
-		return store;
-	}
+		// refresh grid
+		grid.store.sync();
+		grid.getView().refresh();
+	},
 
 });

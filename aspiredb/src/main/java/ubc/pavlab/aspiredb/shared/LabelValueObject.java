@@ -28,6 +28,7 @@ import org.directwebremoting.annotations.DataTransferObject;
  */
 @DataTransferObject(javascript = "LabelValueObject")
 public class LabelValueObject implements Displayable, Serializable {
+    
     private static final long serialVersionUID = 5912945308104924604L;
 
     private String name;
@@ -41,7 +42,6 @@ public class LabelValueObject implements Displayable, Serializable {
         this.name = name;
         this.colour = "E6E6FA"; // TODO: define default
     }
-
     public LabelValueObject(String name, String colour) {
         this.name = name;
         this.colour = colour;
@@ -75,6 +75,14 @@ public class LabelValueObject implements Displayable, Serializable {
         return colour;
     }
 
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    public void setColour( String colour ) {
+        this.colour = colour;
+    }
+
     public String toString() {
     	return this.getName();
     }
@@ -86,7 +94,7 @@ public class LabelValueObject implements Displayable, Serializable {
 
     @Override
     public String getHtmlLabel() {
-        return "";
+        return "<span style='background-color: " + colour + "'>" + name + "</span>";
     }
 
     @Override

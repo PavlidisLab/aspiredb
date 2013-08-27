@@ -25,7 +25,7 @@ import java.util.Map;
  * @author ?
  * @version $Id: SubjectValueObject.java,v 1.4 2013/05/14 20:29:21 anton Exp $
  */
-@DataTransferObject
+@DataTransferObject(javascript = "SubjectValueObject")
 public class SubjectValueObject implements Serializable {
 
     private static final long serialVersionUID = 6701485127497073745L;
