@@ -19,7 +19,8 @@
 
 Ext.require([
     'ASPIREdb.store.PhenotypeStore',
-    'ASPIREdb.ActiveProjectSettings'
+    'ASPIREdb.ActiveProjectSettings',
+    'ASPIREdb.view.PhenotypeEnrichmentWindow'
 ]);
 
 //TODO js documentation
@@ -30,7 +31,10 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 
 	tbar : [ {
 		xtype : 'button',
-		text : 'Analyze'
+		text : 'Analyze',
+		handler : function(){
+			ASPIREdb.view.PhenotypeEnrichmentWindow.show();
+		}
 	}, {
 		xtype : 'button',
 		text : 'Save'

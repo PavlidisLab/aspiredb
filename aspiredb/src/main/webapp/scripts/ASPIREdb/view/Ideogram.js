@@ -63,6 +63,8 @@ Ext.define('ASPIREdb.view.Ideogram', {
             }
         });
 
+        
+        //TODO move this call to VariantTabPanel so that we only have to do this once for table and ideogram
         ASPIREdb.EVENT_BUS.on('filter_submit', function(filterConfigs) {
             QueryService.queryVariants(filterConfigs, {
                 callback : function(pageLoad) {

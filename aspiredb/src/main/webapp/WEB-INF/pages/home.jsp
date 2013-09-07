@@ -15,7 +15,7 @@
 
 <script src="scripts/lib/DwrProxy.js"></script>
 
-<link href="http://cdn.sencha.com/ext/gpl/4.2.0/resources/css/ext-all.css" rel="stylesheet" />
+<!-- <link href="http://cdn.sencha.com/ext/gpl/4.2.0/resources/css/ext-all.css" rel="stylesheet" />-->
 <link rel="stylesheet" type="text/css" href="scripts/ASPIREdb/resources/css/multivaluecombo.css" />
 <link rel="stylesheet" type="text/css" href="scripts/lib/resources/css/ext-all-neptune.css">
 <link rel="icon" type="image/x-icon" href="scripts/ASPIREdb/resources/images/favicon.ico" />

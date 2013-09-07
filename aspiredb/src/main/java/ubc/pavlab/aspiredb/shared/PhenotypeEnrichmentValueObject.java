@@ -14,6 +14,8 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import java.io.Serializable;
+
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
@@ -24,7 +26,7 @@ import org.directwebremoting.annotations.DataTransferObject;
  */
 
 @DataTransferObject
-public class PhenotypeEnrichmentValueObject implements Displayable, GwtSerializable {
+public class PhenotypeEnrichmentValueObject implements Serializable{
 
     
     /**
@@ -132,20 +134,7 @@ public class PhenotypeEnrichmentValueObject implements Displayable, GwtSerializa
     }public void setPValueCorrected( Double pValueCorrected ) {
         this.pValueCorrected = pValueCorrected;
     }
-    @Override
-	public String getLabel() {
-        return name;
-	}
-
-	@Override
-	public String getHtmlLabel() {
-		return name;
-	}
-
-	@Override
-	public String getTooltip() {
-		return name ;
-	}
+    
 
     public Integer getTotal() {
         return total;
