@@ -21,7 +21,7 @@ Ext.require([ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel' ]);
 
 // TODO js documentation
 // TODO labels
-// TODO grouping
+
 // TODO button functions
 Ext.define('ASPIREdb.view.VariantTabPanel', {
 	extend : 'Ext.tab.Panel',
@@ -50,7 +50,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		itemId : 'ideogram'
 	} ],
 	
-	defaultGridFields :['variantType', 'genomeCoordinates', 'type', 'copyNumber', 'cnvLength', 'dbSNPID', 'observedBase', 'referenceBase', 'indelLength' ],
+	defaultGridFields :['patientId','variantType', 'genomeCoordinates', 'type', 'copyNumber', 'cnvLength', 'dbSNPID', 'observedBase', 'referenceBase', 'indelLength' ],
 
 	initComponent : function() {
 		this.callParent();
@@ -104,10 +104,17 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 		var store = Ext.create('Ext.data.ArrayStore', {
 			fields : fieldData,
-			data : storeData
+			data : storeData,
+			groupField : 'patientId'
 		});
 
 		var columnConfig = [];
+		
+		columnConfig.push({
+			text : 'Patient Id',
+			flex : 1,
+			dataIndex : 'patientId'
+		});
 
 		columnConfig.push({
 			text : 'Type',
@@ -184,16 +191,19 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 		}
 
-		//TODO grouping, styling
+		//TODO styling
 		grid = Ext.create('Ext.grid.Panel', {
 			store : store,
 			columns : columnConfig,
 			stripeRows : true,
 			height : 180,
 			width : 500,
-
 			title : 'Table View',
-			requires : [ 'Ext.grid.feature.Grouping' ]
+			requires : [ 'Ext.grid.feature.Grouping' ],			
+			features: [Ext.create('Ext.grid.feature.Grouping', {
+                groupHeaderTpl: '{name} ({rows.length} Item{[values.rows.length > 1 ? "s" : ""]})'
+			})]
+			
 		});
 		
 		return grid;
@@ -208,6 +218,8 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			var vvo = vvos[i];
 
 			var dataRow = [];
+			
+			dataRow.push(vvo.patientId);
 
 			dataRow.push(vvo.variantType);
 			dataRow.push(vvo.genomicRange.chromosome + ":" + vvo.genomicRange.baseStart + "-"
