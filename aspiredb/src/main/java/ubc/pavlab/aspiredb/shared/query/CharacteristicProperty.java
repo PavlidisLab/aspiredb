@@ -32,6 +32,7 @@ public class CharacteristicProperty extends Property<DataType> {
     public CharacteristicProperty() {
         this.operators =  Arrays.asList(Operator.IS_IN_SET, Operator.IS_NOT_IN_SET);
         this.supportsSuggestions = true;
+        this.isCharacteristic = true;
     }
 
     public CharacteristicProperty(String name) {
@@ -39,6 +40,7 @@ public class CharacteristicProperty extends Property<DataType> {
         this.name = name;
         this.displayName = name;
         this.dataType = new TextDataType();
+        this.isCharacteristic = true;
     }
 
     public CharacteristicProperty(String name, DataType dataType) {
@@ -46,5 +48,6 @@ public class CharacteristicProperty extends Property<DataType> {
         this.name = name;
         this.displayName = name;
         this.dataType = dataType;
+        this.isCharacteristic = true;
     }
 }

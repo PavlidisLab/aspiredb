@@ -20,7 +20,9 @@
 Ext.require([ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel' ]);
 
 // TODO js documentation
-// TODO just works for generic VariantValueObject, make it work for subtypes (CNV etc.)
+// TODO labels
+// TODO grouping
+// TODO button functions
 Ext.define('ASPIREdb.view.VariantTabPanel', {
 	extend : 'Ext.tab.Panel',
 	alias : 'widget.variantTabPanel',
@@ -44,8 +46,11 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	}, ],
 
 	items : [ {
-		xtype : 'ideogram'
+		xtype : 'ideogram',
+		itemId : 'ideogram'
 	} ],
+	
+	defaultGridFields :['variantType', 'genomeCoordinates', 'type', 'copyNumber', 'cnvLength', 'dbSNPID', 'observedBase', 'referenceBase', 'indelLength' ],
 
 	initComponent : function() {
 		this.callParent();
@@ -53,55 +58,49 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		var ref = this;
 
 		ASPIREdb.EVENT_BUS.on('filter_submit', function(filterConfigs) {
-			QueryService.queryVariants(filterConfigs, {
-				callback : function(pageLoad) {
-
-					var vvos = pageLoad.items;
-					
-					var storeData = [];
-					
-					var fieldData = ['variantType', 'genomeCoordinates' ];
-
-					var characteristicNames = [];
-
-					for ( var char in vvos[0].characteristics) {
-
-						characteristicNames.push(vvos[0].characteristics[char].key);
-						fieldData.push(vvos[0].characteristics[char].key);
+			
+			VariantService.suggestProperties(function(properties){
+				
+				QueryService.queryVariants(filterConfigs, {
+					callback : function(pageLoad) {
 						
-					}
-
-					for ( var i = 0; i < vvos.length; i++) {
-
-						var vvo = vvos[i];
-
-						var dataRow = [];
-
-						dataRow.push(vvo.variantType);
-						dataRow.push(vvo.genomicRange.chromosome + ":" + vvo.genomicRange.baseStart + "-"
-								+ vvo.genomicRange.baseEnd);
-
-						for ( var char in vvo.characteristics) {
-
-							dataRow.push(vvo.characteristics[char].value);
-
+						var vvos = pageLoad.items;
+						
+						var ideogram = ref.getComponent('ideogram');
+		                ideogram.drawChromosomes();
+		                ideogram.drawVariants(vvos);
+						
+						var fieldData = [];
+						
+						for (var i = 0 ; i< ref.defaultGridFields.length; i++){
+							fieldData.push(ref.defaultGridFields[i]);
 						}
 
-						storeData.push(dataRow);
+						var characteristicNames = [];
+
+						for ( var i = 0 ; i < properties.length ; i++) {
+							
+							if (properties[i].characteristic){
+								fieldData.push(properties[i].displayName);
+								characteristicNames.push(properties[i].name);
+							}							
+							
+						}
+
+						var grid = ref.createVariantGrid(ref.constructVariantStoreData(vvos, characteristicNames), fieldData,
+								characteristicNames);
+
+						ref.add(grid);
 
 					}
-
-					var grid = ref.createVariantGrid(storeData, fieldData,
-							characteristicNames);
-
-					ref.add(grid);
-
-				}
-			});
+				});			
+				
+			});			
+			
 		});
 	},
 
-	createVariantGrid : function(storeData, fieldData,charColumnNames) {
+	createVariantGrid : function(storeData, fieldData, characteristicNames) {
 
 		var store = Ext.create('Ext.data.ArrayStore', {
 			fields : fieldData,
@@ -121,14 +120,65 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			flex : 1,
 			dataIndex : 'genomeCoordinates'
 		});
+		
+		columnConfig.push({
+			text : 'Copy Number',
+			flex : 1,
+			dataIndex : 'copyNumber',
+			hidden : true
+				
+		});
+		
+		columnConfig.push({
+			text : 'CNV Type',
+			flex : 1,
+			dataIndex : 'type',
+			hidden : true
+		});
+		
+		columnConfig.push({
+			text : 'CNV Length',
+			flex : 1,
+			dataIndex : 'cnvLength',
+			hidden : true
+		});
+		
+		columnConfig.push({
+			text : 'DB SNP ID',
+			flex : 1,
+			dataIndex : 'dbSNPID',
+			hidden : true
+		});
+		
+		columnConfig.push({
+			text : 'Observed Base',
+			flex : 1,
+			dataIndex : 'observedBase',
+			hidden : true
+		});
+		
+		columnConfig.push({
+			text : 'Reference Base',
+			flex : 1,
+			dataIndex : 'referenceBase',
+			hidden : true
+		});
+		
+		columnConfig.push({
+			text : 'Indel Length',
+			flex : 1,
+			dataIndex : 'indelLength',
+			hidden : true
+		});
 
-		for ( var i = 0; i < charColumnNames.length; i++) {
-
+		for ( var i = 0; i < characteristicNames.length; i++) {
+			
 			var config ={};
 
-			config.text = charColumnNames[i];
+			config.text = characteristicNames[i];
 			config.flex = 1;
-			config.dataIndex = charColumnNames[i];
+			config.dataIndex = characteristicNames[i];
+			config.hidden = true;
 
 			columnConfig.push(config);
 
@@ -147,6 +197,67 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		});
 		
 		return grid;
+	},
+	
+	constructVariantStoreData : function (vvos, characteristicNames){
+		
+		var storeData = [];
+		
+		for ( var i = 0; i < vvos.length; i++) {
+
+			var vvo = vvos[i];
+
+			var dataRow = [];
+
+			dataRow.push(vvo.variantType);
+			dataRow.push(vvo.genomicRange.chromosome + ":" + vvo.genomicRange.baseStart + "-"
+					+ vvo.genomicRange.baseEnd);
+			
+			if (vvo.variantType == "CNV"){
+				dataRow.push(vvo.type);
+				dataRow.push(vvo.copyNumber);
+				dataRow.push(vvo.cnvLength);																
+			}else{								
+				dataRow.push("");
+				dataRow.push("");
+				dataRow.push("");								
+			}
+			
+			if (vvo.variantType =="SNV"){
+				dataRow.push(vvo.dbSNPID);
+				dataRow.push(vvo.observedBase);
+				dataRow.push(vvo.referenceBase);
+			}else{
+				dataRow.push("");
+				dataRow.push("");
+				dataRow.push("");
+			}
+			
+			if (vvo.variantType =="INDEL"){
+				dataRow.push(vvo.length);								
+			}else{
+				dataRow.push("");
+			}
+			
+			for (var j=0 ; j<characteristicNames.length ; j++){
+				
+				var dataRowValue = "";
+				
+				for ( var char in vvo.characteristics) {									
+					if (char == characteristicNames[j]){
+						dataRowValue = vvo.characteristics[char].value;
+						break;
+					}
+				}
+				
+				dataRow.push(dataRowValue);				
+			}
+
+			storeData.push(dataRow);
+		}
+		
+		return storeData;
+		
 	}
 
 });

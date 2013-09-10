@@ -37,8 +37,17 @@ public class Property<D extends DataType> implements Serializable {
     protected String exampleValues;
     protected Collection<Operator> operators;
     protected boolean supportsSuggestions = false;
+    protected boolean isCharacteristic = false;
 
-    public Property() {
+    public boolean isCharacteristic() {
+		return isCharacteristic;
+	}
+
+	public void setCharacteristic(boolean isCharacteristic) {
+		this.isCharacteristic = isCharacteristic;
+	}
+
+	public Property() {
     }
 
     public boolean isSupportsSuggestions() {

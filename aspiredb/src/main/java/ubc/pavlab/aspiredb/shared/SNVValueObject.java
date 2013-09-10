@@ -25,7 +25,7 @@ import ubc.pavlab.aspiredb.shared.query.ReferenceBaseProperty;
  * 
  * @version $Id: SNVValueObject.java,v 1.4 2013/07/04 17:26:00 anton Exp $
  */
-@DataTransferObject
+@DataTransferObject(javascript = "SNVValueObject")
 public class SNVValueObject extends VariantValueObject {
 
 	/**

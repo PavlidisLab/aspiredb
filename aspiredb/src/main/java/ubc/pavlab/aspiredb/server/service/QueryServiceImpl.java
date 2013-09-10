@@ -56,7 +56,7 @@ import java.util.*;
  */
 @Service("queryService")
 @RemoteProxy(name="QueryService")
-public class QueryServiceImpl extends GwtService implements QueryService {
+public class QueryServiceImpl implements QueryService {
     
     private static Logger log = LoggerFactory.getLogger( QueryServiceImpl.class );
 
@@ -184,8 +184,7 @@ public class QueryServiceImpl extends GwtService implements QueryService {
     public BoundedList<SubjectValueObject> querySubjects( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException
     {
-        throwGwtExceptionIfNotLoggedIn();
-
+      
         // TODO: Add pre-processing steps here
         // - fill in genomic locations, etc
         preProcessFilters( filters );
@@ -233,8 +232,7 @@ public class QueryServiceImpl extends GwtService implements QueryService {
     @RemoteMethod
     public BoundedList<VariantValueObject> queryVariants( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException {
-        throwGwtExceptionIfNotLoggedIn();
-
+        
         // TODO: move this?
         for (AspireDbFilterConfig filter : filters) {
             if (filter instanceof VariantFilterConfig) {
@@ -425,7 +423,7 @@ public class QueryServiceImpl extends GwtService implements QueryService {
 
     @Override
     public Collection<QueryValueObject> getSavedQueries() throws NotLoggedInException{
-        throwGwtExceptionIfNotLoggedIn();
+        
         Collection<Query> queries = queryDao.loadAll();
         Collection<QueryValueObject> queryVOs = new ArrayList<QueryValueObject>();
         for (Query query : queries) {
