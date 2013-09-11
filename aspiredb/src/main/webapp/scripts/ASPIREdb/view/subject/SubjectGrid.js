@@ -16,8 +16,8 @@
  * limitations under the License.
  *
  */
-Ext.require([ 'ASPIREdb.store.SubjectStore',
-				'ASPIREdb.ActiveProjectSettings' ]);
+Ext.require([ 'ASPIREdb.store.SubjectStore', 'ASPIREdb.view.CreateLabelWindow',
+		'ASPIREdb.ActiveProjectSettings' ]);
 
 /**
  * Queries Subject values and loads them into a {@link Ext.grid.Panel}
@@ -76,7 +76,7 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 		icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
 		listeners : {
 			click : function() {
-				alert("Clicked Configure Labels");
+				alert('Clicked Config');
 			}
 		}
 	}, {
@@ -106,7 +106,7 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 			QueryService.querySubjects(filterConfigs, {
 				callback : function(pageLoad) {
 					var subjectValueObjects = pageLoad.items;
-					
+
 					// TODO: fix me (define grid/store in initComponent)
 					// me.items.removeAll();
 
@@ -143,26 +143,41 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 		var ids = [];
 		var grid = this.findParentByType('grid');
 		var selSubjects = grid.getSelectionModel().getSelection();
+
+		if (selSubjects.length == 0) {
+			alert("At least one subject must be selected");
+			return;
+		}
+
 		for ( var i = 0; i < selSubjects.length; i++) {
 			ids.push(selSubjects[i].get('id'));
 		}
 
-		// TODO replace with input from user
-		var theLabel = new LabelValueObject();
-		theLabel.name = 'aa';
-		theLabel.colour = 'FFB6C1';
+		Ext.define('ASPIREdb.view.CreateLabelWindowSubject', {
+			extend : 'ASPIREdb.view.CreateLabelWindow',
 
-		// store in database
-		SubjectService.addLabel(ids, theLabel);
+			// override
+			onOkButtonClick : function() {
+				this.callParent();
 
-		// update local store
-		for ( var i = 0; i < selSubjects.length; i++) {
-			selSubjects[i].get('label').push(theLabel);
-		}
+				var theLabel = this.getLabel();
 
-		// refresh grid
-		grid.store.sync();
-		grid.getView().refresh();
+				// store in database
+				SubjectService.addLabel(ids, theLabel);
+
+				// update local store
+				for ( var i = 0; i < selSubjects.length; i++) {
+					selSubjects[i].get('label').push(theLabel);
+				}
+
+				// refresh grid
+				grid.store.sync();
+				grid.getView().refresh();
+			},
+		});
+
+		var labelWindow = new ASPIREdb.view.CreateLabelWindowSubject();
+		labelWindow.show();
 	},
 
 });
