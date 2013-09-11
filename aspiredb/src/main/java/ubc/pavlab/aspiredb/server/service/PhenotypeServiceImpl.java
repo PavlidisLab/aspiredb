@@ -27,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +44,6 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.TextValue;
 import ubc.pavlab.aspiredb.shared.query.PhenotypeProperty;
 import ubc.pavlab.aspiredb.shared.query.PropertyValue;
-import ubc.pavlab.aspiredb.shared.suggestions.PhenotypeSuggestion;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 import ubic.basecode.math.MultipleTestCorrection;
 import ubic.basecode.math.SpecFunc;
@@ -377,7 +375,9 @@ public class PhenotypeServiceImpl extends GwtService implements PhenotypeService
         }
     }
 
-    @Transactional
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)    
     public List<PhenotypeEnrichmentValueObject> getPhenotypeEnrichmentValueObjects( Collection<Long> activeProjects,
             Collection<Long> subjectIds ) throws NotLoggedInException {
 

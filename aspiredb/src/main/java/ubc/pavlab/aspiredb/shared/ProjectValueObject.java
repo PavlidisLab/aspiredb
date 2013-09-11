@@ -16,10 +16,13 @@ package ubc.pavlab.aspiredb.shared;
 
 import java.io.Serializable;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * 
  * 
  */
+@DataTransferObject
 public class ProjectValueObject implements Serializable {
     
     /**

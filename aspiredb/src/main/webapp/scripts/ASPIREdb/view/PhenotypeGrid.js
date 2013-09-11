@@ -29,16 +29,22 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	alias : 'widget.phenotypeGrid',
 	title : 'Phenotype',
 
-	tbar : [ {
+	dockedItems:[{
+		xtype: 'toolbar',
+		itemId: 'phenotypeGridToolbar',
+		dock: 'top',
+		items :[ {
 		xtype : 'button',
 		text : 'Analyze',
-		handler : function(){
-			ASPIREdb.view.PhenotypeEnrichmentWindow.show();
-		}
+		disabled: 'true',
+		itemId: 'analyzeButton'
+		
 	}, {
 		xtype : 'button',
 		text : 'Save'
-	} ],
+	} ]
+
+}],
 
 	columns : [ {
 		header : 'Name',
@@ -51,14 +57,35 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	} ],
 
 	store : Ext.create('ASPIREdb.store.PhenotypeStore'),
-
+	
 	initComponent : function() {
 		this.callParent();
+		
+		this.getDockedComponent('phenotypeGridToolbar').getComponent('analyzeButton').on('click', this.getPhenotypeEnrichment, this);
 
 		var ref = this;
 
 		ASPIREdb.EVENT_BUS.on('subjects_loaded', function(subjectIds){
-            SubjectService.getPhenotypeSummaries(subjectIds, ASPIREdb.ActiveProjectSettings.getActiveProjectIds() , {
+			
+			ref.currentSubjectIds = subjectIds;
+			
+			ProjectService.numSubjects( ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
+				callback: function(numSubjects){				
+					
+					if (subjectIds.length > 0 ){
+						
+						if (subjectIds.length < numSubjects -1){							
+							ref.getDockedComponent('phenotypeGridToolbar').getComponent('analyzeButton').enable();							
+						}else{
+							ref.getDockedComponent('phenotypeGridToolbar').getComponent('analyzeButton').disable();
+						}
+						
+					}
+				
+				}
+			} );
+						
+			SubjectService.getPhenotypeSummaries(subjectIds, ASPIREdb.ActiveProjectSettings.getActiveProjectIds() , {
                 callback : function(vos) {
 
                     var data = [];
@@ -73,6 +100,10 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
                     ref.store.loadData(data);
                 }
             });
+			
+			
+			
+            
         });
 
 	},
@@ -103,5 +134,19 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 
 		return subjectValue;
 
+	},
+	
+	getPhenotypeEnrichment : function(){
+		
+		PhenotypeService.getPhenotypeEnrichmentValueObjects(ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), this.currentSubjectIds , {
+            callback : function(vos) {
+            	ASPIREdb.view.PhenotypeEnrichmentWindow.populateGrid(vos);
+            	ASPIREdb.view.PhenotypeEnrichmentWindow.show();
+            }
+        });
+		
 	}
+	
+	
+	
 });
