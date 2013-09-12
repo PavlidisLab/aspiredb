@@ -86,6 +86,8 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 							}							
 							
 						}
+						
+						ref.remove('variantGrid',true);
 
 						var grid = ref.createVariantGrid(ref.constructVariantStoreData(vvos, characteristicNames), fieldData,
 								characteristicNames);
@@ -194,6 +196,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		//TODO styling
 		grid = Ext.create('Ext.grid.Panel', {
 			store : store,
+			itemId: 'variantGrid',
 			columns : columnConfig,
 			stripeRows : true,
 			height : 180,

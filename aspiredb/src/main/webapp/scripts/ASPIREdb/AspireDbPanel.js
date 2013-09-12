@@ -2,7 +2,8 @@ Ext.require([
     'ASPIREdb.MainPanel',
     'ASPIREdb.EVENT_BUS',
     'ASPIREdb.view.filter.FilterWindow',
-    'ASPIREdb.ActiveProjectSettings'
+    'ASPIREdb.ActiveProjectSettings',
+    'ASPIREdb.view.DashboardWindow'
 ]);
 
 /**
@@ -32,7 +33,9 @@ Ext.define('ASPIREdb.AspireDbPanel', {
                 dashboard.show();
                 me.parseUrlParametersAndRedirect();
 */
-
+                ASPIREdb.view.DashboardWindow.show();
+                
+       /*         
                 var filterConfigs = [];
                 var activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
                 var projectFilter = new ProjectFilterConfig;
@@ -46,6 +49,8 @@ Ext.define('ASPIREdb.AspireDbPanel', {
                     messageItem.setText("Project id = " + activeProjectIds[0] + 
                     		", Logged in as " + username );
                 });
+                
+                */
                 
             }
         );
@@ -116,7 +121,10 @@ Ext.define('ASPIREdb.AspireDbPanel', {
                 xtype: 'button',
                 text: 'Dashboard',
                 itemId: 'dashboardButton',
-                height: 30
+                height: 30,
+                handler: function() {
+                	ASPIREdb.view.DashboardWindow.show();
+                }
             },
             {
                 xtype: 'button',
