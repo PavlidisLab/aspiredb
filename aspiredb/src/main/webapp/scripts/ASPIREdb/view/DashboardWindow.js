@@ -9,14 +9,14 @@ Ext.define('ASPIREdb.view.DashboardWindow', {
         title: 'Dashboard',
         closable: true,
         closeAction: 'hide',
-        width: 500,
-        height: 400,
+        width: 400,
+        height: 250,
         layout: {
             type: 'vbox',
             align: 'left'
         },
         bodyStyle: 'padding: 5px;',
-      
+     
         initComponent: function () {
         	
         	this.callParent();
@@ -33,6 +33,8 @@ Ext.define('ASPIREdb.view.DashboardWindow', {
                                            }
                 }
             });
+        	
+        	
 
            var projectComboBox = Ext.create( 'Ext.form.ComboBox',{
               id:'projectField',
@@ -42,14 +44,50 @@ Ext.define('ASPIREdb.view.DashboardWindow', {
               editable: false,
               displayField: 'name',
               allowBlank: false,
-              valueField: 'id'
+              valueField: 'id',
+              forceSelection:true,
+              emptyText: "Choose project...",
+              msgTarget: 'qtip'
                });
            
            	this.add(projectComboBox);
            	
+           	projectComboBox.on('select', function(){
+           		
+           		           		
+           		ProjectService.numSubjects( [projectComboBox.getValue()], {
+    				callback: function(numSubjects){				
+    					
+    					ref.getComponent('numSubjects').setText('Number of Subjects: '+numSubjects);
+    						
+    					}
+    				
+    				});
+    			
+           		
+           		ProjectService.numVariants( [projectComboBox.getValue()], {
+    				callback: function(numVariants){				
+    					 
+    					ref.getComponent('numVariants').setText('Number of Variants:  '+numVariants);
+    						
+    					}
+    				
+    				});
+    			
+           		
+           		
+           	});
+                      	
            	var okButton = Ext.create('Ext.Button', {
            	    text: 'ok',           	    
-           	    handler: function() {           	    	
+           	    handler: function() {
+           	    	
+           	    	if (!projectComboBox.getValue()){
+           	    		
+           	    		projectComboBox.setActiveError('Please select project');
+           	    		return;
+           	    	}
+           	    	
            	    	ASPIREdb.ActiveProjectSettings.setActiveProject([{id: projectComboBox.getValue(), name:projectComboBox.getName(), description:''}]);
            	    	
            	    	var filterConfigs = [];
@@ -64,11 +102,20 @@ Ext.define('ASPIREdb.view.DashboardWindow', {
            	    }
            	});
            	
+           	
+           	
+           	this.add({xtype: 'label',
+           				itemId: 'numSubjects',
+           				text: 'Number of Subjects:',
+           				margin: '20 20 5 20'},
+            		{xtype: 'label',
+                		itemId: 'numVariants',
+                		text: 'Number of Variants:',
+                		margin: '5 20 20 20'});
+           	
+           	
            	this.add(okButton);
            	
-           	
-           	
-            //this.on('show',function(event) {});
             
         }
 
