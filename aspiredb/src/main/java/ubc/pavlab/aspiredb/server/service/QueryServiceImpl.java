@@ -247,7 +247,7 @@ public class QueryServiceImpl implements QueryService {
         StopWatch timer = new StopWatch();
         timer.start();
         Page<? extends Variant> page = variantDao.loadPage(
-                0, 2000,
+                0, 5000,
                 sortProperty, sortDirection,
                 filters );
 
