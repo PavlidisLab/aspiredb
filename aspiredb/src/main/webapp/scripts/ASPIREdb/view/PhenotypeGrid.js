@@ -17,34 +17,30 @@
  *
  */
 
-Ext.require([
-    'ASPIREdb.store.PhenotypeStore',
-    'ASPIREdb.ActiveProjectSettings',
-    'ASPIREdb.view.PhenotypeEnrichmentWindow'
-]);
+Ext.require([ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.PhenotypeEnrichmentWindow' ]);
 
-//TODO js documentation
+// TODO js documentation
 Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.phenotypeGrid',
 	title : 'Phenotype',
 
-	dockedItems:[{
-		xtype: 'toolbar',
-		itemId: 'phenotypeGridToolbar',
-		dock: 'top',
-		items :[ {
-		xtype : 'button',
-		text : 'Analyze',
-		disabled: 'true',
-		itemId: 'analyzeButton'
-		
-	}, {
-		xtype : 'button',
-		text : 'Save'
-	} ]
+	dockedItems : [ {
+		xtype : 'toolbar',
+		itemId : 'phenotypeGridToolbar',
+		dock : 'top',
+		items : [ {
+			xtype : 'button',
+			text : 'Analyze',
+			disabled : 'true',
+			itemId : 'analyzeButton'
 
-}],
+		}, {
+			xtype : 'button',
+			text : 'Save'
+		} ]
+
+	} ],
 
 	columns : [ {
 		header : 'Name',
@@ -57,54 +53,50 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	} ],
 
 	store : Ext.create('ASPIREdb.store.PhenotypeStore'),
-	
+
 	initComponent : function() {
 		this.callParent();
-		
+
 		this.getDockedComponent('phenotypeGridToolbar').getComponent('analyzeButton').on('click', this.getPhenotypeEnrichment, this);
 
 		var ref = this;
 
-		ASPIREdb.EVENT_BUS.on('subjects_loaded', function(subjectIds){
-			
+		ASPIREdb.EVENT_BUS.on('subjects_loaded', function(subjectIds) {
+
 			ref.currentSubjectIds = subjectIds;
-			
-			ProjectService.numSubjects( ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
-				callback: function(numSubjects){				
-					
-					if (subjectIds.length > 0 ){
-						
-						if (subjectIds.length < numSubjects -1){							
-							ref.getDockedComponent('phenotypeGridToolbar').getComponent('analyzeButton').enable();							
-						}else{
+
+			ProjectService.numSubjects(ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
+				callback : function(numSubjects) {
+
+					if (subjectIds.length > 0) {
+
+						if (subjectIds.length < numSubjects - 1) {
+							ref.getDockedComponent('phenotypeGridToolbar').getComponent('analyzeButton').enable();
+						} else {
 							ref.getDockedComponent('phenotypeGridToolbar').getComponent('analyzeButton').disable();
 						}
-						
+
 					}
-				
+
 				}
-			} );
-						
-			SubjectService.getPhenotypeSummaries(subjectIds, ASPIREdb.ActiveProjectSettings.getActiveProjectIds() , {
-                callback : function(vos) {
+			});
 
-                    var data = [];
-                    for ( var key in vos) {
-                        var phenSummary = vos[key];
+			SubjectService.getPhenotypeSummaries(subjectIds, ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
+				callback : function(vos) {
 
-                        var row = [ phenSummary.name,
-                            ref.getSubjectValue(phenSummary) ];
-                        data.push(row);
-                    }
+					var data = [];
+					for ( var key in vos) {
+						var phenSummary = vos[key];
 
-                    ref.store.loadData(data);
-                }
-            });
-			
-			
-			
-            
-        });
+						var row = [ phenSummary.name, ref.getSubjectValue(phenSummary) ];
+						data.push(row);
+					}
+
+					ref.store.loadData(data);
+				}
+			});
+
+		});
 
 	},
 
@@ -119,34 +111,29 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 
 			if (phenSummary.valueType == "HPONTOLOGY") {
 				if (key == '1') {
-					subjectValue = subjectValue + ' Present('
-							+ valueToSubjectSet[key].length + ')';
+					subjectValue = subjectValue + ' Present(' + valueToSubjectSet[key].length + ')';
 				}
 				if (key == '0') {
-					subjectValue = subjectValue + ' Absent('
-							+ valueToSubjectSet[key].length + ')';
+					subjectValue = subjectValue + ' Absent(' + valueToSubjectSet[key].length + ')';
 				}
 			} else {
-				subjectValue = subjectValue + ' ' + key + ' ('
-						+ valueToSubjectSet[key].length + ')';
+				subjectValue = subjectValue + ' ' + key + ' (' + valueToSubjectSet[key].length + ')';
 			}
 		}
 
 		return subjectValue;
 
 	},
-	
-	getPhenotypeEnrichment : function(){
-		
-		PhenotypeService.getPhenotypeEnrichmentValueObjects(ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), this.currentSubjectIds , {
-            callback : function(vos) {
-            	ASPIREdb.view.PhenotypeEnrichmentWindow.populateGrid(vos);
-            	ASPIREdb.view.PhenotypeEnrichmentWindow.show();
-            }
-        });
-		
+
+	getPhenotypeEnrichment : function() {
+
+		PhenotypeService.getPhenotypeEnrichmentValueObjects(ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), this.currentSubjectIds, {
+			callback : function(vos) {
+				ASPIREdb.view.PhenotypeEnrichmentWindow.populateGrid(vos);
+				ASPIREdb.view.PhenotypeEnrichmentWindow.show();
+			}
+		});
+
 	}
-	
-	
-	
+
 });

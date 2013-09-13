@@ -17,11 +17,9 @@
  *
  */
 
-Ext.require([
-    'ASPIREdb.store.PhenotypeEnrichmentStore'
-]);
+Ext.require([ 'ASPIREdb.store.PhenotypeEnrichmentStore' ]);
 
-//TODO js documentation
+// TODO js documentation
 Ext.define('ASPIREdb.view.PhenotypeEnrichmentGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.phenotypeEnrichmentGrid',
@@ -59,8 +57,6 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentGrid', {
 		this.callParent();
 
 		var ref = this;
-
-		
 
 	}
 });
