@@ -27,30 +27,8 @@ Ext.define('ASPIREdb.AspireDbPanel', {
             function(event) {
                 aspireDbPanel.getLoginForm().hide();
                 aspireDbPanel.getComponent('topToolbar').getComponent('logoutForm').show();
-/*
-                toolPanel.setVisible( false );
-                mainPanel.setVisible( false );
-                dashboard.show();
-                me.parseUrlParametersAndRedirect();
-*/
+
                 ASPIREdb.view.DashboardWindow.show();
-                
-       /*         
-                var filterConfigs = [];
-                var activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
-                var projectFilter = new ProjectFilterConfig;
-                projectFilter.projectIds = activeProjectIds;
-                filterConfigs.push(projectFilter);
-                ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);
-                
-                // TODO
-                LoginStatusService.getCurrentUsername(function callback(username) {
-                	var messageItem = aspireDbPanel.items.get('topToolbar').items.get('logoutForm').items.get('message');
-                    messageItem.setText("Project id = " + activeProjectIds[0] + 
-                    		", Logged in as " + username );
-                });
-                
-                */
                 
             }
         );
@@ -115,7 +93,15 @@ Ext.define('ASPIREdb.AspireDbPanel', {
                 xtype: 'button',
                 text: 'Clear filter',
                 itemId: 'clearFilterButton',
-                height: 30
+                height: 30,
+                handler: function() {
+                	var filterConfigs = [];
+                    var activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+                    var projectFilter = new ProjectFilterConfig;
+                    projectFilter.projectIds = activeProjectIds;
+                    filterConfigs.push(projectFilter);
+                    ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);
+                }
             },
             {
                 xtype: 'button',
