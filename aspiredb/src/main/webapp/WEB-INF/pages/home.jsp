@@ -32,11 +32,9 @@
         appFolder: 'scripts/ASPIREdb',
 
         launch: function () {
-            var win = Ext.create('ASPIREdb.view.LoginForm');
-            var viewport = Ext.create('ASPIREdb.AspireDbPanel', {
-                loginForm: win
-            });
-            win.show();
+            //var win = Ext.create('ASPIREdb.view.LoginForm');
+            var viewport = Ext.create('ASPIREdb.AspireDbPanel');
+            //win.show();
         }
     });
 
