@@ -132,6 +132,12 @@ public class ConfigUtils {
         }
         return url;
     }
+    
+    public static String getGemmaBaseUrl() {
+        String url = getString( "gemma.base.url", "http://chibi.ubc.ca/Gemma" );
+       
+        return url;
+    }
 
     /**
      * @return host url e.g. http://www.chibi.ubc.ca

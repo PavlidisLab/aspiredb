@@ -18,6 +18,8 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import org.directwebremoting.annotations.RemoteMethod;
+import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +43,8 @@ import java.util.List;
  * date: 01/05/13
  */
 @Service("geneService")
-public class GeneServiceImpl extends GwtService implements GeneService {
+@RemoteProxy(name="GeneService")
+public class GeneServiceImpl implements GeneService {
 
     @Autowired private VariantDao variantDao;
     @Autowired private BioMartQueryService bioMartQueryService;
@@ -49,10 +52,10 @@ public class GeneServiceImpl extends GwtService implements GeneService {
     
     @Override
     @Transactional(readOnly = true)
+    @RemoteMethod
     public List<GeneValueObject> getGenesInsideVariants(Collection<Long> ids)
             throws NotLoggedInException, BioMartServiceException {
-        throwGwtExceptionIfNotLoggedIn();
-
+        
         // Used to remove duplicates
         HashMap<String,GeneValueObject> genes = new HashMap<String, GeneValueObject>();
         for (Long id: ids) {
@@ -70,10 +73,10 @@ public class GeneServiceImpl extends GwtService implements GeneService {
     }
 
     @Override
+    @RemoteMethod
     public Collection<GeneValueObject> findGenesWithNeurocartaPhenotype(String phenotypeValueUri)
             throws NotLoggedInException, ExternalDependencyException {
-        throwGwtExceptionIfNotLoggedIn();
-
+        
         return this.neurocartaQueryService.fetchGenesAssociatedWithPhenotype(phenotypeValueUri);
     }
 }

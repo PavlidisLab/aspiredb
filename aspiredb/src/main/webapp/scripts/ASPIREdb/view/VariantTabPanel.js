@@ -17,7 +17,7 @@
  *
  */
 
-Ext.require([ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel' ]);
+Ext.require([ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel', 'ASPIREdb.view.GeneHitsByVariantWindow' ]);
 
 // TODO js documentation
 // TODO labels
@@ -28,77 +28,169 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	alias : 'widget.variantTabPanel',
 	title : 'Variant',
 
-	tbar : [ {
-		xtype : 'button',
-		text : 'Labels'
-	}, {
-		xtype : 'button',
-		text : 'Actions'
-	}, {
-		xtype : 'button',
-		text : 'Select All'
-	}, {
-		xtype : 'button',
-		text : 'Ideogram settings'
-	}, {
-		xtype : 'button',
-		text : 'Save'
-	}, ],
-
 	items : [ {
 		xtype : 'ideogram',
 		itemId : 'ideogram'
 	} ],
 
-	defaultGridFields : [ 'patientId', 'variantType', 'genomeCoordinates', 'type', 'copyNumber', 'cnvLength', 'dbSNPID', 'observedBase', 'referenceBase', 'indelLength' ],
+	storeFields : [ 'id', 'patientId', 'variantType', 'genomeCoordinates', 'type', 'copyNumber', 'cnvLength', 'dbSNPID', 'observedBase', 'referenceBase', 'indelLength' ],
 
 	initComponent : function() {
 		this.callParent();
 
 		var ref = this;
 
-		ASPIREdb.EVENT_BUS.on('filter_submit', function(filterConfigs) {
+		this.actionsMenu = Ext.create('Ext.menu.Menu', {
+			items : [ {
+				itemId : 'viewInUCSC',
+				text : 'View in UCSC',
+				disabled : true,
+				handler : this.viewGenesHandler,
+				scope : this
+			}, {
+				itemId : 'viewGenes',
+				text : 'View Genes',
+				disabled : true,
+				handler : this.viewGenesHandler,
+				scope : this
+			} ]
+		});
 
-			VariantService.suggestProperties(function(properties) {
+		this.actionsButton = Ext.create('Ext.Button', {
+			text : '<b>Actions</b>',
+			itemId : 'actionsButton',
+			menu : this.actionsMenu
+		});
 
-				QueryService.queryVariants(filterConfigs, {
-					callback : function(pageLoad) {
+		this.toolbar = Ext.create('Ext.toolbar.Toolbar', {
+			itemId : 'variantTabToolbar',
+			dock : 'top'
+		});
 
-						var vvos = pageLoad.items;
+		this.toolbar.add(this.actionsButton);
+		this.addDocked(this.toolbar);
 
-						var ideogram = ref.getComponent('ideogram');
-						ideogram.drawChromosomes();
-						ideogram.drawVariants(vvos);
+		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);
+	},
 
-						var fieldData = [];
+	viewGenesHandler : function() {
+		
+		ASPIREdb.view.GeneHitsByVariantWindow.clearGridAndMask();		
+		ASPIREdb.view.GeneHitsByVariantWindow.show();
+		
+		GeneService.getGenesInsideVariants(this.selectedVariantIds, {
+			callback : function(vos) {
+				ASPIREdb.view.GeneHitsByVariantWindow.populateGrid(vos);
+			}
+		});
 
-						for ( var i = 0; i < ref.defaultGridFields.length; i++) {
-							fieldData.push(ref.defaultGridFields[i]);
+	},
+
+	selectionChangeHandler : function(model, records) {
+
+		var grid = this.getComponent('variantGrid');
+		if (!grid)
+			return;
+
+		var viewGenesButton = this.actionsMenu.getComponent('viewGenes');
+
+		if (records.length > 0) {
+			viewGenesButton.enable();
+		} else {
+			viewGenesButton.disable();
+			viewInUCSCButton.disable();
+			return;
+		}
+
+		var viewInUCSCButton = this.actionsMenu.getComponent('viewInUCSC');
+
+		if (this.areOnSameChromosome(records)) {
+			viewInUCSCButton.enable();
+		} else {
+			viewInUCSCButton.disable();
+		}
+
+		this.selectedVariantIds = [];
+
+		// needed for 'View Genes' button
+		for ( var i = 0; i < records.length; i++) {
+			this.selectedVariantIds.push(records[i].data.id);
+		}
+
+	},
+
+	areOnSameChromosome : function(records) {
+
+		if (records.length < 1)
+			return false;
+
+		var chromosome = this.getChromosomeFromGenomicRangeString(records[0].data.genomeCoordinates);
+
+		for ( var i = 0; i < records.length; i++) {
+
+			var otherChromosome = this.getChromosomeFromGenomicRangeString(records[i].data.genomeCoordinates);
+
+			if (chromosome !== otherChromosome) {
+				return false;
+			}
+
+		}
+
+		return true;
+
+	},
+
+	getChromosomeFromGenomicRangeString : function(grString) {
+
+		return grString.slice(0, grString.indexOf(':'));
+
+	},
+
+	filterSubmitHandler : function(filterConfigs) {
+
+		var ref = this;
+
+		VariantService.suggestProperties(function(properties) {
+
+			QueryService.queryVariants(filterConfigs, {
+				callback : function(pageLoad) {
+
+					var vvos = pageLoad.items;
+
+					var ideogram = ref.getComponent('ideogram');
+					ideogram.drawChromosomes();
+					ideogram.drawVariants(vvos);
+
+					var fieldData = [];
+
+					for ( var i = 0; i < ref.storeFields.length; i++) {
+						fieldData.push(ref.storeFields[i]);
+					}
+
+					var characteristicNames = [];
+
+					for ( var i = 0; i < properties.length; i++) {
+
+						if (properties[i].characteristic) {
+							fieldData.push(properties[i].displayName);
+							characteristicNames.push(properties[i].name);
 						}
-
-						var characteristicNames = [];
-
-						for ( var i = 0; i < properties.length; i++) {
-
-							if (properties[i].characteristic) {
-								fieldData.push(properties[i].displayName);
-								characteristicNames.push(properties[i].name);
-							}
-
-						}
-
-						ref.remove('variantGrid', true);
-
-						var grid = ref.createVariantGrid(ref.constructVariantStoreData(vvos, characteristicNames), fieldData, characteristicNames);
-
-						ref.add(grid);
 
 					}
-				});
 
+					ref.remove('variantGrid', true);
+
+					var grid = ref.createVariantGrid(ref.constructVariantStoreData(vvos, characteristicNames), fieldData, characteristicNames);
+
+					grid.on('selectionchange', ref.selectionChangeHandler, ref);
+
+					ref.add(grid);
+
+				}
 			});
 
 		});
+
 	},
 
 	createVariantGrid : function(storeData, fieldData, characteristicNames) {
@@ -197,6 +289,9 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			store : store,
 			itemId : 'variantGrid',
 			columns : columnConfig,
+			selModel : Ext.create('Ext.selection.RowModel', {
+				mode : 'MULTI'
+			}),
 			stripeRows : true,
 			height : 180,
 			width : 500,
@@ -220,6 +315,8 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			var vvo = vvos[i];
 
 			var dataRow = [];
+
+			dataRow.push(vvo.id);
 
 			dataRow.push(vvo.patientId);
 
