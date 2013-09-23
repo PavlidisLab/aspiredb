@@ -2,6 +2,7 @@
 
 <script src="dwr/interface/ChromosomeService.js"></script>
 <script src="dwr/interface/HomeController.js"></script>
+<script src="dwr/interface/LabelService.js"></script>
 <script src="dwr/interface/LoginStatusService.js"></script>
 <script src="dwr/interface/PhenotypeService.js"></script>
 <script src="dwr/interface/ProjectService.js"></script>

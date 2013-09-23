@@ -70,15 +70,15 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 		}
 	}, {
 		xtype : 'button',
-		id : 'configLabelButton',
+		id : 'labelSettingsButton',
 		text : '',
-		tooltip : 'Configure Labels',
+		tooltip : 'Configure label settings',
 		icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
-		listeners : {
+		/*listeners : {
 			click : function() {
 				alert('Clicked Config');
 			}
-		}
+		}*/
 	}, {
 		xtype : 'tbfill'
 	}, {
@@ -130,7 +130,8 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 		});
 
 		// add event handlers to buttons
-		Ext.getCmp('addLabelButton').on('click', this.onMakeLabelClick);
+		this.down('#addLabelButton').on('click', this.onMakeLabelClick);
+		this.down('#labelSettingsButton').on('click', this.onLabelSettingsClick);
 	},
 
 	/**
@@ -180,4 +181,12 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 		labelWindow.show();
 	},
 
+	/**
+	 * Display LabelSettingsWindow
+	 */
+	onLabelSettingsClick : function(event) {
+		var labelControlWindow = Ext.create('ASPIREdb.view.LabelControlWindow');
+		labelControlWindow.show();
+	},
+	
 });
