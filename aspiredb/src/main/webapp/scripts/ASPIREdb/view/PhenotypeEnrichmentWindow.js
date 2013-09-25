@@ -46,6 +46,8 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
 	populateGrid : function(vos) {
 
 		var grid = ASPIREdb.view.PhenotypeEnrichmentWindow.getComponent('phenotypeEnrichmentGrid');
+		
+		grid.valueObjects= vos;
 
 		var data = [];
 		for ( var i = 0; i < vos.length; i++) {
@@ -53,7 +55,7 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
 
 			var row = [ vo.name, vo.inGroupTotalString, vo.outGroupTotalString, vo.PValueString, vo.PValueCorrectedString ];
 			data.push(row);
-		}
+		}		
 
 		grid.store.loadData(data);
 

@@ -17,16 +17,25 @@
  *
  */
 
-Ext.require([ 'ASPIREdb.store.PhenotypeEnrichmentStore' ]);
+Ext.require([ 'ASPIREdb.store.PhenotypeEnrichmentStore', 'ASPIREdb.TextDataDownloadWindow' ]);
 
 // TODO js documentation
 Ext.define('ASPIREdb.view.PhenotypeEnrichmentGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.phenotypeEnrichmentGrid',
+	
+	dockedItems : [ {
+		xtype : 'toolbar',
+		itemId : 'phenotypeEnrichmentGridToolbar',
+		dock : 'top',
+		items : [ {
+			xtype : 'button',
+			itemId : 'saveButton',
+			text : '',
+			tooltip : 'Download table contents as text',
+			icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
+		} ]
 
-	tbar : [ {
-		xtype : 'button',
-		text : 'Save'
 	} ],
 
 	columns : [ {
@@ -50,6 +59,8 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentGrid', {
 		dataIndex : 'corrpValue',
 		flex : 1
 	} ],
+	
+	valueObjects : [],
 
 	store : Ext.create('ASPIREdb.store.PhenotypeEnrichmentStore'),
 
@@ -57,6 +68,17 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentGrid', {
 		this.callParent();
 
 		var ref = this;
+		
+		var saveButton = this.getComponent('phenotypeEnrichmentGridToolbar').getComponent('saveButton');
+		
+		saveButton.on('click', function(){
+			ASPIREdb.TextDataDownloadWindow.showPhenotypeEnrichmentDownload(ref.valueObjects);
+						
+		}
+		);
 
 	}
+	
+	
+	
 });

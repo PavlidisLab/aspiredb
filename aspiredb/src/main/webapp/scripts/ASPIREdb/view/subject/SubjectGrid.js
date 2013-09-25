@@ -17,7 +17,7 @@
  *
  */
 Ext.require([ 'ASPIREdb.store.SubjectStore', 'ASPIREdb.view.CreateLabelWindow',
-		'ASPIREdb.ActiveProjectSettings' ]);
+		'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.TextDataDownloadWindow' ]);
 
 /**
  * Queries Subject values and loads them into a {@link Ext.grid.Panel}
@@ -83,14 +83,11 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 		xtype : 'tbfill'
 	}, {
 		xtype : 'button',
+		id : 'saveButton',
 		text : '',
 		tooltip : 'Download table contents as text',
-		icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
-		listeners : {
-			click : function() {
-				alert("Clicked Save");
-			}
-		}
+		icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
+		
 	} ],
 
 	/**
@@ -106,6 +103,8 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 			QueryService.querySubjects(filterConfigs, {
 				callback : function(pageLoad) {
 					var subjectValueObjects = pageLoad.items;
+					
+					me.valueObjects = subjectValueObjects;
 
 					// TODO: fix me (define grid/store in initComponent)
 					// me.items.removeAll();
@@ -132,6 +131,12 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 		// add event handlers to buttons
 		this.down('#addLabelButton').on('click', this.onMakeLabelClick);
 		this.down('#labelSettingsButton').on('click', this.onLabelSettingsClick);
+		
+		this.down('#saveButton').on('click', function(){
+			
+			ASPIREdb.TextDataDownloadWindow.showSubjectDownload(me.valueObjects);
+			
+		});
 	},
 
 	/**
@@ -187,6 +192,6 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 	onLabelSettingsClick : function(event) {
 		var labelControlWindow = Ext.create('ASPIREdb.view.LabelControlWindow');
 		labelControlWindow.show();
-	},
+	}
 	
 });

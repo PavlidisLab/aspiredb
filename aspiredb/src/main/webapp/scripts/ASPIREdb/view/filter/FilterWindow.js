@@ -14,8 +14,8 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
         title: 'Filter',
         closable: true,
         closeAction: 'hide',
-        width: 700,
-        height: 350,
+        width: 1000,
+        height: 500,
         layout: 'border',
         bodyStyle: 'padding: 5px;',
 
@@ -146,6 +146,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
                                     handler: function () {
                                         var filterConfigs = me.getFilterConfigs();
                                         ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);
+                                        me.close();
                                     }
                                 },
                                 {
