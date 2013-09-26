@@ -1,7 +1,7 @@
 Ext.require([
     'Ext.panel.Panel',
     'ASPIREdb.view.Ideogram',
-    'ASPIREdb.view.subject.SubjectGrid',
+    'ASPIREdb.view.SubjectGrid',
     'ASPIREdb.view.PhenotypeGrid',
     'ASPIREdb.view.VariantTabPanel'
 ]);

@@ -23,7 +23,7 @@ Ext.require([ 'ASPIREdb.store.SubjectStore', 'ASPIREdb.view.CreateLabelWindow',
  * Queries Subject values and loads them into a {@link Ext.grid.Panel}
  * 
  */
-Ext.define('ASPIREdb.view.subject.SubjectGrid', {
+Ext.define('ASPIREdb.view.SubjectGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.subjectGrid',
 	title : 'Subject',
