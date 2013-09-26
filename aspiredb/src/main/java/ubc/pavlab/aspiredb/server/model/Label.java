@@ -41,6 +41,9 @@ public class Label implements Securable, ValueObjectConvertible<LabelValueObject
     @Column(name = "COLOUR")
     private String colour;
 
+    @Column(name = "IS_SHOWN")
+    private Boolean isShown;
+    
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "QUERY_FK")
     private Query query;
@@ -48,9 +51,10 @@ public class Label implements Securable, ValueObjectConvertible<LabelValueObject
     public Label() {
     }
 
-    public Label( String name, String colour ) {
+    public Label( String name, String colour, Boolean isShown ) {
         this.name = name;
         this.colour = colour;
+        this.isShown = isShown;
     }
 
     @Override
@@ -86,6 +90,14 @@ public class Label implements Securable, ValueObjectConvertible<LabelValueObject
         this.query = query;
     }
 
+    public Boolean isShown() {
+        return isShown;
+    }
+    
+    public void setIsShown( Boolean isShown ) {
+        this.isShown = isShown;
+    }
+    
     @Override
     public boolean equals( Object o ) {
         if ( this == o ) return true;
@@ -108,7 +120,7 @@ public class Label implements Securable, ValueObjectConvertible<LabelValueObject
 
     @Override
     public LabelValueObject toValueObject() {
-        return new LabelValueObject( id, name, colour );
+        return new LabelValueObject( id, name, colour, isShown );
     }
 
     public static Collection<LabelValueObject> toValueObjects( Collection<Label> labels ) {

@@ -84,6 +84,7 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 		var label = new LabelValueObject();
 		label.name = labelCombo.getValue();
 		label.colour = colorPicker.getValue();
+		label.isShown = true;
 		return label;
 	},
 });

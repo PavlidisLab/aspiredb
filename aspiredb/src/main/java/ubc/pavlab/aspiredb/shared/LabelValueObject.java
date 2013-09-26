@@ -34,6 +34,7 @@ public class LabelValueObject implements Displayable, Serializable {
     private String name;
     private Long id;
     private String colour;
+    private Boolean isShown;
 
     public LabelValueObject() {
     }
@@ -57,6 +58,14 @@ public class LabelValueObject implements Displayable, Serializable {
         this.id = id;
         this.name = name;
         this.colour = colour;
+        this.isShown = false;
+    }
+    
+    public LabelValueObject(Long id, String name, String colour, Boolean isShown) {
+        this.id = id;
+        this.name = name;
+        this.colour = colour;
+        this.isShown = isShown;
     }
 
     public String getName() {
@@ -75,6 +84,10 @@ public class LabelValueObject implements Displayable, Serializable {
         return colour;
     }
 
+    public Boolean getIsShown() {
+        return isShown;
+    }
+    
     public void setName( String name ) {
         this.name = name;
     }
@@ -83,6 +96,10 @@ public class LabelValueObject implements Displayable, Serializable {
         this.colour = colour;
     }
 
+    public void setIsShown( Boolean isShown ) {
+        this.isShown = isShown;
+    }
+    
     public String toString() {
     	return this.getName();
     }

@@ -52,6 +52,18 @@ public class LabelServiceImpl implements LabelService {
     @Autowired
     private VariantDao variantDao;
 
+
+    @Override
+    @Transactional
+    @RemoteMethod
+    public void updateLabel(LabelValueObject label) {
+        Label labelEntity = labelDao.load(label.getId());
+        labelEntity.setName( label.getName() );
+        labelEntity.setColour( label.getColour() );
+        labelEntity.setIsShown( label.getIsShown() );
+        labelDao.update(labelEntity);
+    }
+    
     @Override
     @Transactional
     @RemoteMethod

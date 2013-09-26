@@ -16,8 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require([ 'ASPIREdb.store.SubjectStore', 'ASPIREdb.view.CreateLabelWindow',
-		'ASPIREdb.ActiveProjectSettings' ]);
+Ext.require([ 'ASPIREdb.store.SubjectStore', 'ASPIREdb.view.CreateLabelWindow' ]);
 
 /**
  * Queries Subject values and loads them into a {@link Ext.grid.Panel}
@@ -27,9 +26,17 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.subjectGrid',
 	title : 'Subject',
+	id : 'subjectGrid',
 	multiSelect : true,
 	store : Ext.create('ASPIREdb.store.SubjectStore'),
-
+	config : {
+		visibleLabelIds : [],
+		filterConfigs : [],
+	},
+	constructor : function(cfg) {
+		this.initConfig(cfg);
+		this.callParent(arguments);
+	},
 	columns : [
 			{
 				text : "Subject Id",
@@ -42,9 +49,11 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 				renderer : function(value) {
 					var ret = "";
 					for ( var i = 0; i < value.length; i++) {
-						ret += "<span style='background-color: "
-								+ value[i].colour + "'>" + value[i].name
-								+ "</span>&nbsp;";
+						if (value[i].isShown) {
+							ret += "<span style='background-color: "
+									+ value[i].colour + "'>" + value[i].name
+									+ "</span>&nbsp;";
+						}
 					}
 					return ret;
 				},
@@ -59,26 +68,10 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 		icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
 	}, {
 		xtype : 'button',
-		id : 'removeLabelButton',
-		text : '',
-		tooltip : 'Remove labels from a Subject',
-		icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
-		listeners : {
-			click : function() {
-				alert("Clicked Remove Labels");
-			}
-		}
-	}, {
-		xtype : 'button',
 		id : 'labelSettingsButton',
 		text : '',
 		tooltip : 'Configure label settings',
 		icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
-		/*listeners : {
-			click : function() {
-				alert('Clicked Config');
-			}
-		}*/
 	}, {
 		xtype : 'tbfill'
 	}, {
@@ -103,35 +96,58 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 		var me = this;
 
 		ASPIREdb.EVENT_BUS.on('filter_submit', function(filterConfigs) {
-			QueryService.querySubjects(filterConfigs, {
-				callback : function(pageLoad) {
-					var subjectValueObjects = pageLoad.items;
-
-					// TODO: fix me (define grid/store in initComponent)
-					// me.items.removeAll();
-
-					var data = [];
-					for ( var i = 0; i < subjectValueObjects.length; i++) {
-						var val = subjectValueObjects[i];
-						var row = [ val.id, val.patientId, val.labels ];
-						data.push(row);
-					}
-					me.store.loadData(data);
-
-					var ids = [];
-					for ( var i = 0; i < subjectValueObjects.length; i++) {
-						var o = subjectValueObjects[i];
-						ids.push(o.id);
-					}
-					ASPIREdb.EVENT_BUS.fireEvent('subjects_loaded', ids);
-
-				}
-			});
+			me.filterConfigs = filterConfigs;
+			me.initSubjectLabelStore(me);
 		});
 
 		// add event handlers to buttons
 		this.down('#addLabelButton').on('click', this.onMakeLabelClick);
-		this.down('#labelSettingsButton').on('click', this.onLabelSettingsClick);
+		this.down('#labelSettingsButton')
+				.on('click', this.onLabelSettingsClick);
+	},
+
+	/**
+	 * Populate grid with Subjects and Labels
+	 * 
+	 * @param grid
+	 */
+	initSubjectLabelStore : function(grid) {
+		QueryService.querySubjects(grid.filterConfigs, {
+			callback : function(pageLoad) {
+				var subjectValueObjects = pageLoad.items;
+
+				// TODO: fix me (define grid/store in initComponent)
+				// me.items.removeAll();
+
+				var labelMap = {};
+				var data = [];
+				grid.visibleLabelIds = [];
+				for ( var i = 0; i < subjectValueObjects.length; i++) {
+					var val = subjectValueObjects[i];
+					var row = [ val.id, val.patientId, val.labels ];
+					for ( var j = 0; j < val.labels.length; j++) {
+						labelMap[val.labels[j]] = 1;
+						if (grid.visibleLabelIds.indexOf(val.labels[j]) == -1) {
+							grid.visibleLabelIds.push(val.labels[j]);
+						}
+					}
+					data.push(row);
+				}
+				
+				grid.store.loadData(data);
+
+				// refresh grid
+				grid.store.sync();
+				grid.getView().refresh();
+
+				var ids = [];
+				for ( var i = 0; i < subjectValueObjects.length; i++) {
+					var o = subjectValueObjects[i];
+					ids.push(o.id);
+				}
+				ASPIREdb.EVENT_BUS.fireEvent('subjects_loaded', ids);
+			}
+		});
 	},
 
 	/**
@@ -140,9 +156,8 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 	 * @param event
 	 */
 	onMakeLabelClick : function(event) {
-
 		var ids = [];
-		var grid = this.findParentByType('grid');
+		var grid = this.up('#subjectGrid');
 		var selSubjects = grid.getSelectionModel().getSelection();
 
 		if (selSubjects.length == 0) {
@@ -161,19 +176,25 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 			onOkButtonClick : function() {
 				this.callParent();
 
-				var theLabel = this.getLabel();
+				var labelWithoutId = this.getLabel();
 
 				// store in database
-				SubjectService.addLabel(ids, theLabel);
+				SubjectService.addLabel(ids, labelWithoutId, {
+					callback : function(theLabelWithId) {
+						theLabel = theLabelWithId;
 
-				// update local store
-				for ( var i = 0; i < selSubjects.length; i++) {
-					selSubjects[i].get('label').push(theLabel);
-				}
+						grid.visibleLabelIds.push(theLabel);
 
-				// refresh grid
-				grid.store.sync();
-				grid.getView().refresh();
+						// update local store
+						for ( var i = 0; i < selSubjects.length; i++) {
+							selSubjects[i].get('label').push(theLabel);
+						}
+
+						// refresh grid
+						grid.store.sync();
+						grid.getView().refresh();
+					}
+				});
 			},
 		});
 
@@ -185,8 +206,19 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 	 * Display LabelSettingsWindow
 	 */
 	onLabelSettingsClick : function(event) {
-		var labelControlWindow = Ext.create('ASPIREdb.view.LabelControlWindow');
+		var grid = this.up('#subjectGrid');
+
+		var labelControlWindow = Ext.create('ASPIREdb.view.LabelControlWindow',
+				{
+					visibleLabelIds : grid.getVisibleLabelIds(),
+					isSubjectLabel : true,
+				});
+
+		labelControlWindow.on('destroy', function(btn, e, eOpts) {
+			grid.initSubjectLabelStore(grid);
+		});
+
 		labelControlWindow.show();
 	},
-	
+
 });
