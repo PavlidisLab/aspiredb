@@ -16,7 +16,8 @@
  * limitations under the License.
  *
  */
-Ext.require([ 'ASPIREdb.store.SubjectStore', 'ASPIREdb.view.CreateLabelWindow' ]);
+Ext.require([ 'ASPIREdb.store.SubjectStore', 'ASPIREdb.view.CreateLabelWindow',
+              'ASPIREdb.TextDataDownloadWindow' ]);
 
 /**
  * Queries Subject values and loads them into a {@link Ext.grid.Panel}
@@ -32,6 +33,7 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 	config : {
 		visibleLabelIds : [],
 		filterConfigs : [],
+		valueObjects : [],
 	},
 	constructor : function(cfg) {
 		this.initConfig(cfg);
@@ -76,14 +78,11 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 		xtype : 'tbfill'
 	}, {
 		xtype : 'button',
+		id : 'saveButton',
 		text : '',
 		tooltip : 'Download table contents as text',
-		icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
-		listeners : {
-			click : function() {
-				alert("Clicked Save");
-			}
-		}
+		icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
+		
 	} ],
 
 	/**
@@ -102,8 +101,10 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 
 		// add event handlers to buttons
 		this.down('#addLabelButton').on('click', this.onMakeLabelClick);
-		this.down('#labelSettingsButton')
-				.on('click', this.onLabelSettingsClick);
+		this.down('#labelSettingsButton').on('click', this.onLabelSettingsClick);
+		this.down('#saveButton').on('click', function(){
+			ASPIREdb.TextDataDownloadWindow.showSubjectDownload(me.valueObjects);
+		});
 	},
 
 	/**
@@ -114,16 +115,16 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 	initSubjectLabelStore : function(grid) {
 		QueryService.querySubjects(grid.filterConfigs, {
 			callback : function(pageLoad) {
-				var subjectValueObjects = pageLoad.items;
-
+				grid.valueObjects = pageLoad.items;
+				
 				// TODO: fix me (define grid/store in initComponent)
 				// me.items.removeAll();
 
 				var labelMap = {};
 				var data = [];
 				grid.visibleLabelIds = [];
-				for ( var i = 0; i < subjectValueObjects.length; i++) {
-					var val = subjectValueObjects[i];
+				for ( var i = 0; i < grid.valueObjects.length; i++) {
+					var val = grid.valueObjects[i];
 					var row = [ val.id, val.patientId, val.labels ];
 					for ( var j = 0; j < val.labels.length; j++) {
 						labelMap[val.labels[j]] = 1;
@@ -141,8 +142,8 @@ Ext.define('ASPIREdb.view.subject.SubjectGrid', {
 				grid.getView().refresh();
 
 				var ids = [];
-				for ( var i = 0; i < subjectValueObjects.length; i++) {
-					var o = subjectValueObjects[i];
+				for ( var i = 0; i < grid.valueObjects.length; i++) {
+					var o = grid.valueObjects[i];
 					ids.push(o.id);
 				}
 				ASPIREdb.EVENT_BUS.fireEvent('subjects_loaded', ids);

@@ -17,13 +17,13 @@
  *
  */
 
-Ext.require([ 'Ext.Window', 'ASPIREdb.view.PhenotypeEnrichmentGrid' ]);
+Ext.require([ 'Ext.Window', 'ASPIREdb.view.GeneHitsByVariantGrid','ASPIREdb.GemmaURLUtils' ]);
 
-Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
+Ext.define('ASPIREdb.view.GeneHitsByVariantWindow', {
 	extend : 'Ext.Window',
-	alias : 'widget.phenotypeEnrichmentWindow',
+	alias : 'widget.geneHitsByVariantWindow',
 	singleton : true,
-	title : 'Phenotype Enrichment',
+	title : 'Gene Hits By Variant',
 	closable : true,
 	closeAction : 'hide',
 	width : 800,
@@ -32,8 +32,8 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
 	bodyStyle : 'padding: 5px;',
 
 	items : [ {
-		xtype : 'phenotypeEnrichmentGrid',
-		itemId : 'phenotypeEnrichmentGrid'
+		xtype : 'geneHitsByVariantGrid',
+		itemId : 'geneHitsByVariantGrid'
 	} ],
 
 	initComponent : function() {
@@ -43,22 +43,38 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
 
 	},
 
-	populateGrid : function(vos) {
-
-		var grid = ASPIREdb.view.PhenotypeEnrichmentWindow.getComponent('phenotypeEnrichmentGrid');
+	//VariantValueObject
+	populateGrid : function(vos) {		
 		
-		grid.valueObjects= vos;
-
+		var grid = ASPIREdb.view.GeneHitsByVariantWindow.getComponent('geneHitsByVariantGrid');
+		
+		grid.setLoading(true);
+		
 		var data = [];
 		for ( var i = 0; i < vos.length; i++) {
 			var vo = vos[i];
+			
+			var linkToGemma = "";
+			
+			if (vo.geneBioType == "protein_coding"){
+				linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl(vo.symbol);
+			}
+			
 
-			var row = [ vo.name, vo.inGroupTotalString, vo.outGroupTotalString, vo.PValueString, vo.PValueCorrectedString ];
+			var row = [ vo.symbol, vo.geneBioType, vo.name, linkToGemma ];
 			data.push(row);
-		}		
+		}
 
 		grid.store.loadData(data);
+		grid.setLoading(false);
+		
+		grid.enableViewCoexpressionLink(vos);
 
+	},
+	
+	clearGridAndMask : function(){		
+		ASPIREdb.view.GeneHitsByVariantWindow.getComponent('geneHitsByVariantGrid').setLoading(true);
+		ASPIREdb.view.GeneHitsByVariantWindow.getComponent('geneHitsByVariantGrid').store.removeAll();		
 	}
 
 });
