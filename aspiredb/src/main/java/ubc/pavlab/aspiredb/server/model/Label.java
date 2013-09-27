@@ -51,6 +51,12 @@ public class Label implements Securable, ValueObjectConvertible<LabelValueObject
     public Label() {
     }
 
+    public Label( String name, String colour ) {
+        this.name = name;
+        this.colour = colour;
+        this.isShown = true;
+    }
+    
     public Label( String name, String colour, Boolean isShown ) {
         this.name = name;
         this.colour = colour;
