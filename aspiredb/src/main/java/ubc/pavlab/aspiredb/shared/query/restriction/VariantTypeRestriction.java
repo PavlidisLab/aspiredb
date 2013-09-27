@@ -27,6 +27,9 @@ import ubc.pavlab.aspiredb.shared.VariantType;
  */
 @DataTransferObject(javascript = "VariantTypeRestriction")
 public class VariantTypeRestriction implements RestrictionExpression {
+    
+    private static final long serialVersionUID = 1L;
+    
     private VariantType type;
 
     public VariantTypeRestriction() {

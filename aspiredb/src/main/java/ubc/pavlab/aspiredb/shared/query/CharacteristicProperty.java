@@ -29,6 +29,8 @@ import java.util.Arrays;
 @DataTransferObject(javascript = "CharacteristicProperty")
 public class CharacteristicProperty extends Property<DataType> {
 
+    private static final long serialVersionUID = 1L;
+
     public CharacteristicProperty() {
         this.operators =  Arrays.asList(Operator.IS_IN_SET, Operator.IS_NOT_IN_SET);
         this.supportsSuggestions = true;

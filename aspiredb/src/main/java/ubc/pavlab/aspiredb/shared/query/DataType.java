@@ -28,5 +28,10 @@ import java.util.Collection;
  * date: 07/05/13
  */
 @DataTransferObject(javascript = "DataType")
-public class DataType {
+public class DataType implements Serializable {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 }

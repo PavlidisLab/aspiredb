@@ -28,6 +28,12 @@ import java.util.Arrays;
  */
 @DataTransferObject(javascript = "NumericProperty")
 public class NumericProperty extends Property<NumericalDataType> {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5128521922049745550L;
+
     public NumericProperty() {
         this.dataType = new NumericalDataType();
         this.operators = Arrays.asList(

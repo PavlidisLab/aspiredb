@@ -31,6 +31,7 @@ import java.io.Serializable;
  */
 @DataTransferObject(javascript = "SimpleRestriction")
 public class SimpleRestriction implements RestrictionExpression {
+    private static final long serialVersionUID = 1L;
     protected Property property;
     protected Operator operator;
     protected Object value;
