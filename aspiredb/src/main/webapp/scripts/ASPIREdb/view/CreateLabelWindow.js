@@ -68,11 +68,11 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 			callback : function(vo) {
 				var data = [];
 				for ( var i = 0; i < vo.length; i++) {
-					data.push([ vo[i].name ]);
+					data.push([ vo[i].name, vo[i] ]);
 				}
 
 				var labelStore = Ext.create('Ext.data.ArrayStore', {
-					fields : [ 'name' ],
+					fields : [ 'name', 'vo' ],
 					data : data,
 				});
 
@@ -81,7 +81,7 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 					store : labelStore,
 					queryMode : 'local',
 					displayField : 'name',
-					valueField : 'name',
+					valueField : 'vo',
 					renderTo : Ext.getBody()
 				});
 
@@ -101,10 +101,13 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 	getLabel : function() {
 		var colorPicker = this.getComponent("colorPicker");
 		var labelCombo = this.getComponent("labelCombo");
-		var label = new LabelValueObject();
-		label.name = labelCombo.getValue();
-		label.colour = colorPicker.getValue();
-		label.isShown = true;
+		var label = labelCombo.getValue();
+		if (label.id == undefined) {
+			label = new LabelValueObject();
+			label.name = labelCombo.getValue();
+			label.colour = colorPicker.getValue();
+			label.isShown = true;
+		}
 		return label;
 	},
 });
