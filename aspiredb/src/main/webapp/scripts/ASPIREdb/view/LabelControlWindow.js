@@ -40,7 +40,7 @@ Ext
 			height : 320,
 			renderTo : Ext.getBody(),
 			config : {
-				visibleLabelIds : [],
+				visibleLabels : [],
 				isSubjectLabel : false,
 			},
 			constructor : function(cfg) {
@@ -101,12 +101,13 @@ Ext
 
 				var ids = [];
 				var loadData = [];
-				for ( var i = 0; i < me.visibleLabelIds.length; i++) {
-					var label = me.visibleLabelIds[i];
+				for ( var i = 0; i < me.visibleLabels.length; i++) {
+					var label = me.visibleLabels[i];
 					var isShown = label.isShown;
 					if (ids.indexOf(label.id) == -1) {
 						ids.push(label.id);
 						loadData.push([ label, isShown ]);
+						console.log('label='+label.name+"; isShown="+isShown);
 					}
 				}
 				me.down('#labelSettingsGrid').store.loadData(loadData);

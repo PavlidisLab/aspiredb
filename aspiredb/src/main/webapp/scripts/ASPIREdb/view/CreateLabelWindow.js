@@ -34,10 +34,20 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 			top : 5,
 			right : 5,
 			left : 5,
-			bottom : 5
-		}
+			bottom : 5,
+		},
+	},
+	
+	config : {
+		isSubjectLabel : false,
 	},
 
+
+	constructor : function(cfg) {
+		this.initConfig(cfg);
+		this.callParent(arguments);
+	},
+	
 	initComponent : function() {
 		var me = this;
 
@@ -64,36 +74,76 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 			}
 		}, ];
 
-		SubjectService.suggestLabels(null, {
-			callback : function(vo) {
-				var data = [];
-				for ( var i = 0; i < vo.length; i++) {
-					data.push([ vo[i].name, vo[i] ]);
+		if (me.isSubjectLabel) {
+			SubjectService.suggestLabels(null, {
+				callback :  function(vo) {
+					me.createSuggestLabelCombo(vo, me);
 				}
+			});
+		} else {
+			VariantService.suggestLabels(null, {
+				callback : function(vo) {
+					var data = [];
+					for ( var i = 0; i < vo.length; i++) {
+						data.push([ vo[i].name, vo[i] ]);
+					}
+	
+					var labelStore = Ext.create('Ext.data.ArrayStore', {
+						fields : [ 'name', 'vo' ],
+						data : data,
+					});
+	
+					var labelCombo = Ext.create('Ext.form.ComboBox', {
+						itemId : 'labelCombo',
+						store : labelStore,
+						queryMode : 'local',
+						displayField : 'name',
+						valueField : 'vo',
+						renderTo : Ext.getBody()
+					});
+	
+					me.insert(0, labelCombo);
+	
+				}
+			});
+		}
 
-				var labelStore = Ext.create('Ext.data.ArrayStore', {
-					fields : [ 'name', 'vo' ],
-					data : data,
-				});
-
-				var labelCombo = Ext.create('Ext.form.ComboBox', {
-					itemId : 'labelCombo',
-					store : labelStore,
-					queryMode : 'local',
-					displayField : 'name',
-					valueField : 'vo',
-					renderTo : Ext.getBody()
-				});
-
-				me.insert(0, labelCombo);
-
-			}
-		});
-
+		
+		
 		this.callParent();
 
 	},
 
+	createSuggestLabelCombo : function(vo, me) {
+			var data = [];
+			for ( var i = 0; i < vo.length; i++) {
+				data.push([ vo[i].name, vo[i] ]);
+			}
+
+			var labelStore = Ext.create('Ext.data.ArrayStore', {
+				fields : [ 'name', 'vo' ],
+				data : data,
+			});
+
+			var labelCombo = Ext.create('Ext.form.ComboBox', {
+				itemId : 'labelCombo',
+				store : labelStore,
+				queryMode : 'local',
+				displayField : 'name',
+				valueField : 'vo',
+				renderTo : Ext.getBody(),
+			});
+
+			me.insert(0, labelCombo);
+
+			labelCombo.on('select', function(combo, records, eOpts) {
+				var vo = records[0].data.vo;
+				if (vo != null) {
+					me.down('#colorPicker').select(vo.colour);
+				}
+			});
+	},
+	
 	onOkButtonClick : function() {
 		this.hide();
 	},
@@ -106,8 +156,8 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 			label = new LabelValueObject();
 			label.name = labelCombo.getValue();
 			label.colour = colorPicker.getValue();
-			label.isShown = true;
 		}
+		label.isShown = true;
 		return label;
 	},
 });
