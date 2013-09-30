@@ -16,8 +16,11 @@
  * limitations under the License.
  *
  */
-Ext.require([ 'ASPIREdb.store.SubjectStore', 'ASPIREdb.view.CreateLabelWindow',
-              'ASPIREdb.TextDataDownloadWindow' ]);
+Ext
+		.require([ 'ASPIREdb.store.SubjectStore',
+				'ASPIREdb.view.CreateLabelWindow',
+				'ASPIREdb.view.LabelControlWindow',
+				'ASPIREdb.TextDataDownloadWindow' ]);
 
 /**
  * Queries Subject values and loads them into a {@link Ext.grid.Panel}
@@ -30,12 +33,19 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 	id : 'subjectGrid',
 	multiSelect : true,
 	store : Ext.create('ASPIREdb.store.SubjectStore'),
-	config : {
-		visibleLabelIds : [],
-		filterConfigs : [],
-		valueObjects : [],
-	},
 	constructor : function(cfg) {
+		// the filters used to select which subjects to show
+		var filterConfigs = [];
+
+		// labels that are displayed
+		var visibleLabelIds = [];
+
+		// all the value objects in the grid
+		var valueObjects = [];
+
+		// selected subjects in the grid
+		var selSubjects = [];
+
 		this.initConfig(cfg);
 		this.callParent(arguments);
 	},
@@ -62,29 +72,6 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 				flex : 1
 			}, ],
 
-	tbar : [ {
-		xtype : 'button',
-		id : 'addLabelButton',
-		text : '',
-		tooltip : 'Add a new Label',
-		icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
-	}, {
-		xtype : 'button',
-		id : 'labelSettingsButton',
-		text : '',
-		tooltip : 'Configure label settings',
-		icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
-	}, {
-		xtype : 'tbfill'
-	}, {
-		xtype : 'button',
-		id : 'saveButton',
-		text : '',
-		tooltip : 'Download table contents as text',
-		icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
-		
-	} ],
-
 	/**
 	 * 
 	 */
@@ -94,80 +81,126 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 
 		var me = this;
 
+		this.labelsMenu = Ext.create('Ext.menu.Menu', {
+			items : [ {
+				itemId : 'makeLabel',
+				text : 'Make label...',
+				disabled : true,
+				handler : this.makeLabelHandler,
+				scope : this
+			}, {
+				itemId : 'labelSettings',
+				text : 'Settings...',
+				disabled : false,
+				handler : this.labelSettingsHandler,
+				scope : this
+			} ]
+		});
+
+		this.labelsButton = Ext.create('Ext.Button', {
+			text : '<b>Labels</b>',
+			itemId : 'labelsButton',
+			menu : this.labelsMenu
+		});
+
+		this.saveButton = Ext.create('Ext.Button', {
+			itemId : 'saveButton',
+			text : '',
+			tooltip : 'Download table contents as text',
+			icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
+		});
+
+		this.toolbar = Ext.create('Ext.toolbar.Toolbar', {
+			itemId : 'subjectGridToolbar',
+			dock : 'top'
+		});
+
+		this.toolbar.add(this.labelsButton);
+		this.toolbar.add(Ext.create('Ext.toolbar.Fill'));
+		this.toolbar.add(this.saveButton);
+		this.addDocked(this.toolbar);
+
+		// add event handlers to buttons
+		this.saveButton.on('click', function() {
+			ASPIREdb.TextDataDownloadWindow
+					.showSubjectDownload(me.valueObjects);
+		}, this);
+
 		ASPIREdb.EVENT_BUS.on('filter_submit', function(filterConfigs) {
 			me.filterConfigs = filterConfigs;
 			me.initSubjectLabelStore(me);
-		});
+		}, this);
 
-		// add event handlers to buttons
-		this.down('#addLabelButton').on('click', this.onMakeLabelClick);
-		this.down('#labelSettingsButton').on('click', this.onLabelSettingsClick);
-		this.down('#saveButton').on('click', function(){
-			ASPIREdb.TextDataDownloadWindow.showSubjectDownload(me.valueObjects);
-		});
 	},
 
 	/**
 	 * Populate grid with Subjects and Labels
 	 * 
-	 * @param grid
+	 * @param me
 	 */
-	initSubjectLabelStore : function(grid) {
-		QueryService.querySubjects(grid.filterConfigs, {
+	initSubjectLabelStore : function(me) {
+
+		QueryService.querySubjects(me.filterConfigs, {
 			callback : function(pageLoad) {
-				grid.valueObjects = pageLoad.items;
-				
+				me.valueObjects = pageLoad.items;
+
 				// TODO: fix me (define grid/store in initComponent)
 				// me.items.removeAll();
 
-				var labelMap = {};
 				var data = [];
-				grid.visibleLabelIds = [];
-				for ( var i = 0; i < grid.valueObjects.length; i++) {
-					var val = grid.valueObjects[i];
+				me.visibleLabelIds = [];
+				for ( var i = 0; i < me.valueObjects.length; i++) {
+					var val = me.valueObjects[i];
 					var row = [ val.id, val.patientId, val.labels ];
 					for ( var j = 0; j < val.labels.length; j++) {
-						labelMap[val.labels[j]] = 1;
-						if (grid.visibleLabelIds.indexOf(val.labels[j]) == -1) {
-							grid.visibleLabelIds.push(val.labels[j]);
-						}
+						me.visibleLabelIds.push(val.labels[j]);
 					}
 					data.push(row);
 				}
-				
-				grid.store.loadData(data);
+
+				me.store.loadData(data);
+
+				me.on('selectionchange', me.selectionChangeHandler, me);
 
 				// refresh grid
-				grid.store.sync();
-				grid.getView().refresh();
+				me.store.sync();
+				me.getView().refresh();
 
 				var ids = [];
-				for ( var i = 0; i < grid.valueObjects.length; i++) {
-					var o = grid.valueObjects[i];
+				for ( var i = 0; i < me.valueObjects.length; i++) {
+					var o = me.valueObjects[i];
 					ids.push(o.id);
 				}
 				ASPIREdb.EVENT_BUS.fireEvent('subjects_loaded', ids);
+
 			}
 		});
 	},
 
-	/**
-	 * Assigns a Label to a Subject
-	 * 
-	 * @param event
-	 */
-	onMakeLabelClick : function(event) {
-		var ids = [];
-		var grid = this.up('#subjectGrid');
-		var selSubjects = grid.getSelectionModel().getSelection();
+	selectionChangeHandler : function() {
 
-		if (selSubjects.length == 0) {
-			alert("At least one subject must be selected");
+		this.selSubjects = this.getSelectionModel().getSelection();
+
+		if (this.selSubjects.length == 0) {
+			this.down('#makeLabel').disable();
 			return;
+		} else {
+			this.down('#makeLabel').enable();
 		}
 
-		for ( var i = 0; i < selSubjects.length; i++) {
-			ids.push(selSubjects[i].get('id'));
+	},
+
+	/**
+	 * Assigns a Label
+	 * 
+	 */
+	makeLabelHandler : function(event) {
+
+		var me = this;
+
+		var selSubjectIds = [];
+		for ( var i = 0; i < me.selSubjects.length; i++) {
+			selSubjectIds.push(me.selSubjects[i].data.id);
 		}
 
 		Ext.define('ASPIREdb.view.CreateLabelWindowSubject', {
@@ -180,20 +213,20 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 				var labelWithoutId = this.getLabel();
 
 				// store in database
-				SubjectService.addLabel(ids, labelWithoutId, {
+				SubjectService.addLabel(selSubjectIds, labelWithoutId, {
 					callback : function(theLabelWithId) {
 						theLabel = theLabelWithId;
 
-						grid.visibleLabelIds.push(theLabel);
+						me.visibleLabelIds.push(theLabel);
 
 						// update local store
-						for ( var i = 0; i < selSubjects.length; i++) {
-							selSubjects[i].get('label').push(theLabel);
+						for ( var i = 0; i < me.selSubjects.length; i++) {
+							me.selSubjects[i].get('label').push(theLabel);
 						}
 
 						// refresh grid
-						grid.store.sync();
-						grid.getView().refresh();
+						me.store.sync();
+						me.getView().refresh();
 					}
 				});
 			},
@@ -201,23 +234,24 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 
 		var labelWindow = new ASPIREdb.view.CreateLabelWindowSubject();
 		labelWindow.show();
+
 	},
 
 	/**
 	 * Display LabelSettingsWindow
 	 */
-	onLabelSettingsClick : function(event) {
-		var grid = this.up('#subjectGrid');
+	labelSettingsHandler : function(event) {
+		var me = this;
 
 		var labelControlWindow = Ext.create('ASPIREdb.view.LabelControlWindow',
 				{
-					visibleLabelIds : grid.getVisibleLabelIds(),
+					visibleLabelIds : me.visibleLabelIds,
 					isSubjectLabel : true,
 				});
 
 		labelControlWindow.on('destroy', function(btn, e, eOpts) {
-			grid.initSubjectLabelStore(grid);
-		});
+			me.initSubjectLabelStore(me);
+		}, this);
 
 		labelControlWindow.show();
 	},

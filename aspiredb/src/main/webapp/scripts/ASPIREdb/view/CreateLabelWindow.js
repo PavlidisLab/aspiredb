@@ -16,7 +16,8 @@
  * limitations under the License.
  *
  */
-Ext.require([ 'Ext.Window', 'Ext.picker.Color', ]);
+Ext.require([ 'Ext.Window', 'Ext.picker.Color', 'Ext.data.ArrayStore',
+		'Ext.form.ComboBox', 'Ext.button.Button' ]);
 
 Ext.define('ASPIREdb.view.CreateLabelWindow', {
 	extend : 'Ext.Window',
@@ -41,15 +42,6 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 		var me = this;
 
 		this.items = [ {
-			xtype : 'combo',
-			itemId : 'labelCombo',
-			matchFieldWidth : false,
-			triggerAction : 'query',
-			autoSelect : true,
-			hideTrigger : true,
-			displayField : 'displayName',
-			flex : 1,
-		}, {
 			xtype : 'colorpicker',
 			itemId : 'colorPicker',
 			value : '00FFFF', // default
@@ -71,7 +63,35 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 				me.hide();
 			}
 		}, ];
+
+		SubjectService.suggestLabels(null, {
+			callback : function(vo) {
+				var data = [];
+				for ( var i = 0; i < vo.length; i++) {
+					data.push([ vo[i].name ]);
+				}
+
+				var labelStore = Ext.create('Ext.data.ArrayStore', {
+					fields : [ 'name' ],
+					data : data,
+				});
+
+				var labelCombo = Ext.create('Ext.form.ComboBox', {
+					itemId : 'labelCombo',
+					store : labelStore,
+					queryMode : 'local',
+					displayField : 'name',
+					valueField : 'name',
+					renderTo : Ext.getBody()
+				});
+
+				me.insert(0, labelCombo);
+
+			}
+		});
+
 		this.callParent();
+
 	},
 
 	onOkButtonClick : function() {
