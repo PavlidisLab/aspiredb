@@ -7,6 +7,6 @@ Ext.define('ASPIREdb.model.Subject', {
 	}, {
 		name : 'patientId'
 	}, {
-		name : 'label'
+		name : 'labels'
 	} ],
 });

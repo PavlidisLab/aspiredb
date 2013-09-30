@@ -57,7 +57,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 			},
 			{
 				text : "Labels",
-				dataIndex : 'label',
+				dataIndex : 'labels',
 				renderer : function(value) {
 					var ret = "";
 					for ( var i = 0; i < value.length; i++) {
@@ -221,7 +221,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 
 						// update local store
 						for ( var i = 0; i < me.selSubjects.length; i++) {
-							me.selSubjects[i].get('label').push(theLabel);
+							me.selSubjects[i].get('labels').push(theLabel);
 						}
 
 						// refresh grid
