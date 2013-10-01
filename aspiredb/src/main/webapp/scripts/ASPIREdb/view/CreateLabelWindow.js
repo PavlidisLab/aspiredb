@@ -24,7 +24,7 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 	alias : 'widget.createLabelWindow',
 	title : 'Make label',
 	closable : true,
-	closeAction : 'hide',
+	closeAction : 'destroy',
 	layout : 'border',
 	bodyStyle : 'padding: 5px;',
 	flex : 1,
@@ -37,17 +37,16 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 			bottom : 5,
 		},
 	},
-	
+
 	config : {
 		isSubjectLabel : false,
 	},
-
 
 	constructor : function(cfg) {
 		this.initConfig(cfg);
 		this.callParent(arguments);
 	},
-	
+
 	initComponent : function() {
 		var me = this;
 
@@ -76,88 +75,75 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 
 		if (me.isSubjectLabel) {
 			SubjectService.suggestLabels(null, {
-				callback :  function(vo) {
-					me.createSuggestLabelCombo(vo, me);
+				callback : function(vos) {
+					me.createSuggestLabelCombo(vos, me);
 				}
 			});
 		} else {
 			VariantService.suggestLabels(null, {
-				callback : function(vo) {
-					var data = [];
-					for ( var i = 0; i < vo.length; i++) {
-						data.push([ vo[i].name, vo[i] ]);
-					}
-	
-					var labelStore = Ext.create('Ext.data.ArrayStore', {
-						fields : [ 'name', 'vo' ],
-						data : data,
-					});
-	
-					var labelCombo = Ext.create('Ext.form.ComboBox', {
-						itemId : 'labelCombo',
-						store : labelStore,
-						queryMode : 'local',
-						displayField : 'name',
-						valueField : 'vo',
-						renderTo : Ext.getBody()
-					});
-	
-					me.insert(0, labelCombo);
-	
+				callback : function(vos) {
+					me.createSuggestLabelCombo(vos, me);
 				}
 			});
 		}
 
-		
-		
 		this.callParent();
 
 	},
 
-	createSuggestLabelCombo : function(vo, me) {
-			var data = [];
-			for ( var i = 0; i < vo.length; i++) {
-				data.push([ vo[i].name, vo[i] ]);
+	createSuggestLabelCombo : function(vos, me) {
+		var data = [];
+		for ( var i = 0; i < vos.length; i++) {
+			data.push([ vos[i], vos[i].name ]);
+		}
+
+		var suggestLabelStore = Ext.create('Ext.data.ArrayStore', {
+			fields : [ 'value', 'display' ],
+			data : data,
+			autoLoad : true,
+			autoSync : true,
+		});
+
+		var labelCombo = Ext.create('Ext.form.ComboBox', {
+			itemId : 'labelCombo',
+			store : suggestLabelStore,
+			queryMode : 'local',
+			displayField : 'display',
+			valueField : 'value',
+			renderTo : Ext.getBody(),
+		});
+
+		labelCombo.on('select', function(combo, records, eOpts) {
+			var vo = records[0].data.vos;
+			if (vo != null && vo.colour != null) {
+				me.down('#colorPicker').select(vo.colour);
 			}
+		});
 
-			var labelStore = Ext.create('Ext.data.ArrayStore', {
-				fields : [ 'name', 'vo' ],
-				data : data,
-			});
+		me.insert(0, labelCombo);
 
-			var labelCombo = Ext.create('Ext.form.ComboBox', {
-				itemId : 'labelCombo',
-				store : labelStore,
-				queryMode : 'local',
-				displayField : 'name',
-				valueField : 'vo',
-				renderTo : Ext.getBody(),
-			});
-
-			me.insert(0, labelCombo);
-
-			labelCombo.on('select', function(combo, records, eOpts) {
-				var vo = records[0].data.vo;
-				if (vo != null) {
-					me.down('#colorPicker').select(vo.colour);
-				}
-			});
 	},
-	
+
 	onOkButtonClick : function() {
 		this.hide();
 	},
 
 	getLabel : function() {
-		var colorPicker = this.getComponent("colorPicker");
-		var labelCombo = this.getComponent("labelCombo");
-		var label = labelCombo.getValue();
-		if (label.id == undefined) {
-			label = new LabelValueObject();
-			label.name = labelCombo.getValue();
-			label.colour = colorPicker.getValue();
+		var colorPicker = this.down("#colorPicker");
+		var labelCombo = this.down("#labelCombo");
+
+		// vo will be a ValueObject if it already exists
+		// otherwise, it's just a name of type string
+		var vo = labelCombo.getValue();
+		if (vo == null || vo.length == "") {
+			return null;
 		}
-		label.isShown = true;
-		return label;
+		if (vo.id == undefined) {
+			vo = new LabelValueObject();
+			vo.name = labelCombo.getValue();
+			vo.colour = colorPicker.getValue();
+		}
+		vo.isShown = true;
+		return vo;
 	},
 });

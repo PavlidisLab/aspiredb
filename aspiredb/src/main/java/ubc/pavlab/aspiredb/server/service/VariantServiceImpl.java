@@ -306,6 +306,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     }
 
     @Override
+    @RemoteMethod
     @Transactional
     public LabelValueObject addLabel(Long id, LabelValueObject label) throws NotLoggedInException {
         throwGwtExceptionIfNotLoggedIn();
@@ -316,6 +317,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     }
 
     @Override
+    @RemoteMethod
     @Transactional
     public LabelValueObject addLabel(Collection<Long> ids, LabelValueObject label) throws NotLoggedInException {
         throwGwtExceptionIfNotLoggedIn();
@@ -329,6 +331,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     }
 
     @Override
+    @RemoteMethod
     @Transactional
     public void removeLabel(Long id, LabelValueObject label) throws NotLoggedInException {
         Variant variant = variantDao.load(id);
@@ -338,6 +341,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     }
 
     @Override
+    @RemoteMethod
     @Transactional
     public void removeLabel(Collection<Long> variantIds, LabelValueObject label) throws NotLoggedInException {
         for (Long variantId : variantIds) {
@@ -346,6 +350,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     }
 
     @Override
+    @RemoteMethod
     @Transactional(readOnly = true)
     public List<LabelValueObject> suggestLabels(SuggestionContext suggestionContext) {
         // TODO: filter out labels non-applicable to variants

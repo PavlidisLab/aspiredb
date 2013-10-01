@@ -22,9 +22,14 @@ Ext.define('ASPIREdb.store.LabelStore', {
 	extend : 'Ext.data.ArrayStore',
 	alias : 'store.labelStore',
 	autoSync : true,
-    
-	fields : [ { name : 'label', // LabelValueObject
-	}, { name : 'show', type : 'boolean' } ],
+
+	fields : [ {
+		name : 'labelId',
+		type : 'int'
+	}, {
+		name : 'show',
+		type : 'boolean'
+	} ],
 
 	storeId : 'labelStore'
 

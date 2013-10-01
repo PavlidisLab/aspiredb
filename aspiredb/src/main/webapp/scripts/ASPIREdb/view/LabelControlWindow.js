@@ -17,182 +17,154 @@
  *
  */
 Ext.require([ 'Ext.Window', 'ASPIREdb.store.LabelStore',
-              'Ext.grid.column.Action', 'Ext.ux.CheckColumn' ]);
+		'Ext.grid.column.Action', 'Ext.ux.CheckColumn' ]);
 
 /**
  * For removing and showing labels
  */
 Ext
-.define(
-		'ASPIREdb.view.LabelControlWindow',
-		{
-			extend : 'Ext.Window',
-			alias : 'widget.labelControlWindow',
-			title : 'Label settings',
-			id : 'labelControlWindow',
-			frame : 'true',
-			closable : true,
-			closeAction : 'destroy',
-			layout : 'border',
-			bodyStyle : 'padding: 5px;',
-			layout : 'fit',
-			width : 300,
-			height : 320,
-			renderTo : Ext.getBody(),
-			config : {
-				visibleLabels : [],
-				isSubjectLabel : false,
-			},
-			constructor : function(cfg) {
-				this.initConfig(cfg);
-				this.callParent(arguments);
-			},
-			items : [ {
-				xtype : 'grid',
-				itemId : 'labelSettingsGrid',
-				store : Ext.create('ASPIREdb.store.LabelStore'),
-				columns : [
-				           {
-				        	   header : 'Label',
-				        	   dataIndex : 'label',
-				        	   width : 180,
-				        	   renderer : function(value) {
-				        		   // value is a LabelValueObject
-				        		   var ret = "";
-				        		   ret += "<span style='background-color: "
-				        			   + value.colour
-				        			   + "'>"
-				        			   + value.name + "</span>&nbsp;";
-				        		   return ret;
-				        	   },
-				           },
-				           {
-				        	   header : 'Show',
-				        	   dataIndex : 'show',
-				        	   xtype : 'checkcolumn',
-				        	   id : 'labelCheckColumn',
-				        	   flex : 1,
-				           },
-				           {
-				        	   header : '',
-				        	   xtype : 'actioncolumn',
-				        	   id : 'labelActionColumn',
-				        	   handler : function(view, rowIndex,
-				        			   colIndex, item, e) {
-				        		   var action = 'removeLabel';
-				        		   this.fireEvent('itemclick', this,
-				        				   action, view, rowIndex,
-				        				   colIndex, item, e);
-				        	   },
+		.define(
+				'ASPIREdb.view.LabelControlWindow',
+				{
+					extend : 'Ext.Window',
+					alias : 'widget.labelControlWindow',
+					title : 'Label settings',
+					id : 'labelControlWindow',
+					frame : 'true',
+					closable : true,
+					closeAction : 'destroy',
+					layout : 'border',
+					bodyStyle : 'padding: 5px;',
+					layout : 'fit',
+					width : 300,
+					height : 320,
+					renderTo : Ext.getBody(),
+					config : {
+						visibleLabels : [],
+						isSubjectLabel : false,
+					},
+					constructor : function(cfg) {
+						this.initConfig(cfg);
+						this.callParent(arguments);
+					},
+					items : [ {
+						xtype : 'grid',
+						itemId : 'labelSettingsGrid',
+						store : Ext.create('ASPIREdb.store.LabelStore'),
+						columns : [
+								{
+									header : 'Label',
+									dataIndex : 'labelId',
+									width : 180,
+									renderer : function(labelId) {
 
-				        	   width : 30,
-				        	   items : [ {
-				        		   icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
-				        		   tooltip : 'Remove label',
+										var label = this
+												.up('#labelControlWindow').visibleLabels[labelId];
+										var ret = "";
+										ret += "<span style='background-color: "
+												+ label.colour
+												+ "'>"
+												+ label.name + "</span>&nbsp;";
+										return ret;
+									},
+								},
+								{
+									header : 'Show',
+									dataIndex : 'show',
+									xtype : 'checkcolumn',
+									id : 'labelCheckColumn',
+									flex : 1,
+								},
+								{
+									header : '',
+									xtype : 'actioncolumn',
+									id : 'labelActionColumn',
+									handler : function(view, rowIndex,
+											colIndex, item, e) {
+										var action = 'removeLabel';
+										this.fireEvent('itemclick', this,
+												action, view, rowIndex,
+												colIndex, item, e);
+									},
 
-				        	   } ]
-				           } ],
-			} ],
+									width : 30,
+									items : [ {
+										icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
+										tooltip : 'Remove label',
 
-			initComponent : function() {
-				this.callParent();
+									} ]
+								} ],
+					} ],
 
-				var me = this;
+					initComponent : function() {
+						this.callParent();
 
-				var ids = [];
-				var loadData = [];
-				for ( var i = 0; i < me.visibleLabels.length; i++) {
-					var label = me.visibleLabels[i];
-					var isShown = label.isShown;
-					if (ids.indexOf(label.id) == -1) {
-						ids.push(label.id);
-						loadData.push([ label, isShown ]);
-						console.log('label='+label.name+"; isShown="+isShown);
-					}
-				}
-				me.down('#labelSettingsGrid').store.loadData(loadData);
+						var me = this;
 
-				me.down('#labelCheckColumn').on('checkchange',
-						me.onLabelCheckChange);
-				me.down('#labelActionColumn').on('itemclick',
-						me.onLabelActionColumnClick);
-			},
+						var loadData = [];
 
-			/**
-			 * Remove label?
-			 * 
-			 * @param column
-			 * @param action
-			 * @param view
-			 * @param rowIndex
-			 * @param colIndex
-			 * @param item
-			 * @param e
-			 */
-			onLabelActionColumnClick : function(column, action, view,
-					rowIndex, colIndex, item, e) {
+						for ( var labelId in me.visibleLabels) {
+							var label = me.visibleLabels[labelId];
+							loadData.push([ label.id, label.isShown ]);
+						}
+						me.down('#labelSettingsGrid').store.loadData(loadData);
 
-				var rec = view.store.getAt(rowIndex);
-				var label = rec.get('label');
-				var me = this;
-				if (action == 'removeLabel') {
-					Ext.MessageBox
-					.confirm(
-							'Delete',
-							'Remove label "' + label.name
-							+ '"?',
-							function(btn) {
+						me.down('#labelCheckColumn').on('checkchange',
+								me.onLabelCheckChange, this);
+						me.down('#labelActionColumn').on('itemclick',
+								me.onLabelActionColumnClick, this);
+					},
+
+					/**
+					 * Remove label?
+					 * 
+					 * @param column
+					 * @param action
+					 * @param view
+					 * @param rowIndex
+					 * @param colIndex
+					 * @param item
+					 * @param e
+					 */
+					onLabelActionColumnClick : function(column, action, view,
+							rowIndex, colIndex, item, e) {
+
+						var me = this;
+
+						var rec = view.store.getAt(rowIndex);
+						var labelId = rec.get('labelId');
+						var label = this.visibleLabels[labelId];
+
+						if (action == 'removeLabel') {
+							Ext.MessageBox.confirm('Delete', 'Remove label "'
+									+ label.name + '"?', function(btn) {
 								if (btn === 'yes') {
-									me.up('#labelSettingsGrid').store
-									.removeAt(rowIndex);
-									if (me
-											.up('#labelControlWindow').isSubjectLabel) {
-										LabelService
-										.deleteSubjectLabel(
-												label,
-												{
-													timeout : 500,
-													errorHandler : function(
-															message) {
-														alert("Error deleting subject label: "
-																+ message);
-													}
-												});
+									me.down('#labelSettingsGrid').store
+											.removeAt(rowIndex);
+									delete me.visibleLabels[labelId];
+									if (me.isSubjectLabel) {
+										LabelService.deleteSubjectLabel(label);
 									} else {
-										LabelService
-										.deleteVariantLabel(
-												label,
-												{
-													timeout : 500,
-													errorHandler : function(
-															message) {
-														alert("Error deleting variant label: "
-																+ message);
-													}
-												});
+										LabelService.deleteVariantLabel(label);
 									}
 								}
 							});
-				}
-			},
+						}
+					},
 
-			/**
-			 * Show label?
-			 * 
-			 * @param checkColumn
-			 * @param rowIndex
-			 * @param checked
-			 * @param eOpts
-			 */
-			onLabelCheckChange : function(checkColumn, rowIndex,
-					checked, eOpts) {
-				var label = this.up('#labelSettingsGrid').store.data.items[rowIndex].data.label;
-				label.isShown = checked;
-				LabelService.updateLabel(label, {
-					timeout : 500,
-					errorHandler : function(message) {
-						alert("Error updating label: " + message);
-					}
+					/**
+					 * Show label?
+					 * 
+					 * @param checkColumn
+					 * @param rowIndex
+					 * @param checked
+					 * @param eOpts
+					 */
+					onLabelCheckChange : function(checkColumn, rowIndex,
+							checked, eOpts) {
+						var labelId = this.down('#labelSettingsGrid').store.data.items[rowIndex].data.labelId;
+						var label = this.visibleLabels[labelId];
+						label.isShown = checked;
+						LabelService.updateLabel(label);
+					},
 				});
-			},
-		});
