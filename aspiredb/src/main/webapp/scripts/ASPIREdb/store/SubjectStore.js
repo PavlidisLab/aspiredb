@@ -7,13 +7,23 @@ Ext.require([
 Ext.define('ASPIREdb.store.SubjectStore', {
     extend: 'Ext.data.ArrayStore',
     alias: 'store.subjectStore',
-    model: 'ASPIREdb.model.Subject',
     autoLoad: true,
     autoSync: true,
     proxy: {
     	type: 'localstorage',
     	id: 'subjectId'
     },   
+	
+    fields : [ {
+		name : 'id',
+		type : 'int'
+	}, {
+		name : 'patientId',
+		type : 'string'
+	}, {
+		name : 'labelIds',
+		type : 'array'
+	} ],
 	
     storeId: 'subjectStore'
     

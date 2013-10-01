@@ -33,19 +33,21 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 	id : 'subjectGrid',
 	multiSelect : true,
 	store : Ext.create('ASPIREdb.store.SubjectStore'),
-	constructor : function(cfg) {
-		// the filters used to select which subjects to show
-		var filterConfigs = [];
+	config : {
 
-		// labels that are displayed
-		var visibleLabelIds = [];
+		// member variables
 
-		// all the value objects in the grid
-		var valueObjects = [];
+		// labels that are displayable
+		// { label.id : label.valueObject }
+		visibleLabels : {},
+
+		// all the subject value objects in the grid
+		valueObjects : [],
 
 		// selected subjects in the grid
-		var selSubjects = [];
-
+		selSubjects : [],
+	},
+	constructor : function(cfg) {
 		this.initConfig(cfg);
 		this.callParent(arguments);
 	},
@@ -57,13 +59,18 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 			},
 			{
 				text : "Labels",
-				dataIndex : 'labels',
+				dataIndex : 'labelIds',
 				renderer : function(value) {
 					var ret = "";
 					for ( var i = 0; i < value.length; i++) {
-						if (value[i].isShown) {
+						var label = this.visibleLabels[value[i]];
+						if (label == undefined) {
+							continue;
+						}
+						if (label.isShown) {
+
 							ret += "<span style='background-color: "
-									+ value[i].colour + "'>" + value[i].name
+									+ label.colour + "'>" + label.name
 									+ "</span>&nbsp;";
 						}
 					}
@@ -126,10 +133,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 					.showSubjectDownload(me.valueObjects);
 		}, this);
 
-		ASPIREdb.EVENT_BUS.on('filter_submit', function(filterConfigs) {
-			me.filterConfigs = filterConfigs;
-			me.initSubjectLabelStore(me);
-		}, this);
+		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);
 
 	},
 
@@ -138,9 +142,11 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 	 * 
 	 * @param me
 	 */
-	initSubjectLabelStore : function(me) {
+	filterSubmitHandler : function(filterConfigs) {
 
-		QueryService.querySubjects(me.filterConfigs, {
+		var me = this;
+
+		QueryService.querySubjects(filterConfigs, {
 			callback : function(pageLoad) {
 				me.valueObjects = pageLoad.items;
 
@@ -148,13 +154,22 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 				// me.items.removeAll();
 
 				var data = [];
-				me.visibleLabelIds = [];
+				me.visibleLabels = {};
 				for ( var i = 0; i < me.valueObjects.length; i++) {
 					var val = me.valueObjects[i];
-					var row = [ val.id, val.patientId, val.labels ];
+
+					// create only one unique label instance
+					var labelIds = [];
 					for ( var j = 0; j < val.labels.length; j++) {
-						me.visibleLabelIds.push(val.labels[j]);
+						var aLabel = me.visibleLabels[val.labels[j].id];
+						if (aLabel == undefined) {
+							aLabel = val.labels[j];
+							me.visibleLabels[aLabel.id] = aLabel;
+						}
+						labelIds.push(aLabel.id);
 					}
+
+					var row = [ val.id, val.patientId, labelIds ];
 					data.push(row);
 				}
 
@@ -204,24 +219,33 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		}
 
 		Ext.define('ASPIREdb.view.CreateLabelWindowSubject', {
+			isSubjectLabel : true,
 			extend : 'ASPIREdb.view.CreateLabelWindow',
 
 			// override
 			onOkButtonClick : function() {
 				this.callParent();
 
-				var labelWithoutId = this.getLabel();
+				var vo = this.getLabel();
 
 				// store in database
-				SubjectService.addLabel(selSubjectIds, labelWithoutId, {
-					callback : function(theLabelWithId) {
-						theLabel = theLabelWithId;
+				SubjectService.addLabel(selSubjectIds, vo, {
+					callback : function(addedLabel) {
 
-						me.visibleLabelIds.push(theLabel);
+						addedLabel.isShown = true;
+						LabelService.updateLabel(addedLabel);
+
+						var existingLab = me.visibleLabels[addedLabel.id];
+						if (existingLab == undefined) {
+							me.visibleLabels[addedLabel.id] = addedLabel;
+						} else {
+							existingLab.isShown = true;
+						}
 
 						// update local store
 						for ( var i = 0; i < me.selSubjects.length; i++) {
-							me.selSubjects[i].get('labels').push(theLabel);
+							me.selSubjects[i].get('labelIds').push(
+									addedLabel.id);
 						}
 
 						// refresh grid
@@ -245,12 +269,12 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 
 		var labelControlWindow = Ext.create('ASPIREdb.view.LabelControlWindow',
 				{
-					visibleLabelIds : me.visibleLabelIds,
+					visibleLabels : me.visibleLabels,
 					isSubjectLabel : true,
 				});
 
 		labelControlWindow.on('destroy', function(btn, e, eOpts) {
-			me.initSubjectLabelStore(me);
+			me.getView().refresh();
 		}, this);
 
 		labelControlWindow.show();

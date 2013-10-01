@@ -27,7 +27,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	extend : 'Ext.tab.Panel',
 	alias : 'widget.variantTabPanel',
 	title : 'Variant',
-	
+
 	dockedItems : [ {
 		xtype : 'toolbar',
 		itemId : 'variantTabPanelToolbar',
@@ -35,18 +35,65 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 	} ],
 
+	id    : 'variantTabPanel',
+
+
 	items : [ {
 		xtype : 'ideogram',
 		itemId : 'ideogram'
 	} ],
 
-	storeFields : [ 'id', 'patientId', 'variantType', 'genomeCoordinates', 'type', 'copyNumber', 'cnvLength', 'dbSNPID', 'observedBase', 'referenceBase', 'indelLength' ],
+	storeFields : [ 'id', 'patientId', 'variantType', 'genomeCoordinates', 'labelIds', 'type', 'copyNumber', 'cnvLength', 'dbSNPID', 'observedBase', 'referenceBase', 'indelLength' ],
 
+	config : {
+	
+		// member variables 
+		
+		// labels that are displayable
+		// { label.id : label.valueObject }
+		visibleLabels : {},
+		
+		// selected subjects ids the grid
+		selectedVariantIds : [],
+		
+		// selected subjects records in the grid
+		selectedVariants : [],
+		
+	},
+	
+	constructor : function(cfg) {
+		this.initConfig(cfg);
+		this.callParent(arguments);
+	},
+	
 	initComponent : function() {
 		this.callParent();
 
 		var ref = this;
 
+		this.labelsMenu = Ext.create('Ext.menu.Menu', {
+			items : [ {
+				itemId : 'makeLabel',
+				text : 'Make label...',
+				disabled : true,
+				handler : this.makeLabelHandler,
+				scope : this
+			}, {
+				itemId : 'labelSettings',
+				text : 'Settings...',
+				disabled : false,
+				handler : this.labelSettingsHandler,
+				scope : this
+			} ]
+		});
+
+		this.labelsButton = Ext.create('Ext.Button', {
+			text : '<b>Labels</b>',
+			itemId : 'labelsButton',
+			menu : this.labelsMenu
+		});
+
+		
 		this.actionsMenu = Ext.create('Ext.menu.Menu', {
 			items : [ {
 				itemId : 'viewInUCSC',
@@ -98,8 +145,9 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		
 		}
 		
-	},
 
+	},
+	
 	viewGenesHandler : function() {
 		
 		ASPIREdb.view.GeneHitsByVariantWindow.clearGridAndMask();		
@@ -120,16 +168,17 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			return;
 
 		var viewGenesButton = this.actionsMenu.getComponent('viewGenes');
+		var viewInUCSCButton = this.actionsMenu.getComponent('viewInUCSC');
 
 		if (records.length > 0) {
 			viewGenesButton.enable();
+			this.down('#makeLabel').enable();
 		} else {
 			viewGenesButton.disable();
 			viewInUCSCButton.disable();
+			this.down('#makeLabel').disable();
 			return;
 		}
-
-		var viewInUCSCButton = this.actionsMenu.getComponent('viewInUCSC');
 
 		if (this.areOnSameChromosome(records)) {
 			viewInUCSCButton.enable();
@@ -138,10 +187,12 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		}
 
 		this.selectedVariantIds = [];
-
+		this.selectedVariants = [];
+		
 		// needed for 'View Genes' button
 		for ( var i = 0; i < records.length; i++) {
 			this.selectedVariantIds.push(records[i].data.id);
+			this.selectedVariants.push(records[i]);
 		}
 
 	},
@@ -176,7 +227,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	filterSubmitHandler : function(filterConfigs) {
 
 		var ref = this;
-
+		
 		VariantService.suggestProperties(function(properties) {
 
 			QueryService.queryVariants(filterConfigs, {
@@ -194,7 +245,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 						fieldData.push(ref.storeFields[i]);
 					}
 
-					var characteristicNames = [];
+					characteristicNames = [];
 
 					for ( var i = 0; i < properties.length; i++) {
 
@@ -257,6 +308,28 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			dataIndex : 'genomeCoordinates'
 		});
 
+		columnConfig.push({
+			text : "Labels",
+			dataIndex : 'labelIds',
+			renderer : function(value) {
+				var ret = "";
+				for ( var i = 0; i < value.length; i++) {
+					var label = this.up('#variantTabPanel').visibleLabels[value[i]];
+					if (label == undefined) {
+						continue;
+					}
+					if (label.isShown) {
+						
+						ret += "<span style='background-color: "
+								+ label.colour + "'>" + label.name
+								+ "</span>&nbsp;";
+					}
+				}
+				return ret;
+			},
+			flex : 1
+		});
+		
 		columnConfig.push({
 			text : 'Copy Number',
 			flex : 1,
@@ -349,7 +422,8 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	constructVariantStoreData : function(vvos, characteristicNames) {
 
 		var storeData = [];
-
+		this.visibleLabels = {};
+		
 		for ( var i = 0; i < vvos.length; i++) {
 
 			var vvo = vvos[i];
@@ -362,7 +436,20 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 			dataRow.push(vvo.variantType);
 			dataRow.push(vvo.genomicRange.chromosome + ":" + vvo.genomicRange.baseStart + "-" + vvo.genomicRange.baseEnd);
+			
+			// create only one unique label instance
+			var labels = [];
+			for ( var j = 0; j < vvo.labels.length; j++) {
+				var aLabel = this.visibleLabels[vvo.labels[j].id];
+				if (aLabel == undefined) {
+					aLabel = vvo.labels[j];
+					this.visibleLabels[aLabel.id] = aLabel;
+				}
+				labels.push(aLabel.id);
+			}
 
+			dataRow.push(labels);
+			
 			if (vvo.variantType == "CNV") {
 				dataRow.push(vvo.type);
 				dataRow.push(vvo.copyNumber);
@@ -408,6 +495,76 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 		return storeData;
 
-	}
+	},
+	
+	/**
+	 * Assigns a Label
+	 * 
+	 */
+	makeLabelHandler : function(event) {
+		
+		var me = this;
+		
+		Ext.define('ASPIREdb.view.CreateLabelWindowVariant', {
+			isSubjectLabel : false,
+			extend : 'ASPIREdb.view.CreateLabelWindow',
+
+			// override
+			onOkButtonClick : function() {
+				this.callParent();
+
+				var vo = this.getLabel();
+
+				// store in database
+				VariantService.addLabel(me.selectedVariantIds, vo, {
+					errorHandler : function( message ) {
+						alert('Error adding variant label. ' + message);
+					},
+					callback : function(addedLabel) {
+						
+						addedLabel.isShown = true;
+						LabelService.updateLabel(addedLabel);
+		
+						var existingLab = me.visibleLabels[addedLabel.id];
+						if ( existingLab == undefined ) {
+							me.visibleLabels[addedLabel.id] = addedLabel;
+						} else {
+							existingLab.isShown = true;
+						}
+						
+						// update local store
+						for ( var i = 0; i < me.selectedVariants.length; i++) {
+							me.selectedVariants[i].get('labelIds').push(addedLabel.id);
+						}
+
+						// refresh grid
+						me.down('#variantGrid').store.sync();
+						me.down('#variantGrid').getView().refresh();
+					}
+				});
+			},
+		});
+
+		var labelWindow = new ASPIREdb.view.CreateLabelWindowVariant();
+		labelWindow.show();
+	},
+
+	/**
+	 * Display LabelSettingsWindow
+	 */
+	labelSettingsHandler : function(event) {
+		var me = this;
+
+		var labelControlWindow = Ext.create('ASPIREdb.view.LabelControlWindow', {
+			visibleLabels : me.visibleLabels,
+			isSubjectLabel : false,
+		});
+
+		labelControlWindow.on('destroy', function(btn, e, eOpts) {
+			me.down('#variantGrid').getView().refresh();
+		}, this);
+
+		labelControlWindow.show();
+	},
 
 });
