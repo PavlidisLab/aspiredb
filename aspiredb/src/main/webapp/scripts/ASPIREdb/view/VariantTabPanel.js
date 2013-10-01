@@ -27,6 +27,13 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	extend : 'Ext.tab.Panel',
 	alias : 'widget.variantTabPanel',
 	title : 'Variant',
+	
+	dockedItems : [ {
+		xtype : 'toolbar',
+		itemId : 'variantTabPanelToolbar',
+		dock : 'top'
+
+	} ],
 
 	items : [ {
 		xtype : 'ideogram',
@@ -61,16 +68,36 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			itemId : 'actionsButton',
 			menu : this.actionsMenu
 		});
+		
+		this.saveButton = Ext.create('Ext.Button',{			
+			id : 'saveButton',
+			text : '',
+			tooltip : 'Download table contents as text',
+			icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
+						
+		} );
 
-		this.toolbar = Ext.create('Ext.toolbar.Toolbar', {
-			itemId : 'variantTabToolbar',
-			dock : 'top'
+		//adding buttons to toolbar in filterSubmitHandler because extJS was bugging out when we added the dynamically created grid afterwords
+		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);		
+		
+		this.saveButton.on('click', function(){
+			ref.saveButtonHandler();
+						
 		});
-
-		this.toolbar.add(this.actionsButton);
-		this.addDocked(this.toolbar);
-
-		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);
+		
+		
+	},
+	
+	saveButtonHandler : function() {
+		
+		var grid = this.getComponent('variantGrid');
+		
+		if (grid){
+		
+			ASPIREdb.TextDataDownloadWindow.showVariantsDownload(grid.getStore().getRange(), grid.columnHeaders);
+		
+		}
+		
 	},
 
 	viewGenesHandler : function() {
@@ -185,6 +212,13 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					grid.on('selectionchange', ref.selectionChangeHandler, ref);
 
 					ref.add(grid);
+					
+					
+					var toolbar = ref.getDockedComponent('variantTabPanelToolbar');
+					
+					toolbar.add(ref.actionsButton);
+					toolbar.add(ref.saveButton);
+					
 
 				}
 			});
@@ -201,6 +235,8 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			groupField : 'patientId'
 		});
 
+		
+		var columnHeaders = ['Patient Id','Type','Genome Coordinates','Copy Number','CNV Type','CNV Length','DB SNP ID','Observed Base','Reference Base','Indel Length'];
 		var columnConfig = [];
 
 		columnConfig.push({
@@ -281,14 +317,18 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			config.hidden = true;
 
 			columnConfig.push(config);
+			
+			columnHeaders.push(characteristicNames[i]);
 
 		}
 
+		
 		// TODO styling
 		grid = Ext.create('Ext.grid.Panel', {
 			store : store,
 			itemId : 'variantGrid',
 			columns : columnConfig,
+			columnHeaders : columnHeaders,
 			selModel : Ext.create('Ext.selection.RowModel', {
 				mode : 'MULTI'
 			}),

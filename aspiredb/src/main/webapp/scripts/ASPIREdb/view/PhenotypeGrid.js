@@ -35,9 +35,13 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			disabled : 'true',
 			itemId : 'analyzeButton'
 
-		}, {
+		},{			
+			id : 'saveButton',
 			xtype : 'button',
-			text : 'Save'
+			text : '',
+			tooltip : 'Download table contents as text',
+			icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
+						
 		} ]
 
 	} ],
@@ -96,8 +100,18 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 				}
 			});
 
+		});		
+		
+		var saveButton = ref.getDockedComponent('phenotypeGridToolbar').getComponent('saveButton');
+		
+		saveButton.on('click', function(){			
+			SubjectService.getPhenotypeTextDownloadBySubjectIds(ref.currentSubjectIds,ref.saveButtonHandler);
 		});
 
+	},
+	
+	saveButtonHandler : function(text) {
+		ASPIREdb.TextDataDownloadWindow.showPhenotypesDownload(text);		
 	},
 
 	// TODO this will have to change when we get around to prettying up the grid

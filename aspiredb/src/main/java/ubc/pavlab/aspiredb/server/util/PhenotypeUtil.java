@@ -175,7 +175,7 @@ public class PhenotypeUtil {
             return disjunction;
         } else if (node instanceof Junction) {
             Collection<RestrictionExpression> restrictions = ((Junction) node).getRestrictions();
-            Collection<RestrictionExpression> results = new ArrayList<>();
+            Collection<RestrictionExpression> results = new ArrayList();
             for (RestrictionExpression restriction : restrictions) {
                 RestrictionExpression result = expandNodesUsingOntologyInference( restriction );
                 results.add( result );

@@ -16,7 +16,9 @@ package ubc.pavlab.aspiredb.server.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
@@ -36,10 +38,15 @@ import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
+import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.TextValue;
-import ubc.pavlab.aspiredb.shared.query.*;
+import ubc.pavlab.aspiredb.shared.query.ExternalSubjectIdProperty;
+import ubc.pavlab.aspiredb.shared.query.LabelProperty;
 import ubc.pavlab.aspiredb.shared.query.Property;
+import ubc.pavlab.aspiredb.shared.query.PropertyValue;
+import ubc.pavlab.aspiredb.shared.query.SubjectLabelProperty;
+import ubc.pavlab.aspiredb.shared.query.TextProperty;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 /**
@@ -51,7 +58,7 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
  */
 @Service("subjectService")
 @RemoteProxy(name="SubjectService")
-public class SubjectServiceImpl extends GwtService implements SubjectService {
+public class SubjectServiceImpl implements SubjectService {
 	protected static Log log = LogFactory.getLog( SubjectServiceImpl.class );
 
     @Autowired private SubjectDao subjectDao;
@@ -64,7 +71,7 @@ public class SubjectServiceImpl extends GwtService implements SubjectService {
     @RemoteMethod
     @Transactional(readOnly = true)
     public SubjectValueObject getSubject(Long projectId, Long subjectId ) throws NotLoggedInException {
-        throwGwtExceptionIfNotLoggedIn();
+        //throwGwtExceptionIfNotLoggedIn();
         Subject subject = subjectDao.load( subjectId );
         if ( subject == null ) return null;
 
@@ -111,7 +118,7 @@ public class SubjectServiceImpl extends GwtService implements SubjectService {
     @Transactional
 	public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
             throws NotLoggedInException, NeurocartaServiceException {
-        throwGwtExceptionIfNotLoggedIn();
+        //throwGwtExceptionIfNotLoggedIn();
         // This should throw AccessDenied exception if user isn't allowed to view the subjects
         // (there is a better way to test security, this method is probably going to disappear)
         Collection<Subject> subjects = subjectDao.load(subjectIds);
@@ -130,9 +137,9 @@ public class SubjectServiceImpl extends GwtService implements SubjectService {
     @Override
     @RemoteMethod
     @Transactional
-    public List<SubjectValueObject> getSubjectsWithPhenotypesBySubjectIds( List<Long> subjectIds)
+    public String getPhenotypeTextDownloadBySubjectIds( List<Long> subjectIds)
             throws NotLoggedInException {
-        throwGwtExceptionIfNotLoggedIn();        
+        //throwGwtExceptionIfNotLoggedIn();        
         
         StopWatch timer = new StopWatch();
         timer.start();
@@ -146,14 +153,57 @@ public class SubjectServiceImpl extends GwtService implements SubjectService {
             svoList.add( svo );            
         }
         
-        return svoList;
+        StringBuffer text = new StringBuffer();
+
+        LinkedHashMap<String, String> phenotypeFileColumnsMap = new LinkedHashMap<String, String>();
+
+        for ( SubjectValueObject svo : svoList ) {
+
+            for ( PhenotypeValueObject pvo : svo.getPhenotypes().values() ) {
+
+                String columnName = pvo.getUri()!=null ? (pvo.getUri() +":"+pvo.getName() ): pvo
+                        .getName();
+
+                if ( !phenotypeFileColumnsMap.containsKey( columnName ) ) {
+                    phenotypeFileColumnsMap.put( columnName, pvo.getName() );
+                }
+
+            }
+
+        }
+
+        text.append( "Subject Id\t" );
+
+        for ( String columnName : phenotypeFileColumnsMap.keySet() ) {
+            text.append( columnName + "\t" );
+        }
+
+        text.append( "\n" );
+        for ( SubjectValueObject svo : svoList ) {
+
+            text.append( svo.getPatientId() + "\t" );
+            Map<String, PhenotypeValueObject> phenotypeMap = svo.getPhenotypes();
+
+            for ( String columnName : phenotypeFileColumnsMap.keySet() ) {
+                
+                PhenotypeValueObject vo = phenotypeMap.get( phenotypeFileColumnsMap.get( columnName ) );
+                
+                if (vo !=null){                
+                    text.append( vo.getDbValue() + "\t" );
+                }
+            }
+
+            text.append( "\n" );
+        }
+        
+        return text.toString();
     }
 
     @Override
     @RemoteMethod
     @Transactional
     public LabelValueObject addLabel(Collection<Long> subjectIds, LabelValueObject labelVO) throws NotLoggedInException {
-        throwGwtExceptionIfNotLoggedIn();
+        //throwGwtExceptionIfNotLoggedIn();
         Collection<Subject> subjects = subjectDao.load(subjectIds);
         Label label = labelDao.findOrCreate( labelVO );
         for (Subject subject : subjects) {
@@ -167,7 +217,7 @@ public class SubjectServiceImpl extends GwtService implements SubjectService {
     @RemoteMethod
     @Transactional
     public void removeLabel(Long id, LabelValueObject label) throws NotLoggedInException {
-        throwGwtExceptionIfNotLoggedIn();
+        //throwGwtExceptionIfNotLoggedIn();
         Subject subject = subjectDao.load(id);
         Label labelEntity = labelDao.load(label.getId());
         subject.removeLabel(labelEntity);
@@ -178,7 +228,7 @@ public class SubjectServiceImpl extends GwtService implements SubjectService {
     @RemoteMethod
     @Transactional
     public void removeLabel(Collection<Long> subjectIds, LabelValueObject label) throws NotLoggedInException {
-        throwGwtExceptionIfNotLoggedIn();
+        //throwGwtExceptionIfNotLoggedIn();
         for (Long subjectId : subjectIds) {
             removeLabel(subjectId, label);
         }
