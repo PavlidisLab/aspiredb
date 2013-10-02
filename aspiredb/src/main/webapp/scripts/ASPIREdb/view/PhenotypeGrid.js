@@ -64,6 +64,13 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		this.getDockedComponent('phenotypeGridToolbar').getComponent('analyzeButton').on('click', this.getPhenotypeEnrichment, this);
 
 		var ref = this;
+		
+		ASPIREdb.EVENT_BUS.on('filter_submit', function(){
+			
+			ref.setLoading(true);
+			ref.getStore().removeAll();
+			
+		});
 
 		ASPIREdb.EVENT_BUS.on('subjects_loaded', function(subjectIds) {
 
@@ -97,6 +104,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 					}
 
 					ref.store.loadData(data);
+					ref.setLoading(false);
 				}
 			});
 
@@ -104,13 +112,17 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		
 		var saveButton = ref.getDockedComponent('phenotypeGridToolbar').getComponent('saveButton');
 		
-		saveButton.on('click', function(){			
+		saveButton.on('click', function(){
+			ASPIREdb.TextDataDownloadWindow.show();
+			ASPIREdb.TextDataDownloadWindow.setLoading(true);
+			
 			SubjectService.getPhenotypeTextDownloadBySubjectIds(ref.currentSubjectIds,ref.saveButtonHandler);
 		});
 
 	},
 	
 	saveButtonHandler : function(text) {
+		ASPIREdb.TextDataDownloadWindow.setLoading(false);
 		ASPIREdb.TextDataDownloadWindow.showPhenotypesDownload(text);		
 	},
 
@@ -140,11 +152,15 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	},
 
 	getPhenotypeEnrichment : function() {
+		
+		ASPIREdb.view.PhenotypeEnrichmentWindow.clearGrid();		
+		ASPIREdb.view.PhenotypeEnrichmentWindow.show();
+		ASPIREdb.view.PhenotypeEnrichmentWindow.setLoading(true);
 
 		PhenotypeService.getPhenotypeEnrichmentValueObjects(ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), this.currentSubjectIds, {
 			callback : function(vos) {
 				ASPIREdb.view.PhenotypeEnrichmentWindow.populateGrid(vos);
-				ASPIREdb.view.PhenotypeEnrichmentWindow.show();
+				ASPIREdb.view.PhenotypeEnrichmentWindow.setLoading(false);
 			}
 		});
 

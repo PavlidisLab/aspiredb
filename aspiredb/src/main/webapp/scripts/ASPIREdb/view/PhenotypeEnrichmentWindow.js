@@ -59,6 +59,14 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
 
 		grid.store.loadData(data);
 
+	},
+	
+	clearGrid : function(){
+		
+		var grid = ASPIREdb.view.PhenotypeEnrichmentWindow.getComponent('phenotypeEnrichmentGrid');
+		
+		grid.getStore().removeAll();		
+		
 	}
 
 });

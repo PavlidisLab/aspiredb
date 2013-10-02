@@ -145,6 +145,9 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 	filterSubmitHandler : function(filterConfigs) {
 
 		var me = this;
+		
+		me.setLoading(true);
+		me.getStore().removeAll();
 
 		QueryService.querySubjects(filterConfigs, {
 			callback : function(pageLoad) {
@@ -174,6 +177,8 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 				}
 
 				me.store.loadData(data);
+				
+				me.setLoading(false);
 
 				me.on('selectionchange', me.selectionChangeHandler, me);
 
