@@ -10,6 +10,7 @@
 <script src="dwr/interface/SubjectService.js"></script>
 <script src="dwr/interface/VariantService.js"></script>
 <script src="dwr/interface/GeneService.js"></script>
+<script src="dwr/interface/UCSCConnector.js"></script>
 <script src="dwr/dtoall.js"></script>
 
 <script src="scripts/lib/ext-all-debug-w-comments.js"></script>

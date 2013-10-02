@@ -99,7 +99,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 				itemId : 'viewInUCSC',
 				text : 'View in UCSC',
 				disabled : true,
-				handler : this.viewGenesHandler,
+				handler : this.viewInUCSCHandler,
 				scope : this
 			}, {
 				itemId : 'viewGenes',
@@ -145,6 +145,32 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		
 		}
 		
+
+	},
+	
+	viewInUCSCHandlerHandler : function() {
+		/*
+		UCSCConnector.constructCustomTracksFile
+		
+		var customTrackData
+		
+		Ext.Ajax.request({
+            url:"../search",
+            method: "POST",
+            params: JSON.stringify({
+                clade: 'mammal',
+                org: 'Human',
+                db: 'hg19',
+                hgct_customText: searchPhrase
+            }),
+            success: function(){
+                console.log("ok");
+            },
+            failure: function(response, opts){
+                console.log("failed");
+            },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });*/
 
 	},
 	
@@ -217,6 +243,26 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		return true;
 
 	},
+	
+	getSpanningGenomicRange : function(genomeCoordinateObjects) {
+        if ( !areOnSameChromosome( genomeCoordinateObjects ) ) return;
+
+        var start =  2147483647;
+        var end =  -2147483648;
+        var chromosome = genomeCoordinateObjects[0].chromosome;
+        for (var i = 0 ; i < genomeCoordinateObjects.length ; i++ ) {
+        	
+        	var variant = genomeCoordinateObjects[i];
+        /*	
+            if (variant.getGenomicRange().getChromosome().equals(chromosome)) {
+                if (variant.getGenomicRange().getBaseStart() < start)
+                    start = variant.getGenomicRange().getBaseStart();
+                if (variant.getGenomicRange().getBaseEnd() > end)
+                    end = variant.getGenomicRange().getBaseEnd();
+            }*/
+        }
+        //return new GenomicRange(chromosome, start, end);
+    },
 
 	getChromosomeFromGenomicRangeString : function(grString) {
 
