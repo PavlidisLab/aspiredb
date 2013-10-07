@@ -314,6 +314,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					var toolbar = ref.getDockedComponent('variantTabPanelToolbar');
 					
 					toolbar.add(ref.actionsButton);
+					toolbar.add(ref.labelsButton);
 					toolbar.add(ref.saveButton);
 					
 
