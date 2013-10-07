@@ -18,18 +18,19 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import java.util.Collection;
+
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
-import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Variant;
+import ubc.pavlab.aspiredb.server.util.ConfigUtils;
 import ubc.pavlab.aspiredb.server.ws.CnvToBed;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
-
-import java.util.Collection;
 
 /**
  *
@@ -45,8 +46,7 @@ public class UCSCConnectorImpl implements UCSCConnector {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public String constructCustomTracksFile( GenomicRange range, Collection<Long> activeProjectIds, String appUrl )
-            throws NotLoggedInException {
+    public String constructCustomTracksFile( GenomicRange range, Collection<Long> activeProjectIds ){
         //throwGwtExceptionIfNotLoggedIn();
 
         Collection<Variant> variants = variantDao.findByGenomicLocation(
@@ -57,6 +57,6 @@ public class UCSCConnectorImpl implements UCSCConnector {
                 range.getChromosome(),
                 range.getBaseStart(),
                 range.getBaseEnd(),
-                appUrl);
+                ConfigUtils.getBaseUrl());
     }
 }

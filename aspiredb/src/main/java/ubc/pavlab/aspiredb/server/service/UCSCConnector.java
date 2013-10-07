@@ -18,15 +18,13 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
-import ubc.pavlab.aspiredb.shared.GenomicRange;
-
 import java.util.Collection;
+
+import ubc.pavlab.aspiredb.shared.GenomicRange;
 
 /**
  *
  */
 public interface UCSCConnector {
-    public String constructCustomTracksFile(GenomicRange range, Collection<Long> activeProjectIds, String appUrl)
-            throws NotLoggedInException;
+    public String constructCustomTracksFile(GenomicRange range, Collection<Long> activeProjectIds);
 }

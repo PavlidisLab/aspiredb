@@ -17,7 +17,7 @@
  *
  */
 
-Ext.require([ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel', 'ASPIREdb.view.GeneHitsByVariantWindow' ]);
+Ext.require([ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel', 'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings' ]);
 
 // TODO js documentation
 // TODO labels
@@ -35,37 +35,33 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 	} ],
 
-	id    : 'variantTabPanel',
-
+	id : 'variantTabPanel',
 
 	items : [ {
 		xtype : 'ideogram',
 		itemId : 'ideogram'
 	} ],
 
-	storeFields : [ 'id', 'patientId', 'variantType', 'genomeCoordinates', 'labelIds', 'type', 'copyNumber', 'cnvLength', 'dbSNPID', 'observedBase', 'referenceBase', 'indelLength' ],
+	storeFields : [ 'id', 'patientId', 'variantType', 'genomeCoordinates', 'chromosome', 'baseStart', 'baseEnd', 'labelIds', 'type', 'copyNumber', 'cnvLength', 'dbSNPID', 'observedBase', 'referenceBase', 'indelLength' ],
 
 	config : {
-	
-		// member variables 
-		
+
+		// member variables
+
 		// labels that are displayable
 		// { label.id : label.valueObject }
 		visibleLabels : {},
-		
-		// selected subjects ids the grid
-		selectedVariantIds : [],
-		
+
 		// selected subjects records in the grid
-		selectedVariants : [],
-		
+		selectedVariants : []
+
 	},
-	
+
 	constructor : function(cfg) {
 		this.initConfig(cfg);
 		this.callParent(arguments);
 	},
-	
+
 	initComponent : function() {
 		this.callParent();
 
@@ -93,7 +89,6 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			menu : this.labelsMenu
 		});
 
-		
 		this.actionsMenu = Ext.create('Ext.menu.Menu', {
 			items : [ {
 				itemId : 'viewInUCSC',
@@ -115,71 +110,104 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			itemId : 'actionsButton',
 			menu : this.actionsMenu
 		});
-		
-		this.saveButton = Ext.create('Ext.Button',{			
+
+		this.saveButton = Ext.create('Ext.Button', {
 			id : 'saveButton',
 			text : '',
 			tooltip : 'Download table contents as text',
 			icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
-						
-		} );
 
-		//adding buttons to toolbar in filterSubmitHandler because extJS was bugging out when we added the dynamically created grid afterwords
-		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);		
-		
-		this.saveButton.on('click', function(){
-			ref.saveButtonHandler();
-						
 		});
-		
-		
+
+		// adding buttons to toolbar in filterSubmitHandler because extJS was
+		// bugging out when we added the dynamically created grid afterwords
+		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);
+
+		this.saveButton.on('click', function() {
+			ref.saveButtonHandler();
+
+		});
+
 	},
-	
+
 	saveButtonHandler : function() {
-		
+
 		var grid = this.getComponent('variantGrid');
-		
-		if (grid){
-		
+
+		if (grid) {
 			ASPIREdb.TextDataDownloadWindow.showVariantsDownload(grid.getStore().getRange(), grid.columnHeaders);
-		
 		}
-		
 
 	},
-	
-	viewInUCSCHandlerHandler : function() {
-		/*
-		UCSCConnector.constructCustomTracksFile
-		
-		var customTrackData
-		
-		Ext.Ajax.request({
-            url:"../search",
-            method: "POST",
-            params: JSON.stringify({
-                clade: 'mammal',
-                org: 'Human',
-                db: 'hg19',
-                hgct_customText: searchPhrase
-            }),
-            success: function(){
-                console.log("ok");
-            },
-            failure: function(response, opts){
-                console.log("failed");
-            },
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        });*/
+
+	viewInUCSCHandler : function() {
+
+		UCSCConnector.constructCustomTracksFile(this.getSpanningGenomicRange(this.selectedVariants), ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), function(searchPhrase) {
+
+			var ucscForm = Ext.create('Ext.form.Panel', {
+
+			});
+
+			ucscForm.submit({
+				target : '_blank',
+				url : "http://genome.ucsc.edu/cgi-bin/hgCustom",
+				standardSubmit : true,
+				method : "POST",
+				params : {
+					clade : 'mammal',
+					org : 'Human',
+					db : 'hg19',
+					hgct_customText : searchPhrase
+				},
+				success : function() {
+					console.log("ok");
+				},
+				failure : function(response, opts) {
+					console.log("failed");
+				},
+				headers : {
+					'Content-Type' : 'multipart/form-data'
+				}
+			});
+
+		});
 
 	},
-	
+
+	getSpanningGenomicRange : function(selectedVariants) {
+		if (!this.areOnSameChromosome(selectedVariants))
+			return;
+
+		var start = 2147483647;
+		var end = -2147483648;
+		var chromosome = selectedVariants[0].data.chromosome;
+		for ( var i = 0; i < selectedVariants.length; i++) {
+
+			var variant = selectedVariants[i].data;
+
+			if (variant.chromosome == chromosome) {
+				if (variant.baseStart < start)
+					start = variant.baseStart;
+				if (variant.baseEnd > end)
+					end = variant.baseEnd;
+			}
+		}
+
+		// Genomic Range
+		return {
+			chromosome : chromosome,
+			baseStart : start,
+			baseEnd : end
+		};
+
+	},
+
 	viewGenesHandler : function() {
-		
-		ASPIREdb.view.GeneHitsByVariantWindow.clearGridAndMask();		
+
+		ASPIREdb.view.GeneHitsByVariantWindow.clearGridAndMask();
 		ASPIREdb.view.GeneHitsByVariantWindow.show();
-		
-		GeneService.getGenesInsideVariants(this.selectedVariantIds, {
+
+		GeneService.getGenesInsideVariants(this.getSelectedVariantIds(this.selectedVariants), {
 			callback : function(vos) {
 				ASPIREdb.view.GeneHitsByVariantWindow.populateGrid(vos);
 			}
@@ -189,36 +217,28 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 	selectionChangeHandler : function(model, records) {
 
+		this.selectedVariants = records;
+
 		var grid = this.getComponent('variantGrid');
 		if (!grid)
 			return;
 
-		var viewGenesButton = this.actionsMenu.getComponent('viewGenes');
-		var viewInUCSCButton = this.actionsMenu.getComponent('viewInUCSC');
-
 		if (records.length > 0) {
-			viewGenesButton.enable();
+
+			this.down('#viewGenes').enable();
 			this.down('#makeLabel').enable();
 		} else {
-			viewGenesButton.disable();
-			viewInUCSCButton.disable();
+
+			this.down('#viewGenes').disable();
+			this.down('#viewInUCSC').disable();
 			this.down('#makeLabel').disable();
 			return;
 		}
 
 		if (this.areOnSameChromosome(records)) {
-			viewInUCSCButton.enable();
+			this.down('#viewInUCSC').enable();
 		} else {
-			viewInUCSCButton.disable();
-		}
-
-		this.selectedVariantIds = [];
-		this.selectedVariants = [];
-		
-		// needed for 'View Genes' button
-		for ( var i = 0; i < records.length; i++) {
-			this.selectedVariantIds.push(records[i].data.id);
-			this.selectedVariants.push(records[i]);
+			this.down('#viewInUCSC').disable();
 		}
 
 	},
@@ -228,11 +248,11 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		if (records.length < 1)
 			return false;
 
-		var chromosome = this.getChromosomeFromGenomicRangeString(records[0].data.genomeCoordinates);
+		var chromosome = records[0].data.chromosome;
 
 		for ( var i = 0; i < records.length; i++) {
 
-			var otherChromosome = this.getChromosomeFromGenomicRangeString(records[i].data.genomeCoordinates);
+			var otherChromosome = records[i].data.chromosome;
 
 			if (chromosome !== otherChromosome) {
 				return false;
@@ -243,37 +263,11 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		return true;
 
 	},
-	
-	getSpanningGenomicRange : function(genomeCoordinateObjects) {
-        if ( !areOnSameChromosome( genomeCoordinateObjects ) ) return;
-
-        var start =  2147483647;
-        var end =  -2147483648;
-        var chromosome = genomeCoordinateObjects[0].chromosome;
-        for (var i = 0 ; i < genomeCoordinateObjects.length ; i++ ) {
-        	
-        	var variant = genomeCoordinateObjects[i];
-        /*	
-            if (variant.getGenomicRange().getChromosome().equals(chromosome)) {
-                if (variant.getGenomicRange().getBaseStart() < start)
-                    start = variant.getGenomicRange().getBaseStart();
-                if (variant.getGenomicRange().getBaseEnd() > end)
-                    end = variant.getGenomicRange().getBaseEnd();
-            }*/
-        }
-        //return new GenomicRange(chromosome, start, end);
-    },
-
-	getChromosomeFromGenomicRangeString : function(grString) {
-
-		return grString.slice(0, grString.indexOf(':'));
-
-	},
 
 	filterSubmitHandler : function(filterConfigs) {
 
 		var ref = this;
-		
+
 		VariantService.suggestProperties(function(properties) {
 
 			QueryService.queryVariants(filterConfigs, {
@@ -288,7 +282,18 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					var fieldData = [];
 
 					for ( var i = 0; i < ref.storeFields.length; i++) {
-						fieldData.push(ref.storeFields[i]);
+
+						if (ref.storeFields[i] == 'chromosome' || ref.storeFields[i] == 'baseStart' || ref.storeFields[i] == 'baseEnd' || ref.storeFields[i] == 'indelLength') {
+							fieldData.push({
+								name : ref.storeFields[i],
+								type : 'int'
+							});
+						} else {
+							fieldData.push({
+								name : ref.storeFields[i],
+								type : 'string'
+							});
+						}
 					}
 
 					characteristicNames = [];
@@ -309,14 +314,12 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					grid.on('selectionchange', ref.selectionChangeHandler, ref);
 
 					ref.add(grid);
-					
-					
+
 					var toolbar = ref.getDockedComponent('variantTabPanelToolbar');
-					
+
 					toolbar.add(ref.actionsButton);
 					toolbar.add(ref.labelsButton);
 					toolbar.add(ref.saveButton);
-					
 
 				}
 			});
@@ -333,8 +336,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			groupField : 'patientId'
 		});
 
-		
-		var columnHeaders = ['Patient Id','Type','Genome Coordinates','Copy Number','CNV Type','CNV Length','DB SNP ID','Observed Base','Reference Base','Indel Length'];
+		var columnHeaders = [ 'Patient Id', 'Type', 'Genome Coordinates', 'Copy Number', 'CNV Type', 'CNV Length', 'DB SNP ID', 'Observed Base', 'Reference Base', 'Indel Length' ];
 		var columnConfig = [];
 
 		columnConfig.push({
@@ -356,6 +358,27 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		});
 
 		columnConfig.push({
+			text : 'Chromosome',
+			flex : 1,
+			dataIndex : 'chromosome',
+			hidden : true
+		});
+
+		columnConfig.push({
+			text : 'Base Start',
+			flex : 1,
+			dataIndex : 'baseStart',
+			hidden : true
+		});
+
+		columnConfig.push({
+			text : 'Base End',
+			flex : 1,
+			dataIndex : 'baseEnd',
+			hidden : true
+		});
+
+		columnConfig.push({
 			text : "Labels",
 			dataIndex : 'labelIds',
 			renderer : function(value) {
@@ -366,17 +389,15 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 						continue;
 					}
 					if (label.isShown) {
-						
-						ret += "<span style='background-color: "
-								+ label.colour + "'>" + label.name
-								+ "</span>&nbsp;";
+
+						ret += "<span style='background-color: " + label.colour + "'>" + label.name + "</span>&nbsp;";
 					}
 				}
 				return ret;
 			},
 			flex : 1
 		});
-		
+
 		columnConfig.push({
 			text : 'Copy Number',
 			flex : 1,
@@ -437,12 +458,11 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			config.hidden = true;
 
 			columnConfig.push(config);
-			
+
 			columnHeaders.push(characteristicNames[i]);
 
 		}
 
-		
 		// TODO styling
 		grid = Ext.create('Ext.grid.Panel', {
 			store : store,
@@ -470,7 +490,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 		var storeData = [];
 		this.visibleLabels = {};
-		
+
 		for ( var i = 0; i < vvos.length; i++) {
 
 			var vvo = vvos[i];
@@ -483,7 +503,10 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 			dataRow.push(vvo.variantType);
 			dataRow.push(vvo.genomicRange.chromosome + ":" + vvo.genomicRange.baseStart + "-" + vvo.genomicRange.baseEnd);
-			
+			dataRow.push(vvo.genomicRange.chromosome);
+			dataRow.push(vvo.genomicRange.baseStart);
+			dataRow.push(vvo.genomicRange.baseEnd);
+
 			// create only one unique label instance
 			var labels = [];
 			for ( var j = 0; j < vvo.labels.length; j++) {
@@ -496,7 +519,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			}
 
 			dataRow.push(labels);
-			
+
 			if (vvo.variantType == "CNV") {
 				dataRow.push(vvo.type);
 				dataRow.push(vvo.copyNumber);
@@ -543,15 +566,15 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		return storeData;
 
 	},
-	
+
 	/**
 	 * Assigns a Label
 	 * 
 	 */
 	makeLabelHandler : function(event) {
-		
+
 		var me = this;
-		
+
 		Ext.define('ASPIREdb.view.CreateLabelWindowVariant', {
 			isSubjectLabel : false,
 			extend : 'ASPIREdb.view.CreateLabelWindow',
@@ -563,22 +586,22 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 				var vo = this.getLabel();
 
 				// store in database
-				VariantService.addLabel(me.selectedVariantIds, vo, {
-					errorHandler : function( message ) {
+				VariantService.addLabel(me.getSelectedVariantIds(me.selectedVariants), vo, {
+					errorHandler : function(message) {
 						alert('Error adding variant label. ' + message);
 					},
 					callback : function(addedLabel) {
-						
+
 						addedLabel.isShown = true;
 						LabelService.updateLabel(addedLabel);
-		
+
 						var existingLab = me.visibleLabels[addedLabel.id];
-						if ( existingLab == undefined ) {
+						if (existingLab == undefined) {
 							me.visibleLabels[addedLabel.id] = addedLabel;
 						} else {
 							existingLab.isShown = true;
 						}
-						
+
 						// update local store
 						for ( var i = 0; i < me.selectedVariants.length; i++) {
 							me.selectedVariants[i].get('labelIds').push(addedLabel.id);
@@ -613,5 +636,16 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 		labelControlWindow.show();
 	},
+
+	getSelectedVariantIds : function(selectedVariantRecords) {
+
+		var selectedVariantIds = [];
+
+		for ( var i = 0; i < selectedVariantRecords.length; i++) {
+			selectedVariantIds.push(selectedVariantRecords[i].data.id);
+		}
+
+		return selectedVariantIds;
+	}
 
 });

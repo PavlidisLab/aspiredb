@@ -14,9 +14,15 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import com.sencha.gxt.data.shared.SortInfo;
-import com.sencha.gxt.data.shared.loader.PagingLoadResult;
-import com.sencha.gxt.data.shared.loader.PagingLoadResultBean;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang.time.StopWatch;
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
@@ -25,9 +31,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import ubc.pavlab.aspiredb.server.GenomeCoordinateConverter;
 import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
-import ubc.pavlab.aspiredb.server.dao.*;
+import ubc.pavlab.aspiredb.server.dao.Page;
+import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
+import ubc.pavlab.aspiredb.server.dao.QueryDao;
+import ubc.pavlab.aspiredb.server.dao.SubjectDao;
+import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
@@ -37,8 +48,22 @@ import ubc.pavlab.aspiredb.server.model.Query;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
-import ubc.pavlab.aspiredb.shared.*;
-import ubc.pavlab.aspiredb.shared.query.*;
+import ubc.pavlab.aspiredb.shared.AspireDbPagingLoadConfig;
+import ubc.pavlab.aspiredb.shared.BoundedList;
+import ubc.pavlab.aspiredb.shared.GeneValueObject;
+import ubc.pavlab.aspiredb.shared.GenomicRange;
+import ubc.pavlab.aspiredb.shared.GwtSerializable;
+import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
+import ubc.pavlab.aspiredb.shared.OntologyTermValueObject;
+import ubc.pavlab.aspiredb.shared.SubjectValueObject;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
+import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.GeneProperty;
+import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
+import ubc.pavlab.aspiredb.shared.query.NeurocartaPhenotypeProperty;
+import ubc.pavlab.aspiredb.shared.query.Property;
+import ubc.pavlab.aspiredb.shared.query.QueryValueObject;
+import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.restriction.Junction;
 import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
 import ubc.pavlab.aspiredb.shared.query.restriction.SetRestriction;
@@ -46,8 +71,8 @@ import ubc.pavlab.aspiredb.shared.suggestions.PhenotypeSuggestion;
 import ubic.basecode.ontology.model.OntologyTerm;
 import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
 
-import java.io.Serializable;
-import java.util.*;
+import com.sencha.gxt.data.shared.loader.PagingLoadResult;
+import com.sencha.gxt.data.shared.loader.PagingLoadResultBean;
 
 /**
  *
