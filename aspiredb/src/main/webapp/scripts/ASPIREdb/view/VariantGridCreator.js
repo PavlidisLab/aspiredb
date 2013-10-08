@@ -66,8 +66,6 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 		
 		var storeData = this.constructVariantStoreData(vvos, characteristicNames);
 		
-		//var grid = ref.createVariantGrid(ref.constructVariantStoreData(vvos, characteristicNames), fieldData, characteristicNames);
-		
 		var store = Ext.create('Ext.data.ArrayStore', {
 			fields : fieldData,
 			data : storeData,
