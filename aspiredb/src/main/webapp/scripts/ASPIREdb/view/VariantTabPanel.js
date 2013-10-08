@@ -44,11 +44,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 	config : {
 
-		// member variables
-
-		// labels that are displayable
-		// { label.id : label.valueObject }
-		visibleLabels : {},
+		
 
 		// selected subjects records in the grid
 		selectedVariants : []
@@ -324,25 +320,28 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 						alert('Error adding variant label. ' + message);
 					},
 					callback : function(addedLabel) {
+						
+						var grid = me.down('#variantGrid');
 
 						addedLabel.isShown = true;
 						LabelService.updateLabel(addedLabel);
 
-						var existingLab = me.visibleLabels[addedLabel.id];
+						var existingLab = grid.visibleLabels[addedLabel.id];
 						if (existingLab == undefined) {
-							me.visibleLabels[addedLabel.id] = addedLabel;
+							grid.visibleLabels[addedLabel.id] = addedLabel;
 						} else {
 							existingLab.isShown = true;
 						}
 
 						// update local store
-						for ( var i = 0; i < me.selectedVariants.length; i++) {
-							me.selectedVariants[i].get('labelIds').push(addedLabel.id);
+						for ( var i = 0; i < me.selectedVariants.length; i++) {							
+							var labelIds = me.selectedVariants[i].get('labelIds');
+							labelIds.push(addedLabel.id);
 						}
 
 						// refresh grid
-						me.down('#variantGrid').store.sync();
-						me.down('#variantGrid').getView().refresh();
+						grid.store.sync();
+						grid.getView().refresh();
 					}
 				});
 			},
@@ -359,7 +358,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		var me = this;
 
 		var labelControlWindow = Ext.create('ASPIREdb.view.LabelControlWindow', {
-			visibleLabels : me.visibleLabels,
+			visibleLabels : me.down('#variantGrid').visibleLabels,
 			isSubjectLabel : false,
 		});
 

@@ -37,6 +37,8 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 		var fieldData = [];
 		
 		var dataIndexes = this.storeFields;
+		
+		var visibleLabels = {};
 
 		for ( var i = 0; i < dataIndexes.length; i++) {
 
@@ -48,7 +50,7 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 			} else {
 				fieldData.push({
 					name : dataIndexes[i],
-					type : 'string'
+					type : 'auto'
 				});
 			}
 		}
@@ -64,7 +66,7 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 
 		}
 		
-		var storeData = this.constructVariantStoreData(vvos, characteristicNames);
+		var storeData = this.constructVariantStoreData(vvos, characteristicNames, visibleLabels);
 		
 		var store = Ext.create('Ext.data.ArrayStore', {
 			fields : fieldData,
@@ -119,8 +121,9 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 			dataIndex : 'labelIds',
 			renderer : function(value) {
 				var ret = "";
-				for ( var i = 0; i < value.length; i++) {
-					var label = this.up('#variantTabPanel').visibleLabels[value[i]];
+				for ( var i = 0; i < value.length; i++) {					
+					
+					var label = this.visibleLabels[value[i]];
 					if (label == undefined) {
 						continue;
 					}
@@ -215,17 +218,18 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 			requires : [ 'Ext.grid.feature.Grouping' ],
 			features : [ Ext.create('Ext.grid.feature.Grouping', {
 				groupHeaderTpl : '{name} ({rows.length} Item{[values.rows.length > 1 ? "s" : ""]})'
-			}) ]
+			}) ],
+			visibleLabels : visibleLabels
 
 		});
 
 		return grid;
 	},
 
-	constructVariantStoreData : function(vvos, characteristicNames) {
+	constructVariantStoreData : function(vvos, characteristicNames, visibleLabels) {
 
 		var storeData = [];
-		this.visibleLabels = {};
+		
 
 		for ( var i = 0; i < vvos.length; i++) {
 
@@ -246,10 +250,10 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 			// create only one unique label instance
 			var labels = [];
 			for ( var j = 0; j < vvo.labels.length; j++) {
-				var aLabel = this.visibleLabels[vvo.labels[j].id];
+				var aLabel = visibleLabels[vvo.labels[j].id];
 				if (aLabel == undefined) {
 					aLabel = vvo.labels[j];
-					this.visibleLabels[aLabel.id] = aLabel;
+					visibleLabels[aLabel.id] = aLabel;
 				}
 				labels.push(aLabel.id);
 			}
