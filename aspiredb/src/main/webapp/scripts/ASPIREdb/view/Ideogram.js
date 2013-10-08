@@ -153,7 +153,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
     /**
      */
     onMouseOut: function () {
-        if (this.previousChromosome != null) {
+        if (this.previousChromosome !== null) {
             this.previousChromosome.clearCursor();
         }
         this.previousChromosome = null;
@@ -171,15 +171,15 @@ Ext.define('ASPIREdb.view.Ideogram', {
         var chromosomeIdeogram = this.findChromosomeIdeogram(x, y);
 
         // If we moved from one chromosome to another, clear cursor from the previous one.
-        if (chromosomeIdeogram != null) {
-            if (this.previousChromosome != null) {
+        if (chromosomeIdeogram !== null) {
+            if (this.previousChromosome !== null) {
                 if (this.previousChromosome  !== chromosomeIdeogram) {
                     this.previousChromosome.clearCursor();
                 }
             }
             chromosomeIdeogram.drawCursor(y);
         } else {
-            if (this.previousChromosome != null) {
+            if (this.previousChromosome !== null) {
                 this.previousChromosome.clearCursor();
             }
         }
@@ -196,7 +196,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
         var y = event.browserEvent.offsetY;
         var chromosomeIdeogram = this.findChromosomeIdeogram(x, y);
 
-        if (chromosomeIdeogram != null) {
+        if (chromosomeIdeogram !== null) {
             for (var chromosomeName in this.chromosomeIdeograms )
             {
                 var otherChromosomeIdeogram = this.chromosomeIdeograms[chromosomeName];
@@ -219,7 +219,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
         var y = event.browserEvent.offsetY;
         /*ChromosomeIdeogram */
         var chromosomeIdeogram = this.findChromosomeIdeogram(x, y);
-        if (chromosomeIdeogram != null) {
+        if (chromosomeIdeogram !== null) {
             chromosomeIdeogram.finishSelection(y);
             this.fireEvent('GenomeRegionSelectionEvent', chromosomeIdeogram.getSelection());
         }
@@ -484,7 +484,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
         for (var chromosomeName in this.chromosomeIdeograms) {
             if (this.chromosomeIdeograms.hasOwnProperty(chromosomeName)) {
                 var chromosomeIdeogram = this.chromosomeIdeograms[chromosomeName];
-                if (chromosomeIdeogram.getSelection() != null) {
+                if (chromosomeIdeogram.getSelection() !== null) {
                     return chromosomeIdeogram.getSelection();
                 }
             }
