@@ -38,7 +38,7 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 	parseUrlParametersAndRedirect : function() {
 		var parsedParams = Ext.Object.fromQueryString(location.search);
 		var variantId = parsedParams.variantId;
-		if (variantId != null && !variantId.isEmpty()) {
+		if (variantId !== null && !variantId.isEmpty()) {
 			// Grab genomic range
 			VariantService.getVariant(Long.parseLong(variantId), function callback(vo) {
 				var filterConfig = new VariantFilterConfig();

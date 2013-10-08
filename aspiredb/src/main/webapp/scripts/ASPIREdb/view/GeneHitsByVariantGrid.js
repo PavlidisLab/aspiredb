@@ -109,7 +109,7 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 			handler: function(){
 				ASPIREdb.TextDataDownloadWindow.showGenesDownload(ref.getStore().getRange(), ['Gene Symbol', 'Type','Gene Name']);
 			}
-		})
+		});
 
 	}
 });

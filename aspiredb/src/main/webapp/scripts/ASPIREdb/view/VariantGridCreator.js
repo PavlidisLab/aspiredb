@@ -124,7 +124,7 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 				for ( var i = 0; i < value.length; i++) {					
 					
 					var label = this.visibleLabels[value[i]];
-					if (label == undefined) {
+					if (label === undefined) {
 						continue;
 					}
 					if (label.isShown) {

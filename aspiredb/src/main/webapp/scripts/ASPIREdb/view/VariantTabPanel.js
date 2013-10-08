@@ -20,9 +20,7 @@
 Ext.require([ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel', 'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.VariantGridCreator' ]);
 
 // TODO js documentation
-// TODO labels
 
-// TODO button functions
 Ext.define('ASPIREdb.view.VariantTabPanel', {
 	extend : 'Ext.tab.Panel',
 	alias : 'widget.variantTabPanel',
@@ -113,7 +111,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 		});
 
-		// adding buttons to toolbar in filterSubmitHandler because extJS was
+		// adding buttons to toolbar in filterSubmitHandler with the grid because extJS was
 		// bugging out when we added the dynamically created grid afterwords
 		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);
 
@@ -327,7 +325,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 						LabelService.updateLabel(addedLabel);
 
 						var existingLab = grid.visibleLabels[addedLabel.id];
-						if (existingLab == undefined) {
+						if (existingLab === undefined) {
 							grid.visibleLabels[addedLabel.id] = addedLabel;
 						} else {
 							existingLab.isShown = true;
