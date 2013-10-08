@@ -209,6 +209,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 		GeneService.getGenesInsideVariants(this.getSelectedVariantIds(this.selectedVariants), {
 			callback : function(vos) {
+				
 				ASPIREdb.view.GeneHitsByVariantWindow.populateGrid(vos);
 			}
 		});

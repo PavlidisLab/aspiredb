@@ -116,7 +116,7 @@ Ext.define('ASPIREdb.TextDataDownloadWindow', {
 		}		
 
         text = text +  "\n" ;
-        for (var i = 1 ; i< data.length ; i++ ) {
+        for (var i = 0 ; i< data.length ; i++ ) {
         	
         	vvoArray = data[i].raw;
         	
@@ -125,6 +125,38 @@ Ext.define('ASPIREdb.TextDataDownloadWindow', {
         		
         		if (vvoArray[j]){
         			text = text + vvoArray[j];
+        		}
+        		text = text +  "\t" ;
+        	} 
+
+            text = text +  "\n" ;
+        }
+
+        this.populateText(text);
+
+    },
+    
+    showGenesDownload : function( data, columnHeaders ) {
+
+        var text = "";
+		
+		for (var i = 0 ; i < columnHeaders.length ; i++){
+			
+			text = text + columnHeaders[i];
+			text = text +  "\t" ;
+			
+		}		
+
+        text = text +  "\n" ;
+        for (var i = 0 ; i< data.length ; i++ ) {
+        	
+        	geneArray = data[i].raw;
+        	
+        	//last column is gemma link so skip
+        	for (var j = 0 ; j <geneArray.length-1 ; j++){
+        		
+        		if (geneArray[j]){
+        			text = text + geneArray[j];
         		}
         		text = text +  "\t" ;
         	} 

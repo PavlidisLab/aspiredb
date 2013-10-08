@@ -17,22 +17,18 @@
  *
  */
 
-Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore' ]);
+Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow' ]);
 
 // TODO js documentation
 Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.geneHitsByVariantGrid',
+	emptyText : 'No genes found',
 
 	dockedItems : [ {
 		xtype : 'toolbar',
 		itemId : 'geneHitsByVariantGridToolbar',
-		dock : 'top',
-		items : [ {
-			xtype : 'button',
-			text : 'Save'
-		} ]
-
+		dock : 'top'
 	} ],
 
 	columns : [ {
@@ -67,8 +63,8 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 		this.callParent();
 
 	},
-
-	enableViewCoexpressionLink : function(vos) {
+	
+	enableToolbar : function(vos) {
 
 		if (vos.length < 1) {
 			return;
@@ -94,8 +90,26 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 				cn : 'View Coexpression Network in Gemma'
 			}
 		};
-
+		
+		this.getDockedComponent('geneHitsByVariantGridToolbar').remove('viewCoexpressionNetworkButton');
+		this.getDockedComponent('geneHitsByVariantGridToolbar').remove('saveButtonGeneHits');
+		
 		this.getDockedComponent('geneHitsByVariantGridToolbar').add(viewCoexpressionNetworkInGemmaLink);
+		
+		this.getDockedComponent('geneHitsByVariantGridToolbar').add('-');
+		
+		var ref = this;
+		
+		this.getDockedComponent('geneHitsByVariantGridToolbar').add({
+			xtype : 'button',
+			id : 'saveButtonGeneHits',
+			text : '',
+			tooltip : 'Download table contents as text',
+			icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
+			handler: function(){
+				ASPIREdb.TextDataDownloadWindow.showGenesDownload(ref.getStore().getRange(), ['Gene Symbol', 'Type','Gene Name']);
+			}
+		})
 
 	}
 });

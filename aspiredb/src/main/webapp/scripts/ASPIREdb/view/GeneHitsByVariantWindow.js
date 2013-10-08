@@ -48,8 +48,6 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantWindow', {
 		
 		var grid = ASPIREdb.view.GeneHitsByVariantWindow.getComponent('geneHitsByVariantGrid');
 		
-		grid.setLoading(true);
-		
 		var data = [];
 		for ( var i = 0; i < vos.length; i++) {
 			var vo = vos[i];
@@ -68,13 +66,13 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantWindow', {
 		grid.store.loadData(data);
 		grid.setLoading(false);
 		
-		grid.enableViewCoexpressionLink(vos);
+		grid.enableToolbar(vos);
 
 	},
 	
-	clearGridAndMask : function(){		
-		ASPIREdb.view.GeneHitsByVariantWindow.getComponent('geneHitsByVariantGrid').setLoading(true);
-		ASPIREdb.view.GeneHitsByVariantWindow.getComponent('geneHitsByVariantGrid').store.removeAll();		
+	clearGridAndMask : function(){
+		ASPIREdb.view.GeneHitsByVariantWindow.getComponent('geneHitsByVariantGrid').store.removeAll();
+		ASPIREdb.view.GeneHitsByVariantWindow.getComponent('geneHitsByVariantGrid').setLoading(true);				
 	}
 
 });
