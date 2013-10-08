@@ -139,6 +139,7 @@ public class PhenotypeServiceImpl extends GwtService implements PhenotypeService
     }
 
     @Override
+    @RemoteMethod
     @Transactional
     public Map<String, PhenotypeValueObject> getPhenotypes( Long subjectId ) throws NotLoggedInException {
         throwGwtExceptionIfNotLoggedIn();

@@ -5,7 +5,7 @@ import org.directwebremoting.annotations.DataTransferObject;
 import java.io.Serializable;
 import java.util.*;
 
-@DataTransferObject
+@DataTransferObject(javascript = "PhenotypeSummaryValueObject")
 public class PhenotypeSummaryValueObject implements Serializable, Comparable<PhenotypeSummaryValueObject> {
 
 	private static final long serialVersionUID = 5581881760734417223L;
@@ -35,8 +35,6 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
     private Map<String,Set<Long>> dbValueToSubjectSet = new HashMap<String, Set<Long>>();
 
     private PhenotypeValueObject selectedPhenotype;
-    private String selectedSubjectId;
-
     public Collection<PhenotypeSummaryValueObject> getDescendantOntologyTermSummaries() {
 		return descendantOntologyTermSummaries;
 	}
@@ -55,7 +53,6 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
     }
 
     public void setSelectedSubjectId(String subjectId) {
-        this.selectedSubjectId = subjectId;
     }
 
     public PhenotypeValueObject getSelectedPhenotype() {

@@ -135,6 +135,8 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 
 		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);
 
+		this.on('selectionchange', me.selectionChangeHandler, me);
+		this.on('select', me.onSelectHandler, me);
 	},
 
 	/**
@@ -180,8 +182,6 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 				
 				me.setLoading(false);
 
-				me.on('selectionchange', me.selectionChangeHandler, me);
-
 				// refresh grid
 				me.store.sync();
 				me.getView().refresh();
@@ -207,9 +207,12 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		} else {
 			this.down('#makeLabel').enable();
 		}
-
 	},
 
+	onSelectHandler : function(ref, record, index, eOpts) {
+		ASPIREdb.EVENT_BUS.fireEvent('subject_selected', record.get('id'));
+	},
+	
 	/**
 	 * Assigns a Label
 	 * 

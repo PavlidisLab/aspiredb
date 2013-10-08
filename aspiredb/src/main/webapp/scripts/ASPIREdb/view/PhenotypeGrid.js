@@ -17,14 +17,38 @@
  *
  */
 
-Ext.require([ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.PhenotypeEnrichmentWindow' ]);
+Ext.require([ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.PhenotypeEnrichmentWindow', 'Ext.grid.column.Column' ]);
 
 // TODO js documentation
 Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.phenotypeGrid',
 	title : 'Phenotype',
+	id : 'phenotypeGrid',
 
+	config : {
+
+		// member variables
+
+		// column id of selectedValuesColumn
+		SELECTED_VALUES_COL_IDX : 1,
+		
+		// PhenotypeSummary styles
+		STYLE_DEFAULT : "style='color: black'",
+		STYLE_HPO_PRESENT : "style='color: red'",
+		STYLE_HPO_ABSENT : "style='color: green'",
+		DB_VAL_HPO_PRESENT : 1,
+		DB_VAL_HPO_ABSENT : 0,
+
+		// collection of all the PhenotypeSummaryValueObject loaded
+		phenotypeStore : {},
+		
+	},
+	constructor : function(cfg) {
+		this.initConfig(cfg);
+		this.callParent(arguments);
+	},
+	
 	dockedItems : [ {
 		xtype : 'toolbar',
 		itemId : 'phenotypeGridToolbar',
@@ -47,11 +71,37 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	} ],
 
 	columns : [ {
-		header : 'Name',
+		text : 'Name',
 		dataIndex : 'name',
 		flex : 1
-	}, {
-		header : 'Value (subject count)',
+	}, { 
+		// populated dynamically when a Subject is selected
+		text : '',
+		dataIndex : 'selectedPhenotype',
+		hidden : true,
+		flex : 1,
+		renderer : function(value) {
+
+			var phenSummary = value.selectedPhenotype;
+			if (phenSummary == null) return ret;
+			var style = this.STYLE_DEFAULT;
+			var displayVal = phenSummary.dbValue;
+			
+			if (phenSummary.valueType == "HPONTOLOGY") {
+				if (phenSummary.dbValue == this.DB_VAL_HPO_ABSENT) {
+					style = this.STYLE_HPO_ABSENT;
+					displayVal = "Absent";
+				} else if (phenSummary.dbValue == this.DB_VAL_HPO_PRESENT) {
+					style = this.STYLE_HPO_PRESENT;
+					displayVal = "Present";	
+				}
+			}
+			
+			var ret = "<span " + style + ">" + displayVal + "</span>";
+			return ret;
+		},
+	} , {
+		text : 'Value (subject count)',
 		dataIndex : 'value',
 		flex : 1
 	} ],
@@ -62,7 +112,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		this.callParent();
 
 		this.getDockedComponent('phenotypeGridToolbar').getComponent('analyzeButton').on('click', this.getPhenotypeEnrichment, this);
-
+		
 		var ref = this;
 		
 		ASPIREdb.EVENT_BUS.on('filter_submit', function(){
@@ -99,7 +149,9 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 					for ( var key in vos) {
 						var phenSummary = vos[key];
 
-						var row = [ phenSummary.name, ref.getSubjectValue(phenSummary) ];
+						ref.phenotypeStore[key] = phenSummary;
+						
+						var row = [ phenSummary.name, phenSummary, ref.getSubjectValue(phenSummary) ];
 						data.push(row);
 					}
 
@@ -118,7 +170,46 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			
 			SubjectService.getPhenotypeTextDownloadBySubjectIds(ref.currentSubjectIds,ref.saveButtonHandler);
 		});
+		
+		ASPIREdb.EVENT_BUS.on('subject_selected', this.subjectSelectHandler, this);
 
+	},
+	
+	/**
+	 * Loads selected Subject's phenotypes
+	 * 
+	 * @param subjectId
+	 */
+	subjectSelectHandler : function(subjectId) {
+		var activeProjectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
+		
+		var ref = this;
+		
+		SubjectService.getSubject(activeProjectId, subjectId, { 
+			callback : function(svo) {
+				if ( svo != null ) {
+					ref.setLoading(true);
+					PhenotypeService.getPhenotypes( svo.id, {
+						callback : function(vos) {
+		
+							var col = ref.columns[ref.SELECTED_VALUES_COL_IDX];
+							col.setText(svo.patientId);
+							col.setVisible(true);
+							
+							var data = [];
+							for ( var key in ref.phenotypeStore ) {
+								var phenSummary = ref.phenotypeStore[key];
+								var subjectPhenotype = vos[phenSummary.name];
+								phenSummary.selectedPhenotype = subjectPhenotype;
+							}
+							
+							ref.getView().refresh(true);
+							ref.setLoading(false);
+						}
+					});
+				}
+			}
+		});
 	},
 	
 	saveButtonHandler : function(text) {
@@ -136,14 +227,17 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		for ( var key in valueToSubjectSet) {
 
 			if (phenSummary.valueType == "HPONTOLOGY") {
-				if (key == '1') {
+				if (key == this.DB_VAL_HPO_PRESENT) {
 					subjectValue = subjectValue + ' Present(' + valueToSubjectSet[key].length + ')';
+					subjectValue = "<span " + this.STYLE_HPO_PRESENT + ">" + subjectValue + "</span>";
 				}
-				if (key == '0') {
+				if (key == this.DB_VAL_HPO_ABSENT) {
 					subjectValue = subjectValue + ' Absent(' + valueToSubjectSet[key].length + ')';
+					subjectValue = "<span " + this.STYLE_HPO_ABSENT + ">" + subjectValue + "</span>";
 				}
 			} else {
 				subjectValue = subjectValue + ' ' + key + ' (' + valueToSubjectSet[key].length + ')';
+				subjectValue = "<span " + this.STYLE_DEFAULT + ">" + subjectValue + "</span>";
 			}
 		}
 
