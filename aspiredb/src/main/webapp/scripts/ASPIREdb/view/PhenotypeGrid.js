@@ -73,13 +73,28 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	columns : [ {
 		text : 'Name',
 		dataIndex : 'name',
-		flex : 1
+		
+		renderer : function(value) {
+			
+			var image = "";
+			if (value.neurocartaPhenotype) {
+				var src = 'scripts/ASPIREdb/resources/images/icons/neurocarta.png';
+				var tooltip = "View genes associated in Neurocarta";
+				var alt = tooltip;
+				var cls = 'gwt-Hyperlink';
+					
+				image = Ext.String.format("<img src='{0}' alt='{1}' tooltip='{2}' cls='{3}'", src, alt, tooltip, cls);
+			}
+			var ret = value.name + " " + image;
+			return ret;
+		},
+		width : 350,
 	}, { 
 		// populated dynamically when a Subject is selected
 		text : '',
 		dataIndex : 'selectedPhenotype',
 		hidden : true,
-		flex : 1,
+		width : 80,
 		renderer : function(value) {
 
 			var phenSummary = value.selectedPhenotype;
@@ -151,7 +166,9 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 
 						ref.phenotypeStore[key] = phenSummary;
 						
-						var row = [ phenSummary.name, phenSummary, ref.getSubjectValue(phenSummary) ];
+						// [ phenSummary.name, phenSummary.selectedPhenotype, subjectVal]
+						// TODO find a more elegant way of doing this ...
+						var row = [ phenSummary, phenSummary, ref.getSubjectValue(phenSummary) ];
 						data.push(row);
 					}
 

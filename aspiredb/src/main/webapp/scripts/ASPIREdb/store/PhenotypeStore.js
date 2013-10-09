@@ -5,9 +5,17 @@ Ext.define('ASPIREdb.store.PhenotypeStore', {
     alias: 'store.phenotypeStore',
         
     fields: [
-             {name: 'name', type: 'string'},
+             // a PhenotypeSummary object
+             {
+            	 name: 'name', 
+            	 type: 'auto',
+        		 sortType : function(value) {
+	    			return value.name;
+	    		},	 
+            },
              
-          // a PhenotypeSummary object
+            // the same PhenotypeSummary object
+            // TODO find a more elegant way of doing this ...
              {
             	 name: 'selectedPhenotype', 
             	 type: 'auto', 
