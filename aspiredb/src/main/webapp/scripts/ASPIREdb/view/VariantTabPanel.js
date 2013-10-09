@@ -42,8 +42,6 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 	config : {
 
-		
-
 		// selected subjects records in the grid
 		selectedVariants : []
 
@@ -119,6 +117,9 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			ref.saveButtonHandler();
 
 		});
+		
+		
+		
 
 	},
 

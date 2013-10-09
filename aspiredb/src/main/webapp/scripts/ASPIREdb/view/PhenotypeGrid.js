@@ -241,16 +241,33 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 
 		var subjectValue = '';
 
+		var keyArray = [];
+		
 		for ( var key in valueToSubjectSet) {
+			if(key !== "Unknown"){
+				keyArray.push(key);				
+			}
+						
+		}
+		
+		keyArray.sort();
+		//ensure "Unknown is at the end
+		keyArray.push("Unknown");
+		
+		for ( var i = 0; i < keyArray.length ; i ++) {
+			
+			var key = keyArray[i];
 
 			if (phenSummary.valueType == "HPONTOLOGY") {
 				if (key == this.DB_VAL_HPO_PRESENT) {
 					subjectValue = subjectValue + ' Present(' + valueToSubjectSet[key].length + ')';
 					subjectValue = "<span " + this.STYLE_HPO_PRESENT + ">" + subjectValue + "</span>";
-				}
-				if (key == this.DB_VAL_HPO_ABSENT) {
+				}else if (key == this.DB_VAL_HPO_ABSENT) {
 					subjectValue = subjectValue + ' Absent(' + valueToSubjectSet[key].length + ')';
 					subjectValue = "<span " + this.STYLE_HPO_ABSENT + ">" + subjectValue + "</span>";
+				} else {
+					subjectValue = subjectValue + ' ' + key + ' (' + valueToSubjectSet[key].length + ')';
+					subjectValue = "<span " + this.STYLE_DEFAULT + ">" + subjectValue + "</span>";
 				}
 			} else {
 				subjectValue = subjectValue + ' ' + key + ' (' + valueToSubjectSet[key].length + ')';

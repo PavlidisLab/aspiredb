@@ -32,6 +32,11 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 
 	},
 
+	/**
+     * @public     
+     * @param {VariantValueObject[]} vvos
+     * @param {string[]} properties     
+     */
 	createVariantGrid : function(vvos, properties) {
 		
 		var fieldData = [];
@@ -226,6 +231,13 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 		return grid;
 	},
 
+	/**
+     * @public     
+     * @param {VariantValueObject[]} vvos
+     * @param {string[]} characteristicNames
+     * @param {string[]} visibleLabels
+     * 
+     */
 	constructVariantStoreData : function(vvos, characteristicNames, visibleLabels) {
 
 		var storeData = [];

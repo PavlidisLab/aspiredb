@@ -122,7 +122,7 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService  {
 
         Map<String, Set<Long>> dbValueToSubjects = phenotypeSummary.getDbValueToSubjectSet();
         Set<Long> subjects = dbValueToSubjects.get(phenotypeValue);
-        Set<Long> subjectsWithUnknown = phenotypeSummary.getInferredValueToSubjectSet().get("Unknown");
+        Set<Long> subjectsWithUnknown = phenotypeSummary.getDbValueToSubjectSet().get("Unknown");
 
         if ( subjects == null ) {
             subjects = new HashSet<Long>();

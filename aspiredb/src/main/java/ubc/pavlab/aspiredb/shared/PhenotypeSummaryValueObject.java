@@ -73,7 +73,7 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
 		this.name = vo.getName();
 		this.uri = vo.getUri();
 		this.valueType = vo.getValueType();
-		this.inferredValueToSubjectSet = valueToCountMap;
+		this.dbValueToSubjectSet = valueToCountMap;
 
         this.descendantOntologyTermSummaries = new ArrayList<PhenotypeSummaryValueObject>();
     }
