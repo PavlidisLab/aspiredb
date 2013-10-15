@@ -118,6 +118,11 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 		});
 		
+		//selection is GenomicRange{baseEnd, baseStart, chromosome}
+		this.getComponent('ideogram').on('GenomeRegionSelectionEvent', function(selection){
+			ref.selectionChangeHandler(null,ref.getVariantRecordSelection());
+		});
+		
 		
 		
 
@@ -135,7 +140,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 	viewInUCSCHandler : function() {
 
-		UCSCConnector.constructCustomTracksFile(this.getSpanningGenomicRange(this.selectedVariants), ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), function(searchPhrase) {
+		UCSCConnector.constructCustomTracksFile(this.getSpanningGenomicRange(this.getVariantRecordSelection()), ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), function(searchPhrase) {
 
 			var ucscForm = Ext.create('Ext.form.Panel', {
 
@@ -200,7 +205,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		ASPIREdb.view.GeneHitsByVariantWindow.clearGridAndMask();
 		ASPIREdb.view.GeneHitsByVariantWindow.show();
 
-		GeneService.getGenesInsideVariants(this.getSelectedVariantIds(this.selectedVariants), {
+		GeneService.getGenesInsideVariants(this.getSelectedVariantIds(this.getVariantRecordSelection()), {
 			callback : function(vos) {
 				
 				ASPIREdb.view.GeneHitsByVariantWindow.populateGrid(vos);
@@ -236,6 +241,54 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		}
 
 	},
+	
+	secondGenomicRangeIsWithinFirst : function(first, other) {
+        if (first.chromosome == other.chromosome) {
+            if (first.baseStart >= other.baseStart && first.baseEnd <= other.baseEnd) {
+                return true;
+            }
+        }
+        return false;
+    },
+	
+	getVariantRecordSelection : function() {
+		
+		if (this.getActiveTab().itemId == 'ideogram'){
+			
+			var ideogram = this.getComponent('ideogram');
+			
+			var ideogramGenomicRange = ideogram.getSelection();
+			
+			if (ideogramGenomicRange == null){
+				return [];
+			}
+			
+			var grid = this.getComponent('variantGrid');
+			
+			var records= grid.getStore().getRange();
+			
+			var variantRecordsInsideRange = [];
+			
+			for (var i = 0 ; i < records.length ; i++){
+				
+				var genomicRange = {chromosome : records[i].data.chromosome,
+									baseStart : records[i].data.baseStart,
+									baseEnd : records[i].data.baseEnd};
+				
+				if (this.secondGenomicRangeIsWithinFirst(genomicRange, ideogramGenomicRange )){
+					variantRecordsInsideRange.push(records[i]);
+				}
+				
+			}
+			
+			return variantRecordsInsideRange;
+			
+			
+		}else{
+			return this.selectedVariants;
+		}
+		
+    },
 
 	areOnSameChromosome : function(records) {
 

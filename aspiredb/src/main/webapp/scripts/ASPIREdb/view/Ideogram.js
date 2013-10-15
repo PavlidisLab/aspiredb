@@ -221,7 +221,9 @@ Ext.define('ASPIREdb.view.Ideogram', {
         var chromosomeIdeogram = this.findChromosomeIdeogram(x, y);
         if (chromosomeIdeogram !== null) {
             chromosomeIdeogram.finishSelection(y);
-            this.fireEvent('GenomeRegionSelectionEvent', chromosomeIdeogram.getSelection());
+            
+            var selection = chromosomeIdeogram.getSelection();
+            this.fireEvent('GenomeRegionSelectionEvent', selection);
         }
     },
 
