@@ -17,7 +17,7 @@
  *
  */
 
-Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow' ]);
+Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow','ASPIREdb.GemmaURLUtils' ]);
 
 // TODO js documentation
 Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
@@ -64,7 +64,7 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 
 	},
 	
-	enableToolbar : function(vos) {
+	enableToolbar : function(vos,uri) {
 
 		if (vos.length < 1) {
 			return;
@@ -82,7 +82,7 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 		//This kind of weird technique is being used because the baked in extjs button href config way was not working
 		var viewCoexpressionNetworkInGemmaLink = {
 			xtype : 'box',
-			itemId : 'viewCoexpressionNetworkButton',
+			itemId : 'viewCoexpressionNetworkLink',
 			autoEl : {
 				tag : 'a',
 				href : url,
@@ -91,12 +91,33 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 			}
 		};
 		
-		this.getDockedComponent('neurocartaGeneGridToolbar').remove('viewCoexpressionNetworkButton');
-		this.getDockedComponent('neurocartaGeneGridToolbar').remove('saveButtonGeneHits');
+		var neurocartaUrl = ASPIREdb.GemmaURLUtils.makeNeurocartaPhenotypeUrl(uri);
 		
-		this.getDockedComponent('neurocartaGeneGridToolbar').add(viewCoexpressionNetworkInGemmaLink);
+		var viewNeurocartaGenesLink = {
+				xtype : 'box',
+				itemId : 'viewNeurocartaGeneLink',
+				autoEl : {
+					tag : 'a',
+					href : neurocartaUrl,
+					target : '_blank',
+					cn : 'View Neurocarta Phenotypes'
+				}
+			};
 		
-		this.getDockedComponent('neurocartaGeneGridToolbar').add('-');
+		var toolbar = this.getDockedComponent('neurocartaGeneGridToolbar');
+		
+		toolbar.remove('viewCoexpressionNetworkLink');
+		toolbar.remove('viewNeurocartaGeneLink');
+		toolbar.remove('saveButtonGeneHits');
+		toolbar.removeAll();
+		
+		toolbar.add(viewCoexpressionNetworkInGemmaLink);
+		
+		toolbar.add('-');
+		
+		toolbar.add(viewNeurocartaGenesLink);
+		
+		toolbar.add('-');
 		
 		var ref = this;
 		

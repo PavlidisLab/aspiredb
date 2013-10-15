@@ -55,7 +55,7 @@ Ext.define('ASPIREdb.view.NeurocartaGeneWindow', {
 	
 		GeneService.findGenesWithNeurocartaPhenotype( ontologyPrefix + uri, function(vos){
 			
-			ref.populateGrid(vos);
+			ref.populateGrid(vos, uri);
 			grid.setLoading(false);
 			
 		});		
@@ -63,7 +63,7 @@ Ext.define('ASPIREdb.view.NeurocartaGeneWindow', {
 	},
 
 	//GeneValueObject
-	populateGrid : function(vos) {		
+	populateGrid : function(vos,uri) {		
 		
 		var grid = ASPIREdb.view.NeurocartaGeneWindow.getComponent('neurocartaGeneGrid');
 		
@@ -85,7 +85,7 @@ Ext.define('ASPIREdb.view.NeurocartaGeneWindow', {
 		grid.store.loadData(data);
 		grid.setLoading(false);
 		
-		grid.enableToolbar(vos);
+		grid.enableToolbar(vos,uri);
 
 	},
 	
