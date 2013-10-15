@@ -17,7 +17,7 @@
  *
  */
 
-Ext.require([ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.PhenotypeEnrichmentWindow', 'Ext.grid.column.Column' ]);
+Ext.require([ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.PhenotypeEnrichmentWindow', 'Ext.grid.column.Column', 'ASPIREdb.view.NeurocartaGeneWindow']);
 
 // TODO js documentation
 Ext.define('ASPIREdb.view.PhenotypeGrid', {
@@ -80,10 +80,10 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			if (value.neurocartaPhenotype) {
 				var src = 'scripts/ASPIREdb/resources/images/icons/neurocarta.png';
 				var tooltip = "View genes associated in Neurocarta";
-				var alt = tooltip;
-				var cls = 'gwt-Hyperlink';
-					
-				image = Ext.String.format("<img src='{0}' alt='{1}' tooltip='{2}' cls='{3}'", src, alt, tooltip, cls);
+								
+				var ahrefurl = '<a onclick="return Ext.getCmp(\'phenotypeGrid\').viewNeurocartaGenes(\''+value.uri+'\')" href=#>';
+				 
+				image = Ext.String.format(ahrefurl + "<img src='{0}' alt='{1}' > </a>", src, tooltip);
 			}
 			var ret = value.name + " " + image;
 			return ret;
@@ -213,7 +213,6 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 							col.setText(svo.patientId);
 							col.setVisible(true);
 							
-							var data = [];
 							for ( var key in ref.phenotypeStore ) {
 								var phenSummary = ref.phenotypeStore[key];
 								var subjectPhenotype = vos[phenSummary.name];
@@ -292,6 +291,10 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			}
 		});
 
+	},
+	
+	viewNeurocartaGenes : function(uri){
+		ASPIREdb.view.NeurocartaGeneWindow.initGridAndShow(uri);
 	}
 
 });
