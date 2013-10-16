@@ -160,6 +160,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
         this.previousChromosome = null;
     },
     
+    //Needed because chrome uses offsetX in its event and firefox uses something else
     getOffset : function (evt)
     {
     	if(evt.offsetX!=undefined)
