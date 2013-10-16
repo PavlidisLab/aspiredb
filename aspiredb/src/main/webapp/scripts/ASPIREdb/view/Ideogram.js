@@ -66,79 +66,80 @@ Ext.define('ASPIREdb.view.Ideogram', {
     },
 
     /**
-     * @private
-     * @type {PropertyValueObject}
-     */
+	 * @private
+	 * @type {PropertyValueObject}
+	 */
     displayedProperty: null,
 
     /**
-     * @private
-     * @type {VariantValueObject[]}
-     */
+	 * @private
+	 * @type {VariantValueObject[]}
+	 */
     variants: null,
 
     /**
-     * @private
-     * @type {ColourLegend }
-     */
+	 * @private
+	 * @type {ColourLegend }
+	 */
     colourLegend: null,
 
     /**
-     * @private
-     * @type {CanvasRenderingContext2D}
-     */
+	 * @private
+	 * @type {CanvasRenderingContext2D}
+	 */
     ctx: null,
 
     /**
-     * @private
-     * @type {CanvasRenderingContext2D}
-     */
+	 * @private
+	 * @type {CanvasRenderingContext2D}
+	 */
     ctxOverlay: null,
 
     /**
-     * @private
-     * @type {number}
-     */
+	 * @private
+	 * @type {number}
+	 */
     zoom: 1,
 
     /**
-     * @private
-     */
+	 * @private
+	 */
     boxHeight: 700,
 
     /**
-     * bases per pixel
-     * @private
-     * @type {number}
-     */
+	 * bases per pixel
+	 * 
+	 * @private
+	 * @type {number}
+	 */
     displayScaleFactor: 0,
 
     /**
-     * @private
-     */
+	 * @private
+	 */
     doneDrawing: false,
 
     /**
-     * @private
-     * @type {Object.<string, ChromosomeValueObject>}
-     */
+	 * @private
+	 * @type {Object.<string, ChromosomeValueObject>}
+	 */
     chromosomeValueObjects: {},
 
     /**
-     * @private
-     * @type {Object.<string, ChromosomeIdeogram>}
-     */
+	 * @private
+	 * @type {Object.<string, ChromosomeIdeogram>}
+	 */
     chromosomeIdeograms: {},
 
     /**
-     * @private
-     * @type {ChromosomeIdeogram}
-     */
+	 * @private
+	 * @type {ChromosomeIdeogram}
+	 */
     previousChromosome: null,
 
     /**
-     * @private
-     */
+	 * @private
+	 */
     registerMouseEventListeners: function() {
         var me = this;
         var canvasBoxOverlay = me.getComponent("canvasBoxOverlay");
@@ -158,6 +159,27 @@ Ext.define('ASPIREdb.view.Ideogram', {
         }
         this.previousChromosome = null;
     },
+    
+    getOffset : function (evt)
+    {
+    	if(evt.offsetX!=undefined)
+    		return {x:evt.offsetX,y:evt.offsetY};
+     
+    	var el = evt.target;
+    	var offset = {x:0,y:0};
+     
+    	while(el.offsetParent)
+    	{
+    		offset.x+=el.offsetLeft;
+    		offset.y+=el.offsetTop;
+    		el = el.offsetParent;
+    	}
+     
+    	offset.x = evt.pageX - offset.x;
+    	offset.y = evt.pageY - offset.y;
+     
+    return offset;
+    },
 
     /**
      */
@@ -165,19 +187,21 @@ Ext.define('ASPIREdb.view.Ideogram', {
         if (!this.doneDrawing) return;
 
         // Determine chromosome we are in.
-        var x = event.browserEvent.offsetX;
-        var y = event.browserEvent.offsetY;
-        /*ChromosomeIdeogram */
-        var chromosomeIdeogram = this.findChromosomeIdeogram(x, y);
+        
+        var offset = this.getOffset(event.browserEvent);
+        
+        /* ChromosomeIdeogram */
+        var chromosomeIdeogram = this.findChromosomeIdeogram(offset.x, offset.y);
 
-        // If we moved from one chromosome to another, clear cursor from the previous one.
+        // If we moved from one chromosome to another, clear cursor from the
+		// previous one.
         if (chromosomeIdeogram !== null) {
             if (this.previousChromosome !== null) {
                 if (this.previousChromosome  !== chromosomeIdeogram) {
                     this.previousChromosome.clearCursor();
                 }
             }
-            chromosomeIdeogram.drawCursor(y);
+            chromosomeIdeogram.drawCursor(offset.y);
         } else {
             if (this.previousChromosome !== null) {
                 this.previousChromosome.clearCursor();
@@ -192,9 +216,8 @@ Ext.define('ASPIREdb.view.Ideogram', {
         if (!this.doneDrawing) return;
 
         // Determine chromosome
-        var x = event.browserEvent.offsetX;
-        var y = event.browserEvent.offsetY;
-        var chromosomeIdeogram = this.findChromosomeIdeogram(x, y);
+        var offset = this.getOffset(event.browserEvent);
+        var chromosomeIdeogram = this.findChromosomeIdeogram(offset.x, offset.y);
 
         if (chromosomeIdeogram !== null) {
             for (var chromosomeName in this.chromosomeIdeograms )
@@ -203,24 +226,22 @@ Ext.define('ASPIREdb.view.Ideogram', {
                 otherChromosomeIdeogram.clearCursor();
                 otherChromosomeIdeogram.clearSelection();
             }
-            chromosomeIdeogram.startSelection(y);
+            chromosomeIdeogram.startSelection(offset.y);
         }
     },
 
     /**
-     * @public
-     * MouseUpEvent
-     */
+	 * @public MouseUpEvent
+	 */
     onMouseUp: function (event) {
         if (!this.doneDrawing) return;
 
         // Determine chromosome
-        var x = event.browserEvent.offsetX;
-        var y = event.browserEvent.offsetY;
-        /*ChromosomeIdeogram */
-        var chromosomeIdeogram = this.findChromosomeIdeogram(x, y);
+        var offset = this.getOffset(event.browserEvent);
+        /* ChromosomeIdeogram */
+        var chromosomeIdeogram = this.findChromosomeIdeogram(offset.x, offset.y);
         if (chromosomeIdeogram !== null) {
-            chromosomeIdeogram.finishSelection(y);
+            chromosomeIdeogram.finishSelection(offset.y);
             
             var selection = chromosomeIdeogram.getSelection();
             this.fireEvent('GenomeRegionSelectionEvent', selection);
@@ -228,40 +249,43 @@ Ext.define('ASPIREdb.view.Ideogram', {
     },
 
     /**
-     * @public
-     * @param {VariantValueObject[]} variants
-     */
+	 * @public
+	 * @param {VariantValueObject[]}
+	 *            variants
+	 */
     setVariants: function (variants) {
         this.variants = variants;
     },
 
     /**
-     * @public
-     * @return {VariantValueObject[]}
-     */
+	 * @public
+	 * @return {VariantValueObject[]}
+	 */
     getVariants: function () {
         return this.variants;
     },
 
     /**
-     * @public
-     */
+	 * @public
+	 */
     showColourLegend: function () {
         this.colourLegend.show();
     },
 
     /**
-     * @public
-     */
+	 * @public
+	 */
     hideColourLegend: function () {
         this.colourLegend.hide();
     },
 
     /**
-     * TODO: update callers (zoom() -> changeZoom())
-     * @public
-     * @param {number} newZoom
-     */
+	 * TODO: update callers (zoom() -> changeZoom())
+	 * 
+	 * @public
+	 * @param {number}
+	 *            newZoom
+	 */
     changeZoom: function (newZoom) {
         this.zoom = newZoom;
         this.width = Math.round(850 * this.zoom);
@@ -270,26 +294,30 @@ Ext.define('ASPIREdb.view.Ideogram', {
     },
 
     /**
-     * TODO: once service is exposed through DWR
-     * @public
-     */
+	 * TODO: once service is exposed through DWR
+	 * 
+	 * @public
+	 */
     fetchChromosomeInfo: function () {
-        //TODO: fixme
+        // TODO: fixme
         var ChromosomeService = {getChromosomes:function(cb){}};
         ChromosomeService.getChromosomes({
             onFailure: function (error) {
                 // throw new ChromosomeServiceException;
             },
 
-            onSuccess: function (/*@type {Object.<string, ChromosomeValueObject>}*/ result) {
+            onSuccess: function (/*
+									 * @type {Object.<string,
+									 * ChromosomeValueObject>}
+									 */ result) {
                 this.chromosomeValueObjects = result;
             }
         });
     },
 
     /**
-     * @private
-     */
+	 * @private
+	 */
     initChromosomeIdeograms: function () {
         var longestChromosome = 250000000; // longest chromosome (# bases)
         var displayScaleFactor = Math.round(longestChromosome / ( this.height - 30 ));
@@ -302,11 +330,11 @@ Ext.define('ASPIREdb.view.Ideogram', {
             var name = chromosomeOrder[index];
             /* ChromosomeValueObject */
             var chromosomeInfo = this.chromosomeValueObjects[name];
-            /*Map < String, ChromosomeBand > */
+            /* Map < String, ChromosomeBand > */
             var size = chromosomeInfo.size;
             var centromereLocation = chromosomeInfo.centromereLocation;
             var leftX = Math.round(5 + index * 35 * this.zoom);
-            /*ChromosomeIdeogram */
+            /* ChromosomeIdeogram */
             var chromosomeIdeogram = new ChromosomeIdeogram
                 (name, size, centromereLocation, topY, leftX, displayScaleFactor,
                     this.ctx, this.ctxOverlay, chromosomeInfo, this.zoom);
@@ -314,8 +342,8 @@ Ext.define('ASPIREdb.view.Ideogram', {
         }
     },
     /**
-     * @private
-     */
+	 * @private
+	 */
     initCanvasSize: function () {
         var canvasBox = this.getComponent("canvasBox");
         var overlayCanvasBox = this.getComponent("canvasBoxOverlay");
@@ -323,7 +351,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
         this.ctx = canvasBox.getEl().dom.getContext('2d');
         this.ctxOverlay = overlayCanvasBox.getEl().dom.getContext('2d');
 
-        canvasBox.getEl().dom.height = this.height; //+ "px";
+        canvasBox.getEl().dom.height = this.height; // + "px";
         canvasBox.getEl().dom.width = this.width; // + "px";
 
         overlayCanvasBox.getEl().dom.height = this.height;// + "px";
@@ -334,9 +362,9 @@ Ext.define('ASPIREdb.view.Ideogram', {
     },
 
     /**
-     * @private
-     * @return ChromosomeIdeogram
-     */
+	 * @private
+	 * @return ChromosomeIdeogram
+	 */
     findChromosomeIdeogram: function (x, y) {
         if (x < 5) return null;
         var name;
@@ -351,7 +379,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
             name = index;
         }
 
-        /*ChromosomeIdeogram */
+        /* ChromosomeIdeogram */
         var chromosomeIdeogram = this.chromosomeIdeograms[name];
         var padding = 4;
         if (chromosomeIdeogram.getTopY() - padding > y) return null;
@@ -361,28 +389,33 @@ Ext.define('ASPIREdb.view.Ideogram', {
     },
 
     /**
-     * @private
-     * @param {VariantValueObject[]} variantValueObjects
-     */
+	 * @private
+	 * @param {VariantValueObject[]}
+	 *            variantValueObjects
+	 */
     drawVariants: function (variantValueObjects) {
-        /*List<VariantValueObject> */
+        /* List<VariantValueObject> */
         var variants = variantValueObjects.slice(); // make a copy
         this.sortVariantsBySize(variants);
         for (var i = 0; i < variants.length; i++) {
             var variant = variants[i];
             var chrName = variant.genomicRange.chromosome;
-            /*ChromosomeIdeogram */
+            /* ChromosomeIdeogram */
             var chrIdeogram = this.chromosomeIdeograms[chrName];
             chrIdeogram.drawVariant(variant, this.displayedProperty);
         }
     },
 
     /**
-     * @private
-     * @param {VariantValueObject[]} variants
-     */
+	 * @private
+	 * @param {VariantValueObject[]}
+	 *            variants
+	 */
     sortVariantsBySize: function (variants) {
-        variants.sort(function compare(/*@type VariantValueObject*/ variant1, /*@type VariantValueObject*/ variant2) {
+        variants.sort(function compare(/* @type VariantValueObject */ variant1, /*
+																				 * @type
+																				 * VariantValueObject
+																				 */ variant2) {
             var size1 = variant1.genomicRange.baseEnd - variant1.genomicRange.baseStart;
             var size2 = variant2.genomicRange.baseEnd - variant2.genomicRange.baseStart;
             return size2 - size1;
@@ -390,19 +423,20 @@ Ext.define('ASPIREdb.view.Ideogram', {
     },
 
     /**
-     * @private
-     * @param subjectId
-     * @param {VariantValueObject[]} variantValueObjects
-     */
+	 * @private
+	 * @param subjectId
+	 * @param {VariantValueObject[]}
+	 *            variantValueObjects
+	 */
     drawVariantsWithSubjectHighlighted: function (subjectId, variantValueObjects) {
-        /*List<VariantValueObject>*/
+        /* List<VariantValueObject> */
         var variants = variantValueObjects.slice(); // copy array
         this.sortVariantsBySize( variants );
 
         for (var i = 0; i < variants.length; i++) {
             var variant = variants[i];
             var chrName = variant.genomicRange.chromosome;
-            /*ChromosomeIdeogram*/
+            /* ChromosomeIdeogram */
             var chrIdeogram = this.chromosomeIdeograms[chrName];
             if (variant.subjectId === subjectId) {
                 chrIdeogram.drawHighlightedVariant( variant, this.displayedProperty );
@@ -413,25 +447,26 @@ Ext.define('ASPIREdb.view.Ideogram', {
     },
 
     /**
-     * @public
-     * @param {PropertyValueObject} displayedProperty
-     */
+	 * @public
+	 * @param {PropertyValueObject}
+	 *            displayedProperty
+	 */
     setDisplayedProperty: function (displayedProperty) {
         this.displayedProperty = displayedProperty;
         ASPIREdb.view.ideogram.VariantLayer.resetDisplayProperty();
     },
 
     /**
-     * @public
-     * @return {Object.<string,string>}
-     */
+	 * @public
+	 * @return {Object.<string,string>}
+	 */
     getColourLegend: function () {
         return ASPIREdb.view.ideogram.VariantLayer.valueToColourMap;
     },
 
     /**
-     * @public
-     */
+	 * @public
+	 */
     redraw: function () {
         this.drawChromosomes();
         this.drawVariants(variants);
@@ -439,8 +474,8 @@ Ext.define('ASPIREdb.view.Ideogram', {
     },
 
     /**
-     * @private
-     */
+	 * @private
+	 */
     drawChromosomes: function () {
         this.doneDrawing = false;
 
@@ -457,11 +492,12 @@ Ext.define('ASPIREdb.view.Ideogram', {
     },
 
     /**
-     * @public
-     * @param {Array} variants
-     * @param subjectId
-     */
-    highlightSubject: function (/*Long*/ subjectId, /*List<VariantValueObject>*/ variants) {
+	 * @public
+	 * @param {Array}
+	 *            variants
+	 * @param subjectId
+	 */
+    highlightSubject: function (/* Long */ subjectId, /* List<VariantValueObject> */ variants) {
         this.doneDrawing = false;
         this.initCanvasSize();
 
@@ -472,16 +508,16 @@ Ext.define('ASPIREdb.view.Ideogram', {
     },
 
     /**
-     * @public
-     */
+	 * @public
+	 */
     removeHighlight: function () {
         this.redraw();
     },
 
     /**
-     * @public
-     * @return GenomicRange
-     */
+	 * @public
+	 * @return GenomicRange
+	 */
     getSelection: function () {
         for (var chromosomeName in this.chromosomeIdeograms) {
             if (this.chromosomeIdeograms.hasOwnProperty(chromosomeName)) {
@@ -495,8 +531,8 @@ Ext.define('ASPIREdb.view.Ideogram', {
     },
 
     /**
-     * @public
-     */
+	 * @public
+	 */
     deselectAll: function () {
         for (var chromosomeName in this.chromosomeIdeograms ) {
             var chromosomeIdeogram = this.chromosomeIdeograms[chromosomeName];
@@ -505,16 +541,16 @@ Ext.define('ASPIREdb.view.Ideogram', {
     },
 
     /**
-     * @public
-     */
+	 * @public
+	 */
     setWidth: function (width) {
         this.width = width;
     },
 
     /**
-     * @public
-     * @param height
-     */
+	 * @public
+	 * @param height
+	 */
     setHeight: function (height) {
         this.boxHeight = height;
     }
