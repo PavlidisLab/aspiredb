@@ -340,7 +340,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
     findChromosomeIdeogram: function (x, y) {
         if (x < 5) return null;
         var name;
-        var index = Math.round((x - 5) / (35 * this.zoom) + 1);
+        var index = Math.round((x - 20) / (35 * this.zoom) + 1);
         if (index > 24) return null;
 
         if (index == 23) {
