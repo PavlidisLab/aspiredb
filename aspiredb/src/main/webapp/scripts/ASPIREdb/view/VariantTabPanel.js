@@ -213,17 +213,8 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	},
 	
 	viewGenesHandler : function() {
-
 		ASPIREdb.view.GeneHitsByVariantWindow.clearGridAndMask();
-		ASPIREdb.view.GeneHitsByVariantWindow.show();
-
-		GeneService.getGenesInsideVariants(this.getSelectedVariantIds(this.getVariantRecordSelection()), {
-			callback : function(vos) {
-				
-				ASPIREdb.view.GeneHitsByVariantWindow.populateGrid(vos);
-			}
-		});
-
+		ASPIREdb.view.GeneHitsByVariantWindow.initGridAndShow(this.getSelectedVariantIds(this.getVariantRecordSelection()));
 	},
 
 	viewInUCSCHandler : function() {

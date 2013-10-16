@@ -90,8 +90,8 @@ Ext.define('ASPIREdb.view.NeurocartaGeneWindow', {
 	},
 	
 	clearGridAndMask : function(){
-		ASPIREdb.view.GeneHitsByVariantWindow.getComponent('neurocartaGeneGrid').store.removeAll();
-		ASPIREdb.view.GeneHitsByVariantWindow.getComponent('neurocartaGeneGrid').setLoading(true);				
+		ASPIREdb.view.NeurocartaGeneWindow.getComponent('neurocartaGeneGrid').store.removeAll();
+		ASPIREdb.view.NeurocartaGeneWindow.getComponent('neurocartaGeneGrid').setLoading(true);				
 	}
 
 });

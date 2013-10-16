@@ -37,10 +37,27 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantWindow', {
 	} ],
 
 	initComponent : function() {
-		var ref = this;
-
+		
 		this.callParent();
 
+	},
+	
+	initGridAndShow : function(ids){
+		
+		var ref = this;
+		
+		var grid = ASPIREdb.view.GeneHitsByVariantWindow.getComponent('geneHitsByVariantGrid');
+		
+		ref.show();
+		grid.setLoading(true);
+		
+		GeneService.getGenesInsideVariants(ids, {
+			callback : function(vos) {
+				
+				ASPIREdb.view.GeneHitsByVariantWindow.populateGrid(vos);
+			}
+		});
+		
 	},
 
 	//VariantValueObject
