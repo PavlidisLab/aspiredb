@@ -41,7 +41,6 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	} ],
 
 	config : {
-
 		// selected subjects records in the grid
 		selectedVariants : []
 
@@ -133,6 +132,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 				currentlySelectedRecords = this.getIdeogramVariantRecordSelection();
 				
 			}else{
+				//newCard is the grid
 				currentlySelectedRecords = this.selectedVariants;
 			}
 			
@@ -162,6 +162,15 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					ref.remove('variantGrid', true);
 
 					grid.on('selectionchange', ref.selectionChangeHandler, ref);
+					
+					grid.on('show', function(){
+						
+						if (ref.newIdeogramLabel){
+							grid.store.sync();
+							grid.getView().refresh();
+							ref.newIdeogramLabel = undefined;
+						}
+					});
 
 					ref.add(grid);
 
@@ -335,8 +344,12 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 				var vo = this.getLabel();
 
+				var idsToLabel = [];
+				
+				idsToLabel = me.getSelectedVariantIds(me.getVariantRecordSelection());
+				
 				// store in database
-				VariantService.addLabel(me.getSelectedVariantIds(me.selectedVariants), vo, {
+				VariantService.addLabel(idsToLabel, vo, {
 					errorHandler : function(message) {
 						alert('Error adding variant label. ' + message);
 					},
@@ -354,15 +367,25 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 							existingLab.isShown = true;
 						}
 
+						var currentlySelectedRecords = me.getVariantRecordSelection();
+						
 						// update local store
-						for ( var i = 0; i < me.selectedVariants.length; i++) {							
-							var labelIds = me.selectedVariants[i].get('labelIds');
+						for ( var i = 0; i < currentlySelectedRecords.length; i++) {							
+							var labelIds = currentlySelectedRecords[i].get('labelIds');
 							labelIds.push(addedLabel.id);
 						}
-
-						// refresh grid
-						grid.store.sync();
-						grid.getView().refresh();
+						
+						
+						if (me.getActiveTab().itemId == 'ideogram'){
+							//refreshing grid doesn't work if it is not the active tab so set flag to refresh on grid 'show' event
+							me.newIdeogramLabel = true;
+							
+						}else{
+							// refresh grid
+							grid.store.sync();
+							grid.getView().refresh();
+						}
+						
 					}
 				});
 			},

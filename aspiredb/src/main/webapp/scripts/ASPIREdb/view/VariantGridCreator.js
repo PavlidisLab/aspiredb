@@ -47,7 +47,7 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 
 		for ( var i = 0; i < dataIndexes.length; i++) {
 
-			if (dataIndexes[i] == 'chromosome' || dataIndexes[i] == 'baseStart' || dataIndexes[i] == 'baseEnd' || dataIndexes[i] == 'indelLength') {
+			if ( dataIndexes[i] == 'baseStart' || dataIndexes[i] == 'baseEnd' || dataIndexes[i] == 'indelLength') {
 				fieldData.push({
 					name : dataIndexes[i],
 					type : 'int'
