@@ -120,11 +120,76 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		
 		//selection is GenomicRange{baseEnd, baseStart, chromosome}
 		this.getComponent('ideogram').on('GenomeRegionSelectionEvent', function(selection){
-			ref.selectionChangeHandler(null,ref.getVariantRecordSelection());
+			ref.ideogramSelectionChangeHandler(null,ref.getVariantRecordSelection());
 		});
 		
+		//activate/deactiveButtons based on activeTab
+		this.on('beforetabchange', function(tabPanel, newCard, oldCard, eOpts){
+			
+			var currentlySelectedRecords = [];
+			
+			if (newCard.itemId == 'ideogram'){
+				
+				currentlySelectedRecords = this.getIdeogramVariantRecordSelection();
+				
+			}else{
+				currentlySelectedRecords = this.selectedVariants;
+			}
+			
+			this.enableActionButtonsBySelectedRecords(currentlySelectedRecords);
+			
+		});
+
+	},
+	
+	filterSubmitHandler : function(filterConfigs) {
+
+		var ref = this;
+
+		VariantService.suggestProperties(function(properties) {
+
+			QueryService.queryVariants(filterConfigs, {
+				callback : function(pageLoad) {
+
+					var vvos = pageLoad.items;
+
+					var ideogram = ref.getComponent('ideogram');
+					ideogram.drawChromosomes();
+					ideogram.drawVariants(vvos);
+
+					var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid(vvos, properties);
+
+					ref.remove('variantGrid', true);
+
+					grid.on('selectionchange', ref.selectionChangeHandler, ref);
+
+					ref.add(grid);
+
+					var toolbar = ref.getDockedComponent('variantTabPanelToolbar');
+
+					toolbar.add(ref.actionsButton);
+					toolbar.add(ref.labelsButton);
+					toolbar.add(ref.saveButton);
+
+				}
+			});
+
+		});
+
+	},
+	
+	selectionChangeHandler : function(model, records) {
+
+		this.selectedVariants = records;
 		
+		this.enableActionButtonsBySelectedRecords(records);
 		
+
+	},
+	
+	ideogramSelectionChangeHandler : function(model, records) {
+		
+		this.enableActionButtonsBySelectedRecords(records);		
 
 	},
 
@@ -135,6 +200,20 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		if (grid) {
 			ASPIREdb.TextDataDownloadWindow.showVariantsDownload(grid.getStore().getRange(), grid.columnHeaders);
 		}
+
+	},
+	
+	viewGenesHandler : function() {
+
+		ASPIREdb.view.GeneHitsByVariantWindow.clearGridAndMask();
+		ASPIREdb.view.GeneHitsByVariantWindow.show();
+
+		GeneService.getGenesInsideVariants(this.getSelectedVariantIds(this.getVariantRecordSelection()), {
+			callback : function(vos) {
+				
+				ASPIREdb.view.GeneHitsByVariantWindow.populateGrid(vos);
+			}
+		});
 
 	},
 
@@ -171,57 +250,9 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		});
 
 	},
-
-	getSpanningGenomicRange : function(selectedVariants) {
-		if (!this.areOnSameChromosome(selectedVariants))
-			return;
-
-		var start = 2147483647;
-		var end = -2147483648;
-		var chromosome = selectedVariants[0].data.chromosome;
-		for ( var i = 0; i < selectedVariants.length; i++) {
-
-			var variant = selectedVariants[i].data;
-
-			if (variant.chromosome == chromosome) {
-				if (variant.baseStart < start)
-					start = variant.baseStart;
-				if (variant.baseEnd > end)
-					end = variant.baseEnd;
-			}
-		}
-
-		// Genomic Range
-		return {
-			chromosome : chromosome,
-			baseStart : start,
-			baseEnd : end
-		};
-
-	},
-
-	viewGenesHandler : function() {
-
-		ASPIREdb.view.GeneHitsByVariantWindow.clearGridAndMask();
-		ASPIREdb.view.GeneHitsByVariantWindow.show();
-
-		GeneService.getGenesInsideVariants(this.getSelectedVariantIds(this.getVariantRecordSelection()), {
-			callback : function(vos) {
-				
-				ASPIREdb.view.GeneHitsByVariantWindow.populateGrid(vos);
-			}
-		});
-
-	},
-
-	selectionChangeHandler : function(model, records) {
-
-		this.selectedVariants = records;
-
-		var grid = this.getComponent('variantGrid');
-		if (!grid)
-			return;
-
+	
+	enableActionButtonsBySelectedRecords : function(records){
+		
 		if (records.length > 0) {
 
 			this.down('#viewGenes').enable();
@@ -239,114 +270,52 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		} else {
 			this.down('#viewInUCSC').disable();
 		}
-
+		
 	},
-	
-	secondGenomicRangeIsWithinFirst : function(first, other) {
-        if (first.chromosome == other.chromosome) {
-            if (first.baseStart >= other.baseStart && first.baseEnd <= other.baseEnd) {
-                return true;
-            }
-        }
-        return false;
-    },
 	
 	getVariantRecordSelection : function() {
 		
 		if (this.getActiveTab().itemId == 'ideogram'){
 			
-			var ideogram = this.getComponent('ideogram');
-			
-			var ideogramGenomicRange = ideogram.getSelection();
-			
-			if (ideogramGenomicRange == null){
-				return [];
-			}
-			
-			var grid = this.getComponent('variantGrid');
-			
-			var records= grid.getStore().getRange();
-			
-			var variantRecordsInsideRange = [];
-			
-			for (var i = 0 ; i < records.length ; i++){
-				
-				var genomicRange = {chromosome : records[i].data.chromosome,
-									baseStart : records[i].data.baseStart,
-									baseEnd : records[i].data.baseEnd};
-				
-				if (this.secondGenomicRangeIsWithinFirst(genomicRange, ideogramGenomicRange )){
-					variantRecordsInsideRange.push(records[i]);
-				}
-				
-			}
-			
-			return variantRecordsInsideRange;
-			
+			return this.getIdeogramVariantRecordSelection();
 			
 		}else{
 			return this.selectedVariants;
 		}
 		
     },
-
-	areOnSameChromosome : function(records) {
-
-		if (records.length < 1)
-			return false;
-
-		var chromosome = records[0].data.chromosome;
-
-		for ( var i = 0; i < records.length; i++) {
-
-			var otherChromosome = records[i].data.chromosome;
-
-			if (chromosome !== otherChromosome) {
-				return false;
-			}
-
+    
+    getIdeogramVariantRecordSelection : function(){
+    	
+    	var ideogram = this.getComponent('ideogram');
+		
+		var ideogramGenomicRange = ideogram.getSelection();
+		
+		if (ideogramGenomicRange == null){
+			return [];
 		}
-
-		return true;
-
-	},
-
-	filterSubmitHandler : function(filterConfigs) {
-
-		var ref = this;
-
-		VariantService.suggestProperties(function(properties) {
-
-			QueryService.queryVariants(filterConfigs, {
-				callback : function(pageLoad) {
-
-					var vvos = pageLoad.items;
-
-					var ideogram = ref.getComponent('ideogram');
-					ideogram.drawChromosomes();
-					ideogram.drawVariants(vvos);
-
-					var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid(vvos, properties);
-
-					ref.remove('variantGrid', true);
-
-					grid.on('selectionchange', ref.selectionChangeHandler, ref);
-
-					ref.add(grid);
-
-					var toolbar = ref.getDockedComponent('variantTabPanelToolbar');
-
-					toolbar.add(ref.actionsButton);
-					toolbar.add(ref.labelsButton);
-					toolbar.add(ref.saveButton);
-
-				}
-			});
-
-		});
-
-	},
-
+		
+		var grid = this.getComponent('variantGrid');
+		
+		var records= grid.getStore().getRange();
+		
+		var variantRecordsInsideRange = [];
+		
+		for (var i = 0 ; i < records.length ; i++){
+			
+			var genomicRange = {chromosome : records[i].data.chromosome,
+								baseStart : records[i].data.baseStart,
+								baseEnd : records[i].data.baseEnd};
+			
+			if (this.secondGenomicRangeIsWithinFirst(genomicRange, ideogramGenomicRange )){
+				variantRecordsInsideRange.push(records[i]);
+			}
+			
+		}
+		
+		return variantRecordsInsideRange;
+    	
+    },
 
 	/**
 	 * Assigns a Label
@@ -430,6 +399,64 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		}
 
 		return selectedVariantIds;
+	},
+	
+	areOnSameChromosome : function(records) {
+
+		if (records.length < 1)
+			return false;
+
+		var chromosome = records[0].data.chromosome;
+
+		for ( var i = 0; i < records.length; i++) {
+
+			var otherChromosome = records[i].data.chromosome;
+
+			if (chromosome !== otherChromosome) {
+				return false;
+			}
+
+		}
+
+		return true;
+
+	},
+	
+	secondGenomicRangeIsWithinFirst : function(first, other) {
+        if (first.chromosome == other.chromosome) {
+            if (first.baseStart >= other.baseStart && first.baseEnd <= other.baseEnd) {
+                return true;
+            }
+        }
+        return false;
+    },
+    
+    getSpanningGenomicRange : function(selectedVariants) {
+		if (!this.areOnSameChromosome(selectedVariants))
+			return;
+
+		var start = 2147483647;
+		var end = -2147483648;
+		var chromosome = selectedVariants[0].data.chromosome;
+		for ( var i = 0; i < selectedVariants.length; i++) {
+
+			var variant = selectedVariants[i].data;
+
+			if (variant.chromosome == chromosome) {
+				if (variant.baseStart < start)
+					start = variant.baseStart;
+				if (variant.baseEnd > end)
+					end = variant.baseEnd;
+			}
+		}
+
+		// Genomic Range
+		return {
+			chromosome : chromosome,
+			baseStart : start,
+			baseEnd : end
+		};
+
 	}
 
 });
