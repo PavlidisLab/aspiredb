@@ -4,7 +4,8 @@ Ext.require([
     'ASPIREdb.view.filter.AndFilterContainer',
     'ASPIREdb.view.filter.VariantFilterPanel',
     'ASPIREdb.view.filter.SubjectFilterPanel',
-    'ASPIREdb.view.filter.PhenotypeFilterPanel'
+    'ASPIREdb.view.filter.PhenotypeFilterPanel',
+    'ASPIREdb.view.SaveQueryWindow'
 ]);
 
 Ext.define('ASPIREdb.view.filter.FilterWindow', {
@@ -61,7 +62,13 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
                                 },
                                 {
                                     xtype: 'combo',
-                                    itemId: 'savedQueryComboBox'
+                                    itemId: 'savedQueryComboBox',
+                                    editable: false,
+                                    forceSelection: true,
+                                    value: 'FILTER_PLACEHOLDER',
+                                    store: [
+                                        ['QUERY_NAME_PLACEHOLDER', '<Query name>']
+                                    ]
                                 }
                             ]
                         }
@@ -153,7 +160,9 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
                                     xtype: 'button',
                                     flex: 2,
                                     text: 'Save query',
-                                    itemId: 'saveQueryButton'
+                                    itemId: 'saveQueryButton',
+                                    handler: me.saveQueryHandler,
+                                    scope: me
                                 },
                                 {
                                     xtype: 'button',
@@ -177,6 +186,10 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
             this.callParent();
             var filterTypeComboBox = this.down('#filterTypeComboBox');
             var filterContainer = this.down('#filterContainer');
+            
+            this.updateSavedQueryCombo();
+            
+            this.down('#savedQueryComboBox').on('select', this.savedQueryComboBoxSelectHandler,this);
 
             filterTypeComboBox.on('select', function (combo, records) {
                 var record = records[0];
@@ -185,6 +198,87 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
                 );
                 filterTypeComboBox.setValue('FILTER_PLACEHOLDER');
             });
+            
+            
+            ASPIREdb.view.SaveQueryWindow.on('new_query_saved', this.updateSavedQueryCombo, this);
+        },
+        
+        savedQueryComboBoxSelectHandler : function(combo, records, eOpts){
+        	
+        	if (combo.getValue()=='') return;
+        	
+        	QueryService.loadQuery(combo.getValue(),{callback: function(filters){
+        		
+        		//TODO load filters into widget
+        		
+        		//for (var i = 0; i <filters.length; i++){
+        			
+        		//}        		
+        		
+        		/*
+        		filterContainer.clear();
+            	for (RestrictionFilterConfig filterConfig: selectedQuery.getQuery()) {
+            		FilterWidget filterWidget = null;
+            		
+            		if (filterConfig instanceof PhenotypeFilterConfig) {
+            			filterWidget = new PhenotypeFilterWidget();
+            		} else if (filterConfig instanceof SubjectFilterConfig) {
+            			filterWidget = new SubjectFilterWidget(subjectProperties);
+            		} else if (filterConfig instanceof VariantFilterConfig) {
+            			filterWidget = new VariantFilterWidget(variantProperties, variantLocationProperties);
+            		}
+            		
+            		if (filterWidget != null) {
+            	    	filterWidget.addRemoveMeHandler( new RemoveMeHandler() {
+            				@Override
+            				public void onRemoveMe( RemoveMeEvent event ) {
+            					filterContainer.remove( event.getWidget() );
+                                aspiredb.EVENT_BUS.fireEvent(new QueryUpdateEvent());
+            				}    		
+            	    	});
+            			filterWidget.setFilterConfig(filterConfig);
+            			filterContainer.add(filterWidget);
+            		}
+            	}
+
+                aspiredb.EVENT_BUS.fireEvent(new QueryUpdateEvent());
+        		*/
+    			
+        		
+    			
+    		}});
+        	        	
+        	
+        },
+        
+        updateSavedQueryCombo : function(){
+        	
+        	
+        	var savedQueryComboBox = this.down('#savedQueryComboBox');
+        	
+        	QueryService.getSavedQueryNames({callback: function(names){
+    			
+        		var storedata= [
+                                ['QUERY_NAME_PLACEHOLDER', '<Query name>']
+                                ];
+        		
+        		for (var i = 0 ; i<names.length ; i++){
+        			
+        			storedata.push([names[i],names[i]]);
+        			
+        		}
+        		
+    			savedQueryComboBox.getStore().loadData(storedata);
+    			
+    		}});
+        	
+        	
+        },
+        
+        saveQueryHandler: function(){
+        	
+        	ASPIREdb.view.SaveQueryWindow.initAndShow(this.getFilterConfigs());       	
+        	
         },
 
         getFilterConfigs: function () {

@@ -62,7 +62,6 @@ import ubc.pavlab.aspiredb.shared.query.GeneProperty;
 import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
 import ubc.pavlab.aspiredb.shared.query.NeurocartaPhenotypeProperty;
 import ubc.pavlab.aspiredb.shared.query.Property;
-import ubc.pavlab.aspiredb.shared.query.QueryValueObject;
 import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.restriction.Junction;
 import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
@@ -422,46 +421,56 @@ public class QueryServiceImpl implements QueryService {
 
     @Override
     @Transactional
-    public QueryValueObject saveQuery(QueryValueObject queryVO) {
-        final List<Query> queries = queryDao.findByName(queryVO.getName());
+    @RemoteMethod
+    public Long saveQuery(String name,Set<AspireDbFilterConfig> filters) {
+        final List<Query> queries = queryDao.findByName(name);
         Query savedQuery;
         if (queries.isEmpty()) {
-            Query query = new Query(queryVO.getName(), (Serializable) queryVO.getQuery());
+            Query query = new Query(name, (Serializable) filters);
             savedQuery = queryDao.create( query );
         } else if (queries.size() == 1) {
             Query query = queries.iterator().next();
-            query.setObject((Serializable) queryVO.getQuery());
+            query.setObject((Serializable) filters);
             queryDao.update(query);
             savedQuery = query;
         } else {
             throw new IllegalStateException("Found more than one saved query with same name belonging to one user.");
         }
-        return savedQuery.toValueObject();
+        return savedQuery.getId();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     @Transactional
-    public QueryValueObject loadQuery(Long id) {
-        Query query = queryDao.load(id);
-        return query.toValueObject();
-    }
-
-    @Override
-    public Collection<QueryValueObject> getSavedQueries() throws NotLoggedInException{
+    @RemoteMethod
+    public Set<AspireDbFilterConfig> loadQuery(String name) {
+        List<Query> querys = queryDao.findByName( name );
         
-        Collection<Query> queries = queryDao.loadAll();
-        Collection<QueryValueObject> queryVOs = new ArrayList<QueryValueObject>();
-        for (Query query : queries) {
-            queryVOs.add( query.toValueObject() );
-        }
-        return queryVOs;
+        //should only be one for one user
+        return (Set<AspireDbFilterConfig>) querys.iterator().next().getObject();
     }
+    
+    @Override
+    @RemoteMethod
+    public Collection<String> getSavedQueryNames() {
+        
+        
+        Collection<String> queryNames = new ArrayList<String>();
+        Collection<Query> queries = queryDao.loadAll();
+        
+        for (Query query : queries) {
+            queryNames.add( query.getName() );
+        }
+        return queryNames;
+    }
+
+    
 
     @Override
     @Transactional
-    public void deleteQuery(QueryValueObject query) {
-        Query queryEntity = queryDao.load(query.getId());
-        queryDao.remove(queryEntity);
+    public void deleteQuery(String name) {
+        List<Query> querys = queryDao.findByName( name );       
+        queryDao.remove(querys.iterator().next());
     }
 
     private void addGenomicLocations(RestrictionExpression restrictionExpression)

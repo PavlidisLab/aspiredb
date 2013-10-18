@@ -22,7 +22,6 @@ import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.shared.*;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.Property;
-import ubc.pavlab.aspiredb.shared.query.QueryValueObject;
 import ubc.pavlab.aspiredb.shared.suggestions.PhenotypeSuggestion;
 
 import java.util.Collection;
@@ -65,13 +64,13 @@ public interface QueryService {
 	
 	public List<SubjectValueObject> getSubjects(List<String> subjectIds);
 
-    public QueryValueObject saveQuery(QueryValueObject queryVO);
+    public Long saveQuery(String name,Set<AspireDbFilterConfig> filters);
 
-    public QueryValueObject loadQuery(Long id);
+    public Set<AspireDbFilterConfig> loadQuery(String name);
+    
+    public Collection<String> getSavedQueryNames();
 
-    public Collection<QueryValueObject> getSavedQueries() throws NotLoggedInException;
-
-    public void deleteQuery(QueryValueObject query);
+    public void deleteQuery(String name);
 
 //    // TODO: To be removed
 //    @Deprecated

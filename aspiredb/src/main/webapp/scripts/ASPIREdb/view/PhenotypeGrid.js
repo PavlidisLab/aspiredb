@@ -60,7 +60,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			itemId : 'analyzeButton'
 
 		},{			
-			id : 'saveButton',
+			itemId : 'saveButton',
 			xtype : 'button',
 			text : '',
 			tooltip : 'Download table contents as text',
@@ -232,8 +232,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		ASPIREdb.TextDataDownloadWindow.setLoading(false);
 		ASPIREdb.TextDataDownloadWindow.showPhenotypesDownload(text);		
 	},
-
-	// TODO this will have to change when we get around to prettying up the grid
+	
 	getSubjectValue : function(phenSummary) {
 
 		var valueToSubjectSet = phenSummary.dbValueToSubjectSet;
