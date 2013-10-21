@@ -83,9 +83,9 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
                         type: 'vbox'
                     },
                     items: [
-                        {
-                            xtype: 'filter_variant'
-                        }
+                       // {
+                      //      xtype: 'filter_variant'
+                       // }
                     ]
                 },
                 {
@@ -168,13 +168,17 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
                                     xtype: 'button',
                                     flex: 1,
                                     text: 'Clear',
-                                    itemId: 'clearButton'
+                                    itemId: 'clearButton',
+                                    handler: me.clearButtonHandler,
+                                    scope: me
                                 },
                                 {
                                     xtype: 'button',
                                     flex: 1,
                                     text: 'Cancel',
-                                    itemId: 'cancelButton'
+                                    itemId: 'cancelButton',
+                                    handler: me.cancelButtonHandler,
+                                    scope: me
                                 }
                             ]
                         }
@@ -278,6 +282,19 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
         saveQueryHandler: function(){
         	
         	ASPIREdb.view.SaveQueryWindow.initAndShow(this.getFilterConfigs());       	
+        	
+        },
+        
+        cancelButtonHandler: function(){
+        	
+        	this.hide();      	
+        	
+        },
+        
+        clearButtonHandler: function(){
+        	
+        	this.down('#filterContainer').removeAll();
+        	  	
         	
         },
 
