@@ -48,6 +48,7 @@
 				<prop key="/dwr/**/*">dwrController</prop>
 				<prop key="/home.html">homeController</prop>
 				<prop key="/login.html">loginController</prop>
+				<prop key="/login_check.html">loginController</prop>
 			</props>
 		</property>
 	</bean>

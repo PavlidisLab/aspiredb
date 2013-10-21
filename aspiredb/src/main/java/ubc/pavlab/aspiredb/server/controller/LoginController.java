@@ -1,20 +1,43 @@
 package ubc.pavlab.aspiredb.server.controller;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
- 
+
+import ubc.pavlab.aspiredb.server.security.SecurityServiceImpl;
+import ubc.pavlab.aspiredb.server.security.authentication.JSONUtil;
+
 @Controller
 @RemoteProxy
-@RequestMapping("/login.html")
 public class LoginController {
- 
-	@RequestMapping(method = RequestMethod.GET)
-	public String showLogin(ModelMap model) { 		
-		return "login"; 
-	}
- 
+
+    @RequestMapping("/login.html")
+    public String showLogin( ModelMap model ) {
+        return "login";
+    }
+
+    @RequestMapping("/login_check.html")
+    public void loadUser( HttpServletRequest request, HttpServletResponse response ) throws IOException{
+
+        String jsonText = null;
+        
+        if ( !SecurityServiceImpl.isUserLoggedIn() ) {            
+            jsonText = "{success:false}";
+
+        } else {
+            jsonText = "{success:true}";
+        }
+
+        JSONUtil jsonUtil = new JSONUtil( request, response );
+        
+        jsonUtil.writeToResponse( jsonText );
+
+    }
+
 }

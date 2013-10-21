@@ -19,6 +19,35 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			aspireDbPanel.getComponent('topToolbar').getComponent('logoutForm').show();
 
 			ASPIREdb.view.DashboardWindow.show();
+			
+			
+			var runner = new Ext.util.TaskRunner();
+
+			// poll login_check page every minute
+			var task = runner.start({
+			    run: function() {
+			        Ext.Ajax.request({
+			            url: 'login_check.html',
+
+			            success: function(response){
+			                var json = Ext.JSON.decode(response.responseText);
+
+			                // is we are logged out then redirect to login page
+			                if (!json.success) {
+			                    runner.destroy();
+			                    
+			                    Ext.Msg.alert("You have been logged out","You have been logged out due to inactivity, please login again.", function(){
+			                    	location.href = "/aspiredb/home.html";
+			                    });
+			                   
+			                }
+			            }
+			        });
+			    },
+			    interval: 60000
+			});
+
+
 
 		});
 
