@@ -22,6 +22,13 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilterPanel', {
         config.restriction = phenotypeFilterContainer.getRestrictionExpression();
         return config;
     },
+    
+    setFilterConfig: function(config) {
+        
+        var phenotypeFilterContainer = this.down('#phenotypeFilterContainer');
+        phenotypeFilterContainer.setRestrictionExpression(config.restriction);
+        
+    },
 
     initComponent: function () {
         this.callParent();

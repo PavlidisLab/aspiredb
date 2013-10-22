@@ -16,7 +16,7 @@ Ext.define('ASPIREdb.view.filter.SubjectFilterPanel', {
         filterItemType: 'ASPIREdb.view.filter.PropertyFilter',
         suggestValuesRemoteFunction: SubjectService.suggestValues,
         propertyStore: {
-            autoLoad: true,
+            autoLoad: false,
             proxy : {
                 type: 'dwr',
                 dwrFunction : SubjectService.suggestProperties,
@@ -35,6 +35,13 @@ Ext.define('ASPIREdb.view.filter.SubjectFilterPanel', {
         var subjectFilterContainer = this.getComponent('subjectFilterContainer');
         config.restriction = subjectFilterContainer.getRestrictionExpression();
         return config;
+    },
+    
+    setFilterConfig: function(config) {
+        
+        var subjectFilterContainer = this.down('#subjectFilterContainer');
+        subjectFilterContainer.setRestrictionExpression(config.restriction);
+        
     },
 
     initComponent: function () {

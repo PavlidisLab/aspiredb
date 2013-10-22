@@ -19,35 +19,32 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			aspireDbPanel.getComponent('topToolbar').getComponent('logoutForm').show();
 
 			ASPIREdb.view.DashboardWindow.show();
-			
-			
+
 			var runner = new Ext.util.TaskRunner();
 
 			// poll login_check page every minute
 			var task = runner.start({
-			    run: function() {
-			        Ext.Ajax.request({
-			            url: 'login_check.html',
+				run : function() {
+					Ext.Ajax.request({
+						url : 'login_check.html',
 
-			            success: function(response){
-			                var json = Ext.JSON.decode(response.responseText);
+						success : function(response) {
+							var json = Ext.JSON.decode(response.responseText);
 
-			                // is we are logged out then redirect to login page
-			                if (!json.success) {
-			                    runner.destroy();
-			                    
-			                    Ext.Msg.alert("You have been logged out","You have been logged out due to inactivity, please login again.", function(){
-			                    	location.href = "/aspiredb/home.html";
-			                    });
-			                   
-			                }
-			            }
-			        });
-			    },
-			    interval: 60000
+							// is we are logged out then redirect to login page
+							if (!json.success) {
+								runner.destroy();
+
+								Ext.Msg.alert("You have been logged out", "You have been logged out due to inactivity, please login again.", function() {
+									location.href = "/aspiredb/home.html";
+								});
+
+							}
+						}
+					});
+				},
+				interval : 60000
 			});
-
-
 
 		});
 
@@ -90,7 +87,7 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 		layout : 'column',
 		items : [ {
 			xtype : 'component',
-			margin: '5 5 5 5',
+			margin : '5 5 5 5',
 			autoEl : {
 				tag : 'img',
 				src : 'scripts/ASPIREdb/resources/images/aspiredb-logo-smaller.png'
@@ -100,7 +97,7 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			text : 'Filter...',
 			itemId : 'filterButton',
 			height : 30,
-			margin: '5 5 5 5',
+			margin : '5 5 5 5',
 			handler : function() {
 				ASPIREdb.view.filter.FilterWindow.show();
 			}
@@ -109,7 +106,7 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			text : 'Clear filter',
 			itemId : 'clearFilterButton',
 			height : 30,
-			margin: '5 5 5 5',
+			margin : '5 5 5 5',
 			handler : function() {
 				var filterConfigs = [];
 				var activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
@@ -123,7 +120,7 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			text : 'Dashboard',
 			itemId : 'dashboardButton',
 			height : 30,
-			margin: '5 5 5 5',
+			margin : '5 5 5 5',
 			handler : function() {
 				ASPIREdb.view.DashboardWindow.show();
 			}
@@ -131,25 +128,25 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			xtype : 'button',
 			text : 'Help',
 			itemId : 'helpButton',
-			margin: '5 5 5 5',
+			margin : '5 5 5 5',
 			height : 30
 		}, {
 			xtype : 'button',
 			text : 'Logout',
 			itemId : 'logoutButton',
 			height : 30,
-			margin: '5 5 5 5',
+			margin : '5 5 5 5',
 			handler : function() {
 
 				window.location.href = 'j_spring_security_logout';
-				
+
 			}
 		}, {
 			xtype : 'container',
 			itemId : 'logoutForm',
 			hidden : true,
 			layout : 'hbox',
-			items : [  {
+			items : [ {
 				xtype : 'button',
 				text : 'Admin Tools',
 				itemId : 'adminToolsButton',

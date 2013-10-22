@@ -108,7 +108,8 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 		});
 
-		// adding buttons to toolbar in filterSubmitHandler with the grid because extJS was
+		// adding buttons to toolbar in filterSubmitHandler with the grid
+		// because extJS was
 		// bugging out when we added the dynamically created grid afterwords
 		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);
 
@@ -116,32 +117,32 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			ref.saveButtonHandler();
 
 		});
-		
-		//selection is GenomicRange{baseEnd, baseStart, chromosome}
-		this.getComponent('ideogram').on('GenomeRegionSelectionEvent', function(selection){
-			ref.ideogramSelectionChangeHandler(null,ref.getVariantRecordSelection());
+
+		// selection is GenomicRange{baseEnd, baseStart, chromosome}
+		this.getComponent('ideogram').on('GenomeRegionSelectionEvent', function(selection) {
+			ref.ideogramSelectionChangeHandler(null, ref.getVariantRecordSelection());
 		});
-		
-		//activate/deactiveButtons based on activeTab
-		this.on('beforetabchange', function(tabPanel, newCard, oldCard, eOpts){
-			
+
+		// activate/deactiveButtons based on activeTab
+		this.on('beforetabchange', function(tabPanel, newCard, oldCard, eOpts) {
+
 			var currentlySelectedRecords = [];
-			
-			if (newCard.itemId == 'ideogram'){
-				
+
+			if (newCard.itemId == 'ideogram') {
+
 				currentlySelectedRecords = this.getIdeogramVariantRecordSelection();
-				
-			}else{
-				//newCard is the grid
+
+			} else {
+				// newCard is the grid
 				currentlySelectedRecords = this.selectedVariants;
 			}
-			
+
 			this.enableActionButtonsBySelectedRecords(currentlySelectedRecords);
-			
+
 		});
 
 	},
-	
+
 	filterSubmitHandler : function(filterConfigs) {
 
 		var ref = this;
@@ -162,10 +163,10 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					ref.remove('variantGrid', true);
 
 					grid.on('selectionchange', ref.selectionChangeHandler, ref);
-					
-					grid.on('show', function(){
-						
-						if (ref.newIdeogramLabel){
+
+					grid.on('show', function() {
+
+						if (ref.newIdeogramLabel) {
 							grid.store.sync();
 							grid.getView().refresh();
 							ref.newIdeogramLabel = undefined;
@@ -186,19 +187,18 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		});
 
 	},
-	
+
 	selectionChangeHandler : function(model, records) {
 
 		this.selectedVariants = records;
-		
+
 		this.enableActionButtonsBySelectedRecords(records);
-		
 
 	},
-	
+
 	ideogramSelectionChangeHandler : function(model, records) {
-		
-		this.enableActionButtonsBySelectedRecords(records);		
+
+		this.enableActionButtonsBySelectedRecords(records);
 
 	},
 
@@ -211,7 +211,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		}
 
 	},
-	
+
 	viewGenesHandler : function() {
 		ASPIREdb.view.GeneHitsByVariantWindow.clearGridAndMask();
 		ASPIREdb.view.GeneHitsByVariantWindow.initGridAndShow(this.getSelectedVariantIds(this.getVariantRecordSelection()));
@@ -250,9 +250,9 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		});
 
 	},
-	
-	enableActionButtonsBySelectedRecords : function(records){
-		
+
+	enableActionButtonsBySelectedRecords : function(records) {
+
 		if (records.length > 0) {
 
 			this.down('#viewGenes').enable();
@@ -270,52 +270,54 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		} else {
 			this.down('#viewInUCSC').disable();
 		}
-		
+
 	},
-	
+
 	getVariantRecordSelection : function() {
-		
-		if (this.getActiveTab().itemId == 'ideogram'){
-			
+
+		if (this.getActiveTab().itemId == 'ideogram') {
+
 			return this.getIdeogramVariantRecordSelection();
-			
-		}else{
+
+		} else {
 			return this.selectedVariants;
 		}
-		
-    },
-    
-    getIdeogramVariantRecordSelection : function(){
-    	
-    	var ideogram = this.getComponent('ideogram');
-		
+
+	},
+
+	getIdeogramVariantRecordSelection : function() {
+
+		var ideogram = this.getComponent('ideogram');
+
 		var ideogramGenomicRange = ideogram.getSelection();
-		
-		if (ideogramGenomicRange == null){
+
+		if (ideogramGenomicRange == null) {
 			return [];
 		}
-		
+
 		var grid = this.getComponent('variantGrid');
-		
-		var records= grid.getStore().getRange();
-		
+
+		var records = grid.getStore().getRange();
+
 		var variantRecordsInsideRange = [];
-		
-		for (var i = 0 ; i < records.length ; i++){
-			
-			var genomicRange = {chromosome : records[i].data.chromosome,
-								baseStart : records[i].data.baseStart,
-								baseEnd : records[i].data.baseEnd};
-			
-			if (this.secondGenomicRangeIsWithinFirst(genomicRange, ideogramGenomicRange )){
+
+		for ( var i = 0; i < records.length; i++) {
+
+			var genomicRange = {
+				chromosome : records[i].data.chromosome,
+				baseStart : records[i].data.baseStart,
+				baseEnd : records[i].data.baseEnd
+			};
+
+			if (this.secondGenomicRangeIsWithinFirst(genomicRange, ideogramGenomicRange)) {
 				variantRecordsInsideRange.push(records[i]);
 			}
-			
+
 		}
-		
+
 		return variantRecordsInsideRange;
-    	
-    },
+
+	},
 
 	/**
 	 * Assigns a Label
@@ -336,16 +338,16 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 				var vo = this.getLabel();
 
 				var idsToLabel = [];
-				
+
 				idsToLabel = me.getSelectedVariantIds(me.getVariantRecordSelection());
-				
+
 				// store in database
 				VariantService.addLabel(idsToLabel, vo, {
 					errorHandler : function(message) {
 						alert('Error adding variant label. ' + message);
 					},
 					callback : function(addedLabel) {
-						
+
 						var grid = me.down('#variantGrid');
 
 						addedLabel.isShown = true;
@@ -359,24 +361,25 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 						}
 
 						var currentlySelectedRecords = me.getVariantRecordSelection();
-						
+
 						// update local store
-						for ( var i = 0; i < currentlySelectedRecords.length; i++) {							
+						for ( var i = 0; i < currentlySelectedRecords.length; i++) {
 							var labelIds = currentlySelectedRecords[i].get('labelIds');
 							labelIds.push(addedLabel.id);
 						}
-						
-						
-						if (me.getActiveTab().itemId == 'ideogram'){
-							//refreshing grid doesn't work if it is not the active tab so set flag to refresh on grid 'show' event
+
+						if (me.getActiveTab().itemId == 'ideogram') {
+							// refreshing grid doesn't work if it is not the
+							// active tab so set flag to refresh on grid 'show'
+							// event
 							me.newIdeogramLabel = true;
-							
-						}else{
+
+						} else {
 							// refresh grid
 							grid.store.sync();
 							grid.getView().refresh();
 						}
-						
+
 					}
 				});
 			},
@@ -414,7 +417,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 		return selectedVariantIds;
 	},
-	
+
 	areOnSameChromosome : function(records) {
 
 		if (records.length < 1)
@@ -435,17 +438,17 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		return true;
 
 	},
-	
+
 	secondGenomicRangeIsWithinFirst : function(first, other) {
-        if (first.chromosome == other.chromosome) {
-            if (first.baseStart >= other.baseStart && first.baseEnd <= other.baseEnd) {
-                return true;
-            }
-        }
-        return false;
-    },
-    
-    getSpanningGenomicRange : function(selectedVariants) {
+		if (first.chromosome == other.chromosome) {
+			if (first.baseStart >= other.baseStart && first.baseEnd <= other.baseEnd) {
+				return true;
+			}
+		}
+		return false;
+	},
+
+	getSpanningGenomicRange : function(selectedVariants) {
 		if (!this.areOnSameChromosome(selectedVariants))
 			return;
 

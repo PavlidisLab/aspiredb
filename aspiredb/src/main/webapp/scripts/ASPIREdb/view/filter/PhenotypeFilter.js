@@ -14,7 +14,7 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
                 itemId: 'nameCombo',
                 matchFieldWidth: false,
                 triggerAction: 'query',
-                autoSelect: true,
+                //autoSelect: true,
                 hideTrigger: true,
                 displayField: 'displayName',
                 store: Ext.create('ASPIREdb.PhenotypeSuggestionStore',{
@@ -83,5 +83,12 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
         phenotypeRestriction.name = nameCombo.getValue();
         phenotypeRestriction.value = valueCombo.getValue();
         return phenotypeRestriction;
+    },
+    
+    setRestrictionExpression: function(phenotypeRestriction) {
+        var nameCombo = this.getComponent("nameCombo");
+        var valueCombo = this.getComponent("valueCombo");
+        nameCombo.setValue(phenotypeRestriction.name);
+        valueCombo.setValue(phenotypeRestriction.value);        
     }
 });

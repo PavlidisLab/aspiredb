@@ -17,41 +17,41 @@
  *
  */
 
-Ext.define('ASPIREdb.GemmaURLUtils',{
-    singleton: true,
-    
-    GEMMA_URL : "http://chibi.ubc.ca/Gemma",
+Ext.define('ASPIREdb.GemmaURLUtils', {
+	singleton : true,
+
+	GEMMA_URL : "http://chibi.ubc.ca/Gemma",
 	GEMMA_WEB_SERVICE_URL : "http://chibi.ubc.ca/Gemma/rest",
 
 	HELP_PAGE_URL : "http://aspiredb.sites.olt.ubc.ca/",
-	
-	makeViewGeneNetworkInGemmaURL: function( geneSymbols) {
 
-        var url = ASPIREdb.GemmaURLUtils.GEMMA_URL + "/home.html?taxon=1&geneList=";
-        
-        for (var i = 0 ; i <geneSymbols.length ; i++){
-            
-            url = url + geneSymbols[i]+",";
-            
-        }
-        
-        return url;
-        
-    },
+	makeViewGeneNetworkInGemmaURL : function(geneSymbols) {
 
-    makeGeneUrl : function (geneSymbol) {        
-        return ASPIREdb.GemmaURLUtils.GEMMA_URL + "/gene/showGene.html?name=" + geneSymbol + "&taxon=human";
-    },
- 
-    makeNeurocartaPhenotypeUrl : function (phenotypeUri) {
-    	return ASPIREdb.GemmaURLUtils.GEMMA_URL + "/phenotypes.html?phenotypeUrlId=" + phenotypeUri; 
-    },
+		var url = ASPIREdb.GemmaURLUtils.GEMMA_URL + "/home.html?taxon=1&geneList=";
 
-    makeWebServiceUrl : function (path) {
-    	return ASPIREdb.GemmaURLUtils.GEMMA_WEB_SERVICE_URL + path; 
-    },
-    
-    getHelpPageURL : function( ) {
-        return ASPIREdb.GemmaURLUtils.HELP_PAGE_URL;
-    }
+		for ( var i = 0; i < geneSymbols.length; i++) {
+
+			url = url + geneSymbols[i] + ",";
+
+		}
+
+		return url;
+
+	},
+
+	makeGeneUrl : function(geneSymbol) {
+		return ASPIREdb.GemmaURLUtils.GEMMA_URL + "/gene/showGene.html?name=" + geneSymbol + "&taxon=human";
+	},
+
+	makeNeurocartaPhenotypeUrl : function(phenotypeUri) {
+		return ASPIREdb.GemmaURLUtils.GEMMA_URL + "/phenotypes.html?phenotypeUrlId=" + phenotypeUri;
+	},
+
+	makeWebServiceUrl : function(path) {
+		return ASPIREdb.GemmaURLUtils.GEMMA_WEB_SERVICE_URL + path;
+	},
+
+	getHelpPageURL : function() {
+		return ASPIREdb.GemmaURLUtils.HELP_PAGE_URL;
+	}
 });

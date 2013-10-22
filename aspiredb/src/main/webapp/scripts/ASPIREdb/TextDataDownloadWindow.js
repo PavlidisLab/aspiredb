@@ -103,72 +103,72 @@ Ext.define('ASPIREdb.TextDataDownloadWindow', {
 		this.populateText(text);
 
 	},
-	
-	showVariantsDownload : function( data, columnHeaders ) {
 
-        var text = "";
-		
-		for (var i = 0 ; i < columnHeaders.length ; i++){
-			
+	showVariantsDownload : function(data, columnHeaders) {
+
+		var text = "";
+
+		for ( var i = 0; i < columnHeaders.length; i++) {
+
 			text = text + columnHeaders[i];
-			text = text +  "\t" ;
-			
-		}		
+			text = text + "\t";
 
-        text = text +  "\n" ;
-        for (var i = 0 ; i< data.length ; i++ ) {
-        	
-        	vvoArray = data[i].raw;
-        	
-        	//first column is subjectId so skip
-        	for (var j = 1 ; j <vvoArray.length ; j++){
-        		
-        		if (vvoArray[j]){
-        			text = text + vvoArray[j];
-        		}
-        		text = text +  "\t" ;
-        	} 
+		}
 
-            text = text +  "\n" ;
-        }
+		text = text + "\n";
+		for ( var i = 0; i < data.length; i++) {
 
-        this.populateText(text);
+			vvoArray = data[i].raw;
 
-    },
-    
-    showGenesDownload : function( data, columnHeaders ) {
+			// first column is subjectId so skip
+			for ( var j = 1; j < vvoArray.length; j++) {
 
-        var text = "";
-		
-		for (var i = 0 ; i < columnHeaders.length ; i++){
-			
+				if (vvoArray[j]) {
+					text = text + vvoArray[j];
+				}
+				text = text + "\t";
+			}
+
+			text = text + "\n";
+		}
+
+		this.populateText(text);
+
+	},
+
+	showGenesDownload : function(data, columnHeaders) {
+
+		var text = "";
+
+		for ( var i = 0; i < columnHeaders.length; i++) {
+
 			text = text + columnHeaders[i];
-			text = text +  "\t" ;
-			
-		}		
+			text = text + "\t";
 
-        text = text +  "\n" ;
-        for (var i = 0 ; i< data.length ; i++ ) {
-        	
-        	geneArray = data[i].raw;
-        	
-        	//last column is gemma link so skip
-        	for (var j = 0 ; j <geneArray.length-1 ; j++){
-        		
-        		if (geneArray[j]){
-        			text = text + geneArray[j];
-        		}
-        		text = text +  "\t" ;
-        	} 
+		}
 
-            text = text +  "\n" ;
-        }
+		text = text + "\n";
+		for ( var i = 0; i < data.length; i++) {
 
-        this.populateText(text);
+			geneArray = data[i].raw;
 
-    },
-    
-    showPhenotypesDownload : function(text) {
-    	this.populateText(text);
+			// last column is gemma link so skip
+			for ( var j = 0; j < geneArray.length - 1; j++) {
+
+				if (geneArray[j]) {
+					text = text + geneArray[j];
+				}
+				text = text + "\t";
+			}
+
+			text = text + "\n";
+		}
+
+		this.populateText(text);
+
+	},
+
+	showPhenotypesDownload : function(text) {
+		this.populateText(text);
 	},
 });

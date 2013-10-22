@@ -1,20 +1,16 @@
-Ext.require([
-    'Ext.data.Store',
-    'ASPIREdb.model.Subject',
-    'ASPIREdb.ActiveProjectSettings'
-]);
+Ext.require([ 'Ext.data.Store', 'ASPIREdb.model.Subject', 'ASPIREdb.ActiveProjectSettings' ]);
 
 Ext.define('ASPIREdb.store.SubjectStore', {
-    extend: 'Ext.data.ArrayStore',
-    alias: 'store.subjectStore',
-    autoLoad: true,
-    autoSync: true,
-    proxy: {
-    	type: 'localstorage',
-    	id: 'subjectId'
-    },   
-	
-    fields : [ {
+	extend : 'Ext.data.ArrayStore',
+	alias : 'store.subjectStore',
+	autoLoad : true,
+	autoSync : true,
+	proxy : {
+		type : 'localstorage',
+		id : 'subjectId'
+	},
+
+	fields : [ {
 		name : 'id',
 		type : 'int'
 	}, {
@@ -24,7 +20,7 @@ Ext.define('ASPIREdb.store.SubjectStore', {
 		name : 'labelIds',
 		type : 'array'
 	} ],
-	
-    storeId: 'subjectStore'
-    
+
+	storeId : 'subjectStore'
+
 });

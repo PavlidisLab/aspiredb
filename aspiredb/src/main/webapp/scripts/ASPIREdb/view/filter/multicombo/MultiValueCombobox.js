@@ -78,6 +78,22 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
         comboBox.clearValue();
         this.doLayout();
     },
+    
+    addMultiComboItem: function(item) {
+        var itemElement = item;
+        itemElement.on('remove', function(itemToRemove) {
+            this.items.remove(itemToRemove);
+            itemToRemove.destroy();
+        },this);
+
+        var comboBox = this.getComponent('invisibleCombo');
+        var items = this.items;
+        items.insert(items.getCount() - 1, itemElement);
+        comboBox.clearValue();
+        this.doLayout();
+        
+        
+    },
 
     /**
      * @private

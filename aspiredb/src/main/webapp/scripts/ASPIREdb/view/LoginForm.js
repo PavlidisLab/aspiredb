@@ -27,7 +27,7 @@ Ext.define('ASPIREdb.view.LoginForm', {
 
 	initComponent : function() {
 		this.callParent();
-		
+
 		var ref = this;
 
 		var panel = Ext.create('Ext.form.Panel', {
@@ -48,26 +48,26 @@ Ext.define('ASPIREdb.view.LoginForm', {
 				itemId : 'username',
 				fieldLabel : 'Username',
 				allowBlank : false,
-				listeners: {
-	                specialkey: function(field, e){
-	                    if (e.getKey() == e.ENTER) {
-	                        ref.submitHandler();
-	                    }
-	                }
-	            }
+				listeners : {
+					specialkey : function(field, e) {
+						if (e.getKey() == e.ENTER) {
+							ref.submitHandler();
+						}
+					}
+				}
 			}, {
 				xtype : 'textfield',
 				itemId : 'password',
 				fieldLabel : 'Password',
 				inputType : 'password',
 				allowBlank : false,
-				listeners: {
-	                specialkey: function(field, e){
-	                    if (e.getKey() == e.ENTER) {
-	                        ref.submitHandler();
-	                    }
-	                }
-	            }
+				listeners : {
+					specialkey : function(field, e) {
+						if (e.getKey() == e.ENTER) {
+							ref.submitHandler();
+						}
+					}
+				}
 			}, {
 				xtype : 'label',
 				itemId : 'message',
@@ -92,12 +92,12 @@ Ext.define('ASPIREdb.view.LoginForm', {
 					var me = this.ownerCt.ownerCt;
 					me.getComponent('username').setValue('');
 					me.getComponent('password').setValue('');
-					
+
 				}
 			}, {
 				xtype : 'button',
 				itemId : 'loginButton',
-				text : 'Login',				
+				text : 'Login',
 				handler : ref.submitHandler,
 				scope : ref
 			} ]
@@ -108,8 +108,8 @@ Ext.define('ASPIREdb.view.LoginForm', {
 		this.doLayout();
 
 	},
-	
-	submitHandler : function(){
+
+	submitHandler : function() {
 
 		var me = this;
 		Ext.Ajax.request({
@@ -118,7 +118,7 @@ Ext.define('ASPIREdb.view.LoginForm', {
 			headers : {
 				'Content-Type' : 'application/x-www-form-urlencoded'
 			},
-			scope: me,
+			scope : me,
 			params : Ext.Object.toQueryString({
 				'j_username' : me.down('#username').getValue(),
 				'j_password' : me.down('#password').getValue(),

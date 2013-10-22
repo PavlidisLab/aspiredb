@@ -17,7 +17,7 @@
  *
  */
 
-Ext.require([ 'Ext.Window']);
+Ext.require([ 'Ext.Window' ]);
 
 Ext.define('ASPIREdb.view.SaveQueryWindow', {
 	extend : 'Ext.Window',
@@ -30,64 +30,64 @@ Ext.define('ASPIREdb.view.SaveQueryWindow', {
 	height : 200,
 	layout : 'fit',
 	bodyStyle : 'padding: 5px;',
-	
-	filterConfigs: [],
-	
-	items : [{
-	    
-	    bodyPadding: 5,
-	    width: 350,
-	    
-	    layout: 'anchor',
-	    defaults: {
-	        anchor: '100%'
-	    },
-	    
-	    defaultType: 'textfield',
-	    items: [{
-	    	fieldLabel: 'Query Name',
-	        name: 'last',
-	        allowBlank: false,
-	        itemId : 'queryName'
-		}],
-	    
-	    buttons: [{
-			xtype : 'button',		
+
+	filterConfigs : [],
+
+	items : [ {
+
+		bodyPadding : 5,
+		width : 350,
+
+		layout : 'anchor',
+		defaults : {
+			anchor : '100%'
+		},
+
+		defaultType : 'textfield',
+		items : [ {
+			fieldLabel : 'Query Name',
+			name : 'last',
+			allowBlank : false,
+			itemId : 'queryName'
+		} ],
+
+		buttons : [ {
+			xtype : 'button',
 			itemId : 'saveButton',
 			text : 'OK'
-		}]
-	
-	}],
+		} ]
+
+	} ],
 
 	initComponent : function() {
 		this.callParent();
-		
+
 		var ref = this;
-		
-		this.down('#saveButton').on('click', ref.saveButtonHandler, ref );
+
+		this.down('#saveButton').on('click', ref.saveButtonHandler, ref);
 	},
-	
-	initAndShow : function(filters){
-		
-		this.filterConfigs = filters;		
+
+	initAndShow : function(filters) {
+
+		this.filterConfigs = filters;
 		this.show();
-		
+
 	},
-	
-	saveButtonHandler : function(){
-		
-		var queryName = this.down('#queryName').getValue();		
-		
-		QueryService.saveQuery(queryName, this.filterConfigs, {callback: function(qvoId){
-			
-			ASPIREdb.view.SaveQueryWindow.down('#queryName').setValue('');
-			ASPIREdb.view.SaveQueryWindow.close();
-			ASPIREdb.view.SaveQueryWindow.fireEvent('new_query_saved');
-			
-		}});
-		
+
+	saveButtonHandler : function() {
+
+		var queryName = this.down('#queryName').getValue();
+
+		QueryService.saveQuery(queryName, this.filterConfigs, {
+			callback : function(qvoId) {
+
+				ASPIREdb.view.SaveQueryWindow.down('#queryName').setValue('');
+				ASPIREdb.view.SaveQueryWindow.close();
+				ASPIREdb.view.SaveQueryWindow.fireEvent('new_query_saved');
+
+			}
+		});
+
 	}
-	
-	
 
 });
