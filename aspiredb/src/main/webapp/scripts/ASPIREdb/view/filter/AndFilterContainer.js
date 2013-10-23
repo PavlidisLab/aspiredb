@@ -59,24 +59,81 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 				filterContainer.add(item);
 
 			}
-		} else if (filterItemType == 'ASPIREdb.view.filter.PropertyFilter') {
+		}// else if (filterItemType == 'ASPIREdb.view.filter.PropertyFilter') {
 
+		//	filterContainer.removeAll();
+
+		//	var item = this.getNewItem();
+
+		//	item.setRestrictionExpression(restriction);
+
+		//	filterContainer.add(item);
+
+		//} 
+	else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer' || filterItemType == 'ASPIREdb.view.filter.PropertyFilter') {
 			filterContainer.removeAll();
 
-			var item = this.getNewItem();
+			//this next bit of code is ugly and ridiculous, and can probably be trimmed down a bit
+			if (restriction.restrictions) {
 
-			item.setRestrictionExpression(restriction);
+				for ( var i = 0; i < restriction.restrictions.length; i++) {
 
-			filterContainer.add(item);
+					var rest1 = restriction.restrictions[i];
 
-		} else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer') {
-			filterContainer.removeAll();
+					if (rest1.restrictions) {
 
-			var item = this.getNewItem();
+						var rest1Array = rest1.restrictions;
 
-			item.setRestrictionExpression(restriction);
+						for ( var j = 0; j < rest1Array.length; j++) {
 
-			filterContainer.add(item);
+							rest2 = rest1Array[j];
+
+							if (rest2.restrictions) {
+
+								var rest2Array = rest2.restrictions;
+
+								for ( var k = 0; k < rest2Array.length; k++) {
+									var rest3 = rest2Array[k];									
+									
+									var item = this.getNewItem();				
+
+									item.setRestrictionExpression(rest3);
+
+									filterContainer.add(item);
+								}
+
+							} else {
+								
+								var item = this.getNewItem();				
+
+								item.setRestrictionExpression(rest2);
+
+								filterContainer.add(item);
+								
+							}
+
+						}
+
+					} else{
+						var item = this.getNewItem();				
+
+						item.setRestrictionExpression(rest1);
+
+						filterContainer.add(item);
+					}
+
+				}
+
+			}else {
+				
+				var item = this.getNewItem();				
+
+				item.setSimpleRestrictionExpression(restriction);
+
+				filterContainer.add(item);
+				
+				
+			}
 
 		}
 

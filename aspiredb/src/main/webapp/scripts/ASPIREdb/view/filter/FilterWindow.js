@@ -161,6 +161,8 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		var filterContainer = this.down('#filterContainer');
 
 		this.updateSavedQueryCombo();
+		
+		this.initializeFilterProperties();
 
 		this.down('#loadQuery').on('click', this.savedQueryComboBoxSelectHandler, this);
 
@@ -206,6 +208,9 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 					var variantFilterPanel = Ext.create('ASPIREdb.view.filter.VariantFilterPanel');
 					
 					//variantFilterPanel.remove('locationFilterContainer');
+					
+					variantFilterPanel.cnvProperties = this.cnvProperties;
+					variantFilterPanel.indelProperties = this.indelProperties;
 					filterContainer.add(variantFilterPanel);
 					filterContainer.doLayout();
 					variantFilterPanel.setFilterConfig(filters[i]);
@@ -355,11 +360,18 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	initializeFilterProperties : function() {
 		var filterWindow = this;
 
-		var callback = {
+		var cnvCallback = {
 			callback : function(properties) {
-				// filterWindow.getComponent('');
+				filterWindow.cnvProperties = properties;
 			}
 		};
-		VariantService.suggestProperties('CNV', callback);
+		VariantService.suggestEntityPropertiesByStringName('CNV', cnvCallback);
+		
+		var indelCallback = {
+				callback : function(properties) {
+					filterWindow.indelProperties = properties;
+				}
+			};
+		VariantService.suggestEntityPropertiesByStringName('INDEL', indelCallback);
 	}
 });

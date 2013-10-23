@@ -37,7 +37,17 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 		animCollapse : false,
 		getRestrictionExpression : function() {
 			var filterContainer = this.getComponent('cnvCharacteristicFilterContainer');
-			return filterContainer.getRestrictionExpression();
+			
+			var cnvRestrictionExpression = filterContainer.getRestrictionExpression();
+			
+			var variantRestriction = new VariantTypeRestriction();
+			
+			variantRestriction.type = "CNV";
+			
+			cnvRestrictionExpression.restrictions.push(variantRestriction);
+			
+			return cnvRestrictionExpression;
+			
 		},
 		setRestrictionExpression : function(restriction) {
 			// and filter container
@@ -49,7 +59,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 			itemId : 'cnvCharacteristicFilterContainer',
 			suggestValuesRemoteFunction : VariantService.suggestValues,
 			propertyStore : {
-				autoLoad : true,
+				//autoLoad : true,
 				proxy : {
 					type : 'dwr',
 					dwrFunction : VariantService.suggestPropertiesForVariantType,
@@ -74,7 +84,9 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 		animCollapse : false,
 		getRestrictionExpression : function() {
 			var filterContainer = this.getComponent('indelCharacteristicFilterContainer');
-			return filterContainer.getRestrictionExpression();
+			
+			var indelRestrictionExpression = filterContainer.getRestrictionExpression();
+			return indelRestrictionExpression;
 		},
 		setRestrictionExpression : function(restriction) {
 			// and filter container
@@ -138,16 +150,45 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 		var cnvFilterPanel = this.getComponent('cnvFilterPanel');
 		var indelFilterPanel = this.getComponent('indelFilterPanel');
 		var locationFilterContainer = this.getComponent('locationFilterContainer');
-		// var config = new VariantFilterConfig();
-		// var conjunction = new Conjunction();
-		// conjunction.restrictions = [];
+		
+		
+		var conjunction = new Conjunction();
+		var conjunctions = [];
+		
+		var cnvDisjunction = new Disjunction();
+		var indelDisjunctions = new Disjunction();
+		var disjunctions = [];
+		
+		if (config.restriction.restrictions){
+			
+			restrictions = config.restriction.restrictions;
+			
+			for (var i = 0 ; i<restrictions.length ; i++){
+				
+				if (restrictions[i] instanceof Conjunction){
+					conjunctions.push(restrictions[i]);
+				}else if (restrictions[i] instanceof Disjunction){
+					disjunctions.push(restrictions[i]);
+				}
+				
+			}			
+			
+		}
+		
+		conjunction.restrictions = conjunctions;
 
-		locationFilterContainer.setRestrictionExpression(config.restriction);
-
-		// cnvFilterPanel.setRestrictionExpression(config.restriction);
+		locationFilterContainer.setRestrictionExpression(conjunction);
+		
+		//disjunction.restrictions = disjunctions;
+		
+		//cnvFilterPanel.setRestrictionExpression(disjunction);
 
 		// indelFilterPanel.setRestrictionExpression(config.restriction);
 
+	},
+	
+	separateVariantDisjunctions : function(disjunctions, displayNameArray){
+		
 	},
 
 	initComponent : function() {

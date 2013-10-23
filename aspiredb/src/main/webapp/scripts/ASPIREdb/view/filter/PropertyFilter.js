@@ -41,43 +41,26 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 
 	setRestrictionExpression : function(restriction) {
 
-		if (restriction.restrictions) {
+		if (restriction instanceof Conjunction || restriction instanceof Disjunction) {
 
 			for ( var i = 0; i < restriction.restrictions.length; i++) {
 
 				var rest1 = restriction.restrictions[i];
 
-				if (rest1.restrictions) {
-
-					var rest1Array = rest1.restrictions;
-
-					for ( var j = 0; j < rest1Array.length; j++) {
-
-						rest2 = rest1Array[j];
-
-						if (rest2.restrictions) {
-
-							var rest2Array = rest2.restrictions;
-
-							for ( var k = 0; k < rest2Array.length; k++) {
-								var rest3 = rest2Array[k];
-								this.populateMultiComboItem(rest3);
-							}
-
-						} else {
-							this.populateMultiComboItem(rest2);
-						}
-
-					}
-
-				} else {
-
-					this.populateMultiComboItem(rest1);
-				}
+				this.populateMultiComboItem(rest1);
 
 			}
 
 		} else {
+
+			this.populateMultiComboItem(restriction);
+		}
+
+	},
+	
+	setSimpleRestrictionExpression : function(restriction) {
+
+	
 
 			var singleValueField = multicombo_container.getComponent("singleValueField");
 			// var simpleRestriction = new SimpleRestriction();
@@ -87,7 +70,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			value.value = singleValueField.getValue();
 			simpleRestriction.value = value;
 			return simpleRestriction;
-		}
+		
 	},
 
 	populateMultiComboItem : function(restriction) {
