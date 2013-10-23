@@ -15,18 +15,18 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 		var aspireDbPanel = this;
 
 		ASPIREdb.EVENT_BUS.on('login', function(event) {
-			// aspireDbPanel.getLoginForm().hide();
+			
 			aspireDbPanel.getComponent('topToolbar').getComponent('logoutForm').show();
 
 			ASPIREdb.view.DashboardWindow.show();
 
 			var runner = new Ext.util.TaskRunner();
 
-			// poll login_check page every minute
+			// poll keep_alive page so session doesn't reset
 			var task = runner.start({
 				run : function() {
 					Ext.Ajax.request({
-						url : 'login_check.html',
+						url : 'keep_alive.html',
 
 						success : function(response) {
 							var json = Ext.JSON.decode(response.responseText);
@@ -43,7 +43,7 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 						}
 					});
 				},
-				interval : 60000
+				interval : 60000*10
 			});
 
 		});

@@ -22,7 +22,7 @@ public class LoginController {
         return "login";
     }
 
-    @RequestMapping("/login_check.html")
+    @RequestMapping("/keep_alive.html")
     public void loadUser( HttpServletRequest request, HttpServletResponse response ) throws IOException{
 
         String jsonText = null;
