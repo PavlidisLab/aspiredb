@@ -152,12 +152,12 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 		var locationFilterContainer = this.getComponent('locationFilterContainer');
 		
 		
-		var conjunction = new Conjunction();
+		var locationRestrictions = new Conjunction();
 		var conjunctions = [];
 		
-		var cnvDisjunction = new Disjunction();
-		var indelDisjunctions = new Disjunction();
-		var disjunctions = [];
+		var cnvRestrictions = new Conjunction();
+		var indelRestrictions = new Conjunction();
+		var variantTypeDisjunctions = [];
 		
 		if (config.restriction.restrictions){
 			
@@ -168,26 +168,49 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 				if (restrictions[i] instanceof Conjunction){
 					conjunctions.push(restrictions[i]);
 				}else if (restrictions[i] instanceof Disjunction){
-					disjunctions.push(restrictions[i]);
+					variantTypeDisjunctions.push(restrictions[i]);
 				}
 				
 			}			
 			
 		}
 		
-		conjunction.restrictions = conjunctions;
+		locationRestrictions.restrictions = conjunctions;
 
-		locationFilterContainer.setRestrictionExpression(conjunction);
+		locationFilterContainer.setRestrictionExpression(locationRestrictions);
 		
-		//disjunction.restrictions = disjunctions;
+		cnvRestrictions.restrictions = this.separateVariantDisjunctions(variantTypeDisjunctions, "CNV");
 		
-		//cnvFilterPanel.setRestrictionExpression(disjunction);
+		cnvFilterPanel.setRestrictionExpression(cnvRestrictions);
 
 		// indelFilterPanel.setRestrictionExpression(config.restriction);
 
 	},
 	
-	separateVariantDisjunctions : function(disjunctions, displayNameArray){
+	separateVariantDisjunctions : function(disjunctions, variantType){
+		
+		var restriction = {};
+		restriction.restrictions = disjunctions;
+		
+		var separatedDisjunctions = [];
+		
+		var addVariantRestrictionToDisjunctions = function(innerRestriction, outerRestriction, somethingElseToDo){
+			
+			if (innerRestriction.type  && innerRestriction.type == variantType){
+				
+				separatedDisjunctions.push(outerRestriction);
+				
+			}
+			
+		};
+		
+		var somethingElseToDoFunction = function(){
+			
+		};
+		
+		FilterUtil.traverseRidiculousObjectQueryGraphAndDoSomething(restriction, addVariantRestrictionToDisjunctions, somethingElseToDoFunction);
+		
+		return separatedDisjunctions;
 		
 	},
 

@@ -221,34 +221,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 
 		}
 
-		// filterContainer.doLayout();
-
-		// TODO load filters into widget
-
-		// for (var i = 0; i <filters.length; i++){
-
-		// }
-
-		/*
-		 * filterContainer.clear(); for (RestrictionFilterConfig filterConfig:
-		 * selectedQuery.getQuery()) { FilterWidget filterWidget = null;
-		 * 
-		 * if (filterConfig instanceof PhenotypeFilterConfig) { filterWidget =
-		 * new PhenotypeFilterWidget(); } else if (filterConfig instanceof
-		 * SubjectFilterConfig) { filterWidget = new
-		 * SubjectFilterWidget(subjectProperties); } else if (filterConfig
-		 * instanceof VariantFilterConfig) { filterWidget = new
-		 * VariantFilterWidget(variantProperties, variantLocationProperties); }
-		 * 
-		 * if (filterWidget != null) { filterWidget.addRemoveMeHandler( new
-		 * RemoveMeHandler() { @Override public void onRemoveMe( RemoveMeEvent
-		 * event ) { filterContainer.remove( event.getWidget() );
-		 * aspiredb.EVENT_BUS.fireEvent(new QueryUpdateEvent()); } });
-		 * filterWidget.setFilterConfig(filterConfig);
-		 * filterContainer.add(filterWidget); } }
-		 * 
-		 * aspiredb.EVENT_BUS.fireEvent(new QueryUpdateEvent());
-		 */
+		
 
 	},
 

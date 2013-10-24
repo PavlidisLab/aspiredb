@@ -51,8 +51,10 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 
 			}
 
-		} else {
+		} else if (restriction instanceof VariantTypeRestriction){
 
+			
+		} else {
 			this.populateMultiComboItem(restriction);
 		}
 

@@ -27,7 +27,25 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 			var conjunction = new Conjunction();
 			conjunction.restrictions = [];
 			this.items.each(function(item, index, length) {
-				conjunction.restrictions.push(item.getRestrictionExpression());
+				
+				var itemRestriction = item.getRestrictionExpression();
+				
+				if (itemRestriction instanceof PhenotypeRestriction && itemRestriction.name && itemRestriction.value){
+					
+					conjunction.restrictions.push(itemRestriction);
+					
+				}else if (itemRestriction instanceof SetRestriction && itemRestriction.operator && itemRestriction.property && itemRestriction.values && itemRestriction.values.length>0){
+				
+					conjunction.restrictions.push(itemRestriction);
+				
+				}
+				else if (itemRestriction instanceof SimpleRestriction){
+					//not sure where simplerestriction comes into play yet
+					alert("TODO  simplerestriction");
+				}
+				else {
+					conjunction.restrictions.push(itemRestriction);
+				}
 			});
 			return conjunction;
 		}
@@ -44,6 +62,10 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 
 	setRestrictionExpression : function(restriction) {
 		var filterContainer = this.getComponent('filterContainer');
+		
+		var addMultiItemToContainer = this.getAddMultiItemToContainerFunction(filterContainer);
+		
+		var getNewItem = this.getNewItemFunction();
 
 		var filterItemType = this.getFilterItemType();
 
@@ -51,78 +73,16 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 
 			filterContainer.removeAll();
 			for ( var i = 0; i < restriction.restrictions.length; i++) {
-
-				var item = this.getNewItem();
-
-				item.setRestrictionExpression(restriction.restrictions[i]);
-
-				filterContainer.add(item);
+				
+				addMultiItemToContainer(restriction.restrictions[i], null, getNewItem);				
 
 			}
-		}// else if (filterItemType == 'ASPIREdb.view.filter.PropertyFilter') {
-
-		//	filterContainer.removeAll();
-
-		//	var item = this.getNewItem();
-
-		//	item.setRestrictionExpression(restriction);
-
-		//	filterContainer.add(item);
-
-		//} 
-	else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer' || filterItemType == 'ASPIREdb.view.filter.PropertyFilter') {
+		}else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer' || filterItemType == 'ASPIREdb.view.filter.PropertyFilter') {
 			filterContainer.removeAll();
-
-			//this next bit of code is ugly and ridiculous, and can probably be trimmed down a bit
+			
 			if (restriction.restrictions) {
-
-				for ( var i = 0; i < restriction.restrictions.length; i++) {
-
-					var rest1 = restriction.restrictions[i];
-
-					if (rest1.restrictions) {
-
-						var rest1Array = rest1.restrictions;
-
-						for ( var j = 0; j < rest1Array.length; j++) {
-
-							rest2 = rest1Array[j];
-
-							if (rest2.restrictions) {
-
-								var rest2Array = rest2.restrictions;
-
-								for ( var k = 0; k < rest2Array.length; k++) {
-									var rest3 = rest2Array[k];									
-									
-									var item = this.getNewItem();				
-
-									item.setRestrictionExpression(rest3);
-
-									filterContainer.add(item);
-								}
-
-							} else {
-								
-								var item = this.getNewItem();				
-
-								item.setRestrictionExpression(rest2);
-
-								filterContainer.add(item);
-								
-							}
-
-						}
-
-					} else{
-						var item = this.getNewItem();				
-
-						item.setRestrictionExpression(rest1);
-
-						filterContainer.add(item);
-					}
-
-				}
+				
+				FilterUtil.traverseRidiculousObjectQueryGraphAndDoSomething(restriction, addMultiItemToContainer, getNewItem);
 
 			}else {
 				
@@ -130,20 +90,48 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 
 				item.setSimpleRestrictionExpression(restriction);
 
-				filterContainer.add(item);
-				
+				filterContainer.add(item);				
 				
 			}
 
 		}
 
 	},
+	
+	getAddMultiItemToContainerFunction : function(filterContainer){	
+		
+		//outerRestriction is unused in this function and refers to the outermost Conjunction/Disjunction
+		var addMultiItemToContainer = function(restriction, outerRestriction,getNewItem){
+			
+			var item = getNewItem();				
 
-	getNewItem : function() {
-		return Ext.create(this.getFilterItemType(), {
-			propertyStore : this.getPropertyStore(),
-			suggestValuesRemoteFunction : this.getSuggestValuesRemoteFunction()
-		});
+			item.setRestrictionExpression(restriction);
+
+			filterContainer.add(item);
+			
+		};
+		
+		return addMultiItemToContainer;		
+		
+		
+	},
+
+	getNewItemFunction : function() {
+		
+		var filterTypeItem = this.getFilterItemType();
+		var propertyStore = this.getPropertyStore();
+		var suggestValuesRemoteFunction = this.getSuggestValuesRemoteFunction();
+		
+		var getNewItem = function(){
+		
+			return Ext.create(filterTypeItem, {
+				propertyStore : propertyStore,
+				suggestValuesRemoteFunction : suggestValuesRemoteFunction
+			});
+		
+		};
+		
+		return getNewItem;
 	},
 
 	initComponent : function() {
@@ -152,7 +140,9 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 		var me = this;
 		var filterContainer = this.getComponent("filterContainer");
 
-		var item = this.getNewItem();
+		var getNewItem = this.getNewItemFunction();
+		
+		var item = getNewItem();
 		// Add first item.
 		filterContainer.insert(0, item);
 
