@@ -228,11 +228,15 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	savedQueryComboBoxSelectHandler : function() {
 
 		var combo = this.down('#savedQueryComboBox');
+		
+		if (combo.getValue() && combo.getValue()!=''){
 
-		QueryService.loadQuery(combo.getValue(), {
-			callback : this.loadQueryHandler,
-			scope : this
-		});
+			QueryService.loadQuery(combo.getValue(), {
+				callback : this.loadQueryHandler,
+				scope : this
+			});
+		
+		}
 
 	},
 

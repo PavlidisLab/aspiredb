@@ -40,10 +40,10 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 				
 				}
 				else if (itemRestriction instanceof SimpleRestriction){
-					//not sure where simplerestriction comes into play yet
+					
 					alert("TODO  simplerestriction");
 				}
-				else {
+				else if (!(itemRestriction instanceof PhenotypeRestriction)&& !(itemRestriction instanceof SetRestriction)&&!(itemRestriction instanceof SimpleRestriction) ){
 					conjunction.restrictions.push(itemRestriction);
 				}
 			});
@@ -148,7 +148,7 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 
 		// Attach button listener
 		me.getComponent("addButton").on('click', function(button, event) {
-			filterContainer.add(me.getNewItem());
+			filterContainer.add(getNewItem());
 			filterContainer.doLayout();
 		});
 	}

@@ -83,10 +83,19 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 		collapsed : true,
 		animCollapse : false,
 		getRestrictionExpression : function() {
+						
 			var filterContainer = this.getComponent('indelCharacteristicFilterContainer');
 			
 			var indelRestrictionExpression = filterContainer.getRestrictionExpression();
+			
+			var variantRestriction = new VariantTypeRestriction();
+			
+			variantRestriction.type = "INDEL";
+			
+			indelRestrictionExpression.restrictions.push(variantRestriction);
+			
 			return indelRestrictionExpression;
+			
 		},
 		setRestrictionExpression : function(restriction) {
 			// and filter container
@@ -113,11 +122,60 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 			},
 			filterItemType : 'ASPIREdb.view.filter.PropertyFilter'
 		}
+	}, {
+		xtype : 'panel',
+		itemId : 'snvFilterPanel',
+		bodyStyle : 'background: #FFFFD0;',
+		title : 'SNV:',
+		collapsible : true,
+		collapsed : true,
+		animCollapse : false,
+		getRestrictionExpression : function() {
+						
+			var filterContainer = this.getComponent('snvCharacteristicFilterContainer');
+			
+			var snvRestrictionExpression = filterContainer.getRestrictionExpression();
+			
+			var variantRestriction = new VariantTypeRestriction();
+			
+			variantRestriction.type = "SNV";
+			
+			snvRestrictionExpression.restrictions.push(variantRestriction);
+			
+			return snvRestrictionExpression;
+			
+		},
+		setRestrictionExpression : function(restriction) {
+			// and filter container
+			var filterContainer = this.getComponent('snvCharacteristicFilterContainer');
+			filterContainer.setRestrictionExpression(restriction);
+		},
+		items : {
+			xtype : 'filter_and',
+			itemId : 'snvCharacteristicFilterContainer',
+			suggestValuesRemoteFunction : VariantService.suggestValues,
+			propertyStore : {
+				autoLoad : true,
+				proxy : {
+					type : 'dwr',
+					dwrFunction : VariantService.suggestPropertiesForVariantType,
+					dwrParams : [ 'SNV' ],
+					model : 'ASPIREdb.model.Property',
+					reader : {
+						type : 'json',
+						root : 'data',
+						totalProperty : 'count'
+					}
+				}
+			},
+			filterItemType : 'ASPIREdb.view.filter.PropertyFilter'
+		}
 	} ],
 
 	getFilterConfig : function() {
 		var cnvFilterPanel = this.getComponent('cnvFilterPanel');
 		var indelFilterPanel = this.getComponent('indelFilterPanel');
+		var snvFilterPanel = this.getComponent('snvFilterPanel');
 		var config = new VariantFilterConfig();
 		var conjunction = new Conjunction();
 		conjunction.restrictions = [];
@@ -130,20 +188,20 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 
 		var disjunction = new Disjunction();
 		disjunction.restrictions = [];
-		if (!cnvFilterPanel.getCollapsed()) {
-			disjunction.restrictions.push(cnvFilterPanel.getRestrictionExpression());
-		}
-		if (!indelFilterPanel.getCollapsed()) {
-			disjunction.restrictions.push(indelFilterPanel.getRestrictionExpression());
-		}
 
-		if (disjunction.restrictions.length > 0) {
-			conjunction.restrictions.push(disjunction);
-		}
+		disjunction.restrictions.push(cnvFilterPanel.getRestrictionExpression());
+
+		disjunction.restrictions.push(indelFilterPanel.getRestrictionExpression());
+		
+		disjunction.restrictions.push(snvFilterPanel.getRestrictionExpression());
+
+		conjunction.restrictions.push(disjunction);
 
 		config.restriction = conjunction;
 		return config;
 	},
+	
+	
 
 	setFilterConfig : function(config) {
 
@@ -181,9 +239,17 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 		
 		cnvRestrictions.restrictions = this.separateVariantDisjunctions(variantTypeDisjunctions, "CNV");
 		
-		cnvFilterPanel.setRestrictionExpression(cnvRestrictions);
-
-		// indelFilterPanel.setRestrictionExpression(config.restriction);
+		if(cnvRestrictions.restrictions.length>0){
+			cnvFilterPanel.setRestrictionExpression(cnvRestrictions);
+			cnvFilterPanel.expand();
+		}
+		
+		indelRestrictions.restrictions = this.separateVariantDisjunctions(variantTypeDisjunctions, "INDEL");
+		
+		if(indelRestrictions.restrictions.length>0){
+			indelFilterPanel.setRestrictionExpression(indelRestrictions);
+			indelFilterPanel.expand();
+		}
 
 	},
 	

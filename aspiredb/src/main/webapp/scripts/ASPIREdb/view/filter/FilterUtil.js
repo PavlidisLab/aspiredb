@@ -18,10 +18,11 @@
  */
 
 var FilterUtil = {		
-		
+		 
 		//I thought that all these nested for loops was ridiculous until I looked at the old gwt implementation and saw the same thing.
-		//Putting this restriction query object navigation code in its own file since we need to call it a couple times
-		//complexity breeds ridiculousness
+		//Putting this restriction query object navigation code in its own file since we need to call it a couple times.
+		//Recursion would probably make things more elegant yet harder to debug however the limit of the 
+		//complexity of the queries is literally hard coded into the application so its a moot point
 		traverseRidiculousObjectQueryGraphAndDoSomething: function(restriction, somethingToDoFunction, somethingElseToDoFunction){
 			
 			for ( var i = 0; i < restriction.restrictions.length; i++) {
