@@ -162,8 +162,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 
 		this.updateSavedQueryCombo();
 		
-		this.initializeFilterProperties();
-
+		
 		this.down('#loadQuery').on('click', this.savedQueryComboBoxSelectHandler, this);
 
 		filterTypeComboBox.on('select', function(combo, records) {
@@ -205,12 +204,8 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 
 				} else if (filters[i] instanceof VariantFilterConfig) {
 					
-					var variantFilterPanel = Ext.create('ASPIREdb.view.filter.VariantFilterPanel');
+					var variantFilterPanel = Ext.create('ASPIREdb.view.filter.VariantFilterPanel');					
 					
-					//variantFilterPanel.remove('locationFilterContainer');
-					
-					variantFilterPanel.cnvProperties = this.cnvProperties;
-					variantFilterPanel.indelProperties = this.indelProperties;
 					filterContainer.add(variantFilterPanel);
 					filterContainer.doLayout();
 					variantFilterPanel.setFilterConfig(filters[i]);
@@ -334,21 +329,5 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	// }
 	// });
 	// },
-	initializeFilterProperties : function() {
-		var filterWindow = this;
-
-		var cnvCallback = {
-			callback : function(properties) {
-				filterWindow.cnvProperties = properties;
-			}
-		};
-		VariantService.suggestEntityPropertiesByStringName('CNV', cnvCallback);
-		
-		var indelCallback = {
-				callback : function(properties) {
-					filterWindow.indelProperties = properties;
-				}
-			};
-		VariantService.suggestEntityPropertiesByStringName('INDEL', indelCallback);
-	}
+	
 });

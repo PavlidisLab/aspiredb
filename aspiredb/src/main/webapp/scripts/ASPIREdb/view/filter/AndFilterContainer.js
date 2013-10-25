@@ -27,24 +27,60 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 			var conjunction = new Conjunction();
 			conjunction.restrictions = [];
 			this.items.each(function(item, index, length) {
-				
+
 				var itemRestriction = item.getRestrictionExpression();
-				
-				if (itemRestriction instanceof PhenotypeRestriction && itemRestriction.name && itemRestriction.value){
+
+				if (FilterUtil.isSimpleRestriction(itemRestriction)) {
+
+					if (FilterUtil.validateSimpleRestriction(itemRestriction)) {
+
+						conjunction.restrictions.push(itemRestriction);
+					}
+
+				} else if (itemRestriction instanceof Disjunction) {
+
+					var nonEmptyDisjunction = new Disjunction();
 					
-					conjunction.restrictions.push(itemRestriction);
+					var nonEmptyRestrictionsArray = [];
+
+					if (itemRestriction.restrictions) {
+
+						for ( var i = 0; i < itemRestriction.restrictions.length; i++) {
+							
+							var disjunctedRestriction = itemRestriction.restrictions[i];
+							
+							if (FilterUtil.isSimpleRestriction(disjunctedRestriction)) {
+
+								if (FilterUtil.validateSimpleRestriction(disjunctedRestriction)) {
+
+									nonEmptyRestrictionsArray.push(disjunctedRestriction);
+								}
+
+							}							
+
+						}
+
+					}
+
+					else {
+						//to help flush out any bugs
+						alert("multi nested disjunction andfilterconatiner");
+
+					}
 					
-				}else if (itemRestriction instanceof SetRestriction && itemRestriction.operator && itemRestriction.property && itemRestriction.values && itemRestriction.values.length>0){
-				
-					conjunction.restrictions.push(itemRestriction);
-				
+					if (nonEmptyRestrictionsArray.length>0){
+						
+						nonEmptyDisjunction.restrictions = nonEmptyRestrictionsArray;
+						
+						conjunction.restrictions.push(nonEmptyDisjunction);
+						
+					}
+
 				}
-				else if (itemRestriction instanceof SimpleRestriction){
+				else{
+					//to help flush out any bugs
+					alert("Unsupported Restriction andfiltercontainer");
 					
-					alert("TODO  simplerestriction");
-				}
-				else if (!(itemRestriction instanceof PhenotypeRestriction)&& !(itemRestriction instanceof SetRestriction)&&!(itemRestriction instanceof SimpleRestriction) ){
-					conjunction.restrictions.push(itemRestriction);
 				}
 			});
 			return conjunction;
@@ -62,9 +98,9 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 
 	setRestrictionExpression : function(restriction) {
 		var filterContainer = this.getComponent('filterContainer');
-		
+
 		var addMultiItemToContainer = this.getAddMultiItemToContainerFunction(filterContainer);
-		
+
 		var getNewItem = this.getNewItemFunction();
 
 		var filterItemType = this.getFilterItemType();
@@ -73,64 +109,68 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 
 			filterContainer.removeAll();
 			for ( var i = 0; i < restriction.restrictions.length; i++) {
-				
-				addMultiItemToContainer(restriction.restrictions[i], null, getNewItem);				
+
+				addMultiItemToContainer(restriction.restrictions[i], null, getNewItem);
 
 			}
-		}else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer' || filterItemType == 'ASPIREdb.view.filter.PropertyFilter') {
+		} else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer' || filterItemType == 'ASPIREdb.view.filter.PropertyFilter') {
 			filterContainer.removeAll();
-			
+
 			if (restriction.restrictions) {
-				
+
 				FilterUtil.traverseRidiculousObjectQueryGraphAndDoSomething(restriction, addMultiItemToContainer, getNewItem);
 
-			}else {
-				
-				var item = this.getNewItem();				
+			} else {
+
+				var item = this.getNewItem();
 
 				item.setSimpleRestrictionExpression(restriction);
 
-				filterContainer.add(item);				
-				
+				filterContainer.add(item);
+
 			}
 
 		}
 
 	},
-	
-	getAddMultiItemToContainerFunction : function(filterContainer){	
-		
-		//outerRestriction is unused in this function and refers to the outermost Conjunction/Disjunction
-		var addMultiItemToContainer = function(restriction, outerRestriction,getNewItem){
-			
-			var item = getNewItem();				
 
-			item.setRestrictionExpression(restriction);
+	getAddMultiItemToContainerFunction : function(filterContainer) {
 
-			filterContainer.add(item);
+				
+		var addMultiItemToContainer = function(restriction, outerRestriction, getNewItem) {
 			
+			
+			if (!(restriction instanceof VariantTypeRestriction)){
+				
+				var item = getNewItem();
+				
+				item.setRestrictionExpression(restriction);
+
+				filterContainer.add(item);
+				
+			}
+
 		};
-		
-		return addMultiItemToContainer;		
-		
-		
+
+		return addMultiItemToContainer;
+
 	},
 
 	getNewItemFunction : function() {
-		
+
 		var filterTypeItem = this.getFilterItemType();
 		var propertyStore = this.getPropertyStore();
 		var suggestValuesRemoteFunction = this.getSuggestValuesRemoteFunction();
-		
-		var getNewItem = function(){
-		
+
+		var getNewItem = function() {
+
 			return Ext.create(filterTypeItem, {
 				propertyStore : propertyStore,
 				suggestValuesRemoteFunction : suggestValuesRemoteFunction
 			});
-		
+
 		};
-		
+
 		return getNewItem;
 	},
 
@@ -141,7 +181,7 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 		var filterContainer = this.getComponent("filterContainer");
 
 		var getNewItem = this.getNewItemFunction();
-		
+
 		var item = getNewItem();
 		// Add first item.
 		filterContainer.insert(0, item);

@@ -107,7 +107,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 			itemId : 'indelCharacteristicFilterContainer',
 			suggestValuesRemoteFunction : VariantService.suggestValues,
 			propertyStore : {
-				autoLoad : true,
+				//autoLoad : true,
 				proxy : {
 					type : 'dwr',
 					dwrFunction : VariantService.suggestPropertiesForVariantType,
@@ -155,7 +155,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 			itemId : 'snvCharacteristicFilterContainer',
 			suggestValuesRemoteFunction : VariantService.suggestValues,
 			propertyStore : {
-				autoLoad : true,
+				//autoLoad : true,
 				proxy : {
 					type : 'dwr',
 					dwrFunction : VariantService.suggestPropertiesForVariantType,
@@ -207,6 +207,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 
 		var cnvFilterPanel = this.getComponent('cnvFilterPanel');
 		var indelFilterPanel = this.getComponent('indelFilterPanel');
+		var snvFilterPanel = this.getComponent('snvFilterPanel');
 		var locationFilterContainer = this.getComponent('locationFilterContainer');
 		
 		
@@ -215,6 +216,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 		
 		var cnvRestrictions = new Conjunction();
 		var indelRestrictions = new Conjunction();
+		var snvRestrictions = new Conjunction();
 		var variantTypeDisjunctions = [];
 		
 		if (config.restriction.restrictions){
@@ -236,19 +238,26 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 		locationRestrictions.restrictions = conjunctions;
 
 		locationFilterContainer.setRestrictionExpression(locationRestrictions);
-		
+				
 		cnvRestrictions.restrictions = this.separateVariantDisjunctions(variantTypeDisjunctions, "CNV");
 		
-		if(cnvRestrictions.restrictions.length>0){
+		if(this.shouldExpandVariantTypeBox(cnvRestrictions)){
 			cnvFilterPanel.setRestrictionExpression(cnvRestrictions);
 			cnvFilterPanel.expand();
 		}
 		
 		indelRestrictions.restrictions = this.separateVariantDisjunctions(variantTypeDisjunctions, "INDEL");
 		
-		if(indelRestrictions.restrictions.length>0){
+		if(this.shouldExpandVariantTypeBox(indelRestrictions)){
 			indelFilterPanel.setRestrictionExpression(indelRestrictions);
 			indelFilterPanel.expand();
+		}
+		
+		snvRestrictions.restrictions = this.separateVariantDisjunctions(variantTypeDisjunctions, "SNV");
+		
+		if(this.shouldExpandVariantTypeBox(snvRestrictions)){
+			snvFilterPanel.setRestrictionExpression(snvRestrictions);
+			snvFilterPanel.expand();
 		}
 
 	},
@@ -271,13 +280,21 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 		};
 		
 		var somethingElseToDoFunction = function(){
-			
+			//Questioner: There's nothing else to do?!?!? Are you sure????  Answer: Yes, I am sure.  Questioner: Do the dishes.
 		};
 		
 		FilterUtil.traverseRidiculousObjectQueryGraphAndDoSomething(restriction, addVariantRestrictionToDisjunctions, somethingElseToDoFunction);
 		
 		return separatedDisjunctions;
 		
+	},
+	
+	shouldExpandVariantTypeBox : function(restrictions){
+		if (restrictions.restrictions.length> 0 && restrictions.restrictions[0].restrictions.length > 1){
+			return true;
+		}
+		
+		return false;
 	},
 
 	initComponent : function() {

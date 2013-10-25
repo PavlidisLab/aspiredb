@@ -44,7 +44,7 @@ var FilterUtil = {
 							for ( var k = 0; k < rest2Array.length; k++) {
 								var rest3 = rest2Array[k];								
 								
-								somethingToDoFunction(rest3, rest1, somethingElseToDoFunction);
+								somethingToDoFunction(rest3, rest2, somethingElseToDoFunction);
 							}
 
 						} else {							
@@ -58,6 +58,37 @@ var FilterUtil = {
 				}
 
 			}
+			
+		},
+
+		//Simple means not Disjunction or Conjunction
+		validateSimpleRestriction: function(restriction){
+			
+			if (restriction instanceof PhenotypeRestriction && restriction.name && restriction.value){
+				
+				return true;
+				
+			}else if (restriction instanceof SetRestriction && restriction.operator && restriction.property && restriction.values && restriction.values.length>0){
+			
+				return true;
+			
+			}
+			else if (restriction instanceof SimpleRestriction && restriction.operator && restriction.property && restriction.value && restriction.value.value !==''){
+				
+				return true;
+			}
+			
+			return false;
+			
+		},
+		
+		isSimpleRestriction : function(restriction){
+			
+			if (restriction instanceof PhenotypeRestriction || restriction instanceof SetRestriction ||restriction instanceof SimpleRestriction){
+				return true;
+			}
+			
+			return false;
 			
 		}
 		
