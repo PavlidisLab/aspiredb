@@ -27,7 +27,61 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 			var conjunction = new Conjunction();
 			conjunction.restrictions = [];
 			this.items.each(function(item, index, length) {
-				conjunction.restrictions.push(item.getRestrictionExpression());
+
+				var itemRestriction = item.getRestrictionExpression();
+
+				if (FilterUtil.isSimpleRestriction(itemRestriction)) {
+
+					if (FilterUtil.validateSimpleRestriction(itemRestriction)) {
+
+						conjunction.restrictions.push(itemRestriction);
+					}
+
+				} else if (itemRestriction instanceof Disjunction) {
+
+					var nonEmptyDisjunction = new Disjunction();
+					
+					var nonEmptyRestrictionsArray = [];
+
+					if (itemRestriction.restrictions) {
+
+						for ( var i = 0; i < itemRestriction.restrictions.length; i++) {
+							
+							var disjunctedRestriction = itemRestriction.restrictions[i];
+							
+							if (FilterUtil.isSimpleRestriction(disjunctedRestriction)) {
+
+								if (FilterUtil.validateSimpleRestriction(disjunctedRestriction)) {
+
+									nonEmptyRestrictionsArray.push(disjunctedRestriction);
+								}
+
+							}							
+
+						}
+
+					}
+
+					else {
+						//to help flush out any bugs
+						alert("multi nested disjunction andfilterconatiner");
+
+					}
+					
+					if (nonEmptyRestrictionsArray.length>0){
+						
+						nonEmptyDisjunction.restrictions = nonEmptyRestrictionsArray;
+						
+						conjunction.restrictions.push(nonEmptyDisjunction);
+						
+					}
+
+				}
+				else{
+					//to help flush out any bugs
+					alert("Unsupported Restriction andfiltercontainer");
+					
+				}
 			});
 			return conjunction;
 		}
@@ -45,6 +99,10 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 	setRestrictionExpression : function(restriction) {
 		var filterContainer = this.getComponent('filterContainer');
 
+		var addMultiItemToContainer = this.getAddMultiItemToContainerFunction(filterContainer);
+
+		var getNewItem = this.getNewItemFunction();
+
 		var filterItemType = this.getFilterItemType();
 
 		if (filterItemType == 'ASPIREdb.view.filter.PhenotypeFilter') {
@@ -52,41 +110,68 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 			filterContainer.removeAll();
 			for ( var i = 0; i < restriction.restrictions.length; i++) {
 
+				addMultiItemToContainer(restriction.restrictions[i], null, getNewItem);
+
+			}
+		} else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer' || filterItemType == 'ASPIREdb.view.filter.PropertyFilter') {
+			filterContainer.removeAll();
+
+			if (restriction.restrictions) {
+
+				FilterUtil.traverseRidiculousObjectQueryGraphAndDoSomething(restriction, addMultiItemToContainer, getNewItem);
+
+			} else {
+
 				var item = this.getNewItem();
 
-				item.setRestrictionExpression(restriction.restrictions[i]);
+				item.setSimpleRestrictionExpression(restriction);
 
 				filterContainer.add(item);
 
 			}
-		} else if (filterItemType == 'ASPIREdb.view.filter.PropertyFilter') {
-
-			filterContainer.removeAll();
-
-			var item = this.getNewItem();
-
-			item.setRestrictionExpression(restriction);
-
-			filterContainer.add(item);
-
-		} else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer') {
-			filterContainer.removeAll();
-
-			var item = this.getNewItem();
-
-			item.setRestrictionExpression(restriction);
-
-			filterContainer.add(item);
 
 		}
 
 	},
 
-	getNewItem : function() {
-		return Ext.create(this.getFilterItemType(), {
-			propertyStore : this.getPropertyStore(),
-			suggestValuesRemoteFunction : this.getSuggestValuesRemoteFunction()
-		});
+	getAddMultiItemToContainerFunction : function(filterContainer) {
+
+				
+		var addMultiItemToContainer = function(restriction, outerRestriction, getNewItem) {
+			
+			
+			if (!(restriction instanceof VariantTypeRestriction)){
+				
+				var item = getNewItem();
+				
+				item.setRestrictionExpression(restriction);
+
+				filterContainer.add(item);
+				
+			}
+
+		};
+
+		return addMultiItemToContainer;
+
+	},
+
+	getNewItemFunction : function() {
+
+		var filterTypeItem = this.getFilterItemType();
+		var propertyStore = this.getPropertyStore();
+		var suggestValuesRemoteFunction = this.getSuggestValuesRemoteFunction();
+
+		var getNewItem = function() {
+
+			return Ext.create(filterTypeItem, {
+				propertyStore : propertyStore,
+				suggestValuesRemoteFunction : suggestValuesRemoteFunction
+			});
+
+		};
+
+		return getNewItem;
 	},
 
 	initComponent : function() {
@@ -95,13 +180,15 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 		var me = this;
 		var filterContainer = this.getComponent("filterContainer");
 
-		var item = this.getNewItem();
+		var getNewItem = this.getNewItemFunction();
+
+		var item = getNewItem();
 		// Add first item.
 		filterContainer.insert(0, item);
 
 		// Attach button listener
 		me.getComponent("addButton").on('click', function(button, event) {
-			filterContainer.add(me.getNewItem());
+			filterContainer.add(getNewItem());
 			filterContainer.doLayout();
 		});
 	}

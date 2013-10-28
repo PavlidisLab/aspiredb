@@ -30,20 +30,20 @@ public class VariantTypeRestriction implements RestrictionExpression {
     
     private static final long serialVersionUID = 1L;
     
-    private VariantType type;
+    private String type;
 
     public VariantTypeRestriction() {
     }
 
     public VariantTypeRestriction(VariantType type) {
+        this.type = type.name();
+    }
+
+    public void setType(String type) {
         this.type = type;
     }
 
-    public void setType(VariantType type) {
-        this.type = type;
-    }
-
-    public VariantType getType() {
+    public String getType() {
         return type;
     }
 }

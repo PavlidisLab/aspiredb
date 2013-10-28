@@ -26,6 +26,7 @@
 <script src="scripts/ASPIREdb/view/ideogram/IdeogramCursorLayer.js"></script>
 <script src="scripts/ASPIREdb/view/ideogram/ChromosomeLayer.js"></script>
 <script src="scripts/ASPIREdb/view/ideogram/ChromosomeIdeogram.js"></script>
+<script src="scripts/ASPIREdb/view/filter/FilterUtil.js"></script>
 
 <script>
 

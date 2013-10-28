@@ -92,7 +92,7 @@ Ext.define('ASPIREdb.view.DashboardWindow', {
 				projectFilter.projectIds = activeProjectIds;
 				filterConfigs.push(projectFilter);
 				ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);
-
+				ASPIREdb.EVENT_BUS.fireEvent('query_update');
 				ref.close();
 
 			}

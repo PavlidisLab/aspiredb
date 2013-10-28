@@ -50,7 +50,7 @@ import java.util.Map;
  */
 @RemoteProxy(name = "VariantService")
 @Service("variantService")
-public class VariantServiceImpl extends GwtService implements VariantService {
+public class VariantServiceImpl implements VariantService {
 
     private static Logger log = LoggerFactory.getLogger(VariantServiceImpl.class);
 
@@ -107,6 +107,31 @@ public class VariantServiceImpl extends GwtService implements VariantService {
         }
         return properties;
     }
+    
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<Property> suggestEntityPropertiesByStringName(String variantType){
+        
+        variantType = variantType.toUpperCase();
+        
+        VariantType type = VariantType.CNV;
+        
+        if (variantType.equals( "CNV" )){
+            type = VariantType.CNV;            
+        } else if (variantType.equals( "INDEL" )){
+            type = VariantType.INDEL;
+        } else if (variantType.equals( "SNV" )){
+            type = VariantType.SNV;
+        } else if (variantType.equals( "INVERSION" )){
+            type = VariantType.INVERSION;
+        } else if (variantType.equals( "TRANSLOCATION" )){
+            type = VariantType.TRANSLOCATION;
+        }
+        
+        return suggestEntityProperties(type);       
+        
+    }
 
     private Collection<Property> suggestEntityProperties(VariantType variantType) {
         Collection<Property> properties = new ArrayList<Property>();
@@ -137,7 +162,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<Property> suggestProperties() throws NotLoggedInException {
+    public Collection<Property> suggestProperties() {
         Collection<Property> properties = new ArrayList<Property>();
         for (VariantType type : VariantType.values()) {
             properties.addAll(suggestEntityProperties(type));
@@ -156,7 +181,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext) throws NotLoggedInException, BioMartServiceException, NeurocartaServiceException {
+    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext) throws BioMartServiceException, NeurocartaServiceException {
         List<PropertyValue> values = new ArrayList<PropertyValue>();
         if (property instanceof CharacteristicProperty) {
             Collection<String> stringValues = characteristicDao.getValuesForKey(property.getName());
@@ -208,16 +233,15 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public VariantValueObject getVariant(Long id) throws NotLoggedInException {
-        throwGwtExceptionIfNotLoggedIn();
-
+    public VariantValueObject getVariant(Long id) {
+       
         Variant variant = variantDao.load(id);
         return variant.toValueObject();
     }
 
     @Override
     @RemoteMethod
-    public Collection<Property> suggestVariantLocationProperties() throws NotLoggedInException {
+    public Collection<Property> suggestVariantLocationProperties() {
         Collection<Property> properties = new ArrayList<Property>();
 
         properties.add(new GenomicLocationProperty());
@@ -230,7 +254,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     public Collection<PropertyValue> suggestVariantLocationValues(Property property, SuggestionContext suggestionContext)
-            throws NotLoggedInException, BioMartServiceException, NeurocartaServiceException {
+            throws BioMartServiceException, NeurocartaServiceException {
         Collection<PropertyValue> values = new ArrayList<PropertyValue>();
 
         if (property instanceof GeneProperty) {
@@ -308,8 +332,8 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     @Transactional
-    public LabelValueObject addLabel(Long id, LabelValueObject label) throws NotLoggedInException {
-        throwGwtExceptionIfNotLoggedIn();
+    public LabelValueObject addLabel(Long id, LabelValueObject label) {
+        
         Variant variant = variantDao.load(id);
         Label labelEntity = labelDao.findOrCreate(label);
         variant.addLabel(labelEntity);
@@ -319,8 +343,8 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     @Transactional
-    public LabelValueObject addLabel(Collection<Long> ids, LabelValueObject label) throws NotLoggedInException {
-        throwGwtExceptionIfNotLoggedIn();
+    public LabelValueObject addLabel(Collection<Long> ids, LabelValueObject label) {
+        
         Collection<Variant> variants = variantDao.load(ids);
         Label labelEntity = labelDao.findOrCreate(label);
         for (Variant variant : variants) {
@@ -333,7 +357,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     @Transactional
-    public void removeLabel(Long id, LabelValueObject label) throws NotLoggedInException {
+    public void removeLabel(Long id, LabelValueObject label) {
         Variant variant = variantDao.load(id);
         Label labelEntity = labelDao.load(label.getId());
         variant.removeLabel(labelEntity);
@@ -343,7 +367,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     @Transactional
-    public void removeLabel(Collection<Long> variantIds, LabelValueObject label) throws NotLoggedInException {
+    public void removeLabel(Collection<Long> variantIds, LabelValueObject label) {
         for (Long variantId : variantIds) {
             removeLabel(variantId, label);
         }

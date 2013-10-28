@@ -34,6 +34,9 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
                             valueCombo.getStore().setProperty(record.raw);
                         },
                         scope: this
+                    },
+                    change: function(field, newValue) {
+                        field.setValue(newValue); 
                     }
                 }
             },

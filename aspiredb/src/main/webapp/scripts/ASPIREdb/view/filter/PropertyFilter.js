@@ -16,7 +16,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 	selectedProperty : null,
 
 	getRestrictionExpression : function() {
-		var propertyComboBox = this.getComponent("propertyComboBox");
+		
 		var operatorComboBox = this.getComponent("operatorComboBox");
 		var multicombo_container = this.getComponent("multicombo_container");
 		var multicombo = multicombo_container.getComponent("multicombo");
@@ -41,53 +41,48 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 
 	setRestrictionExpression : function(restriction) {
 
-		if (restriction.restrictions) {
+		if (restriction instanceof Conjunction || restriction instanceof Disjunction) {
 
 			for ( var i = 0; i < restriction.restrictions.length; i++) {
 
 				var rest1 = restriction.restrictions[i];
 
-				if (rest1.restrictions) {
-
-					var rest1Array = rest1.restrictions;
-
-					for ( var j = 0; j < rest1Array.length; j++) {
-
-						rest2 = rest1Array[j];
-
-						if (rest2.restrictions) {
-
-							var rest2Array = rest2.restrictions;
-
-							for ( var k = 0; k < rest2Array.length; k++) {
-								var rest3 = rest2Array[k];
-								this.populateMultiComboItem(rest3);
-							}
-
-						} else {
-							this.populateMultiComboItem(rest2);
-						}
-
-					}
-
-				} else {
-
-					this.populateMultiComboItem(rest1);
-				}
+				this.populateMultiComboItem(rest1);
 
 			}
 
-		} else {
-
-			var singleValueField = multicombo_container.getComponent("singleValueField");
-			// var simpleRestriction = new SimpleRestriction();
-			simpleRestriction.property = this.selectedProperty = restriction.property;
-			simpleRestriction.operator = operatorComboBox.getValue();
-			var value = new NumericValue();
-			value.value = singleValueField.getValue();
-			simpleRestriction.value = value;
-			return simpleRestriction;
+		} else if (restriction instanceof VariantTypeRestriction){
+			//VariantType is implied by the container
+			
+		} else if (restriction instanceof SimpleRestriction){
+			this.setSimpleRestrictionExpression(restriction);
+		} 
+		else {
+			this.populateMultiComboItem(restriction);
 		}
+
+	},
+
+		
+	setSimpleRestrictionExpression : function(restriction) {
+		var propertyComboBox = this.getComponent("propertyComboBox");
+		var operatorComboBox = this.getComponent("operatorComboBox");	
+		
+		var multicombo_container = this.getComponent("multicombo_container");
+		var multicombo = multicombo_container.getComponent("multicombo");
+		
+		var singleValueField = multicombo_container.getComponent("singleValueField");
+
+		this.selectedProperty = restriction.property;
+		propertyComboBox.setValue(restriction.property.displayName);
+		operatorComboBox.setValue(restriction.operator);
+
+		singleValueField.setValue(restriction.value.value);
+		
+		this.isMultiValue = false;
+		multicombo.hide();		
+		singleValueField.show();
+
 	},
 
 	populateMultiComboItem : function(restriction) {
@@ -214,13 +209,17 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			me.selectedProperty = property;
 		});
 
+		singleValueField.on('change', function(obj, newValue, oldValue) {
+			ASPIREdb.EVENT_BUS.fireEvent('query_update');
+		});
+		
 		me.getComponent("removeButton").on('click', function(button, event) {
 			// TODO: fix with custom events
 			var item = button.ownerCt;
 			var filterContainer = item.ownerCt;
 			filterContainer.remove(item);
 			filterContainer.doLayout();
-			ASPIREdb.EVENT_BUS.fireEvent('queryUpdate');
+			ASPIREdb.EVENT_BUS.fireEvent('query_update');
 		});
 
 		propertyComboBox.getStore().on('load', function(store, records, successful) {

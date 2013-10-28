@@ -96,13 +96,13 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 				},
 				items : [ {
 					xtype : 'label',
-					itemId : 'numberOfSubjectsLabel'
+					itemId : 'numberOfSubjectsLabel',
 				}, {
 					xtype : 'label',
 					text : ' subjects and '
 				}, {
 					xtype : 'label',
-					itemId : 'numberOfVariantsLabel'
+					itemId : 'numberOfVariantsLabel',
 				}, {
 					xtype : 'label',
 					text : ' variants will be returned.'
@@ -161,7 +161,8 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		var filterContainer = this.down('#filterContainer');
 
 		this.updateSavedQueryCombo();
-
+		
+		
 		this.down('#loadQuery').on('click', this.savedQueryComboBoxSelectHandler, this);
 
 		filterTypeComboBox.on('select', function(combo, records) {
@@ -172,7 +173,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 
 		ASPIREdb.view.SaveQueryWindow.on('new_query_saved', this.updateSavedQueryCombo, this);
 		
-		ASPIREdb.EVENT_BUS.on('queryUpdate', function(event) {
+		ASPIREdb.EVENT_BUS.on('query_update', function(event) {
 			me.updateResultCounts();
 		});
 	},
@@ -207,9 +208,8 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 
 				} else if (filters[i] instanceof VariantFilterConfig) {
 					
-					var variantFilterPanel = Ext.create('ASPIREdb.view.filter.VariantFilterPanel');
+					var variantFilterPanel = Ext.create('ASPIREdb.view.filter.VariantFilterPanel');					
 					
-					//variantFilterPanel.remove('locationFilterContainer');
 					filterContainer.add(variantFilterPanel);
 					filterContainer.doLayout();
 					variantFilterPanel.setFilterConfig(filters[i]);
@@ -219,48 +219,23 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 			}
 
 		}
-
-		// filterContainer.doLayout();
-
-		// TODO load filters into widget
-
-		// for (var i = 0; i <filters.length; i++){
-
-		// }
-
-		/*
-		 * filterContainer.clear(); for (RestrictionFilterConfig filterConfig:
-		 * selectedQuery.getQuery()) { FilterWidget filterWidget = null;
-		 * 
-		 * if (filterConfig instanceof PhenotypeFilterConfig) { filterWidget =
-		 * new PhenotypeFilterWidget(); } else if (filterConfig instanceof
-		 * SubjectFilterConfig) { filterWidget = new
-		 * SubjectFilterWidget(subjectProperties); } else if (filterConfig
-		 * instanceof VariantFilterConfig) { filterWidget = new
-		 * VariantFilterWidget(variantProperties, variantLocationProperties); }
-		 * 
-		 * if (filterWidget != null) { filterWidget.addRemoveMeHandler( new
-		 * RemoveMeHandler() { @Override public void onRemoveMe( RemoveMeEvent
-		 * event ) { filterContainer.remove( event.getWidget() );
-		 * aspiredb.EVENT_BUS.fireEvent(new QueryUpdateEvent()); } });
-		 * filterWidget.setFilterConfig(filterConfig);
-		 * filterContainer.add(filterWidget); } }
-		 * 
-		 * 
-		 */
 		
-		ASPIREdb.EVENT_BUS.fireEvent('queryUpdate');
+		ASPIREdb.EVENT_BUS.fireEvent('query_update');
 
 	},
 
 	savedQueryComboBoxSelectHandler : function() {
 
 		var combo = this.down('#savedQueryComboBox');
+		
+		if (combo.getValue() && combo.getValue()!=''){
 
-		QueryService.loadQuery(combo.getValue(), {
-			callback : this.loadQueryHandler,
-			scope : this
-		});
+			QueryService.loadQuery(combo.getValue(), {
+				callback : this.loadQueryHandler,
+				scope : this
+			});
+		
+		}
 
 	},
 
@@ -301,7 +276,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	clearButtonHandler : function() {
 
 		this.down('#filterContainer').removeAll();
-		ASPIREdb.EVENT_BUS.fireEvent('queryUpdate');
+		ASPIREdb.EVENT_BUS.fireEvent('query_update');
 
 	},
 
@@ -324,31 +299,20 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	updateResultCounts: function() {
 
 		var me = this;
-		me.down('#numberOfSubjectsLabel').setText("...");
-		me.down('#numberOfVariantsLabel').setText("...");
 		
 		QueryService.getSubjectCount( this.getFilterConfigs(), {
 			callback : function(totalSize) {
-				me.down('#numberOfSubjectsLabel').setText(totalSize);
+				console.log('totalSize='+totalSize);
+				me.down('#numberOfSubjectsLabel').setText(totalSize.toString());
 			}
 		});
 		
 		QueryService.getVariantCount( this.getFilterConfigs(), {
 			callback : function(totalSize) {
-				me.down('#numberOfVariantsLabel').setText(totalSize);
+				me.down('#numberOfVariantsLabel').setText(totalSize.toString());
 			}
 		});
 		
 	},
-		
-	initializeFilterProperties : function() {
-		var filterWindow = this;
-
-		var callback = {
-			callback : function(properties) {
-				// filterWindow.getComponent('');
-			}
-		};
-		VariantService.suggestProperties('CNV', callback);
-	}
+	
 });

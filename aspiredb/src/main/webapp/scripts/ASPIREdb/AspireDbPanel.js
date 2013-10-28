@@ -40,6 +40,14 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 								});
 
 							}
+						},
+						
+						failure : function(response, opts){
+							runner.destroy();
+
+							Ext.Msg.alert("You have been logged out", "You have been logged out due to inactivity, please login again.", function() {
+								location.href = "/aspiredb/home.html";
+							});
 						}
 					});
 				},
