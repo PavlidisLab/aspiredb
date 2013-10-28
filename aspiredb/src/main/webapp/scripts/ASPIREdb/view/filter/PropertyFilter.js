@@ -16,7 +16,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 	selectedProperty : null,
 
 	getRestrictionExpression : function() {
-		var propertyComboBox = this.getComponent("propertyComboBox");
+		
 		var operatorComboBox = this.getComponent("operatorComboBox");
 		var multicombo_container = this.getComponent("multicombo_container");
 		var multicombo = multicombo_container.getComponent("multicombo");
@@ -52,27 +52,37 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			}
 
 		} else if (restriction instanceof VariantTypeRestriction){
-
+			//VariantType is implied by the container
 			
-		} else {
+		} else if (restriction instanceof SimpleRestriction){
+			this.setSimpleRestrictionExpression(restriction);
+		} 
+		else {
 			this.populateMultiComboItem(restriction);
 		}
 
 	},
-	
-	setSimpleRestrictionExpression : function(restriction) {
 
-	
-
-			var singleValueField = multicombo_container.getComponent("singleValueField");
-			// var simpleRestriction = new SimpleRestriction();
-			simpleRestriction.property = this.selectedProperty = restriction.property;
-			simpleRestriction.operator = operatorComboBox.getValue();
-			var value = new NumericValue();
-			value.value = singleValueField.getValue();
-			simpleRestriction.value = value;
-			return simpleRestriction;
 		
+	setSimpleRestrictionExpression : function(restriction) {
+		var propertyComboBox = this.getComponent("propertyComboBox");
+		var operatorComboBox = this.getComponent("operatorComboBox");	
+		
+		var multicombo_container = this.getComponent("multicombo_container");
+		var multicombo = multicombo_container.getComponent("multicombo");
+		
+		var singleValueField = multicombo_container.getComponent("singleValueField");
+
+		this.selectedProperty = restriction.property;
+		propertyComboBox.setValue(restriction.property.displayName);
+		operatorComboBox.setValue(restriction.operator);
+
+		singleValueField.setValue(restriction.value.value);
+		
+		this.isMultiValue = false;
+		multicombo.hide();		
+		singleValueField.show();
+
 	},
 
 	populateMultiComboItem : function(restriction) {
