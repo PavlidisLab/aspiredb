@@ -137,6 +137,10 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 
 		this.on('selectionchange', me.selectionChangeHandler, me);
 		this.on('select', me.onSelectHandler, me);
+		
+		ASPIREdb.EVENT_BUS.on('label_change', function() {
+			me.getView().refresh();
+		});
 	},
 
 	/**
@@ -280,10 +284,6 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 					visibleLabels : me.visibleLabels,
 					isSubjectLabel : true,
 				});
-
-		labelControlWindow.on('destroy', function(btn, e, eOpts) {
-			me.getView().refresh();
-		}, this);
 
 		labelControlWindow.show();
 	},

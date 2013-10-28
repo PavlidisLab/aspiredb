@@ -113,6 +113,10 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		// bugging out when we added the dynamically created grid afterwords
 		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);
 
+		ASPIREdb.EVENT_BUS.on('label_change', function() {
+			ref.down('#variantGrid').getView().refresh();
+		});
+		
 		this.saveButton.on('click', function() {
 			ref.saveButtonHandler();
 
@@ -399,10 +403,6 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			visibleLabels : me.down('#variantGrid').visibleLabels,
 			isSubjectLabel : false,
 		});
-
-		labelControlWindow.on('destroy', function(btn, e, eOpts) {
-			me.down('#variantGrid').getView().refresh();
-		}, this);
 
 		labelControlWindow.show();
 	},
