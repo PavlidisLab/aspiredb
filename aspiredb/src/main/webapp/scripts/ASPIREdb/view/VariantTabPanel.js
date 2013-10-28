@@ -99,6 +99,14 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			itemId : 'actionsButton',
 			menu : this.actionsMenu
 		});
+		
+		this.selectAllButton = Ext.create('Ext.Button', {
+			itemId : 'selectAll',
+			text : 'Select All',
+			disabled : true,
+			handler : this.selectAllHandler,
+			scope : this
+		});
 
 		this.saveButton = Ext.create('Ext.Button', {
 			id : 'saveButton',
@@ -131,10 +139,12 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			if (newCard.itemId == 'ideogram') {
 
 				currentlySelectedRecords = this.getIdeogramVariantRecordSelection();
+				this.selectAllButton.disable();
 
 			} else {
 				// newCard is the grid
 				currentlySelectedRecords = this.selectedVariants;
+				this.selectAllButton.enable();
 			}
 
 			this.enableActionButtonsBySelectedRecords(currentlySelectedRecords);
@@ -179,6 +189,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 					toolbar.add(ref.actionsButton);
 					toolbar.add(ref.labelsButton);
+					toolbar.add(ref.selectAllButton);
 					toolbar.add(ref.saveButton);
 
 				}
@@ -193,6 +204,15 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		this.selectedVariants = records;
 
 		this.enableActionButtonsBySelectedRecords(records);
+
+	},
+	
+	selectAllHandler : function() {
+
+		//boolean true to suppressEvent
+		this.getComponent('variantGrid').getSelectionModel().selectAll(true);
+		
+		this.selectionChangeHandler(this.getComponent('variantGrid').getSelectionModel(), this.getComponent('variantGrid').getSelectionModel().getSelection());
 
 	},
 
