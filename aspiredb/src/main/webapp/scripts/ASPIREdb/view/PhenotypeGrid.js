@@ -198,6 +198,17 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	 * @param subjectId
 	 */
 	subjectSelectHandler : function(subjectId) {
+		
+		if (!subjectId){
+			var col = this.columns[this.SELECTED_VALUES_COL_IDX];
+			
+			col.setText("");
+			col.setVisible(false);
+			
+			
+			return;
+		}
+		
 		var activeProjectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
 		
 		var ref = this;
