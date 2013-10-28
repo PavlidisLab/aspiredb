@@ -60,13 +60,25 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
      * @private
      * @param item
      */
-    addItem: function(item) {
-        var itemElement = Ext.create('ASPIREdb.view.filter.multicombo.Item',
-            {
-                text: item.data.displayValue,
-                value: item.raw.value
-            }
-        );
+	    addItem : function(item) {
+
+		var itemElement;
+
+		// if this is gene don't display full description
+		if (item.data && item.data.value && item.data.value.ensemblId) {
+			itemElement = Ext.create('ASPIREdb.view.filter.multicombo.Item', {
+				text : item.data.value.label,
+				value : item.raw.value
+			});
+
+		} else {
+			itemElement = Ext.create('ASPIREdb.view.filter.multicombo.Item', {
+				text : item.data.displayValue,
+				value : item.raw.value
+			});
+
+		}    	
+        
         itemElement.on('remove', function(itemToRemove) {
             this.items.remove(itemToRemove);
             itemToRemove.destroy();
@@ -118,7 +130,8 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
                 hideTrigger: true,
                 cls: 'multiValueSuggestBox-list-input',
                 triggerAction: 'query',
-                autoSelect: true,
+                autoSelect: false, 
+                
                 enableKeyEvents: true,
                 displayField: 'displayValue',
                 store: Ext.create('ASPIREdb.ValueSuggestionStore',{
@@ -130,7 +143,10 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
                 },
                 listeners: {
                     change: function(field, newValue) {
-                        field.setValue(newValue); 
+                    	
+                        field.setValue(newValue);
+                        
+                        
                     }
                 }
             }
@@ -140,6 +156,20 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
 
         var multiCombo = this;
         var comboBox = this.getComponent('invisibleCombo');
+        
+
+		        // ExtJs wasn't firing the select event when we selected the
+				// currently highlighted item in the combolist, this function is
+				// a workaround
+		var addItemHack = function() {
+			var currentValue = comboBox.getValue();
+			var record = comboBox.findRecordByValue(currentValue);
+
+			var records = [];
+			records.push(record);
+
+			comboBox.fireEvent('select', comboBox, records);
+		};
 
         comboBox.on('keydown', function(obj, event) {
             if (event.getKey() === event.BACKSPACE) {
@@ -148,10 +178,21 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
                     comboBox.collapse();
                 }
             }
+            
+
+			            if (event.getKey() === event.ENTER || event.getKey() === event.TAB) {
+
+				addItemHack();
+
+			}
         });
 
         comboBox.on('select', function(obj, records) {
             multiCombo.addItem(records[0]);
+        });
+        
+        comboBox.on('blur', function(obj, records) {
+        	addItemHack();
         });
 
         this.on('afterrender', function() {
