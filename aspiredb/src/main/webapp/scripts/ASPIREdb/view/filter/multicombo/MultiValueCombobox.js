@@ -77,6 +77,7 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
         items.insert(items.getCount() - 1, itemElement);
         comboBox.clearValue();
         this.doLayout();
+        ASPIREdb.EVENT_BUS.fireEvent('queryUpdate');
     },
     
     addMultiComboItem: function(item) {
@@ -91,7 +92,7 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
         items.insert(items.getCount() - 1, itemElement);
         comboBox.clearValue();
         this.doLayout();
-        
+        ASPIREdb.EVENT_BUS.fireEvent('queryUpdate');
         
     },
 
@@ -104,6 +105,7 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
             var item = this.items.removeAt(this.items.getCount() - 2);
             item.destroy();
             this.doLayout();
+            ASPIREdb.EVENT_BUS.fireEvent('queryUpdate');
         }
     },
 

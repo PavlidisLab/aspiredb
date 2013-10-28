@@ -220,6 +220,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			var filterContainer = item.ownerCt;
 			filterContainer.remove(item);
 			filterContainer.doLayout();
+			ASPIREdb.EVENT_BUS.fireEvent('queryUpdate');
 		});
 
 		propertyComboBox.getStore().on('load', function(store, records, successful) {

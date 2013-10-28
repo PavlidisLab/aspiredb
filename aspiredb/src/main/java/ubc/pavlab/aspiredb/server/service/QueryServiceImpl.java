@@ -289,14 +289,30 @@ public class QueryServiceImpl implements QueryService {
 
     @Override
     @Transactional(readOnly = true)
+    @RemoteMethod
     public int getSubjectCount(AspireDbPagingLoadConfig config) throws NotLoggedInException, ExternalDependencyException {
         return querySubjects( config.getFilters() ).getTotalSize();
     }
 
     @Override
     @Transactional(readOnly = true)
+    @RemoteMethod
+    public int getSubjectCount(Set<AspireDbFilterConfig> filters) throws NotLoggedInException, ExternalDependencyException {
+        return querySubjects( filters ).getTotalSize();
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    @RemoteMethod
     public int getVariantCount(AspireDbPagingLoadConfig config) throws NotLoggedInException, ExternalDependencyException {
         return queryVariants( config.getFilters() ).getTotalSize();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @RemoteMethod
+    public int getVariantCount(Set<AspireDbFilterConfig> filters) throws NotLoggedInException, ExternalDependencyException {
+        return queryVariants( filters ).getTotalSize();
     }
 
     private List<VariantValueObject> convertToValueObjects (Collection<Variant> variants) {

@@ -6,7 +6,7 @@ import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 
 import java.util.Set;
 
-@DataTransferObject
+@DataTransferObject(javascript = "AspireDbPagingLoadConfig")
 public interface AspireDbPagingLoadConfig extends PagingLoadConfig {
 	
 	  Set<AspireDbFilterConfig> getFilters();

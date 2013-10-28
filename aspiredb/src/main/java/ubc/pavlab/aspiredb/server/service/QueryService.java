@@ -72,6 +72,10 @@ public interface QueryService {
 
     public void deleteQuery(String name);
 
+    public int getSubjectCount( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException, ExternalDependencyException;
+
+    public int getVariantCount( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException, ExternalDependencyException;
+
 //    // TODO: To be removed
 //    @Deprecated
 //    public Collection<GeneValueObject> getGeneSuggestions(String query) throws BioMartServiceException;

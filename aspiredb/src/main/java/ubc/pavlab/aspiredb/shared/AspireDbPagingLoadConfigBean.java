@@ -7,7 +7,7 @@ import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import java.util.HashSet;
 import java.util.Set;
 
-@DataTransferObject
+@DataTransferObject(javascript = "AspireDbPagingLoadConfigBean")
 public class AspireDbPagingLoadConfigBean extends PagingLoadConfigBean implements AspireDbPagingLoadConfig {
 
 	private static final long serialVersionUID = 1795348301253031445L;

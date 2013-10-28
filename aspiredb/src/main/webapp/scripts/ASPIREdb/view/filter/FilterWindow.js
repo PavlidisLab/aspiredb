@@ -171,6 +171,10 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		});
 
 		ASPIREdb.view.SaveQueryWindow.on('new_query_saved', this.updateSavedQueryCombo, this);
+		
+		ASPIREdb.EVENT_BUS.on('queryUpdate', function(event) {
+			me.updateResultCounts();
+		});
 	},
 
 	loadQueryHandler : function(filters) {
@@ -242,8 +246,10 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		 * filterWidget.setFilterConfig(filterConfig);
 		 * filterContainer.add(filterWidget); } }
 		 * 
-		 * aspiredb.EVENT_BUS.fireEvent(new QueryUpdateEvent());
+		 * 
 		 */
+		
+		ASPIREdb.EVENT_BUS.fireEvent('queryUpdate');
 
 	},
 
@@ -295,6 +301,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	clearButtonHandler : function() {
 
 		this.down('#filterContainer').removeAll();
+		ASPIREdb.EVENT_BUS.fireEvent('queryUpdate');
 
 	},
 
@@ -314,44 +321,26 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		return filterConfigs;
 	},
 
-	/**
-	 * 
-	 */
-	// updateResultCounts: function() {
-	// numPreviewQueriesInProgress = 2;
-	// numberOfSubjectsLabel.setText("...");
-	// numberOfVariantsLabel.setText("...");
-	//
-	// AspireDbPagingLoadConfig config = new AspireDbPagingLoadConfigBean();
-	// config.getFilters().add( new ProjectFilterConfig(
-	// ActiveProjectSettings.getActiveProjects() ) );
-	// config.setOffset(0);
-	// config.setLimit(2000);
-	// config.getFilters().addAll( getFilterConfigs() );
-	// queryService.getSubjectCount(config, new AspireAsyncCallback<Integer>(){
-	// @Override
-	// public void onSuccess(Integer count) {
-	// numberOfSubjectsLabel.setText(count.toString());
-	// numPreviewQueriesInProgress--;
-	// if (numPreviewQueriesInProgress == 0 && runPreviewQuery) {
-	// updateResultCounts();
-	// runPreviewQuery = false;
-	// }
-	// }
-	// });
-	//
-	// queryService.getVariantCount(config, new AspireAsyncCallback<Integer>(){
-	// @Override
-	// public void onSuccess(Integer count) {
-	// numberOfVariantsLabel.setText(count.toString());
-	// numPreviewQueriesInProgress--;
-	// if (numPreviewQueriesInProgress == 0 && runPreviewQuery) {
-	// updateResultCounts();
-	// runPreviewQuery = false;
-	// }
-	// }
-	// });
-	// },
+	updateResultCounts: function() {
+
+		var me = this;
+		me.down('#numberOfSubjectsLabel').setText("...");
+		me.down('#numberOfVariantsLabel').setText("...");
+		
+		QueryService.getSubjectCount( this.getFilterConfigs(), {
+			callback : function(totalSize) {
+				me.down('#numberOfSubjectsLabel').setText(totalSize);
+			}
+		});
+		
+		QueryService.getVariantCount( this.getFilterConfigs(), {
+			callback : function(totalSize) {
+				me.down('#numberOfVariantsLabel').setText(totalSize);
+			}
+		});
+		
+	},
+		
 	initializeFilterProperties : function() {
 		var filterWindow = this;
 

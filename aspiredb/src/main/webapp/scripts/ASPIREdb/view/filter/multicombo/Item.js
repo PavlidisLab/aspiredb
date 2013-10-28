@@ -35,6 +35,7 @@ Ext.define('ASPIREdb.view.filter.multicombo.Item', {
                         element:'el',
                         fn: function() {
                             this.fireEvent('remove', this);
+                            ASPIREdb.EVENT_BUS.fireEvent('queryUpdate');
                         },
                         scope: this
                     }
