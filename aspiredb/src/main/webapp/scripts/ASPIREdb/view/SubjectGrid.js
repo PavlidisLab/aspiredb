@@ -210,7 +210,12 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 	},
 
 	onSelectHandler : function(ref, record, index, eOpts) {
-		ASPIREdb.EVENT_BUS.fireEvent('subject_selected', record.get('id'));
+		if (this.getSelectionModel().getSelection().length==1){		
+			ASPIREdb.EVENT_BUS.fireEvent('subject_selected', record.get('id'));
+		}else{
+			ASPIREdb.EVENT_BUS.fireEvent('subject_selected', null);
+			
+		}
 	},
 	
 	/**
