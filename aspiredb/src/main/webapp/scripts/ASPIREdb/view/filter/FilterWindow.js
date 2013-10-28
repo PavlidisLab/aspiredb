@@ -302,7 +302,6 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		
 		QueryService.getSubjectCount( this.getFilterConfigs(), {
 			callback : function(totalSize) {
-				console.log('totalSize='+totalSize);
 				me.down('#numberOfSubjectsLabel').setText(totalSize.toString());
 			}
 		});
