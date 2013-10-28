@@ -127,6 +127,11 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
                 listConfig: {
                     loadingText: 'Searching...',
                     emptyText: 'No results found.'
+                },
+                listeners: {
+                    change: function(field, newValue) {
+                        field.setValue(newValue); 
+                    }
                 }
             }
         ];
