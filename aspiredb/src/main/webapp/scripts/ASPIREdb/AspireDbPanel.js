@@ -4,6 +4,7 @@ Ext.require([ 'ASPIREdb.MainPanel', 'ASPIREdb.EVENT_BUS', 'ASPIREdb.view.filter.
  * Events: - login - logout
  */
 Ext.define('ASPIREdb.AspireDbPanel', {
+	itemId : 'aspireDbPanel',
 	extend : 'Ext.container.Viewport',
 	layout : 'border',
 	config : {
@@ -17,6 +18,8 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 		ASPIREdb.EVENT_BUS.on('login', function(event) {
 			
 			aspireDbPanel.getComponent('topToolbar').getComponent('logoutForm').show();
+			
+			aspireDbPanel.disableToolbarButtonsForDashboard(true);
 
 			ASPIREdb.view.DashboardWindow.show();
 
@@ -55,6 +58,10 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			});
 
 		});
+		
+		ASPIREdb.view.DashboardWindow.on('beforeclose', function(event) {
+			aspireDbPanel.disableToolbarButtonsForDashboard(false);
+		});
 
 		// TODO: finish me
 		ASPIREdb.EVENT_BUS.on('logout', function(event) {
@@ -67,6 +74,17 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 		});
 
 		ASPIREdb.EVENT_BUS.fireEvent('login');
+	},
+	
+	disableToolbarButtonsForDashboard: function(yes){
+		
+		if (yes){
+			this.down('#filterButton').disable();
+			this.down('#clearFilterButton').disable();
+		}else{
+			this.down('#filterButton').enable();
+			this.down('#clearFilterButton').enable();
+		}
 	},
 
 	parseUrlParametersAndRedirect : function() {
@@ -130,6 +148,7 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			height : 30,
 			margin : '5 5 5 5',
 			handler : function() {
+				this.up('#aspireDbPanel').disableToolbarButtonsForDashboard(true);
 				ASPIREdb.view.DashboardWindow.show();
 			}
 		}, {
