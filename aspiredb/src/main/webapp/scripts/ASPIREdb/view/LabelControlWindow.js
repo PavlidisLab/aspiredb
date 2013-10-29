@@ -147,6 +147,8 @@ Ext
 									} else {
 										LabelService.deleteVariantLabel(label);
 									}
+
+									ASPIREdb.EVENT_BUS.fireEvent('label_change');
 								}
 							});
 						}
@@ -166,5 +168,6 @@ Ext
 						var label = this.visibleLabels[labelId];
 						label.isShown = checked;
 						LabelService.updateLabel(label);
+						ASPIREdb.EVENT_BUS.fireEvent('label_change');
 					},
 				});
