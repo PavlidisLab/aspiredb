@@ -97,6 +97,9 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 		this.selectedProperty = r.property;
 		propertyComboBox.setValue(r.property.displayName);
 		operatorComboBox.setValue(r.operator);
+		
+		//set property in combo store for dwr calls
+		multicombo.setProperty(r.property);
 
 		for ( var j = 0; j < r.values.length; j++) {
 
