@@ -54,7 +54,7 @@ import cern.colt.list.DoubleArrayList;
 
 @RemoteProxy(name="PhenotypeService")
 @Service("phenotypeService")
-public class PhenotypeServiceImpl extends GwtService implements PhenotypeService {
+public class PhenotypeServiceImpl implements PhenotypeService {
 
     protected static Log log = LogFactory.getLog( PhenotypeServiceImpl.class );
 
@@ -142,8 +142,7 @@ public class PhenotypeServiceImpl extends GwtService implements PhenotypeService
     @RemoteMethod
     @Transactional
     public Map<String, PhenotypeValueObject> getPhenotypes( Long subjectId ) throws NotLoggedInException {
-        throwGwtExceptionIfNotLoggedIn();
-
+        
         log.info( "getPhenotypes" );
 
         StopWatch timer = new StopWatch();

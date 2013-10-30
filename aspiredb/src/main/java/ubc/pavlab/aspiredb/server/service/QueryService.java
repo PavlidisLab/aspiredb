@@ -24,6 +24,7 @@ import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.suggestions.PhenotypeSuggestion;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -58,7 +59,7 @@ public interface QueryService {
 
 	public PagingLoadResult<SubjectValueObject> getSubjectSuggestionLoadResult(String query);
 	
-	public List<GwtSerializable> getVariantLocationValueObjects(Property property, List<String> text) throws BioMartServiceException, NeurocartaServiceException;
+	public List<Serializable> getVariantLocationValueObjects(Property property, List<String> text) throws BioMartServiceException, NeurocartaServiceException;
 	
 	public List<PhenotypeSuggestion> getPhenotypeSuggestions(List<String> names);
 	

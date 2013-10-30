@@ -52,7 +52,7 @@ import ubc.pavlab.aspiredb.shared.AspireDbPagingLoadConfig;
 import ubc.pavlab.aspiredb.shared.BoundedList;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
-import ubc.pavlab.aspiredb.shared.GwtSerializable;
+
 import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.OntologyTermValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
@@ -372,7 +372,7 @@ public class QueryServiceImpl implements QueryService {
 	}
 
 	@Override
-	public List<GwtSerializable> getVariantLocationValueObjects(Property property, List<String> text) throws BioMartServiceException, NeurocartaServiceException {
+	public List<Serializable> getVariantLocationValueObjects(Property property, List<String> text) throws BioMartServiceException, NeurocartaServiceException {
 		final List valueObjects;
 		
 		if (property instanceof GeneProperty) {

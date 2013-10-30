@@ -20,7 +20,7 @@ package ubc.pavlab.aspiredb.shared.query;
 
 import org.directwebremoting.annotations.DataTransferObject;
 import ubc.pavlab.aspiredb.shared.Displayable;
-import ubc.pavlab.aspiredb.shared.GwtSerializable;
+
 
 import java.io.Serializable;
 
