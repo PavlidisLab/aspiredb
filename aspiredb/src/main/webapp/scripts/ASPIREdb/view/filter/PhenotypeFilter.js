@@ -12,6 +12,7 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
             {
                 xtype: 'combo',
                 itemId: 'nameCombo',
+                emptyText: 'phenotype',
                 matchFieldWidth: false,
                 triggerAction: 'query',
                 //autoSelect: true,
@@ -43,6 +44,7 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
             {
                 xtype: 'combo',
                 itemId: 'valueCombo',
+                emptyText: 'value',
                 displayField: 'displayValue',
                 triggerAction: 'query',
                 minChars: 0,
