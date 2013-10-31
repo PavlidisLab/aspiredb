@@ -27,6 +27,8 @@ var FilterUtil = {
 			
 			for ( var i = 0; i < restriction.restrictions.length; i++) {
 
+				
+				//Conjunction
 				var rest1 = restriction.restrictions[i];
 
 				if (rest1.restrictions) {
@@ -35,6 +37,7 @@ var FilterUtil = {
 
 					for ( var j = 0; j < rest1Array.length; j++) {
 
+						//Disjunction
 						rest2 = rest1Array[j];
 
 						if (rest2.restrictions) {
@@ -42,6 +45,7 @@ var FilterUtil = {
 							var rest2Array = rest2.restrictions;
 
 							for ( var k = 0; k < rest2Array.length; k++) {
+								//Specific Restriction
 								var rest3 = rest2Array[k];								
 								
 								somethingToDoFunction(rest3, rest2, somethingElseToDoFunction);
@@ -54,6 +58,8 @@ var FilterUtil = {
 					}
 
 				} else{
+					//this probably will never get called
+					alert("FilterUtil: unexpected Object");
 					somethingToDoFunction(rest1, rest1, somethingElseToDoFunction);
 				}
 

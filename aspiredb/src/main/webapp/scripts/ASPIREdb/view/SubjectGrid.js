@@ -109,6 +109,13 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 			itemId : 'labelsButton',
 			menu : this.labelsMenu
 		});
+		
+		this.selectAllButton = Ext.create('Ext.Button', {
+			itemId : 'selectAll',
+			text : 'Select All',
+			handler : this.selectAllHandler,
+			scope : this
+		});
 
 		this.saveButton = Ext.create('Ext.Button', {
 			itemId : 'saveButton',
@@ -123,6 +130,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		});
 
 		this.toolbar.add(this.labelsButton);
+		this.toolbar.add(this.selectAllButton);
 		this.toolbar.add(Ext.create('Ext.toolbar.Fill'));
 		this.toolbar.add(this.saveButton);
 		this.addDocked(this.toolbar);
@@ -292,5 +300,13 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 
 		labelControlWindow.show();
 	},
+	
+	selectAllHandler : function() {
+
+		//boolean true to suppressEvent
+		this.getSelectionModel().selectAll(true);		
+		this.selectionChangeHandler();
+
+	}
 
 });

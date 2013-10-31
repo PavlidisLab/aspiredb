@@ -3,7 +3,7 @@ Ext.require([ 'Ext.layout.container.*', 'ASPIREdb.view.filter.multicombo.MultiVa
 Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 	extend : 'Ext.Container',
 	alias : 'widget.filter_property',
-	width : 690,
+	width : 850,
 	layout : {
 		type : 'hbox'
 	},
@@ -97,6 +97,9 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 		this.selectedProperty = r.property;
 		propertyComboBox.setValue(r.property.displayName);
 		operatorComboBox.setValue(r.operator);
+		
+		//set property in combo store for dwr calls
+		multicombo.setProperty(r.property);
 
 		for ( var j = 0; j < r.values.length; j++) {
 
@@ -116,11 +119,13 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 		this.items = [ {
 			xtype : 'combo',
 			itemId : 'propertyComboBox',
+			emptyText: 'name',
 			store : me.getPropertyStore(),
 			displayField : 'displayName'
 		}, {
 			xtype : 'combo',
 			itemId : 'operatorComboBox',
+			emptyText: 'operator',
 			displayField : 'displayLabel',
 			queryMode : 'local',
 			store : {
@@ -139,13 +144,13 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			items : [ {
 				xtype : 'multivalue_combo',
 				itemId : 'multicombo',
-				width : 400,
+				width : 450,
 				height : 20,
 				suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
 			}, {
 				xtype : 'textfield',
 				itemId : 'singleValueField',
-				width : 400,
+				width : 450,
 				height : 20,
 				hidden : true
 			}, {
@@ -214,7 +219,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 		});
 		
 		me.getComponent("removeButton").on('click', function(button, event) {
-			// TODO: fix with custom events
+			
 			var item = button.ownerCt;
 			var filterContainer = item.ownerCt;
 			filterContainer.remove(item);
