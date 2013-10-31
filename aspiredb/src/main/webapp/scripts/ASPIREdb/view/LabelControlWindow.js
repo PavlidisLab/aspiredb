@@ -103,12 +103,25 @@ Ext
 
 						var loadData = [];
 
-						for ( var labelId in me.visibleLabels) {
-							var label = me.visibleLabels[labelId];
-							loadData.push([ label.id, label.isShown ]);
+						if (me.isSubjectLabel) {
+							me.service = SubjectService;
+							
+						} else {
+							me.service = VariantService;
 						}
-						me.down('#labelSettingsGrid').store.loadData(loadData);
-
+						
+						// populate grid from suggestLabels()
+						// don't use me.visibleLabels because it contains other user's labels
+						me.service.suggestLabels(new SuggestionContext, {
+							callback : function(labels) {
+								for ( var idx in labels) {
+									var label = labels[idx];
+									loadData.push([ label.id, label.isShown ]);
+								}
+								me.down('#labelSettingsGrid').store.loadData(loadData);
+							}
+						});
+						
 						me.down('#labelCheckColumn').on('checkchange',
 								me.onLabelCheckChange, this);
 						me.down('#labelActionColumn').on('itemclick',

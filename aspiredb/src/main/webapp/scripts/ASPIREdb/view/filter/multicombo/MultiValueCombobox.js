@@ -62,6 +62,8 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
      */
 	    addItem : function(item) {
 
+	    if (!item) return;
+	    	
 		var itemElement;
 
 		// if this is gene don't display full description
