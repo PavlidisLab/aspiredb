@@ -5,7 +5,7 @@ Ext.define('ASPIREdb.view.filter.OrFilterContainer', {
 	alias : 'widget.filter_or',
 	closable : true,
 	title : 'OR Filter',
-	width: 850,
+	width: 900,
 	layout : {
 		type : 'vbox'
 	},

@@ -144,13 +144,13 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			items : [ {
 				xtype : 'multivalue_combo',
 				itemId : 'multicombo',
-				width : 300,
+				width : 450,
 				height : 20,
 				suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
 			}, {
 				xtype : 'textfield',
 				itemId : 'singleValueField',
-				width : 300,
+				width : 450,
 				height : 20,
 				hidden : true
 			}, {

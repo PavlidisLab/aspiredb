@@ -13,7 +13,7 @@ Ext.define('ASPIREdb.view.filter.OrPhenotypeFilterContainer', {
 	alias : 'widget.filter_or_pheno',
 	closable : true,
 	title : 'OR Filter',
-	width: 850,
+	width: 900,
 	layout : {
 		type : 'vbox'
 	},
