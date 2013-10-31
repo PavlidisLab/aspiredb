@@ -2,6 +2,7 @@
 
 Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
     extend: 'Ext.Container',
+    alias : 'filter_phenotype_property',
     layout: 'hbox',
     /**
      * @private

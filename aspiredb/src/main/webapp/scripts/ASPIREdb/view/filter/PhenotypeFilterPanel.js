@@ -1,7 +1,7 @@
 Ext.require([
     'Ext.layout.container.*',
     'ASPIREdb.view.filter.AndFilterContainer',
-    'ASPIREdb.view.filter.OrFilterContainer',
+    'ASPIREdb.view.filter.OrPhenotypeFilterContainer',
     'ASPIREdb.view.filter.FilterPanel'
 ]);
 
@@ -11,9 +11,14 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilterPanel', {
     title: 'Phenotype Filter',
     bodyStyle: 'background: #C3FDB8;',
     items: {
-        xtype: 'filter_and',
-        itemId: 'phenotypeFilterContainer',
-        filterItemType: 'ASPIREdb.view.filter.PhenotypeFilter'
+        //xtype: 'filter_and',
+        //itemId: 'phenotypeFilterContainer',
+        //filterItemType: 'ASPIREdb.view.filter.PhenotypeFilter'
+    	
+    	xtype : 'filter_and',
+		
+		itemId : 'phenotypeFilterContainer',
+		filterItemType : 'ASPIREdb.view.filter.OrPhenotypeFilterContainer'
     },
 
     getFilterConfig: function() {
