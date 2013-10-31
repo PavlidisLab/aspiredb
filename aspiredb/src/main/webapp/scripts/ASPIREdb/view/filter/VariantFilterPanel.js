@@ -26,7 +26,8 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 		}
 	}, {
 		xtype : 'label',
-		text : 'Variant characteristics:'
+		text : 'Variant characteristics:',
+		padding: '5 5 5 5',
 	}, {
 		xtype : 'panel',
 		itemId : 'cnvFilterPanel',

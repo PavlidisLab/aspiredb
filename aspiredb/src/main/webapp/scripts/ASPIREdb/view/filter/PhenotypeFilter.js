@@ -4,6 +4,7 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
     extend: 'Ext.Container',
     alias : 'filter_phenotype_property',
     layout: 'hbox',
+    width: 850,
     /**
      * @private
      * @override
@@ -14,6 +15,7 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
                 xtype: 'combo',
                 itemId: 'nameCombo',
                 emptyText: 'phenotype',
+                width: 400,
                 matchFieldWidth: false,
                 triggerAction: 'query',
                 //autoSelect: true,

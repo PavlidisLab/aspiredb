@@ -9,10 +9,11 @@ Ext.require([ 'Ext.layout.container.*', 'ASPIREdb.view.filter.PropertyFilter' ])
  * 
  */
 Ext.define('ASPIREdb.view.filter.OrPhenotypeFilterContainer', {
-	extend : 'Ext.Panel',
+	extend : 'ASPIREdb.view.filter.FilterPanel',
 	alias : 'widget.filter_or_pheno',
 	closable : true,
-	title : 'OR Filter Container',
+	title : 'OR Filter',
+	width: 850,
 	layout : {
 		type : 'vbox'
 	},
@@ -77,6 +78,7 @@ Ext.define('ASPIREdb.view.filter.OrPhenotypeFilterContainer', {
 			 ]
 		}, {
 			xtype : 'button',
+			padding: '5 5 5 5',
 			itemId : 'addButton',
 			text : 'OR'
 		} ];

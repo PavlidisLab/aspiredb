@@ -10,7 +10,7 @@ Ext.define('ASPIREdb.view.filter.SubjectFilterPanel', {
     alias: 'widget.filter_subject',
     title: 'Subject Filter',
     bodyStyle: 'background: #FFE5B4;',
-    items: {
+    items: [{
         xtype: 'filter_and',
         itemId: 'subjectFilterContainer',
         filterItemType: 'ASPIREdb.view.filter.PropertyFilter',
@@ -27,8 +27,8 @@ Ext.define('ASPIREdb.view.filter.SubjectFilterPanel', {
                     totalProperty: 'count'
                 }
             }
-        }
-    },
+        }}
+    ],
 
     getFilterConfig: function() {
         var config = new SubjectFilterConfig();
@@ -43,8 +43,15 @@ Ext.define('ASPIREdb.view.filter.SubjectFilterPanel', {
         subjectFilterContainer.setRestrictionExpression(config.restriction);
         
     },
+    
+    handleCloseImageClick: function(){
+    	this.close();
+    },
 
     initComponent: function () {
         this.callParent();
+        
+       
+        
     }
 });
