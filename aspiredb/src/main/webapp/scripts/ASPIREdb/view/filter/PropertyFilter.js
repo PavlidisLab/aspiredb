@@ -148,7 +148,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 				height : 20,
 				suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
 			}, {
-				xtype : 'textfield',
+				xtype : 'numberfield',
 				itemId : 'singleValueField',
 				width : 450,
 				height : 20,

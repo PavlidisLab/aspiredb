@@ -72,12 +72,9 @@ Ext.define('ASPIREdb.view.filter.OrPhenotypeFilterContainer', {
 
 						filterContainer.add(filter);
 						
-					}					
+					}
 					
-					
-				}			
-
-				
+				}
 
 			},
 

@@ -111,6 +111,7 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 			for ( var i = 0; i < restriction.restrictions.length; i++) {
 
 				addMultiItemToContainer(restriction.restrictions[i], null, getNewItem);
+				
 
 			}
 		} else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer' || filterItemType == 'ASPIREdb.view.filter.OrPhenotypeFilterContainer' || filterItemType == 'ASPIREdb.view.filter.PropertyFilter') {
