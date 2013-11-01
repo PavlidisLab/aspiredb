@@ -44,7 +44,7 @@ Ext.define('ASPIREdb.view.filter.FilterPanel', {
     			    }
     			
         	}]
-    })
+    });
         
     }
 });
