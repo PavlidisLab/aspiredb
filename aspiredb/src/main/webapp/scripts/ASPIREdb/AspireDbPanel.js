@@ -74,6 +74,12 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 		});
 
 		ASPIREdb.EVENT_BUS.fireEvent('login');
+		
+		LoginStatusService.getCurrentUsername( {
+			callback : function( username ) {
+				aspireDbPanel.down('#message').setText('You are logged in as ' + username);
+			}
+		} );
 	},
 	
 	disableToolbarButtonsForDashboard: function(yes){
@@ -158,6 +164,13 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			margin : '5 5 5 5',
 			height : 30
 		}, {
+			xtype : 'label',
+			itemId : 'message',
+			style : 'text-align: right; vertical-align : middle; padding-top : 10px',
+			height : 30,
+			margin : '5 5 5 5',
+			columnWidth : 1,
+		}, {
 			xtype : 'button',
 			text : 'Logout',
 			itemId : 'logoutButton',
@@ -176,6 +189,8 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			items : [ {
 				xtype : 'button',
 				text : 'Admin Tools',
+				height : 30,			
+				margin : '5 5 5 5',
 				itemId : 'adminToolsButton',
 				hidden : true
 			} ]
