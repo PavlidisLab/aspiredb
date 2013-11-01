@@ -113,12 +113,12 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 				addMultiItemToContainer(restriction.restrictions[i], null, getNewItem);
 
 			}
-		} else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer' || filterItemType == 'ASPIREdb.view.filter.PropertyFilter') {
+		} else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer' || filterItemType == 'ASPIREdb.view.filter.OrPhenotypeFilterContainer' || filterItemType == 'ASPIREdb.view.filter.PropertyFilter') {
 			filterContainer.removeAll();
 
 			if (restriction.restrictions) {
 
-				FilterUtil.traverseRidiculousObjectQueryGraphAndDoSomething(restriction, addMultiItemToContainer, getNewItem);
+				FilterUtil.traverseRidiculousObjectQueryGraphAndDoSomething(restriction.restrictions, restriction, addMultiItemToContainer, getNewItem);
 
 			} else {
 
@@ -142,11 +142,24 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 			
 			if (!(restriction instanceof VariantTypeRestriction)){
 				
-				var item = getNewItem();
-				
-				item.setRestrictionExpression(restriction);
+				if (outerRestriction instanceof Disjunction){
+					
+					var item = getNewItem();
+					
+					item.setRestrictionExpression(outerRestriction);
 
-				filterContainer.add(item);
+					filterContainer.add(item);
+					
+					
+				}else{
+				
+					var item = getNewItem();
+				
+					item.setRestrictionExpression(restriction);
+
+					filterContainer.add(item);
+				
+				}
 				
 			}
 

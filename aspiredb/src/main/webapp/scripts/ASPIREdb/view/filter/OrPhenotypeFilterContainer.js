@@ -59,16 +59,25 @@ Ext.define('ASPIREdb.view.filter.OrPhenotypeFilterContainer', {
 			},
 
 			setRestrictionExpression : function(restriction) {
-
+				
 				var filterContainer = me.getComponent("filterContainer");
+				
+				if (restriction instanceof Disjunction){
+					
+					for (var i = 0 ; i < restriction.restrictions.length; i++){
+						
+						var filter = Ext.create('ASPIREdb.view.filter.PhenotypeFilter');
 
-				var filter = Ext.create('ASPIREdb.view.filter.PhenotypeFilter');
+						filter.setRestrictionExpression(restriction.restrictions[i]);
 
-				filter.setRestrictionExpression(restriction);
+						filterContainer.add(filter);
+						
+					}					
+					
+					
+				}			
 
-				filterContainer.add(filter);
-
-				filterContainer.doLayout();
+				
 
 			},
 

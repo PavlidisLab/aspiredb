@@ -18,54 +18,7 @@
  */
 
 var FilterUtil = {		
-		 
-		//I thought that all these nested for loops was ridiculous until I looked at the old gwt implementation and saw the same thing.
-		//Putting this restriction query object navigation code in its own file since we need to call it a couple times.
-		//Recursion would probably make things more elegant yet harder to debug however the limit of the 
-		//complexity of the queries is literally hard coded into the application so its a moot point
-		traverseRidiculousObjectQueryGraphAndDoSomething: function(restriction, somethingToDoFunction, somethingElseToDoFunction){
-			
-			for ( var i = 0; i < restriction.restrictions.length; i++) {
-
-				
-				//Conjunction
-				var rest1 = restriction.restrictions[i];
-
-				if (rest1.restrictions) {
-
-					var rest1Array = rest1.restrictions;
-
-					for ( var j = 0; j < rest1Array.length; j++) {
-
-						//Disjunction
-						rest2 = rest1Array[j];
-
-						if (rest2.restrictions) {
-
-							var rest2Array = rest2.restrictions;
-
-							for ( var k = 0; k < rest2Array.length; k++) {
-								//Specific Restriction
-								var rest3 = rest2Array[k];								
-								
-								somethingToDoFunction(rest3, rest2, somethingElseToDoFunction);
-							}
-
-						} else {							
-							somethingToDoFunction(rest2, rest1, somethingElseToDoFunction);							
-						}
-
-					}
-
-				} else{
-					//this probably will never get called
-					alert("FilterUtil: unexpected Object");
-					somethingToDoFunction(rest1, rest1, somethingElseToDoFunction);
-				}
-
-			}
-			
-		},
+		
 
 		//Simple means not Disjunction or Conjunction
 		validateSimpleRestriction: function(restriction){
@@ -95,6 +48,29 @@ var FilterUtil = {
 			}
 			
 			return false;
+			
+		},
+		
+		traverseRidiculousObjectQueryGraphAndDoSomething: function(restrictions, parentRestriction, somethingToDoFunction, somethingElseToDoFunction){
+			
+			for ( var i = 0; i < restrictions.length; i++) {
+				
+				
+				var rest1 = restrictions[i];
+
+				if (rest1.restrictions) {
+					
+					this.traverseRidiculousObjectQueryGraphAndDoSomething(rest1.restrictions, rest1, somethingToDoFunction, somethingElseToDoFunction);
+
+				} else{	
+					
+					somethingToDoFunction(rest1, parentRestriction, somethingElseToDoFunction);				
+					
+					//Disjunction Junction, what's your Function?
+					if (parentRestriction instanceof Disjunction) return;
+				}
+
+			}
 			
 		}
 		

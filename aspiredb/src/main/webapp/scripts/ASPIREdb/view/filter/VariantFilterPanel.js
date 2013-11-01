@@ -263,11 +263,8 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 
 	},
 	
-	separateVariantDisjunctions : function(disjunctions, variantType){
-		
-		var restriction = {};
-		restriction.restrictions = disjunctions;
-		
+	separateVariantDisjunctions : function(disjunctions, variantType){		
+				
 		var separatedDisjunctions = [];
 		
 		var addVariantRestrictionToDisjunctions = function(innerRestriction, outerRestriction, somethingElseToDo){
@@ -284,7 +281,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 			//Questioner: There's nothing else to do?!?!? Are you sure????  Answer: Yes, I am sure.  Questioner: Do the dishes.
 		};
 		
-		FilterUtil.traverseRidiculousObjectQueryGraphAndDoSomething(restriction, addVariantRestrictionToDisjunctions, somethingElseToDoFunction);
+		FilterUtil.traverseRidiculousObjectQueryGraphAndDoSomething(disjunctions, null, addVariantRestrictionToDisjunctions, somethingElseToDoFunction);
 		
 		return separatedDisjunctions;
 		
