@@ -46,5 +46,13 @@ Ext.define('ASPIREdb.view.filter.FilterPanel', {
         	}]
     });
         
-    }
+    },
+    
+    closeEmptyFilter : function(){
+		var filterContainer = this.getComponent('filterContainer');
+		
+		if(filterContainer.items.length == 0){
+			this.close();
+		}
+	}
 });

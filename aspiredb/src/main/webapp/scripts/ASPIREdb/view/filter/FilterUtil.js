@@ -53,8 +53,7 @@ var FilterUtil = {
 		
 		traverseRidiculousObjectQueryGraphAndDoSomething: function(restrictions, parentRestriction, somethingToDoFunction, somethingElseToDoFunction){
 			
-			for ( var i = 0; i < restrictions.length; i++) {
-				
+			for ( var i = 0; i < restrictions.length; i++) {				
 				
 				var rest1 = restrictions[i];
 

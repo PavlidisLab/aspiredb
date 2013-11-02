@@ -33,7 +33,7 @@ Ext.define('ASPIREdb.view.filter.OrPhenotypeFilterContainer', {
 
 		filterContainer.setRestrictionExpression(restriction);
 
-	},
+	},	
 
 	initComponent : function() {
 		var me = this;
@@ -96,5 +96,7 @@ Ext.define('ASPIREdb.view.filter.OrPhenotypeFilterContainer', {
 			filterContainer.add(Ext.create('ASPIREdb.view.filter.PhenotypeFilter'));
 			filterContainer.doLayout();
 		});
+		
+		
 	}
 });

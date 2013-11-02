@@ -225,6 +225,8 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			filterContainer.remove(item);
 			filterContainer.doLayout();
 			ASPIREdb.EVENT_BUS.fireEvent('query_update');
+			
+			if(filterContainer.ownerCt.closeEmptyFilter) filterContainer.ownerCt.closeEmptyFilter();
 		});
 
 		propertyComboBox.getStore().on('load', function(store, records, successful) {

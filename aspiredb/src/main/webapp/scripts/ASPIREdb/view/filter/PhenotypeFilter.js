@@ -79,6 +79,8 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
             var filterContainer = item.ownerCt;
             filterContainer.remove(item);
             filterContainer.doLayout();
+            
+            if(filterContainer.ownerCt.closeEmptyFilter) filterContainer.ownerCt.closeEmptyFilter();
         });
 
     },
