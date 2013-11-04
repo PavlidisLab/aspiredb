@@ -8,17 +8,14 @@ Ext.define('ASPIREdb.view.filter.TextImportWindow', {
 	closable : true,
 	closeAction : 'hide',
 	width : 500,
-	height : 500,
-	layout : 'border',
+	height : 400,
+	layout : 'fit',
 	bodyStyle : 'padding: 5px;',
 
 	initComponent : function() {
 		var me = this;
 		this.items = [{xtype : 'textarea',
-                      itemId : 'textImport',
-                      
-                      width : 500,
-                      height : 500 } ];
+                      itemId : 'textImport' } ];
 		
 		this.buttons = [{
             text : 'OK',

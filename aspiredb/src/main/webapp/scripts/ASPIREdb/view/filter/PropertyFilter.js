@@ -112,8 +112,8 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			multicombo_container.add(multicombo);
 		}
 		
-		this.getComponent("enterListButton").enable();		
-		this.getComponent("enterListButton").show();
+		this.enableEnterList(r.property);
+		
 
 	},
 	
@@ -140,8 +140,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			multicombo_container.add(multicombo);
 		}
 		
-		this.getComponent("enterListButton").enable();		
-		this.getComponent("enterListButton").show();
+		this.enableEnterList(this.selectedProperty);
 
 	},
 
@@ -198,12 +197,15 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			itemId : 'removeButton',
 			text : 'X'
 		},
-		, {
-			xtype : 'button',
+		
+		{			
 			itemId : 'enterListButton',
-			text : 'EE',
+			xtype : 'button',
+			text : '',
+			tooltip : 'Enter list...',
+			icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
 			disabled: true,
-			hidden: true
+			hidden: true			
 		}];
 
 		this.callParent();
@@ -250,9 +252,10 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			}
 
 			me.selectedProperty = property;
-			me.getComponent("enterListButton").enable();
 			
-			me.getComponent("enterListButton").show();
+			me.enableEnterList(property);
+			
+			
 		});
 
 		singleValueField.on('change', function(obj, newValue, oldValue) {
@@ -278,5 +281,19 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			propertyComboBox.select(store.getAt(0));
 			propertyComboBox.fireEvent('select', propertyComboBox, [ store.getAt(0) ]);
 		});
+	},
+	
+	enableEnterList: function(property){
+		
+		if (property.displayName == 'Location' || property.displayName == 'Gene' || property.displayName== 'Neurocarta Phenotype'){
+			
+			this.getComponent("enterListButton").enable();			
+			this.getComponent("enterListButton").show();
+			
+		}else{
+			this.getComponent("enterListButton").disable();			
+			this.getComponent("enterListButton").hide();
+		}
+		
 	}
 });
