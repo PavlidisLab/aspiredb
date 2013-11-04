@@ -371,7 +371,8 @@ public class QueryServiceImpl implements QueryService {
         return new PagingLoadResultBean<SubjectValueObject>( vos, 0, 0 );
 	}
 
-	@Override
+	@Override	
+    @RemoteMethod
 	public List<Serializable> getVariantLocationValueObjects(Property property, List<String> text) throws BioMartServiceException, NeurocartaServiceException {
 		final List valueObjects;
 		

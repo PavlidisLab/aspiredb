@@ -1,9 +1,9 @@
-Ext.require([ 'Ext.layout.container.*', 'ASPIREdb.view.filter.multicombo.MultiValueCombobox', 'ASPIREdb.model.Operator' ]);
+Ext.require([ 'Ext.layout.container.*', 'ASPIREdb.view.filter.multicombo.MultiValueCombobox', 'ASPIREdb.model.Operator','ASPIREdb.view.filter.TextImportWindow' ]);
 
 Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 	extend : 'Ext.Container',
 	alias : 'widget.filter_property',
-	width : 850,
+	width : 875,
 	layout : {
 		type : 'hbox'
 	},
@@ -111,6 +111,37 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			multicombo.addMultiComboItem(itemElement);
 			multicombo_container.add(multicombo);
 		}
+		
+		this.getComponent("enterListButton").enable();		
+		this.getComponent("enterListButton").show();
+
+	},
+	
+	populateMultiComboItemFromImportList : function(vos) {
+
+		
+		var multicombo_container = this.getComponent("multicombo_container");
+		var multicombo = multicombo_container.getComponent("multicombo");
+		
+		multicombo.reset();
+
+				
+		//set property in combo store for dwr calls
+		//multicombo.setProperty(r.property);
+
+		for ( var j = 0; j < vos.length; j++) {
+
+			var itemElement = Ext.create('ASPIREdb.view.filter.multicombo.Item', {
+				text : vos[j].label,
+				value : vos[j]
+			});
+
+			multicombo.addMultiComboItem(itemElement);
+			multicombo_container.add(multicombo);
+		}
+		
+		this.getComponent("enterListButton").enable();		
+		this.getComponent("enterListButton").show();
 
 	},
 
@@ -166,7 +197,14 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			xtype : 'button',
 			itemId : 'removeButton',
 			text : 'X'
-		} ];
+		},
+		, {
+			xtype : 'button',
+			itemId : 'enterListButton',
+			text : 'EE',
+			disabled: true,
+			hidden: true
+		}];
 
 		this.callParent();
 		var multicombo_container = me.getComponent("multicombo_container");
@@ -212,6 +250,9 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			}
 
 			me.selectedProperty = property;
+			me.getComponent("enterListButton").enable();
+			
+			me.getComponent("enterListButton").show();
 		});
 
 		singleValueField.on('change', function(obj, newValue, oldValue) {
@@ -224,9 +265,13 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			var filterContainer = item.ownerCt;
 			filterContainer.remove(item);
 			filterContainer.doLayout();
-			ASPIREdb.EVENT_BUS.fireEvent('query_update');
-			
+			ASPIREdb.EVENT_BUS.fireEvent('query_update');			
 			if(filterContainer.ownerCt.closeEmptyFilter) filterContainer.ownerCt.closeEmptyFilter();
+		});
+		
+		me.getComponent("enterListButton").on('click', function(button, event) {
+			example.destroy();
+			ASPIREdb.view.filter.TextImportWindow.setPropertyFilterAndShow(me);
 		});
 
 		propertyComboBox.getStore().on('load', function(store, records, successful) {
