@@ -255,9 +255,14 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			
 			me.enableEnterList(property);
 			
+			ASPIREdb.EVENT_BUS.fireEvent('query_update');
 			
 		});
 
+		operatorComboBox.on('change', function(obj, newValue, oldValue) {
+			ASPIREdb.EVENT_BUS.fireEvent('query_update');
+		});
+		
 		singleValueField.on('change', function(obj, newValue, oldValue) {
 			ASPIREdb.EVENT_BUS.fireEvent('query_update');
 		});

@@ -39,6 +39,7 @@ Ext.define('ASPIREdb.view.filter.FilterPanel', {
     			        render: function(c) {
     			            c.getEl().on('click', function(e) {
     			                ref.close();
+    			                ASPIREdb.EVENT_BUS.fireEvent('query_update');
     			            }, c);
     			        }
     			    }
@@ -54,5 +55,7 @@ Ext.define('ASPIREdb.view.filter.FilterPanel', {
 		if(filterContainer.items.length == 0){
 			this.close();
 		}
+		
+        ASPIREdb.EVENT_BUS.fireEvent('query_update');
 	}
 });
