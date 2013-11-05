@@ -49,11 +49,6 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 					forceSelection : true,
 					value : 'FILTER_PLACEHOLDER',
 					store : [ [ 'QUERY_NAME_PLACEHOLDER', '<Query name>' ] ]
-				}, {
-					xtype : 'button',
-					itemId : 'loadQuery',
-					editable : false,
-					text : "Load Query"
 				} ]
 			} ]
 		}, {
@@ -164,7 +159,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		this.updateSavedQueryCombo();
 		
 		
-		this.down('#loadQuery').on('click', this.savedQueryComboBoxSelectHandler, this);
+		this.down('#savedQueryComboBox').on('select', this.savedQueryComboBoxSelectHandler, this);
 
 		filterTypeComboBox.on('select', function(combo, records) {
 			var record = records[0];
