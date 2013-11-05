@@ -14,6 +14,7 @@ Ext.define('ASPIREdb.view.DashboardWindow', {
 		align : 'left'
 	},
 	bodyStyle : 'padding: 5px;',
+	border: false,
 
 	initComponent : function() {
 

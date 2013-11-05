@@ -101,7 +101,7 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 					tag : 'a',
 					href : neurocartaUrl,
 					target : '_blank',
-					cn : 'View Neurocarta Phenotypes'
+					cn : 'View Phenocarta Phenotypes'
 				}
 			};
 		

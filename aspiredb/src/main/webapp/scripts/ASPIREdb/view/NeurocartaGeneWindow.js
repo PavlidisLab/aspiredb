@@ -23,7 +23,7 @@ Ext.define('ASPIREdb.view.NeurocartaGeneWindow', {
 	extend : 'Ext.Window',
 	alias : 'widget.neurocartaGeneWindow',
 	singleton : true,
-	title : 'Genes associated with phenotype in Neurocarta',
+	title : 'Genes associated with phenotype in Phenocarta',
 	closable : true,
 	closeAction : 'hide',
 	width : 800,
@@ -42,13 +42,15 @@ Ext.define('ASPIREdb.view.NeurocartaGeneWindow', {
 
 	},
 	
-	initGridAndShow : function(uri){
+	initGridAndShow : function(uri, name){
 			
 		var ref = this;
 		
 		var grid = ASPIREdb.view.NeurocartaGeneWindow.getComponent('neurocartaGeneGrid');
 		
 		ref.show();
+		ref.setTitle("Genes associated with "+ name +" in Phenocarta");
+		
 		grid.setLoading(true);
 		
 		var ontologyPrefix = "http://purl.obolibrary.org/obo/";
