@@ -56,16 +56,35 @@ Ext.define('ASPIREdb.view.filter.OrFilterContainer', {
 			setRestrictionExpression : function(restriction) {
 
 				var filterContainer = me.getComponent("filterContainer");
+				
+				if (restriction instanceof Disjunction){
+					
+					for (var i = 0 ; i < restriction.restrictions.length; i++){
+						
+						var filter = Ext.create('ASPIREdb.view.filter.PropertyFilter', {
+							propertyStore : me.getPropertyStore(),
+							suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
+						});
 
-				var filter = Ext.create('ASPIREdb.view.filter.PropertyFilter', {
-					propertyStore : me.getPropertyStore(),
-					suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
-				});
+						filter.setRestrictionExpression(restriction.restrictions[i]);
 
-				filter.setRestrictionExpression(restriction);
+						filterContainer.add(filter);
+						
+					}
+					
+				}else{
+					//this else block probably never gets called
+					var filter = Ext.create('ASPIREdb.view.filter.PropertyFilter', {
+						propertyStore : me.getPropertyStore(),
+						suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
+					});
 
-				filterContainer.add(filter);
+					filter.setRestrictionExpression(restriction);
 
+					filterContainer.add(filter);					
+					
+				}
+				
 				filterContainer.doLayout();
 
 			},
