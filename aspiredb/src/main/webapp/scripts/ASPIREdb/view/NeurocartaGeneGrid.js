@@ -24,6 +24,7 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.neurocartaGeneGrid',
 	emptyText : 'No genes found',
+	border: false,
 
 	dockedItems : [ {
 		xtype : 'toolbar',

@@ -24,6 +24,7 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.geneHitsByVariantGrid',
 	emptyText : 'No genes found',
+	border: false,
 
 	dockedItems : [ {
 		xtype : 'toolbar',
