@@ -81,7 +81,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 				var src = 'scripts/ASPIREdb/resources/images/icons/neurocarta.png';
 				var tooltip = "View genes associated in Neurocarta";
 								
-				var ahrefurl = '<a onclick="return Ext.getCmp(\'phenotypeGrid\').viewNeurocartaGenes(\''+value.uri+'\')" href=#>';
+				var ahrefurl = '<a onclick="return Ext.getCmp(\'phenotypeGrid\').viewNeurocartaGenes(\''+value.uri+'\',\''+value.name+'\')" href=#>';
 				 
 				image = Ext.String.format(ahrefurl + "<img src='{0}' alt='{1}' > </a>", src, tooltip);
 			}
@@ -303,8 +303,8 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 
 	},
 	
-	viewNeurocartaGenes : function(uri){
-		ASPIREdb.view.NeurocartaGeneWindow.initGridAndShow(uri);
+	viewNeurocartaGenes : function(value, name){
+		ASPIREdb.view.NeurocartaGeneWindow.initGridAndShow(value,name);
 	}
 
 });
