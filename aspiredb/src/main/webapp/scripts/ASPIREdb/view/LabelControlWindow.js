@@ -110,17 +110,12 @@ Ext
 							me.service = VariantService;
 						}
 						
-						// populate grid from suggestLabels()
-						// don't use me.visibleLabels because it contains other user's labels
-						me.service.suggestLabels(new SuggestionContext, {
-							callback : function(labels) {
-								for ( var idx in labels) {
-									var label = labels[idx];
-									loadData.push([ label.id, label.isShown ]);
-								}
-								me.down('#labelSettingsGrid').store.loadData(loadData);
-							}
-						});
+						var loadData = [];
+						for ( var idx in me.visibleLabels ) {
+							var label = me.visibleLabels[idx];
+							loadData.push([ label.id, label.isShown ]);
+						}
+						me.down('#labelSettingsGrid').store.loadData(loadData);
 						
 						me.down('#labelCheckColumn').on('checkchange',
 								me.onLabelCheckChange, this);
