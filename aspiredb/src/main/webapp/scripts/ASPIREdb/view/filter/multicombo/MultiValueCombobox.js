@@ -10,12 +10,16 @@ Ext.require([
 Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
     extend: 'Ext.Container',
     alias: 'widget.multivalue_combo',
-    layout: 'column',
+    layout : { 
+    	type : 'column',
+    	autoSize : true,
+    }, 
+    minHeight : '50',
     autoEl: {
       tag:  'ul'
     },
     cls: 'multiValueSuggestBox-list',
-    width: 200,
+    width : 'auto',
     config: {
         suggestValuesRemoteFunction: null
     },
