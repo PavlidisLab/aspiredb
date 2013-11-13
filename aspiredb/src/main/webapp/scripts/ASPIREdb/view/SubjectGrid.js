@@ -152,6 +152,28 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 	},
 
 	/**
+	 * 
+	 * @param visibleLabels
+	 */
+	createVisibleLabels : function() {
+		var visibleLabels = [];
+		var suggestionContext = new SuggestionContext();
+		suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+		
+		// load all labels created by this user
+		SubjectService.suggestLabels(suggestionContext, {
+			callback : function(labels) {
+				for ( var idx in labels) {
+					var label = labels[idx];
+					visibleLabels[label.id] = label;
+				}
+			}
+		});	
+		
+		return visibleLabels;
+	},
+	
+	/**
 	 * Populate grid with Subjects and Labels
 	 * 
 	 * @param me
@@ -163,15 +185,14 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		me.setLoading(true);
 		me.getStore().removeAll();
 
+		me.visibleLabels = me.createVisibleLabels();
+		
 		QueryService.querySubjects(filterConfigs, {
 			callback : function(pageLoad) {
 				me.valueObjects = pageLoad.items;
 
-				// TODO: fix me (define grid/store in initComponent)
-				// me.items.removeAll();
-
 				var data = [];
-				me.visibleLabels = {};
+				
 				for ( var i = 0; i < me.valueObjects.length; i++) {
 					var val = me.valueObjects[i];
 
@@ -179,10 +200,14 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 					var labelIds = [];
 					for ( var j = 0; j < val.labels.length; j++) {
 						var aLabel = me.visibleLabels[val.labels[j].id];
+						
+						// this happens when a label has been assigned
+						// by the admin and the user has no permissions
+						// to modify the label
 						if (aLabel == undefined) {
 							aLabel = val.labels[j];
-							me.visibleLabels[aLabel.id] = aLabel;
 						}
+						
 						labelIds.push(aLabel.id);
 					}
 

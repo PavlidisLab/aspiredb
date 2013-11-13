@@ -71,6 +71,7 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 
 		}
 		
+		var visibleLabels = this.createVisibleLabels();
 		var storeData = this.constructVariantStoreData(vvos, characteristicNames, visibleLabels);
 		
 		var store = Ext.create('Ext.data.ArrayStore', {
@@ -232,6 +233,28 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 	},
 
 	/**
+	 * 
+	 * @param visibleLabels
+	 */
+	createVisibleLabels : function(visibleLabels) {
+		var visibleLabels = [];
+		var suggestionContext = new SuggestionContext();
+		suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+		
+		// load all labels created by this user
+		VariantService.suggestLabels(suggestionContext, {
+			callback : function(labels) {
+				for ( var idx in labels) {
+					var label = labels[idx];
+					visibleLabels[label.id] = label;
+				}
+			}
+		});
+		
+		return visibleLabels;
+	},
+	
+	/**
      * @public     
      * @param {VariantValueObject[]} vvos
      * @param {string[]} characteristicNames
@@ -241,7 +264,6 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 	constructVariantStoreData : function(vvos, characteristicNames, visibleLabels) {
 
 		var storeData = [];
-		
 
 		for ( var i = 0; i < vvos.length; i++) {
 
@@ -263,10 +285,14 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 			var labels = [];
 			for ( var j = 0; j < vvo.labels.length; j++) {
 				var aLabel = visibleLabels[vvo.labels[j].id];
+				
+				// this happens when a label has been assigned
+				// by the admin and the user has no permissions
+				// to modify the label
 				if (aLabel == undefined) {
 					aLabel = vvo.labels[j];
-					visibleLabels[aLabel.id] = aLabel;
 				}
+				
 				labels.push(aLabel.id);
 			}
 

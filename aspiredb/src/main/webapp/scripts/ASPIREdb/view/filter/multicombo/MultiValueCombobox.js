@@ -10,12 +10,16 @@ Ext.require([
 Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
     extend: 'Ext.Container',
     alias: 'widget.multivalue_combo',
-    layout: 'column',
+    layout : { 
+    	type : 'column',
+    	autoSize : true,
+    }, 
+    minHeight : '50',
     autoEl: {
       tag:  'ul'
     },
     cls: 'multiValueSuggestBox-list',
-    width: 200,
+    width : 'auto',
     config: {
         suggestValuesRemoteFunction: null
     },
@@ -128,7 +132,7 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
             {
                 xtype: 'combo',
                 itemId:'invisibleCombo',
-                width: 100,
+                width: 150,
                 minChars: 0,
                 matchFieldWidth: false,
                 hideTrigger: true,
@@ -143,7 +147,13 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
                 }),
                 listConfig: {
                     loadingText: 'Searching...',
-                    emptyText: 'No results found.'
+                    emptyText: 'No results found.',
+                    listeners: {
+                        itemclick: function(list, record) {
+                        	// this fires a 'select' event
+                        	comboBox.clearValue(); 
+                        }
+                    }
                 },
                 listeners: {
                     change: function(field, newValue) {
