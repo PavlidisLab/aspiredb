@@ -162,7 +162,10 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			text : 'Help',
 			itemId : 'helpButton',
 			margin : '5 5 5 5',
-			height : 30
+			height : 30,
+			handler : function() {
+				window.open("http://aspiredb.sites.olt.ubc.ca/", "_blank", "");
+			}
 		}, {
 			xtype : 'label',
 			itemId : 'message',
