@@ -18,6 +18,12 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.Collection;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,22 +31,22 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.model.Label;
+import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
-
-import java.util.Collection;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class LabelDaoTest extends BaseSpringContextTest {
     @Autowired
     private LabelDao labelDao;
 
+    @Autowired
+    private ProjectDao projectDao;
+    
     @Autowired
     private SubjectDao subjectDao;
 
@@ -56,12 +62,20 @@ public class LabelDaoTest extends BaseSpringContextTest {
     String testSubjectId;
     Subject testSubject;
     Variant testVariant;
-
+    Project testProject;
+    
     @Before
     public void init() {
         testSubjectId = RandomStringUtils.randomAlphanumeric( 5 );
         testSubject = testObjectHelper.createPersistentTestSubjectObjectWithCNV(testSubjectId);
         testVariant = testSubject.getVariants().iterator().next();
+        
+        testProject = new Project();
+        testProject.setName(RandomStringUtils.randomAlphabetic( 4 ));
+        testProject.getSubjects().add(testSubject);
+
+        testProject = testObjectHelper.createPersistentProject(testProject);
+
     }
 
     @Test
@@ -110,5 +124,22 @@ public class LabelDaoTest extends BaseSpringContextTest {
         Collection<Label> labels = labelDao.getLabelsMatching( name.substring(0, 3) );
         Label l = labels.iterator().next();
         assertEquals( name, l.getName() );
+    }
+    
+    @Test
+    public void labelSuggestionByContext() {
+        String name = RandomStringUtils.randomAlphabetic( 4 );
+        Label label = new Label( name, "FF0000" );
+        labelDao.create( label );
+        testSubject.addLabel( label );
+        subjectDao.update( testSubject );
+
+        Collection<Label> labels = labelDao.getSubjectLabelsByProjectId( 0L );
+        assertEquals(0, labels.size());
+        
+        labels = labelDao.getSubjectLabelsByProjectId( testProject.getId() );
+        assertNotNull(labels);
+        assertEquals(1, labels.size());
+        assertEquals( name, labels.iterator().next().getName() );
     }
 }

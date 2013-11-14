@@ -238,9 +238,11 @@ public class SubjectServiceImpl implements SubjectService {
     @RemoteMethod
     @Transactional
     public List<LabelValueObject> suggestLabels(SuggestionContext suggestionContext) {
-        // TODO: filter out labels non-applicable to subjects
-        // labelDao.getLabelsMatching(partialName);
-        Collection<Label> labels = labelDao.getSubjectLabels();
+        Collection<Label> labels;
+        if ( suggestionContext == null || suggestionContext.getActiveProjectIds().size() == 0 )
+            labels = labelDao.getSubjectLabels();
+        else 
+            labels = labelDao.getSubjectLabelsByProjectId( suggestionContext.getActiveProjectIds().iterator().next() );
         List<LabelValueObject> vos = new ArrayList<LabelValueObject>();
         for (Label label : labels) {
             vos.add( label.toValueObject() );
