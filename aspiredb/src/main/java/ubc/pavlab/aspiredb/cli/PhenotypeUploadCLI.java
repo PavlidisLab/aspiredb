@@ -124,7 +124,7 @@ public class PhenotypeUploadCLI extends AbstractCLI {
 
         try {
 
-            os.getHumanPhenotypeOntologyService().startInitializationThread( false );
+            os.getHumanPhenotypeOntologyService().startInitializationThread( true );
             int c = 0;
 
             while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
@@ -159,13 +159,16 @@ public class PhenotypeUploadCLI extends AbstractCLI {
             results.close();
             stmt.close();
             conn.close();
+            
+            projectManager.addSubjectPhenotypesToProject( projectName, createProject, phenResult.getPhenotypesToAdd() );
 
-            if ( phenResult.getErrorMessages().isEmpty() ) {
-                projectManager.addSubjectPhenotypesToProject( projectName, createProject, phenResult.getPhenotypesToAdd() );
-            } else {
+            if ( !phenResult.getErrorMessages().isEmpty() ) {
                 for ( String errorMessage : phenResult.getErrorMessages() ) {
                     System.out.println( errorMessage );
                 }
+                
+            } else {
+                System.out.println( "no errors" );
                 
             }
 
