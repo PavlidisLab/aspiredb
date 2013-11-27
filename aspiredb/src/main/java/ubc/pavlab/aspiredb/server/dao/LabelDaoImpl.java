@@ -18,17 +18,19 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-import ubc.pavlab.aspiredb.server.model.Label;
-import ubc.pavlab.aspiredb.shared.LabelValueObject;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import org.hibernate.Query;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import ubc.pavlab.aspiredb.server.model.Label;
+import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 /**
  * author: anton
@@ -65,6 +67,22 @@ public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDa
         return load(ids);
     }
 
+    @Transactional(readOnly = true)
+    public Collection<Label> getSubjectLabelsByProjectId( Long projectId ) {
+
+        String sqlString = "select distinct LABEL_FK from SUBJECT_LABEL sl, SUBJECT_PROJECTS sp, SUBJECT s WHERE sl.SUBJECT_FK = s.ID AND sp.SUBJECT_ID = s.ID AND sp.PROJECT_ID = :projectId ";
+        Query query = currentSession().createSQLQuery( sqlString );
+        query.setLong( "projectId", projectId );
+
+        Collection<BigInteger> labelIds = query.list();
+
+        Collection<Long> ids = new ArrayList<Long>();
+        for ( BigInteger labelId : labelIds ) {
+            ids.add( labelId.longValue() );
+        }
+        return load( ids );
+    }
+    
     @Override
     @Transactional(readOnly = true)
     @SuppressWarnings("unchecked")

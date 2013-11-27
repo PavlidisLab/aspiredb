@@ -118,10 +118,12 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 		itemId : 'topToolbar',
 		height : 50,
 		xtype : 'container',
-		layout : 'column',
+		layout : 'hbox',
 		items : [ {
 			xtype : 'component',
 			margin : '5 5 5 5',
+			height : 30,
+			width : 126,
 			autoEl : {
 				tag : 'img',
 				src : 'scripts/ASPIREdb/resources/images/aspiredb-logo-smaller.png'
@@ -176,7 +178,7 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			style : 'text-align: right; vertical-align : middle; padding-top : 10px',
 			height : 30,
 			margin : '5 5 5 5',
-			columnWidth : 1,
+			flex : 1
 		}, {
 			xtype : 'button',
 			text : 'Logout',
