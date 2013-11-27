@@ -80,23 +80,4 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
         
     }
     
-    @Override
-    @Transactional
-    public void addSubjectToProject(Project project, Subject subject){
-        
-        Collection<Subject> currentSubjects = project.getSubjects();
-        
-        for (Subject s: currentSubjects){
-            if (s.getPatientId().equals( subject.getPatientId() )){                
-                log.error( "Subject names need to be unique in projects. Subject not added" );
-                return;
-            }
-        }
-        
-        currentSubjects.add( subject);
-        
-    }
-    
-        
-    
 }

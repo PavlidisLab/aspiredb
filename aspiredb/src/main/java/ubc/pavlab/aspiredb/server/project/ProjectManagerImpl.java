@@ -105,6 +105,36 @@ public class ProjectManagerImpl implements ProjectManager {
 
         return projectDao.create( p );
     }
+    
+    @Transactional
+    public Project createSpecialProject( String name, boolean deleteProject ) throws Exception {
+        
+        name = name.toUpperCase();
+        
+        if (!name.equals( "DECIPHER" ) && !name.equals( "DGV")){
+            throw new Exception( "Special project names limited to 'DECIPHER' or 'DGV'" );
+        }        
+        
+        if ( projectDao.findByProjectName( name ) != null){
+            
+            if ( deleteProject ) {
+                
+                deleteProject( name );
+
+            }else {
+                return projectDao.findByProjectName( name );
+            }
+            
+        }
+        
+        
+
+        Project p = new Project();
+        p.setName( name );
+        p.setSpecialData( true );
+
+        return projectDao.create( p );
+    }
 
     
     /* (non-Javadoc)
@@ -127,6 +157,16 @@ public class ProjectManagerImpl implements ProjectManager {
 
     }
     
+    @Transactional
+    public void addSubjectVariantsToSpecialProject( String projectName, boolean deleteProject, List<VariantValueObject> voList )
+            throws Exception {
+               
+        Project proj= createSpecialProject( projectName, deleteProject );
+
+        createSubjectVariantsFromVariantValueObjects( proj, voList, true );
+
+    }
+    
     /**
      * @param projectName
      * @param voList
@@ -146,44 +186,68 @@ public class ProjectManagerImpl implements ProjectManager {
         createSubjectVariantsFromVariantValueObjects( proj, voList );
 
     }
+    
+    private void createSubjectVariantsFromVariantValueObjects( Project project, List<VariantValueObject> voList ) {
+        createSubjectVariantsFromVariantValueObjects(project,voList, false );
+    }
 
     @Transactional
-    private void createSubjectVariantsFromVariantValueObjects( Project project, List<VariantValueObject> voList ) {
-
+    private void createSubjectVariantsFromVariantValueObjects( Project project, List<VariantValueObject> voList, Boolean specialProject ) {
+        log.info("Adding "+voList.size()+" value objects");
+        int counter = 0;
         for ( VariantValueObject vo : voList ) {
+            
             if ( vo instanceof CNVValueObject ) {
-                createSubjectVariantFromCNVValueObject( project, ( CNVValueObject ) vo );
+                createSubjectVariantFromCNVValueObject( project, ( CNVValueObject ) vo, specialProject );
             } else if ( vo instanceof SNVValueObject ) {
-                createSubjectVariantFromSNVValueObject( project, ( SNVValueObject ) vo );
+                createSubjectVariantFromSNVValueObject( project, ( SNVValueObject ) vo, specialProject);
             } else if ( vo instanceof IndelValueObject ) {
-                createSubjectVariantFromIndelValueObject( project, ( IndelValueObject ) vo );
+                createSubjectVariantFromIndelValueObject( project, ( IndelValueObject ) vo, specialProject );
             } else if ( vo instanceof InversionValueObject ) {
-                createSubjectVariantFromInversionValueObject( project, ( InversionValueObject ) vo );
+                createSubjectVariantFromInversionValueObject( project, ( InversionValueObject ) vo, specialProject );
             } else {
                 log.error( "unsupported VariantValueObject" );
             }
+            
+            counter++;
+            log.info("Added "+counter+" variant");
         }
 
     }
 
     @Transactional
-    private void createSubjectVariantFromCNVValueObject( Project project, CNVValueObject cnv ) {
+    private void createSubjectVariantFromCNVValueObject( Project project, CNVValueObject cnv, Boolean specialProject ) {
 
-        CNV cnvEntity = ( CNV ) getVariant(cnv);
         
+        CNV cnvEntity;
+        
+        if (specialProject){        
+            cnvEntity = ( CNV ) getSpecialProjectVariant(cnv);
+        }
+        else{
+            cnvEntity = ( CNV ) getVariant(cnv);
+        }
         cnvEntity.setType( CnvType.valueOf( cnv.getType().toUpperCase() ) );
         cnvEntity.setCopyNumber( cnv.getCopyNumber() );
         cnvEntity.setCnvLength( cnv.getCnvLength() );
         
         
         if ( cnvEntity.getId()==null ) {
-            addSubjectVariantToProject( project, cnv.getPatientId(), cnvEntity );
+            addSubjectVariantToProject( project, cnv.getPatientId(), cnvEntity, specialProject );
         }
     }
 
     @Transactional
-    private void createSubjectVariantFromSNVValueObject( Project project, SNVValueObject snv ) {
-        SNV snvEntity = ( SNV ) getVariant(snv);
+    private void createSubjectVariantFromSNVValueObject( Project project, SNVValueObject snv, Boolean specialProject) {
+        SNV snvEntity;
+        
+        if (specialProject){        
+            snvEntity = ( SNV ) getSpecialProjectVariant(snv);
+        }
+        else{
+            snvEntity = ( SNV ) getVariant(snv);
+        }
+        
         
         snvEntity.setReferenceBase( snv.getReferenceBase() );
         snvEntity.setObservedBase( snv.getObservedBase() );
@@ -191,29 +255,43 @@ public class ProjectManagerImpl implements ProjectManager {
         snvEntity.setDbSNPID( snv.getDbSNPID() );        
         
         if ( snvEntity.getId()==null ) {
-            addSubjectVariantToProject( project, snv.getPatientId(), snvEntity );
+            addSubjectVariantToProject( project, snv.getPatientId(), snvEntity, specialProject );
         }
     }
 
     @Transactional
-    private void createSubjectVariantFromIndelValueObject( Project project, IndelValueObject indel ) {
+    private void createSubjectVariantFromIndelValueObject( Project project, IndelValueObject indel, Boolean specialProject ) {
         
         Indel indelEntity = ( Indel ) getVariant(indel);
+        
+        if (specialProject){        
+            indelEntity = ( Indel ) getSpecialProjectVariant(indel);
+        }
+        else{
+            indelEntity = ( Indel ) getVariant(indel);
+        }
         
         indelEntity.setIndelLength( indel.getLength() );
 
         if (indelEntity.getId()==null){
-            addSubjectVariantToProject( project, indel.getPatientId(), indelEntity );
+            addSubjectVariantToProject( project, indel.getPatientId(), indelEntity, specialProject );
         }
     }
 
     @Transactional
-    private void createSubjectVariantFromInversionValueObject( Project project, InversionValueObject inversion ) {
+    private void createSubjectVariantFromInversionValueObject( Project project, InversionValueObject inversion, Boolean specialProject ) {
 
         Inversion inversionEntity = (Inversion) getVariant(inversion);
         
+        if (specialProject){        
+            inversionEntity = ( Inversion ) getSpecialProjectVariant(inversion);
+        }
+        else{
+            inversionEntity = ( Inversion ) getVariant(inversion);
+        }
+        
         if (inversionEntity.getId()==null){
-            addSubjectVariantToProject( project, inversion.getPatientId(), inversionEntity );
+            addSubjectVariantToProject( project, inversion.getPatientId(), inversionEntity, specialProject );
         }
 
     }
@@ -222,26 +300,42 @@ public class ProjectManagerImpl implements ProjectManager {
         
         Variant entity = variantDao.findByUserVariantId( vvo.getUserVariantId(), vvo.getPatientId() );
         if ( entity == null ) {            
-            if (vvo instanceof CNVValueObject){
-                entity = new CNV();
-                entity.setUserVariantId( vvo.getUserVariantId() );
-            }else if (vvo instanceof SNVValueObject){
-                entity = new SNV();
-                entity.setUserVariantId( vvo.getUserVariantId() );
-            }else if (vvo instanceof IndelValueObject){
-                entity = new Indel();
-                entity.setUserVariantId( vvo.getUserVariantId() );
-            }else if (vvo instanceof InversionValueObject){
-                entity = new Inversion();
-                entity.setUserVariantId( vvo.getUserVariantId() );
-            }else{
-                throw new RuntimeException();
-            }
-            
+            entity = getVariantEntity(vvo);            
         }
-        
                 
         addCommonVariantData( entity, vvo );
+        
+        return entity;
+        
+    }
+    
+    private Variant getSpecialProjectVariant(VariantValueObject vvo){
+        
+        Variant entity = getVariantEntity(vvo);
+                        
+        addCommonVariantData( entity, vvo );
+        
+        return entity;
+        
+    }
+    
+    private Variant getVariantEntity(VariantValueObject vvo){
+        Variant entity;
+        if (vvo instanceof CNVValueObject){
+            entity = new CNV();
+            entity.setUserVariantId( vvo.getUserVariantId() );
+        }else if (vvo instanceof SNVValueObject){
+            entity = new SNV();
+            entity.setUserVariantId( vvo.getUserVariantId() );
+        }else if (vvo instanceof IndelValueObject){
+            entity = new Indel();
+            entity.setUserVariantId( vvo.getUserVariantId() );
+        }else if (vvo instanceof InversionValueObject){
+            entity = new Inversion();
+            entity.setUserVariantId( vvo.getUserVariantId() );
+        }else{
+            throw new RuntimeException();
+        }
         
         return entity;
         
@@ -262,6 +356,16 @@ public class ProjectManagerImpl implements ProjectManager {
             proj = projectDao.findByProjectName( projectName );
             if ( proj == null ) throw new Exception( "Project does not exist" );
         }
+
+        createSubjectPhenotypesFromPhenotypeValueObjects( proj, voList );
+
+    }
+    
+    @Transactional
+    public void addSubjectPhenotypesToSpecialProject( String projectName, boolean deleteProject,
+            List<PhenotypeValueObject> voList ) throws Exception {
+
+        Project proj = createSpecialProject( projectName, deleteProject );
 
         createSubjectPhenotypesFromPhenotypeValueObjects( proj, voList );
 
@@ -288,7 +392,8 @@ public class ProjectManagerImpl implements ProjectManager {
                 subject.setPatientId( vo.getExternalSubjectId() );
                 subject = subjectDao.create( subject );
                 subject.addPhenotype( p );
-                projectDao.addSubjectToProject( project, subject );
+                subject.getProjects().add( project );
+                
             } else {
                 subject.addPhenotype( p );
             }
@@ -334,8 +439,8 @@ public class ProjectManagerImpl implements ProjectManager {
         return userVariantId;        
 
     }
-
-    private void addSubjectVariantToProject( Project project, String patientId, Variant v ) {
+    
+    private void addSubjectVariantToProject( Project project, String patientId, Variant v, Boolean specialProject ) {
 
         Subject subject = subjectDao.findByPatientId( project, patientId );
 
@@ -347,7 +452,7 @@ public class ProjectManagerImpl implements ProjectManager {
             subject = subjectDao.create( subject );
         }
 
-        if ( v.getUserVariantId() == null || v.getUserVariantId().trim().isEmpty() ) {
+        if (!specialProject && (v.getUserVariantId() == null || v.getUserVariantId().trim().isEmpty() )) {
             v.setUserVariantId( getNewVariantId(patientId) );
         }
         
@@ -355,7 +460,7 @@ public class ProjectManagerImpl implements ProjectManager {
         subject.addVariant( v );
 
         if ( newSubject ) {
-            projectDao.addSubjectToProject( project, subject );
+            subject.getProjects().add( project );            
         }
     }
 

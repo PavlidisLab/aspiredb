@@ -226,6 +226,6 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
 	@Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
 	public Collection<? extends Subject> load(Set<AspireDbFilterConfig> filters)
             throws BioMartServiceException, NeurocartaServiceException {
-		return loadPage(0, 0, null, null, filters);
+		return loadPage(0, 2000, null, null, filters);
 	}
 }

@@ -75,9 +75,9 @@ public class ProjectDaoTest extends BaseSpringContextTest {
         
         Project p = projectDao.create( detachedProject );
         
-        projectDao.addSubjectToProject(p, ind1 );
-        projectDao.addSubjectToProject(p, ind2 );
-        
+        ind1.getProjects().add(p);
+        ind2.getProjects().add(p);
+               
         projectDao.update( p );
         
         
@@ -125,9 +125,8 @@ public class ProjectDaoTest extends BaseSpringContextTest {
         
         Project p = projectDao.create( detachedProject );
         
-        projectDao.addSubjectToProject(p, ind1 );
-        projectDao.addSubjectToProject(p, ind2 );
-        
+        ind1.getProjects().add(p);
+        ind2.getProjects().add(p);
         String someUsername = RandomStringUtils.randomAlphabetic( 6 );
         
         try {
@@ -179,9 +178,8 @@ public class ProjectDaoTest extends BaseSpringContextTest {
         detachedProject.setName( projectId);
         
         Project p = projectDao.create( detachedProject );
-        
-        projectDao.addSubjectToProject(p, ind1 );
-        projectDao.addSubjectToProject(p, ind2 );
+        ind1.getProjects().add(p);
+        ind2.getProjects().add(p);
         projectDao.update( p );
         
         

@@ -38,8 +38,7 @@ public interface ProjectDao extends SecurableDaoBase<Project> {
     @Secured({"GROUP_USER"})
     public Integer getSubjectCountForProjects(Collection<Long> projectIds);  
     
-    @Secured({"GROUP_USER"})
-    public void addSubjectToProject(Project project, Subject subject);
+    
     
     
 

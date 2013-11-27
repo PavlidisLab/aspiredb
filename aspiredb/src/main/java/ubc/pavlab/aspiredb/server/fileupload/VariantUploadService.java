@@ -61,6 +61,37 @@ public class VariantUploadService {
         return serviceResult;
 
     }
+    
+    //Decipher gave us a weird file, this may only need to be done as a one off
+    public static VariantUploadServiceResult makeVariantValueObjectsFromDecipherResultSet( ResultSet results) throws Exception {
+
+        ArrayList<VariantValueObject> variantsToAdd = new ArrayList<VariantValueObject>();
+        int lineNumber = 1;
+        ArrayList<String> errorMessages = new ArrayList<String>();
+
+        // TODO maybe validate columns first, and bail if they are all not there
+        while ( results.next() ) {
+            lineNumber++;
+            try {
+                variantsToAdd.add( makeVariantValueObjectFromResultSet( results, VariantType.DECIPHER ) );
+            } catch ( InvalidDataException e ) {
+                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
+            } catch ( NumberFormatException e ) {
+                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
+            } catch ( SQLException e ) {
+                errorMessages.add( "Invalid data format on line number: " + lineNumber + " error message:"
+                        + e.getMessage() );
+            }catch ( Exception e ) {
+                errorMessages.add( "Error on line number: " + lineNumber + " error message:"
+                        + e.getMessage() );
+            }
+        }
+
+        VariantUploadServiceResult serviceResult = new VariantUploadServiceResult( variantsToAdd, errorMessages );
+
+        return serviceResult;
+
+    }
 
     public static VariantValueObject makeVariantValueObjectFromResultSet( ResultSet results, VariantType variantType )
             throws Exception {
@@ -73,7 +104,9 @@ public class VariantUploadService {
             return makeIndelFromResultSet( results );
         } else if ( variantType.equals( VariantType.INVERSION ) ) {
             return makeInversionFromResultSet( results );
-        } else {
+        } else if ( variantType.equals( VariantType.DECIPHER ) ) {
+            return makeDecipherCNVFromResultSet( results );
+        }else {
             log.error( "VariantType not supported" );
             throw new InvalidDataException( "VariantType not supported" );
         }
@@ -106,6 +139,70 @@ public class VariantUploadService {
         reservedCNVColumns.addAll( OptionalCNVColumn.getOptionalCNVColumnNames() );
 
         cnv.setCharacteristics( getCharacteristicsFromResultSet( results, reservedCNVColumns ) );
+
+        return cnv;
+
+    }
+    
+    //Quick and dirty method to grab data from decipher's poorly formatted data file they gave us
+    //no point in making this pretty because of the one off nature of the file
+    public static CNVValueObject makeDecipherCNVFromResultSet( ResultSet results ) throws Exception {
+
+        //RGB colour for browser display - this will tell us if it's a GAIN or LOSS: 255,0,0 is for LOSS and 0,0,255 is GAIN 
+        String rgbTypeString = "type";
+
+        CNVValueObject cnv = new CNVValueObject();
+
+        cnv.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
+        cnv.setGenomicRange( getGenomicRangeFromResultSet( results ) );
+        cnv.setCnvLength( cnv.getGenomicRange().getBaseEnd()-cnv.getGenomicRange().getBaseStart() );
+
+               
+        if (results.getString(rgbTypeString).equals( "255,0,0" )){
+            cnv.setType(CnvType.LOSS.name()  );
+        }else if(results.getString(rgbTypeString).equals( "0,0,255" )){
+            cnv.setType(CnvType.GAIN.name()  );
+        }
+        
+        
+
+        if ( !cnv.getType().toUpperCase().equals( CnvType.GAIN.name() )
+                && !cnv.getType().toUpperCase().equals( CnvType.LOSS.name() ) ) {
+            throw new InvalidDataException( "invalid type:" + cnv.getType() );
+        }
+
+        String html = results.getString( "html" );
+        
+        String[] characteristicsAndPhenotypes = html.split( "<p>" );
+        
+        
+        Map<String, CharacteristicValueObject> characteristics = new HashMap<String, CharacteristicValueObject>();
+        
+        for (String entry : characteristicsAndPhenotypes){
+            
+            if (entry.contains( "Inheritance" )){
+                
+                entry = entry.replaceAll( "Inheritance:", "" );
+                
+                entry = entry.replaceAll( "</p>", "" );
+                
+                CharacteristicValueObject charVO = new CharacteristicValueObject();
+                charVO.setKey( "Inheritance" );
+                charVO.setValue(entry.trim() );
+                characteristics.put( charVO.getKey(), charVO );
+                
+            }else if (entry.contains("Mean Ratio")){
+                entry = entry.replaceAll( "Mean Ratio:", "" );                
+                entry = entry.replaceAll( "</p>", "" );
+                
+                CharacteristicValueObject charVO = new CharacteristicValueObject();
+                charVO.setKey( "Mean Ratio" );
+                charVO.setValue(entry.trim() );
+                characteristics.put( charVO.getKey(), charVO );
+            }
+        }
+
+        cnv.setCharacteristics( characteristics );
 
         return cnv;
 
@@ -195,7 +292,14 @@ public class VariantUploadService {
     private static GenomicRange getGenomicRangeFromResultSet( ResultSet results ) throws Exception {
         GenomicRange gr = new GenomicRange();
 
-        gr.setChromosome( results.getString( CommonVariantColumn.CHROM.key ).toUpperCase() );
+        String chrom = results.getString( CommonVariantColumn.CHROM.key ).toUpperCase();
+        
+        //For decipher data, this really shouldn't be here, adding it to quickly add in decipher data
+        if (chrom.startsWith( "CHR" )){
+            chrom = chrom.replace( "CHR","" );
+        }
+        
+        gr.setChromosome(chrom  );
 
         // Note that results.getInt return 0 if it is not a number
         gr.setBaseStart( results.getInt( CommonVariantColumn.START.key ) );

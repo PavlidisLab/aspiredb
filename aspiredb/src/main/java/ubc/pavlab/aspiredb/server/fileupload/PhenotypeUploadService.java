@@ -28,6 +28,7 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Service("phenotypeUploadService")
@@ -91,7 +92,66 @@ public class PhenotypeUploadService {
 
         }
 
-        return new PhenotypeUploadServiceResult( voList, errorMessages );
+        return new PhenotypeUploadServiceResult( voList, errorMessages, new HashSet<String>() );
+
+    }
+    
+    //cut and pasted and modified to handle decipher file to quickly get it into the system for testing
+    public PhenotypeUploadServiceResult getPhenotypeValueObjectsFromDecipherResultSet( ResultSet results ) throws Exception {
+
+        
+        ArrayList<String> errorMessages = new ArrayList<String>();
+
+        ArrayList<PhenotypeValueObject> voList = new ArrayList<PhenotypeValueObject>();
+        
+        HashSet<String> unmatched = new HashSet<String>();
+        
+        int lineNumber = 1;
+        while ( results.next() ) {
+        
+            String html = results.getString( "html" );
+        
+            String[] characteristicsAndPhenotypes = html.split( "<p>" );
+            
+            for (String entry : characteristicsAndPhenotypes){
+                
+                if (entry.contains( "Phenotypes" )){
+                    
+                    entry = entry.replaceAll( "Phenotypes:", "" );
+                    
+                    entry = entry.replaceAll( "</p>", "" );
+                    entry = entry.replaceAll( "</body></html>", "" );
+                    
+                    String[] phenotypeStrings = entry.split( ";" );
+                    
+                    for (String s: phenotypeStrings){
+                        
+                        PhenotypeValueObject vo = new PhenotypeValueObject();
+                        vo.setExternalSubjectId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
+
+                        boolean matched = phenotypeUtil.setPhenotypeValueObjectByOntologyString( vo, s.trim() );
+                        
+                        if (matched){
+                            phenotypeUtil.setValue( vo, "1" );
+                            voList.add( vo );
+                        }else{
+                            
+                            errorMessages.add( "Couldn't match phenotype string: '"+ s +"' in HPO on line number: " + lineNumber);
+                            unmatched.add( s );
+                        }
+                        
+                    }
+            
+                    
+                }
+            
+            }
+            
+            lineNumber++;
+        
+        }
+        
+        return new PhenotypeUploadServiceResult( voList, errorMessages, unmatched );
 
     }
 

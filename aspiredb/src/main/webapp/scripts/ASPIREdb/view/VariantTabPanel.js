@@ -166,8 +166,9 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			QueryService.queryVariants(filterConfigs, {
 				callback : function(pageLoad) {
 
+					
 					var vvos = pageLoad.items;
-
+					
 					var ideogram = ref.getComponent('ideogram');
 					ideogram.drawChromosomes();
 					ideogram.drawVariants(vvos);

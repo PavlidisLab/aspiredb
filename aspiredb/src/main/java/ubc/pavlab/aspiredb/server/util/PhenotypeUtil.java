@@ -32,6 +32,7 @@ import ubc.pavlab.aspiredb.shared.query.restriction.Disjunction;
 import ubc.pavlab.aspiredb.shared.query.restriction.Junction;
 import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
 import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
+import ubic.basecode.ontology.model.OntologyIndividual;
 import ubic.basecode.ontology.model.OntologyResource;
 import ubic.basecode.ontology.model.OntologyTerm;
 import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
@@ -44,12 +45,40 @@ public class PhenotypeUtil {
 
     @Autowired
     OntologyService os;
+    
+    
+    //Currently just for DECIPHER returns true if it found a match
+    public boolean setPhenotypeValueObjectByOntologyString(PhenotypeValueObject phenotype, String searchString){
+        
+        Collection<OntologyTerm> terms = os.findTerms( searchString );
+        
+        for (OntologyTerm ot: terms){
+            String uri = ot.getUri();
+            String label = ot.getLabel();
+            
+            if (label.toLowerCase().equals(searchString.toLowerCase())){
+                
+                phenotype.setName( label );
+                phenotype.setValueType( PhenotypeValueType.HPONTOLOGY.toString() );                
+                int start = uri.indexOf( "HP_", 1 );
+                phenotype.setUri( uri.substring( start, uri.length() ) );
+                                
+                return true;
+                
+            }
+            
+        }
+        
+        return false;
+        
+    }
 
     
     public void setNameUriValueType( PhenotypeValueObject phenotype, String key ) throws InvalidDataException {
         if ( isUri( key ) ) {
             phenotype.setUri( key );
-            OntologyResource resource = os.getTerm( HUMAN_PHENOTYPE_URI_PREFIX + key );
+            OntologyResource resource = os.getTerm( HUMAN_PHENOTYPE_URI_PREFIX + key );            
+                        
             if (resource == null) {
                 throw new InvalidDataException(HUMAN_PHENOTYPE_URI_PREFIX + key+" not found in Ontology");
             }

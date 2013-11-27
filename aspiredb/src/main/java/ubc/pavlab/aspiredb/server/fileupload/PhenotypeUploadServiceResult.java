@@ -18,16 +18,21 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class PhenotypeUploadServiceResult {
 
-    public PhenotypeUploadServiceResult( ArrayList<PhenotypeValueObject> phenotypes, List<String> errors ) {
+    public PhenotypeUploadServiceResult( ArrayList<PhenotypeValueObject> phenotypes, List<String> errors, HashSet<String> unmatchedStrings ) {
 
         phenotypesToAdd = phenotypes;
         errorMessages = errors;
+        unmatched = unmatchedStrings;
 
     }
+    
+
+    HashSet<String> unmatched = new HashSet<String>();
 
     ArrayList<PhenotypeValueObject> phenotypesToAdd;
 
@@ -47,5 +52,13 @@ public class PhenotypeUploadServiceResult {
 
     public void setErrorMessages( List<String> errorMessages ) {
         this.errorMessages = errorMessages;
+    }
+
+    public HashSet<String> getUnmatched() {
+        return unmatched;
+    }
+
+    public void setUnmatched( HashSet<String> unmatched ) {
+        this.unmatched = unmatched;
     }
 }

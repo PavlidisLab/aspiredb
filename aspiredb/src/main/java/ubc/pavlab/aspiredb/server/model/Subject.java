@@ -21,6 +21,7 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -38,13 +39,16 @@ public class Subject implements Serializable, Securable {
     @Column(name = "PATIENT_ID")
     private String patientId;
 
-    @ManyToMany(mappedBy = "subjects")
-    private List<Project> projects;
+    
+    
+    @ManyToMany
+    @JoinTable(name = "SUBJECT_PROJECTS", joinColumns = { @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "PROJECT_ID", referencedColumnName = "ID") })
+    private List<Project> projects = new ArrayList<Project>();
 
-    @OneToMany(mappedBy = "subject", cascade = javax.persistence.CascadeType.ALL)
+    @OneToMany(mappedBy = "subject")
     private Collection<Phenotype> phenotypes = new HashSet<Phenotype>();
 
-    @OneToMany(cascade = javax.persistence.CascadeType.ALL)
+    @OneToMany
     @JoinTable(name = "SUBJECT_VARIANT", joinColumns = { @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "VARIANT_ID", referencedColumnName = "ID") })
     private List<Variant> variants;
 

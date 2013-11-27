@@ -82,10 +82,7 @@ public class ProjectServiceImpl implements ProjectService{
     @RemoteMethod
     public Integer numSubjects( Collection<Long> projectIds ) {
 
-
-        Project project = this.projectDao.load( projectIds.iterator().next() );
-
-        return project.getSubjects().size();
+        return this.projectDao.getSubjectCountForProjects( projectIds );
     }
 
     /*

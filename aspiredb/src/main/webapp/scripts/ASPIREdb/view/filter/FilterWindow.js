@@ -122,6 +122,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 					itemId : 'applyButton',
 					handler : function() {
 						var filterConfigs = me.getFilterConfigs();
+						console.log("filter_submit event from FilterWindow");
 						ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);
 						me.close();
 					}
