@@ -118,9 +118,7 @@ public class SubjectServiceImpl implements SubjectService {
     @Transactional
 	public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
             throws NotLoggedInException, NeurocartaServiceException {
-        //throwGwtExceptionIfNotLoggedIn();
-        // This should throw AccessDenied exception if user isn't allowed to view the subjects
-        // (there is a better way to test security, this method is probably going to disappear)
+        
         Collection<Subject> subjects = subjectDao.load(subjectIds);
         
         StopWatch timer = new StopWatch();
@@ -129,7 +127,7 @@ public class SubjectServiceImpl implements SubjectService {
         log.info( "loading phenotypeSummaries for "+subjectIds.size()+" subjects" );
         List<PhenotypeSummaryValueObject> phenotypeSummaries =
                 phenotypeBrowserService.getPhenotypesBySubjectIds(subjectIds, projectIds);
-        log.info( "processing phenotypeSummaries for "+subjectIds.size()+" subjects took " + timer.getTime() + "ms" );
+        log.info( "processing"+ phenotypeSummaries.size() + " phenotypeSummaries for "+subjectIds.size()+" subjects took " + timer.getTime() + "ms" );
         
         return phenotypeSummaries;
 	}

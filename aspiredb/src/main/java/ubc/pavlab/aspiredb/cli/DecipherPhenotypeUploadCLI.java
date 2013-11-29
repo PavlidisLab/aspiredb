@@ -149,7 +149,7 @@ public class DecipherPhenotypeUploadCLI extends AbstractCLI {
             ResultSet results = stmt.executeQuery( "SELECT * FROM " + filename );
 
             
-//TODO change implementation of this method
+
             PhenotypeUploadServiceResult phenResult = phenotypeUploadService.getPhenotypeValueObjectsFromDecipherResultSet( results );
             
             
@@ -157,10 +157,10 @@ public class DecipherPhenotypeUploadCLI extends AbstractCLI {
             results.close();
             stmt.close();
             conn.close();
+            
+            projectManager.addSubjectPhenotypesToSpecialProject( projectName, deleteProject, phenResult.getPhenotypesToAdd() );
 
-            if ( phenResult.getErrorMessages().isEmpty() ) {
-                projectManager.addSubjectPhenotypesToSpecialProject( projectName, deleteProject, phenResult.getPhenotypesToAdd() );
-            } else {
+            if ( !phenResult.getErrorMessages().isEmpty() ) {
                 for ( String errorMessage : phenResult.getErrorMessages() ) {
                     System.out.println( errorMessage );
                 }

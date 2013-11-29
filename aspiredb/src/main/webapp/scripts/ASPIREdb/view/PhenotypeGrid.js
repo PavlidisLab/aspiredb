@@ -252,6 +252,11 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 
 		var keyArray = [];
 		
+		//if this is a special(large) project, this will not be populated
+		if (!valueToSubjectSet.length){
+			return subjectValue;
+		}
+		
 		for ( var key in valueToSubjectSet) {
 			if(key !== "Unknown"){
 				keyArray.push(key);				

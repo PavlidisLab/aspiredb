@@ -46,34 +46,6 @@ public class PhenotypeUtil {
     @Autowired
     OntologyService os;
     
-    
-    //Currently just for DECIPHER returns true if it found a match
-    public boolean setPhenotypeValueObjectByOntologyString(PhenotypeValueObject phenotype, String searchString){
-        
-        Collection<OntologyTerm> terms = os.findTerms( searchString );
-        
-        for (OntologyTerm ot: terms){
-            String uri = ot.getUri();
-            String label = ot.getLabel();
-            
-            if (label.toLowerCase().equals(searchString.toLowerCase())){
-                
-                phenotype.setName( label );
-                phenotype.setValueType( PhenotypeValueType.HPONTOLOGY.toString() );                
-                int start = uri.indexOf( "HP_", 1 );
-                phenotype.setUri( uri.substring( start, uri.length() ) );
-                                
-                return true;
-                
-            }
-            
-        }
-        
-        return false;
-        
-    }
-
-    
     public void setNameUriValueType( PhenotypeValueObject phenotype, String key ) throws InvalidDataException {
         if ( isUri( key ) ) {
             phenotype.setUri( key );

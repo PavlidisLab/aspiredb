@@ -96,7 +96,9 @@ public class PhenotypeUploadService {
 
     }
     
-    //cut and pasted and modified to handle decipher file to quickly get it into the system for testing
+    //cut and pasted and modified to handle decipher file to quickly get it into the system
+    //no point making this pretty because some guy at decipher is going to break this code next time he uploads a file
+    //to the decipher ftp server
     public PhenotypeUploadServiceResult getPhenotypeValueObjectsFromDecipherResultSet( ResultSet results ) throws Exception {
 
         
@@ -128,17 +130,23 @@ public class PhenotypeUploadService {
                         
                         PhenotypeValueObject vo = new PhenotypeValueObject();
                         vo.setExternalSubjectId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
-
-                        boolean matched = phenotypeUtil.setPhenotypeValueObjectByOntologyString( vo, s.trim() );
+                                                
+                        s = s.substring( s.indexOf( ":" )+1 );
+                        s = s.substring( 0,  s.indexOf( ")" ) );
+                        s = "HP_"+s;
                         
-                        if (matched){
-                            phenotypeUtil.setValue( vo, "1" );
-                            voList.add( vo );
-                        }else{
+                        try{
+
+                       phenotypeUtil.setNameUriValueType( vo, s );
+                       phenotypeUtil.setValue( vo, "1" );
+                       voList.add( vo );
+                       
+                        } catch(InvalidDataException e){
+                            errorMessages.add( "Error on line number:"+lineNumber+" phenotype string:"+s +"  \nFull entry:" + entry);
                             
-                            errorMessages.add( "Couldn't match phenotype string: '"+ s +"' in HPO on line number: " + lineNumber);
                             unmatched.add( s );
                         }
+                        
                         
                     }
             

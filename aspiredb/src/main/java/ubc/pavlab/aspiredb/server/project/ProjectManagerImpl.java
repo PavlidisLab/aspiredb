@@ -373,7 +373,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
     // The PhenotypeValueObject class doesn't really fit well with this, using it anyway    
     private void createSubjectPhenotypesFromPhenotypeValueObjects( Project project, List<PhenotypeValueObject> voList ) throws InvalidDataException {
-
+        log.info( "Adding "+voList.size()+" valueobjects" );
         for ( PhenotypeValueObject vo : voList ) {
 
             Phenotype p = new Phenotype();
@@ -388,6 +388,7 @@ public class ProjectManagerImpl implements ProjectManager {
             Subject subject = subjectDao.findByPatientId( project, vo.getExternalSubjectId() );
 
             if ( subject == null ) {
+                log.info( "Adding new Subject and phenotype" );
                 subject = new Subject();
                 subject.setPatientId( vo.getExternalSubjectId() );
                 subject = subjectDao.create( subject );
@@ -395,6 +396,7 @@ public class ProjectManagerImpl implements ProjectManager {
                 subject.getProjects().add( project );
                 
             } else {
+                log.info( "Adding phenotype to existing subject "+p.getUri() );
                 subject.addPhenotype( p );
             }
         }
