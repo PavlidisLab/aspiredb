@@ -168,7 +168,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 						
 						// [ phenSummary.name, phenSummary.selectedPhenotype, subjectVal]
 						// TODO find a more elegant way of doing this ...
-						var row = [ phenSummary, phenSummary, ref.getSubjectValue(phenSummary) ];
+						var row = [ phenSummary, phenSummary, phenSummary.displaySummary ];
 						data.push(row);
 					}
 

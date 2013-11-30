@@ -21,6 +21,7 @@ package ubc.pavlab.aspiredb.server.service;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
+import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.query.Property;
