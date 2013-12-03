@@ -74,9 +74,10 @@ public class ProjectDaoTest extends BaseSpringContextTest {
         detachedProject.setName( projectName );
         
         Project p = projectDao.create( detachedProject );
+               
+        testObjectHelper.addSubjectToProject( ind1, p );
         
-        ind1.getProjects().add(p);
-        ind2.getProjects().add(p);
+        testObjectHelper.addSubjectToProject( ind2, p );
                
         projectDao.update( p );
         
@@ -85,22 +86,13 @@ public class ProjectDaoTest extends BaseSpringContextTest {
         
         assertEquals(projectName, persistentProject.getName());
         
-        Collection<Subject> projectIndividuals = persistentProject.getSubjects();
         
+        List<Long> projectList = new ArrayList<Long>();
+        
+        projectList.add( persistentProject.getId() );
+                                
+        assertEquals(2, projectDao.getSubjectCountForProjects( projectList ).intValue());
                 
-        assertEquals(2, projectIndividuals.size());        
-        
-        HashSet<Long> indIds = new HashSet<Long>();
-        
-        for (Subject i: projectIndividuals){            
-            indIds.add( i.getId() );
-        }
-        
-        assertTrue(indIds.contains( ind1.getId() ));
-        
-        assertTrue(indIds.contains( ind2.getId() ));
-        
-        
     }
     
     @Test
@@ -148,54 +140,7 @@ public class ProjectDaoTest extends BaseSpringContextTest {
         
         
         
-        
-        
-        
-        
     }
-    
-    
-    
-    @Test
-    public void testProjectDaoNumIndividuals() throws Exception{
-        
-        String patientId1 = RandomStringUtils.randomAlphabetic( 5 );
-        
-        String patientId2 = RandomStringUtils.randomAlphabetic( 6 );
-        
-        String projectId = RandomStringUtils.randomAlphabetic( 6 );
-        
-                
-        super.runAsAdmin();
-        
-        //each individual should have 1 cnv
-        Subject ind1 = testObjectHelper.createPersistentTestSubjectObjectWithCNV( patientId1 );
-        Subject ind2 = testObjectHelper.createPersistentTestSubjectObjectWithCNV( patientId2 );
-        
-        
-        Project detachedProject = new Project();
-        
-        detachedProject.setName( projectId);
-        
-        Project p = projectDao.create( detachedProject );
-        ind1.getProjects().add(p);
-        ind2.getProjects().add(p);
-        projectDao.update( p );
-        
-        
-        Project persistentProject = projectDao.findByProjectName( projectId );
-        
-        Collection<Long> projectCollection = new ArrayList<Long>();
-                
-        projectCollection.add( persistentProject.getId() );
-        
-        assertEquals((Integer)2, projectDao.getSubjectCountForProjects( projectCollection ));
-        
-        
-        
-    }
-    
-    
     
  
 }

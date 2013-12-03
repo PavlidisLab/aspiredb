@@ -36,7 +36,8 @@ public interface ProjectDao extends SecurableDaoBase<Project> {
     public Integer getVariantCountForProjects(Collection<Long> projectIds);
     
     @Secured({"GROUP_USER"})
-    public Integer getSubjectCountForProjects(Collection<Long> projectIds);  
+    public Integer getSubjectCountForProjects(Collection<Long> projectIds);
+    
     
     
     

@@ -547,6 +547,7 @@ public class ProjectManagerImpl implements ProjectManager {
         
         Project project = projectDao.findByProjectName( name );
         
+        
         if ( project == null ) {
             log.error( "That project doesn't exist" );
         }
@@ -554,21 +555,27 @@ public class ProjectManagerImpl implements ProjectManager {
         List<Subject> subjectsToRemove = new ArrayList<Subject>();
         List<Subject> subjects = project.getSubjects();
         
-        for (Subject s: subjects){            
-            if (s.getProjects().size()>1){
-                s.getProjects().remove( project );
-            }else{
+        for (Subject s: subjects){
+            s.getProjects().remove( project );
+            if (s.getProjects().size()==1){
                 subjectsToRemove.add( s );
+            }else{
+               //this is when a subject has more than one project 
             }            
         }
         
+        
+        
         //might have to individually remove variants/labels/phenotypes etc. to get rid of acls
         for (Subject s: subjectsToRemove){
+            
             subjectDao.remove( s );
         }
         
         
         projectDao.remove( project );
+        
+        
     }
     
     @Override

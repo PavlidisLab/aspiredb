@@ -228,4 +228,6 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
             throws BioMartServiceException, NeurocartaServiceException {
 		return loadPage(0, 2000, null, null, filters);
 	}
+	
+	
 }
