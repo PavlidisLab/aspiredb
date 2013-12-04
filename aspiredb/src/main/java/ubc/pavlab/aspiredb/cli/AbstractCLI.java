@@ -341,14 +341,20 @@ public abstract class AbstractCLI {
             } catch ( NumberFormatException e ) {
                 throw new RuntimeException( "Logging level must be an integer" );
             }
+        }else{
+            configureLogging( getLogger(), this.verbosity );
         }
 
         if ( hasOption( "mdate" ) ) {
             this.mDate = this.getOptionValue( "mdate" );
         }
 
-        configureLogging( "ubc.pavlab.aspiredb", this.verbosity );
+        
 
+    }
+    
+    protected String getLogger(){
+        return "set your own logger";
     }
 
     @SuppressWarnings("static-access")

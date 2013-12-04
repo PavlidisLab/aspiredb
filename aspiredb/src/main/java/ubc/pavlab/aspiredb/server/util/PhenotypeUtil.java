@@ -38,6 +38,7 @@ import ubc.pavlab.aspiredb.shared.query.restriction.Disjunction;
 import ubc.pavlab.aspiredb.shared.query.restriction.Junction;
 import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
 import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
+import ubic.basecode.ontology.model.OntologyIndividual;
 import ubic.basecode.ontology.model.OntologyResource;
 import ubic.basecode.ontology.model.OntologyTerm;
 import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
@@ -67,7 +68,6 @@ public class PhenotypeUtil {
                 throw new InvalidDataException( HUMAN_PHENOTYPE_URI_PREFIX + key + " not found in Ontology" );
             }
             phenotype.setName( resource.getLabel() );
-
             phenotype.setValueType( PhenotypeValueType.HPONTOLOGY.toString() );
         } else if ( key.trim().equalsIgnoreCase( "GENDER" ) ) {
             phenotype.setName( key );

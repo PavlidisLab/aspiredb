@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,7 +70,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     InversionDao inversionDao;
 
     @Autowired
-    SubjectDao individualDao;
+    SubjectDao subjectDao;
 
     @Autowired
     ProjectDao projectDao;
@@ -79,7 +80,8 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     @Autowired
     PhenotypeUtil phenotypeUtil;
-
+    
+   
     public PersistentTestObjectHelperImpl() {
     }
 
@@ -237,7 +239,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
         Subject individual = createDetachedIndividualObject( patientId );
 
-        return individualDao.create( individual );
+        return subjectDao.create( individual );
     }
     
     @Transactional
@@ -274,6 +276,18 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     }
     
     @Transactional
+    public Subject addSubjectToProject(Subject s, Project p){        
+               
+        s.getProjects().add( p );
+        
+        subjectDao.update( s );
+        
+        
+        return s;
+        
+    }
+    
+    @Transactional
     public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypesForEnrichmentTest( String patientId, String phenName, String phenUri, String phenValue ){
         
         Subject subject = createPersistentTestIndividualObject( patientId );
@@ -287,5 +301,9 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     @Transactional
     public Project createPersistentProject( Project p ) {
         return projectDao.create( p );
+    }
+    @Transactional
+    public List<Subject> getSubjectsForProject(Project p){
+        return p.getSubjects();
     }
 }

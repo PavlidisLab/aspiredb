@@ -168,7 +168,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 						
 						// [ phenSummary.name, phenSummary.selectedPhenotype, subjectVal]
 						// TODO find a more elegant way of doing this ...
-						var row = [ phenSummary, phenSummary, ref.getSubjectValue(phenSummary) ];
+						var row = [ phenSummary, phenSummary, phenSummary.displaySummary ];
 						data.push(row);
 					}
 
@@ -251,6 +251,11 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		var subjectValue = '';
 
 		var keyArray = [];
+		
+		//if this is a special(large) project, this will not be populated
+		if (!valueToSubjectSet.Unknown){
+			return subjectValue;
+		}
 		
 		for ( var key in valueToSubjectSet) {
 			if(key !== "Unknown"){

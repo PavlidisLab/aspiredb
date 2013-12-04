@@ -105,6 +105,8 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 				genomicRangeRestriction.operator = 'IS_IN';
 				genomicRangeRestriction.value = vo.genomicRange;
 				filterConfig.restriction(genomicRangeRestriction);
+				
+				console.log("filter_submit event from aspiredbpanel parseurlparameters and redirect");
 				ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfig);
 				// mainPanel.resizeMe();
 			});
@@ -147,6 +149,8 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 				var projectFilter = new ProjectFilterConfig;
 				projectFilter.projectIds = activeProjectIds;
 				filterConfigs.push(projectFilter);
+				
+				console.log("filter_submit event from Aspiredbpanel clearfilterbutton");
 				ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);
 			}
 		}, {

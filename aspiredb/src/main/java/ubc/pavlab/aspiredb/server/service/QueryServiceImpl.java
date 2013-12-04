@@ -221,9 +221,11 @@ public class QueryServiceImpl implements QueryService {
 //            sortField = sortInfo.getSortField();
 //            sortDir = sortInfo.getSortDir().toString();
 //        }
+        
+        log.info( "searching for subjects" );
 
         Page<Subject> subjects = (Page<Subject>) subjectDao.loadPage(
-                0, 2000,
+                0, 20000,
                 sortField, sortDir,
                 filters, activeProjectIds );
 
@@ -235,6 +237,8 @@ public class QueryServiceImpl implements QueryService {
             SubjectValueObject vo = subject.convertToValueObject();
             vos.add( vo );
         }
+        
+        log.info( "returning "+ vos.size()+" subjects" );
 
         return new BoundedList<SubjectValueObject>( vos );
     }
@@ -270,7 +274,7 @@ public class QueryServiceImpl implements QueryService {
         StopWatch timer = new StopWatch();
         timer.start();
         Page<? extends Variant> page = variantDao.loadPage(
-                0, 5000,
+                0, 20000,
                 sortProperty, sortDirection,
                 filters, activeProjectIds );
 
@@ -282,6 +286,8 @@ public class QueryServiceImpl implements QueryService {
         int totalLength = page.getTotalCount();
 
         List<VariantValueObject> vos = convertToValueObjects( variants );
+        
+        log.info( "returning "+ vos.size()+" variants" );
 
         return new BoundedList<VariantValueObject>( vos );
     }

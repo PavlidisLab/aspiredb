@@ -242,15 +242,17 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
         // .createAlias("variant.labels", "variant_label", CriteriaSpecification.LEFT_JOIN)
                 .createAlias( "variant.characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN );
         Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
-                CriteriaBuilder.EntityType.SUBJECT );
-        criteria.add( junction );
-    }
+                CriteriaBuilder.EntityType.SUBJECT  );
+		criteria.add( junction );
+	}
 
-    @Override
-    @Transactional(readOnly = true)
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
-    public Collection<? extends Subject> load( Set<AspireDbFilterConfig> filters ) throws BioMartServiceException,
-            NeurocartaServiceException {
-        return loadPage( 0, 0, null, null, filters );
-    }
+	@Override
+	@Transactional(readOnly = true)
+	@Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+	public Collection<? extends Subject> load(Set<AspireDbFilterConfig> filters)
+            throws BioMartServiceException, NeurocartaServiceException {
+		return loadPage(0, 2000, null, null, filters);
+	}
+	
+	
 }

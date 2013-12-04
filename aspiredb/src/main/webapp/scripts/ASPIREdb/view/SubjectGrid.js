@@ -60,7 +60,9 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 			{
 				text : "Labels",
 				dataIndex : 'labelIds',
+				/*// This is very slow we need to rethink this
 				renderer : function(value) {
+					
 					var ret = "";
 					for ( var i = 0; i < value.length; i++) {
 						var label = this.visibleLabels[value[i]];
@@ -75,7 +77,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 						}
 					}
 					return ret;
-				},
+				},*/
 				flex : 1
 			}, ],
 
@@ -190,14 +192,17 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		QueryService.querySubjects(filterConfigs, ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
 			callback : function(pageLoad) {
 				me.valueObjects = pageLoad.items;
-
+				
 				var data = [];
+				
+				console.log(me.valueObjects.length + " subjects being processed into value objects");
 				
 				for ( var i = 0; i < me.valueObjects.length; i++) {
 					var val = me.valueObjects[i];
 
 					// create only one unique label instance
 					var labelIds = [];
+					/*
 					for ( var j = 0; j < val.labels.length; j++) {
 						var aLabel = me.visibleLabels[val.labels[j].id];
 						
@@ -210,7 +215,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 						
 						labelIds.push(aLabel.id);
 					}
-
+*/
 					var row = [ val.id, val.patientId, labelIds ];
 					data.push(row);
 				}
@@ -220,14 +225,16 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 				me.setLoading(false);
 
 				// refresh grid
-				me.store.sync();
-				me.getView().refresh();
+				//me.store.sync();
+				//me.getView().refresh();
 
 				var ids = [];
 				for ( var i = 0; i < me.valueObjects.length; i++) {
 					var o = me.valueObjects[i];
 					ids.push(o.id);
 				}
+				
+				console.log(ids.length + " subjects loaded");
 				ASPIREdb.EVENT_BUS.fireEvent('subjects_loaded', ids);
 
 			}

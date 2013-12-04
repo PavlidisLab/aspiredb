@@ -22,42 +22,47 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.springframework.beans.factory.BeanFactory;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
-import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadService;
-import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadServiceResult;
-import ubc.pavlab.aspiredb.server.ontology.OntologyService;
+import ubc.pavlab.aspiredb.server.fileupload.VariantUploadService;
+import ubc.pavlab.aspiredb.server.fileupload.VariantUploadServiceResult;
+import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
-import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
+import ubc.pavlab.aspiredb.shared.VariantType;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * First pass phenotype data uploader, missing a bunch of requirements
  * 
- * @author cmcdonald
- * @version $Id: PhenotypeUploadCLI.java,v 1.8 2013/07/19 17:03:49 ptan Exp $
+ * modified VariantUploadCLI hack for unfortunately formatted file(since modified) that we got from DECIPHER
+ * not intended to be used for anything other than that file
+ *  
+ * @version $Id: DecipherVariantUploadCLI.java
  */
-public class PhenotypeUploadCLI extends AbstractCLI {
-
-    private static ProjectDao projectDao;
+public class DecipherVariantUploadCLI extends AbstractCLI {
 
     private static ProjectManager projectManager;
-
-    private static OntologyService os;
-    
-    private static PhenotypeUploadService phenotypeUploadService;
+    private static ProjectDao projectDao;
 
     private String directory = "";
-    private String columns = "";
+
     private String filename = "";
     private String projectName = "";
+   
 
-    private boolean createProject = false;
+    private boolean deleteProject = true;
+
+    private boolean dryRun = false;
 
     private static BeanFactory applicationContext;
+    
+    public String getLogger(){
+        return "ubc.pavlab.aspiredb.cli.DecipherVariantUploadCLI";
+    }
 
     /**
      * @param args
@@ -72,12 +77,12 @@ public class PhenotypeUploadCLI extends AbstractCLI {
         Logger.getRootLogger().addAppender( console );
 
         applicationContext = SpringContextUtil.getApplicationContext( false );
-        projectDao = ( ProjectDao ) applicationContext.getBean( "projectDao" );
-        projectManager = ( ProjectManager ) applicationContext.getBean( "projectManager" );
-        phenotypeUploadService = ( PhenotypeUploadService ) applicationContext.getBean( "phenotypeUploadService" );
-        os = ( OntologyService ) applicationContext.getBean( "ontologyService" );
 
-        PhenotypeUploadCLI p = new PhenotypeUploadCLI();
+        projectDao = ( ProjectDao ) applicationContext.getBean( "projectDao" );
+
+        projectManager = ( ProjectManager ) applicationContext.getBean( "projectManager" );
+
+        DecipherVariantUploadCLI p = new DecipherVariantUploadCLI();
         try {
             Exception ex = p.doWork( args );
             if ( ex != null ) {
@@ -92,49 +97,72 @@ public class PhenotypeUploadCLI extends AbstractCLI {
     @SuppressWarnings("static-access")
     @Override
     protected void buildOptions() {
-        Option d = OptionBuilder.hasArg().withArgName( "Directory" ).withDescription( "Directory containing csv files" )
-                .withLongOpt( "directory" ).create( 'd' );
+        Option d = OptionBuilder.isRequired().hasArg().withArgName( "Directory" )
+                .withDescription( "Directory containing csv files" ).withLongOpt( "directory" ).create( 'd' );
 
-        Option f = OptionBuilder.hasArg().withArgName( "File name" ).withDescription( "The file to parse" )
+        Option f = OptionBuilder.isRequired().hasArg().withArgName( "File name" ).withDescription( "The file to parse" )
                 .withLongOpt( "filename" ).create( 'f' );
-
+        
+        //Decipher will reside in a 'Special project' and are all CNVs
+        /*
+        Option variantType = OptionBuilder.isRequired().hasArg().withArgName( "Variant Type" )
+                .withDescription( "The type of variant in this file, one of: CNV, Indel, SNV, Inversion" )
+                .create( "variant" );
+*/
         Option project = OptionBuilder
                 .isRequired()
                 .hasArg()
                 .withArgName( "Project name" )
                 .withDescription(
-                        "The project where this data will reside. Project will be created if does not exist,"
-                                + "If the project does exist use the existingproject option to add to an existing project" )
+                        "The project where this data will reside. Project will be deleted if existingproject option is not specified,"
+                                + "Acceptable values = 'DGV' and 'DECIPHER" )
                 .create( "project" );
 
         addOption( "existingproject", false, "You must use this option if you are adding to an existing project" );
 
+        addOption( "dryrun", false, "Use this option to validate your data before uploading" );
+
         addOption( d );
         addOption( f );
+        
         addOption( project );
+
+    }
+    
+    @Override
+    protected void processOptions() {
+        if ( this.hasOption( 'd' ) ) {
+            directory = this.getOptionValue( 'd' );
+        }
+        if ( this.hasOption( 'f' ) ) {
+            filename = this.getOptionValue( 'f' );
+        }
+
+        if ( this.hasOption( "project" ) ) {
+            projectName = this.getOptionValue( "project" );
+        }
+
+        if ( this.hasOption( "existingproject" ) ) {
+            deleteProject = false;
+        } else {
+            deleteProject = true;
+        }
+
+        if ( this.hasOption( "dryrun" ) ) {
+            dryRun = true;
+        }
+
     }
 
     @Override
     protected Exception doWork( String[] args ) {
-        Exception err = processCommandLine( "Parse CVS", args );
+        Exception err = processCommandLine( "Upload Variant file", args );
         authenticate( applicationContext );
         if ( err != null ) return err;
 
-        if ( directory == null || filename == null || columns == null ) return err;
+        if ( directory == null || filename == null ) return err;
 
         try {
-
-            os.getHumanPhenotypeOntologyService().startInitializationThread( true );
-            int c = 0;
-
-            while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
-                Thread.sleep( 10000 );
-                log.info( "Waiting for HumanPhenotypeOntology to load" );
-                if ( ++c > 10 ) {
-                    throw new Exception( "Ontology load timeout" );
-                }
-            }
-
             Class.forName( "org.relique.jdbc.csv.CsvDriver" );
 
             // create a connection
@@ -143,32 +171,30 @@ public class PhenotypeUploadCLI extends AbstractCLI {
 
             Statement stmt = conn.createStatement();
             ResultSet results = stmt.executeQuery( "SELECT * FROM " + filename );
-
-            if ( createProject ) {
-                if ( projectDao.findByProjectName( projectName ) != null ) {
-                    log.warn( "Project name already exists, choose a different project name or use existingproject option to add to this project." );
-
-                    bail( ErrorCode.MISSING_OPTION );
-                }
-            }
-
-            PhenotypeUploadServiceResult phenResult = phenotypeUploadService.getPhenotypeValueObjectsFromResultSet( results );
+   
+            System.out.println("getting value objects");
+            VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromDecipherResultSet( results);
             
-            
-            // clean up
+           
             results.close();
             stmt.close();
             conn.close();
-            
-            projectManager.addSubjectPhenotypesToProject( projectName, createProject, phenResult.getPhenotypesToAdd() );
 
-            if ( !phenResult.getErrorMessages().isEmpty() ) {
-                for ( String errorMessage : phenResult.getErrorMessages() ) {
+            if ( result.getErrorMessages().isEmpty() && !dryRun ) {
+                
+                System.out.println("inserting "+result.getVariantsToAdd().size()+" value objects into database");
+                
+                //should probably batch this up to speed it up a bit
+                
+                projectManager.addSubjectVariantsToSpecialProject( projectName, deleteProject, result.getVariantsToAdd() );
+               
+            } else if ( result.getErrorMessages().isEmpty()  ) {
+                System.out.println( "No errors are detected in your data file" );
+
+            } else {
+                for ( String errorMessage : result.getErrorMessages() ) {
                     System.out.println( errorMessage );
                 }
-                
-            } else {
-                System.out.println( "no errors" );
                 
             }
 
@@ -178,33 +204,14 @@ public class PhenotypeUploadCLI extends AbstractCLI {
 
         return null;
     }
+    
+
+   
 
     @Override
     public String getShortDesc() {
-        return "Upload a phenotype data file";
+        return "Upload a variant data file and create / assign it to a project";
     }
 
-    @Override
-    protected void processOptions() {
-        if ( this.hasOption( 'd' ) ) {
-            directory = this.getOptionValue( 'd' );
-        }
-        if ( this.hasOption( 'f' ) ) {
-            filename = this.getOptionValue( 'f' );
-        }
-        if ( this.hasOption( 't' ) ) {
-            projectName = this.getOptionValue( 't' );
-        }
-
-        if ( this.hasOption( "project" ) ) {
-            projectName = this.getOptionValue( "project" );
-        }
-
-        if ( this.hasOption( "existingproject" ) ) {
-            createProject = false;
-        } else {
-            createProject = true;
-        }
-    }
 
 }

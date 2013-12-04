@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
@@ -37,6 +38,7 @@ import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
+import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
@@ -118,20 +120,69 @@ public class SubjectServiceImpl implements SubjectService {
     @Transactional
 	public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
             throws NotLoggedInException, NeurocartaServiceException {
-        //throwGwtExceptionIfNotLoggedIn();
-        // This should throw AccessDenied exception if user isn't allowed to view the subjects
-        // (there is a better way to test security, this method is probably going to disappear)
+        
         Collection<Subject> subjects = subjectDao.load(subjectIds);
         
         StopWatch timer = new StopWatch();
         timer.start();
 
         log.info( "loading phenotypeSummaries for "+subjectIds.size()+" subjects" );
-        List<PhenotypeSummaryValueObject> phenotypeSummaries =
+        List<PhenotypeSummary> phenotypeSummaries =
                 phenotypeBrowserService.getPhenotypesBySubjectIds(subjectIds, projectIds);
-        log.info( "processing phenotypeSummaries for "+subjectIds.size()+" subjects took " + timer.getTime() + "ms" );
+        log.info( "processing"+ phenotypeSummaries.size() + " phenotypeSummaries for "+subjectIds.size()+" subjects took " + timer.getTime() + "ms" );
         
-        return phenotypeSummaries;
+        
+        
+        List<PhenotypeSummaryValueObject> valueObjects = new ArrayList<PhenotypeSummaryValueObject>();        
+        
+        //convert PhenotypeSummaries to lighter PhenotypeValueObjects
+        
+        for (PhenotypeSummary sum: phenotypeSummaries){
+            
+            String displaySummary = "";
+            
+            Set<String> keyArray = sum.getDbValueToSubjectSet().keySet();
+            
+            for (String key: keyArray){
+                
+                Integer size = sum.getDbValueToSubjectSet().get( key ).size();
+                
+                if (sum.getValueType().equals( "HPONTOLOGY")) {
+                    if (key.equals( "1")) {
+                        displaySummary = displaySummary + " Present(" + size + ')';
+                        displaySummary = "<span " + "style='color: red'" + ">" + displaySummary + "</span>";
+                    }else if (key.equals( "0")) {
+                        displaySummary = displaySummary + " Absent(" + size + ')';
+                        displaySummary = "<span " + "style='color: green'" + ">" + displaySummary + "</span>";
+                    } else {
+                        displaySummary = displaySummary + ' ' + key + " (" + size + ')';
+                        displaySummary = "<span " + "style='color: black'" + ">" + displaySummary + "</span>";
+                    }
+                } else {
+                    displaySummary = displaySummary + ' ' + key + " (" + size + ')';
+                    displaySummary = "<span " + "style='color: black'" + ">" + displaySummary + "</span>";
+                }
+                
+                
+                
+                
+            }
+            
+            PhenotypeSummaryValueObject pvo = new PhenotypeSummaryValueObject();
+            
+            pvo.setName( sum.getName() );
+            pvo.setUri( sum.getUri() );
+            pvo.setValueType( sum.getValueType() );
+            pvo.setNeurocartaPhenotype( sum.isNeurocartaPhenotype() );
+            
+            pvo.setDisplaySummary( displaySummary );
+            
+            valueObjects.add( pvo );
+            
+        }
+        
+        
+        return valueObjects;
 	}
     
     @Override

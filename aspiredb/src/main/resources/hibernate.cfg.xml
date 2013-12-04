@@ -7,9 +7,7 @@
     <session-factory>
 
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
-
-	    <!-- Echo all executed SQL to stdout -->
-	    <property name="show_sql">false</property>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
 	    
 	    <!-- We shouldn't use other options (validate is ok).
 	    We should be manually updating database schema on production. It's too risky to

@@ -18,14 +18,17 @@ import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
+import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
+import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
-import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
+import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
 import ubic.basecode.ontology.model.OntologyTerm;
 import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
 
@@ -43,17 +46,19 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService  {
 	protected static Log log = LogFactory.getLog( PhenotypeBrowserServiceImpl.class );
 
     @Autowired private PhenotypeDao phenotypeDao;
+    
+    @Autowired private ProjectDao projectDao;
     @Autowired private OntologyService ontologyService;
     @Autowired private NeurocartaQueryService neurocartaQueryService;
     
-	public List<PhenotypeSummaryValueObject> getPhenotypesBySubjectIds(Collection<Long> subjectIds,
+	public List<PhenotypeSummary> getPhenotypesBySubjectIds(Collection<Long> subjectIds,
             Collection<Long> projectIds) throws NeurocartaServiceException {
 		
 		Collection<Phenotype> phenotypes = loadPhenotypesBySubjectIds( subjectIds );	       
 
-        Map<String, PhenotypeSummaryValueObject> pvoMap = constructPhenotypeSummaryValueObjects(phenotypes, subjectIds, projectIds);
+        Map<String, PhenotypeSummary> pvoMap = constructPhenotypeSummarys(phenotypes, subjectIds, projectIds);
 
-        List<PhenotypeSummaryValueObject> phenotypeSummaries = new ArrayList<PhenotypeSummaryValueObject>(pvoMap.values());
+        List<PhenotypeSummary> phenotypeSummaries = new ArrayList<PhenotypeSummary>(pvoMap.values());
 
 // TODO: temporarily disabled
 //        for (PhenotypeSummaryValueObject phenotypeSummary : phenotypeSummaries ) {
@@ -63,21 +68,56 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService  {
         return phenotypeSummaries;
 	}
 
-	private Map<String, PhenotypeSummaryValueObject> constructPhenotypeSummaryValueObjects(
+	private Map<String, PhenotypeSummary> constructPhenotypeSummarys(
             Collection<Phenotype> phenotypes, Collection<Long> subjectIds, Collection<Long> projectIds) throws NeurocartaServiceException {
 		
-		Map<String, PhenotypeSummaryValueObject> phenotypeNameToSummary = new LinkedHashMap<String, PhenotypeSummaryValueObject>();
+		Map<String, PhenotypeSummary> phenotypeNameToSummary = new LinkedHashMap<String, PhenotypeSummary>();
+		
+		//checking if a phenotype is a NeuroPhenoCarta Phenotype takes a while and for large 'special' projects prohibitively so. disable this for special projects.
+		Boolean containsLargeSpecialProject=false;
+		
+		Collection<Project> projects = projectDao.load( projectIds );
+		
+		for (Project p: projects){
+		    
+		    if (p.getSpecialData()!=null && p.getSpecialData()){
+		        
+		        containsLargeSpecialProject = true;
+		        log.info( "constructing phenotypeSummaries for 'SPECIAL' project, some data will not be filled" );
+		        break;
+		        
+		    }
+		    
+		}
 
         // Make PhenotypeSummaryValueObjects and populate their value counts.
+		
+		
+		
+		
+		StopWatch timer = new StopWatch();
+        timer.start();
+
+        log.info( "constructing PhenotypeSummaryValueObject for "+phenotypes.size()+" phenotypes, specialproject="+containsLargeSpecialProject );
         for ( Phenotype phenotype : phenotypes ) {
-        	PhenotypeSummaryValueObject phenotypeSummary = phenotypeNameToSummary.get( phenotype.getName() );
+        	PhenotypeSummary phenotypeSummary = phenotypeNameToSummary.get( phenotype.getName() );
             
             // Create new PhenotypeSummaryValueObject.
             if ( phenotypeSummary == null ) {
-            	List<String> possibleValues = phenotypeDao.getListOfPossibleValuesByName( projectIds, phenotype.getName() );
-            	phenotypeSummary = makePhenotypeSummaryValueObject( phenotype, possibleValues, subjectIds );
+                
+                List<String> possibleValues =new ArrayList<String>();
+                
+                //all possible values of only large special project are HPO so this database call is unnecessary
+                if (!containsLargeSpecialProject){
+                    possibleValues = phenotypeDao.getListOfPossibleValuesByName( projectIds, phenotype.getName() );
+                }else{
+                    possibleValues.add( "1" );
+                    possibleValues.add( "0" );
+                }
+            	
+            	phenotypeSummary = makePhenotypeSummary( phenotype, possibleValues, subjectIds, containsLargeSpecialProject );
                 phenotypeNameToSummary.put(phenotype.getName(), phenotypeSummary);
-                // FIXME: temporary hack
+                // FIXME: Anton's temporary hack
                 if ( (possibleValues.size() == 1 && (possibleValues.contains("1") || possibleValues.contains("0")))
                       || (possibleValues.size() == 2 && possibleValues.contains("1") && possibleValues.contains("0"))
                     )
@@ -86,36 +126,53 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService  {
                 }
             }
             
-            addSubjectToPhenotypeCountingSet(phenotypeSummary, phenotype) ;
+                addSubjectToPhenotypeCountingSet(phenotypeSummary, phenotype) ;
+            
         }
+        log.info( "construction PhenotypeSummaryValueObject for "+phenotypes.size()+" phenotoypes took " + timer.getTime() + "ms" );
 
-        for ( PhenotypeSummaryValueObject summary : phenotypeNameToSummary.values() ) {
-            summary.initializeInferredPhenotypes();
+        if (!containsLargeSpecialProject){
+            timer.reset();
+            timer.start();
+
+            log.info( "initializeInferredPhenotypes for "+phenotypeNameToSummary.values().size()+" phenotypesummaryValueobjects" );
+            for ( PhenotypeSummary summary : phenotypeNameToSummary.values() ) {
+                summary.initializeInferredPhenotypes();
+            }
+        
+            log.info( "initializeInferredPhenotypes took " + timer.getTime() + "ms" );
         }
+        
 
 		return phenotypeNameToSummary;
 	}
 	
-	private PhenotypeSummaryValueObject makePhenotypeSummaryValueObject (
-			Phenotype phenotype, List<String> possibleValues, Collection<Long> subjectIds ) throws NeurocartaServiceException {
-		Map<String, Set<Long>> valueToSubjectIds = new HashMap<String, Set<Long>>();
-		
-        valueToSubjectIds.put("Unknown", new HashSet<Long>(subjectIds));  // Initialize with unknown.
-		// Pre-populate possible values.
-		for ( String phenotypeValue : possibleValues ) {
-	        valueToSubjectIds.put( phenotypeValue, new HashSet<Long>() );
-		}
-		
-		PhenotypeSummaryValueObject phenotypeSummary = new PhenotypeSummaryValueObject( phenotype.convertToValueObject(),
-		        valueToSubjectIds );
+    private PhenotypeSummary makePhenotypeSummary( Phenotype phenotype, List<String> possibleValues,
+            Collection<Long> subjectIds, Boolean disableForLargeProject ) throws NeurocartaServiceException {
+        Map<String, Set<Long>> valueToSubjectIds = new HashMap<String, Set<Long>>();
 
-        phenotypeSummary.setNeurocartaPhenotype(isNeurocartaPhenotype( PhenotypeUtil.HUMAN_PHENOTYPE_URI_PREFIX+phenotypeSummary.getUri() ));
+        PhenotypeSummary phenotypeSummary;
+
+        valueToSubjectIds.put( "Unknown", new HashSet<Long>( subjectIds ) ); // Initialize with unknown.
+        // Pre-populate possible values.
+        for ( String phenotypeValue : possibleValues ) {
+            valueToSubjectIds.put( phenotypeValue, new HashSet<Long>() );
+        }
+
+        phenotypeSummary = new PhenotypeSummary( phenotype.convertToValueObject(), valueToSubjectIds );
+
+        //if ( !disableForLargeProject ) {
+            phenotypeSummary.setNeurocartaPhenotype( isNeurocartaPhenotype( PhenotypeUtil.HUMAN_PHENOTYPE_URI_PREFIX
+                    + phenotypeSummary.getUri() ) );
+       // } else {
+        //    phenotypeSummary.setNeurocartaPhenotype( false );
+        //}
 
         return phenotypeSummary;
-	}
-	
+    }
+
 	private void addSubjectToPhenotypeCountingSet(
-            PhenotypeSummaryValueObject phenotypeSummary, Phenotype subjectPhenotype) {
+            PhenotypeSummary phenotypeSummary, Phenotype subjectPhenotype) {
 
 		Long subjectId = subjectPhenotype.getSubject().getId();
         String phenotypeValue = subjectPhenotype.getValue();
@@ -133,8 +190,8 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService  {
 	}
 
     // FIXME: temporarily disabled
-    private PhenotypeSummaryValueObject fillInferredPhenotypeSummaries ( PhenotypeSummaryValueObject phenotypeSummary,
-			Map<String, PhenotypeSummaryValueObject> phenotypeToSummaryMap) throws NeurocartaServiceException {
+    private PhenotypeSummary fillInferredPhenotypeSummaries ( PhenotypeSummary phenotypeSummary,
+			Map<String, PhenotypeSummary> phenotypeToSummaryMap) throws NeurocartaServiceException {
 		
         HumanPhenotypeOntologyService hpoService = ontologyService.getHumanPhenotypeOntologyService();
         OntologyTerm ontologyTerm = hpoService.getTerm(
@@ -145,7 +202,7 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService  {
         }
 
         // Shown when phenotype grid row is expanded.
-        Collection<PhenotypeSummaryValueObject> descendantSummaries = phenotypeSummary.getDescendantOntologyTermSummaries();
+        Collection<PhenotypeSummary> descendantSummaries = phenotypeSummary.getDescendantOntologyTermSummaries();
         Collection<OntologyTerm> descendantsTerms = ontologyTerm.getChildren( false );
 //        if ( descendantsTerms.isEmpty() ) { // Is leaf term.
 //            return phenotypeSummary;
@@ -175,7 +232,7 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService  {
         Set<Long> presentSubjectSet = phenotypeSummary.getInferredValueToSubjectSet().get( "1" );
         Set<Long> absentSubjectSet = phenotypeSummary.getInferredValueToSubjectSet().get( "0" );
 
-        for ( PhenotypeSummaryValueObject childSummary : descendantSummaries ) {
+        for ( PhenotypeSummary childSummary : descendantSummaries ) {
             // Propagate 'Present' (1) values to ancestor.
             Set<Long> childPresentSubjectSet = childSummary.getInferredValueToSubjectSet().get( "1" );
             if ( childPresentSubjectSet != null ) {

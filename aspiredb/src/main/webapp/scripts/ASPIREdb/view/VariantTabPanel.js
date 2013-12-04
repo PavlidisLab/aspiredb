@@ -161,13 +161,16 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 		var ref = this;
 
+		ref.setLoading(true);
+		
 		VariantService.suggestProperties(function(properties) {
 
 			QueryService.queryVariants(filterConfigs, ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
 				callback : function(pageLoad) {
 
+					
 					var vvos = pageLoad.items;
-
+					
 					var ideogram = ref.getComponent('ideogram');
 					ideogram.drawChromosomes();
 					ideogram.drawVariants(vvos);
@@ -195,6 +198,8 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					toolbar.add(ref.labelsButton);
 					toolbar.add(ref.selectAllButton);
 					toolbar.add(ref.saveButton);
+					
+					ref.setLoading(false);
 
 				}
 			});

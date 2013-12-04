@@ -92,7 +92,10 @@ Ext.define('ASPIREdb.view.DashboardWindow', {
 				var projectFilter = new ProjectFilterConfig;
 				projectFilter.projectIds = activeProjectIds;
 				filterConfigs.push(projectFilter);
+				console.log("filter_submit event from DashBoard window");
 				ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);
+				
+				console.log("query_update event from DashboardWindow");
 				ASPIREdb.EVENT_BUS.fireEvent('query_update');
 				ref.close();
 

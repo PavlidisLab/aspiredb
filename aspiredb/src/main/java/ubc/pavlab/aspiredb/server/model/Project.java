@@ -20,6 +20,7 @@ import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 
 
 import javax.persistence.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +39,7 @@ public class Project implements Securable {
     @Column(name = "ID")
     private Long id;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "SUBJECT_PROJECTS", joinColumns = { @JoinColumn(name = "PROJECT_ID", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID") })
+    @ManyToMany(mappedBy = "projects")
     private List<Subject> subjects = new ArrayList<Subject>();
 
     @Column(name = "NAME", unique = true)
@@ -47,6 +47,10 @@ public class Project implements Securable {
 
     @Column(name = "DESCRIPTION")
     private String description;
+    
+    //e.g. DECIPHER or DGV data
+    @Column(name = "SPECIAL_DATA")
+    private Boolean specialData;
 
     public Project() {
     }
@@ -73,6 +77,14 @@ public class Project implements Securable {
 
     public void setDescription( String description ) {
         this.description = description;
+    }
+
+    public Boolean getSpecialData() {
+        return specialData;
+    }
+
+    public void setSpecialData( Boolean specialData ) {
+        this.specialData = specialData;
     }
 
     public List<Subject> getSubjects() {

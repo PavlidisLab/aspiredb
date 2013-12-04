@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
@@ -77,16 +78,26 @@ public class PhenotypeDaoTest extends BaseSpringContextTest {
         
         Project p1 = new Project();
         p1.setName(project1Name);
-        p1.getSubjects().add(subject1);
-        p1.getSubjects().add(subject2);
-
+        
         p1 = testObjectHelper.createPersistentProject(p1);
+        
+        List<Project> p1List = new ArrayList<Project>();
+        p1List.add( p1 );
+        
+        testObjectHelper.addSubjectToProject( subject1, p1 );
+       
+        testObjectHelper.addSubjectToProject( subject2, p1 );
+
+        
 
         Project p2 = new Project();
         p2.setName(project2Name);
-        p2.getSubjects().add(subject3);
-
+        
         p2 = testObjectHelper.createPersistentProject(p2);
+        
+        testObjectHelper.addSubjectToProject( subject3, p2 );
+
+        
 
         final ArrayList<Long> activeProjects = new ArrayList<Long>();
         activeProjects.add( p1.getId() );
@@ -113,16 +124,22 @@ public class PhenotypeDaoTest extends BaseSpringContextTest {
         
         Project p1 = new Project();
         p1.setName(project1Name);
-        p1.getSubjects().add(subject1);
-        p1.getSubjects().add(subject2);
-
+        
         p1 = testObjectHelper.createPersistentProject(p1);
+        
+        
+        testObjectHelper.addSubjectToProject( subject1, p1 );
+        testObjectHelper.addSubjectToProject( subject2, p1 );
+        
 
         Project p2 = new Project();
         p2.setName(project2Name);
-        p2.getSubjects().add(subject3);
-
+        
         p2 = testObjectHelper.createPersistentProject(p2);
+        
+        testObjectHelper.addSubjectToProject( subject3, p2 );
+        
+        
 
         final ArrayList<Long> activeProjects = new ArrayList<Long>();
         activeProjects.add( p1.getId() );

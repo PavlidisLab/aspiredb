@@ -38,9 +38,9 @@ import java.util.List;
  * First pass phenotype data uploader, missing a bunch of requirements
  * 
  * @author cmcdonald
- * @version $Id: PhenotypeUploadCLI.java,v 1.8 2013/07/19 17:03:49 ptan Exp $
+ * @version $Id: PhenotypeUploadCLI.java $
  */
-public class PhenotypeUploadCLI extends AbstractCLI {
+public class DecipherPhenotypeUploadCLI extends AbstractCLI {
 
     private static ProjectDao projectDao;
 
@@ -55,9 +55,13 @@ public class PhenotypeUploadCLI extends AbstractCLI {
     private String filename = "";
     private String projectName = "";
 
-    private boolean createProject = false;
+    private boolean deleteProject = true;
 
     private static BeanFactory applicationContext;
+    
+    public String getLogger(){
+        return "ubc.pavlab.aspiredb.cli.DecipherPhenotypeUploadCLI";
+    }
 
     /**
      * @param args
@@ -77,7 +81,7 @@ public class PhenotypeUploadCLI extends AbstractCLI {
         phenotypeUploadService = ( PhenotypeUploadService ) applicationContext.getBean( "phenotypeUploadService" );
         os = ( OntologyService ) applicationContext.getBean( "ontologyService" );
 
-        PhenotypeUploadCLI p = new PhenotypeUploadCLI();
+        DecipherPhenotypeUploadCLI p = new DecipherPhenotypeUploadCLI();
         try {
             Exception ex = p.doWork( args );
             if ( ex != null ) {
@@ -144,15 +148,9 @@ public class PhenotypeUploadCLI extends AbstractCLI {
             Statement stmt = conn.createStatement();
             ResultSet results = stmt.executeQuery( "SELECT * FROM " + filename );
 
-            if ( createProject ) {
-                if ( projectDao.findByProjectName( projectName ) != null ) {
-                    log.warn( "Project name already exists, choose a different project name or use existingproject option to add to this project." );
+            
 
-                    bail( ErrorCode.MISSING_OPTION );
-                }
-            }
-
-            PhenotypeUploadServiceResult phenResult = phenotypeUploadService.getPhenotypeValueObjectsFromResultSet( results );
+            PhenotypeUploadServiceResult phenResult = phenotypeUploadService.getPhenotypeValueObjectsFromDecipherResultSet( results );
             
             
             // clean up
@@ -160,15 +158,19 @@ public class PhenotypeUploadCLI extends AbstractCLI {
             stmt.close();
             conn.close();
             
-            projectManager.addSubjectPhenotypesToProject( projectName, createProject, phenResult.getPhenotypesToAdd() );
+            projectManager.addSubjectPhenotypesToSpecialProject( projectName, deleteProject, phenResult.getPhenotypesToAdd() );
 
             if ( !phenResult.getErrorMessages().isEmpty() ) {
                 for ( String errorMessage : phenResult.getErrorMessages() ) {
                     System.out.println( errorMessage );
                 }
                 
-            } else {
-                System.out.println( "no errors" );
+                System.out.println("Unmatched phenotypes");
+                for (String unmatched: phenResult.getUnmatched()){
+                    
+                    System.out.println(unmatched);
+                    
+                }
                 
             }
 
@@ -201,9 +203,9 @@ public class PhenotypeUploadCLI extends AbstractCLI {
         }
 
         if ( this.hasOption( "existingproject" ) ) {
-            createProject = false;
+            deleteProject = false;
         } else {
-            createProject = true;
+            deleteProject = true;
         }
     }
 

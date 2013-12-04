@@ -72,23 +72,29 @@ public class LabelDaoTest extends BaseSpringContextTest {
         
         testProject = new Project();
         testProject.setName(RandomStringUtils.randomAlphabetic( 4 ));
-        testProject.getSubjects().add(testSubject);
+        
 
         testProject = testObjectHelper.createPersistentProject(testProject);
+        
+        testObjectHelper.addSubjectToProject( testSubject, testProject );
+        
 
     }
 
     @Test
     public void addSubjectLabel() {
-        String name = RandomStringUtils.randomAlphabetic( 4 );
-        Label label = new Label( name, "FF0000" );
-        labelDao.create( label );
-        testSubject.addLabel( label );
-        subjectDao.update( testSubject );
+        
 
         new InlineTransaction() {
             @Override
             public void instructions() {
+                String name = RandomStringUtils.randomAlphabetic( 4 );
+                Label label = new Label( name, "FF0000" );
+                labelDao.create( label );
+                testSubject.addLabel( label );
+                subjectDao.update( testSubject );
+                
+                
                 Subject s = subjectDao.findByPatientId( testSubjectId );
                 assertTrue(s.getLabels().size() > 0);
             }

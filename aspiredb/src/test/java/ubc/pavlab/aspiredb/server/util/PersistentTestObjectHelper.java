@@ -18,6 +18,8 @@
  */
 package ubc.pavlab.aspiredb.server.util;
 
+import java.util.List;
+
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Indel;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
@@ -60,5 +62,10 @@ public interface PersistentTestObjectHelper {
     public Subject createDetachedIndividualObject( String patientId );
 
     public Project createPersistentProject( Project p );
-
+    
+    public Subject addSubjectToProject(Subject s, Project p);
+    
+    public List<Subject> getSubjectsForProject(Project p);
+    
+    
 }
