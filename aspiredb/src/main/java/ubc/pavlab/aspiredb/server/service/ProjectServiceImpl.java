@@ -15,7 +15,6 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -38,8 +37,6 @@ import ubc.pavlab.aspiredb.server.fileupload.VariantUploadServiceResult;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
-
-
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
 

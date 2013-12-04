@@ -40,9 +40,6 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
                         },
                         scope: this
                     },
-                    change: function(field, newValue) {
-                        field.setValue(newValue); 
-                    }
                 }
             },
             {

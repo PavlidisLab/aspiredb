@@ -52,7 +52,6 @@ import ubc.pavlab.aspiredb.shared.AspireDbPagingLoadConfig;
 import ubc.pavlab.aspiredb.shared.BoundedList;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
-
 import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.OntologyTermValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
@@ -205,10 +204,10 @@ public class QueryServiceImpl implements QueryService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public BoundedList<SubjectValueObject> querySubjects( Set<AspireDbFilterConfig> filters )
+    public BoundedList<SubjectValueObject> querySubjects( Set<AspireDbFilterConfig> filters, Collection<Long> activeProjectIds )
             throws NotLoggedInException, ExternalDependencyException
     {
-      
+    
         // TODO: Add pre-processing steps here
         // - fill in genomic locations, etc
         preProcessFilters( filters );
@@ -226,7 +225,7 @@ public class QueryServiceImpl implements QueryService {
         Page<Subject> subjects = (Page<Subject>) subjectDao.loadPage(
                 0, 2000,
                 sortField, sortDir,
-                filters );
+                filters, activeProjectIds );
 
         long totalLength = subjects.getTotalCount();
 
@@ -254,7 +253,7 @@ public class QueryServiceImpl implements QueryService {
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
-    public BoundedList<VariantValueObject> queryVariants( Set<AspireDbFilterConfig> filters )
+    public BoundedList<VariantValueObject> queryVariants( Set<AspireDbFilterConfig> filters, Collection<Long> activeProjectIds )
             throws NotLoggedInException, ExternalDependencyException {
         
         // TODO: move this?
@@ -267,13 +266,13 @@ public class QueryServiceImpl implements QueryService {
 
         String sortProperty = "id";//getSortColumn( config );
         String sortDirection = "ASC";//getSortDirection( config );
-        log.info( "in getVariants");
+        
         StopWatch timer = new StopWatch();
         timer.start();
         Page<? extends Variant> page = variantDao.loadPage(
                 0, 5000,
                 sortProperty, sortDirection,
-                filters );
+                filters, activeProjectIds );
 
         if ( timer.getTime() > 100 ) {
             log.info( "loading variants took " + timer.getTime() + "ms" );
@@ -290,29 +289,29 @@ public class QueryServiceImpl implements QueryService {
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
-    public int getSubjectCount(AspireDbPagingLoadConfig config) throws NotLoggedInException, ExternalDependencyException {
-        return querySubjects( config.getFilters() ).getTotalSize();
+    public int getSubjectCount(AspireDbPagingLoadConfig config, Collection<Long> activeProjectIds) throws NotLoggedInException, ExternalDependencyException {
+        return querySubjects( config.getFilters(), activeProjectIds ).getTotalSize();
     }
 
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
-    public int getSubjectCount(Set<AspireDbFilterConfig> filters) throws NotLoggedInException, ExternalDependencyException {
-        return querySubjects( filters ).getTotalSize();
+    public int getSubjectCount(Set<AspireDbFilterConfig> filters, Collection<Long> activeProjectIds) throws NotLoggedInException, ExternalDependencyException {
+        return querySubjects( filters, activeProjectIds ).getTotalSize();
     }
     
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
-    public int getVariantCount(AspireDbPagingLoadConfig config) throws NotLoggedInException, ExternalDependencyException {
-        return queryVariants( config.getFilters() ).getTotalSize();
+    public int getVariantCount(AspireDbPagingLoadConfig config, Collection<Long> activeProjectIds) throws NotLoggedInException, ExternalDependencyException {
+        return queryVariants( config.getFilters(), activeProjectIds ).getTotalSize();
     }
 
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
-    public int getVariantCount(Set<AspireDbFilterConfig> filters) throws NotLoggedInException, ExternalDependencyException {
-        return queryVariants( filters ).getTotalSize();
+    public int getVariantCount(Set<AspireDbFilterConfig> filters, Collection<Long> activeProjectIds) throws NotLoggedInException, ExternalDependencyException {
+        return queryVariants( filters, activeProjectIds ).getTotalSize();
     }
 
     private List<VariantValueObject> convertToValueObjects (Collection<Variant> variants) {

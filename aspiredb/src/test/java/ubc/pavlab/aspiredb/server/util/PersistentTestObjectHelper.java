@@ -20,6 +20,7 @@ package ubc.pavlab.aspiredb.server.util;
 
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Indel;
+import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
@@ -49,6 +50,8 @@ public interface PersistentTestObjectHelper {
     public Subject createPersistentTestSubjectObjectWithCNV( String patientId );
     
     public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypes( String patientId );
+    
+    public Phenotype createPersistentTestPhenotypeObject( String name, String uri, String valueType, String value );
     
     public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypesForEnrichmentTest( String patientId, String phenName, String phenUri, String phenValue );
 

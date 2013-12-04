@@ -15,15 +15,20 @@
 
 package ubc.pavlab.aspiredb.server.security.authorization.acl;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.MutableAclService;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
+import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.CNV;
+import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
@@ -47,9 +52,12 @@ public class AclAdviceTest extends BaseSpringContextTest {
 
     @Autowired
     SubjectDao indDao;
-    
+
     @Autowired
     VariantDao variantDao;
+
+    @Autowired
+    PhenotypeDao phenotypeDao;
 
     /**
      * @throws Exception
@@ -61,7 +69,7 @@ public class AclAdviceTest extends BaseSpringContextTest {
 
         aclTestUtils.checkHasAcl( cnv );
 
-        variantDao.remove( (Variant)cnv );
+        variantDao.remove( ( Variant ) cnv );
 
         aclTestUtils.checkDeletedAcl( cnv );
 
@@ -78,8 +86,31 @@ public class AclAdviceTest extends BaseSpringContextTest {
         indDao.remove( ind );
 
         aclTestUtils.checkDeletedAcl( ind );
-        
-        
+
     }
 
+    @Test
+    public void testPhenotypeAcls() throws Exception {
+        Collection<Phenotype> phenos = new HashSet<Phenotype>();
+        
+        Phenotype pheno = testObjectHelper.createPersistentTestPhenotypeObject(
+                RandomStringUtils.randomAlphabetic( 4 ), RandomStringUtils.randomAlphabetic( 4 ),
+                RandomStringUtils.randomAlphabetic( 1 ), RandomStringUtils.randomAlphabetic( 4 ) );
+        phenos.add(pheno);
+        
+        pheno = testObjectHelper.createPersistentTestPhenotypeObject(
+                RandomStringUtils.randomAlphabetic( 4 ), RandomStringUtils.randomAlphabetic( 4 ),
+                RandomStringUtils.randomAlphabetic( 1 ), RandomStringUtils.randomAlphabetic( 4 ) );
+        phenos.add(pheno);
+
+        // TODO figure out why removing a collection throws an error 
+        // phenotypeDao.remove( phenos );
+        
+        for (Phenotype apheno : phenos) {
+            aclTestUtils.checkHasAcl( apheno );
+            phenotypeDao.remove( apheno );
+            aclTestUtils.checkDeletedAcl( apheno );
+        }
+
+    }
 }

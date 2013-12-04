@@ -296,15 +296,18 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 
 		var me = this;
 		
-		QueryService.getSubjectCount( this.getFilterConfigs(), {
+		me.setLoading(true);
+        
+		QueryService.getSubjectCount( this.getFilterConfigs(), ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
 			callback : function(totalSize) {
 				me.down('#numberOfSubjectsLabel').setText(totalSize.toString());
 			}
 		});
 		
-		QueryService.getVariantCount( this.getFilterConfigs(), {
+		QueryService.getVariantCount( this.getFilterConfigs(), ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
 			callback : function(totalSize) {
 				me.down('#numberOfVariantsLabel').setText(totalSize.toString());
+				me.setLoading(false);
 			}
 		});
 		

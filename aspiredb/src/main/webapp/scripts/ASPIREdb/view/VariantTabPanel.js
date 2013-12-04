@@ -163,7 +163,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 		VariantService.suggestProperties(function(properties) {
 
-			QueryService.queryVariants(filterConfigs, {
+			QueryService.queryVariants(filterConfigs, ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
 				callback : function(pageLoad) {
 
 					var vvos = pageLoad.items;

@@ -14,6 +14,14 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
@@ -22,18 +30,24 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
-import ubc.pavlab.aspiredb.shared.query.*;
+import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
+import ubc.pavlab.aspiredb.shared.query.Operator;
+import ubc.pavlab.aspiredb.shared.query.PhenotypeFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.Property;
+import ubc.pavlab.aspiredb.shared.query.SubjectFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
 import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
-
-import java.util.*;
 
 /**
  * TODO Document Me
@@ -46,6 +60,11 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
         extends SecurableDaoBaseImpl<T>
         implements VariantDaoBase<T>
 {
+    
+    private Collection<Long> activeProjectIds;
+    
+    private static Log log = LogFactory.getLog( VariantDaoBaseImpl.class.getName() );
+    
     private Class<T> elementClass;
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -111,6 +130,16 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
         return variants;
     }    
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<? extends T> loadPage( int offset, int limit,
+            String sortField, String sortDirection,
+            Set<AspireDbFilterConfig> filters, Collection<Long> activeProjectIds ) throws BioMartServiceException, NeurocartaServiceException
+    {
+        this.activeProjectIds = activeProjectIds;
+        return loadPage(offset, limit, sortField, sortDirection, filters);
+    }
+    
     @Override
     @Transactional(readOnly = true)
     public Page<? extends T> loadPage( int offset, int limit,
@@ -184,7 +213,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
 			ProjectFilterConfig projectFilter = (ProjectFilterConfig) filter;
 			criteria.createAlias("subject","subject")
 	        		.createAlias("subject.projects","project")
-	        			.add( Restrictions.in( "project.id", projectFilter.getProjectIds() ) );        
+	        			.add( Restrictions.in( "project.id", projectFilter.getProjectIds() ) );
 		} else if ( filter.getClass() == SubjectFilterConfig.class ) {
 			SubjectFilterConfig subjectFilter = (SubjectFilterConfig) filter;
 			RestrictionExpression restrictionExpression = subjectFilter.getRestriction();
@@ -195,8 +224,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
             criteria.add(criterion);
 		} else if ( filter.getClass() == PhenotypeFilterConfig.class ) {
             PhenotypeFilterConfig filterConfig = (PhenotypeFilterConfig) filter;
-            filterConfig = phenotypeUtils.expandOntologyTerms(filterConfig);
-
+            filterConfig = phenotypeUtils.expandOntologyTerms(filterConfig, activeProjectIds);
             RestrictionExpression restrictionExpression = filterConfig.getRestriction();
             Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
                     CriteriaBuilder.EntityType.VARIANT );
