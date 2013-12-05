@@ -99,20 +99,20 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
     @After
     public void tearDown() throws Exception {
-        projectDao.remove( project );
         for ( Subject s : project.getSubjects() ) {
             try {
+                
+                for (Phenotype p : s.getPhenotypes() ) {
+                    phenotypeDao.remove( p );
+                }
+                
                 subjectDao.remove( s );
                 
-                // Removing subjects already removes associated Phenotypes
-                /*for (Phenotype p : s.getPhenotypes() ) {
-                    phenotypeDao.remove( p );
-                }*/
-                
             } catch ( Exception e ) {
-                // no-op, just making sure we're all cleaned up
+                e.printStackTrace();
             }
         }
+        projectDao.remove( project );
     }
 
     private Subject createSubjectWithPhenotypes( String headPhenoValue, String facePhenoValue, String mouthPhenoValue,
@@ -167,9 +167,14 @@ public class QueryServiceTest extends BaseSpringContextTest {
         subject.addPhenotype( phenoNervous );
         subjectList.add( subject );
         subjectDao.update( subject );
+        phenotypeDao.update( phenoHead );
+        phenotypeDao.update( phenoFace );
+        phenotypeDao.update( phenoMouth );
+        phenotypeDao.update( phenoNervous );
 
         projectDao.update( project );
 
+        
         return subject;
     }
 
