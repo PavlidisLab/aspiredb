@@ -14,45 +14,45 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
+import java.util.Collection;
+
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 
-import java.util.Collection;
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 
 /**
  * TODO Document Me
  * 
  * @author ??
  * @version $Id: SecurableDaoBase.java,v 1.5 2013/06/11 22:30:45 anton Exp $
- * 
  */
 public interface SecurableDaoBase<T extends Securable> {
-    
-    @Secured({ "GROUP_USER"})
+
+    @Secured({ "GROUP_USER" })
     public Collection<T> create( Collection<T> entities );
-   
-    @Secured({ "GROUP_USER"})
+
+    @Secured({ "GROUP_USER" })
     public T create( T entity );
-    
+
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<T> load( Collection<Long> ids );
-    
+
     @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
     public T load( Long id );
-    
+
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<T> loadAll();
 
     @Secured({ "GROUP_USER", "ACL_SECURABLE_EDIT" })
     public void remove( Collection<T> entities );
-    
+
     @Secured({ "GROUP_USER", "ACL_SECURABLE_EDIT" })
     public void remove( T entity );
 
     @Secured({ "GROUP_USER", "ACL_SECURABLE_COLLECTION_EDIT" })
     public void update( Collection<T> entities );
-    
+
     @Secured({ "GROUP_USER", "ACL_SECURABLE_EDIT" })
     public void update( T entity );
 

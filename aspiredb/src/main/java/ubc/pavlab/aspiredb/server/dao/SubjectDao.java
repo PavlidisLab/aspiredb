@@ -15,28 +15,29 @@
 
 package ubc.pavlab.aspiredb.server.dao;
 
+import java.util.Collection;
+
 import org.springframework.security.access.annotation.Secured;
+
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
-import java.util.Collection;
-
 public interface SubjectDao extends SecurableDaoBase<Subject>, RemotePaging<Subject> {
-    
-    @Secured({"GROUP_USER" ,"AFTER_ACL_READ"})
-    public Subject findByPatientId(Project p, String patientId );
-    
-	@Secured({"GROUP_USER" ,"AFTER_ACL_READ"})
-	public Subject findByPatientId( String patientId);
 
-    @Secured({"GROUP_USER","AFTER_ACL_READ"})
-	public Collection<Subject> findPatients(String queryString);
+    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
+    public Subject findByPatientId( Project p, String patientId );
 
-    public Collection<String> suggestValuesForEntityProperty(Property property, SuggestionContext suggestionContext);
+    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
+    public Subject findByPatientId( String patientId );
 
-    @Secured({"GROUP_USER","AFTER_ACL_READ"})
-    public Collection<Subject> findByLabel(LabelValueObject labelEntity);
+    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
+    public Collection<Subject> findPatients( String queryString );
+
+    public Collection<String> suggestValuesForEntityProperty( Property property, SuggestionContext suggestionContext );
+
+    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
+    public Collection<Subject> findByLabel( LabelValueObject labelEntity );
 }
