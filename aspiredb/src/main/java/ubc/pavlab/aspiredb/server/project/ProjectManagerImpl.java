@@ -18,7 +18,9 @@ package ubc.pavlab.aspiredb.server.project;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.logging.Log;
@@ -35,7 +37,10 @@ import ubc.pavlab.aspiredb.cli.InvalidDataException;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
+import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantInfoDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
+import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
+import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Characteristic;
 import ubc.pavlab.aspiredb.server.model.CnvType;
@@ -47,17 +52,30 @@ import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
+import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantInfo;
 import ubc.pavlab.aspiredb.server.security.SecurityService;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
+import ubc.pavlab.aspiredb.server.service.QueryService;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
+import ubc.pavlab.aspiredb.shared.BoundedList;
 import ubc.pavlab.aspiredb.shared.CNVValueObject;
 import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
+import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.IndelValueObject;
 import ubc.pavlab.aspiredb.shared.InversionValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.SNVValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
+import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
+import ubc.pavlab.aspiredb.shared.query.GenomicRangeDataType;
+import ubc.pavlab.aspiredb.shared.query.Operator;
+import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.restriction.Conjunction;
+import ubc.pavlab.aspiredb.shared.query.restriction.Disjunction;
+import ubc.pavlab.aspiredb.shared.query.restriction.SetRestriction;
 
 /**
  * TODO Document Me
@@ -78,6 +96,9 @@ public class ProjectManagerImpl implements ProjectManager {
 
     @Autowired
     VariantDao variantDao;
+    
+    @Autowired
+    Variant2SpecialVariantInfoDao variant2SpecialVariantInfoDao;
 
     @Autowired
     PhenotypeDao phenotypeDao;
@@ -90,6 +111,9 @@ public class ProjectManagerImpl implements ProjectManager {
     
     @Autowired
     UserManager userManager;
+    
+    @Autowired
+    QueryService queryService;
     
     ShaPasswordEncoder passwordEncoder = new ShaPasswordEncoder();
 
@@ -630,8 +654,107 @@ public class ProjectManagerImpl implements ProjectManager {
         
         return null;
         
+    }
+    @Override
+    @Transactional
+    public void populateSpecialProjectOverlap(String projectName, String specialProjectName) throws ExternalDependencyException, NotLoggedInException{
         
+        Project specialProject = projectDao.findByProjectName( specialProjectName );
+        
+        Project projectToPopulate = projectDao.findByProjectName( projectName );        
+        
+        ProjectFilterConfig specialProjectFilterConfig = getProjectFilterConfigById(specialProject);
+        
+        ProjectFilterConfig projectToPopulateFilterConfig = getProjectFilterConfigById(projectToPopulate);
+        
+        HashSet<AspireDbFilterConfig> projSet = new HashSet<AspireDbFilterConfig>();
+        projSet.add( projectToPopulateFilterConfig );
+        
+                
+        BoundedList<VariantValueObject> projToPopulateVvos = queryService.queryVariants( projSet );       
+        
+        for (VariantValueObject vvo: projToPopulateVvos.getItems()){            
+            
+            Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
+            
+            filters.add( specialProjectFilterConfig );
+            filters.add( getVariantFilterConfigForSingleVariant(vvo) );
+            
+            BoundedList<VariantValueObject> overLappedVvos = queryService.queryVariants( filters );
+            
+            for (VariantValueObject vvoOverlapped: overLappedVvos.getItems()){
+                
+                Variant2SpecialVariantInfo overlapInfo = new Variant2SpecialVariantInfo();
+                
+                overlapInfo.setVariantId( vvo.getId() );
+                overlapInfo.setOverlapSpecialVariantId( vvoOverlapped.getId() );
+                
+                int start = Math.max( vvo.getGenomicRange().getBaseStart(), vvoOverlapped.getGenomicRange().getBaseStart() );
+                int end = Math.min( vvo.getGenomicRange().getBaseEnd(), vvoOverlapped.getGenomicRange().getBaseEnd() );
+               
+               //genius 
+               if (start< end){
+                   overlapInfo.setOverlap( end-start);
+               }else{                   
+                   throw new RuntimeException("No overlap for variants that are supposed to, Whaaaaa??????");
+               }
+                
+               
+               variant2SpecialVariantInfoDao.create(overlapInfo);
+                            
+                
+            }
+            
+           
+            
+            
+            
+        }
+               
         
     }
+    
+    private ProjectFilterConfig getProjectFilterConfigById(Project p){
+        
+        ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();
+        
+        ArrayList<Long> projectIds = new ArrayList<Long>();
+        
+        projectIds.add(p.getId() );
+        
+        projectFilterConfig.setProjectIds( projectIds );        
+        
+        return projectFilterConfig;        
+        
+    }
+    
+    
+    private VariantFilterConfig getVariantFilterConfigForSingleVariant(VariantValueObject v){
+        
+        SetRestriction genomicRangeRestriction = new SetRestriction();
+        
+        GenomicLocationProperty genomicLocationProperty =  new GenomicLocationProperty();        
+               
+        genomicLocationProperty.setDataType( new GenomicRangeDataType() );
+        
+        genomicRangeRestriction.setProperty( genomicLocationProperty );
+        
+        genomicRangeRestriction.setOperator( Operator.IS_IN_SET );        
+        
+        GenomicRange gr = v.getGenomicRange();
+        
+        Set genomicRangeSet = new HashSet();
+        
+        genomicRangeSet.add( gr );
+        
+        genomicRangeRestriction.setValues( genomicRangeSet );
+        
+        VariantFilterConfig variantFilterConfig = new VariantFilterConfig();
+        
+        variantFilterConfig.setRestriction(genomicRangeRestriction );
+        
+        return variantFilterConfig;
+    }
+    
 
 }
