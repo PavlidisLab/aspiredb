@@ -60,9 +60,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
         extends SecurableDaoBaseImpl<T>
         implements VariantDaoBase<T>
 {
-    
-    private Collection<Long> activeProjectIds;
-    
+        
     private static Log log = LogFactory.getLog( VariantDaoBaseImpl.class.getName() );
     
     private Class<T> elementClass;
@@ -128,18 +126,8 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
         List<T> variants = this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
                 .add( Restrictions.in( "subject", subjects ) ).list();
         return variants;
-    }    
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<? extends T> loadPage( int offset, int limit,
-            String sortField, String sortDirection,
-            Set<AspireDbFilterConfig> filters, Collection<Long> activeProjectIds ) throws BioMartServiceException, NeurocartaServiceException
-    {
-        this.activeProjectIds = activeProjectIds;
-        return loadPage(offset, limit, sortField, sortDirection, filters);
-    }
-    
+    } 
+ 
     @Override
     @Transactional(readOnly = true)
     public Page<? extends T> loadPage( int offset, int limit,
@@ -224,7 +212,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
             criteria.add(criterion);
 		} else if ( filter.getClass() == PhenotypeFilterConfig.class ) {
             PhenotypeFilterConfig filterConfig = (PhenotypeFilterConfig) filter;
-            filterConfig = phenotypeUtils.expandOntologyTerms(filterConfig, activeProjectIds);
+            filterConfig = phenotypeUtils.expandOntologyTerms(filterConfig, filterConfig.getActiveProjectIds());
             RestrictionExpression restrictionExpression = filterConfig.getRestriction();
             Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
                     CriteriaBuilder.EntityType.VARIANT );

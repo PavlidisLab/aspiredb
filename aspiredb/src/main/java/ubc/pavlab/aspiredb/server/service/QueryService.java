@@ -41,17 +41,11 @@ import com.sencha.gxt.data.shared.loader.PagingLoadResult;
  */
 public interface QueryService {
 
-    public BoundedList<SubjectValueObject> querySubjects( Set<AspireDbFilterConfig> filters,
-            Collection<Long> activeProjectIds ) throws NotLoggedInException, ExternalDependencyException;
+    public BoundedList<SubjectValueObject> querySubjects( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException, ExternalDependencyException;
 
-    public BoundedList<VariantValueObject> queryVariants( Set<AspireDbFilterConfig> filters,
-            Collection<Long> activeProjectIds ) throws NotLoggedInException, ExternalDependencyException;
+    public BoundedList<VariantValueObject> queryVariants( Set<AspireDbFilterConfig> filters) throws NotLoggedInException, ExternalDependencyException;
 
-    public int getSubjectCount( AspireDbPagingLoadConfig config, Collection<Long> activeProjectIds )
-            throws NotLoggedInException, ExternalDependencyException;
-
-    public int getVariantCount( AspireDbPagingLoadConfig config, Collection<Long> activeProjectIds )
-            throws NotLoggedInException, ExternalDependencyException;
+   
 
     public PagingLoadResult<OntologyTermValueObject> getOntologyTermSuggestions( String query );
 
@@ -83,10 +77,10 @@ public interface QueryService {
 
     public void deleteQuery( String name );
 
-    public int getSubjectCount( Set<AspireDbFilterConfig> filters, Collection<Long> activeProjectIds )
+    public int getSubjectCount( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException;
 
-    public int getVariantCount( Set<AspireDbFilterConfig> filters, Collection<Long> activeProjectIds )
+    public int getVariantCount( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException;
 
     // // TODO: To be removed

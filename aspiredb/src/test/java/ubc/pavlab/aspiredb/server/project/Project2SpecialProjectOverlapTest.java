@@ -152,8 +152,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         
         ProjectFilterConfig projectToPopulateFilterConfig = getProjectFilterConfigById(projectToPopulate);
         
-        ArrayList<Long> activeIds = new ArrayList<Long>();
-        activeIds.add( projectToPopulate.getId() );
+       
         
         HashSet<AspireDbFilterConfig> projSet = new HashSet<AspireDbFilterConfig>();
         projSet.add( projectToPopulateFilterConfig );
@@ -163,7 +162,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         try{
         
         //this should only be one variant in this project        
-            projToPopulateVvos = queryService.queryVariants( projSet, activeIds );
+            projToPopulateVvos = queryService.queryVariants( projSet );
         }catch(Exception e){
             
             fail("queryService.queryVariants threw an exception");

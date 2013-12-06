@@ -17,6 +17,7 @@ package ubc.pavlab.aspiredb.shared.query;
 import org.directwebremoting.annotations.DataTransferObject;
 import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 @DataTransferObject(javascript = "PhenotypeFilterConfig")
@@ -24,5 +25,18 @@ public class PhenotypeFilterConfig extends RestrictionFilterConfig {
 	private static final long serialVersionUID = -6273822469846069494L;
 
 	public PhenotypeFilterConfig() {}
+	
+	
+	//its possible we could use the project filter config for this, just putting it here to get it out of the queryvariants method signature
+	Collection<Long> activeProjectIds=new ArrayList<Long>();
+
+    public Collection<Long> getActiveProjectIds() {
+        return activeProjectIds;
+    }
+
+
+    public void setActiveProjectIds( Collection<Long> activeProjectIds ) {
+        this.activeProjectIds = activeProjectIds;
+    }
 
 }

@@ -165,7 +165,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		
 		VariantService.suggestProperties(function(properties) {
 
-			QueryService.queryVariants(filterConfigs, ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
+			QueryService.queryVariants(filterConfigs, {
 				callback : function(pageLoad) {
 
 					

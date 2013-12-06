@@ -58,8 +58,6 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 @Repository
 public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements SubjectDao {
 
-    private Collection<Long> activeProjectIds;
-
     @Autowired
     private PhenotypeUtil phenotypeUtils;
 
@@ -138,16 +136,7 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
         return criteria.list();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Page<? extends Subject> loadPage( int offset, int limit,
-            String sortField, String sortDirection,
-            Set<AspireDbFilterConfig> filters, Collection<Long> activeProjectIds ) throws BioMartServiceException, NeurocartaServiceException
-    {
-        this.activeProjectIds = activeProjectIds;
-        return loadPage(offset, limit, sortField, sortDirection, filters);
-    }
-    
+       
     @Override
     @Transactional(readOnly = true)
     public Page<? extends Subject> loadPage( int offset, int limit, String sortProperty, String sortDirection,
@@ -225,7 +214,7 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
         } else if ( filter.getClass() == PhenotypeFilterConfig.class ) {
             PhenotypeFilterConfig filterConfig = ( PhenotypeFilterConfig ) filter;
 
-            filterConfig = phenotypeUtils.expandOntologyTerms( filterConfig, activeProjectIds );
+            filterConfig = phenotypeUtils.expandOntologyTerms( filterConfig, filterConfig.getActiveProjectIds() );
 
             RestrictionExpression restrictionExpression = filterConfig.getRestriction();
 

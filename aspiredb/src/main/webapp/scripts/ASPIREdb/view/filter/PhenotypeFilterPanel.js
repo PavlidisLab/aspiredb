@@ -25,6 +25,10 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilterPanel', {
         var config = new PhenotypeFilterConfig();
         var phenotypeFilterContainer = this.getComponent('phenotypeFilterContainer');
         config.restriction = phenotypeFilterContainer.getRestrictionExpression();
+        
+        //patrick needed this for a phenotype change, possible we could get rid of this and just use what is in the project filter
+        config.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+        
         return config;
     },
     

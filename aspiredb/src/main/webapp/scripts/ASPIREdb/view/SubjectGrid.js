@@ -189,7 +189,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 
 		me.visibleLabels = me.createVisibleLabels();
 		
-		QueryService.querySubjects(filterConfigs, ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
+		QueryService.querySubjects(filterConfigs, {
 			callback : function(pageLoad) {
 				me.valueObjects = pageLoad.items;
 				

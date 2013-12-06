@@ -195,12 +195,14 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
         PhenotypeFilterConfig phenoConfig = new PhenotypeFilterConfig();
         phenoConfig.setRestriction( restriction );
+        phenoConfig.setActiveProjectIds( activeProjectIds );
+        
         Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
         filters.add( projConfig );
         filters.add( phenoConfig );
         AspireDbPagingLoadConfig loadConfig = new AspireDbPagingLoadConfigBean();
         loadConfig.setFilters( filters );
-        return queryService.querySubjects( filters, activeProjectIds ).getItems();
+        return queryService.querySubjects( filters ).getItems();
     }
 
     /**
