@@ -670,8 +670,11 @@ public class ProjectManagerImpl implements ProjectManager {
         HashSet<AspireDbFilterConfig> projSet = new HashSet<AspireDbFilterConfig>();
         projSet.add( projectToPopulateFilterConfig );
         
+        ArrayList<Long> activeIds = new ArrayList<Long>();
+        activeIds.add( projectToPopulate.getId() );
+        
                 
-        BoundedList<VariantValueObject> projToPopulateVvos = queryService.queryVariants( projSet );       
+        BoundedList<VariantValueObject> projToPopulateVvos = queryService.queryVariants( projSet, activeIds  );       
         
         for (VariantValueObject vvo: projToPopulateVvos.getItems()){            
             
@@ -680,7 +683,7 @@ public class ProjectManagerImpl implements ProjectManager {
             filters.add( specialProjectFilterConfig );
             filters.add( getVariantFilterConfigForSingleVariant(vvo) );
             
-            BoundedList<VariantValueObject> overLappedVvos = queryService.queryVariants( filters );
+            BoundedList<VariantValueObject> overLappedVvos = queryService.queryVariants( filters, activeIds );
             
             for (VariantValueObject vvoOverlapped: overLappedVvos.getItems()){
                 
