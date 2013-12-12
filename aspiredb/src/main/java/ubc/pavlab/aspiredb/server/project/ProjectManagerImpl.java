@@ -685,6 +685,10 @@ public class ProjectManagerImpl implements ProjectManager {
             
             for (VariantValueObject vvoOverlapped: overLappedVvos.getItems()){
                 
+                if(!vvo.getGenomicRange().getChromosome().equals( vvoOverlapped.getGenomicRange().getChromosome() )){
+                    continue;
+                }
+                
                 Variant2SpecialVariantInfo overlapInfo = new Variant2SpecialVariantInfo();
                 
                 int start = Math.max( vvo.getGenomicRange().getBaseStart(), vvoOverlapped.getGenomicRange().getBaseStart() );
@@ -704,9 +708,6 @@ public class ProjectManagerImpl implements ProjectManager {
                 overlapInfo.setOverlapSpecialVariantId( vvoOverlapped.getId() );
                 
                 overlapInfo.setOverlapProjectId( specialProject.getId() );
-                
-                
-                
                
                variant2SpecialVariantInfoDao.create(overlapInfo);
                             

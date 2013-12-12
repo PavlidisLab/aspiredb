@@ -247,7 +247,10 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
     }
 	
 	private List<Long> getProjectOverlapIds(ProjectOverlapFilterConfig overlapFilter) {
-	   
+	   //Grabbing all ids for the project and iterating over them with a query to get the overlap for each
+	    //could probably mash it all into one query, but this is simpler for now 
+	    
+	    
         ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();        
         projectFilterConfig.setProjectIds( overlapFilter.getProjectIds() );
         
