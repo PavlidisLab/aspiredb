@@ -43,6 +43,7 @@ import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.PhenotypeFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.ProjectOverlapFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.SubjectFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.SubjectLabelProperty;
@@ -184,6 +185,14 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
 
     private List<Long> findIds( AspireDbFilterConfig filter ) throws BioMartServiceException,
             NeurocartaServiceException {
+        
+        if (filter instanceof ProjectOverlapFilterConfig){
+            //TODO implement this after doing it in Variant filter
+            
+            return new ArrayList<Long>();
+            
+        }
+        
         Session session = this.getSessionFactory().getCurrentSession();
         Criteria criteria = session.createCriteria( Subject.class );
         addSingleFilter( filter, criteria );

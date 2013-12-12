@@ -15,12 +15,9 @@
 
 package ubc.pavlab.aspiredb.server.dao;
 
-import org.springframework.security.access.annotation.Secured;
-import ubc.pavlab.aspiredb.server.model.Project;
-import ubc.pavlab.aspiredb.server.model.Subject;
-import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantInfo;
-
 import java.util.Collection;
+
+import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantInfo;
 
 /**
  * TODO Document Me
@@ -30,11 +27,8 @@ import java.util.Collection;
  */
 public interface Variant2SpecialVariantInfoDao extends DaoBase<Variant2SpecialVariantInfo> {
     
+    public Collection<Variant2SpecialVariantInfo> loadByVariantId( Long id, Collection<Long> overlapProjectIds );
     
-    public Collection<Variant2SpecialVariantInfo> loadByVariantId( Long id );
-    
-    
-    
-    
+    public Collection<Variant2SpecialVariantInfo> loadByVariantIdAndOverlap( Long id, Integer overlap, Integer operator, Collection<Long> overlapProjectIds );
 
 }

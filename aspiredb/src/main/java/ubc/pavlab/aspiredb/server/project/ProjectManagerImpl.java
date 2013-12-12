@@ -687,18 +687,25 @@ public class ProjectManagerImpl implements ProjectManager {
                 
                 Variant2SpecialVariantInfo overlapInfo = new Variant2SpecialVariantInfo();
                 
-                overlapInfo.setVariantId( vvo.getId() );
-                overlapInfo.setOverlapSpecialVariantId( vvoOverlapped.getId() );
-                
                 int start = Math.max( vvo.getGenomicRange().getBaseStart(), vvoOverlapped.getGenomicRange().getBaseStart() );
                 int end = Math.min( vvo.getGenomicRange().getBaseEnd(), vvoOverlapped.getGenomicRange().getBaseEnd() );
                
                //genius 
                if (start< end){
                    overlapInfo.setOverlap( end-start);
-               }else{                   
-                   throw new RuntimeException("No overlap for variants that are supposed to, Whaaaaa??????");
+               }else{
+                   log.info( "No Overlap" );
+                   continue;
                }
+                
+                
+                
+                overlapInfo.setVariantId( vvo.getId() );
+                overlapInfo.setOverlapSpecialVariantId( vvoOverlapped.getId() );
+                
+                overlapInfo.setOverlapProjectId( specialProject.getId() );
+                
+                
                 
                
                variant2SpecialVariantInfoDao.create(overlapInfo);

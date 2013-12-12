@@ -16,10 +16,12 @@ package ubc.pavlab.aspiredb.server.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
@@ -35,6 +37,7 @@ import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
+import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantInfo;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
@@ -42,6 +45,7 @@ import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.PhenotypeFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.ProjectOverlapFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.SubjectFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
@@ -72,6 +76,9 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
         this.elementClass = elementClass;
     }
 
+    @Autowired
+    private Variant2SpecialVariantInfoDao variant2SpecialVariantInfoDao;
+    
     @Autowired private PhenotypeUtil phenotypeUtils;
 
     @Override
@@ -179,6 +186,12 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
     private List<Long> findIds ( AspireDbFilterConfig filter )
             throws BioMartServiceException, NeurocartaServiceException
     {
+        if (filter instanceof ProjectOverlapFilterConfig){
+            
+            return this.getProjectOverlapIds( (ProjectOverlapFilterConfig)filter );
+            
+        }
+        
         Session session = this.getSessionFactory().getCurrentSession();
         Criteria criteria = session.createCriteria( this.elementClass );
                 
@@ -232,4 +245,53 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
                 CriteriaBuilder.EntityType.VARIANT  );
         criteria.add( junction );
     }
+	
+	private List<Long> getProjectOverlapIds(ProjectOverlapFilterConfig overlapFilter) {
+	   
+        ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();        
+        projectFilterConfig.setProjectIds( overlapFilter.getProjectIds() );
+        
+        Set<AspireDbFilterConfig> filterSet = new HashSet<AspireDbFilterConfig>();        
+        filterSet.add( projectFilterConfig );
+        
+        List<Long> variantIds = new ArrayList<Long>();
+        
+        try{
+            variantIds =  getFilteredIds(filterSet);          
+        }catch (Exception e){
+            log.error( "exception while getting projectOverlapIds" );
+        }
+       
+        
+        Set<Long> variantIdsWithOverlap = new HashSet<Long>();
+        
+        Boolean searchByOverlap = overlapFilter.getOperator()!=null;
+        
+        for (Long vId: variantIds){
+            
+            Collection<Variant2SpecialVariantInfo> infos = new ArrayList<Variant2SpecialVariantInfo>();
+            
+            if (searchByOverlap){                
+                infos =  variant2SpecialVariantInfoDao.loadByVariantIdAndOverlap( vId, overlapFilter.getOverlap(), overlapFilter.getOperator() , overlapFilter.getOverlapProjectIds());                
+            }else{                
+                infos =  variant2SpecialVariantInfoDao.loadByVariantId( vId, overlapFilter.getOverlapProjectIds());                
+            }
+            
+            if (infos.size()>0){
+                
+                for (Variant2SpecialVariantInfo vInfo: infos){
+                     variantIdsWithOverlap.add( vInfo.getVariantId() );                    
+                }
+                
+            }            
+            
+        }        
+        
+        List<Long> overlapToReturn = new ArrayList<Long>();
+        
+        overlapToReturn.addAll( variantIdsWithOverlap );
+        
+        return overlapToReturn;
+	
+	}
 }

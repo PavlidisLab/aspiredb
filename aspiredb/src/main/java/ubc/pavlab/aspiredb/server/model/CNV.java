@@ -93,6 +93,7 @@ public class CNV extends Variant {
         vo.setVariantType( this.getClass().getSimpleName() );
         vo.setPatientId( this.getSubject().getPatientId() );
         vo.setSubjectId( this.getSubject().getId() );
+        vo.setUserVariantId( this.getUserVariantId() );
 
         vo.setGenomicRange( new GenomicRange( this.getLocation().getChromosome(), this.getLocation().getStart(), this
                 .getLocation().getEnd() ) );

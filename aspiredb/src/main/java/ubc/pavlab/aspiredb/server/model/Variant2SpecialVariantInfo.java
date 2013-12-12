@@ -48,6 +48,9 @@ public class Variant2SpecialVariantInfo implements Serializable  {
     @Column(name="OVERLAP_LENGTH")
     private Integer overlap;
     
+    @Column(name="OVERLAP_PROJECTID")
+    private Long overlapProjectId;
+    
     public Variant2SpecialVariantInfo(){
         
     }
@@ -74,6 +77,14 @@ public class Variant2SpecialVariantInfo implements Serializable  {
 
     public void setOverlap( Integer overlap ) {
         this.overlap = overlap;
+    }
+
+    public Long getOverlapProjectId() {
+        return overlapProjectId;
+    }
+
+    public void setOverlapProjectId( Long overlapProjectId ) {
+        this.overlapProjectId = overlapProjectId;
     }
     
 }

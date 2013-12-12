@@ -14,8 +14,16 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+
+import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
+import ubc.pavlab.aspiredb.shared.GenomicRange;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 /**
  * @version $Id: Inversion.java,v 1.3 2013/01/28 21:54:23 cmcdonald Exp $
@@ -25,6 +33,29 @@ import javax.persistence.Entity;
 public class Inversion extends Variant {
 
     public Inversion() {
+    }
+    
+    @Override
+    public VariantValueObject toValueObject() {
+        VariantValueObject vo = new VariantValueObject();
+        vo.setId( this.getId() );
+        vo.setVariantType( this.getClass().getSimpleName() );
+        vo.setPatientId( this.getSubject().getPatientId() );
+        vo.setSubjectId( this.getSubject().getId() );
+        vo.setUserVariantId( this.getUserVariantId() );
+
+        GenomicRange genomicRange = new GenomicRange( this.getLocation().getChromosome(),
+                this.getLocation().getStart(), this.getLocation().getEnd() );
+        vo.setGenomicRange( genomicRange );
+        Collection<CharacteristicValueObject> characteristicValueObjects = Characteristic
+                .toValueObjects( this.characteristics );
+        Map<String, CharacteristicValueObject> map = new HashMap<String, CharacteristicValueObject>();
+        for ( CharacteristicValueObject characteristicValueObject : characteristicValueObjects ) {
+            map.put( characteristicValueObject.getKey(), characteristicValueObject );
+        }
+        vo.setCharacteristics( map );
+        vo.setLabels( Label.toValueObjects( this.labels ) );
+        return vo;
     }
 
 }

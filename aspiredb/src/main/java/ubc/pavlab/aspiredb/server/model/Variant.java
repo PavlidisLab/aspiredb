@@ -53,11 +53,11 @@ public abstract class Variant implements SecuredNotChild, ValueObjectConvertible
 
     @OneToMany(cascade = javax.persistence.CascadeType.ALL)
     @JoinTable(name = "VARIANT_CHARACTERISTIC", joinColumns = { @JoinColumn(name = "VARIANT_FK") }, inverseJoinColumns = { @JoinColumn(name = "CHARACTERISTIC_FK") })
-    private List<Characteristic> characteristics;
+    protected List<Characteristic> characteristics;
 
     @ManyToMany
     @JoinTable(name = "VARIANT_LABEL", joinColumns = { @JoinColumn(name = "VARIANT_FK", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "LABEL_FK", referencedColumnName = "ID") })
-    private Set<Label> labels = new HashSet<Label>();
+    protected Set<Label> labels = new HashSet<Label>();
 
     @Column(name = "USERVARIANTID")
     private String userVariantId;
@@ -132,27 +132,6 @@ public abstract class Variant implements SecuredNotChild, ValueObjectConvertible
         this.userVariantId = userVariantId;
     }
 
-    @Override
-    public VariantValueObject toValueObject() {
-        VariantValueObject vo = new VariantValueObject();
-        vo.setId( this.getId() );
-        vo.setVariantType( this.getClass().getSimpleName() );
-        vo.setPatientId( this.getSubject().getPatientId() );
-        vo.setSubjectId( this.getSubject().getId() );
-
-        GenomicRange genomicRange = new GenomicRange( this.getLocation().getChromosome(),
-                this.getLocation().getStart(), this.getLocation().getEnd() );
-        vo.setGenomicRange( genomicRange );
-        Collection<CharacteristicValueObject> characteristicValueObjects = Characteristic
-                .toValueObjects( this.characteristics );
-        Map<String, CharacteristicValueObject> map = new HashMap<String, CharacteristicValueObject>();
-        for ( CharacteristicValueObject characteristicValueObject : characteristicValueObjects ) {
-            map.put( characteristicValueObject.getKey(), characteristicValueObject );
-        }
-        vo.setCharacteristics( map );
-        vo.setLabels( Label.toValueObjects( this.labels ) );
-        return vo;
-    }
 
     // TODO: has to be unique
     public void addLabel( Label label ) {
