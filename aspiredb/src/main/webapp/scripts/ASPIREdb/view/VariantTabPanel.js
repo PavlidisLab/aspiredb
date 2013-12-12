@@ -184,7 +184,6 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					grid.on('show', function() {
 
 						if (ref.newIdeogramLabel) {
-							grid.store.sync();
 							grid.getView().refresh();
 							ref.newIdeogramLabel = undefined;
 						}
@@ -405,7 +404,6 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 						} else {
 							// refresh grid
-							grid.store.sync();
 							grid.getView().refresh();
 						}
 

@@ -60,7 +60,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 			{
 				text : "Labels",
 				dataIndex : 'labelIds',
-				/*// This is very slow we need to rethink this
+				// This is very slow we need to rethink this
 				renderer : function(value) {
 					
 					var ret = "";
@@ -77,7 +77,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 						}
 					}
 					return ret;
-				},*/
+				},
 				flex : 1
 			}, ],
 
@@ -202,7 +202,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 
 					// create only one unique label instance
 					var labelIds = [];
-					/*
+					
 					for ( var j = 0; j < val.labels.length; j++) {
 						var aLabel = me.visibleLabels[val.labels[j].id];
 						
@@ -215,7 +215,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 						
 						labelIds.push(aLabel.id);
 					}
-*/
+
 					var row = [ val.id, val.patientId, labelIds ];
 					data.push(row);
 				}
@@ -225,8 +225,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 				me.setLoading(false);
 
 				// refresh grid
-				//me.store.sync();
-				//me.getView().refresh();
+				me.getView().refresh();
 
 				var ids = [];
 				for ( var i = 0; i < me.valueObjects.length; i++) {
@@ -306,7 +305,6 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 						}
 
 						// refresh grid
-						me.store.sync();
 						me.getView().refresh();
 					}
 				});
