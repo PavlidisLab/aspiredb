@@ -153,7 +153,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         } catch ( Exception e ) {
 
-            fail( "projectManager.addSubjectVariantsToProject threw an exception:" + e.getMessage() );
+            fail( "projectManager.addSubjectVariantsToProject threw an exception:" + e.toString() );
 
         }
 
@@ -164,7 +164,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         } catch ( Exception e ) {
 
-            fail( "projectManager.populateSpecialProjectOverlap threw an exception:" + e.getMessage() );
+            fail( "projectManager.populateSpecialProjectOverlap threw an exception:" + e.toString() );
 
         }
         
@@ -175,7 +175,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         } catch ( Exception e ) {
 
-            fail( "projectManager.populateSpecialProjectOverlap threw an exception:" + e.getMessage() );
+            fail( "projectManager.populateSpecialProjectOverlap threw an exception:" + e.toString() );
 
         }
         
