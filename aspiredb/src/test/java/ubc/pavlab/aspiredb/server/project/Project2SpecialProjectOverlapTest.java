@@ -153,21 +153,34 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         } catch ( Exception e ) {
 
-            fail( "projectManager.addSubjectVariantsToProject threw an exception" );
+            fail( "projectManager.addSubjectVariantsToProject threw an exception:" + e.getMessage() );
 
         }
 
         try {
 
             projectManager.populateSpecialProjectOverlap( projectId, projectIdWithOverlap );
-
-            projectManager.populateSpecialProjectOverlap( projectId, projectIdWithNoOverlap );
+       
 
         } catch ( Exception e ) {
 
-            fail( "projectManager.populateSpecialProjectOverlap threw an exception" );
+            fail( "projectManager.populateSpecialProjectOverlap threw an exception:" + e.getMessage() );
 
         }
+        
+        try {
+
+            projectManager.populateSpecialProjectOverlap( projectId, projectIdWithNoOverlap );
+       
+
+        } catch ( Exception e ) {
+
+            fail( "projectManager.populateSpecialProjectOverlap threw an exception:" + e.getMessage() );
+
+        }
+        
+        
+        
 
     }
 
@@ -383,7 +396,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         
         
     }
- /*   TODO finish this
+ 
     @Test
     public void testProjectOverlapFilterWithSpecificOverlapLessThan() {
 
@@ -420,13 +433,13 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
             fail();
         }
 
-        assertEquals( result.getItems().size(), 1 );
+        assertEquals( result.getItems().size(), 2 );
 
-        assertEquals( result.getItems().iterator().next().getUserVariantId(), userVariantId2 );
+       
         
         
     }
-    */
+    
 
     private boolean doesOverlap( Variant variant, Variant specialVariant ) {
 
