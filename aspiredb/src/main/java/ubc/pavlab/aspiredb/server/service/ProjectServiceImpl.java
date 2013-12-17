@@ -71,6 +71,19 @@ public class ProjectServiceImpl implements ProjectService{
 
         return vos;
     }
+    
+    @RemoteMethod 
+    public List<ProjectValueObject> getOverlapProjects(){        
+
+        Collection<Project> projects = projectDao.getOverlapProjects();
+        List<ProjectValueObject> vos = new ArrayList<ProjectValueObject>();
+
+        for ( Project p : projects ) {
+                vos.add( Project.convertToValueObject( p ) );           
+        }
+
+        return vos;
+    }
 
     /*
      * TODO eventually we want this to work with a collection of projectIds

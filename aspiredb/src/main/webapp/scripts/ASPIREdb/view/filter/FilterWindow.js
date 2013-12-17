@@ -1,4 +1,4 @@
-Ext.require([ 'Ext.window.*', 'Ext.layout.container.Border', 'ASPIREdb.view.filter.AndFilterContainer', 'ASPIREdb.view.filter.VariantFilterPanel', 'ASPIREdb.view.filter.SubjectFilterPanel', 'ASPIREdb.view.filter.PhenotypeFilterPanel', 'ASPIREdb.view.SaveQueryWindow' ]);
+Ext.require([ 'Ext.window.*', 'Ext.layout.container.Border', 'ASPIREdb.view.filter.AndFilterContainer', 'ASPIREdb.view.filter.VariantFilterPanel', 'ASPIREdb.view.filter.SubjectFilterPanel', 'ASPIREdb.view.filter.PhenotypeFilterPanel', 'ASPIREdb.view.SaveQueryWindow', 'ASPIREdb.view.filter.ProjectOverlapFilterPanel' ]);
 
 Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	extend : 'Ext.Window',
@@ -38,7 +38,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 					editable : false,
 					forceSelection : true,
 					value : 'FILTER_PLACEHOLDER',
-					store : [ [ 'FILTER_PLACEHOLDER', '<Filter>' ], [ 'ASPIREdb.view.filter.SubjectFilterPanel', 'Subject Filter' ], [ 'ASPIREdb.view.filter.VariantFilterPanel', 'Variant Filter' ], [ 'ASPIREdb.view.filter.PhenotypeFilterPanel', 'Phenotype Filter' ] ]
+					store : [ [ 'FILTER_PLACEHOLDER', '<Filter>' ], [ 'ASPIREdb.view.filter.SubjectFilterPanel', 'Subject Filter' ], [ 'ASPIREdb.view.filter.VariantFilterPanel', 'Variant Filter' ], [ 'ASPIREdb.view.filter.PhenotypeFilterPanel', 'Phenotype Filter' ], [ 'ASPIREdb.view.filter.ProjectOverlapFilterPanel', 'Project Overlap Filter' ] ]
 				}, {
 					xtype : 'label',
 					text : 'or load saved query: '
@@ -118,6 +118,13 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 				items : [ {
 					xtype : 'button',
 					flex : 1,
+					text : 'Preview query',
+					itemId : 'previewQueryButton',
+					handler : me.previewQueryHandler,
+					scope : me
+				},{
+					xtype : 'button',
+					flex : 1,
 					text : 'Submit',
 					itemId : 'applyButton',
 					handler : function() {
@@ -126,14 +133,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 						ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);
 						me.close();
 					}
-				}, {
-					xtype : 'button',
-					flex : 2,
-					text : 'Save query',
-					itemId : 'saveQueryButton',
-					handler : me.saveQueryHandler,
-					scope : me
-				}, {
+				},  {
 					xtype : 'button',
 					flex : 1,
 					text : 'Clear',
@@ -261,6 +261,12 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	saveQueryHandler : function() {
 
 		ASPIREdb.view.SaveQueryWindow.initAndShow(this.getFilterConfigs());
+
+	},
+	
+	previewQueryHandler : function() {
+
+		ASPIREdb.EVENT_BUS.fireEvent('query_update');
 
 	},
 

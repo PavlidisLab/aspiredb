@@ -49,6 +49,7 @@ import ubc.pavlab.aspiredb.shared.query.ProjectOverlapFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.SubjectFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
 import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
 import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
@@ -186,6 +187,8 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
     private List<Long> findIds ( AspireDbFilterConfig filter )
             throws BioMartServiceException, NeurocartaServiceException
     {
+        //Project overlap filter requires a little more data processing than the other filters and uses precalculated database table
+        //as it doesn't quite fit the same paradigm as the other filters I am breaking it off into its own method
         if (filter instanceof ProjectOverlapFilterConfig){
             
             return this.getProjectOverlapIds( (ProjectOverlapFilterConfig)filter );
@@ -246,9 +249,10 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
         criteria.add( junction );
     }
 	
-	private List<Long> getProjectOverlapIds(ProjectOverlapFilterConfig overlapFilter) {
+	
+	public List<Long> getProjectOverlapIds(ProjectOverlapFilterConfig overlapFilter) {
 	   //Grabbing all ids for the project and iterating over them with a query to get the overlap for each
-	    //could probably mash it all into one query, but this is simpler for now 
+	    //could probably mash it into fewer queries, but this is simpler for now 
 	    
 	    
         ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();        
@@ -257,20 +261,47 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
         Set<AspireDbFilterConfig> filterSet = new HashSet<AspireDbFilterConfig>();        
         filterSet.add( projectFilterConfig );
         
-        List<Long> variantIds = new ArrayList<Long>();
+        List<Long> activeProjectsVariantIds = new ArrayList<Long>();
         
         try{
-            variantIds =  getFilteredIds(filterSet);          
+            //get the variantIds of all the variants in the activeProjects to iterate over later and search for overlap
+            activeProjectsVariantIds =  getFilteredIds(filterSet);          
         }catch (Exception e){
             log.error( "exception while getting projectOverlapIds" );
         }
+        
+        PhenotypeRestriction phenRestriction = overlapFilter.getPhenotypeRestriction();
+        
+        Boolean hasPhenotype = phenRestriction.getValue() !=null && phenRestriction.getName()!=null;
        
+        List<Long> overlapProjsPhenoAssociatedVariantIds = new ArrayList<Long>();
+        
+        //Get variants in specified overlapping projects with specified phenotype for easier checking later
+        if (hasPhenotype){
+            
+            PhenotypeFilterConfig phenConfig = new PhenotypeFilterConfig();
+            phenConfig.setRestriction( phenRestriction );
+            phenConfig.setActiveProjectIds( overlapFilter.getOverlapProjectIds() );
+            
+            Set<AspireDbFilterConfig> phenFilterSet = new HashSet<AspireDbFilterConfig>();        
+            phenFilterSet.add( phenConfig );
+            
+            try{
+                overlapProjsPhenoAssociatedVariantIds = getFilteredIds(phenFilterSet);         
+            }catch (Exception e){
+                log.error( "exception while getting projectOverlapIds for phenotype" );
+            }
+        }        
+        
         
         Set<Long> variantIdsWithOverlap = new HashSet<Long>();
         
         Boolean searchByOverlap = overlapFilter.getOperator()!=null;
         
-        for (Long vId: variantIds){
+        
+        
+        
+        for (Long vId: activeProjectsVariantIds){
             
             Collection<Variant2SpecialVariantInfo> infos = new ArrayList<Variant2SpecialVariantInfo>();
             
@@ -282,10 +313,24 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
             
             if (infos.size()>0){
                 
-                for (Variant2SpecialVariantInfo vInfo: infos){
-                     variantIdsWithOverlap.add( vInfo.getVariantId() );                    
+                if (hasPhenotype){
+                    
+                    for (Variant2SpecialVariantInfo info : infos){
+                        
+                        //if the overlapped variant has the specified phenotype associated with it
+                        if (overlapProjsPhenoAssociatedVariantIds.contains( info.getOverlapSpecialVariantId())){                            
+                            variantIdsWithOverlap.add( vId );
+                            
+                            //all of this 'infos' deal with the same variantId so we can break if there is one
+                            break;                            
+                        }                       
+                        
+                    }
+                    
                 }
-                
+                else{            
+                    variantIdsWithOverlap.add( vId );
+                }
             }            
             
         }        

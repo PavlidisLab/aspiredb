@@ -16,6 +16,7 @@
 package ubc.pavlab.aspiredb.server.dao;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.security.access.annotation.Secured;
 
@@ -40,4 +41,7 @@ public interface SubjectDao extends SecurableDaoBase<Subject>, RemotePaging<Subj
 
     @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
     public Collection<Subject> findByLabel( LabelValueObject labelEntity );
+    
+    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
+    public Collection<Subject> loadByVariantIds(List<Long> variantIds );
 }

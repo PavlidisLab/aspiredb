@@ -16,6 +16,7 @@ package ubc.pavlab.aspiredb.server.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -37,6 +38,7 @@ import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
@@ -61,11 +63,30 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
 
     @Autowired
     private PhenotypeUtil phenotypeUtils;
+    
+    @Autowired
+    private VariantDao variantDao;
 
     @Autowired
     public SubjectDaoImpl( SessionFactory sessionFactory ) {
         super( Subject.class );
         super.setSessionFactory( sessionFactory );
+    }
+    
+    public Collection<Subject> loadByVariantIds(List<Long> variantIds ){
+        
+        Collection<Variant> variants = variantDao.load( variantIds );
+        
+        HashSet<Subject> subjects = new HashSet<Subject>();
+        
+        for (Variant v: variants){
+            
+            subjects.add( v.getSubject() );
+            
+        }
+        
+        return subjects;
+        
     }
 
     @Override
@@ -187,9 +208,18 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
             NeurocartaServiceException {
         
         if (filter instanceof ProjectOverlapFilterConfig){
-            //TODO implement this after doing it in Variant filter
             
-            return new ArrayList<Long>();
+            List<Long> variantIds = variantDao.getProjectOverlapIds( (ProjectOverlapFilterConfig)filter );
+            
+            Collection<Subject> subjects= this.loadByVariantIds( variantIds );
+            
+            ArrayList<Long> subjectIds = new ArrayList<Long>();
+            
+            for (Subject s: subjects){
+                subjectIds.add( s.getId() );
+            }
+            
+            return subjectIds;
             
         }
         

@@ -215,6 +215,8 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 		var singleValueField = multicombo_container.getComponent("singleValueField");
 		var example = multicombo_container.getComponent("example");
 		var propertyComboBox = me.getComponent("propertyComboBox");
+		
+		var firstTime= true;
 
 		propertyComboBox.on('select', function(obj, records) {
 			var record = records[0];
@@ -254,18 +256,11 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			me.selectedProperty = property;
 			
 			me.enableEnterList(property);
-			
-			ASPIREdb.EVENT_BUS.fireEvent('query_update');
-			
+						
 		});
 
-		operatorComboBox.on('change', function(obj, newValue, oldValue) {
-			ASPIREdb.EVENT_BUS.fireEvent('query_update');
-		});
 		
-		singleValueField.on('change', function(obj, newValue, oldValue) {
-			ASPIREdb.EVENT_BUS.fireEvent('query_update');
-		});
+		
 		
 		me.getComponent("removeButton").on('click', function(button, event) {
 			
@@ -273,7 +268,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			var filterContainer = item.ownerCt;
 			filterContainer.remove(item);
 			filterContainer.doLayout();
-			ASPIREdb.EVENT_BUS.fireEvent('query_update');			
+				
 			if(filterContainer.ownerCt.closeEmptyFilter) filterContainer.ownerCt.closeEmptyFilter();
 		});
 		

@@ -16,6 +16,8 @@ package ubc.pavlab.aspiredb.shared.query;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
+import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
+
 import java.util.Collection;
 
 @DataTransferObject(javascript = "ProjectOverlapFilterConfig")
@@ -31,10 +33,12 @@ public class ProjectOverlapFilterConfig extends AspireDbFilterConfig {
 	//the projects that you want to search for overlap
 	private Collection<Long> overlapProjectIds;
 	
-	private Integer overlap;
-	
+	private Integer overlap;	
 	//+ greater than, 0 equals, - less than
 	private Integer operator;
+	
+	//May want to incorporate Conjunction/Disjunction object graphs at some point to make these more complex, keep it simple for now
+	private PhenotypeRestriction phenotypeRestriction;
 	
 	
 					
@@ -75,5 +79,13 @@ public class ProjectOverlapFilterConfig extends AspireDbFilterConfig {
 
     public void setOperator( Integer operator ) {
         this.operator = operator;
+    }
+
+    public PhenotypeRestriction getPhenotypeRestriction() {
+        return phenotypeRestriction;
+    }
+
+    public void setPhenotypeRestriction( PhenotypeRestriction phenotypeRestriction ) {
+        this.phenotypeRestriction = phenotypeRestriction;
     }
 }

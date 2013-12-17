@@ -38,6 +38,9 @@ public interface ProjectDao extends SecurableDaoBase<Project> {
     @Secured({"GROUP_USER"})
     public Integer getSubjectCountForProjects(Collection<Long> projectIds);
     
+    @Secured({"GROUP_USER"})
+    public Collection<Project> getOverlapProjects();
+    
     
     
     

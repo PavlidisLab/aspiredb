@@ -35,6 +35,8 @@ public class ProjectValueObject implements Serializable {
     private String name;
     
     private String description;
+    
+    private Boolean special;
 
     public ProjectValueObject() {
     }
@@ -61,6 +63,14 @@ public class ProjectValueObject implements Serializable {
 
     public void setDescription( String description ) {
         this.description = description;
+    }
+
+    public Boolean getSpecial() {
+        return special;
+    }
+
+    public void setSpecial( Boolean special ) {
+        this.special = special;
     }
 
     

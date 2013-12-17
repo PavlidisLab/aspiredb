@@ -23,8 +23,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Repository("projectDao")
 public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements ProjectDao{
@@ -80,4 +83,22 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
         
     }
     
+    @Override
+    @Transactional(readOnly=true)
+    public Collection<Project> getOverlapProjects(){
+        
+        
+        Collection<Project> projects = this.loadAll();
+        Collection<Project> overlapProjects = new ArrayList<Project>();
+
+        for ( Project p : projects ) {
+            
+            if (p.getSpecialData()!=null && p.getSpecialData()){            
+                overlapProjects.add( p );
+            }
+        }
+
+        return overlapProjects;
+        
+    }
 }

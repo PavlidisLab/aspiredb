@@ -96,6 +96,7 @@ public class Project implements Securable {
         valueObject.setId( project.getId() );
         valueObject.setName( project.getName() );
         valueObject.setDescription( project.getDescription() );
+        valueObject.setSpecial( project.getSpecialData() );
         return valueObject;
     }
 

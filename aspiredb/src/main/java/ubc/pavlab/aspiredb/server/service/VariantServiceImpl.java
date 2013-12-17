@@ -111,6 +111,17 @@ public class VariantServiceImpl implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
+    public Collection<Property> suggestPropertiesForProjectOverlap(){
+        Collection<Property> properties = new ArrayList<Property>();
+        properties.add(new OverlapProperty());
+        
+        return properties;
+        
+    }
+    
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
     public Collection<Property> suggestEntityPropertiesByStringName(String variantType){
         
         variantType = variantType.toUpperCase();
