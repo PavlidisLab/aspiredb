@@ -14,20 +14,25 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Query;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ubc.pavlab.aspiredb.server.model.Project;
-import ubc.pavlab.aspiredb.server.model.Subject;
-import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantInfo;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantInfo;
+import ubc.pavlab.aspiredb.shared.NumericValue;
+import ubc.pavlab.aspiredb.shared.query.MutualOverlapPercentageProperty;
+import ubc.pavlab.aspiredb.shared.query.Operator;
+import ubc.pavlab.aspiredb.shared.query.OverlapBasesProperty;
+import ubc.pavlab.aspiredb.shared.query.OverlapPercentageMyVariantProperty;
+import ubc.pavlab.aspiredb.shared.query.OverlapPercentageOtherVariantProperty;
+import ubc.pavlab.aspiredb.shared.query.Property;
+import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 
 @Repository("variant2SpecialVariantInfoDao")
 public class Variant2SpecialVariantInfoDaoImpl extends DaoBaseImpl<Variant2SpecialVariantInfo> implements Variant2SpecialVariantInfoDao{
@@ -58,29 +63,53 @@ public class Variant2SpecialVariantInfoDaoImpl extends DaoBaseImpl<Variant2Speci
     
     @Override
     @Transactional(readOnly = true)
-    public Collection<Variant2SpecialVariantInfo> loadByVariantIdAndOverlap( Long id , Integer overlap, Integer operator, Collection<Long> overlapProjectIds) {
+    public Collection<Variant2SpecialVariantInfo> loadByVariantIdAndOverlap( Long id , SimpleRestriction overlapRestriction, Collection<Long> overlapProjectIds) {
         
         if (id == null){
             return new ArrayList<Variant2SpecialVariantInfo>();
             
         }
         
-        String[] paramNames = { "id", "overlap", "overlapProjectIds" };
-        Object[] objectValues = { id, overlap, overlapProjectIds };
+        String queryString = "from Variant2SpecialVariantInfo where variantId = :id";        
         
-        String greaterThan = "from Variant2SpecialVariantInfo where variantId = :id and overlap > :overlap and overlapProjectId in (:overlapProjectIds)";
-        String lessThan = "from Variant2SpecialVariantInfo where variantId = :id and overlap < :overlap and overlapProjectId in (:overlapProjectIds)";
-        String equal = "from Variant2SpecialVariantInfo where variantId = :id and overlap = :overlap and overlapProjectId in (:overlapProjectIds)";
         
-        String queryString = "";
+        Operator o = overlapRestriction.getOperator();
         
-        if (operator >0){
-            queryString = greaterThan;
-        }else if(operator<0){
-            queryString = lessThan;
-        }else{
-            queryString = equal;
+        String operatorString =""; 
+        
+        if (o.equals( Operator.NUMERIC_GREATER)){
+            operatorString =">";
+        }else if (o.equals( Operator.NUMERIC_LESS)){
+            operatorString ="<";
+        }else if (o.equals( Operator.NUMERIC_EQUAL)){
+            operatorString ="=";
+        }else if (o.equals( Operator.NUMERIC_NOT_EQUAL)){
+            operatorString ="!=";
         }
+        
+        
+        Property p = overlapRestriction.getProperty();
+        
+        String columnRestriction = "";
+        
+        if (p instanceof OverlapBasesProperty ){
+            
+            columnRestriction = " and overlap "+operatorString+" :overlap";
+            
+        } else if (p instanceof MutualOverlapPercentageProperty){
+            columnRestriction = " and overlapPercentage "+operatorString+" :overlap and overlappedOverlapPercentage "+operatorString+" :overlap ";
+        }else if (p instanceof OverlapPercentageMyVariantProperty){
+            columnRestriction = " and overlapPercentage "+operatorString+" :overlap";
+        }else if (p instanceof OverlapPercentageOtherVariantProperty){
+            columnRestriction =" and overlappedOverlapPercentage "+operatorString+" :overlap ";
+        }
+        
+        queryString = queryString+ columnRestriction + " and overlapProjectId in (:overlapProjectIds)";
+       
+        NumericValue numeric = (NumericValue)overlapRestriction.getValue();
+        
+        String[] paramNames = { "id", "overlap", "overlapProjectIds" };
+        Object[] objectValues = { id, numeric.getValue(), overlapProjectIds };
         
         return this.getHibernateTemplate().findByNamedParam(
                 queryString, paramNames, objectValues );

@@ -113,8 +113,10 @@ public class VariantServiceImpl implements VariantService {
     @Transactional(readOnly = true)
     public Collection<Property> suggestPropertiesForProjectOverlap(){
         Collection<Property> properties = new ArrayList<Property>();
-        properties.add(new OverlapProperty());
-        
+        properties.add(new OverlapBasesProperty());        
+        properties.add( new MutualOverlapPercentageProperty() );
+        properties.add( new OverlapPercentageMyVariantProperty() );
+        properties.add( new OverlapPercentageOtherVariantProperty() );
         return properties;
         
     }

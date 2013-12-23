@@ -34,6 +34,7 @@ import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SNVDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.TranslocationDao;
+import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Characteristic;
 import ubc.pavlab.aspiredb.server.model.CnvType;
@@ -43,6 +44,7 @@ import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.model.Variant;
 
 /**
  * Class for tests to use to create and remove persistent objects This class will become unnecessary one we have
@@ -80,6 +82,9 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     @Autowired
     PhenotypeUtil phenotypeUtil;
+    
+    @Autowired
+    VariantDao variantDao;
     
    
     public PersistentTestObjectHelperImpl() {
@@ -305,5 +310,27 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     @Transactional
     public List<Subject> getSubjectsForProject(Project p){
         return p.getSubjects();
+    }
+    
+    @Transactional
+    public void deleteProject(String projectName){
+        Project project = projectDao.findByProjectName( projectName );
+        for ( Subject s : project.getSubjects() ) {
+            try {
+                
+                for (Phenotype p : s.getPhenotypes() ) {
+                    phenotypeDao.remove( p );
+                }
+                
+                for (Variant v: s.getVariants()){
+                    variantDao.remove( v );
+                }
+                subjectDao.remove( s );
+                
+            } catch ( Exception e ) {
+                e.printStackTrace();
+            }
+        }
+        projectDao.remove( project );
     }
 }

@@ -14,33 +14,32 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import java.util.Collection;
+
 import org.directwebremoting.annotations.DataTransferObject;
 
 import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
-
-import java.util.Collection;
+import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
+import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 
 @DataTransferObject(javascript = "ProjectOverlapFilterConfig")
-public class ProjectOverlapFilterConfig extends AspireDbFilterConfig {
+public class ProjectOverlapFilterConfig extends RestrictionFilterConfig {
+	
+	
 	
 	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8603007193329791775L;
-	
-	//the 'active projects'
+     * 
+     */
+    private static final long serialVersionUID = 6091780632280417499L;
+    //the 'active projects'
 	private Collection<Long> projectIds;
 	//the projects that you want to search for overlap
 	private Collection<Long> overlapProjectIds;
 	
-	private Integer overlap;	
-	//+ greater than, 0 equals, - less than
-	private Integer operator;
+	
 	
 	//May want to incorporate Conjunction/Disjunction object graphs at some point to make these more complex, keep it simple for now
 	private PhenotypeRestriction phenotypeRestriction;
-	
-	
 					
 	public ProjectOverlapFilterConfig() {
 	}
@@ -63,23 +62,7 @@ public class ProjectOverlapFilterConfig extends AspireDbFilterConfig {
 
     public void setOverlapProjectIds( Collection<Long> overlapProjectIds ) {
         this.overlapProjectIds = overlapProjectIds;
-    }
-
-    public Integer getOverlap() {
-        return overlap;
-    }
-
-    public void setOverlap( Integer overlap ) {
-        this.overlap = overlap;
-    }
-
-    public Integer getOperator() {
-        return operator;
-    }
-
-    public void setOperator( Integer operator ) {
-        this.operator = operator;
-    }
+    }   
 
     public PhenotypeRestriction getPhenotypeRestriction() {
         return phenotypeRestriction;
@@ -88,4 +71,7 @@ public class ProjectOverlapFilterConfig extends AspireDbFilterConfig {
     public void setPhenotypeRestriction( PhenotypeRestriction phenotypeRestriction ) {
         this.phenotypeRestriction = phenotypeRestriction;
     }
+
+    
+    
 }

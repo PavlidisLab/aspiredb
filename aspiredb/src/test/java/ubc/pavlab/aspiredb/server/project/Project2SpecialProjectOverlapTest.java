@@ -15,7 +15,8 @@
 
 package ubc.pavlab.aspiredb.server.project;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -27,26 +28,36 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
+import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantInfoDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
+import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantInfo;
 import ubc.pavlab.aspiredb.server.service.QueryService;
+import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.shared.BoundedList;
 import ubc.pavlab.aspiredb.shared.CNVValueObject;
 import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
+import ubc.pavlab.aspiredb.shared.NumericValue;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.Operator;
+import ubc.pavlab.aspiredb.shared.query.OverlapBasesProperty;
 import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.ProjectOverlapFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.Property;
+import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 
 public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
@@ -64,6 +75,12 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
     @Autowired
     VariantDao variantDao;
+    
+    @Autowired
+    SubjectDao subjectDao;
+    
+    @Autowired
+    PersistentTestObjectHelper helper;
 
     final String patientId = RandomStringUtils.randomAlphabetic( 5 );
     final String projectId = RandomStringUtils.randomAlphabetic( 5 );
@@ -71,11 +88,14 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
     final String userVariantId = RandomStringUtils.randomAlphabetic( 5 );
     
     final String userVariantId2 = RandomStringUtils.randomAlphabetic( 5 );
+    
+    final String userVariantIdToTestOverlapPercentage = RandomStringUtils.randomAlphabetic( 5 );
 
     final String overlapVariantId1 = RandomStringUtils.randomAlphabetic( 5 );
     final String overlapVariantId2 = RandomStringUtils.randomAlphabetic( 5 );
     final String overlapVariantId3 = RandomStringUtils.randomAlphabetic( 5 );
     final String overlapVariantId4 = RandomStringUtils.randomAlphabetic( 5 );
+    final String overlapVariantId5 = RandomStringUtils.randomAlphabetic( 5 );
 
     final String patientIdWithOverlap = RandomStringUtils.randomAlphabetic( 5 );
     final String projectIdWithOverlap = RandomStringUtils.randomAlphabetic( 5 );
@@ -91,7 +111,8 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         ArrayList<VariantValueObject> cnvList = new ArrayList<VariantValueObject>();
         cnvList.add( getCNV( "X", 3, 234, userVariantId, patientId ) );
         
-        cnvList.add( getCNV( "X", 1, 5, userVariantId2, patientId ) );
+        cnvList.add( getCNV( "X", 1, 5, userVariantId2, patientId ) );        
+        
         cnvList.add( getCNV( "2", 123, 235, "XXXXXXX", patientId ) );
         cnvList.add( getCNV( "3", 12, 236, "XXXXXXX2", patientId ) );
 
@@ -118,8 +139,11 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         // will overlap by 2
         cnvListWithOverlap.add( getCNV( "X", 5, 7, overlapVariantId4, patientIdWithOverlap ) );
+        
+        //will overlap by 134, we will use this one to test the percentage overlap
+        cnvListWithOverlap.add( getCNV( "X", 100, 900, overlapVariantId5, patientIdWithOverlap ) );
 
-        cnvListWithOverlap.add( getCNV( "X", 400, 500, null, patientIdWithOverlap ) );
+        cnvListWithOverlap.add( getCNV( "X", 900, 1600, null, patientIdWithOverlap ) );
 
         cnvListWithOverlap.add( getCNV( "Y", 3, 234, null, patientIdWithOverlap ) );
 
@@ -183,7 +207,16 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         
 
     }
-
+    
+    
+    @After
+    public void tearDown() throws Exception {
+        helper.deleteProject(projectId);
+        helper.deleteProject(projectIdWithOverlap);
+        helper.deleteProject(projectIdWithNoOverlap);
+    }
+    
+   
     @Test
     public void testPopulateSpecialProjectOverlap() {
 
@@ -209,7 +242,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         }
 
-        assertEquals( projToPopulateVvos.getItems().size(), 4 );
+        assertEquals(4, projToPopulateVvos.getItems().size() );
 
         
         List<VariantValueObject> vvos = projToPopulateVvos.getItems();
@@ -238,7 +271,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         assertEquals( v.getLocation().getChromosome(), "X" );
 
-        assertEquals( infos.size(), 4 );
+        assertEquals( 5, infos.size() );
 
         for ( Variant2SpecialVariantInfo vInfo : infos ) {
 
@@ -253,20 +286,26 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
             } else if ( specialVariant.getUserVariantId().equals( overlapVariantId1 ) ) {// check the accuracy of the
                                                                                          // overlap length
 
-                assertEquals( vInfo.getOverlap().intValue(), 231 );
+                assertEquals(231, vInfo.getOverlap().intValue());
                 assertEquals( vInfo.getOverlapProjectId(), specialProject.getId() );
+                
+                
 
             } else if ( specialVariant.getUserVariantId().equals( overlapVariantId2 ) ) {
 
-                assertEquals( vInfo.getOverlap().intValue(), 229 );
+                assertEquals(229, vInfo.getOverlap().intValue());
                 assertEquals( vInfo.getOverlapProjectId(), specialProject.getId() );
 
             } else if ( specialVariant.getUserVariantId().equals( overlapVariantId3 ) ) {
-                assertEquals( vInfo.getOverlap().intValue(), 2 );
+                assertEquals(2, vInfo.getOverlap().intValue());
                 assertEquals( vInfo.getOverlapProjectId(), specialProject.getId() );
             } else if ( specialVariant.getUserVariantId().equals( overlapVariantId4 ) ) {
-                assertEquals( vInfo.getOverlap().intValue(), 2 );
+                assertEquals(2, vInfo.getOverlap().intValue());
                 assertEquals( vInfo.getOverlapProjectId(), specialProject.getId() );
+            } else if ( specialVariant.getUserVariantId().equals( overlapVariantId5 ) ) {
+                assertEquals(58,vInfo.getOverlapPercentage().intValue());
+                
+                assertEquals(17,vInfo.getOverlappedOverlapPercentage().intValue());
             }
 
         }
@@ -305,10 +344,10 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
             result = queryService.queryVariants( set );
 
         } catch ( Exception e ) {
-            fail();
+            fail(e.toString());
         }
 
-        assertEquals( result.getItems().size(), 2 );
+        assertEquals(2, result.getItems().size());
 
         assertEquals( result.getItems().iterator().next().getUserVariantId(), userVariantId );
         
@@ -345,10 +384,10 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
             result = queryService.queryVariants( set );
 
         } catch ( Exception e ) {
-            fail();
+            fail(e.toString());
         }
 
-        assertEquals( result.getItems().size(), 0 );
+        assertEquals(0, result.getItems().size() );
 
        
     }
@@ -372,9 +411,22 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         overlapFilter.setProjectIds( projectList );
         overlapFilter.setOverlapProjectIds( projectListWithOverlap );
         
-      //overlap greater than 230, should return 1
-        overlapFilter.setOperator( 1 );
-        overlapFilter.setOverlap( 230 );
+      
+        
+        SimpleRestriction overlapRestriction = new SimpleRestriction();
+        
+        overlapRestriction.setProperty( new OverlapBasesProperty() );
+                
+        overlapRestriction.setOperator( Operator.NUMERIC_GREATER );
+        
+        
+        NumericValue numericValue = new NumericValue();
+        numericValue.setValue( 230 );
+        
+        overlapRestriction.setValue( numericValue );
+        
+        overlapFilter.setRestriction( overlapRestriction );
+        
 
         BoundedList<VariantValueObject> result = null;
 
@@ -387,10 +439,10 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
             result = queryService.queryVariants( set );
 
         } catch ( Exception e ) {
-            fail();
+            fail(e.toString());
         }
 
-        assertEquals( result.getItems().size(), 1 );
+        assertEquals( 1,result.getItems().size() );
 
         assertEquals( result.getItems().iterator().next().getUserVariantId(), userVariantId );
         
@@ -416,8 +468,8 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         overlapFilter.setOverlapProjectIds( projectListWithOverlap );
         
       //overlap less than 10, should return 1
-        overlapFilter.setOperator( -1 );
-        overlapFilter.setOverlap( 10 );
+        //overlapFilter.setOperator( -1 );
+        //overlapFilter.setOverlap( 10 );
 
         BoundedList<VariantValueObject> result = null;
 
@@ -430,10 +482,11 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
             result = queryService.queryVariants( set );
 
         } catch ( Exception e ) {
-            fail();
+            
+            fail(e.toString());
         }
 
-        assertEquals( result.getItems().size(), 2 );
+        assertEquals(2, result.getItems().size());
 
        
         

@@ -67,5 +67,7 @@ public interface PersistentTestObjectHelper {
     
     public List<Subject> getSubjectsForProject(Project p);
     
+    public void deleteProject(String projectName);
+    
     
 }

@@ -48,6 +48,15 @@ public class Variant2SpecialVariantInfo implements Serializable  {
     @Column(name="OVERLAP_LENGTH")
     private Integer overlap;
     
+    //the percentage of the variantId-variant that is overlapped, storing for easier searching
+    //using integer as it is better for comparison, easy to change to float later if need be
+    @Column(name="OVERLAP_PERCENTAGE")
+    private Integer overlapPercentage;
+    
+    //the percentage of the overlapSpecialVariantId-variant that is overlapped
+    @Column(name="OVERLAPPED_OVERLAP_PERCENTAGE")
+    private Integer overlappedOverlapPercentage;
+    
     @Column(name="OVERLAP_PROJECTID")
     private Long overlapProjectId;
     
@@ -77,6 +86,22 @@ public class Variant2SpecialVariantInfo implements Serializable  {
 
     public void setOverlap( Integer overlap ) {
         this.overlap = overlap;
+    }
+
+    public Integer getOverlapPercentage() {
+        return overlapPercentage;
+    }
+
+    public void setOverlapPercentage( Integer overlapPercentage ) {
+        this.overlapPercentage = overlapPercentage;
+    }
+
+    public Integer getOverlappedOverlapPercentage() {
+        return overlappedOverlapPercentage;
+    }
+
+    public void setOverlappedOverlapPercentage( Integer overlappedOverlapPercentage ) {
+        this.overlappedOverlapPercentage = overlappedOverlapPercentage;
     }
 
     public Long getOverlapProjectId() {

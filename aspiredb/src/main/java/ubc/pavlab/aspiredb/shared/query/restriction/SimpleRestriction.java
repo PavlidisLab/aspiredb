@@ -31,7 +31,11 @@ import ubc.pavlab.aspiredb.shared.query.Property;
  */
 @DataTransferObject(javascript = "SimpleRestriction")
 public class SimpleRestriction implements RestrictionExpression {
-    private static final long serialVersionUID = 1L;
+    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7926398222172096531L;
     protected Property property;
     protected Operator operator;
     protected Object value;

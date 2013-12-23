@@ -272,7 +272,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
         
         PhenotypeRestriction phenRestriction = overlapFilter.getPhenotypeRestriction();
         
-        Boolean hasPhenotype = phenRestriction.getValue() !=null && phenRestriction.getName()!=null;
+        Boolean hasPhenotype = phenRestriction!=null && phenRestriction.getValue() !=null && phenRestriction.getName()!=null;
        
         List<Long> overlapProjsPhenoAssociatedVariantIds = new ArrayList<Long>();
         
@@ -287,7 +287,16 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
             phenFilterSet.add( phenConfig );
             
             try{
-                overlapProjsPhenoAssociatedVariantIds = getFilteredIds(phenFilterSet);         
+                
+                StopWatch timer = new StopWatch();
+                timer.start();
+                
+                log.info( "fetching phenotype associated variant ids for overlapped projects" );
+                overlapProjsPhenoAssociatedVariantIds = getFilteredIds(phenFilterSet); 
+                
+                if ( timer.getTime() > 100 ) {
+                    log.info( "fetching phenotype associated variant ids for overlapped projects took " + timer.getTime() + "ms" );
+                }
             }catch (Exception e){
                 log.error( "exception while getting projectOverlapIds for phenotype" );
             }
@@ -296,7 +305,10 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
         
         Set<Long> variantIdsWithOverlap = new HashSet<Long>();
         
-        Boolean searchByOverlap = overlapFilter.getOperator()!=null;
+        SimpleRestriction overlapRestriction =  (SimpleRestriction)overlapFilter.getRestriction();
+                
+        //test other things like value and type, discern if it is percentage or number of bases
+        Boolean searchByOverlap = overlapRestriction !=null && overlapRestriction.getValue()!=null && overlapRestriction.getOperator() != null;
         
         
         
@@ -306,7 +318,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
             Collection<Variant2SpecialVariantInfo> infos = new ArrayList<Variant2SpecialVariantInfo>();
             
             if (searchByOverlap){                
-                infos =  variant2SpecialVariantInfoDao.loadByVariantIdAndOverlap( vId, overlapFilter.getOverlap(), overlapFilter.getOperator() , overlapFilter.getOverlapProjectIds());                
+                infos =  variant2SpecialVariantInfoDao.loadByVariantIdAndOverlap( vId, (SimpleRestriction)overlapFilter.getRestriction() , overlapFilter.getOverlapProjectIds());                
             }else{                
                 infos =  variant2SpecialVariantInfoDao.loadByVariantId( vId, overlapFilter.getOverlapProjectIds());                
             }

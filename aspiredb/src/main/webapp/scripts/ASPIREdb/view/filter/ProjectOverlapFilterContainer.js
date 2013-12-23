@@ -51,28 +51,11 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 		
 		projectOverlapConfig.overlapProjectIds = overlapProjectIds;
 		
-		var overlapItem = filterContainer.getComponent('overlapItem').getRestrictionExpression();
+		var overlapRestriction = filterContainer.getComponent('overlapItem').getRestrictionExpression();
 		
-		var operator = null;
+		projectOverlapConfig.restriction = overlapRestriction;		
 		
-		if (overlapItem.operator == 'NUMERIC_EQUAL'){
-			operator = 0;
-		}
-		if (overlapItem.operator == 'NUMERIC_GREATER'){
-			operator = 1;
-		}
-		if (overlapItem.operator == 'NUMERIC_LESS'){
-			operator = -1;
-		}
 		
-		//hacky if else block because of poorly implemented 'X subjects and X variants will be returned' functionality that updates way too often
-		if (overlapItem.value.value){
-			projectOverlapConfig.overlap = overlapItem.value.value;
-		}
-		else{
-			projectOverlapConfig.overlap= '999999999999999999';
-		}
-		projectOverlapConfig.operator= operator;
 				
 		projectOverlapConfig.phenotypeRestriction = filterContainer.getComponent('phenRestriction').getRestrictionExpression();
 		
@@ -81,8 +64,6 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 
 	setRestrictionExpression : function(restriction) {
 		var filterContainer = this.getComponent('filterContainer');
-
-		
 
 		var getNewOverlapItem = this.getNewOverlapItemFunction();
 
