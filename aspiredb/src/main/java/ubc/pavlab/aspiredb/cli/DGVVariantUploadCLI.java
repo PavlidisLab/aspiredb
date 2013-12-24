@@ -41,9 +41,9 @@ import java.util.List;
  * modified VariantUploadCLI hack for unfortunately formatted file(since modified) that we got from DECIPHER
  * not intended to be used for anything other than that file
  *  
- * @version $Id: DecipherVariantUploadCLI.java
+ * @version $Id:
  */
-public class DecipherVariantUploadCLI extends AbstractCLI {
+public class DGVVariantUploadCLI extends AbstractCLI {
 
     private static ProjectManager projectManager;
     private static ProjectDao projectDao;
@@ -61,7 +61,7 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
     private static BeanFactory applicationContext;
     
     public String getLogger(){
-        return "ubc.pavlab.aspiredb.cli.DecipherVariantUploadCLI";
+        return "ubc.pavlab.aspiredb.cli.DGVVariantUploadCLI";
     }
 
     /**
@@ -82,7 +82,7 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
 
         projectManager = ( ProjectManager ) applicationContext.getBean( "projectManager" );
 
-        DecipherVariantUploadCLI p = new DecipherVariantUploadCLI();
+        DGVVariantUploadCLI p = new DGVVariantUploadCLI();
         try {
             Exception ex = p.doWork( args );
             if ( ex != null ) {
@@ -90,6 +90,7 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
             }
             System.exit( 0 );
         } catch ( Exception e ) {
+            System.out.println(e.toString());
             throw new RuntimeException( e );
         }
     }
@@ -103,7 +104,7 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
         Option f = OptionBuilder.isRequired().hasArg().withArgName( "File name" ).withDescription( "The file to parse" )
                 .withLongOpt( "filename" ).create( 'f' );
         
-        //Decipher will reside in a 'Special project' and are all CNVs
+        //DGV will reside in a 'Special project' and are all CNVs
         /*
         Option variantType = OptionBuilder.isRequired().hasArg().withArgName( "Variant Type" )
                 .withDescription( "The type of variant in this file, one of: CNV, Indel, SNV, Inversion" )
@@ -115,7 +116,7 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
                 .withArgName( "Project name" )
                 .withDescription(
                         "The project where this data will reside. Project will be deleted if existingproject option is not specified,"
-                                + "Acceptable values = 'DECIPHER" )
+                                + "Acceptable values = 'DGV" )
                 .create( "project" );
 
         addOption( "existingproject", false, "You must use this option if you are adding to an existing project" );
@@ -173,7 +174,7 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
             ResultSet results = stmt.executeQuery( "SELECT * FROM " + filename );
    
             System.out.println("getting value objects");
-            VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromDecipherResultSet( results);
+            VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromDGVResultSet( results);
             
            
             results.close();

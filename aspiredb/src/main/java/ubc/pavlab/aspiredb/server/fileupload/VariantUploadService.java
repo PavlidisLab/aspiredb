@@ -50,9 +50,8 @@ public class VariantUploadService {
             } catch ( SQLException e ) {
                 errorMessages.add( "Invalid data format on line number: " + lineNumber + " error message:"
                         + e.getMessage() );
-            }catch ( Exception e ) {
-                errorMessages.add( "Error on line number: " + lineNumber + " error message:"
-                        + e.getMessage() );
+            } catch ( Exception e ) {
+                errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
             }
         }
 
@@ -61,9 +60,10 @@ public class VariantUploadService {
         return serviceResult;
 
     }
-    
-    //Decipher gave us a weird file, this may only need to be done as a one off
-    public static VariantUploadServiceResult makeVariantValueObjectsFromDecipherResultSet( ResultSet results) throws Exception {
+
+    // Decipher gave us a weird file, this may only need to be done as a one off
+    public static VariantUploadServiceResult makeVariantValueObjectsFromDecipherResultSet( ResultSet results )
+            throws Exception {
 
         ArrayList<VariantValueObject> variantsToAdd = new ArrayList<VariantValueObject>();
         int lineNumber = 1;
@@ -81,9 +81,41 @@ public class VariantUploadService {
             } catch ( SQLException e ) {
                 errorMessages.add( "Invalid data format on line number: " + lineNumber + " error message:"
                         + e.getMessage() );
-            }catch ( Exception e ) {
-                errorMessages.add( "Error on line number: " + lineNumber + " error message:"
+            } catch ( Exception e ) {
+                errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
+            }
+        }
+
+        VariantUploadServiceResult serviceResult = new VariantUploadServiceResult( variantsToAdd, errorMessages );
+
+        return serviceResult;
+
+    }
+
+    // DGV file parser
+    public static VariantUploadServiceResult makeVariantValueObjectsFromDGVResultSet( ResultSet results )
+            throws Exception {
+
+        ArrayList<VariantValueObject> variantsToAdd = new ArrayList<VariantValueObject>();
+        int lineNumber = 1;
+        ArrayList<String> errorMessages = new ArrayList<String>();
+
+        // TODO maybe validate columns first, and bail if they are all not there
+        while ( results.next() ) {
+            lineNumber++;
+            try {
+                variantsToAdd.add( makeVariantValueObjectFromResultSet( results, VariantType.DGV ) );
+            } catch ( InvalidDataException e ) {
+                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
+            } catch ( NumberFormatException e ) {
+                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
+            } catch ( SQLException e ) {
+                errorMessages.add( "Invalid data format on line number: " + lineNumber + " error message:"
                         + e.getMessage() );
+            } catch ( Exception e ) {
+                
+                //should just be ignored data
+                //errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
             }
         }
 
@@ -106,7 +138,9 @@ public class VariantUploadService {
             return makeInversionFromResultSet( results );
         } else if ( variantType.equals( VariantType.DECIPHER ) ) {
             return makeDecipherCNVFromResultSet( results );
-        }else {
+        } else if ( variantType.equals( VariantType.DGV ) ) {
+            return makeDGVCNVFromResultSet( results );
+        } else {
             log.error( "VariantType not supported" );
             throw new InvalidDataException( "VariantType not supported" );
         }
@@ -121,7 +155,7 @@ public class VariantUploadService {
 
         cnv.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
         cnv.setGenomicRange( getGenomicRangeFromResultSet( results ) );
-        cnv.setCnvLength( cnv.getGenomicRange().getBaseEnd()-cnv.getGenomicRange().getBaseStart() );
+        cnv.setCnvLength( cnv.getGenomicRange().getBaseEnd() - cnv.getGenomicRange().getBaseStart() );
 
         cnv.setType( results.getString( cnvType ) );
 
@@ -143,28 +177,26 @@ public class VariantUploadService {
         return cnv;
 
     }
-    
-    //Quick and dirty method to grab data from decipher's poorly formatted data file they gave us
-    //no point in making this pretty because of the one off nature of the file
+
+    // Quick and dirty method to grab data from decipher's poorly formatted data file they gave us
+    // no point in making this pretty because of the one off nature of the file
     public static CNVValueObject makeDecipherCNVFromResultSet( ResultSet results ) throws Exception {
 
-        //RGB colour for browser display - this will tell us if it's a GAIN or LOSS: 255,0,0 is for LOSS and 0,0,255 is GAIN 
+        // RGB colour for browser display - this will tell us if it's a GAIN or LOSS: 255,0,0 is for LOSS and 0,0,255 is
+        // GAIN
         String rgbTypeString = "type";
 
         CNVValueObject cnv = new CNVValueObject();
 
         cnv.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
         cnv.setGenomicRange( getGenomicRangeFromResultSet( results ) );
-        cnv.setCnvLength( cnv.getGenomicRange().getBaseEnd()-cnv.getGenomicRange().getBaseStart() );
+        cnv.setCnvLength( cnv.getGenomicRange().getBaseEnd() - cnv.getGenomicRange().getBaseStart() );
 
-               
-        if (results.getString(rgbTypeString).equals( "255,0,0" )){
-            cnv.setType(CnvType.LOSS.name()  );
-        }else if(results.getString(rgbTypeString).equals( "0,0,255" )){
-            cnv.setType(CnvType.GAIN.name()  );
+        if ( results.getString( rgbTypeString ).equals( "255,0,0" ) ) {
+            cnv.setType( CnvType.LOSS.name() );
+        } else if ( results.getString( rgbTypeString ).equals( "0,0,255" ) ) {
+            cnv.setType( CnvType.GAIN.name() );
         }
-        
-        
 
         if ( !cnv.getType().toUpperCase().equals( CnvType.GAIN.name() )
                 && !cnv.getType().toUpperCase().equals( CnvType.LOSS.name() ) ) {
@@ -172,35 +204,84 @@ public class VariantUploadService {
         }
 
         String html = results.getString( "html" );
-        
+
         String[] characteristicsAndPhenotypes = html.split( "<p>" );
-        
-        
+
         Map<String, CharacteristicValueObject> characteristics = new HashMap<String, CharacteristicValueObject>();
-        
-        for (String entry : characteristicsAndPhenotypes){
-            
-            if (entry.contains( "Inheritance" )){
-                
+
+        for ( String entry : characteristicsAndPhenotypes ) {
+
+            if ( entry.contains( "Inheritance" ) ) {
+
                 entry = entry.replaceAll( "Inheritance:", "" );
-                
+
                 entry = entry.replaceAll( "</p>", "" );
-                
+
                 CharacteristicValueObject charVO = new CharacteristicValueObject();
                 charVO.setKey( "Inheritance" );
-                charVO.setValue(entry.trim() );
+                charVO.setValue( entry.trim() );
                 characteristics.put( charVO.getKey(), charVO );
-                
-            }else if (entry.contains("Mean Ratio")){
-                entry = entry.replaceAll( "Mean Ratio:", "" );                
+
+            } else if ( entry.contains( "Mean Ratio" ) ) {
+                entry = entry.replaceAll( "Mean Ratio:", "" );
                 entry = entry.replaceAll( "</p>", "" );
-                
+
                 CharacteristicValueObject charVO = new CharacteristicValueObject();
                 charVO.setKey( "Mean Ratio" );
-                charVO.setValue(entry.trim() );
+                charVO.setValue( entry.trim() );
                 characteristics.put( charVO.getKey(), charVO );
             }
         }
+
+        cnv.setCharacteristics( characteristics );
+
+        return cnv;
+
+    }
+
+    // Quick and dirty method to grab data from DGV data file they gave us
+    public static CNVValueObject makeDGVCNVFromResultSet( ResultSet results ) throws Exception {
+
+        String variantsubtype = results.getString( "variantsubtype" );
+
+        // Sanja says to exclude these
+        if ( variantsubtype.equals( "Complex" ) || variantsubtype.equals( "Inversion" )
+                || variantsubtype.equals( "Insertion" ) ) {
+            
+            log.info(  "ignored variant subtype");
+            throw new Exception( "ignored variant subtype" );
+        }
+
+        CNVValueObject cnv = new CNVValueObject();
+
+        // set patientId as variantid, so each variant will have a 'subject' associated with it
+        // might not be right choice, other option would be all variants with one subject, or no subject at all
+        cnv.setPatientId( results.getString( "variantaccession" ) );
+        cnv.setUserVariantId( results.getString( "variantaccession" ) );
+        cnv.setGenomicRange( getGenomicRangeFromResultSet( results ) );
+        cnv.setCnvLength( cnv.getGenomicRange().getBaseEnd() - cnv.getGenomicRange().getBaseStart() );
+
+        if ( variantsubtype.equals( "Gain" )  || variantsubtype.equals("Duplication")) {
+            cnv.setType( CnvType.GAIN.name() );
+        } else if ( variantsubtype.equals( "Loss" ) || variantsubtype.equals("Deletion") ) {
+            cnv.setType( CnvType.LOSS.name());
+        } else if ( variantsubtype.equals( "Gain+Loss" ) ) {
+            cnv.setType( CnvType.GAINLOSS.name() );
+        }else{
+            
+            log.info("unrecognized variant subtype: "+variantsubtype);
+            throw new Exception( "unrecognized variant subtype" );
+        }
+
+        
+        //Just add pubmedid for now
+        Map<String, CharacteristicValueObject> characteristics = new HashMap<String, CharacteristicValueObject>();
+
+        CharacteristicValueObject charVO = new CharacteristicValueObject();
+        charVO.setKey( "pubmedid" );
+        charVO.setValue( results.getString( "pubmedid" ) );
+        characteristics.put( charVO.getKey(), charVO );
+
 
         cnv.setCharacteristics( characteristics );
 
@@ -293,13 +374,13 @@ public class VariantUploadService {
         GenomicRange gr = new GenomicRange();
 
         String chrom = results.getString( CommonVariantColumn.CHROM.key ).toUpperCase();
-        
-        //For decipher data, this really shouldn't be here, adding it to quickly add in decipher data
-        if (chrom.startsWith( "CHR" )){
-            chrom = chrom.replace( "CHR","" );
+
+        // For decipher data, this really shouldn't be here, adding it to quickly add in decipher data
+        if ( chrom.startsWith( "CHR" ) ) {
+            chrom = chrom.replace( "CHR", "" );
         }
-        
-        gr.setChromosome(chrom  );
+
+        gr.setChromosome( chrom );
 
         // Note that results.getInt return 0 if it is not a number
         gr.setBaseStart( results.getInt( CommonVariantColumn.START.key ) );
@@ -385,9 +466,9 @@ public class VariantUploadService {
         Integer copyNumber = null;
         String copyNumberString = getValueFromResultSet( OptionalCNVColumn.COPYNUMBER.key, results );
 
-        if ( copyNumberString == null || copyNumberString.isEmpty() ){
+        if ( copyNumberString == null || copyNumberString.isEmpty() ) {
             vo.setCopyNumber( null );
-        }else{
+        } else {
             copyNumber = Integer.parseInt( copyNumberString );
             vo.setCopyNumber( copyNumber );
         }

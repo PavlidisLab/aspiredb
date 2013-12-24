@@ -24,5 +24,5 @@ import java.io.Serializable;
  * @version $Id: CnvType.java,v 1.6 2013/06/11 22:55:58 anton Exp $
  */
 public enum CnvType implements Serializable {
-    LOSS, GAIN
+    LOSS, GAIN, GAINLOSS
 }
