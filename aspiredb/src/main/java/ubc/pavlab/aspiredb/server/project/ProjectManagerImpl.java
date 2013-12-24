@@ -181,9 +181,16 @@ public class ProjectManagerImpl implements ProjectManager {
 
     @Transactional
     public void addSubjectVariantsToSpecialProject( String projectName, boolean deleteProject,
-            List<VariantValueObject> voList ) throws Exception {
+            List<VariantValueObject> voList, boolean existingProject ) throws Exception {
 
-        Project proj = createSpecialProject( projectName, deleteProject );
+        Project proj= null;
+        
+        if (!existingProject){        
+            proj = createSpecialProject( projectName, deleteProject );        
+        }        
+        else{
+            proj = projectDao.findByProjectName( projectName );
+        }
 
         createSubjectVariantsFromVariantValueObjects( proj, voList, true );
 

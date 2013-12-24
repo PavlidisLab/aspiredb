@@ -186,7 +186,7 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
                 
                 //should probably batch this up to speed it up a bit
                 
-                projectManager.addSubjectVariantsToSpecialProject( projectName, deleteProject, result.getVariantsToAdd() );
+                projectManager.addSubjectVariantsToSpecialProject( projectName, deleteProject, result.getVariantsToAdd(), false );
                
             } else if ( result.getErrorMessages().isEmpty()  ) {
                 System.out.println( "No errors are detected in your data file" );

@@ -38,8 +38,8 @@ import java.util.List;
 
 /**
  * 
- * modified VariantUploadCLI hack for unfortunately formatted file(since modified) that we got from DECIPHER
- * not intended to be used for anything other than that file
+ * Quick and dirty copy of DecipherVariantUploadCLI plus batching
+ * I should probably just genericize  this one and factor out the Decipher one
  *  
  * @version $Id:
  */
@@ -52,6 +52,9 @@ public class DGVVariantUploadCLI extends AbstractCLI {
 
     private String filename = "";
     private String projectName = "";
+    
+    
+    private int batchSize = 5000;
    
 
     private boolean deleteProject = true;
@@ -185,9 +188,34 @@ public class DGVVariantUploadCLI extends AbstractCLI {
                 
                 System.out.println("inserting "+result.getVariantsToAdd().size()+" value objects into database");
                 
-                //should probably batch this up to speed it up a bit
                 
-                projectManager.addSubjectVariantsToSpecialProject( projectName, deleteProject, result.getVariantsToAdd() );
+                ArrayList<VariantValueObject> variantsToAdd = result.getVariantsToAdd();
+                
+                int batchCount = 0;
+                
+                for (int i = 0; i < variantsToAdd.size(); i=i+batchSize){
+                    
+                    int start = i;
+                    int end = i+batchSize;
+                    
+                    if (end >= variantsToAdd.size()){
+                        end = variantsToAdd.size();
+                    }                    
+                    
+                    
+                    List<VariantValueObject> batched = variantsToAdd.subList(start, end );
+                    
+                    batchCount++;
+                    
+                    System.out.println("batch: "+batchCount+",  adding: variantsToAdd.sublist("+start+","+end+"), "+batched.size()+" variants");
+                    
+                    projectManager.addSubjectVariantsToSpecialProject( projectName, deleteProject, batched, batchCount>1 );
+                    System.out.println("Finished adding batch: "+batchCount);
+                    
+                }
+                
+                
+                
                
             } else if ( result.getErrorMessages().isEmpty()  ) {
                 System.out.println( "No errors are detected in your data file" );
