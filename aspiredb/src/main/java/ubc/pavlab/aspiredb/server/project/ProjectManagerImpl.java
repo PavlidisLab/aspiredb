@@ -240,7 +240,10 @@ public class ProjectManagerImpl implements ProjectManager {
             }
 
             counter++;
-            log.info( "Added " + counter + " variant" );
+            
+            if (counter%500==0){
+                log.info( "Added " + counter + " variant" );
+            }
         }
 
     }
