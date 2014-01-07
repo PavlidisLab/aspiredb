@@ -17,7 +17,7 @@ package ubc.pavlab.aspiredb.server.dao;
 
 import java.util.Collection;
 
-import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantInfo;
+import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
 import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 
 /**
@@ -26,10 +26,10 @@ import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
  * @author cmcdonald
  * @version $Id:$
  */
-public interface Variant2SpecialVariantInfoDao extends DaoBase<Variant2SpecialVariantInfo> {
+public interface Variant2SpecialVariantOverlapDao extends DaoBase<Variant2SpecialVariantOverlap> {
     
-    public Collection<Variant2SpecialVariantInfo> loadByVariantId( Long id, Collection<Long> overlapProjectIds );
+    public Collection<Variant2SpecialVariantOverlap> loadByVariantId( Long id, Collection<Long> overlapProjectIds );
     
-    public Collection<Variant2SpecialVariantInfo> loadByVariantIdAndOverlap( Long id, SimpleRestriction overlapRestriction, Collection<Long> overlapProjectIds );
+    public Collection<Variant2SpecialVariantOverlap> loadByVariantIdAndOverlap( Long id, SimpleRestriction overlapRestriction, Collection<Long> overlapProjectIds );
 
 }

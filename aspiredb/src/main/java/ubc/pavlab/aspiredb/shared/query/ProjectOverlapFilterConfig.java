@@ -23,7 +23,7 @@ import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
 import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 
 @DataTransferObject(javascript = "ProjectOverlapFilterConfig")
-public class ProjectOverlapFilterConfig extends RestrictionFilterConfig {
+public class ProjectOverlapFilterConfig extends CompoundRestrictionFilterConfig {
 	
 	
 	
@@ -35,8 +35,6 @@ public class ProjectOverlapFilterConfig extends RestrictionFilterConfig {
 	private Collection<Long> projectIds;
 	//the projects that you want to search for overlap
 	private Collection<Long> overlapProjectIds;
-	
-	
 	
 	//May want to incorporate Conjunction/Disjunction object graphs at some point to make these more complex, keep it simple for now
 	private PhenotypeRestriction phenotypeRestriction;

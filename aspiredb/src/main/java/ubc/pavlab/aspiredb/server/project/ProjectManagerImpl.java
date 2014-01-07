@@ -36,7 +36,7 @@ import ubc.pavlab.aspiredb.cli.InvalidDataException;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
-import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantInfoDao;
+import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantOverlapDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
@@ -51,7 +51,7 @@ import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
-import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantInfo;
+import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
 import ubc.pavlab.aspiredb.server.security.SecurityService;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
@@ -97,7 +97,7 @@ public class ProjectManagerImpl implements ProjectManager {
     VariantDao variantDao;
 
     @Autowired
-    Variant2SpecialVariantInfoDao variant2SpecialVariantInfoDao;
+    Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
 
     @Autowired
     PhenotypeDao phenotypeDao;
@@ -687,7 +687,7 @@ public class ProjectManagerImpl implements ProjectManager {
                     continue;
                 }
 
-                Variant2SpecialVariantInfo overlapInfo = new Variant2SpecialVariantInfo();
+                Variant2SpecialVariantOverlap overlapInfo = new Variant2SpecialVariantOverlap();
 
                 int start = Math.max( vvo.getGenomicRange().getBaseStart(), vvoOverlapped.getGenomicRange()
                         .getBaseStart() );
@@ -715,7 +715,7 @@ public class ProjectManagerImpl implements ProjectManager {
                     overlapInfo.setOverlapSpecialVariantId( vvoOverlapped.getId() );
                     overlapInfo.setOverlapProjectId( specialProject.getId() );
 
-                    variant2SpecialVariantInfoDao.create( overlapInfo );
+                    variant2SpecialVariantOverlapDao.create( overlapInfo );
                     
                 } else {
                     log.info( "No Overlap" );                    

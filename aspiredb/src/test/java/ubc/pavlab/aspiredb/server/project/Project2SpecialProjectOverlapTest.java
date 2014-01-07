@@ -36,13 +36,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
-import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantInfoDao;
+import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantOverlapDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
-import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantInfo;
+import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
 import ubc.pavlab.aspiredb.server.service.QueryService;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.shared.BoundedList;
@@ -52,6 +52,7 @@ import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.NumericValue;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.DoesOverlapWithXProperty;
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.OverlapBasesProperty;
 import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
@@ -68,7 +69,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
     private QueryService queryService;
 
     @Autowired
-    private Variant2SpecialVariantInfoDao variant2SpecialVariantInfoDao;
+    private Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
 
     @Autowired
     ProjectDao projectDao;
@@ -262,7 +263,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         specialProjectList.add( specialProject.getId() );
 
-        Collection<Variant2SpecialVariantInfo> infos = variant2SpecialVariantInfoDao.loadByVariantId( vvo.getId(),
+        Collection<Variant2SpecialVariantOverlap> infos = variant2SpecialVariantOverlapDao.loadByVariantId( vvo.getId(),
                 specialProjectList );
 
         Variant v = variantDao.load( vvo.getId() );
@@ -273,7 +274,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         assertEquals( 5, infos.size() );
 
-        for ( Variant2SpecialVariantInfo vInfo : infos ) {
+        for ( Variant2SpecialVariantOverlap vInfo : infos ) {
 
             Variant specialVariant = variantDao.load( vInfo.getOverlapSpecialVariantId() );
 
@@ -425,7 +426,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         
         overlapRestriction.setValue( numericValue );
         
-        overlapFilter.setRestriction( overlapRestriction );
+        overlapFilter.setRestriction1( overlapRestriction );
         
 
         BoundedList<VariantValueObject> result = null;
@@ -489,6 +490,116 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         assertEquals(2, result.getItems().size());
 
        
+        
+        
+    }
+    
+    @Test
+    public void testProjectOverlapFilterWithSecondaryOverlapLessThan() {
+
+        Project project = projectDao.findByProjectName( projectId );
+
+        Project projectWithOverlap = projectDao.findByProjectName( projectIdWithOverlap );
+        
+        List<Long> projectList = new ArrayList<Long>();
+        projectList.add( project.getId() );
+
+        List<Long> projectListWithOverlap = new ArrayList<Long>();
+        projectListWithOverlap.add( projectWithOverlap.getId() );
+
+        ProjectOverlapFilterConfig overlapFilter = new ProjectOverlapFilterConfig();
+        
+        overlapFilter.setProjectIds( projectList );
+        overlapFilter.setOverlapProjectIds( projectListWithOverlap );
+        
+      
+        
+        SimpleRestriction overlapRestriction = new SimpleRestriction();
+        
+        overlapRestriction.setProperty( new DoesOverlapWithXProperty() );
+                
+        overlapRestriction.setOperator( Operator.NUMERIC_LESS);
+        
+        
+        NumericValue numericValue = new NumericValue();
+        numericValue.setValue( 10000000 );
+        
+        overlapRestriction.setValue( numericValue );
+        
+        overlapFilter.setRestriction2( overlapRestriction );
+        
+
+        BoundedList<VariantValueObject> result = null;
+
+        Set<AspireDbFilterConfig> set = new HashSet<AspireDbFilterConfig>();
+
+        set.add( overlapFilter );
+
+        try {
+
+            result = queryService.queryVariants( set );
+
+        } catch ( Exception e ) {
+            fail(e.toString());
+        }
+
+        assertEquals( 4,result.getItems().size() );
+
+        
+        
+    }
+    
+    @Test
+    public void testProjectOverlapFilterWithSecondaryGreaterThan() {
+
+        Project project = projectDao.findByProjectName( projectId );
+
+        Project projectWithOverlap = projectDao.findByProjectName( projectIdWithOverlap );
+        
+        List<Long> projectList = new ArrayList<Long>();
+        projectList.add( project.getId() );
+
+        List<Long> projectListWithOverlap = new ArrayList<Long>();
+        projectListWithOverlap.add( projectWithOverlap.getId() );
+
+        ProjectOverlapFilterConfig overlapFilter = new ProjectOverlapFilterConfig();
+        
+        overlapFilter.setProjectIds( projectList );
+        overlapFilter.setOverlapProjectIds( projectListWithOverlap );
+        
+      
+        
+        SimpleRestriction overlapRestriction = new SimpleRestriction();
+        
+        overlapRestriction.setProperty( new DoesOverlapWithXProperty() );
+                
+        overlapRestriction.setOperator( Operator.NUMERIC_GREATER);
+        
+        
+        NumericValue numericValue = new NumericValue();
+        numericValue.setValue( 10000000 );
+        
+        overlapRestriction.setValue( numericValue );
+        
+        overlapFilter.setRestriction2( overlapRestriction );
+        
+
+        BoundedList<VariantValueObject> result = null;
+
+        Set<AspireDbFilterConfig> set = new HashSet<AspireDbFilterConfig>();
+
+        set.add( overlapFilter );
+
+        try {
+
+            result = queryService.queryVariants( set );
+
+        } catch ( Exception e ) {
+            fail(e.toString());
+        }
+
+        assertEquals( 0,result.getItems().size() );
+
         
         
     }

@@ -37,9 +37,10 @@ import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
-import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantInfo;
+import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
+import ubc.pavlab.aspiredb.shared.NumericValue;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
 import ubc.pavlab.aspiredb.shared.query.Operator;
@@ -61,13 +62,11 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
  * @version $Id: VariantDaoBaseImpl.java,v 1.32 2013/07/02 18:20:21 anton Exp $
  */
 
-public abstract class VariantDaoBaseImpl<T extends Variant>
-        extends SecurableDaoBaseImpl<T>
-        implements VariantDaoBase<T>
-{
-        
+public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDaoBaseImpl<T> implements
+        VariantDaoBase<T> {
+
     private static Log log = LogFactory.getLog( VariantDaoBaseImpl.class.getName() );
-    
+
     private Class<T> elementClass;
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -78,43 +77,42 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
     }
 
     @Autowired
-    private Variant2SpecialVariantInfoDao variant2SpecialVariantInfoDao;
-    
-    @Autowired private PhenotypeUtil phenotypeUtils;
+    private Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
+
+    @Autowired
+    private PhenotypeUtil phenotypeUtils;
 
     @Override
-    public Collection<T> findByGenomicLocation(GenomicRange range, Collection<Long> activeProjectIds) {
-        SimpleRestriction restriction = new SimpleRestriction(new GenomicLocationProperty(), Operator.IS_IN_SET, range);
+    public Collection<T> findByGenomicLocation( GenomicRange range, Collection<Long> activeProjectIds ) {
+        SimpleRestriction restriction = new SimpleRestriction( new GenomicLocationProperty(), Operator.IS_IN_SET, range );
 
         Session session = this.getSessionFactory().getCurrentSession();
         Criteria criteria = session.createCriteria( this.elementClass );
         criteria.createAlias( "location", "location" );
-        criteria.createAlias("subject", "subject")
-                .createAlias("subject.projects", "project")
-                .add(Restrictions.in("project.id", activeProjectIds));
+        criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
+                .add( Restrictions.in( "project.id", activeProjectIds ) );
 
         criteria.add( CriteriaBuilder.buildCriteriaRestriction( restriction, CriteriaBuilder.EntityType.VARIANT ) );
 
-		List<T> variants = criteria.list();
+        List<T> variants = criteria.list();
         return variants;
     }
 
     @Override
-    public Collection<String> suggestValuesForEntityProperty(Property property, SuggestionContext suggestionContext) {
+    public Collection<String> suggestValuesForEntityProperty( Property property, SuggestionContext suggestionContext ) {
         Session session = currentSession();
 
-        Criteria criteria = session.createCriteria(this.elementClass);
-        if (suggestionContext.getValuePrefix() != null) {
+        Criteria criteria = session.createCriteria( this.elementClass );
+        if ( suggestionContext.getValuePrefix() != null ) {
             // TODO: escape certain chars
             String valuePrefix = suggestionContext.getValuePrefix();
             String valueWildcard = "%" + valuePrefix + "%";
-            criteria.add(Restrictions.like( property.getName(), valueWildcard ));
+            criteria.add( Restrictions.like( property.getName(), valueWildcard ) );
         }
         criteria.setProjection( Projections.distinct( Projections.property( property.getName() ) ) );
-        if (suggestionContext.getActiveProjectIds() != null && !suggestionContext.getActiveProjectIds().isEmpty()) {
-            criteria.createAlias("subject", "subject")
-                    .createAlias("subject.projects", "project")
-                    .add(Restrictions.in("project.id", suggestionContext.getActiveProjectIds()));
+        if ( suggestionContext.getActiveProjectIds() != null && !suggestionContext.getActiveProjectIds().isEmpty() ) {
+            criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
+                    .add( Restrictions.in( "project.id", suggestionContext.getActiveProjectIds() ) );
         }
 
         return criteria.list();
@@ -124,7 +122,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
     @Transactional(readOnly = true)
     public Collection<T> findBySubjectId( String id ) {
 
-        List<Subject> subjects = this.getSessionFactory().getCurrentSession().createCriteria(Subject.class)
+        List<Subject> subjects = this.getSessionFactory().getCurrentSession().createCriteria( Subject.class )
                 .add( Restrictions.eq( "patientId", id ) ).list();
 
         if ( subjects.size() == 0 ) {
@@ -134,224 +132,298 @@ public abstract class VariantDaoBaseImpl<T extends Variant>
         List<T> variants = this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
                 .add( Restrictions.in( "subject", subjects ) ).list();
         return variants;
-    } 
- 
-    @Override
-    @Transactional(readOnly = true)
-    public Page<? extends T> loadPage( int offset, int limit,
-            String sortField, String sortDirection,
-            Set<AspireDbFilterConfig> filters ) throws BioMartServiceException, NeurocartaServiceException
-    {
-    	assert( filters != null );
-
-    	List<Long> variantIds = getFilteredIds( filters );
-    	List<T> variants = new ArrayList<T>( this.load( variantIds ) );
-        if (limit == 0) {
-            limit = variants.size();
-        }
-        int pageSize = Math.min( limit, variants.size());
-        List<T> variantPage = variants.subList( 0, pageSize );
-
-    	return new PageBean (variantPage, variantIds.size());
     }
 
-	@Override
-	public Collection<? extends T> load(Set<AspireDbFilterConfig> filters)
-            throws BioMartServiceException, NeurocartaServiceException
-    {
-		return loadPage( 0, 0, null, null, filters );
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public Page<? extends T> loadPage( int offset, int limit, String sortField, String sortDirection,
+            Set<AspireDbFilterConfig> filters ) throws BioMartServiceException, NeurocartaServiceException {
+        assert ( filters != null );
 
-    
-	private List<Long> getFilteredIds(Set<AspireDbFilterConfig> filters)
-            throws BioMartServiceException, NeurocartaServiceException
-    {
-    	Iterator<AspireDbFilterConfig> iterator = filters.iterator();
-    	AspireDbFilterConfig filterConfig = iterator.next();
-    	// First iteration
-        List<Long> variantIds = findIds( filterConfig );
-    	
-    	while ( iterator.hasNext() ) {
-    		filterConfig = iterator.next();
-    		List<Long> ids = findIds( filterConfig );
-    		
-    		// intersect results
-    		variantIds.retainAll( ids );
-    		
-        	// if size is 0 -> stop
-    		if ( variantIds.isEmpty() ) break;
-    	}
-		return variantIds;
-	}
-
-    private List<Long> findIds ( AspireDbFilterConfig filter )
-            throws BioMartServiceException, NeurocartaServiceException
-    {
-        //Project overlap filter requires a little more data processing than the other filters and uses precalculated database table
-        //as it doesn't quite fit the same paradigm as the other filters I am breaking it off into its own method
-        if (filter instanceof ProjectOverlapFilterConfig){
-            
-            return this.getProjectOverlapIds( (ProjectOverlapFilterConfig)filter );
-            
+        List<Long> variantIds = getFilteredIds( filters );
+        List<T> variants = new ArrayList<T>( this.load( variantIds ) );
+        if ( limit == 0 ) {
+            limit = variants.size();
         }
-        
+        int pageSize = Math.min( limit, variants.size() );
+        List<T> variantPage = variants.subList( 0, pageSize );
+
+        return new PageBean( variantPage, variantIds.size() );
+    }
+
+    @Override
+    public Collection<? extends T> load( Set<AspireDbFilterConfig> filters ) throws BioMartServiceException,
+            NeurocartaServiceException {
+        return loadPage( 0, 0, null, null, filters );
+    }
+
+    private List<Long> getFilteredIds( Set<AspireDbFilterConfig> filters ) throws BioMartServiceException,
+            NeurocartaServiceException {
+        Iterator<AspireDbFilterConfig> iterator = filters.iterator();
+        AspireDbFilterConfig filterConfig = iterator.next();
+        // First iteration
+        List<Long> variantIds = findIds( filterConfig );
+
+        while ( iterator.hasNext() ) {
+            filterConfig = iterator.next();
+            List<Long> ids = findIds( filterConfig );
+
+            // intersect results
+            variantIds.retainAll( ids );
+
+            // if size is 0 -> stop
+            if ( variantIds.isEmpty() ) break;
+        }
+        return variantIds;
+    }
+
+    private List<Long> findIds( AspireDbFilterConfig filter ) throws BioMartServiceException,
+            NeurocartaServiceException {
+        // Project overlap filter requires a little more data processing than the other filters and uses precalculated
+        // database table
+        // as it doesn't quite fit the same paradigm as the other filters I am breaking it off into its own method
+        if ( filter instanceof ProjectOverlapFilterConfig ) {
+
+            return this.getProjectOverlapIds( ( ProjectOverlapFilterConfig ) filter );
+
+        }
+
         Session session = this.getSessionFactory().getCurrentSession();
         Criteria criteria = session.createCriteria( this.elementClass );
-                
+
         addSingleFilter( filter, criteria );
-                
-       	criteria.setProjection( Projections.distinct( Projections.id() ) );
-        return criteria.list();            	
+
+        criteria.setProjection( Projections.distinct( Projections.id() ) );
+        return criteria.list();
     }
 
     // - use Factory pattern with registration? to map config to appropriate filter subclass
-	// FOR NOW: use getClass
-	private void addSingleFilter(AspireDbFilterConfig filter, Criteria criteria)
-            throws BioMartServiceException, NeurocartaServiceException
-    {
+    // FOR NOW: use getClass
+    private void addSingleFilter( AspireDbFilterConfig filter, Criteria criteria ) throws BioMartServiceException,
+            NeurocartaServiceException {
         if ( filter.getClass() == VariantFilterConfig.class ) {
-            VariantFilterConfig locationFilter = (VariantFilterConfig) filter;
+            VariantFilterConfig locationFilter = ( VariantFilterConfig ) filter;
             RestrictionExpression restriction = locationFilter.getRestriction();
-            addSingleVariantFilter(restriction, criteria);
-		} else if ( filter.getClass() == ProjectFilterConfig.class ) {
-			ProjectFilterConfig projectFilter = (ProjectFilterConfig) filter;
-			criteria.createAlias("subject","subject")
-	        		.createAlias("subject.projects","project")
-	        			.add( Restrictions.in( "project.id", projectFilter.getProjectIds() ) );
-		} else if ( filter.getClass() == SubjectFilterConfig.class ) {
-			SubjectFilterConfig subjectFilter = (SubjectFilterConfig) filter;
-			RestrictionExpression restrictionExpression = subjectFilter.getRestriction();
-            Criterion criterion = CriteriaBuilder.buildCriteriaRestriction(restrictionExpression,
-                    CriteriaBuilder.EntityType.VARIANT);
-            criteria.createAlias("subject", "subject")
-                    .createAlias("subject.labels", "subject_label", CriteriaSpecification.LEFT_JOIN);
-            criteria.add(criterion);
-		} else if ( filter.getClass() == PhenotypeFilterConfig.class ) {
-            PhenotypeFilterConfig filterConfig = (PhenotypeFilterConfig) filter;
-            filterConfig = phenotypeUtils.expandOntologyTerms(filterConfig, filterConfig.getActiveProjectIds());
+            addSingleVariantFilter( restriction, criteria );
+        } else if ( filter.getClass() == ProjectFilterConfig.class ) {
+            ProjectFilterConfig projectFilter = ( ProjectFilterConfig ) filter;
+            criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
+                    .add( Restrictions.in( "project.id", projectFilter.getProjectIds() ) );
+        } else if ( filter.getClass() == SubjectFilterConfig.class ) {
+            SubjectFilterConfig subjectFilter = ( SubjectFilterConfig ) filter;
+            RestrictionExpression restrictionExpression = subjectFilter.getRestriction();
+            Criterion criterion = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
+                    CriteriaBuilder.EntityType.VARIANT );
+            criteria.createAlias( "subject", "subject" ).createAlias( "subject.labels", "subject_label",
+                    CriteriaSpecification.LEFT_JOIN );
+            criteria.add( criterion );
+        } else if ( filter.getClass() == PhenotypeFilterConfig.class ) {
+            PhenotypeFilterConfig filterConfig = ( PhenotypeFilterConfig ) filter;
+            filterConfig = phenotypeUtils.expandOntologyTerms( filterConfig, filterConfig.getActiveProjectIds() );
             RestrictionExpression restrictionExpression = filterConfig.getRestriction();
             Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
                     CriteriaBuilder.EntityType.VARIANT );
-	        criteria.createAlias("subject","subject")
-	        		.createAlias("subject.phenotypes","phenotype");
+            criteria.createAlias( "subject", "subject" ).createAlias( "subject.phenotypes", "phenotype" );
             criteria.add( junction );
         }
-	}
+    }
 
-	private void addSingleVariantFilter(RestrictionExpression restrictionExpression, Criteria criteria) {
-		criteria.createAlias("location", "location")
-                .createAlias("subject", "subject")
-//                .createAlias("subject.labels", "subject_label", CriteriaSpecification.LEFT_JOIN)
-//                .createAlias("labels", "variant_label", CriteriaSpecification.LEFT_JOIN)
-                .createAlias("characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN);
+    private void addSingleVariantFilter( RestrictionExpression restrictionExpression, Criteria criteria ) {
+        criteria.createAlias( "location", "location" ).createAlias( "subject", "subject" )
+        // .createAlias("subject.labels", "subject_label", CriteriaSpecification.LEFT_JOIN)
+        // .createAlias("labels", "variant_label", CriteriaSpecification.LEFT_JOIN)
+                .createAlias( "characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN );
         Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
-                CriteriaBuilder.EntityType.VARIANT  );
+                CriteriaBuilder.EntityType.VARIANT );
         criteria.add( junction );
     }
-	
-	
-	public List<Long> getProjectOverlapIds(ProjectOverlapFilterConfig overlapFilter) {
-	   //Grabbing all ids for the project and iterating over them with a query to get the overlap for each
-	    //could probably mash it into fewer queries, but this is simpler for now 
-	    
-	    
-        ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();        
-        projectFilterConfig.setProjectIds( overlapFilter.getProjectIds() );
+
+    public List<Long> getProjectOverlapIds( ProjectOverlapFilterConfig overlapFilter ) {
         
-        Set<AspireDbFilterConfig> filterSet = new HashSet<AspireDbFilterConfig>();        
-        filterSet.add( projectFilterConfig );
-        
-        List<Long> activeProjectsVariantIds = new ArrayList<Long>();
-        
-        try{
-            //get the variantIds of all the variants in the activeProjects to iterate over later and search for overlap
-            activeProjectsVariantIds =  getFilteredIds(filterSet);          
-        }catch (Exception e){
-            log.error( "exception while getting projectOverlapIds" );
-        }
-        
+        List<Long> activeProjectsVariantIds = getVariantIdsForProjects(overlapFilter.getProjectIds());
+
         PhenotypeRestriction phenRestriction = overlapFilter.getPhenotypeRestriction();
-        
-        Boolean hasPhenotype = phenRestriction!=null && phenRestriction.getValue() !=null && phenRestriction.getName()!=null;
-       
+
+        Boolean hasPhenotypeRestriction = phenRestriction != null && phenRestriction.getValue() != null
+                && phenRestriction.getName() != null;
+
         List<Long> overlapProjsPhenoAssociatedVariantIds = new ArrayList<Long>();
-        
-        //Get variants in specified overlapping projects with specified phenotype for easier checking later
-        if (hasPhenotype){
-            
-            PhenotypeFilterConfig phenConfig = new PhenotypeFilterConfig();
-            phenConfig.setRestriction( phenRestriction );
-            phenConfig.setActiveProjectIds( overlapFilter.getOverlapProjectIds() );
-            
-            Set<AspireDbFilterConfig> phenFilterSet = new HashSet<AspireDbFilterConfig>();        
-            phenFilterSet.add( phenConfig );
-            
-            try{
-                
-                StopWatch timer = new StopWatch();
-                timer.start();
-                
-                log.info( "fetching phenotype associated variant ids for overlapped projects" );
-                overlapProjsPhenoAssociatedVariantIds = getFilteredIds(phenFilterSet); 
-                
-                if ( timer.getTime() > 100 ) {
-                    log.info( "fetching phenotype associated variant ids for overlapped projects took " + timer.getTime() + "ms" );
-                }
-            }catch (Exception e){
-                log.error( "exception while getting projectOverlapIds for phenotype" );
-            }
-        }        
-        
-        
+
+        // Get variants in specified overlapping projects with specified phenotype for easier checking later
+        if ( hasPhenotypeRestriction ) {
+            overlapProjsPhenoAssociatedVariantIds = getPhenoAssociatedVariantIdsForProjects( overlapFilter );
+        }
+
+        SimpleRestriction overlapRestriction = ( SimpleRestriction ) overlapFilter.getRestriction1();
+
+        //if this is false then retrieve all overlaps
+        Boolean hasOverlapRestriction = validateOverlapRestriction( overlapRestriction );
+
+        SimpleRestriction numVariantsOverlapRestriction = ( SimpleRestriction ) overlapFilter.getRestriction2();
+
+        Boolean hasSecondaryOverlapRestriction = validateOverlapRestriction( numVariantsOverlapRestriction );
+
         Set<Long> variantIdsWithOverlap = new HashSet<Long>();
         
-        SimpleRestriction overlapRestriction =  (SimpleRestriction)overlapFilter.getRestriction();
-                
-        //test other things like value and type, discern if it is percentage or number of bases
-        Boolean searchByOverlap = overlapRestriction !=null && overlapRestriction.getValue()!=null && overlapRestriction.getOperator() != null;
+        log.info( "Iterating through variants in projectids:"+overlapFilter.getProjectIds()+" for overlap with variants in projectids:"+ overlapFilter.getOverlapProjectIds()
+                +"\n hasOverlapRestriction:"+hasOverlapRestriction+" hasSecondaryOverlapRestriction:"+hasSecondaryOverlapRestriction+" hasPhenotypeRestriction:"+hasPhenotypeRestriction);
         
-        
-        
-        
-        for (Long vId: activeProjectsVariantIds){
-            
-            Collection<Variant2SpecialVariantInfo> infos = new ArrayList<Variant2SpecialVariantInfo>();
-            
-            if (searchByOverlap){                
-                infos =  variant2SpecialVariantInfoDao.loadByVariantIdAndOverlap( vId, (SimpleRestriction)overlapFilter.getRestriction() , overlapFilter.getOverlapProjectIds());                
-            }else{                
-                infos =  variant2SpecialVariantInfoDao.loadByVariantId( vId, overlapFilter.getOverlapProjectIds());                
+        //Iterate over all variants in active Projects to see if they meet the restriction criteria
+        for ( Long vId : activeProjectsVariantIds ) {
+
+            Collection<Variant2SpecialVariantOverlap> infos = new ArrayList<Variant2SpecialVariantOverlap>();
+
+            if ( hasOverlapRestriction ) {
+                infos = variant2SpecialVariantOverlapDao.loadByVariantIdAndOverlap( vId,
+                        ( SimpleRestriction ) overlapFilter.getRestriction1(), overlapFilter.getOverlapProjectIds() );
+            } else {
+                infos = variant2SpecialVariantOverlapDao.loadByVariantId( vId, overlapFilter.getOverlapProjectIds() );
             }
-            
-            if (infos.size()>0){
+
+            if ( hasPhenotypeRestriction || hasSecondaryOverlapRestriction ) {
                 
-                if (hasPhenotype){
+                Set<Long> variantIdsWithAssociatedPhenotype = new HashSet<Long>();
+                
+                if (hasPhenotypeRestriction){
+
+                    for ( Variant2SpecialVariantOverlap info : infos ) {
+
+                        // if the overlapped variant has the specified phenotype associated with it
+                        if ( overlapProjsPhenoAssociatedVariantIds.contains( info.getOverlapSpecialVariantId() ) ) {
+                            variantIdsWithAssociatedPhenotype.add( vId );
+                            // all of this 'infos' deal with the same variantId so we can break if there is one
+                            break;
+                        }
+
+                    }
+                
+                }
+                
+                Set<Long> variantIdsMeetingSecondaryRestriction = new HashSet<Long>();
+                
+                //This will be the case where the user asks: show me variants that "do"/"do not" overlap with  x number of variants in DGV/DECIPHER
+                if (hasSecondaryOverlapRestriction){ 
                     
-                    for (Variant2SpecialVariantInfo info : infos){
-                        
-                        //if the overlapped variant has the specified phenotype associated with it
-                        if (overlapProjsPhenoAssociatedVariantIds.contains( info.getOverlapSpecialVariantId())){                            
-                            variantIdsWithOverlap.add( vId );
-                            
-                            //all of this 'infos' deal with the same variantId so we can break if there is one
-                            break;                            
-                        }                       
-                        
+                    if (meetsSecondaryOverlapRestriction(numVariantsOverlapRestriction, infos)){
+                        variantIdsMeetingSecondaryRestriction.add( vId );
                     }
                     
                 }
-                else{            
-                    variantIdsWithOverlap.add( vId );
+                
+                //Determine whether variant vId meets phenotype and secondary overlap restrictions
+                if (hasPhenotypeRestriction && hasSecondaryOverlapRestriction ){
+                    
+                    if (variantIdsWithAssociatedPhenotype.size() > 0 && variantIdsMeetingSecondaryRestriction.size() > 0){
+                        variantIdsWithOverlap.add( vId );
+                    }else{
+                        continue;
+                    }                    
+                    
+                }else if(hasPhenotypeRestriction){
+                    
+                    if (variantIdsWithAssociatedPhenotype.size() > 0){
+                        variantIdsWithOverlap.add( vId );
+                    }
+                    
+                }else if(hasSecondaryOverlapRestriction){
+                    if (variantIdsMeetingSecondaryRestriction.size() > 0){
+                        variantIdsWithOverlap.add( vId );
+                    }
                 }
-            }            
-            
-        }        
-        
+                
+            } else if (infos.size() > 0){
+                variantIdsWithOverlap.add( vId );
+            }
+
+        }
+
         List<Long> overlapToReturn = new ArrayList<Long>();
-        
+
         overlapToReturn.addAll( variantIdsWithOverlap );
-        
+
         return overlapToReturn;
-	
-	}
+
+    }
+
+    private Boolean validateOverlapRestriction( SimpleRestriction r ) {
+        // TODO test other things like value and type, discern if it is percentage or number of bases
+
+        return r != null && r.getValue() != null && r.getOperator() != null;
+    }
+    
+    
+  //This will be the case where the user asks: show me variants that "do"/"do not" overlap with  x number of variants in DGV/DECIPHER
+    private Boolean meetsSecondaryOverlapRestriction(SimpleRestriction overlapRestriction, Collection<Variant2SpecialVariantOverlap> overlaps){
+        
+        Operator o = overlapRestriction.getOperator();
+        
+        NumericValue numeric = (NumericValue)overlapRestriction.getValue();
+        
+        Integer value = numeric.getValue();
+                
+        if (o.equals( Operator.NUMERIC_GREATER)){            
+            return overlaps.size() > value;
+        }else if (o.equals( Operator.NUMERIC_LESS)){            
+            return overlaps.size() < value;
+        }else if (o.equals( Operator.NUMERIC_EQUAL)){            
+            return overlaps.size() == value;
+        }else if (o.equals( Operator.NUMERIC_NOT_EQUAL)){            
+            return overlaps.size() != value;
+        }
+        
+        return false;
+        
+    }
+
+    private List<Long> getPhenoAssociatedVariantIdsForProjects( ProjectOverlapFilterConfig overlapFilter ) {
+
+        List<Long> ids = new ArrayList<Long>();
+
+        PhenotypeFilterConfig phenConfig = new PhenotypeFilterConfig();
+        phenConfig.setRestriction( overlapFilter.getPhenotypeRestriction() );
+        phenConfig.setActiveProjectIds( overlapFilter.getOverlapProjectIds() );
+
+        Set<AspireDbFilterConfig> phenFilterSet = new HashSet<AspireDbFilterConfig>();
+        phenFilterSet.add( phenConfig );
+
+        try {
+
+            StopWatch timer = new StopWatch();
+            timer.start();
+
+            log.info( "fetching phenotype associated variant ids for overlapped projects" );
+            ids = getFilteredIds( phenFilterSet );
+
+            if ( timer.getTime() > 100 ) {
+                log.info( "fetching phenotype associated variant ids for overlapped projects took " + timer.getTime()
+                        + "ms" );
+            }
+        } catch ( Exception e ) {
+            log.error( "exception while getting projectOverlapIds for phenotype" );
+        }
+
+        return ids;
+
+    }
+    
+    private List<Long> getVariantIdsForProjects(Collection<Long> projectIds){
+    
+    ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();
+    projectFilterConfig.setProjectIds( projectIds );
+
+    Set<AspireDbFilterConfig> filterSet = new HashSet<AspireDbFilterConfig>();
+    filterSet.add( projectFilterConfig );
+
+    List<Long> projectsVariantIds = new ArrayList<Long>();
+
+    try {
+        // get the variantIds of all the variants in the activeProjects to iterate over later and search for overlap
+        projectsVariantIds = getFilteredIds( filterSet );
+    } catch ( Exception e ) {
+        log.error( "exception while getting projectOverlapIds" );
+    }
+    
+    return projectsVariantIds;
+    
+    }
 }

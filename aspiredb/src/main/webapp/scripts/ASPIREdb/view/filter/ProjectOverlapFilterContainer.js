@@ -20,6 +20,19 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 				}
 			}
 		},
+		propertyStore2 : {
+			//autoLoad : true,
+			proxy : {
+				type : 'dwr',
+				dwrFunction : VariantService.suggestPropertiesForNumberOfVariantsInProjectOverlap,				
+				model : 'ASPIREdb.model.Property',
+				reader : {
+					type : 'json',
+					root : 'data',
+					totalProperty : 'count'
+				}
+			}
+		},
 		suggestValuesRemoteFunction : null,
 		filterItemType : 'ASPIREdb.view.filter.PropertyFilter'
 	},
@@ -53,9 +66,11 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 		
 		var overlapRestriction = filterContainer.getComponent('overlapItem').getRestrictionExpression();
 		
-		projectOverlapConfig.restriction = overlapRestriction;		
+		projectOverlapConfig.restriction1 = this.validateOverlapRestriction(overlapRestriction);
 		
+		var numVariantsOverlapRestriction = filterContainer.getComponent('numVariantsOverlapItem').getRestrictionExpression();
 		
+		projectOverlapConfig.restriction2 = this.validateOverlapRestriction(numVariantsOverlapRestriction);
 				
 		projectOverlapConfig.phenotypeRestriction = filterContainer.getComponent('phenRestriction').getRestrictionExpression();
 		
@@ -70,19 +85,38 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 		//TODO
 
 	},
-
-	getNewOverlapItemFunction : function() {
+	
+	validateOverlapRestriction : function(restriction){
+		
+		
+		//the widget defaults to a SetRestriction if nothing is set, so return SimpleRestriction(what dwr expects) if it is not set
+		if (restriction.operator == null || restriction.property == null){
+			
+			var simpleRestriction = new SimpleRestriction();
+			simpleRestriction.property = null;
+			simpleRestriction.operator = null;
+			var value = new NumericValue();
+			value.value = null;
+			simpleRestriction.value = value;
+			return simpleRestriction;
+			
+		}
+		
+			
+		return restriction;
+	},
+	
+	
+	getNewOverlapItemFunction : function(remoteFunction, storeRef, id) {
 
 		var filterTypeItem = this.getFilterItemType();
-		var propertyStore = this.getPropertyStore();
-		var suggestValuesRemoteFunction = this.getSuggestValuesRemoteFunction();
-
+				
 		var getNewOverlapItem = function() {
 
 			return Ext.create(filterTypeItem, {
-				propertyStore : propertyStore,
-				suggestValuesRemoteFunction : suggestValuesRemoteFunction,
-				itemId : 'overlapItem'
+				propertyStore : storeRef,
+				suggestValuesRemoteFunction : remoteFunction,
+				itemId : id
 			});
 
 		};
@@ -95,12 +129,30 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 		
 		var filterContainer = this.getComponent("filterContainer");
 
-		var getNewOverlapItem = this.getNewOverlapItemFunction();
+		var getNewOverlapItem = this.getNewOverlapItemFunction(VariantService.suggestPropertiesForProjectOverlap, this.getPropertyStore(),'overlapItem');
 
 		var overlapItem = getNewOverlapItem();
 		
+		var getNewNumVariantsOverlapItem = this.getNewOverlapItemFunction(VariantService.suggestPropertiesForNumberOfVariantsInProjectOverlap, this.getPropertyStore2(), 'numVariantsOverlapItem');
+
+		var numVariantsOverlapItem = getNewNumVariantsOverlapItem();
+		
 		filterContainer.insert(0, {xtype: 'filter_phenotype_property', itemId : 'phenRestriction' });
+		filterContainer.insert(0, {
+			xtype : 'label',
+			text : 'Phenotype Association of target project variants restriction: '
+		});
+		
+		filterContainer.insert(0, numVariantsOverlapItem);
+		filterContainer.insert(0, {
+			xtype : 'label',
+			text : 'Number of Variants Overlapped restriction: '
+		});
 		filterContainer.insert(0, overlapItem);
+		filterContainer.insert(0, {
+			xtype : 'label',
+			text : 'Length or %Length of Overlap restriction: '
+		});
 		filterContainer.insert(0,{
 			xtype : 'combo',
 			itemId : 'specialProjectComboBox',

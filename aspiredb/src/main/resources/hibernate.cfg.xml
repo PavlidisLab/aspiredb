@@ -35,7 +35,7 @@
       	<mapping class="ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User" />
       	<mapping class="ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup" />
       	<mapping class="ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority" />
-      	<mapping class="ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantInfo" />
+      	<mapping class="ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap" />
       	
     </session-factory>
 </hibernate-configuration>

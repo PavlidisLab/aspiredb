@@ -29,7 +29,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "VARIANT2SPECIAL_VARIANT_INFO")
-public class Variant2SpecialVariantInfo implements Serializable  {
+public class Variant2SpecialVariantOverlap implements Serializable  {
 
     /**
      * 
@@ -60,7 +60,7 @@ public class Variant2SpecialVariantInfo implements Serializable  {
     @Column(name="OVERLAP_PROJECTID")
     private Long overlapProjectId;
     
-    public Variant2SpecialVariantInfo(){
+    public Variant2SpecialVariantOverlap(){
         
     }
 

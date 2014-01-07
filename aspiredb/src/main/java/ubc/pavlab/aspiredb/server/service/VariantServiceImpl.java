@@ -120,6 +120,15 @@ public class VariantServiceImpl implements VariantService {
         return properties;
         
     }
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<Property> suggestPropertiesForNumberOfVariantsInProjectOverlap(){
+        Collection<Property> properties = new ArrayList<Property>();
+        properties.add(new DoesOverlapWithXProperty());
+        return properties;
+        
+    }
     
     @Override
     @RemoteMethod

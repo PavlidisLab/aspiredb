@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantInfo;
+import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
 import ubc.pavlab.aspiredb.shared.NumericValue;
 import ubc.pavlab.aspiredb.shared.query.MutualOverlapPercentageProperty;
 import ubc.pavlab.aspiredb.shared.query.Operator;
@@ -34,43 +34,43 @@ import ubc.pavlab.aspiredb.shared.query.OverlapPercentageOtherVariantProperty;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 
-@Repository("variant2SpecialVariantInfoDao")
-public class Variant2SpecialVariantInfoDaoImpl extends DaoBaseImpl<Variant2SpecialVariantInfo> implements Variant2SpecialVariantInfoDao{
+@Repository("variant2SpecialVariantOverlapDao")
+public class Variant2SpecialVariantOverlapDaoImpl extends DaoBaseImpl<Variant2SpecialVariantOverlap> implements Variant2SpecialVariantOverlapDao{
     
     protected static Log log = LogFactory.getLog( ProjectDaoImpl.class );
     
     @Autowired
-    public Variant2SpecialVariantInfoDaoImpl( SessionFactory sessionFactory ) {
-        super( Variant2SpecialVariantInfo.class );
+    public Variant2SpecialVariantOverlapDaoImpl( SessionFactory sessionFactory ) {
+        super( Variant2SpecialVariantOverlap.class );
         super.setSessionFactory( sessionFactory );
     }
     
     @Override
     @Transactional(readOnly = true)
-    public Collection<Variant2SpecialVariantInfo> loadByVariantId( Long id , Collection<Long> overlapProjectIds) {
+    public Collection<Variant2SpecialVariantOverlap> loadByVariantId( Long id , Collection<Long> overlapProjectIds) {
         
         if (id == null){
-            return new ArrayList<Variant2SpecialVariantInfo>();
+            return new ArrayList<Variant2SpecialVariantOverlap>();
         }
         
         String[] paramNames = { "id", "overlapProjectIds" };
         Object[] objectValues = { id, overlapProjectIds };
         
         return this.getHibernateTemplate().findByNamedParam(
-                "from Variant2SpecialVariantInfo where variantId = :id and overlapProjectId in (:overlapProjectIds)", paramNames, objectValues );
+                "from Variant2SpecialVariantOverlap where variantId = :id and overlapProjectId in (:overlapProjectIds)", paramNames, objectValues );
         
     }
     
     @Override
     @Transactional(readOnly = true)
-    public Collection<Variant2SpecialVariantInfo> loadByVariantIdAndOverlap( Long id , SimpleRestriction overlapRestriction, Collection<Long> overlapProjectIds) {
+    public Collection<Variant2SpecialVariantOverlap> loadByVariantIdAndOverlap( Long id , SimpleRestriction overlapRestriction, Collection<Long> overlapProjectIds) {
         
         if (id == null){
-            return new ArrayList<Variant2SpecialVariantInfo>();
+            return new ArrayList<Variant2SpecialVariantOverlap>();
             
         }
         
-        String queryString = "from Variant2SpecialVariantInfo where variantId = :id";        
+        String queryString = "from Variant2SpecialVariantOverlap where variantId = :id";        
         
         
         Operator o = overlapRestriction.getOperator();

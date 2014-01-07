@@ -47,6 +47,8 @@ public interface VariantService {
     public Collection<Property> suggestPropertiesForVariantType(VariantType variantType);
     
     public Collection<Property> suggestPropertiesForProjectOverlap();
+    
+    public Collection<Property> suggestPropertiesForNumberOfVariantsInProjectOverlap();
 
     public Collection<Property> suggestProperties();
             
