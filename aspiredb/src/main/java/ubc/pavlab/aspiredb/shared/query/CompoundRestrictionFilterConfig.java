@@ -27,6 +27,8 @@ public abstract class CompoundRestrictionFilterConfig extends AspireDbFilterConf
     private RestrictionExpression restriction1;
     
     private RestrictionExpression restriction2;
+    
+    private RestrictionExpression restriction3;
 
     protected CompoundRestrictionFilterConfig() {
     }
@@ -50,6 +52,14 @@ public abstract class CompoundRestrictionFilterConfig extends AspireDbFilterConf
 
     public void setRestriction2( RestrictionExpression restriction2 ) {
         this.restriction2 = restriction2;
+    }
+
+    public RestrictionExpression getRestriction3() {
+        return restriction3;
+    }
+
+    public void setRestriction3( RestrictionExpression restriction3 ) {
+        this.restriction3 = restriction3;
     }
    
 }

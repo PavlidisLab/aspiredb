@@ -8,7 +8,7 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 	},
 	config : {
 		propertyStore : {
-			//autoLoad : true,
+			
 			proxy : {
 				type : 'dwr',
 				dwrFunction : VariantService.suggestPropertiesForProjectOverlap,				
@@ -21,10 +21,23 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 			}
 		},
 		propertyStore2 : {
-			//autoLoad : true,
+			
 			proxy : {
 				type : 'dwr',
 				dwrFunction : VariantService.suggestPropertiesForNumberOfVariantsInProjectOverlap,				
+				model : 'ASPIREdb.model.Property',
+				reader : {
+					type : 'json',
+					root : 'data',
+					totalProperty : 'count'
+				}
+			}
+		},
+		propertyStore3 : {
+			
+			proxy : {
+				type : 'dwr',
+				dwrFunction : VariantService.suggestPropertiesForSupportOfVariantsInProjectOverlap,				
 				model : 'ASPIREdb.model.Property',
 				reader : {
 					type : 'json',
@@ -71,6 +84,10 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 		var numVariantsOverlapRestriction = filterContainer.getComponent('numVariantsOverlapItem').getRestrictionExpression();
 		
 		projectOverlapConfig.restriction2 = this.validateOverlapRestriction(numVariantsOverlapRestriction);
+		
+		var supportOfVariantsOverlapRestriction = filterContainer.getComponent('supportOfVariantsOverlapItem').getRestrictionExpression();
+		
+		projectOverlapConfig.restriction3 = this.validateOverlapRestriction(supportOfVariantsOverlapRestriction);
 				
 		projectOverlapConfig.phenotypeRestriction = filterContainer.getComponent('phenRestriction').getRestrictionExpression();
 		
@@ -82,8 +99,7 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 
 		var getNewOverlapItem = this.getNewOverlapItemFunction();
 
-		//TODO
-
+		//TODO this will get called when a saved query is reconstructed, implement later after requirements are more clear
 	},
 	
 	validateOverlapRestriction : function(restriction){
@@ -137,10 +153,20 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 
 		var numVariantsOverlapItem = getNewNumVariantsOverlapItem();
 		
+		var getNewVariantSupportOverlapItem = this.getNewOverlapItemFunction(VariantService.suggestPropertiesForSupportOfVariantsInProjectOverlap, this.getPropertyStore3(), 'supportOfVariantsOverlapItem');
+
+		var supportOfVariantsOverlapItem = getNewVariantSupportOverlapItem();
+		
 		filterContainer.insert(0, {xtype: 'filter_phenotype_property', itemId : 'phenRestriction' });
 		filterContainer.insert(0, {
 			xtype : 'label',
 			text : 'Phenotype Association of target project variants restriction: '
+		});
+		
+		filterContainer.insert(0, supportOfVariantsOverlapItem);
+		filterContainer.insert(0, {
+			xtype : 'label',
+			text : 'Number of Different Support Evidence restriction: '
 		});
 		
 		filterContainer.insert(0, numVariantsOverlapItem);
@@ -148,6 +174,7 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 			xtype : 'label',
 			text : 'Number of Variants Overlapped restriction: '
 		});
+		
 		filterContainer.insert(0, overlapItem);
 		filterContainer.insert(0, {
 			xtype : 'label',

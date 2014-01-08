@@ -35,6 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
+import ubc.pavlab.aspiredb.server.model.Characteristic;
+import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
@@ -78,6 +80,9 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
     @Autowired
     private Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
+
+    @Autowired
+    private ProjectDao projectDao;
 
     @Autowired
     private PhenotypeUtil phenotypeUtils;
@@ -162,11 +167,17 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         Iterator<AspireDbFilterConfig> iterator = filters.iterator();
         AspireDbFilterConfig filterConfig = iterator.next();
         // First iteration
+
+        log.info( "findIds for filterconfig:" + filterConfig.getClass() );
         List<Long> variantIds = findIds( filterConfig );
+        log.info( "findIds finished for filterconfig:" + filterConfig.getClass() );
 
         while ( iterator.hasNext() ) {
             filterConfig = iterator.next();
+            log.info( "findIds for filterconfig:" + filterConfig.getClass() );
             List<Long> ids = findIds( filterConfig );
+
+            log.info( "findIds finished for filterconfig:" + filterConfig.getClass() );
 
             // intersect results
             variantIds.retainAll( ids );
@@ -193,6 +204,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         addSingleFilter( filter, criteria );
 
+        log.info( " criteria.list() in findIds" );
         criteria.setProjection( Projections.distinct( Projections.id() ) );
         return criteria.list();
     }
@@ -239,8 +251,8 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
     }
 
     public List<Long> getProjectOverlapIds( ProjectOverlapFilterConfig overlapFilter ) {
-        
-        List<Long> activeProjectsVariantIds = getVariantIdsForProjects(overlapFilter.getProjectIds());
+
+        List<Long> activeProjectsVariantIds = getVariantIdsForProjects( overlapFilter.getProjectIds() );
 
         PhenotypeRestriction phenRestriction = overlapFilter.getPhenotypeRestriction();
 
@@ -256,19 +268,25 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         SimpleRestriction overlapRestriction = ( SimpleRestriction ) overlapFilter.getRestriction1();
 
-        //if this is false then retrieve all overlaps
+        // if this is false then retrieve all overlaps
         Boolean hasOverlapRestriction = validateOverlapRestriction( overlapRestriction );
 
         SimpleRestriction numVariantsOverlapRestriction = ( SimpleRestriction ) overlapFilter.getRestriction2();
 
         Boolean hasSecondaryOverlapRestriction = validateOverlapRestriction( numVariantsOverlapRestriction );
 
+        SimpleRestriction supportOfVariantsOverlapRestriction = ( SimpleRestriction ) overlapFilter.getRestriction3();
+
+        Boolean hasTertiaryOverlapRestriction = validateOverlapRestriction( supportOfVariantsOverlapRestriction );
+
         Set<Long> variantIdsWithOverlap = new HashSet<Long>();
-        
-        log.info( "Iterating through variants in projectids:"+overlapFilter.getProjectIds()+" for overlap with variants in projectids:"+ overlapFilter.getOverlapProjectIds()
-                +"\n hasOverlapRestriction:"+hasOverlapRestriction+" hasSecondaryOverlapRestriction:"+hasSecondaryOverlapRestriction+" hasPhenotypeRestriction:"+hasPhenotypeRestriction);
-        
-        //Iterate over all variants in active Projects to see if they meet the restriction criteria
+
+        log.info( "Iterating through variants in projectids:" + overlapFilter.getProjectIds()
+                + " for overlap with variants in projectids:" + overlapFilter.getOverlapProjectIds()
+                + "\n hasOverlapRestriction:" + hasOverlapRestriction + " hasSecondaryOverlapRestriction:"
+                + hasSecondaryOverlapRestriction +" hasTertiaryOverlapRestriction: "+ hasTertiaryOverlapRestriction + " hasPhenotypeRestriction:" + hasPhenotypeRestriction );
+
+        // Iterate over all variants in active Projects to see if they meet the restriction criteria
         for ( Long vId : activeProjectsVariantIds ) {
 
             Collection<Variant2SpecialVariantOverlap> infos = new ArrayList<Variant2SpecialVariantOverlap>();
@@ -281,10 +299,10 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
             }
 
             if ( hasPhenotypeRestriction || hasSecondaryOverlapRestriction ) {
-                
+
                 Set<Long> variantIdsWithAssociatedPhenotype = new HashSet<Long>();
-                
-                if (hasPhenotypeRestriction){
+
+                if ( hasPhenotypeRestriction ) {
 
                     for ( Variant2SpecialVariantOverlap info : infos ) {
 
@@ -296,42 +314,55 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
                         }
 
                     }
-                
+
                 }
-                
+
                 Set<Long> variantIdsMeetingSecondaryRestriction = new HashSet<Long>();
-                
-                //This will be the case where the user asks: show me variants that "do"/"do not" overlap with  x number of variants in DGV/DECIPHER
-                if (hasSecondaryOverlapRestriction){ 
-                    
-                    if (meetsSecondaryOverlapRestriction(numVariantsOverlapRestriction, infos)){
-                        variantIdsMeetingSecondaryRestriction.add( vId );
+
+                // This will be the case where the user asks: show me variants that "do"/"do not" overlap with x number
+                // of variants in DGV/DECIPHER
+                if ( hasSecondaryOverlapRestriction ) {
+
+                    if ( meetsSecondaryOverlapRestriction( numVariantsOverlapRestriction, infos ) ) {
+
+                        // This will be the case where the wants to ensure the overlapped variant does/doesn't have
+                        // support from multiple sources
+                        if ( hasTertiaryOverlapRestriction ) {
+
+                            if ( meetsTertiaryOverlapRestriction( supportOfVariantsOverlapRestriction, infos ) ) {
+                                variantIdsMeetingSecondaryRestriction.add( vId );
+                            }
+
+                        } else {
+                            variantIdsMeetingSecondaryRestriction.add( vId );
+                        }
                     }
-                    
+
                 }
-                
-                //Determine whether variant vId meets phenotype and secondary overlap restrictions
-                if (hasPhenotypeRestriction && hasSecondaryOverlapRestriction ){
-                    
-                    if (variantIdsWithAssociatedPhenotype.size() > 0 && variantIdsMeetingSecondaryRestriction.size() > 0){
+
+                // Determine whether variant vId meets phenotype and secondary overlap restrictions
+                if ( hasPhenotypeRestriction && hasSecondaryOverlapRestriction ) {
+
+                    if ( variantIdsWithAssociatedPhenotype.size() > 0
+                            && variantIdsMeetingSecondaryRestriction.size() > 0 ) {
                         variantIdsWithOverlap.add( vId );
-                    }else{
+                    } else {
                         continue;
-                    }                    
-                    
-                }else if(hasPhenotypeRestriction){
-                    
-                    if (variantIdsWithAssociatedPhenotype.size() > 0){
+                    }
+
+                } else if ( hasPhenotypeRestriction ) {
+
+                    if ( variantIdsWithAssociatedPhenotype.size() > 0 ) {
                         variantIdsWithOverlap.add( vId );
                     }
-                    
-                }else if(hasSecondaryOverlapRestriction){
-                    if (variantIdsMeetingSecondaryRestriction.size() > 0){
+
+                } else if ( hasSecondaryOverlapRestriction ) {
+                    if ( variantIdsMeetingSecondaryRestriction.size() > 0 ) {
                         variantIdsWithOverlap.add( vId );
                     }
                 }
-                
-            } else if (infos.size() > 0){
+
+            } else if ( infos.size() > 0 ) {
                 variantIdsWithOverlap.add( vId );
             }
 
@@ -350,29 +381,74 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         return r != null && r.getValue() != null && r.getOperator() != null;
     }
-    
-    
-  //This will be the case where the user asks: show me variants that "do"/"do not" overlap with  x number of variants in DGV/DECIPHER
-    private Boolean meetsSecondaryOverlapRestriction(SimpleRestriction overlapRestriction, Collection<Variant2SpecialVariantOverlap> overlaps){
-        
+
+    // This will be the case where the user asks: show me variants that "do"/"do not" overlap with x number of variants
+    // in DGV/DECIPHER
+    private Boolean meetsSecondaryOverlapRestriction( SimpleRestriction overlapRestriction,
+            Collection<Variant2SpecialVariantOverlap> overlaps ) {
+
         Operator o = overlapRestriction.getOperator();
-        
-        NumericValue numeric = (NumericValue)overlapRestriction.getValue();
-        
+
+        NumericValue numeric = ( NumericValue ) overlapRestriction.getValue();
+
         Integer value = numeric.getValue();
-                
-        if (o.equals( Operator.NUMERIC_GREATER)){            
+
+        if ( o.equals( Operator.NUMERIC_GREATER ) ) {
             return overlaps.size() > value;
-        }else if (o.equals( Operator.NUMERIC_LESS)){            
+        } else if ( o.equals( Operator.NUMERIC_LESS ) ) {
             return overlaps.size() < value;
-        }else if (o.equals( Operator.NUMERIC_EQUAL)){            
+        } else if ( o.equals( Operator.NUMERIC_EQUAL ) ) {
             return overlaps.size() == value;
-        }else if (o.equals( Operator.NUMERIC_NOT_EQUAL)){            
+        } else if ( o.equals( Operator.NUMERIC_NOT_EQUAL ) ) {
             return overlaps.size() != value;
         }
-        
+
         return false;
-        
+
+    }
+
+    private Boolean meetsTertiaryOverlapRestriction( SimpleRestriction overlapRestriction,
+            Collection<Variant2SpecialVariantOverlap> overlaps ) {
+
+        Set<String> supportSet = new HashSet<String>();
+
+        // note all of these overlaps are associated with the same variantId
+        for ( Variant2SpecialVariantOverlap overlap : overlaps ) {
+
+            Variant v = load( overlap.getOverlapSpecialVariantId() );
+
+            String supportKey = projectDao.load( overlap.getOverlapProjectId() ).getVariantSupportCharacteristicKey();
+
+            for ( Characteristic c : v.getCharacteristics() ) {
+
+                if ( c.getKey().equals( supportKey ) && c.getValue() != null ) {
+
+                    supportSet.add( c.getValue() );
+
+                }
+
+            }
+
+        }
+
+        Operator o = overlapRestriction.getOperator();
+
+        NumericValue numeric = ( NumericValue ) overlapRestriction.getValue();
+
+        Integer value = numeric.getValue();
+
+        if ( o.equals( Operator.NUMERIC_GREATER ) ) {
+            return supportSet.size() > value;
+        } else if ( o.equals( Operator.NUMERIC_LESS ) ) {
+            return supportSet.size() < value;
+        } else if ( o.equals( Operator.NUMERIC_EQUAL ) ) {
+            return supportSet.size() == value;
+        } else if ( o.equals( Operator.NUMERIC_NOT_EQUAL ) ) {
+            return supportSet.size() != value;
+        }
+
+        return false;
+
     }
 
     private List<Long> getPhenoAssociatedVariantIdsForProjects( ProjectOverlapFilterConfig overlapFilter ) {
@@ -405,25 +481,25 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         return ids;
 
     }
-    
-    private List<Long> getVariantIdsForProjects(Collection<Long> projectIds){
-    
-    ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();
-    projectFilterConfig.setProjectIds( projectIds );
 
-    Set<AspireDbFilterConfig> filterSet = new HashSet<AspireDbFilterConfig>();
-    filterSet.add( projectFilterConfig );
+    private List<Long> getVariantIdsForProjects( Collection<Long> projectIds ) {
 
-    List<Long> projectsVariantIds = new ArrayList<Long>();
+        ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();
+        projectFilterConfig.setProjectIds( projectIds );
 
-    try {
-        // get the variantIds of all the variants in the activeProjects to iterate over later and search for overlap
-        projectsVariantIds = getFilteredIds( filterSet );
-    } catch ( Exception e ) {
-        log.error( "exception while getting projectOverlapIds" );
-    }
-    
-    return projectsVariantIds;
-    
+        Set<AspireDbFilterConfig> filterSet = new HashSet<AspireDbFilterConfig>();
+        filterSet.add( projectFilterConfig );
+
+        List<Long> projectsVariantIds = new ArrayList<Long>();
+
+        try {
+            // get the variantIds of all the variants in the activeProjects to iterate over later and search for overlap
+            projectsVariantIds = getFilteredIds( filterSet );
+        } catch ( Exception e ) {
+            log.error( "exception while getting projectOverlapIds" );
+        }
+
+        return projectsVariantIds;
+
     }
 }

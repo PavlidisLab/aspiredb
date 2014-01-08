@@ -148,7 +148,7 @@ public class PhenotypeUtil {
 
     private void loadOntology() {
         HumanPhenotypeOntologyService humanPhenotypeOntology = os.getHumanPhenotypeOntologyService();
-        humanPhenotypeOntology.startInitializationThread( false );
+        humanPhenotypeOntology.startInitializationThread( true );
         int c = 0;
 
         try {

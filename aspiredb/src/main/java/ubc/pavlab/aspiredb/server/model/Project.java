@@ -51,6 +51,10 @@ public class Project implements Securable {
     //e.g. DECIPHER or DGV data
     @Column(name = "SPECIAL_DATA")
     private Boolean specialData;
+    
+    //currently just for DGV data, the string referring to what characteristic will define the variants 'support', for DGV 'pubmedid'
+    @Column(name = "SPECIAL_DATA_SUPPORT_CHARACTERISTIC_KEY")
+    private String variantSupportCharacteristicKey;
 
     public Project() {
     }
@@ -89,6 +93,14 @@ public class Project implements Securable {
 
     public List<Subject> getSubjects() {
         return subjects;
+    }
+
+    public String getVariantSupportCharacteristicKey() {
+        return variantSupportCharacteristicKey;
+    }
+
+    public void setVariantSupportCharacteristicKey( String variantSupportCharacteristicKey ) {
+        this.variantSupportCharacteristicKey = variantSupportCharacteristicKey;
     }
 
     public static ProjectValueObject convertToValueObject( Project project ) {
