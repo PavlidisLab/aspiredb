@@ -267,6 +267,8 @@ public class VariantUploadService {
             cnv.setType( CnvType.LOSS.name());
         } else if ( variantsubtype.equals( "Gain+Loss" ) ) {
             cnv.setType( CnvType.GAINLOSS.name() );
+        }else if ( variantsubtype.equals( "CNV" ) ) {
+            cnv.setType( CnvType.UNKNOWN.name() );
         }else{
             
             log.info("unrecognized variant subtype: "+variantsubtype);
