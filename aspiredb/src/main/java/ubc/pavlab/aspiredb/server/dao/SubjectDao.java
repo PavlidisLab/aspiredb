@@ -23,6 +23,7 @@ import org.springframework.security.access.annotation.Secured;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
+import ubc.pavlab.aspiredb.shared.query.PhenotypeFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
@@ -41,7 +42,10 @@ public interface SubjectDao extends SecurableDaoBase<Subject>, RemotePaging<Subj
 
     @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
     public Collection<Subject> findByLabel( LabelValueObject labelEntity );
-    
+
     @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
-    public Collection<Subject> loadByVariantIds(List<Long> variantIds );
+    public Collection<Subject> findByPhenotype( PhenotypeFilterConfig filter );
+
+    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
+    public Collection<Subject> loadByVariantIds( List<Long> variantIds );
 }

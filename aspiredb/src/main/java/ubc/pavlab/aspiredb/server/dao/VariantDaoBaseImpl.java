@@ -36,7 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.model.Characteristic;
-import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
@@ -80,6 +79,9 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
     @Autowired
     private Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
+
+    @Autowired
+    private SubjectDao subjectDao;
 
     @Autowired
     private ProjectDao projectDao;
@@ -197,6 +199,16 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
             return this.getProjectOverlapIds( ( ProjectOverlapFilterConfig ) filter );
 
+        } else if ( filter instanceof PhenotypeFilterConfig ) {
+            List<Variant> variants = findByPhenotype( ( PhenotypeFilterConfig ) filter );
+
+            ArrayList<Long> variantIds = new ArrayList<Long>();
+
+            for ( Variant v : variants ) {
+                variantIds.add( v.getId() );
+            }
+
+            return variantIds;
         }
 
         Session session = this.getSessionFactory().getCurrentSession();
@@ -207,6 +219,21 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         log.info( " criteria.list() in findIds" );
         criteria.setProjection( Projections.distinct( Projections.id() ) );
         return criteria.list();
+    }
+
+    /**
+     * Returns list of IDs that satisfy the PhenotypeFilter. Get a list of Subjects first then get the list of all the
+     * Variants for that Subject. This is done for performance reasons.
+     * 
+     * @param filterConfig
+     */
+    public List<Variant> findByPhenotype( PhenotypeFilterConfig filterConfig ) {
+
+        Collection<Subject> subjects = subjectDao.findByPhenotype( filterConfig );
+
+        return this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
+                .add( Restrictions.in( "subject", subjects ) ).list();
+
     }
 
     // - use Factory pattern with registration? to map config to appropriate filter subclass
@@ -229,14 +256,6 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
             criteria.createAlias( "subject", "subject" ).createAlias( "subject.labels", "subject_label",
                     CriteriaSpecification.LEFT_JOIN );
             criteria.add( criterion );
-        } else if ( filter.getClass() == PhenotypeFilterConfig.class ) {
-            PhenotypeFilterConfig filterConfig = ( PhenotypeFilterConfig ) filter;
-            filterConfig = phenotypeUtils.expandOntologyTerms( filterConfig, filterConfig.getActiveProjectIds() );
-            RestrictionExpression restrictionExpression = filterConfig.getRestriction();
-            Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
-                    CriteriaBuilder.EntityType.VARIANT );
-            criteria.createAlias( "subject", "subject" ).createAlias( "subject.phenotypes", "phenotype" );
-            criteria.add( junction );
         }
     }
 
@@ -284,7 +303,8 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         log.info( "Iterating through variants in projectids:" + overlapFilter.getProjectIds()
                 + " for overlap with variants in projectids:" + overlapFilter.getOverlapProjectIds()
                 + "\n hasOverlapRestriction:" + hasOverlapRestriction + " hasSecondaryOverlapRestriction:"
-                + hasSecondaryOverlapRestriction +" hasTertiaryOverlapRestriction: "+ hasTertiaryOverlapRestriction + " hasPhenotypeRestriction:" + hasPhenotypeRestriction );
+                + hasSecondaryOverlapRestriction + " hasTertiaryOverlapRestriction: " + hasTertiaryOverlapRestriction
+                + " hasPhenotypeRestriction:" + hasPhenotypeRestriction );
 
         // Iterate over all variants in active Projects to see if they meet the restriction criteria
         for ( Long vId : activeProjectsVariantIds ) {
