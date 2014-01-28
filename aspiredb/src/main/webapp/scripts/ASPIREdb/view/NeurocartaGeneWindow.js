@@ -26,6 +26,7 @@ Ext.define('ASPIREdb.view.NeurocartaGeneWindow', {
 	title : 'Genes associated with phenotype in Phenocarta',
 	closable : true,
 	closeAction : 'hide',
+	constrain:true,
 	width : 800,
 	height : 500,
 	layout : 'fit',
