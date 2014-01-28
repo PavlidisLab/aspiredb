@@ -29,6 +29,18 @@ Ext.define('ASPIREdb.ActiveProjectSettings', {
         });
         return ids;
     },
+    /**
+     * ToDo: Need to be changed once we implement more than one project
+     * 
+     */
+    getActiveProjectName: function () {
+        var name = '';
+        this.store.each(function (record) {
+            name=record.data.name;
+            return false;
+        });
+        return name;
+    },
 
     setActiveProject: function (project) {
         this.store.removeAll();
