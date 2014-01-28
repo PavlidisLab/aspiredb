@@ -16,9 +16,11 @@ package ubc.pavlab.aspiredb.server.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.time.StopWatch;
@@ -233,6 +235,38 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         return this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
                 .add( Restrictions.in( "subject", subjects ) ).list();
+
+    }
+
+    /**
+     * Returns list of Subject and Variant IDs that satisfy the PhenotypeFilter. 
+     * Get a list of Subjects first then get the list of all the Variants for that Subject. 
+     * This is done for performance reasons. {@link Bug#3892}
+     * 
+     * @param filterConfig
+     * @return key = {@link VariantDao#SUBJECT_IDS_KEY} and {@link VariantDao#VARIANT_IDS_KEY}
+     */
+    public Map<Integer, Collection<Long>> getSubjectVariantIdsByPhenotype( PhenotypeFilterConfig filterConfig ) {
+
+        Collection<Subject> subjects = subjectDao.findByPhenotype( filterConfig );
+        Collection<Variant> variants = this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
+                .add( Restrictions.in( "subject", subjects ) ).list();
+
+        Collection<Long> subjectIds = new HashSet<Long>();
+        Collection<Long> variantIds = new HashSet<Long>();
+
+        for ( Subject s : subjects ) {
+            subjectIds.add( s.getId() );
+        }
+        for ( Variant v : variants ) {
+            variantIds.add( v.getId() );
+        }
+        
+        Map<Integer, Collection<Long>> map = new HashMap<Integer, Collection<Long>>();
+        map.put( VariantDao.SUBJECT_IDS_KEY, subjectIds );
+        map.put( VariantDao.VARIANT_IDS_KEY, variantIds );
+
+        return map;
 
     }
 

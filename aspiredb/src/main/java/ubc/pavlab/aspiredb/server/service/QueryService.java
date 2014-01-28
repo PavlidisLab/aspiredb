@@ -17,13 +17,13 @@ package ubc.pavlab.aspiredb.server.service;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
-import ubc.pavlab.aspiredb.shared.AspireDbPagingLoadConfig;
 import ubc.pavlab.aspiredb.shared.BoundedList;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
@@ -41,11 +41,11 @@ import com.sencha.gxt.data.shared.loader.PagingLoadResult;
  */
 public interface QueryService {
 
-    public BoundedList<SubjectValueObject> querySubjects( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException, ExternalDependencyException;
+    public BoundedList<SubjectValueObject> querySubjects( Set<AspireDbFilterConfig> filters )
+            throws NotLoggedInException, ExternalDependencyException;
 
-    public BoundedList<VariantValueObject> queryVariants( Set<AspireDbFilterConfig> filters) throws NotLoggedInException, ExternalDependencyException;
-
-   
+    public BoundedList<VariantValueObject> queryVariants( Set<AspireDbFilterConfig> filters )
+            throws NotLoggedInException, ExternalDependencyException;
 
     public PagingLoadResult<OntologyTermValueObject> getOntologyTermSuggestions( String query );
 
@@ -77,10 +77,22 @@ public interface QueryService {
 
     public void deleteQuery( String name );
 
-    public int getSubjectCount( Set<AspireDbFilterConfig> filters )
-            throws NotLoggedInException, ExternalDependencyException;
+    public int getSubjectCount( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException,
+            ExternalDependencyException;
 
-    public int getVariantCount( Set<AspireDbFilterConfig> filters )
+    public int getVariantCount( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException,
+            ExternalDependencyException;
+
+    /**
+     * Combination of {@link QueryService#getSubjectCount(Set)} and {@link QueryService#getVariantCount(Set)} that
+     * avoids redundant filtering.
+     * 
+     * @param filters
+     * @return
+     * @throws NotLoggedInException
+     * @throws ExternalDependencyException
+     */
+    public Map<Integer, Integer> getSubjectVariantCounts( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException;
 
     // // TODO: To be removed
