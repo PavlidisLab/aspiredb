@@ -436,7 +436,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         }
         
-        if(overlapFilter.getInvert()){
+        if(overlapFilter.getInvert()!= null && overlapFilter.getInvert()){
             
             activeProjectsVariantIds.removeAll( variantIdsSatisfyingRestrictions );
             
