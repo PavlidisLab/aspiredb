@@ -117,7 +117,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 				},
 				items : [ {
 					xtype : 'button',
-					flex : 1,
+					flex : 2,
 					text : 'Preview query',
 					itemId : 'previewQueryButton',
 					handler : me.previewQueryHandler,
@@ -133,6 +133,13 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 						ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);
 						me.close();
 					}
+				}, {
+					xtype : 'button',
+					flex : 2,
+					text : 'Save query',
+					itemId : 'saveQueryButton',
+					handler : me.saveQueryHandler,
+					scope : me
 				},  {
 					xtype : 'button',
 					flex : 1,
