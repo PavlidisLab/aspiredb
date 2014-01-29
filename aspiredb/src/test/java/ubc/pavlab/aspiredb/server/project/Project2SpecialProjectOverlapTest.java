@@ -101,8 +101,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
     final String patientIdWithOverlap = RandomStringUtils.randomAlphabetic( 5 );
     final String projectNameWithOverlap = RandomStringUtils.randomAlphabetic( 5 );
 
-    final String patientIdWithNoOverlap = RandomStringUtils.randomAlphabetic( 5 );
-    final String projectIdWithNoOverlap = RandomStringUtils.randomAlphabetic( 5 );
+   
 
     @Before
     public void setup() throws Exception {
@@ -158,29 +157,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         }
 
-        ArrayList<VariantValueObject> cnvListWithNoOverlap = new ArrayList<VariantValueObject>();
-
-        cnvListWithNoOverlap.add( getCNV( "4", 3000, 23400, null, patientIdWithNoOverlap ) );
-
-        cnvListWithNoOverlap.add( getCNV( "5", 500, 237000, null, patientIdWithNoOverlap ) );
-
-        cnvListWithNoOverlap.add( getCNV( "6", 100, 500, null, patientIdWithNoOverlap ) );
-
-        cnvListWithNoOverlap.add( getCNV( "7", 500, 7000, null, patientIdWithNoOverlap ) );
-
-        cnvListWithNoOverlap.add( getCNV( "8", 4000, 50000, null, patientIdWithNoOverlap ) );
-
-        cnvListWithNoOverlap.add( getCNV( "9", 30, 2340, null, patientIdWithNoOverlap ) );
-
-        try {
-
-            projectManager.addSubjectVariantsToProject( projectIdWithNoOverlap, true, cnvListWithNoOverlap );
-
-        } catch ( Exception e ) {
-
-            fail( "projectManager.addSubjectVariantsToProject threw an exception:" + e.toString() );
-
-        }
+        
 
         Collection<Project> overlapProjects = projectDao.getOverlapProjects();
         Collection<Long> overlapProjectIds = new ArrayList<Long>();
@@ -208,16 +185,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         }
         
-        try {
-          
-            projectManager.populateSpecialProjectOverlap( projectName, projectIdWithNoOverlap );
        
-
-        } catch ( Exception e ) {
-
-            fail( "projectManager.populateSpecialProjectOverlap threw an exception:" + e.toString() );
-
-        }
         
         
         
@@ -229,7 +197,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
     public void tearDown() throws Exception {
         helper.deleteProject(projectName);
         helper.deleteProject(projectNameWithOverlap);
-        helper.deleteProject(projectIdWithNoOverlap);
+        
     }
     
    
