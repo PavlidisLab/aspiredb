@@ -150,5 +150,19 @@ public class Variant2SpecialVariantOverlapDaoImpl extends DaoBaseImpl<Variant2Sp
     
     }
     
+    @Override
+    @Transactional
+    public void deleteByOverlapProjectIds( Collection<Long> ids ) {
+                
+        for (Long id: ids){
+        
+            Collection<Variant2SpecialVariantOverlap>overlaps = loadByOverlapProjectId(id);
+        
+            this.getHibernateTemplate().deleteAll( overlaps );
+        
+        }
+    
+    }
+    
     
 }

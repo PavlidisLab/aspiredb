@@ -84,7 +84,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
     PersistentTestObjectHelper helper;
 
     final String patientId = RandomStringUtils.randomAlphabetic( 5 );
-    final String projectId = RandomStringUtils.randomAlphabetic( 5 );
+    final String projectName = RandomStringUtils.randomAlphabetic( 7 );
 
     final String userVariantId = RandomStringUtils.randomAlphabetic( 5 );
     
@@ -99,7 +99,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
     final String overlapVariantId5 = RandomStringUtils.randomAlphabetic( 5 );
 
     final String patientIdWithOverlap = RandomStringUtils.randomAlphabetic( 5 );
-    final String projectIdWithOverlap = RandomStringUtils.randomAlphabetic( 5 );
+    final String projectNameWithOverlap = RandomStringUtils.randomAlphabetic( 5 );
 
     final String patientIdWithNoOverlap = RandomStringUtils.randomAlphabetic( 5 );
     final String projectIdWithNoOverlap = RandomStringUtils.randomAlphabetic( 5 );
@@ -119,7 +119,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         try {
 
-            projectManager.addSubjectVariantsToProject( projectId, true, cnvList );
+            projectManager.addSubjectVariantsToProject( projectName, true, cnvList );
 
         } catch ( Exception e ) {
 
@@ -150,7 +150,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         try {
 
-            projectManager.addSubjectVariantsToProject( projectIdWithOverlap, true, cnvListWithOverlap );
+            projectManager.addSubjectVariantsToProject( projectNameWithOverlap, true, cnvListWithOverlap );
 
         } catch ( Exception e ) {
 
@@ -182,13 +182,24 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         }
 
+        Collection<Project> overlapProjects = projectDao.getOverlapProjects();
+        Collection<Long> overlapProjectIds = new ArrayList<Long>();
+        
+        for (Project p: overlapProjects){
+            
+            overlapProjectIds.add( p.getId() );            
+            
+        }
+        
+        
+        
+        variant2SpecialVariantOverlapDao.deleteByOverlapProjectIds(overlapProjectIds);
+        
         try {
 
+           
             
-            Project projectWithOverlap = projectDao.findByProjectName( projectIdWithOverlap );
-            
-            variant2SpecialVariantOverlapDao.deleteByOverlapProjectId( projectWithOverlap.getId() );
-            projectManager.populateSpecialProjectOverlap( projectId, projectIdWithOverlap );
+            projectManager.populateSpecialProjectOverlap( projectName, projectNameWithOverlap );
        
 
         } catch ( Exception e ) {
@@ -198,12 +209,8 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         }
         
         try {
-            
-            Project projectWithNoOverlap = projectDao.findByProjectName( projectIdWithNoOverlap );
-            
-            variant2SpecialVariantOverlapDao.deleteByOverlapProjectId( projectWithNoOverlap.getId() );
-
-            projectManager.populateSpecialProjectOverlap( projectId, projectIdWithNoOverlap );
+          
+            projectManager.populateSpecialProjectOverlap( projectName, projectIdWithNoOverlap );
        
 
         } catch ( Exception e ) {
@@ -220,8 +227,8 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
     
     @After
     public void tearDown() throws Exception {
-        helper.deleteProject(projectId);
-        helper.deleteProject(projectIdWithOverlap);
+        helper.deleteProject(projectName);
+        helper.deleteProject(projectNameWithOverlap);
         helper.deleteProject(projectIdWithNoOverlap);
     }
     
@@ -231,9 +238,9 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         super.runAsAdmin();
 
-        Project projectToPopulate = projectDao.findByProjectName( projectId );
+        Project projectToPopulate = projectDao.findByProjectName( projectName );
 
-        Project specialProject = projectDao.findByProjectName( projectIdWithOverlap );
+        Project specialProject = projectDao.findByProjectName( projectNameWithOverlap );
 
         ProjectFilterConfig projectToPopulateFilterConfig = getProjectFilterConfigById( projectToPopulate );
 

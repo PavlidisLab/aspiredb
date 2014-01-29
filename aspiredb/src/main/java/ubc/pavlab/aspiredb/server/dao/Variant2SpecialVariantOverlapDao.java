@@ -35,4 +35,6 @@ public interface Variant2SpecialVariantOverlapDao extends DaoBase<Variant2Specia
     public Collection<Variant2SpecialVariantOverlap> loadByOverlapProjectId(Long overlapProjectId);
     
     public void deleteByOverlapProjectId( Long id );
+    
+    public void deleteByOverlapProjectIds( Collection<Long> ids );
 }
