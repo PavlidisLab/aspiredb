@@ -99,7 +99,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
     final String overlapVariantId5 = RandomStringUtils.randomAlphabetic( 5 );
 
     final String patientIdWithOverlap = RandomStringUtils.randomAlphabetic( 5 );
-    final String projectNameWithOverlap = RandomStringUtils.randomAlphabetic( 5 );
+    final String projectNameWithOverlap = "DGV";
 
    
 
@@ -149,7 +149,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         try {
 
-            projectManager.addSubjectVariantsToProject( projectNameWithOverlap, true, cnvListWithOverlap );
+            projectManager.addSubjectVariantsToSpecialProject( projectNameWithOverlap, true, cnvListWithOverlap, false );
 
         } catch ( Exception e ) {
 
