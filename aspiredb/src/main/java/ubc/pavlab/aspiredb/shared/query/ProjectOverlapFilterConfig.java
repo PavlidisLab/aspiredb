@@ -36,7 +36,8 @@ public class ProjectOverlapFilterConfig extends CompoundRestrictionFilterConfig 
 	//the projects that you want to search for overlap
 	private Collection<Long> overlapProjectIds;
 	
-	//May want to incorporate Conjunction/Disjunction object graphs at some point to make these more complex, keep it simple for now
+	public Boolean invert;
+	
 	private PhenotypeRestriction phenotypeRestriction;
 					
 	public ProjectOverlapFilterConfig() {
@@ -68,6 +69,14 @@ public class ProjectOverlapFilterConfig extends CompoundRestrictionFilterConfig 
 
     public void setPhenotypeRestriction( PhenotypeRestriction phenotypeRestriction ) {
         this.phenotypeRestriction = phenotypeRestriction;
+    }
+
+    public Boolean getInvert() {
+        return invert;
+    }
+
+    public void setInvert( Boolean invert ) {
+        this.invert = invert;
     }
 
     

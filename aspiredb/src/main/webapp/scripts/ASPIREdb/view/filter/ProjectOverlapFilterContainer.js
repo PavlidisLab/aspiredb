@@ -91,6 +91,8 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 				
 		projectOverlapConfig.phenotypeRestriction = filterContainer.getComponent('phenRestriction').getRestrictionExpression();
 		
+		projectOverlapConfig.invert = filterContainer.getComponent('invertCheckbox').getValue();
+		
 		return projectOverlapConfig;
 	},
 
@@ -156,6 +158,12 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 		var getNewVariantSupportOverlapItem = this.getNewOverlapItemFunction(VariantService.suggestPropertiesForSupportOfVariantsInProjectOverlap, this.getPropertyStore3(), 'supportOfVariantsOverlapItem');
 
 		var supportOfVariantsOverlapItem = getNewVariantSupportOverlapItem();
+		
+		filterContainer.insert(0,{xtype:"checkbox", itemId:"invertCheckbox" });
+		filterContainer.insert(0, {
+			xtype : 'label',
+			text : 'Invert Filter: '
+		});
 		
 		filterContainer.insert(0, {xtype: 'filter_phenotype_property', itemId : 'phenRestriction' });
 		filterContainer.insert(0, {
