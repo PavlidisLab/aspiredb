@@ -419,7 +419,7 @@
 							<driver>com.mysql.jdbc.Driver</driver>
 							<username>${aspiredb.db.build.user}</username>
 							<password>${aspiredb.db.build.password}</password>
-							<onError>continue</onError>
+							<onError>abort</onError>
 							<autocommit>true</autocommit>
 						</configuration>
 						<executions>
@@ -452,6 +452,7 @@
 										<srcFile>target/hibernate3/sql/schema.sql</srcFile>
 										<srcFile>src/main/resources/sql/init-acls.sql</srcFile>
 										<srcFile>src/main/resources/sql/init-entities.sql</srcFile>
+										<srcFile>src/main/resources/sql/init-indices.sql</srcFile>
 									</srcFiles>
 									<onError>abort</onError>
 								</configuration>
@@ -461,6 +462,76 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+            <id>db.build</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>db.build</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>sql-maven-plugin</artifactId>
+                        <version>1.5</version>
+                        <dependencies><!-- specify the dependent JDBC driver here -->
+                            <dependency>
+                                <groupId>mysql</groupId>
+                                <artifactId>mysql-connector-java</artifactId>
+                                <version>5.1.10</version>
+                                <type>jar</type>
+                            </dependency>
+                        </dependencies>
+                        <!-- common configuration shared by all executions -->
+                        <configuration>
+                            <driver>com.mysql.jdbc.Driver</driver>
+                            <username>${aspiredb.db.build.user}</username>
+                            <password>${aspiredb.db.build.password}</password>
+                            <onError>abort</onError>
+                            <autocommit>true</autocommit>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>drop-add-db</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <url>${bootstrap.db.url}</url>
+                                    <autocommit>false</autocommit>
+                                    <sqlCommand>
+                                    <![CDATA[
+                                        drop database if exists ${aspiredb.db.name};
+                                    create database ${aspiredb.db.name}
+                                        ]]>
+                                    </sqlCommand>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>load-db-schema</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <url>${aspiredb.db.build.url}</url>
+                                    <srcFiles>
+                                        <srcFile>target/hibernate3/sql/schema.sql</srcFile>
+                                        <srcFile>src/main/resources/sql/init-acls.sql</srcFile>
+                                        <srcFile>src/main/resources/sql/init-entities.sql</srcFile>
+                                        <srcFile>src/main/resources/sql/init-indices.sql</srcFile>
+                                    </srcFiles>
+                                    <onError>abort</onError>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 		<profile>
 			<!-- For deployment where host is local (and ssh isn't available for builder, 
 				e.g. CI) -->
@@ -490,5 +561,6 @@
 			</distributionManagement>
 		</profile>
 	</profiles>
+
 
 </project>

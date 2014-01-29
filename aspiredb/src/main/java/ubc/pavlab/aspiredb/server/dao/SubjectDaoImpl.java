@@ -63,7 +63,7 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
 
     @Autowired
     private PhenotypeUtil phenotypeUtils;
-    
+
     @Autowired
     private VariantDao variantDao;
 
@@ -72,21 +72,21 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
         super( Subject.class );
         super.setSessionFactory( sessionFactory );
     }
-    
-    public Collection<Subject> loadByVariantIds(List<Long> variantIds ){
-        
+
+    public Collection<Subject> loadByVariantIds( List<Long> variantIds ) {
+
         Collection<Variant> variants = variantDao.load( variantIds );
-        
+
         HashSet<Subject> subjects = new HashSet<Subject>();
-        
-        for (Variant v: variants){
-            
+
+        for ( Variant v : variants ) {
+
             subjects.add( v.getSubject() );
-            
+
         }
-        
+
         return subjects;
-        
+
     }
 
     @Override
@@ -158,7 +158,6 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
         return criteria.list();
     }
 
-       
     @Override
     @Transactional(readOnly = true)
     public Page<? extends Subject> loadPage( int offset, int limit, String sortProperty, String sortDirection,
@@ -206,6 +205,7 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
 
     private List<Long> findIds( AspireDbFilterConfig filter ) throws BioMartServiceException,
             NeurocartaServiceException {
+
         
         if (filter instanceof ProjectOverlapFilterConfig){
             
@@ -213,16 +213,27 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
             
             Collection<Subject> subjects= this.loadByVariantIds( variantIds );
             
+
             ArrayList<Long> subjectIds = new ArrayList<Long>();
-            
-            for (Subject s: subjects){
+
+            for ( Subject s : subjects ) {
                 subjectIds.add( s.getId() );
             }
-            
+
             return subjectIds;
-            
+
+        } else if ( filter instanceof PhenotypeFilterConfig ) {
+            Collection<Subject> subjects = findByPhenotype( ( PhenotypeFilterConfig ) filter );
+
+            ArrayList<Long> subjectIds = new ArrayList<Long>();
+
+            for ( Subject s : subjects ) {
+                subjectIds.add( s.getId() );
+            }
+
+            return subjectIds;
         }
-        
+
         Session session = this.getSessionFactory().getCurrentSession();
         Criteria criteria = session.createCriteria( Subject.class );
         addSingleFilter( filter, criteria );
@@ -250,18 +261,25 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
             criteria.createAlias( "projects", "project" ).add(
                     Restrictions.in( "project.id", projectFilter.getProjectIds() ) );
 
-        } else if ( filter.getClass() == PhenotypeFilterConfig.class ) {
-            PhenotypeFilterConfig filterConfig = ( PhenotypeFilterConfig ) filter;
-
-            filterConfig = phenotypeUtils.expandOntologyTerms( filterConfig, filterConfig.getActiveProjectIds() );
-
-            RestrictionExpression restrictionExpression = filterConfig.getRestriction();
-
-            criteria.createAlias( "phenotypes", "phenotype" );
-            Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
-                    CriteriaBuilder.EntityType.SUBJECT );
-            criteria.add( junction );
         }
+    }
+
+    public Collection<Subject> findByPhenotype( PhenotypeFilterConfig filterConfig ) {
+
+        Session session = this.getSessionFactory().getCurrentSession();
+        Criteria criteria = session.createCriteria( Subject.class );
+
+        filterConfig = phenotypeUtils.expandOntologyTerms( filterConfig, filterConfig.getActiveProjectIds() );
+
+        RestrictionExpression restrictionExpression = filterConfig.getRestriction();
+
+        criteria.createAlias( "phenotypes", "phenotype" );
+        Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
+                CriteriaBuilder.EntityType.SUBJECT );
+        criteria.add( junction );
+
+        return criteria.list();
+
     }
 
     private void addSingleVariantFilter( RestrictionExpression restrictionExpression, Criteria criteria ) {
@@ -270,17 +288,16 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
         // .createAlias("variant.labels", "variant_label", CriteriaSpecification.LEFT_JOIN)
                 .createAlias( "variant.characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN );
         Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
-                CriteriaBuilder.EntityType.SUBJECT  );
-		criteria.add( junction );
-	}
+                CriteriaBuilder.EntityType.SUBJECT );
+        criteria.add( junction );
+    }
 
-	@Override
-	@Transactional(readOnly = true)
-	@Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
-	public Collection<? extends Subject> load(Set<AspireDbFilterConfig> filters)
-            throws BioMartServiceException, NeurocartaServiceException {
-		return loadPage(0, 2000, null, null, filters);
-	}
-	
-	
+    @Override
+    @Transactional(readOnly = true)
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    public Collection<? extends Subject> load( Set<AspireDbFilterConfig> filters ) throws BioMartServiceException,
+            NeurocartaServiceException {
+        return loadPage( 0, 2000, null, null, filters );
+    }
+
 }

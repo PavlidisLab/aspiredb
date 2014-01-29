@@ -303,19 +303,17 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 
 		var me = this;
 		
-		me.setLoading(true);
-        
-		QueryService.getSubjectCount( this.getFilterConfigs(), {
-			callback : function(totalSize) {
-				me.down('#numberOfSubjectsLabel').setText(totalSize.toString());
-			}
-		});
+		var SUBJECT_IDS_KEY = 0;
+		var VARIANT_IDS_KEY = 1;
 		
-		QueryService.getVariantCount( this.getFilterConfigs(), {
-			callback : function(totalSize) {
-				me.down('#numberOfVariantsLabel').setText(totalSize.toString());
-				me.setLoading(false);
-			}
+		me.setLoading(true);
+		
+		QueryService.getSubjectVariantCounts(this.getFilterConfigs(), {
+		    callback : function(totalCounts) {
+                me.down('#numberOfSubjectsLabel').setText(totalCounts[SUBJECT_IDS_KEY].toString());
+                me.down('#numberOfVariantsLabel').setText(totalCounts[VARIANT_IDS_KEY].toString());
+                me.setLoading(false);
+            }
 		});
 		
 	},

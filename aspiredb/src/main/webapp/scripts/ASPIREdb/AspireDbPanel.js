@@ -80,6 +80,18 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 				aspireDbPanel.down('#message').setText('You are logged in as ' + username);
 			}
 		} );
+		
+		ASPIREdb.EVENT_BUS.on('project_select', function(event) {
+			
+			//todo :Add select the project to title bar
+			var projecttitle = ASPIREdb.ActiveProjectSettings.getActiveProjectName();
+			aspireDbPanel.down('#projectTitle').setText('Active Project:  ' + projecttitle);
+		});
+		
+		
+		
+		
+		
 	},
 	
 	disableToolbarButtonsForDashboard: function(yes){
@@ -172,6 +184,13 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			handler : function() {
 				window.open("http://aspiredb.sites.olt.ubc.ca/", "_blank", "");
 			}
+		}, {
+			xtype : 'label',
+			itemId : 'projectTitle',
+			style : 'vertical-align : middle; padding-top : 10px',
+			height : 30,
+			margin : '5 5 5 5',
+			flex : 1
 		}, {
 			xtype : 'label',
 			itemId : 'message',

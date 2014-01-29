@@ -68,6 +68,8 @@ Ext.define('ASPIREdb.view.DashboardWindow', {
 				}
 
 			});
+			
+			
 
 		});
 
@@ -80,10 +82,10 @@ Ext.define('ASPIREdb.view.DashboardWindow', {
 					projectComboBox.setActiveError('Please select project');
 					return;
 				}
-
+				
 				ASPIREdb.ActiveProjectSettings.setActiveProject([ {
 					id : projectComboBox.getValue(),
-					name : projectComboBox.getName(),
+					name : projectComboBox.getRawValue(),
 					description : ''
 				} ]);
 
@@ -97,6 +99,7 @@ Ext.define('ASPIREdb.view.DashboardWindow', {
 				
 				console.log("query_update event from DashboardWindow");
 				ASPIREdb.EVENT_BUS.fireEvent('query_update');
+				ASPIREdb.EVENT_BUS.fireEvent('project_select');
 				ref.close();
 
 			}

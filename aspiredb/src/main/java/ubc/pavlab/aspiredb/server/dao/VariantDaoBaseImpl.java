@@ -16,9 +16,11 @@ package ubc.pavlab.aspiredb.server.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.time.StopWatch;
@@ -36,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.model.Characteristic;
-import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
@@ -80,6 +81,9 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
     @Autowired
     private Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
+
+    @Autowired
+    private SubjectDao subjectDao;
 
     @Autowired
     private ProjectDao projectDao;
@@ -197,6 +201,16 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
             return this.getProjectOverlapVariantIds( ( ProjectOverlapFilterConfig ) filter );
 
+        } else if ( filter instanceof PhenotypeFilterConfig ) {
+            List<Variant> variants = findByPhenotype( ( PhenotypeFilterConfig ) filter );
+
+            ArrayList<Long> variantIds = new ArrayList<Long>();
+
+            for ( Variant v : variants ) {
+                variantIds.add( v.getId() );
+            }
+
+            return variantIds;
         }
 
         Session session = this.getSessionFactory().getCurrentSession();
@@ -207,6 +221,53 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         log.info( " criteria.list() in findIds" );
         criteria.setProjection( Projections.distinct( Projections.id() ) );
         return criteria.list();
+    }
+
+    /**
+     * Returns list of IDs that satisfy the PhenotypeFilter. Get a list of Subjects first then get the list of all the
+     * Variants for that Subject. This is done for performance reasons.
+     * 
+     * @param filterConfig
+     */
+    public List<Variant> findByPhenotype( PhenotypeFilterConfig filterConfig ) {
+
+        Collection<Subject> subjects = subjectDao.findByPhenotype( filterConfig );
+
+        return this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
+                .add( Restrictions.in( "subject", subjects ) ).list();
+
+    }
+
+    /**
+     * Returns list of Subject and Variant IDs that satisfy the PhenotypeFilter. 
+     * Get a list of Subjects first then get the list of all the Variants for that Subject. 
+     * This is done for performance reasons. {@link Bug#3892}
+     * 
+     * @param filterConfig
+     * @return key = {@link VariantDao#SUBJECT_IDS_KEY} and {@link VariantDao#VARIANT_IDS_KEY}
+     */
+    public Map<Integer, Collection<Long>> getSubjectVariantIdsByPhenotype( PhenotypeFilterConfig filterConfig ) {
+
+        Collection<Subject> subjects = subjectDao.findByPhenotype( filterConfig );
+        Collection<Variant> variants = this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
+                .add( Restrictions.in( "subject", subjects ) ).list();
+
+        Collection<Long> subjectIds = new HashSet<Long>();
+        Collection<Long> variantIds = new HashSet<Long>();
+
+        for ( Subject s : subjects ) {
+            subjectIds.add( s.getId() );
+        }
+        for ( Variant v : variants ) {
+            variantIds.add( v.getId() );
+        }
+        
+        Map<Integer, Collection<Long>> map = new HashMap<Integer, Collection<Long>>();
+        map.put( VariantDao.SUBJECT_IDS_KEY, subjectIds );
+        map.put( VariantDao.VARIANT_IDS_KEY, variantIds );
+
+        return map;
+
     }
 
     // - use Factory pattern with registration? to map config to appropriate filter subclass
@@ -229,14 +290,6 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
             criteria.createAlias( "subject", "subject" ).createAlias( "subject.labels", "subject_label",
                     CriteriaSpecification.LEFT_JOIN );
             criteria.add( criterion );
-        } else if ( filter.getClass() == PhenotypeFilterConfig.class ) {
-            PhenotypeFilterConfig filterConfig = ( PhenotypeFilterConfig ) filter;
-            filterConfig = phenotypeUtils.expandOntologyTerms( filterConfig, filterConfig.getActiveProjectIds() );
-            RestrictionExpression restrictionExpression = filterConfig.getRestriction();
-            Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
-                    CriteriaBuilder.EntityType.VARIANT );
-            criteria.createAlias( "subject", "subject" ).createAlias( "subject.phenotypes", "phenotype" );
-            criteria.add( junction );
         }
     }
 
@@ -505,7 +558,6 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         phenFilterSet.add( phenConfig );
 
         try {
-
             StopWatch timer = new StopWatch();
             timer.start();
 
