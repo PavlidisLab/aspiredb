@@ -209,7 +209,7 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
         
         if (filter instanceof ProjectOverlapFilterConfig){
             
-            List<Long> variantIds = variantDao.getProjectOverlapIds( (ProjectOverlapFilterConfig)filter );
+            List<Long> variantIds = variantDao.getProjectOverlapVariantIds( (ProjectOverlapFilterConfig)filter );
             
             Collection<Subject> subjects= this.loadByVariantIds( variantIds );
             

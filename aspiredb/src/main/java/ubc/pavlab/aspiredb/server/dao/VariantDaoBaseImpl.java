@@ -195,7 +195,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         // as it doesn't quite fit the same paradigm as the other filters I am breaking it off into its own method
         if ( filter instanceof ProjectOverlapFilterConfig ) {
 
-            return this.getProjectOverlapIds( ( ProjectOverlapFilterConfig ) filter );
+            return this.getProjectOverlapVariantIds( ( ProjectOverlapFilterConfig ) filter );
 
         }
 
@@ -250,7 +250,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         criteria.add( junction );
     }
 
-    public List<Long> getProjectOverlapIds( ProjectOverlapFilterConfig overlapFilter ) {
+    public List<Long> getProjectOverlapVariantIds( ProjectOverlapFilterConfig overlapFilter ) {
 
         List<Long> activeProjectsVariantIds = getVariantIdsForProjects( overlapFilter.getProjectIds() );
 
@@ -266,10 +266,10 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
             overlapProjsPhenoAssociatedVariantIds = getPhenoAssociatedVariantIdsForProjects( overlapFilter );
         }
 
-        SimpleRestriction overlapRestriction = ( SimpleRestriction ) overlapFilter.getRestriction1();
+        SimpleRestriction overlapRestriction1 = ( SimpleRestriction ) overlapFilter.getRestriction1();
 
         // if this is false then retrieve all overlaps
-        Boolean hasOverlapRestriction = validateOverlapRestriction( overlapRestriction );
+        Boolean hasOverlapRestriction = validateOverlapRestriction( overlapRestriction1 );
 
         SimpleRestriction numVariantsOverlapRestriction = ( SimpleRestriction ) overlapFilter.getRestriction2();
 
@@ -279,12 +279,13 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         Boolean hasTertiaryOverlapRestriction = validateOverlapRestriction( supportOfVariantsOverlapRestriction );
 
-        Set<Long> variantIdsWithOverlap = new HashSet<Long>();
+        ArrayList<Long> variantIdsSatisfyingRestrictions = new ArrayList<Long>();
 
         log.info( "Iterating through variants in projectids:" + overlapFilter.getProjectIds()
                 + " for overlap with variants in projectids:" + overlapFilter.getOverlapProjectIds()
                 + "\n hasOverlapRestriction:" + hasOverlapRestriction + " hasSecondaryOverlapRestriction:"
-                + hasSecondaryOverlapRestriction +" hasTertiaryOverlapRestriction: "+ hasTertiaryOverlapRestriction + " hasPhenotypeRestriction:" + hasPhenotypeRestriction );
+                + hasSecondaryOverlapRestriction + " hasTertiaryOverlapRestriction: " + hasTertiaryOverlapRestriction
+                + " hasPhenotypeRestriction:" + hasPhenotypeRestriction );
 
         // Iterate over all variants in active Projects to see if they meet the restriction criteria
         for ( Long vId : activeProjectsVariantIds ) {
@@ -292,99 +293,140 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
             Collection<Variant2SpecialVariantOverlap> infos = new ArrayList<Variant2SpecialVariantOverlap>();
 
             if ( hasOverlapRestriction ) {
-                infos = variant2SpecialVariantOverlapDao.loadByVariantIdAndOverlap( vId,
-                        ( SimpleRestriction ) overlapFilter.getRestriction1(), overlapFilter.getOverlapProjectIds() );
-            } else {
-                infos = variant2SpecialVariantOverlapDao.loadByVariantId( vId, overlapFilter.getOverlapProjectIds() );
-            }
 
-            if ( hasPhenotypeRestriction || hasSecondaryOverlapRestriction ) {
+                infos = getOverlapsSatisfyingInitialOverlapRestriction( vId, overlapRestriction1,
+                        overlapFilter.getOverlapProjectIds() );
 
-                Set<Long> variantIdsWithAssociatedPhenotype = new HashSet<Long>();
+                if ( infos.size() == 0 ) {
 
-                if ( hasPhenotypeRestriction ) {
-
-                    for ( Variant2SpecialVariantOverlap info : infos ) {
-
-                        // if the overlapped variant has the specified phenotype associated with it
-                        if ( overlapProjsPhenoAssociatedVariantIds.contains( info.getOverlapSpecialVariantId() ) ) {
-                            variantIdsWithAssociatedPhenotype.add( vId );
-                            // all of this 'infos' deal with the same variantId so we can break if there is one
-                            break;
-                        }
-
-                    }
-
-                }
-
-                Set<Long> variantIdsMeetingSecondaryRestriction = new HashSet<Long>();
-
-                // This will be the case where the user asks: show me variants that "do"/"do not" overlap with x number
-                // of variants in DGV/DECIPHER
-                if ( hasSecondaryOverlapRestriction ) {
-
-                    if ( meetsSecondaryOverlapRestriction( numVariantsOverlapRestriction, infos ) ) {
-
-                        // This will be the case where the wants to ensure the overlapped variant does/doesn't have
-                        // support from multiple sources
-                        if ( hasTertiaryOverlapRestriction ) {
-
-                            if ( meetsTertiaryOverlapRestriction( supportOfVariantsOverlapRestriction, infos ) ) {
-                                variantIdsMeetingSecondaryRestriction.add( vId );
-                            }
-
-                        } else {
-                            variantIdsMeetingSecondaryRestriction.add( vId );
-                        }
-                    }
-
-                }
-
-                // Determine whether variant vId meets phenotype and secondary overlap restrictions
-                if ( hasPhenotypeRestriction && hasSecondaryOverlapRestriction ) {
-
-                    if ( variantIdsWithAssociatedPhenotype.size() > 0
-                            && variantIdsMeetingSecondaryRestriction.size() > 0 ) {
-                        variantIdsWithOverlap.add( vId );
-                    } else {
+                    // if this is a less than restriction we have to include overlaps of 0, entries of which do not
+                    // exist in the Variant2SpecialVariantOverlap table
+                    if ( overlapRestriction1.getOperator().equals( Operator.NUMERIC_LESS ) ) {
+                        
+                        Collection<Variant2SpecialVariantOverlap> allInfos = variant2SpecialVariantOverlapDao.loadByVariantId( vId, overlapFilter.getOverlapProjectIds() );                        
+                        
+                        //Further to the comment above, if the overlapinfos returned by the restriction are zero, but it has overlapinfo's,
+                        //we want to skip it because ALL of its overlaps are not less than the restriction
+                        if (allInfos.size()!=0){
+                            continue;
+                        }//else this vId should fall through to the bottom and get added if there are no more restrictions
+                        
+                        
+                    }else{
                         continue;
                     }
 
-                } else if ( hasPhenotypeRestriction ) {
-
-                    if ( variantIdsWithAssociatedPhenotype.size() > 0 ) {
-                        variantIdsWithOverlap.add( vId );
-                    }
-
-                } else if ( hasSecondaryOverlapRestriction ) {
-                    if ( variantIdsMeetingSecondaryRestriction.size() > 0 ) {
-                        variantIdsWithOverlap.add( vId );
-                    }
                 }
 
-            } else if ( infos.size() > 0 ) {
-                variantIdsWithOverlap.add( vId );
+            } else {
+                // get all overlaps
+                infos = variant2SpecialVariantOverlapDao.loadByVariantId( vId, overlapFilter.getOverlapProjectIds() );
+                
+                if ( infos.size() == 0 ){
+                    
+                    if (hasSecondaryOverlapRestriction  && satisfiesSecondaryOverlapRestriction( numVariantsOverlapRestriction, infos ) ){
+                        //This is for the case where a vId has no overlaps, yet wants all overlaps "less then" a number
+                        //so overlaps of '0' (not stored in the database) need to be taken into account
+                        //(this behaviour is what was requested in the meeting)
+                    }else{
+                    
+                        continue;
+                    }
+                }
             }
+
+            // This will be the case where the user asks: show me variants that "do"/"do not" overlap with x number
+            // of variants in DGV/DECIPHER
+            if ( hasSecondaryOverlapRestriction ) {
+                
+                if ( !satisfiesSecondaryOverlapRestriction( numVariantsOverlapRestriction, infos ) ) {
+
+                    // This variant id(vId) does not satisfy the secondary overlap restriction, continue to the next vId
+                    continue;
+
+                }
+
+            }
+
+            // This is the case where the user wants to restrict based on the number of different support evidence
+            if ( hasTertiaryOverlapRestriction ) {
+
+                if ( !satisfiesTertiaryOverlapRestriction( supportOfVariantsOverlapRestriction, infos ) ) {
+                    continue;
+                }
+
+            }
+
+            if ( hasPhenotypeRestriction ) {
+
+                Boolean satisfiesPhenotypeRestriction = false;
+
+                for ( Variant2SpecialVariantOverlap info : infos ) {
+
+                    // if the overlapped variant has the specified phenotype associated with it
+                    if ( overlapProjsPhenoAssociatedVariantIds.contains( info.getOverlapSpecialVariantId() ) ) {
+                        satisfiesPhenotypeRestriction = true;
+                        // all of this 'infos' deal with the same variantId so we can break on the first one
+                        break;
+                    }
+
+                }
+
+                if ( !satisfiesPhenotypeRestriction ) {
+                    continue;
+                }
+
+            }
+
+            // if we get to this point, then we know that this variantId satisfies all the restrictions
+            variantIdsSatisfyingRestrictions.add( vId );
 
         }
 
-        List<Long> overlapToReturn = new ArrayList<Long>();
-
-        overlapToReturn.addAll( variantIdsWithOverlap );
-
-        return overlapToReturn;
+        return variantIdsSatisfyingRestrictions;
 
     }
 
     private Boolean validateOverlapRestriction( SimpleRestriction r ) {
         // TODO test other things like value and type, discern if it is percentage or number of bases
 
-        return r != null && r.getValue() != null && r.getOperator() != null;
+        if ( r == null || r.getValue() == null ) {
+            return false;
+        }
+
+        NumericValue numeric = ( NumericValue ) r.getValue();
+        Integer value = numeric.getValue();
+
+        return value != null && value >= 0 && r.getOperator() != null;
+    }
+
+    // This restriction is of the type:
+    // "Show me variants that overlap/mutually overlap by less/greater than x bases/percentage"
+    // find overlaps for a specific variant Id that meet this restriction
+    // Note that the functionality requested by Sanja was that ALL of a variants overlaps must meet this restriction for
+    // it to satisfy this,
+    // so this means that it will either be all overlaps returned or no overlaps
+    private Collection<Variant2SpecialVariantOverlap> getOverlapsSatisfyingInitialOverlapRestriction( Long vId,
+            SimpleRestriction overlapRestriction, Collection<Long> overlapProjectIds ) {
+
+        Collection<Variant2SpecialVariantOverlap> allOverlaps = variant2SpecialVariantOverlapDao.loadByVariantId( vId,
+                overlapProjectIds );
+
+        Collection<Variant2SpecialVariantOverlap> overlapsMeetingRestriction = variant2SpecialVariantOverlapDao
+                .loadByVariantIdAndOverlap( vId, overlapRestriction, overlapProjectIds );
+
+        if ( allOverlaps.size() == overlapsMeetingRestriction.size() ) {
+
+            return allOverlaps;
+        }
+
+        return new ArrayList<Variant2SpecialVariantOverlap>();
+
     }
 
     // This will be the case where the user asks: show me variants that "do"/"do not" overlap with x number of variants
     // in DGV/DECIPHER
-    private Boolean meetsSecondaryOverlapRestriction( SimpleRestriction overlapRestriction,
+    private Boolean satisfiesSecondaryOverlapRestriction( SimpleRestriction overlapRestriction,
             Collection<Variant2SpecialVariantOverlap> overlaps ) {
 
         Operator o = overlapRestriction.getOperator();
@@ -407,9 +449,9 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
     }
 
-    private Boolean meetsTertiaryOverlapRestriction( SimpleRestriction overlapRestriction,
+    private Boolean satisfiesTertiaryOverlapRestriction( SimpleRestriction overlapRestriction,
             Collection<Variant2SpecialVariantOverlap> overlaps ) {
-
+        // If this is a less than, we probably have to take into account the the variants with 0 overlap????
         Set<String> supportSet = new HashSet<String>();
 
         // note all of these overlaps are associated with the same variantId

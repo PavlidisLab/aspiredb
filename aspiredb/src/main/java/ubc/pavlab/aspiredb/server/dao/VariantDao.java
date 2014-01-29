@@ -17,6 +17,6 @@ public interface VariantDao extends VariantDaoBase<Variant>, RemotePaging<Varian
     public Collection<Variant> findByLabel( LabelValueObject label);
     
     @Secured({"GROUP_USER"})
-    public List<Long> getProjectOverlapIds(ProjectOverlapFilterConfig overlapFilter);
+    public List<Long> getProjectOverlapVariantIds(ProjectOverlapFilterConfig overlapFilter);
 
 }
