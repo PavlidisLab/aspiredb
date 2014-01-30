@@ -358,14 +358,17 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
                         
                         Collection<Variant2SpecialVariantOverlap> allInfos = variant2SpecialVariantOverlapDao.loadByVariantId( vId, overlapFilter.getOverlapProjectIds() );                        
                         
-                        //Further to the comment above, if the overlapinfos returned by the restriction are zero, but it has overlapinfo's,
+                        //Further to the comment above, if the vId's overlapinfos returned by the restriction are zero, but it has overlapinfo's,
                         //we want to skip it because ALL of its overlaps are not less than the restriction
                         if (allInfos.size()!=0){
                             continue;
-                        }//else this vId should fall through to the bottom and get added if there are no more restrictions
+                        }
+                        //else this vId should fall through to the bottom and get added if there are no more restrictions
                         
                         
                     }else{
+                        
+                        //If this is a "GREATER_THAN" and no overlaps meet the restriction, we skip this vId and continue with the next one
                         continue;
                     }
 
@@ -464,8 +467,8 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
     // This restriction is of the type:
     // "Show me variants that overlap/mutually overlap by less/greater than x bases/percentage"
     // find overlaps for a specific variant Id that meet this restriction
-    // Note that the functionality requested by Sanja was that ALL of a variants overlaps must meet this restriction for
-    // it to satisfy this,
+    // Note that the functionality requested by Sanja was that in the case of a "LESS THAN" ALL of a variants overlaps must meet this restriction and we return all of its overlaps
+    // however in the case of "GREATER THAN" we only return the overlaps that meet this restriction. (we don't require that "ALL OF THE VARIANTS MUST MEET THE RESTRICTION)
     // so this means that it will either be all overlaps returned or no overlaps
     private Collection<Variant2SpecialVariantOverlap> getOverlapsSatisfyingInitialOverlapRestriction( Long vId,
             SimpleRestriction overlapRestriction, Collection<Long> overlapProjectIds ) {
@@ -476,9 +479,16 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         Collection<Variant2SpecialVariantOverlap> overlapsMeetingRestriction = variant2SpecialVariantOverlapDao
                 .loadByVariantIdAndOverlap( vId, overlapRestriction, overlapProjectIds );
 
-        if ( allOverlaps.size() == overlapsMeetingRestriction.size() ) {
-
+        if (overlapRestriction.getOperator().equals( Operator.NUMERIC_LESS ) && allOverlaps.size() == overlapsMeetingRestriction.size() ) {
+            //we could also have returned overlapsMeetingRestriction as they are identical sets
             return allOverlaps;
+            
+        }
+        
+        
+        if (overlapRestriction.getOperator().equals( Operator.NUMERIC_GREATER )){
+            return overlapsMeetingRestriction;
+            
         }
 
         return new ArrayList<Variant2SpecialVariantOverlap>();

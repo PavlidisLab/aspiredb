@@ -344,7 +344,7 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
             fail(e.toString());
         }
 
-        assertEquals( 0,result.getItems().size() );
+        assertEquals( 1,result.getItems().size() );
 
         
         
@@ -619,7 +619,7 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
         
         
         NumericValue numericValue = new NumericValue();
-        numericValue.setValue( 100 );
+        numericValue.setValue( 1);
         
         overlapRestriction.setValue( numericValue );
         
