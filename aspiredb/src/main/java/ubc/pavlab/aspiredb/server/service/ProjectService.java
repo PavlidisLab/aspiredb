@@ -34,6 +34,10 @@ public interface ProjectService  {
     
     public List<ProjectValueObject> getOverlapProjects( );
     
+    public ProjectValueObject getDgvProject();
+    
+    public ProjectValueObject getDecipherProject();
+    
     public Integer numSubjects( Collection<Long> projectIds) throws NotLoggedInException;
     
     public Integer numVariants( Collection<Long> projectIds) throws NotLoggedInException;    

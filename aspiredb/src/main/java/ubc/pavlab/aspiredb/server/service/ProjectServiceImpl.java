@@ -84,6 +84,48 @@ public class ProjectServiceImpl implements ProjectService{
 
         return vos;
     }
+    
+    //Hard code these special project's access for clarity
+    @RemoteMethod
+    public ProjectValueObject getDgvProject( ){
+        
+        ProjectValueObject pvo = new ProjectValueObject();
+        
+        Collection<Project> projects = projectDao.getOverlapProjects();
+        
+        for ( Project p : projects ) {
+            
+                if (p.getName().equals( "DGV" )){
+                    return Project.convertToValueObject( p );
+                }
+                        
+        }
+
+       
+        return pvo;       
+        
+        
+    }
+    
+   //Hard code these special project's access for clarity
+    @RemoteMethod
+    public ProjectValueObject getDecipherProject( ){
+        
+        ProjectValueObject pvo = new ProjectValueObject();
+        
+        Collection<Project> projects = projectDao.getOverlapProjects();
+        
+        for ( Project p : projects ) {
+            
+                if (p.getName().equals( "DECIPHER" )){
+                    return Project.convertToValueObject( p );
+                }
+                        
+        }
+       
+        return pvo;
+        
+    }
 
     /*
      * TODO eventually we want this to work with a collection of projectIds
