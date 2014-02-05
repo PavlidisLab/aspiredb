@@ -75,9 +75,59 @@ Ext.define('ASPIREdb.view.SaveQueryWindow', {
 	},
 
 	saveButtonHandler : function() {
-
+		var ref=this;
 		var queryName = this.down('#queryName').getValue();
+			
+		//check whether the query name exist in the database
+		QueryService.isQueryName(queryName,{
+			callback : function(qvoSta) {
+				if (qvoSta){
+					//Ext.Msg.alert('Status', 'Query name already exist. Choose another name');}
+					Ext.Msg.show({
+						title:'Save query overwrite',
+						msg:'Query name already exist. Do you want to overwrite it?',
+						buttons:Ext.Msg.YESNOCANCEL,
+						icon:Ext.Msg.QUESTION,
+						fn:function(btn){
+							if(btn=='cancel'){
+				            //do something
+							}
+							if(btn=='yes'){
+				        	
+								QueryService.saveQuery(queryName, ref.filterConfigs, {
+									callback : function(qvoId) {
 
+										ASPIREdb.view.SaveQueryWindow.down('#queryName').setValue('');
+										ASPIREdb.view.SaveQueryWindow.close();
+										ASPIREdb.view.SaveQueryWindow.fireEvent('new_query_saved');
+
+									}
+								});
+								ref.down('#queryName').clearValue();
+				    		
+							}
+							
+						}
+						
+					});	 
+						
+				
+				}
+				else {
+					QueryService.saveQuery(queryName, ref.filterConfigs, {
+						callback : function(qvoId) {
+
+							ASPIREdb.view.SaveQueryWindow.down('#queryName').setValue('');
+							ASPIREdb.view.SaveQueryWindow.close();
+							ASPIREdb.view.SaveQueryWindow.fireEvent('new_query_saved');
+
+						}
+					});
+				}
+			}
+		
+		});
+		/**
 		QueryService.saveQuery(queryName, this.filterConfigs, {
 			callback : function(qvoId) {
 
@@ -86,7 +136,7 @@ Ext.define('ASPIREdb.view.SaveQueryWindow', {
 				ASPIREdb.view.SaveQueryWindow.fireEvent('new_query_saved');
 
 			}
-		});
+		});*/
 
 	}
 

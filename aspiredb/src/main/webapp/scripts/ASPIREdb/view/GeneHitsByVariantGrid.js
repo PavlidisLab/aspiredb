@@ -92,12 +92,30 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 			}
 		};
 		
+		/**
+		//This kind of weird technique is being used because the baked in extjs button href config way was not working
+		var viewProteinCodingGeneOnly = {
+			xtype : 'checkbox',
+			itemId: 'viewProteinCodingGeneOnlyCheckbox',
+			defaultType: 'checkboxfield',
+			fieldLabel:'Protein-coding',
+			checked: true,
+			handler: function(){
+				
+			}
+			
+		};*/
+	
+		
 		this.getDockedComponent('geneHitsByVariantGridToolbar').remove('viewCoexpressionNetworkButton');
 		this.getDockedComponent('geneHitsByVariantGridToolbar').remove('saveButtonGeneHits');
 		
 		this.getDockedComponent('geneHitsByVariantGridToolbar').add(viewCoexpressionNetworkInGemmaLink);
 		
 		this.getDockedComponent('geneHitsByVariantGridToolbar').add('-');
+		
+		//this.getDockedComponent('geneHitsByVariantGridToolbar').add(viewProteinCodingGeneOnly);
+		//this.getDockedComponent('geneHitsByVariantGridToolbar').add('-');
 		
 		var ref = this;
 		

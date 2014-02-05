@@ -490,6 +490,19 @@ public class QueryServiceImpl implements QueryService {
         // should only be one for one user
         return ( Set<AspireDbFilterConfig> ) querys.iterator().next().getObject();
     }
+    
+    @Override
+    @RemoteMethod
+    public boolean isQueryName(String name) {
+
+        List<Query> querys = queryDao.findByName( name );
+        
+        if (querys.isEmpty()){
+                return false;
+            }else return true;
+                        
+             
+    }
 
     @Override
     @RemoteMethod
@@ -506,6 +519,7 @@ public class QueryServiceImpl implements QueryService {
 
     @Override
     @Transactional
+    @RemoteMethod
     public void deleteQuery( String name ) {
         List<Query> querys = queryDao.findByName( name );
         queryDao.remove( querys.iterator().next() );

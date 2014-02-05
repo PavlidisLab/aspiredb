@@ -1,4 +1,5 @@
-Ext.require([ 'Ext.window.*', 'Ext.layout.container.Border', 'ASPIREdb.view.filter.AndFilterContainer', 'ASPIREdb.view.filter.VariantFilterPanel', 'ASPIREdb.view.filter.SubjectFilterPanel', 'ASPIREdb.view.filter.PhenotypeFilterPanel', 'ASPIREdb.view.SaveQueryWindow', 'ASPIREdb.view.filter.ProjectOverlapFilterPanel','ASPIREdb.view.DeleteQueryWindow' ]);
+Ext.require([ 'Ext.window.*', 'Ext.layout.container.Border', 'ASPIREdb.view.filter.AndFilterContainer', 'ASPIREdb.view.filter.VariantFilterPanel', 'ASPIREdb.view.filter.SubjectFilterPanel', 'ASPIREdb.view.filter.PhenotypeFilterPanel', 'ASPIREdb.view.SaveQueryWindow', 'ASPIREdb.view.filter.DecipherProjectOverlapFilterPanel', 'ASPIREdb.view.filter.DgvProjectOverlapFilterPanel','ASPIREdb.view.DeleteQueryWindow' ]);
+
 
 Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	extend : 'Ext.Window',
@@ -38,7 +39,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 					editable : false,
 					forceSelection : true,
 					value : 'FILTER_PLACEHOLDER',
-					store : [ [ 'FILTER_PLACEHOLDER', '<Filter>' ], [ 'ASPIREdb.view.filter.SubjectFilterPanel', 'Subject Filter' ], [ 'ASPIREdb.view.filter.VariantFilterPanel', 'Variant Filter' ], [ 'ASPIREdb.view.filter.PhenotypeFilterPanel', 'Phenotype Filter' ], [ 'ASPIREdb.view.filter.ProjectOverlapFilterPanel', 'Project Overlap Filter' ] ]
+					store : [ [ 'FILTER_PLACEHOLDER', '<Filter>' ], [ 'ASPIREdb.view.filter.SubjectFilterPanel', 'Subject Filter' ], [ 'ASPIREdb.view.filter.VariantFilterPanel', 'Variant Filter' ], [ 'ASPIREdb.view.filter.PhenotypeFilterPanel', 'Phenotype Filter' ], [ 'ASPIREdb.view.filter.DecipherProjectOverlapFilterPanel', 'Decipher Overlap' ], [ 'ASPIREdb.view.filter.DgvProjectOverlapFilterPanel', 'DGV Overlap' ] ]
 				}, {
 					xtype : 'label',
 					text : 'or load saved query: '

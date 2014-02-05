@@ -92,7 +92,7 @@ public class ProjectManagerCLI extends AbstractCLI {
         Option project = OptionBuilder.isRequired().hasArg().withArgName( "Project name" )
                 .withDescription( "The project that will be affected by these operations" ).create( "project" );
         
-        Option projectOverlap = OptionBuilder.isRequired().hasArg().withArgName( "Overlap Project name" )
+        Option projectOverlap = OptionBuilder.hasArg().withArgName( "Overlap Project name" )
                 .withDescription( "The project that the other project will have its overlaps calculated against" ).create( "overlapProject" );
 
         addOption( "delete", false, "Using this option will delete the project" );

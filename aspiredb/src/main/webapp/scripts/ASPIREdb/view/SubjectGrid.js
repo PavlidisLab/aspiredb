@@ -79,7 +79,17 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 					return ret;
 				},
 				flex : 1
-			}, ],
+			},
+			{
+				text : "# of variants",
+				dataIndex : 'varientNos',
+				flex : 1
+			},
+			{
+				text : "# of phenotypes",
+				dataIndex : 'phenotypeNos',
+				flex : 1
+			}],
 
 	/**
 	 * 
@@ -215,6 +225,9 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 						
 						labelIds.push(aLabel.id);
 					}
+					
+					//create summary of number of variants
+					
 
 					var row = [ val.id, val.patientId, labelIds ];
 					data.push(row);

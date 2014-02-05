@@ -37,7 +37,7 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantWindow', {
 	} ],
 
 	initComponent : function() {
-		
+		var ref = this;
 		this.callParent();
 
 	},

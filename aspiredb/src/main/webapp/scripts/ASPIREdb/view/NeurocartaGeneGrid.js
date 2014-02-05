@@ -17,9 +17,10 @@
  *
  */
 
-Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow','ASPIREdb.GemmaURLUtils' ]);
+Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow','ASPIREdb.GemmaURLUtils','Ext.QuickTips' ]);
 
 // TODO js documentation
+
 Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.neurocartaGeneGrid',
@@ -39,6 +40,7 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 	}, {
 		header : 'Type',
 		dataIndex : 'geneBioType',
+		hidden: true,
 		flex : 1
 	}, {
 		header : 'Gene Name',
@@ -79,29 +81,42 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 		}
 
 		var url = ASPIREdb.GemmaURLUtils.makeViewGeneNetworkInGemmaURL(geneSymbols);
-
+		Ext.QuickTips.init();
 		//This kind of weird technique is being used because the baked in extjs button href config way was not working
 		var viewCoexpressionNetworkInGemmaLink = {
+			
 			xtype : 'box',
 			itemId : 'viewCoexpressionNetworkLink',
 			autoEl : {
 				tag : 'a',
 				href : url,
 				target : '_blank',
-				cn : 'View Coexpression Network in Gemma'
+				
+				children:[{
+					tag:'img',
+					src:'scripts/ASPIREdb/resources/images/gemmaTiny.gif',
+					'ext:qtip': 'View Coexpression Network in Gemma',
+				}]
+				
 			}
 		};
 		
 		var neurocartaUrl = ASPIREdb.GemmaURLUtils.makeNeurocartaPhenotypeUrl(uri);
 		
 		var viewNeurocartaGenesLink = {
+				
 				xtype : 'box',
 				itemId : 'viewNeurocartaGeneLink',
 				autoEl : {
 					tag : 'a',
 					href : neurocartaUrl,
 					target : '_blank',
-					cn : 'View Phenocarta Phenotypes'
+				
+					children:[{
+						tag:'img',
+						src:'scripts/ASPIREdb/resources/images/icons/neurocarta.png',
+						'ext:qtip': 'View Phenocarta Phenotypes'
+					}]
 				}
 			};
 		
@@ -115,10 +130,12 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 		toolbar.add(viewCoexpressionNetworkInGemmaLink);
 		
 		toolbar.add('-');
+		toolbar.add(' ');
 		
 		toolbar.add(viewNeurocartaGenesLink);
 		
 		toolbar.add('-');
+		toolbar.add(' ');
 		
 		var ref = this;
 		

@@ -253,7 +253,39 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 		
 		return visibleLabels;
 	},
-	
+	/**
+	constructVariantCountStoreData : function(vvos, characteristicNames, subjectId){
+		var storeData = [];
+		var countCNV=0;
+		var countSNV=0;
+		var countINDEL=0;
+		var variantype =[];
+		
+		for ( var i = 0; i < vvos.length; i++) {
+			
+			var vvo = vvos[i];
+						
+			if (vvo.patientId == subjectId){
+				
+				switch (vvo.variantType){
+				case "CNV":
+					countCNV++;
+					break;
+				case "SNV":
+					countSNV++;
+					break;
+				case "INDEL":
+					countINDEL++;
+					break;
+				}
+				
+			}
+			
+					
+		}
+		
+		
+	},*/
 	/**
      * @public     
      * @param {VariantValueObject[]} vvos
