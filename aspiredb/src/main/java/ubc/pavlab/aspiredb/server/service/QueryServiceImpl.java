@@ -497,10 +497,12 @@ public class QueryServiceImpl implements QueryService {
 
         List<Query> querys = queryDao.findByName( name );
         
-        if (querys.isEmpty()){
-                return false;
-            }else return true;
-                        
+        if (querys.size() >0){
+                return true;
+            }
+        
+        
+        return false;              
              
     }
 
