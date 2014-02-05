@@ -60,7 +60,7 @@ import ubc.pavlab.aspiredb.shared.query.ProjectOverlapFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 
-public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
+public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest {
 
     @Autowired
     private ProjectManager projectManager;
@@ -106,7 +106,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
     //@Before
     public void setup() throws Exception {
 
-        super.runAsAdmin();
+       // super.runAsAdmin();
 
         ArrayList<VariantValueObject> cnvList = new ArrayList<VariantValueObject>();
         cnvList.add( getCNV( "X", 3, 234, userVariantId, patientId ) );
