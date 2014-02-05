@@ -9,7 +9,7 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilterPanel', {
     extend: 'ASPIREdb.view.filter.FilterPanel',
     alias: 'widget.filter_phenotype',
     title: 'Phenotype Filter',
-    bodyStyle: 'background: #C3FDB8;',
+    bodyStyle: 'background: #D1E88D;',
     items: {
         //xtype: 'filter_and',
         //itemId: 'phenotypeFilterContainer',

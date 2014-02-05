@@ -9,7 +9,7 @@ Ext.define('ASPIREdb.view.filter.SubjectFilterPanel', {
     extend: 'ASPIREdb.view.filter.FilterPanel',
     alias: 'widget.filter_subject',
     title: 'Subject Filter',
-    bodyStyle: 'background: #FFE5B4;',
+    bodyStyle: 'background: #FFDAA3;',
     items: [{
         xtype: 'filter_and',
         itemId: 'subjectFilterContainer',

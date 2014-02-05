@@ -4,7 +4,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 	extend : 'ASPIREdb.view.filter.FilterPanel',
 	alias : 'widget.filter_variant',
 	title : 'Variant Filter',
-	bodyStyle : 'background: #FFFFD0;',
+	bodyStyle : 'background: #FFFFC2;',
 	items : [ {
 		xtype : 'filter_and',
 		title : 'Variant Location:',
@@ -31,7 +31,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 	}, {
 		xtype : 'panel',
 		itemId : 'cnvFilterPanel',
-		bodyStyle : 'background: #FFFFD0;',
+		bodyStyle : 'background: #FFFFC2;',
 		title : 'CNV:',
 		collapsible : true,
 		collapsed : true,
@@ -78,7 +78,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 	}, {
 		xtype : 'panel',
 		itemId : 'indelFilterPanel',
-		bodyStyle : 'background: #FFFFD0;',
+		bodyStyle : 'background: #FFFFC2;',
 		title : 'Indel:',
 		collapsible : true,
 		collapsed : true,
@@ -126,7 +126,7 @@ Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
 	}, {
 		xtype : 'panel',
 		itemId : 'snvFilterPanel',
-		bodyStyle : 'background: #FFFFD0;',
+		bodyStyle : 'background: #FFFFC2;',
 		title : 'SNV:',
 		collapsible : true,
 		collapsed : true,
