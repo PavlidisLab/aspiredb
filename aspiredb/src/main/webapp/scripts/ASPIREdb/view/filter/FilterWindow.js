@@ -13,6 +13,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	layout : 'border',
 	bodyStyle : 'padding: 5px;',
 	border: false,
+	constrain:true,
 
 	initComponent : function() {
 		var me = this;

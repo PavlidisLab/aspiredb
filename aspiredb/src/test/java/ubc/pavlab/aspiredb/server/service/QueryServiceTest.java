@@ -18,11 +18,11 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +34,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
@@ -44,6 +45,8 @@ import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
+import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.AspireDbPagingLoadConfig;
@@ -76,6 +79,9 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
     @Autowired
     private PhenotypeUtil phenotypeUtil;
+    
+    @Autowired
+    UserManager userManager;
 
     private Project project;
 
@@ -87,7 +93,8 @@ public class QueryServiceTest extends BaseSpringContextTest {
     private Collection<Long> activeProjectIds;
 
     private static Log log = LogFactory.getLog( QueryServiceTest.class.getName() );
-
+    String username = RandomStringUtils.randomAlphabetic( 6 );
+    String testname = RandomStringUtils.randomAlphabetic( 6 );
     @Before
     public void setUp() {
         createSubjectWithPhenotypes( "1", "0", "0", "0" );
@@ -95,10 +102,19 @@ public class QueryServiceTest extends BaseSpringContextTest {
         createSubjectWithPhenotypes( "0", "0", "1", "0" );
         createSubjectWithPhenotypes( "0", "0", "0", "1" );
         createSubjectWithPhenotypes( "1", "0", "1", "0" );
+        
+        try {
+            userManager.loadUserByUsername( username );
+        } catch ( UsernameNotFoundException e ) {
+            userManager.createUser( new UserDetailsImpl( "jimmy", username, true, null, RandomStringUtils
+                    .randomAlphabetic( 10 ) + "@gmail.com", "key", new Date() ) );
+        }
+
     }
 
     @After
     public void tearDown() throws Exception {
+        super.runAsAdmin();
         for ( Subject s : project.getSubjects() ) {
             try {
                 
@@ -113,6 +129,35 @@ public class QueryServiceTest extends BaseSpringContextTest {
             }
         }
         projectDao.remove( project );
+    }
+    @Test
+    public void testIsQueryName() {
+        //run save query as administrator in filter window
+        super.runAsAdmin();
+        Collection<Long> projectIds = new HashSet<Long>();
+        projectIds.add( project.getId() );
+        ProjectFilterConfig projConfig = new ProjectFilterConfig();
+        projConfig.setProjectIds( projectIds );
+
+        PhenotypeRestriction restriction = new PhenotypeRestriction();
+        restriction.setName( "Abnormality of the head" );
+        restriction.setValue( "1" );
+        
+        PhenotypeFilterConfig phenoConfig = new PhenotypeFilterConfig();
+        phenoConfig.setRestriction( restriction );
+        phenoConfig.setActiveProjectIds( activeProjectIds );
+        
+        Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
+        filters.add( projConfig );
+        filters.add( phenoConfig );
+        queryService.saveQuery( testname, filters );
+        
+        //run as user to check wheather the admin created query is accessbly y the user
+        super.runAsUser( this.username );
+        boolean returnvalue = queryService.isQueryName( testname);
+        assertFalse(returnvalue);
+        
+        
     }
 
     private Subject createSubjectWithPhenotypes( String headPhenoValue, String facePhenoValue, String mouthPhenoValue,
@@ -210,7 +255,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
      */
     @Test
     public void testPhenoHasNoValueSubjects() {
-
+        super.runAsAdmin();
         try {
             int found = 0;
 
@@ -299,7 +344,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
      */
     @Test
     public void testPhenoHasValueSubjects() {
-
+        super.runAsAdmin();
         try {
             Collection<String> phenoNames = phenotypeDao.getExistingNames( activeProjectIds );
             assertEquals( 4, phenoNames.size() );
