@@ -92,10 +92,11 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
    
 
-    @Before
-    public void setup() throws Exception {
+   
+    @Test
+    public void testPopulateSpecialProjectOverlap() {
 
-       // super.runAsAdmin();
+        super.runAsAdmin();
 
         ArrayList<VariantValueObject> cnvList = new ArrayList<VariantValueObject>();
         cnvList.add( getCNV( "X", 3, 234, userVariantId, patientId ) );
@@ -175,27 +176,6 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         }
         
        
-        
-        
-        
-
-    }
-    
-    
-    @After
-    public void tearDown() throws Exception {
-        helper.deleteProject(projectName);
-        helper.deleteProject(projectNameWithOverlap);
-        
-    }
-    
-    //this test works locally but always seems to fail on the server with an sql constraint violation exception.
-   //commenting out for now
-   
-    @Test
-    public void testPopulateSpecialProjectOverlap() {
-
-        super.runAsAdmin();
 
         Project projectToPopulate = projectDao.findByProjectName( projectName );
 
@@ -284,6 +264,10 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
             }
 
         }
+        
+        helper.deleteProject(projectName);
+        helper.deleteProject(projectNameWithOverlap);
+        
 
     }
 
