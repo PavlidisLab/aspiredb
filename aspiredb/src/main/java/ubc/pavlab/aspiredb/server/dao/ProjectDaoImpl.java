@@ -101,4 +101,10 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
         return overlapProjects;
         
     }
+    
+    @Override
+    @Transactional(readOnly=true)
+    public String getOverlapProjectVariantSupportCharacteristicKey(Long projectId){
+        return this.load( projectId ).getVariantSupportCharacteristicKey();
+    }
 }

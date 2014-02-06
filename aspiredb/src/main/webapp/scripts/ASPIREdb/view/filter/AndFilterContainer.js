@@ -114,7 +114,7 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 				
 
 			}
-		} else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer' || filterItemType == 'ASPIREdb.view.filter.OrPhenotypeFilterContainer' || filterItemType == 'ASPIREdb.view.filter.PropertyFilter') {
+		} else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer' || filterItemType == 'ASPIREdb.view.filter.OrPhenotypeFilterContainer' || filterItemType == 'ASPIREdb.view.filter.PropertyFilter'|| filterItemType == 'ASPIREdb.view.filter.ProjectOverlapPropertyFilter') {
 			filterContainer.removeAll();
 
 			if (restriction.restrictions) {

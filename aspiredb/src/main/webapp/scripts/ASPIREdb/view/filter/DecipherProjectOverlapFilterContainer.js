@@ -47,7 +47,7 @@ Ext.define('ASPIREdb.view.filter.DecipherProjectOverlapFilterContainer', {
 			}
 		},
 		suggestValuesRemoteFunction : null,
-		filterItemType : 'ASPIREdb.view.filter.PropertyFilter'
+		projectOverlapFilterItemType : 'ASPIREdb.view.filter.ProjectOverlapPropertyFilter'
 	},
 	items : [ {
 		xtype : 'container',
@@ -68,9 +68,7 @@ Ext.define('ASPIREdb.view.filter.DecipherProjectOverlapFilterContainer', {
 		
 		var projectOverlapConfig = new ProjectOverlapFilterConfig();
         
-		projectOverlapConfig.projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
-		
-		
+		projectOverlapConfig.projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();		
 		
 		var overlapProjectIds = [];
 		overlapProjectIds.push(this.specialProjectValueObject.id); 
@@ -133,7 +131,7 @@ Ext.define('ASPIREdb.view.filter.DecipherProjectOverlapFilterContainer', {
 			hidden=false;
 		}
 
-		var filterTypeItem = this.getFilterItemType();
+		var filterTypeItem = this.getProjectOverlapFilterItemType();
 				
 		var getNewOverlapItem = function() {
 
@@ -181,20 +179,20 @@ Ext.define('ASPIREdb.view.filter.DecipherProjectOverlapFilterContainer', {
 		filterContainer.insert(0, supportOfVariantsOverlapItem);
 		filterContainer.insert(0, {
 			xtype : 'label',
-			text : 'Number of Different Support Evidence restriction: ',
+			text : 'Overlap study support: ',
 			hidden: true
 		});
 		
 		filterContainer.insert(0, numVariantsOverlapItem);
 		filterContainer.insert(0, {
 			xtype : 'label',
-			text : 'Number of Variants Overlapped restriction: '
+			text : 'Overlap variant support: '
 		});
 		
 		filterContainer.insert(0, overlapItem);
 		filterContainer.insert(0, {
 			xtype : 'label',
-			text : 'Length or %Length of Overlap restriction: '
+			text : 'Overlap size: '
 		});
 		
 

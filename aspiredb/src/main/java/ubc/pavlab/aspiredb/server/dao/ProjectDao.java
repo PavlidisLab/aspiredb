@@ -41,6 +41,9 @@ public interface ProjectDao extends SecurableDaoBase<Project> {
     @Secured({"GROUP_USER"})
     public Collection<Project> getOverlapProjects();
     
+    @Secured({"GROUP_USER"})
+    public String getOverlapProjectVariantSupportCharacteristicKey(Long projectId);
+    
     
     
     

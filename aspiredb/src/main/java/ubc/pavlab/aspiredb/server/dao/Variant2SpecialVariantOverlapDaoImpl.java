@@ -80,14 +80,14 @@ public class Variant2SpecialVariantOverlapDaoImpl extends DaoBaseImpl<Variant2Sp
         
         String operatorString =""; 
         
-        if (o.equals( Operator.NUMERIC_GREATER)){
-            operatorString =">";
-        }else if (o.equals( Operator.NUMERIC_LESS)){
-            operatorString ="<";
-        }else if (o.equals( Operator.NUMERIC_EQUAL)){
-            operatorString ="=";
-        }else if (o.equals( Operator.NUMERIC_NOT_EQUAL)){
-            operatorString ="!=";
+        if (o.equals( Operator.NUMERIC_GREATER_OR_EQUAL)){
+            operatorString =">=";
+        }else if (o.equals( Operator.NUMERIC_LESS_OR_EQUAL)){
+            operatorString ="<=";
+        }else{
+            
+            throw new RuntimeException("Invalid Operator");
+            
         }
         
         

@@ -22,7 +22,7 @@ import org.directwebremoting.annotations.DataTransferObject;
 
 
 @DataTransferObject(javascript = "OverlapBasesProperty")
-public class OverlapBasesProperty extends NumericProperty {
+public class OverlapBasesProperty extends ProjectOverlapNumericProperty {
     
    
     /**
@@ -31,6 +31,6 @@ public class OverlapBasesProperty extends NumericProperty {
     private static final long serialVersionUID = -5424398761247895783L;
 
     public OverlapBasesProperty() {
-        super("Base Overlap", "basesoverlap");
+        super("base overlap", "basesoverlap");
     }
 }

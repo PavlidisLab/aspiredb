@@ -22,10 +22,10 @@ import org.directwebremoting.annotations.DataTransferObject;
 
 
 @DataTransferObject(javascript = "SupportValueProperty")
-public class SupportValueProperty extends NumericProperty {
+public class SupportValueProperty extends ProjectOverlapNumericProperty {
     
    
     public SupportValueProperty() {
-        super("Support Value", "supportvalue");
+        super("# of supporting studies", "supportvalue");
     }
 }
