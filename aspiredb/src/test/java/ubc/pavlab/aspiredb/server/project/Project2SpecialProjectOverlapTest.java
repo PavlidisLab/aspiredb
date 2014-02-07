@@ -138,7 +138,9 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         cnvListWithOverlap.add( getCNV( "Y", 3, 234, null, patientIdWithOverlap ) );
 
         try {
-
+            
+            helper.deleteProject( "DGV" );
+            
             projectManager.addSubjectVariantsToSpecialProject( projectNameWithOverlap, true, cnvListWithOverlap, false );
 
         } catch ( Exception e ) {
@@ -158,13 +160,8 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
             
         }
         
-        
-        
-        variant2SpecialVariantOverlapDao.deleteByOverlapProjectIds(overlapProjectIds);
-        
+                
         try {
-
-           
             
             projectManager.populateSpecialProjectOverlap( projectName, projectNameWithOverlap );
        
