@@ -19,7 +19,15 @@ Ext.define('ASPIREdb.store.SubjectStore', {
 	}, {
 		name : 'labelIds',
 		type : 'array'
-	} ],
+	},
+	{
+		name : 'varientNos',
+		type : 'int'
+	},
+	{
+		name : 'phenotypeNos',
+		type : 'int'
+	}],
 
 	storeId : 'subjectStore'
 

@@ -44,14 +44,27 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 				}, {
 					xtype : 'label',
 					text : 'or load saved query: '
-				}, {
+				}, 
+				{
 					xtype : 'combo',
 					itemId : 'savedQueryComboBox',
 					editable : false,
 					forceSelection : true,
 					value : 'FILTER_PLACEHOLDER',
 					store : [ [ 'QUERY_NAME_PLACEHOLDER', '<Query name>' ] ]
-				} ]
+				},
+				{
+					xtype : 'button',
+					flex : 1,
+					text : 'Query Manager',
+					id: 'querymanager',
+					shrinkWrap: 1,
+					width: 30,
+					disabled: true,
+					itemId : 'deleteQueryButton',
+					handler : me.deleteQueryHandler,
+					scope : me
+				}]
 			} ]
 		}, {
 			region : 'center',
@@ -145,44 +158,6 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 				}, 
 				{
 					xtype : 'button',
-					flex : 2,
-					text : 'Delete Query',
-					itemId : 'deleteQueryButton',
-					handler : me.deleteQueryHandler,
-					scope : me
-				}
-				/**,{
-					xtype : 'button',
-					flex : 2,
-					text : 'Query',
-					menu:{
-						items: [
-						        {
-						        	text : 'Preview query',
-									itemId : 'previewQueryButton',
-									handler : me.previewQueryHandler,
-									scope : me
-						        },
-
-						        {
-						        	text:'Save Query',
-						        	itemId : 'saveQueryButton',
-						        	handler : me.saveQueryHandler,
-						        	scope : me
-						        },
-						        {
-						        	text: 'Delete Query',
-						        	itemId : 'deleteQueryButton',
-						        	handler: me.deleteQueryHandler,
-						        	scope : me
-						        }
-						]},
-				
-					itemId : 'query',
-					scope : me
-				}*/
-				,{
-					xtype : 'button',
 					flex : 1,
 					text : 'Clear',
 					itemId : 'clearButton',
@@ -206,9 +181,8 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		var filterContainer = this.down('#filterContainer');
 
 		this.updateSavedQueryCombo();
+		this.enableDisableQueryManager();
 
-		
-		
 		this.down('#savedQueryComboBox').on('select', this.savedQueryComboBoxSelectHandler, this);
 
 		filterTypeComboBox.on('select', function(combo, records) {
@@ -216,10 +190,11 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 			filterContainer.add(Ext.create(record.raw[0]));
 			filterTypeComboBox.setValue('FILTER_PLACEHOLDER');
 		});
-	
-		ASPIREdb.view.SaveQueryWindow.on('new_query_saved', this.updateSavedQueryCombo, this);
-		ASPIREdb.view.DeleteQueryWindow.on('query_deleted', this.updateSavedQueryCombo, this);
 		
+		ASPIREdb.view.DeleteQueryWindow.on('query_deleted', this.updateSavedQueryCombo, this);
+		ASPIREdb.view.DeleteQueryWindow.on('query_deleted', this.enableDisableQueryManager, this);
+		ASPIREdb.view.SaveQueryWindow.on('new_query_saved', this.updateSavedQueryCombo, this);
+		ASPIREdb.view.SaveQueryWindow.on('new_query_saved', this.enableDisableQueryManager, this);		
 		
 		ASPIREdb.EVENT_BUS.on('query_update', function(event) {
 			me.updateResultCounts();
@@ -279,6 +254,8 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		
 		if (combo.getValue() && combo.getValue()!=''){
 
+			//Ext.getCmp('querymanager').enable();
+
 			QueryService.loadQuery(combo.getValue(), {
 				callback : this.loadQueryHandler,
 				scope : this
@@ -304,7 +281,8 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 				}
 
 				savedQueryComboBox.getStore().loadData(storedata);
-
+				savedQueryComboBox.select(savedQueryComboBox.getStore().getAt(names.length));
+				
 			}
 		});
 		
@@ -312,6 +290,18 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 
 	},
 	
+	enableDisableQueryManager: function(){
+		QueryService.getSavedQueryNames({
+			callback : function(names) {
+				
+			if (names.length != 0)
+				 Ext.getCmp('querymanager').enable();
+			 else 
+				 Ext.getCmp('querymanager').disable();
+			}
+		});
+		
+	},
 	
 	saveQueryHandler : function() {
 

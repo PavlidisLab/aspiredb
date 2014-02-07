@@ -45,6 +45,7 @@ import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
+import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Query;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
@@ -212,6 +213,12 @@ public class QueryServiceImpl implements QueryService {
             // this doesn't take into account the security of the labels, i.e. all users with access to the subject can
             // see all the subjects labels
             SubjectValueObject vo = subject.convertToValueObject();
+            
+            Integer numVariants = variantDao.findBySubjectPatientId( subject.getPatientId() ).size();
+            vo.setVariants( numVariants != null ? numVariants : 0 );
+            
+           Integer numPhenotypes =phenotypeDao.findBySubjectId( subject.getId() ).size();
+            
             vos.add( vo );
         }
 

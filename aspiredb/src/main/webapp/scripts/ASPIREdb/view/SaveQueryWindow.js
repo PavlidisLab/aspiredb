@@ -120,6 +120,7 @@ Ext.define('ASPIREdb.view.SaveQueryWindow', {
 							ASPIREdb.view.SaveQueryWindow.down('#queryName').setValue('');
 							ASPIREdb.view.SaveQueryWindow.close();
 							ASPIREdb.view.SaveQueryWindow.fireEvent('new_query_saved');
+							ASPIREdb.view.DeleteQueryWindow.updateDeleteQueryCombo();
 
 						}
 					});
@@ -127,17 +128,7 @@ Ext.define('ASPIREdb.view.SaveQueryWindow', {
 			}
 		
 		});
-		/**
-		QueryService.saveQuery(queryName, this.filterConfigs, {
-			callback : function(qvoId) {
-
-				ASPIREdb.view.SaveQueryWindow.down('#queryName').setValue('');
-				ASPIREdb.view.SaveQueryWindow.close();
-				ASPIREdb.view.SaveQueryWindow.fireEvent('new_query_saved');
-
-			}
-		});*/
-
+		
 	}
 
 });

@@ -17,7 +17,7 @@
  *
  */
 
-Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow','ASPIREdb.GemmaURLUtils','Ext.QuickTips' ]);
+Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow','ASPIREdb.GemmaURLUtils' ]);
 
 // TODO js documentation
 
@@ -81,7 +81,7 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 		}
 
 		var url = ASPIREdb.GemmaURLUtils.makeViewGeneNetworkInGemmaURL(geneSymbols);
-		Ext.QuickTips.init();
+		
 		//This kind of weird technique is being used because the baked in extjs button href config way was not working
 		var viewCoexpressionNetworkInGemmaLink = {
 			
@@ -91,12 +91,12 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 				tag : 'a',
 				href : url,
 				target : '_blank',
-				
-				children:[{
+				cn: 'View Coexpression Network in Gemma',
+				/**children:[{
 					tag:'img',
 					src:'scripts/ASPIREdb/resources/images/gemmaTiny.gif',
 					'ext:qtip': 'View Coexpression Network in Gemma',
-				}]
+				}]*/
 				
 			}
 		};
@@ -111,12 +111,13 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 					tag : 'a',
 					href : neurocartaUrl,
 					target : '_blank',
-				
+					cn: 'View Phenocarta Phenotypes',
+					/**
 					children:[{
 						tag:'img',
 						src:'scripts/ASPIREdb/resources/images/icons/neurocarta.png',
 						'ext:qtip': 'View Phenocarta Phenotypes'
-					}]
+					}]*/
 				}
 			};
 		

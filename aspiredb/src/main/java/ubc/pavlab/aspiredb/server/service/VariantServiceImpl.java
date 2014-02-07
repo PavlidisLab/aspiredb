@@ -16,6 +16,7 @@ package ubc.pavlab.aspiredb.server.service;
 
 import com.sencha.gxt.data.shared.SortInfo;
 import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
+
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
 import ubc.pavlab.aspiredb.server.dao.CharacteristicDao;
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
@@ -66,6 +68,8 @@ public class VariantServiceImpl implements VariantService {
     private NeurocartaQueryService neurocartaQueryService;
     @Autowired
     private ChromosomeService chromosomeService;
+    
+    private String patientId;
 
     private String getSortColumn(PagingLoadConfig config) {
         // default value
@@ -262,6 +266,8 @@ public class VariantServiceImpl implements VariantService {
         return characteristicDao.getValuesForKey(property.getName());
     }
 
+    
+
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
@@ -270,6 +276,16 @@ public class VariantServiceImpl implements VariantService {
         Variant variant = variantDao.load(id);
         return variant.toValueObject();
     }
+    
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Integer getTotalNoOfVariantsBySubjectId (String patientId) {
+        Collection<Variant> variantCollection = variantDao.findBySubjectPatientId(patientId );
+        
+        return variantCollection.size();
+    }
+    
 
     @Override
     @RemoteMethod

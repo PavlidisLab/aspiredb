@@ -183,7 +183,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
                 
                 assertFalse(securityService.isViewableByUser( subject, aDifferentUsername ));
                 
-                Collection<Variant> variantCollection = variantDao.findBySubjectId(patientId );
+                Collection<Variant> variantCollection = variantDao.findBySubjectPatientId(patientId );
                 
                 for (Variant v: variantCollection){
                     aclTestUtils.checkHasAcl( v );
@@ -262,7 +262,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
                 
                 assertTrue(securityService.isViewableByUser( subject, authorizedUsername ));
                 
-                Collection<Variant> variantCollection = variantDao.findBySubjectId(patientId );
+                Collection<Variant> variantCollection = variantDao.findBySubjectPatientId(patientId );
                 
                 for (Variant v: variantCollection){
                                 
@@ -290,7 +290,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
                 
                 assertFalse(securityService.isViewableByUser( subject, aDifferentUsername ));
                 
-                Collection<Variant> variantCollection = variantDao.findBySubjectId(patientId );
+                Collection<Variant> variantCollection = variantDao.findBySubjectPatientId(patientId );
                 
                 for (Variant v: variantCollection){
                                 
@@ -310,7 +310,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
         
         projectDao.findByProjectName( projectId );
         
-        variantDao.findBySubjectId(patientId );
+        variantDao.findBySubjectPatientId(patientId );
         
         
         super.runAsUser( aDifferentUsername );
@@ -324,7 +324,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
         }
         
         
-        Collection<Variant> vCollection2 = variantDao.findBySubjectId(patientId );
+        Collection<Variant> vCollection2 = variantDao.findBySubjectPatientId(patientId );
         
         assertTrue(vCollection2.isEmpty());
         
@@ -350,7 +350,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
                 
                 assertFalse(securityService.isViewableByUser( subject, authorizedUsername ));
                 
-                Collection<Variant> variantCollection = variantDao.findBySubjectId(patientId );
+                Collection<Variant> variantCollection = variantDao.findBySubjectPatientId(patientId );
                 
                 for (Variant v: variantCollection){
                                 
@@ -376,7 +376,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
         
         
         
-        Collection<Variant> vCollection3 = variantDao.findBySubjectId(patientId );
+        Collection<Variant> vCollection3 = variantDao.findBySubjectPatientId(patientId );
         
         assertTrue(vCollection3.isEmpty());
         

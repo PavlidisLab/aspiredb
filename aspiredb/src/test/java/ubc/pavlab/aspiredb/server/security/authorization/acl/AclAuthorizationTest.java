@@ -139,7 +139,7 @@ public class AclAuthorizationTest extends BaseSpringContextTest {
         
         super.runAsUser( this.ownerUsername );
                 
-        CNV cnv = cnvDao.findBySubjectId( patientId ).iterator().next();
+        CNV cnv = cnvDao.findBySubjectPatientId( patientId ).iterator().next();
         
         assertTrue("User should own the individual's cnvs" , securityService.isOwnedByCurrentUser(cnv ));
         
@@ -170,7 +170,7 @@ public class AclAuthorizationTest extends BaseSpringContextTest {
         
         super.runAsUser( this.ownerUsername );
         
-        Collection<CNV> ownedCNVs = cnvDao.findBySubjectId( patientId );
+        Collection<CNV> ownedCNVs = cnvDao.findBySubjectPatientId( patientId );
         
         CNV cnv = ownedCNVs.iterator().next();
         

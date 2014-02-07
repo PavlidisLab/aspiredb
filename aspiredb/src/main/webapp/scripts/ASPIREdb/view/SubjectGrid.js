@@ -83,6 +83,9 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 			{
 				text : "# of variants",
 				dataIndex : 'varientNos',
+				renderer : function(value) {
+					return value;
+				},
 				flex : 1
 			},
 			{
@@ -92,7 +95,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 			}],
 
 	/**
-	 * 
+	 * init
 	 */
 	initComponent : function() {
 
@@ -185,6 +188,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		return visibleLabels;
 	},
 	
+	
 	/**
 	 * Populate grid with Subjects and Labels
 	 * 
@@ -196,8 +200,8 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		
 		me.setLoading(true);
 		me.getStore().removeAll();
-
 		me.visibleLabels = me.createVisibleLabels();
+		
 		
 		QueryService.querySubjects(filterConfigs, {
 			callback : function(pageLoad) {
@@ -209,7 +213,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 				
 				for ( var i = 0; i < me.valueObjects.length; i++) {
 					var val = me.valueObjects[i];
-
+									
 					// create only one unique label instance
 					var labelIds = [];
 					
@@ -229,7 +233,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 					//create summary of number of variants
 					
 
-					var row = [ val.id, val.patientId, labelIds ];
+					var row = [ val.id, val.patientId, labelIds, val.variants];
 					data.push(row);
 				}
 

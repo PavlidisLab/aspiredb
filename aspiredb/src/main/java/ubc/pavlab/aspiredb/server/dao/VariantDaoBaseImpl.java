@@ -129,7 +129,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<T> findBySubjectId( String id ) {
+    public Collection<T> findBySubjectPatientId( String id ) {
 
         List<Subject> subjects = this.getSessionFactory().getCurrentSession().createCriteria( Subject.class )
                 .add( Restrictions.eq( "patientId", id ) ).list();

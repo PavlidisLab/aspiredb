@@ -78,7 +78,7 @@ public class SubjectServiceImpl implements SubjectService {
         if ( subject == null ) return null;
 
         SubjectValueObject vo = subject.convertToValueObject();
-        Integer numVariants = cnvDao.findBySubjectId( subject.getPatientId() ).size();
+        Integer numVariants = cnvDao.findBySubjectPatientId( subject.getPatientId() ).size();
         vo.setVariants( numVariants != null ? numVariants : 0 );
 
         return vo;
