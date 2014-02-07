@@ -263,11 +263,11 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
         
         overlapRestriction.setProperty( new OverlapBasesProperty() );
                 
-        overlapRestriction.setOperator( Operator.NUMERIC_GREATER );
+        overlapRestriction.setOperator( Operator.NUMERIC_GREATER_OR_EQUAL );
         
         
         NumericValue numericValue = new NumericValue();
-        numericValue.setValue( 100 );
+        numericValue.setValue( 101 );
         
         overlapRestriction.setValue( numericValue );
         
@@ -311,19 +311,18 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
         ProjectOverlapFilterConfig overlapFilter = new ProjectOverlapFilterConfig();
         
         overlapFilter.setProjectIds( projectList );
-        overlapFilter.setOverlapProjectIds( projectListWithOverlap );
-        
+        overlapFilter.setOverlapProjectIds( projectListWithOverlap );        
       
-        //Note that the logic for this filter restriction is that ALL overlaps must be greater than the value specified
+        
         SimpleRestriction overlapRestriction = new SimpleRestriction();
         
         overlapRestriction.setProperty( new OverlapBasesProperty() );
                 
-        overlapRestriction.setOperator( Operator.NUMERIC_GREATER );
+        overlapRestriction.setOperator( Operator.NUMERIC_GREATER_OR_EQUAL );
         
         
         NumericValue numericValue = new NumericValue();
-        numericValue.setValue( 200 );
+        numericValue.setValue( 201 );
         
         overlapRestriction.setValue( numericValue );
         
@@ -373,11 +372,11 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
         
         overlapRestriction.setProperty( new OverlapBasesProperty() );
                 
-        overlapRestriction.setOperator( Operator.NUMERIC_LESS );
+        overlapRestriction.setOperator( Operator.NUMERIC_LESS_OR_EQUAL );
         
         
         NumericValue numericValue = new NumericValue();
-        numericValue.setValue(5 );
+        numericValue.setValue(4 );
         
         overlapRestriction.setValue( numericValue );
         
@@ -429,11 +428,11 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
         
         overlapRestriction.setProperty( new DoesOverlapWithXProperty() );
                 
-        overlapRestriction.setOperator( Operator.NUMERIC_LESS);
+        overlapRestriction.setOperator( Operator.NUMERIC_LESS_OR_EQUAL);
         
         
         NumericValue numericValue = new NumericValue();
-        numericValue.setValue( 10000000 );
+        numericValue.setValue( 9999999 );
         
         overlapRestriction.setValue( numericValue );
         
@@ -488,11 +487,11 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
         
         overlapRestriction.setProperty( new DoesOverlapWithXProperty() );
                 
-        overlapRestriction.setOperator( Operator.NUMERIC_GREATER);
+        overlapRestriction.setOperator( Operator.NUMERIC_GREATER_OR_EQUAL);
         
         
         NumericValue numericValue = new NumericValue();
-        numericValue.setValue( 10000000 );
+        numericValue.setValue( 10000001 );
         
         overlapRestriction.setValue( numericValue );
         
@@ -543,11 +542,11 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
         
         overlapRestriction.setProperty( new OverlapBasesProperty() );
                 
-        overlapRestriction.setOperator( Operator.NUMERIC_GREATER );
+        overlapRestriction.setOperator( Operator.NUMERIC_GREATER_OR_EQUAL );
         
         
         NumericValue numericValue = new NumericValue();
-        numericValue.setValue( 100 );
+        numericValue.setValue( 0 );
         
         overlapRestriction.setValue( numericValue );
         
@@ -559,83 +558,11 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
         
         overlapRestriction2.setProperty( new DoesOverlapWithXProperty() );
                 
-        overlapRestriction2.setOperator( Operator.NUMERIC_GREATER);
+        overlapRestriction2.setOperator( Operator.NUMERIC_GREATER_OR_EQUAL);
         
         
         NumericValue numericValue2 = new NumericValue();
-        numericValue2.setValue( 10000000 );
-        
-        overlapRestriction2.setValue( numericValue2 );
-        
-        overlapFilter.setRestriction2( overlapRestriction2 );
-        
-
-        BoundedList<VariantValueObject> result = null;
-
-        Set<AspireDbFilterConfig> set = new HashSet<AspireDbFilterConfig>();
-
-        set.add( overlapFilter );
-
-        try {
-
-            result = queryService.queryVariants( set );
-
-        } catch ( Exception e ) {
-            fail(e.toString());
-        }
-
-        assertEquals( 0,result.getItems().size() );
-
-       
-        
-        
-    }
-    
-    @Test
-    public void testProjectOverlapFilterWithSpecificOverlapGreaterThanPlusSecondaryOverlapGreaterAgain() {
-
-        Project project = projectDao.findByProjectName( projectName );
-
-        Project projectWithOverlap = projectDao.findByProjectName( projectNameWithOverlap );
-        
-        List<Long> projectList = new ArrayList<Long>();
-        projectList.add( project.getId() );
-
-        List<Long> projectListWithOverlap = new ArrayList<Long>();
-        projectListWithOverlap.add( projectWithOverlap.getId() );
-
-        ProjectOverlapFilterConfig overlapFilter = new ProjectOverlapFilterConfig();
-        
-        overlapFilter.setProjectIds( projectList );
-        overlapFilter.setOverlapProjectIds( projectListWithOverlap );
-        
-      
-        //Note that the logic for this filter restriction is that ALL overlaps must be greater than the value specified
-        SimpleRestriction overlapRestriction = new SimpleRestriction();
-        
-        overlapRestriction.setProperty( new OverlapBasesProperty() );
-                
-        overlapRestriction.setOperator( Operator.NUMERIC_GREATER );
-        
-        
-        NumericValue numericValue = new NumericValue();
-        numericValue.setValue( 1);
-        
-        overlapRestriction.setValue( numericValue );
-        
-        overlapFilter.setRestriction1( overlapRestriction );
-        
-        
-        
-        SimpleRestriction overlapRestriction2 = new SimpleRestriction();
-        
-        overlapRestriction2.setProperty( new DoesOverlapWithXProperty() );
-                
-        overlapRestriction2.setOperator( Operator.NUMERIC_GREATER);
-        
-        
-        NumericValue numericValue2 = new NumericValue();
-        numericValue2.setValue( 2);
+        numericValue2.setValue( 3 );
         
         overlapRestriction2.setValue( numericValue2 );
         
@@ -663,7 +590,77 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
         
     }
     
-    @Test//I love the name of this test
+    @Test
+    public void testProjectOverlapFilterWithSpecificOverlapGreaterThanPlusSecondaryOverlapGreaterAgain() {
+
+        Project project = projectDao.findByProjectName( projectName );
+
+        Project projectWithOverlap = projectDao.findByProjectName( projectNameWithOverlap );
+        
+        List<Long> projectList = new ArrayList<Long>();
+        projectList.add( project.getId() );
+
+        List<Long> projectListWithOverlap = new ArrayList<Long>();
+        projectListWithOverlap.add( projectWithOverlap.getId() );
+
+        ProjectOverlapFilterConfig overlapFilter = new ProjectOverlapFilterConfig();
+        
+        overlapFilter.setProjectIds( projectList );
+        overlapFilter.setOverlapProjectIds( projectListWithOverlap );
+        
+        SimpleRestriction overlapRestriction = new SimpleRestriction();
+        
+        overlapRestriction.setProperty( new OverlapBasesProperty() );
+                
+        overlapRestriction.setOperator( Operator.NUMERIC_GREATER_OR_EQUAL );
+        
+        
+        NumericValue numericValue = new NumericValue();
+        numericValue.setValue( 2);
+        
+        overlapRestriction.setValue( numericValue );
+        
+        overlapFilter.setRestriction1( overlapRestriction );
+        
+        
+        
+        SimpleRestriction overlapRestriction2 = new SimpleRestriction();
+        
+        overlapRestriction2.setProperty( new DoesOverlapWithXProperty() );
+                
+        overlapRestriction2.setOperator( Operator.NUMERIC_GREATER_OR_EQUAL);
+        
+        
+        NumericValue numericValue2 = new NumericValue();
+        numericValue2.setValue( 3);
+        
+        overlapRestriction2.setValue( numericValue2 );
+        
+        overlapFilter.setRestriction2( overlapRestriction2 );
+        
+
+        BoundedList<VariantValueObject> result = null;
+
+        Set<AspireDbFilterConfig> set = new HashSet<AspireDbFilterConfig>();
+
+        set.add( overlapFilter );
+
+        try {
+
+            result = queryService.queryVariants( set );
+
+        } catch ( Exception e ) {
+            fail(e.toString());
+        }
+
+        assertEquals( 1,result.getItems().size() );
+
+       
+        
+        
+    }
+    
+    @Test//great method name
     public void testProjectOverlapFilterWithSpecificOverlapGreaterThanPlusSecondaryOverlapGreaterAgainOneMoreTime() {
 
         Project project = projectDao.findByProjectName( projectName );
@@ -687,11 +684,11 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
         
         overlapRestriction.setProperty( new OverlapBasesProperty() );
                 
-        overlapRestriction.setOperator( Operator.NUMERIC_GREATER );
+        overlapRestriction.setOperator( Operator.NUMERIC_GREATER_OR_EQUAL );
         
         
         NumericValue numericValue = new NumericValue();
-        numericValue.setValue( 0 );
+        numericValue.setValue( 1 );
         
         overlapRestriction.setValue( numericValue );
         
@@ -703,11 +700,11 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
         
         overlapRestriction2.setProperty( new DoesOverlapWithXProperty() );
                 
-        overlapRestriction2.setOperator( Operator.NUMERIC_GREATER);
+        overlapRestriction2.setOperator( Operator.NUMERIC_GREATER_OR_EQUAL);
         
         
         NumericValue numericValue2 = new NumericValue();
-        numericValue2.setValue( 1);
+        numericValue2.setValue( 2);
         
         overlapRestriction2.setValue( numericValue2 );
         
@@ -736,7 +733,7 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
     }
     
     
-    @Test//I love the name of this test
+    @Test
     public void testProjectOverlapFilterWithSpecificLessThanPlusSecondaryOverlapLessThan() {
 
         Project project = projectDao.findByProjectName( projectName );
@@ -760,11 +757,11 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
         
         overlapRestriction.setProperty( new OverlapBasesProperty() );
                 
-        overlapRestriction.setOperator( Operator.NUMERIC_LESS );
+        overlapRestriction.setOperator( Operator.NUMERIC_LESS_OR_EQUAL );
         
         
         NumericValue numericValue = new NumericValue();
-        numericValue.setValue( 1);
+        numericValue.setValue( 0);
         
         overlapRestriction.setValue( numericValue );
         
@@ -776,11 +773,11 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
         
         overlapRestriction2.setProperty( new DoesOverlapWithXProperty() );
                 
-        overlapRestriction2.setOperator( Operator.NUMERIC_LESS);
+        overlapRestriction2.setOperator( Operator.NUMERIC_LESS_OR_EQUAL);
         
         
         NumericValue numericValue2 = new NumericValue();
-        numericValue2.setValue( 1);
+        numericValue2.setValue( 0);
         
         overlapRestriction2.setValue( numericValue2 );
         

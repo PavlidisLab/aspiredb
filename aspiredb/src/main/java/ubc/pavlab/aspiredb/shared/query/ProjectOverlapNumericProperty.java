@@ -20,20 +20,27 @@ package ubc.pavlab.aspiredb.shared.query;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
-/**
- * author: anton
- * date: 07/05/13
- */
-@DataTransferObject(type="enum")
-public enum Operator  {
-    IS_IN_SET,
-    IS_NOT_IN_SET,
-    NUMERIC_GREATER,
-    NUMERIC_LESS,
-    NUMERIC_GREATER_OR_EQUAL,
-    NUMERIC_LESS_OR_EQUAL,
-    NUMERIC_EQUAL,
-    NUMERIC_NOT_EQUAL,
-    TEXT_EQUAL,
-    TEXT_NOT_EQUAL;
+import java.util.Arrays;
+
+
+@DataTransferObject(javascript = "ProjectOverlapNumericProperty")
+public class ProjectOverlapNumericProperty extends Property<NumericalDataType> {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5128521922049745550L;
+
+    public ProjectOverlapNumericProperty() {
+        this.dataType = new NumericalDataType();
+        this.operators = Arrays.asList(
+                Operator.NUMERIC_LESS_OR_EQUAL,Operator.NUMERIC_GREATER_OR_EQUAL);
+    }
+
+    public ProjectOverlapNumericProperty(String displayName, String name) {
+        this();
+        this.displayName = displayName;
+        this.name = name;
+    }
+
 }

@@ -22,7 +22,7 @@ import org.directwebremoting.annotations.DataTransferObject;
 
 
 @DataTransferObject(javascript = "MutualOverlapPercentageProperty")
-public class MutualOverlapPercentageProperty extends NumericProperty {
+public class MutualOverlapPercentageProperty extends ProjectOverlapNumericProperty {
    
 
     /**
@@ -31,6 +31,6 @@ public class MutualOverlapPercentageProperty extends NumericProperty {
     private static final long serialVersionUID = -5785254099186914421L;
 
     public MutualOverlapPercentageProperty() {
-        super("Mutual Percentage Overlap", "mutualpercentageoverlap");
+        super("mutual % overlap", "mutualpercentageoverlap");
     }
 }

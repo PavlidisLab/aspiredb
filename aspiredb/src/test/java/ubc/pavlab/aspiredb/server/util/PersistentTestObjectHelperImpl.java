@@ -34,6 +34,7 @@ import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SNVDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.TranslocationDao;
+import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantOverlapDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Characteristic;
@@ -45,6 +46,7 @@ import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
+import ubc.pavlab.aspiredb.server.project.ProjectManager;
 
 /**
  * Class for tests to use to create and remove persistent objects This class will become unnecessary one we have
@@ -76,6 +78,9 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     @Autowired
     ProjectDao projectDao;
+    
+    @Autowired
+    Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
 
     @Autowired
     PhenotypeDao phenotypeDao;
@@ -314,7 +319,17 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     
     @Transactional
     public void deleteProject(String projectName){
+       
+        
         Project project = projectDao.findByProjectName( projectName );
+        
+        if (project == null){
+            
+            return;
+            
+        }
+        
+        variant2SpecialVariantOverlapDao.deleteByOverlapProjectId( project.getId() );
         for ( Subject s : project.getSubjects() ) {
             try {
                 
@@ -333,4 +348,6 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         }
         projectDao.remove( project );
     }
+    
+    
 }

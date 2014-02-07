@@ -22,7 +22,7 @@ import org.directwebremoting.annotations.DataTransferObject;
 
 
 @DataTransferObject(javascript = "OverlapPercentageMyVariantProperty")
-public class OverlapPercentageMyVariantProperty extends NumericProperty {
+public class OverlapPercentageMyVariantProperty extends ProjectOverlapNumericProperty {
     
 
 
@@ -32,6 +32,6 @@ public class OverlapPercentageMyVariantProperty extends NumericProperty {
     private static final long serialVersionUID = 8913091351746995545L;
 
     public OverlapPercentageMyVariantProperty() {
-        super("% Overlap of Active Project Variant", "percentageoverlapmyvariants");
+        super("% overlap with active project variant", "percentageoverlapmyvariants");
     }
 }

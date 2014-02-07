@@ -22,10 +22,10 @@ import org.directwebremoting.annotations.DataTransferObject;
 
 
 @DataTransferObject(javascript = "DoesOverlapWithXProperty")
-public class DoesOverlapWithXProperty extends NumericProperty {
+public class DoesOverlapWithXProperty extends ProjectOverlapNumericProperty {
     
    
     public DoesOverlapWithXProperty() {
-        super("Does Overlap with x Variants", "doesoverlap");
+        super("# of supporting variants", "doesoverlap");
     }
 }

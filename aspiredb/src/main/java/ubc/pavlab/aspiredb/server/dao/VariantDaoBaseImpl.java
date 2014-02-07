@@ -351,10 +351,13 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
                         overlapFilter.getOverlapProjectIds() );
 
                 if ( infos.size() == 0 ) {
+                    
+                    NumericValue numeric1 = ( NumericValue ) overlapRestriction1.getValue();
+                    Integer value1 = numeric1.getValue();
 
                     // if this is a less than restriction we have to include overlaps of 0, entries of which do not
                     // exist in the Variant2SpecialVariantOverlap table
-                    if ( overlapRestriction1.getOperator().equals( Operator.NUMERIC_LESS ) ) {
+                    if ( overlapRestriction1.getOperator().equals( Operator.NUMERIC_LESS_OR_EQUAL ) ) {
                         
                         Collection<Variant2SpecialVariantOverlap> allInfos = variant2SpecialVariantOverlapDao.loadByVariantId( vId, overlapFilter.getOverlapProjectIds() );                        
                         
@@ -366,7 +369,11 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
                         //else this vId should fall through to the bottom and get added if there are no more restrictions
                         
                         
-                    }else{
+                    }else if (overlapRestriction1.getOperator().equals( Operator.NUMERIC_GREATER_OR_EQUAL ) && value1<1){
+                      //edge case, all vids implicitly have an overlap of 0  with something, (unless they overlap with every variant in the project but I am not going to worry about that)
+                       //this means that this vId is still in consideration
+                    }
+                    else{
                         
                         //If this is a "GREATER_THAN" and no overlaps meet the restriction, we skip this vId and continue with the next one
                         continue;
@@ -479,14 +486,14 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         Collection<Variant2SpecialVariantOverlap> overlapsMeetingRestriction = variant2SpecialVariantOverlapDao
                 .loadByVariantIdAndOverlap( vId, overlapRestriction, overlapProjectIds );
 
-        if (overlapRestriction.getOperator().equals( Operator.NUMERIC_LESS ) && allOverlaps.size() == overlapsMeetingRestriction.size() ) {
+        if (overlapRestriction.getOperator().equals( Operator.NUMERIC_LESS_OR_EQUAL ) && allOverlaps.size() == overlapsMeetingRestriction.size() ) {
             //we could also have returned overlapsMeetingRestriction as they are identical sets
             return allOverlaps;
             
         }
         
         
-        if (overlapRestriction.getOperator().equals( Operator.NUMERIC_GREATER )){
+        if (overlapRestriction.getOperator().equals( Operator.NUMERIC_GREATER_OR_EQUAL )){
             return overlapsMeetingRestriction;
             
         }
@@ -506,15 +513,11 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         Integer value = numeric.getValue();
 
-        if ( o.equals( Operator.NUMERIC_GREATER ) ) {
-            return overlaps.size() > value;
-        } else if ( o.equals( Operator.NUMERIC_LESS ) ) {
-            return overlaps.size() < value;
-        } else if ( o.equals( Operator.NUMERIC_EQUAL ) ) {
-            return overlaps.size() == value;
-        } else if ( o.equals( Operator.NUMERIC_NOT_EQUAL ) ) {
-            return overlaps.size() != value;
-        }
+        if ( o.equals( Operator.NUMERIC_GREATER_OR_EQUAL ) ) {
+            return overlaps.size() >= value;
+        } else if ( o.equals( Operator.NUMERIC_LESS_OR_EQUAL ) ) {
+            return overlaps.size() <= value;
+        } 
 
         return false;
 
@@ -529,8 +532,8 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         for ( Variant2SpecialVariantOverlap overlap : overlaps ) {
 
             Variant v = load( overlap.getOverlapSpecialVariantId() );
-
-            String supportKey = projectDao.load( overlap.getOverlapProjectId() ).getVariantSupportCharacteristicKey();
+            
+            String supportKey = projectDao.getOverlapProjectVariantSupportCharacteristicKey( overlap.getOverlapProjectId() );
 
             for ( Characteristic c : v.getCharacteristics() ) {
 
@@ -550,15 +553,11 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         Integer value = numeric.getValue();
 
-        if ( o.equals( Operator.NUMERIC_GREATER ) ) {
-            return supportSet.size() > value;
-        } else if ( o.equals( Operator.NUMERIC_LESS ) ) {
-            return supportSet.size() < value;
-        } else if ( o.equals( Operator.NUMERIC_EQUAL ) ) {
-            return supportSet.size() == value;
-        } else if ( o.equals( Operator.NUMERIC_NOT_EQUAL ) ) {
-            return supportSet.size() != value;
-        }
+        if ( o.equals( Operator.NUMERIC_GREATER_OR_EQUAL ) ) {
+            return supportSet.size() >= value;
+        } else if ( o.equals( Operator.NUMERIC_LESS_OR_EQUAL ) ) {
+            return supportSet.size() <= value;
+        } 
 
         return false;
 

@@ -15,8 +15,7 @@
 
 package ubc.pavlab.aspiredb.server.project;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.After;
@@ -38,9 +36,7 @@ import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantOverlapDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
-import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
-import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
 import ubc.pavlab.aspiredb.server.service.QueryService;
@@ -49,18 +45,11 @@ import ubc.pavlab.aspiredb.shared.BoundedList;
 import ubc.pavlab.aspiredb.shared.CNVValueObject;
 import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
-import ubc.pavlab.aspiredb.shared.NumericValue;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
-import ubc.pavlab.aspiredb.shared.query.DoesOverlapWithXProperty;
-import ubc.pavlab.aspiredb.shared.query.Operator;
-import ubc.pavlab.aspiredb.shared.query.OverlapBasesProperty;
 import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
-import ubc.pavlab.aspiredb.shared.query.ProjectOverlapFilterConfig;
-import ubc.pavlab.aspiredb.shared.query.Property;
-import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 
-public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest {
+public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
     @Autowired
     private ProjectManager projectManager;
@@ -103,18 +92,20 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
 
    
 
-    //@Before
-    public void setup() throws Exception {
+   
+    @Test
+    public void testPopulateSpecialProjectOverlap() {
 
-       // super.runAsAdmin();
-
+        super.runAsAdmin();
+        
+        
         ArrayList<VariantValueObject> cnvList = new ArrayList<VariantValueObject>();
         cnvList.add( getCNV( "X", 3, 234, userVariantId, patientId ) );
         
         cnvList.add( getCNV( "X", 1, 5, userVariantId2, patientId ) );        
         
-        cnvList.add( getCNV( "2", 123, 235, "XXXXXXX", patientId ) );
-        cnvList.add( getCNV( "3", 12, 236, "XXXXXXX2", patientId ) );
+        cnvList.add( getCNV( "2", 123, 235, RandomStringUtils.randomAlphabetic( 5 ), patientId ) );
+        cnvList.add( getCNV( "3", 12, 236, RandomStringUtils.randomAlphabetic( 5 ), patientId ) );
 
         try {
 
@@ -148,7 +139,9 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
         cnvListWithOverlap.add( getCNV( "Y", 3, 234, null, patientIdWithOverlap ) );
 
         try {
-
+            
+            helper.deleteProject( "DGV" );
+            
             projectManager.addSubjectVariantsToSpecialProject( projectNameWithOverlap, true, cnvListWithOverlap, false );
 
         } catch ( Exception e ) {
@@ -168,13 +161,8 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
             
         }
         
-        
-        
-        variant2SpecialVariantOverlapDao.deleteByOverlapProjectIds(overlapProjectIds);
-        
+                
         try {
-
-           
             
             projectManager.populateSpecialProjectOverlap( projectName, projectNameWithOverlap );
        
@@ -186,27 +174,6 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
         }
         
        
-        
-        
-        
-
-    }
-    
-    
-    //@After
-    public void tearDown() throws Exception {
-        helper.deleteProject(projectName);
-        helper.deleteProject(projectNameWithOverlap);
-        
-    }
-    
-    //this test works locally but always seems to fail on the server with an sql constraint violation exception.
-   //commenting out for now
-   /*
-    @Test
-    public void testPopulateSpecialProjectOverlap() {
-
-        super.runAsAdmin();
 
         Project projectToPopulate = projectDao.findByProjectName( projectName );
 
@@ -295,10 +262,14 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
             }
 
         }
+        
+        helper.deleteProject(projectName);
+        helper.deleteProject(projectNameWithOverlap);
+        
 
     }
 
-    *///
+    
 
     private boolean doesOverlap( Variant variant, Variant specialVariant ) {
 
