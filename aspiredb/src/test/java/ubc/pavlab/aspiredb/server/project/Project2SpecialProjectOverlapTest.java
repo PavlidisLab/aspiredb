@@ -97,14 +97,15 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
     public void testPopulateSpecialProjectOverlap() {
 
         super.runAsAdmin();
-
+        
+        
         ArrayList<VariantValueObject> cnvList = new ArrayList<VariantValueObject>();
         cnvList.add( getCNV( "X", 3, 234, userVariantId, patientId ) );
         
         cnvList.add( getCNV( "X", 1, 5, userVariantId2, patientId ) );        
         
-        cnvList.add( getCNV( "2", 123, 235, "XXXXXXX", patientId ) );
-        cnvList.add( getCNV( "3", 12, 236, "XXXXXXX2", patientId ) );
+        cnvList.add( getCNV( "2", 123, 235, RandomStringUtils.randomAlphabetic( 5 ), patientId ) );
+        cnvList.add( getCNV( "3", 12, 236, RandomStringUtils.randomAlphabetic( 5 ), patientId ) );
 
         try {
 
