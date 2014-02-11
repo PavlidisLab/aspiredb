@@ -37,7 +37,7 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
                             valueCombo.clearValue();
                             valueCombo.lastQuery = null;
                             valueCombo.getStore().setProperty(record.raw);
-                            //ASPIREdb.EVENT_BUS.fireEvent('query_update');
+                            ASPIREdb.EVENT_BUS.fireEvent('query_update');
                         },
                         scope: this
                     },
@@ -60,7 +60,7 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
                 listeners: {
                 	select: {
                 		fn: function(obj, records) {
-                			//ASPIREdb.EVENT_BUS.fireEvent('query_update');
+                			ASPIREdb.EVENT_BUS.fireEvent('query_update');
                         },
                         scope : this,
                 	}
@@ -89,7 +89,7 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
             
             if(filterContainer.ownerCt.closeEmptyFilter) filterContainer.ownerCt.closeEmptyFilter();
             
-           // ASPIREdb.EVENT_BUS.fireEvent('query_update');
+            ASPIREdb.EVENT_BUS.fireEvent('query_update');
         });
 
     },

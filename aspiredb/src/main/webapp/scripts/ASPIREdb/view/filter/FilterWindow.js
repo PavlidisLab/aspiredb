@@ -110,13 +110,16 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 					itemId : 'numberOfSubjectsLabel',
 				}, {
 					xtype : 'label',
-					text : ' subjects and '
+					text : ' subjects and ',
+					itemId : 'numberOfSubjectsLabelText'
 				}, {
 					xtype : 'label',
 					itemId : 'numberOfVariantsLabel',
+					
 				}, {
 					xtype : 'label',
-					text : ' variants will be returned.'
+					text : ' variants will be returned.',
+					itemId : 'numberOfVariantsLabelText'
 				} ]
 			}, {
 				xtype : 'container',
@@ -189,6 +192,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 			var record = records[0];
 			filterContainer.add(Ext.create(record.raw[0]));
 			filterTypeComboBox.setValue('FILTER_PLACEHOLDER');
+			me.invalidateResultCounts();
 		});
 		
 		ASPIREdb.view.DeleteQueryWindow.on('query_deleted', this.updateSavedQueryCombo, this);
@@ -197,8 +201,10 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		ASPIREdb.view.SaveQueryWindow.on('new_query_saved', this.enableDisableQueryManager, this);		
 		
 		ASPIREdb.EVENT_BUS.on('query_update', function(event) {
-			me.updateResultCounts();
+			me.invalidateResultCounts();
 		});
+		
+				
 	},
 
 	loadQueryHandler : function(filters) {
@@ -316,8 +322,29 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	},
 	
 	previewQueryHandler : function() {
+		
+		if (this.down('#numberOfSubjectsLabel').getEl() && this.down('#numberOfVariantsLabel').getEl()){
+			this.down('#numberOfSubjectsLabel').getEl().setOpacity(1, true);
+			this.down('#numberOfVariantsLabel').getEl().setOpacity(1, true);
+			this.down('#numberOfSubjectsLabelText').getEl().setOpacity(1, true);
+			this.down('#numberOfVariantsLabelText').getEl().setOpacity(1, true);
+		}
 
-		ASPIREdb.EVENT_BUS.fireEvent('query_update');
+		var me = this;		
+		
+		
+		var SUBJECT_IDS_KEY = 0;
+		var VARIANT_IDS_KEY = 1;
+		
+		me.setLoading(true);
+		
+		QueryService.getSubjectVariantCounts(this.getFilterConfigs(), {
+		    callback : function(totalCounts) {
+                me.down('#numberOfSubjectsLabel').setText(totalCounts[SUBJECT_IDS_KEY].toString());
+                me.down('#numberOfVariantsLabel').setText(totalCounts[VARIANT_IDS_KEY].toString());
+                me.setLoading(false);
+            }
+		});
 
 	},
 
@@ -328,7 +355,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	},
 
 	clearButtonHandler : function() {
-
+		
 		this.down('#filterContainer').removeAll();
 		ASPIREdb.EVENT_BUS.fireEvent('query_update');
 
@@ -351,8 +378,16 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		return filterConfigs;
 	},
 
-	updateResultCounts: function() {
-
+	invalidateResultCounts: function() {
+		
+		if (this.down('#numberOfSubjectsLabel').getEl() && this.down('#numberOfVariantsLabel').getEl()){
+			this.down('#numberOfSubjectsLabel').getEl().setOpacity(0.5, true);
+			this.down('#numberOfVariantsLabel').getEl().setOpacity(0.5, true);
+			this.down('#numberOfSubjectsLabelText').getEl().setOpacity(0.5, true);
+			this.down('#numberOfVariantsLabelText').getEl().setOpacity(0.5, true);
+		}
+		/*
+		 //old code ran queries on the back end to get updated counts, was decided that this was too slow
 		var me = this;
 		
 		var SUBJECT_IDS_KEY = 0;
@@ -367,6 +402,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
                 me.setLoading(false);
             }
 		});
+		*/
 		
 	},
 	

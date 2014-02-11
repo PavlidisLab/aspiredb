@@ -65,13 +65,21 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 
 		
 	setSimpleRestrictionExpression : function(restriction) {
-		var propertyComboBox = this.getComponent("propertyComboBox");
+		
 		var operatorComboBox = this.getComponent("operatorComboBox");	
 		
 		var multicombo_container = this.getComponent("multicombo_container");
 		var multicombo = multicombo_container.getComponent("multicombo");
 		
 		var singleValueField = multicombo_container.getComponent("singleValueField");
+		
+		singleValueField.on('change', function(){
+			
+			ASPIREdb.EVENT_BUS.fireEvent('query_update');
+			
+		});
+		
+		var propertyComboBox = me.getComponent("propertyComboBox");
 
 		this.selectedProperty = restriction.property;
 		propertyComboBox.setValue(restriction.property.displayName);
@@ -182,6 +190,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 				itemId : 'singleValueField',
 				width : 450,
 				height : 20,
+				enableKeyEvents : true,
 				hidden : true
 			}, {
 				xtype : 'label',

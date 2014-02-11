@@ -91,7 +91,7 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapPropertyFilter', {
 				xtype : 'numberfield',
 				itemId : 'singleValueField',
 				width : 200,
-				
+				enableKeyEvents: true,				
 				hidden : true
 			} ]
 		}];
@@ -101,6 +101,12 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapPropertyFilter', {
 		var operatorComboBox = me.getComponent("operatorComboBox");
 		var multicombo_container = me.getComponent("multicombo_container");
 		var singleValueField = multicombo_container.getComponent("singleValueField");
+		
+		singleValueField.on('change', function(){
+			
+			ASPIREdb.EVENT_BUS.fireEvent('query_update');
+			
+		});
 		
 		var propertyComboBox = me.getComponent("propertyComboBox");
 		
