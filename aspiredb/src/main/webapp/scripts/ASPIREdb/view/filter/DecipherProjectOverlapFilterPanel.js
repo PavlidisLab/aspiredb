@@ -27,7 +27,7 @@ Ext.define('ASPIREdb.view.filter.DecipherProjectOverlapFilterPanel', {
     setFilterConfig: function(config) {
         
         var projectOverlapFilterContainer = this.down('#decipherProjectOverlapFilterContainer');
-        projectOverlapFilterContainer.setRestrictionExpression(config.restriction);
+        projectOverlapFilterContainer.setRestrictionExpression(config);
         
     },
     

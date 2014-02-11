@@ -41,19 +41,19 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapPropertyFilter', {
 		var operatorComboBox = this.getComponent("operatorComboBox");	
 		
 		var multicombo_container = this.getComponent("multicombo_container");
-		var multicombo = multicombo_container.getComponent("multicombo");
-		
+				
 		var singleValueField = multicombo_container.getComponent("singleValueField");
 
 		this.selectedProperty = restriction.property;
-		propertyComboBox.setValue(restriction.property.displayName);
-		operatorComboBox.setValue(restriction.operator);
-
-		singleValueField.setValue(restriction.value.value);
 		
-		this.isMultiValue = false;
-		multicombo.hide();		
-		singleValueField.show();
+		if (this.selectedProperty){
+			propertyComboBox.setValue(restriction.property.displayName);
+			operatorComboBox.setValue(restriction.operator);
+			singleValueField.setValue(restriction.value.value);
+			this.isMultiValue = false;			
+			singleValueField.show();
+		}
+		
 
 	},	
 	

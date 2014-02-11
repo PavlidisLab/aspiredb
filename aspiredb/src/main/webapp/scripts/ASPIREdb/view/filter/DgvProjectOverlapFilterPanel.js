@@ -27,7 +27,7 @@ Ext.define('ASPIREdb.view.filter.DgvProjectOverlapFilterPanel', {
     setFilterConfig: function(config) {
         
         var projectOverlapFilterContainer = this.down('#dgvProjectOverlapFilterContainer');
-        projectOverlapFilterContainer.setRestrictionExpression(config.restriction);
+        projectOverlapFilterContainer.setRestrictionExpression(config);
         
     },
     
