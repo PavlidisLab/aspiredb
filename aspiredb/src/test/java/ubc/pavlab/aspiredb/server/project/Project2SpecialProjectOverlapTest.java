@@ -49,7 +49,7 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
 
-public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
+public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest {
 
     @Autowired
     private ProjectManager projectManager;
@@ -93,10 +93,10 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
    
 
    
-    @Test
+   //@Test
     public void testPopulateSpecialProjectOverlap() {
 
-        super.runAsAdmin();
+       // super.runAsAdmin();
         
         
         ArrayList<VariantValueObject> cnvList = new ArrayList<VariantValueObject>();
