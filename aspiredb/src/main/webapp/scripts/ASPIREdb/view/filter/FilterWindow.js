@@ -204,6 +204,8 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 			me.invalidateResultCounts();
 		});
 		
+		this.updateSpecialProjectValues(); 
+		
 				
 	},
 
@@ -219,7 +221,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		// first is filterconfig
 		for ( var i = 0; i < filters.length; i++) {
 
-			if (filters[i].restriction) {
+			if (filters[i].restriction || filters[i].restriction1) {
 
 				if (filters[i] instanceof SubjectFilterConfig) {
 
@@ -242,6 +244,32 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 					filterContainer.add(variantFilterPanel);
 					filterContainer.doLayout();
 					variantFilterPanel.setFilterConfig(filters[i]);
+
+				}else if (filters[i] instanceof ProjectOverlapFilterConfig) {
+					
+					//overlapProjectIds will only have 1 entry currently, however it is an array to allow for extension to multiple projects later
+					var overlapProjectId =filters[i].overlapProjectIds[0];
+					
+					if (overlapProjectId == this.decipherProjectValueObject.id){
+						
+						var decipherProjectOverlapFilterPanel = Ext.create('ASPIREdb.view.filter.DecipherProjectOverlapFilterPanel');					
+						
+						filterContainer.add(decipherProjectOverlapFilterPanel);
+						filterContainer.doLayout();
+						decipherProjectOverlapFilterPanel.setFilterConfig(filters[i]);
+						
+					}else if (overlapProjectId == this.dgvProjectValueObject.id){
+						
+						var dgvProjectOverlapFilterPanel = Ext.create('ASPIREdb.view.filter.DgvProjectOverlapFilterPanel');					
+						
+						filterContainer.add(dgvProjectOverlapFilterPanel);
+						filterContainer.doLayout();
+						dgvProjectOverlapFilterPanel.setFilterConfig(filters[i]);
+						
+					}
+					
+					
+					
 
 				}
 
@@ -386,24 +414,32 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 			this.down('#numberOfSubjectsLabelText').getEl().setOpacity(0.5, true);
 			this.down('#numberOfVariantsLabelText').getEl().setOpacity(0.5, true);
 		}
-		/*
-		 //old code ran queries on the back end to get updated counts, was decided that this was too slow
-		var me = this;
 		
-		var SUBJECT_IDS_KEY = 0;
-		var VARIANT_IDS_KEY = 1;
-		
-		me.setLoading(true);
-		
-		QueryService.getSubjectVariantCounts(this.getFilterConfigs(), {
-		    callback : function(totalCounts) {
-                me.down('#numberOfSubjectsLabel').setText(totalCounts[SUBJECT_IDS_KEY].toString());
-                me.down('#numberOfVariantsLabel').setText(totalCounts[VARIANT_IDS_KEY].toString());
-                me.setLoading(false);
-            }
-		});
-		*/
 		
 	},
+	
+	updateSpecialProjectValues : function() {
+
+		var ref = this;
+		
+		ProjectService.getDecipherProject({
+			
+			callback : function(pvo) {
+
+				ref.decipherProjectValueObject = pvo;
+
+			}
+		});
+		
+		ProjectService.getDgvProject({
+			
+			callback : function(pvo) {
+
+				ref.dgvProjectValueObject = pvo;
+
+			}
+		});
+
+	}
 	
 });

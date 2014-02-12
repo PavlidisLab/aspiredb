@@ -95,12 +95,19 @@ Ext.define('ASPIREdb.view.filter.DgvProjectOverlapFilterContainer', {
 		return projectOverlapConfig;
 	},
 
-	setRestrictionExpression : function(restriction) {
+	setRestrictionExpression : function(config) {
 		var filterContainer = this.getComponent('filterContainer');
-
-		var getNewOverlapItem = this.getNewOverlapItemFunction();
-
-		//TODO this will get called when a saved query is reconstructed, implement later after requirements are more clear
+		
+		
+		filterContainer.getComponent('overlapItem').setRestrictionExpression(config.restriction1);
+		
+		filterContainer.getComponent('numVariantsOverlapItem').setRestrictionExpression(config.restriction2);
+		
+		filterContainer.getComponent('supportOfVariantsOverlapItem').setRestrictionExpression(config.restriction3);
+		
+		filterContainer.getComponent('phenRestriction').setRestrictionExpression(config.phenotypeRestriction);
+		
+		filterContainer.getComponent('invertCheckbox').setValue(config.invert);
 	},
 	
 	validateOverlapRestriction : function(restriction){

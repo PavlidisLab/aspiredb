@@ -83,7 +83,7 @@ Ext.define('ASPIREdb.view.filter.DecipherProjectOverlapFilterContainer', {
 		
 		projectOverlapConfig.restriction2 = this.validateOverlapRestriction(numVariantsOverlapRestriction);
 		
-		//"supportOfVariantsOverlapItem" should be hidden and empty, however we need to set the dwr object to have it. 
+		//"supportOfVariantsOverlapItem" should be hidden and empty, however we need it there because the dwr object requires it. 
 		var supportOfVariantsOverlapRestriction = filterContainer.getComponent('supportOfVariantsOverlapItem').getRestrictionExpression();
 		
 		projectOverlapConfig.restriction3 = this.validateOverlapRestriction(supportOfVariantsOverlapRestriction);
@@ -95,12 +95,20 @@ Ext.define('ASPIREdb.view.filter.DecipherProjectOverlapFilterContainer', {
 		return projectOverlapConfig;
 	},
 
-	setRestrictionExpression : function(restriction) {
+	setRestrictionExpression : function(config) {
 		var filterContainer = this.getComponent('filterContainer');
-
-		var getNewOverlapItem = this.getNewOverlapItemFunction();
-
-		//TODO this will get called when a saved query is reconstructed, implement later after requirements are more clear
+		
+				
+		filterContainer.getComponent('overlapItem').setRestrictionExpression(config.restriction1);
+		
+		filterContainer.getComponent('numVariantsOverlapItem').setRestrictionExpression(config.restriction2);
+		
+		filterContainer.getComponent('supportOfVariantsOverlapItem').setRestrictionExpression(config.restriction3);
+		
+		filterContainer.getComponent('phenRestriction').setRestrictionExpression(config.phenotypeRestriction);
+		
+		filterContainer.getComponent('invertCheckbox').setValue(config.invert);
+		
 	},
 	
 	validateOverlapRestriction : function(restriction){

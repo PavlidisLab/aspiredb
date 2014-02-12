@@ -496,9 +496,10 @@ public class QueryServiceImpl implements QueryService {
     @RemoteMethod
     public Set<AspireDbFilterConfig> loadQuery( String name ) {
         List<Query> querys = queryDao.findByName( name );
-
+        
+        Set<AspireDbFilterConfig> configs = ( Set<AspireDbFilterConfig> ) querys.iterator().next().getObject();
         // should only be one for one user
-        return ( Set<AspireDbFilterConfig> ) querys.iterator().next().getObject();
+        return configs;
     }
     
     @Override
