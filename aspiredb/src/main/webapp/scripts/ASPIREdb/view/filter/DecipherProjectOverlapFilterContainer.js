@@ -181,7 +181,7 @@ Ext.define('ASPIREdb.view.filter.DecipherProjectOverlapFilterContainer', {
 		filterContainer.insert(0, {xtype: 'filter_phenotype_property', itemId : 'phenRestriction' });
 		filterContainer.insert(0, {
 			xtype : 'label',
-			text : 'Phenotype Association of target project variants restriction: '
+			text : 'Overlap Phenotype Association: '
 		});
 		
 		filterContainer.insert(0, supportOfVariantsOverlapItem);
