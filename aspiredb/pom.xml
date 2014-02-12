@@ -387,6 +387,19 @@
 				</executions>
 			</plugin>
 
+            <!--  mvn cobertura:cobertura -->
+            <plugin>
+	            <groupId>org.codehaus.mojo</groupId>
+		        <artifactId>cobertura-maven-plugin</artifactId>
+		        <version>2.6</version>
+		        <configuration>
+		          <aggregate>true</aggregate>
+		          <check>
+		              <haltOnFailure>false</haltOnFailure>
+		          </check>
+		        </configuration>
+            </plugin>
+            
 		</plugins>
 		<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
 	</build>
@@ -562,5 +575,15 @@
 		</profile>
 	</profiles>
 
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.6</version>
+			</plugin>
+		</plugins>
+	</reporting>
+    
 
 </project>
