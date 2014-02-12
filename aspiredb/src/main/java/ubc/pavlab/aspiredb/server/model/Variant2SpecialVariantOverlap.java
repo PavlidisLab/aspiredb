@@ -36,6 +36,30 @@ public class Variant2SpecialVariantOverlap implements Serializable  {
      */
     private static final long serialVersionUID = 6734779432249098068L;
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ( ( overlapSpecialVariantId == null ) ? 0 : overlapSpecialVariantId.hashCode() );
+        result = prime * result + ( ( variantId == null ) ? 0 : variantId.hashCode() );
+        return result;
+    }
+
+    @Override
+    public boolean equals( Object obj ) {
+        if ( this == obj ) return true;
+        if ( obj == null ) return false;
+        if ( getClass() != obj.getClass() ) return false;
+        Variant2SpecialVariantOverlap other = ( Variant2SpecialVariantOverlap ) obj;
+        if ( overlapSpecialVariantId == null ) {
+            if ( other.overlapSpecialVariantId != null ) return false;
+        } else if ( !overlapSpecialVariantId.equals( other.overlapSpecialVariantId ) ) return false;
+        if ( variantId == null ) {
+            if ( other.variantId != null ) return false;
+        } else if ( !variantId.equals( other.variantId ) ) return false;
+        return true;
+    }
+
     //note this is a composite key with variantId and overlapSpecialVariantId
     @Id    
     @Column(name="VARIANTID")
@@ -111,5 +135,7 @@ public class Variant2SpecialVariantOverlap implements Serializable  {
     public void setOverlapProjectId( Long overlapProjectId ) {
         this.overlapProjectId = overlapProjectId;
     }
+    
+    
     
 }
