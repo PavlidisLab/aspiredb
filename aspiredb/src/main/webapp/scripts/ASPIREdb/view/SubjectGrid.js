@@ -231,9 +231,9 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 					}
 					
 					//create summary of number of variants
+					val.numOfPhenotypes;
 					
-
-					var row = [ val.id, val.patientId, labelIds, val.variants];
+					var row = [ val.id, val.patientId, labelIds, val.variants,  val.numOfPhenotypes];
 					data.push(row);
 				}
 
@@ -297,40 +297,68 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 
 			// override
 			onOkButtonClick : function() {
-				this.callParent();
-
+				
+				var labelCombo = this.down("#labelCombo");
 				var vo = this.getLabel();
+				if (vo== null){
+					return;
+				}
+				var labelIndex=labelCombo.getStore().findExact('display',vo.name);
+				if ( labelIndex!=-1){
+							//activate confirmation window
+							Ext.MessageBox.confirm('Label already exist', 'Label already exist. Add into it ?', function(btn){
+							   if(btn === 'yes'){
+								   me.addLabelHandler(vo,selSubjectIds);
+								   this.hide();
+							   }
+							   
+							   
+							 }, this);
 
-				// store in database
-				SubjectService.addLabel(selSubjectIds, vo, {
-					callback : function(addedLabel) {
+				}
+				else{
+					me.addLabelHandler(vo,selSubjectIds);
+					this.hide();
+				}
+					
+				
 
-						addedLabel.isShown = true;
-						LabelService.updateLabel(addedLabel);
-
-						var existingLab = me.visibleLabels[addedLabel.id];
-						if (existingLab == undefined) {
-							me.visibleLabels[addedLabel.id] = addedLabel;
-						} else {
-							existingLab.isShown = true;
-						}
-
-						// update local store
-						for ( var i = 0; i < me.selSubjects.length; i++) {
-							me.selSubjects[i].get('labelIds').push(
-									addedLabel.id);
-						}
-
-						// refresh grid
-						me.getView().refresh();
-					}
-				});
-			},
+			}
 		});
 
 		var labelWindow = new ASPIREdb.view.CreateLabelWindowSubject();
 		labelWindow.show();
 
+	},
+	
+	addLabelHandler: function(vo,selSubjectIds) {
+		 
+		 var me=this;
+		 		   
+			// store in database
+			SubjectService.addLabel(selSubjectIds, vo, {
+				callback : function(addedLabel) {
+
+					addedLabel.isShown = true;
+					LabelService.updateLabel(addedLabel);
+
+					var existingLab = me.visibleLabels[addedLabel.id];
+					if (existingLab == undefined) {
+						me.visibleLabels[addedLabel.id] = addedLabel;
+					} else {
+						existingLab.isShown = true;
+					}
+
+					// update local store
+					for ( var i = 0; i < me.selSubjects.length; i++) {
+						me.selSubjects[i].get('labelIds').push(
+								addedLabel.id);
+					}
+
+					// refresh grid
+					me.getView().refresh();
+				}
+			});
 	},
 
 	/**

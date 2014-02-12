@@ -34,6 +34,8 @@ public class SubjectValueObject implements Serializable {
     private String patientId;
     private Map<String, PhenotypeValueObject> phenotypes;
     private Collection<LabelValueObject> labels;
+    private Integer numOfPhenotypes=0;
+    
 
     public Collection<LabelValueObject> getLabels() {
         return labels;
@@ -99,9 +101,9 @@ public class SubjectValueObject implements Serializable {
         return phenotypes.toString();
     }
 
-    public Integer getNumPhenotypes() {
+    /**public Integer getNumPhenotypes() {
         return phenotypes.size();
-    }
+    }*/
     
     @Override
     public boolean equals (Object o) {
@@ -112,5 +114,17 @@ public class SubjectValueObject implements Serializable {
     public int hashCode() {
     	return this.getId().hashCode();
     }
+
+    
+
+    public void setNumOfPhenotypes(Integer size) {
+        this.numOfPhenotypes = size;
+    }
+    
+    public Integer getNumOfPhenotypes() {
+        return numOfPhenotypes;
+    }
+
+ 
     
 }

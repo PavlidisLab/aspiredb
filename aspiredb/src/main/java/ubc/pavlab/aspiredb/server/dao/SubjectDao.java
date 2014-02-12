@@ -40,12 +40,12 @@ public interface SubjectDao extends SecurableDaoBase<Subject>, RemotePaging<Subj
 
     public Collection<String> suggestValuesForEntityProperty( Property property, SuggestionContext suggestionContext );
 
-    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<Subject> findByLabel( LabelValueObject labelEntity );
 
-    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<Subject> findByPhenotype( PhenotypeFilterConfig filter );
 
-    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<Subject> loadByVariantIds( List<Long> variantIds );
 }

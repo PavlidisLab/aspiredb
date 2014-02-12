@@ -113,20 +113,12 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 			displayField : 'display',
 			valueField : 'value',
 			renderTo : Ext.getBody(),
-			/**listeners: {load: function () {
-				var exist = false;
-				 var combo = labelCombo.getValue();
-				 store.each(function(combo){
-					 if(labelcombo.find(value,combo,false, true, true)!= null){
-						 Ext.Msg.alert('Status', 'Label already exist. Overight?');
-					 }
-				 });
-			}
-			}*/
+		
 		});
 					
-		labelCombo.on('select', function(combo, records, eOpts) {
-			var vo = records[0].data.vos;
+		labelCombo.on('select', function(combo, records, eOpts) {							
+			
+			var vo = records[0].data.value;
 			if (vo != null && vo.colour != null) {
 				me.down('#colorPicker').select(vo.colour);
 			}
@@ -137,7 +129,8 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 	},
 
 	onOkButtonClick : function() {
-		this.hide();
+		
+			this.hide();
 	},
 
 	getLabel : function() {
@@ -158,4 +151,6 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 		vo.isShown = true;
 		return vo;
 	},
+	
+	
 });

@@ -55,6 +55,7 @@ import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.OntologyTermValueObject;
+import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
@@ -217,7 +218,9 @@ public class QueryServiceImpl implements QueryService {
             Integer numVariants = variantDao.findBySubjectPatientId( subject.getPatientId() ).size();
             vo.setVariants( numVariants != null ? numVariants : 0 );
             
-           Integer numPhenotypes =phenotypeDao.findBySubjectId( subject.getId() ).size();
+            //Integer phonetypetot=phenotypeDao.findBySubjectId( subject.getId() ).size();
+            Integer phonetypetot=phenotypeDao.findPhenotypeCountBySubjectId(subject.getId());
+            vo.setNumOfPhenotypes( phonetypetot);
             
             vos.add( vo );
         }
