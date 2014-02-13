@@ -88,6 +88,27 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			aspireDbPanel.down('#projectTitle').setText('Active Project:  ' + projecttitle);
 		});
 		
+		ASPIREdb.EVENT_BUS.on('filter_submit', function(filterConfigs) {
+			var isFilter=false;
+			for ( var i = 0; i < filterConfigs.length; i++) {
+				if (!(filterConfigs[i] instanceof ProjectFilterConfig)) {
+						isFilter=true;		
+				}
+				
+			}
+			
+			if (isFilter){
+				aspireDbPanel.down('#filterActivated').setText('Filter Activated');
+				aspireDbPanel.down('#filterButton').setBorder(4);	
+				aspireDbPanel.down('#filterButton').setTooltip("Filter Activated");				
+			}
+			else {
+				aspireDbPanel.down('#filterActivated').setText('');
+				aspireDbPanel.down('#filterButton').setBorder(1);	
+				aspireDbPanel.down('#filterButton').setTooltip("Filter Not Activated");
+			}
+		});
+		
 		
 		
 		
@@ -191,7 +212,15 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			height : 30,
 			margin : '5 5 5 5',
 			flex : 1
-		}, {
+		},
+		{
+			xtype : 'label',
+			itemId : 'filterActivated',
+			style : 'vertical-align : middle; padding-top : 10px; float:auto',
+			height : 30,
+			margin : '5 5 5 5',
+			flex : 1
+		},{
 			xtype : 'label',
 			itemId : 'message',
 			style : 'text-align: right; vertical-align : middle; padding-top : 10px',
