@@ -83,6 +83,22 @@ public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDa
         return load( ids );
     }
     
+    @Transactional(readOnly = true)
+    public Collection<Label> getSubjectLabelsBySubjectId(Long id){
+
+        String sqlString = "select distinct LABEL_FK from SUBJECT_LABEL sl WHERE sl.SUBJECT_FK = :subjectId ";
+        Query query = currentSession().createSQLQuery( sqlString );
+        query.setLong( "subjectId",id );
+
+        Collection<BigInteger> labelIds = query.list();
+
+        Collection<Long> ids = new ArrayList<Long>();
+        for ( BigInteger labelId : labelIds ) {
+            ids.add( labelId.longValue() );
+        }
+        return load( ids );
+    }
+    
     @Override
     @Transactional(readOnly = true)
     @SuppressWarnings("unchecked")
