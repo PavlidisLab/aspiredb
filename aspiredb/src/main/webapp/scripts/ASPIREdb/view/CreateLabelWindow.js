@@ -117,7 +117,7 @@ Ext.define('ASPIREdb.view.CreateLabelWindow', {
 		});
 					
 		labelCombo.on('select', function(combo, records, eOpts) {							
-			
+			//Bug 3917 fixed
 			var vo = records[0].data.value;
 			if (vo != null && vo.colour != null) {
 				me.down('#colorPicker').select(vo.colour);

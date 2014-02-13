@@ -315,13 +315,14 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 				}
 
 				savedQueryComboBox.getStore().loadData(storedata);
-				savedQueryComboBox.select(savedQueryComboBox.getStore().getAt(names.length));
+				if (names.length >1){
+				savedQueryComboBox.select(savedQueryComboBox.getStore().getAt(names.length));}
 				
 			}
 		});
 		
 		this.down('#savedQueryComboBox').clearValue();
-
+		
 	},
 	
 	enableDisableQueryManager: function(){
@@ -385,6 +386,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	clearButtonHandler : function() {
 		
 		this.down('#filterContainer').removeAll();
+		this.down('#savedQueryComboBox').clearValue();
 		ASPIREdb.EVENT_BUS.fireEvent('query_update');
 
 	},
