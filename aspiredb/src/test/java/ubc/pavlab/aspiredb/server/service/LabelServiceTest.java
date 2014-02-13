@@ -1,0 +1,235 @@
+/*
+ * The aspiredb project
+ * 
+ * Copyright (c) 2013 University of British Columbia
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package ubc.pavlab.aspiredb.server.service;
+
+import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
+import ubc.pavlab.aspiredb.server.dao.LabelDao;
+import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
+import ubc.pavlab.aspiredb.server.dao.ProjectDao;
+import ubc.pavlab.aspiredb.server.dao.SubjectDao;
+import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
+import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
+import ubc.pavlab.aspiredb.server.model.Label;
+import ubc.pavlab.aspiredb.server.model.Phenotype;
+import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.project.ProjectManager;
+import ubc.pavlab.aspiredb.server.security.SecurityService;
+import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
+import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
+import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
+import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
+import ubc.pavlab.aspiredb.shared.AspireDbPagingLoadConfig;
+import ubc.pavlab.aspiredb.shared.AspireDbPagingLoadConfigBean;
+import ubc.pavlab.aspiredb.shared.LabelValueObject;
+import ubc.pavlab.aspiredb.shared.SubjectValueObject;
+import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.PhenotypeFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
+
+
+public class LabelServiceTest extends BaseSpringContextTest {
+
+    @Autowired
+    private LabelService labelService;
+    
+    @Autowired
+    private ProjectManager projectManager;
+    
+    @Autowired
+    private LabelDao labelDao;
+
+    @Autowired
+    private PersistentTestObjectHelper persistentTestObjectHelper;
+
+    @Autowired
+    private ProjectDao projectDao;
+
+    @Autowired
+    private SubjectDao subjectDao;
+    
+    @Autowired
+    private SubjectService subjectService;
+
+    @Autowired
+    private PhenotypeDao phenotypeDao;
+
+    @Autowired
+    private PhenotypeUtil phenotypeUtil;
+    
+    @Autowired
+    private SecurityService securityService;
+    
+    @Autowired
+    UserManager userManager;
+
+    private Project project;
+
+    private String HP_HEAD = "Abnormality of the head";
+    private String HP_FACE = "Abnormality of the face";
+    private String HP_MOUTH = "Abnormality of the mouth";
+    private String HP_NERVOUS = "Abnormality of the nervous system";
+
+    private Collection<Long> activeProjectIds;
+    
+    private Long subjectId;
+
+    private static Log log = LogFactory.getLog( QueryServiceTest.class.getName() );
+    String username = RandomStringUtils.randomAlphabetic( 6 );
+    String testname = RandomStringUtils.randomAlphabetic( 6 );
+    @Before
+    public void setUp() {
+        Subject subject = createSubjectWithPhenotypes( "1", "0", "0", "0" );
+        
+        subjectId = subject.getId();
+        
+        createSubjectWithPhenotypes( "0", "1", "0", "0" );
+        createSubjectWithPhenotypes( "0", "0", "1", "0" );
+        createSubjectWithPhenotypes( "0", "0", "0", "1" );
+        createSubjectWithPhenotypes( "1", "0", "1", "0" );
+        
+        try {
+            userManager.loadUserByUsername( username );
+        } catch ( UsernameNotFoundException e ) {
+            userManager.createUser( new UserDetailsImpl( "jimmy", username, true, null, RandomStringUtils
+                    .randomAlphabetic( 10 ) + "@gmail.com", "key", new Date() ) );
+        }
+        
+        
+        String groupName = randomName();
+        this.securityService.createGroup( groupName );
+        this.securityService.makeWriteableByGroup( subject, groupName );
+       
+        this.securityService.addUserToGroup( username, groupName );
+
+    }
+
+    
+    @Test
+    public void testMultipleUsersCreateSameLabelName() {
+        
+        super.runAsAdmin();
+        
+        LabelValueObject lvo = new LabelValueObject();
+        
+        lvo.setColour( "red");
+        lvo.setName( "blah" );
+        lvo.setIsShown( true );
+        
+        Collection<Long> subjectIds = new ArrayList<Long>();
+        subjectIds.add( subjectId );
+        
+        subjectService.addLabel( subjectIds, lvo );
+       
+        super.runAsUser( this.username );
+        subjectService.addLabel( subjectIds, lvo );
+        
+        Collection<LabelValueObject> lvos= persistentTestObjectHelper.getLabelsForSubject( subjectId );
+        
+        labelService.deleteSubjectLabel( lvos.iterator().next() );
+        
+    }
+
+    private Subject createSubjectWithPhenotypes( String headPhenoValue, String facePhenoValue, String mouthPhenoValue,
+            String nervousPhenoValue ) {
+
+        if ( project == null ) {
+            project = new Project();
+            project.setName( RandomStringUtils.randomAlphabetic( 4 ) );
+            project = persistentTestObjectHelper.createPersistentProject( project );
+        }
+
+        List<Project> plist = new ArrayList<Project>();
+        plist.add( project );
+        Collection<Long> projectIds = new ArrayList<Long>();
+        projectIds.add( project.getId() );
+        activeProjectIds = projectIds;
+
+        Phenotype phenoHead = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_HEAD, "HP_0000234",
+                "HPONTOLOGY", headPhenoValue );
+        Phenotype phenoFace = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_FACE, "HP_0000271",
+                "HPONTOLOGY", facePhenoValue );
+        Phenotype phenoMouth = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_MOUTH, "HP_0000153",
+                "HPONTOLOGY", mouthPhenoValue );
+        Phenotype phenoNervous = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_NERVOUS,
+                "HP_0000707", "HPONTOLOGY", nervousPhenoValue );
+
+        List<Subject> subjectList = project.getSubjects();
+        log.debug( "subjectList.size=" + subjectList.size() );
+        String patientId = "" + subjectList.size();
+
+        if ( headPhenoValue.equals( "1" ) ) {
+            patientId += "_" + HP_HEAD + "=" + headPhenoValue;
+        }
+
+        if ( facePhenoValue.equals( "1" ) ) {
+            patientId += "_" + HP_FACE + "=" + facePhenoValue;
+        }
+
+        if ( mouthPhenoValue.equals( "1" ) ) {
+            patientId += "_" + HP_MOUTH + "=" + mouthPhenoValue;
+        }
+
+        if ( nervousPhenoValue.equals( "1" ) ) {
+            patientId += "_" + HP_NERVOUS + "=" + nervousPhenoValue;
+        }
+
+        Subject subject = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
+        subject.setProjects( plist );
+        subject.addPhenotype( phenoHead );
+        subject.addPhenotype( phenoFace );
+        subject.addPhenotype( phenoMouth );
+        subject.addPhenotype( phenoNervous );
+        subjectList.add( subject );
+        subjectDao.update( subject );
+        phenotypeDao.update( phenoHead );
+        phenotypeDao.update( phenoFace );
+        phenotypeDao.update( phenoMouth );
+        phenotypeDao.update( phenoNervous );
+
+        projectDao.update( project );
+
+        
+        return subject;
+    }
+
+    
+
+   
+
+}

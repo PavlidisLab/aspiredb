@@ -39,28 +39,22 @@ import java.util.List;
  */
 public interface SubjectService {
 
-    public SubjectValueObject getSubject (Long projectId, Long subjectId )
-            throws NotLoggedInException;
+    public SubjectValueObject getSubject (Long projectId, Long subjectId );
 
-    public Collection<Property> suggestProperties()
-            throws NotLoggedInException;
+    public Collection<Property> suggestProperties();
 
-    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext)
-            throws NotLoggedInException;
+    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext);
 
     public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
-            throws NotLoggedInException, ExternalDependencyException;
+            throws  ExternalDependencyException;
 
-    public String getPhenotypeTextDownloadBySubjectIds( List<Long> subjectIds )
-            throws NotLoggedInException;
+    public String getPhenotypeTextDownloadBySubjectIds( List<Long> subjectIds );
 
-    public LabelValueObject addLabel(Collection<Long> subjectIds, LabelValueObject label) throws NotLoggedInException;
+    public LabelValueObject addLabel(Collection<Long> subjectIds, LabelValueObject label) ;
 
-    public void removeLabel(Collection<Long> subjectIds, LabelValueObject label)
-            throws NotLoggedInException;
+    public void removeLabel(Collection<Long> subjectIds, LabelValueObject label);
 
-    public void removeLabel(Long subjectId, LabelValueObject label)
-            throws NotLoggedInException;
+    public void removeLabel(Long subjectId, LabelValueObject label);
 
-    public List<LabelValueObject> suggestLabels(SuggestionContext suggestionContext) throws NotLoggedInException;
+    public List<LabelValueObject> suggestLabels(SuggestionContext suggestionContext);
 }

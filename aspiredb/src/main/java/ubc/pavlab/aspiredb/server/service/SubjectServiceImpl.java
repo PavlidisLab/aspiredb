@@ -72,7 +72,7 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public SubjectValueObject getSubject(Long projectId, Long subjectId ) throws NotLoggedInException {
+    public SubjectValueObject getSubject(Long projectId, Long subjectId ){
         //throwGwtExceptionIfNotLoggedIn();
         Subject subject = subjectDao.load( subjectId );
         if ( subject == null ) return null;
@@ -96,7 +96,7 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext) throws NotLoggedInException {
+    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext){
         List<PropertyValue> values = new ArrayList<PropertyValue>();
         if (property instanceof LabelProperty) {
             List<LabelValueObject> labels = suggestLabels(suggestionContext);
@@ -118,8 +118,7 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     @RemoteMethod
     @Transactional
-	public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
-            throws NotLoggedInException, NeurocartaServiceException {
+	public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds ) throws NeurocartaServiceException{
         
         Collection<Subject> subjects = subjectDao.load(subjectIds);
         
@@ -188,9 +187,8 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     @RemoteMethod
     @Transactional
-    public String getPhenotypeTextDownloadBySubjectIds( List<Long> subjectIds)
-            throws NotLoggedInException {
-        //throwGwtExceptionIfNotLoggedIn();        
+    public String getPhenotypeTextDownloadBySubjectIds( List<Long> subjectIds){
+        
         
         StopWatch timer = new StopWatch();
         timer.start();
@@ -253,8 +251,8 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     @RemoteMethod
     @Transactional
-    public LabelValueObject addLabel(Collection<Long> subjectIds, LabelValueObject labelVO) throws NotLoggedInException {
-        //throwGwtExceptionIfNotLoggedIn();
+    public LabelValueObject addLabel(Collection<Long> subjectIds, LabelValueObject labelVO) {
+        
         Collection<Subject> subjects = subjectDao.load(subjectIds);
         Label label = labelDao.findOrCreate( labelVO );
         for (Subject subject : subjects) {
@@ -267,8 +265,8 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     @RemoteMethod
     @Transactional
-    public void removeLabel(Long id, LabelValueObject label) throws NotLoggedInException {
-        //throwGwtExceptionIfNotLoggedIn();
+    public void removeLabel(Long id, LabelValueObject label){
+       
         Subject subject = subjectDao.load(id);
         Label labelEntity = labelDao.load(label.getId());
         subject.removeLabel(labelEntity);
@@ -278,8 +276,8 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     @RemoteMethod
     @Transactional
-    public void removeLabel(Collection<Long> subjectIds, LabelValueObject label) throws NotLoggedInException {
-        //throwGwtExceptionIfNotLoggedIn();
+    public void removeLabel(Collection<Long> subjectIds, LabelValueObject label){
+       
         for (Long subjectId : subjectIds) {
             removeLabel(subjectId, label);
         }

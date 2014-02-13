@@ -19,6 +19,7 @@
 package ubc.pavlab.aspiredb.server.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ubc.pavlab.aspiredb.server.dao.CNVDao;
 import ubc.pavlab.aspiredb.server.dao.IndelDao;
 import ubc.pavlab.aspiredb.server.dao.InversionDao;
+import ubc.pavlab.aspiredb.server.dao.LabelDao;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SNVDao;
@@ -41,12 +43,15 @@ import ubc.pavlab.aspiredb.server.model.Characteristic;
 import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.server.model.GenomicLocation;
 import ubc.pavlab.aspiredb.server.model.Indel;
+import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
+import ubc.pavlab.aspiredb.server.service.LabelService;
+import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 /**
  * Class for tests to use to create and remove persistent objects This class will become unnecessary one we have
@@ -60,6 +65,9 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     @Autowired
     IndelDao indelDao;
+    
+    @Autowired
+    LabelDao labelDao;
 
     @Autowired
     TranslocationDao translocationDao;
@@ -315,6 +323,11 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     @Transactional
     public List<Subject> getSubjectsForProject(Project p){
         return p.getSubjects();
+    }
+    @Transactional
+    public Collection<LabelValueObject> getLabelsForSubject(Long subjectId){
+               
+        return Label.toValueObjects( labelDao.getSubjectLabelsBySubjectId(subjectId) );
     }
     
     @Transactional
