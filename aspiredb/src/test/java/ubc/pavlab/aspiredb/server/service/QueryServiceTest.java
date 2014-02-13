@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
@@ -46,22 +47,27 @@ import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
+import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.AspireDbPagingLoadConfig;
 import ubc.pavlab.aspiredb.shared.AspireDbPagingLoadConfigBean;
+import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
+import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.TextValue;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.ExternalSubjectIdProperty;
 import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
+import ubc.pavlab.aspiredb.shared.query.NeurocartaPhenotypeProperty;
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.PhenotypeFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
@@ -76,14 +82,17 @@ import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 public class QueryServiceTest extends BaseSpringContextTest {
 
     @Autowired
+    private NeurocartaQueryService neurocartaQueryService;
+
+    @Autowired
     private QueryService queryService;
 
     @Autowired
     private PersistentTestObjectHelper persistentTestObjectHelper;
-    
+
     @Autowired
     private CNVDao cnvDao;
-    
+
     @Autowired
     private ProjectDao projectDao;
 
@@ -95,7 +104,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
     @Autowired
     private PhenotypeUtil phenotypeUtil;
-    
+
     @Autowired
     UserManager userManager;
 
@@ -111,7 +120,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
     private static Log log = LogFactory.getLog( QueryServiceTest.class.getName() );
     String username = "jimmy";
     String testname = RandomStringUtils.randomAlphabetic( 6 );
-    
+
     @Before
     public void setUp() {
         try {
@@ -120,10 +129,11 @@ public class QueryServiceTest extends BaseSpringContextTest {
             userManager.createUser( new UserDetailsImpl( "jimmy", username, true, null, RandomStringUtils
                     .randomAlphabetic( 10 ) + "@gmail.com", "key", new Date() ) );
         }
-        
+
+        // run save query as administrator in filter window
         super.runAsAdmin();
     }
-    
+
     public void setUpPhenotypes() {
         createSubjectWithPhenotypes( "1", "0", "0", "0" );
         createSubjectWithPhenotypes( "0", "1", "0", "0" );
@@ -133,30 +143,30 @@ public class QueryServiceTest extends BaseSpringContextTest {
     }
 
     public void tearDownPhenotypes() throws Exception {
+        // run save query as administrator in filter window
         super.runAsAdmin();
+        
         for ( Subject s : project.getSubjects() ) {
             try {
-                
-                for (Phenotype p : s.getPhenotypes() ) {
+
+                for ( Phenotype p : s.getPhenotypes() ) {
                     phenotypeDao.remove( p );
                 }
-                
+
                 subjectDao.remove( s );
-                
+
             } catch ( Exception e ) {
                 e.printStackTrace();
             }
         }
         projectDao.remove( project );
     }
-    
+
     @Test
     public void testIsQueryName() throws Exception {
-        
+
         setUpPhenotypes();
-        
-        //run save query as administrator in filter window
-        super.runAsAdmin();
+
         Collection<Long> projectIds = new HashSet<Long>();
         projectIds.add( project.getId() );
         ProjectFilterConfig projConfig = new ProjectFilterConfig();
@@ -165,21 +175,21 @@ public class QueryServiceTest extends BaseSpringContextTest {
         PhenotypeRestriction restriction = new PhenotypeRestriction();
         restriction.setName( "Abnormality of the head" );
         restriction.setValue( "1" );
-        
+
         PhenotypeFilterConfig phenoConfig = new PhenotypeFilterConfig();
         phenoConfig.setRestriction( restriction );
         phenoConfig.setActiveProjectIds( activeProjectIds );
-        
+
         Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
         filters.add( projConfig );
         filters.add( phenoConfig );
         queryService.saveQuery( testname, filters );
-        
-        //run as user to check wheather the admin created query is accessbly y the user
+
+        // run as user to check wheather the admin created query is accessble by the user
         super.runAsUser( this.username );
-        boolean returnvalue = queryService.isQueryName( testname);
-        assertFalse(returnvalue);
-        
+        boolean returnvalue = queryService.isQueryName( testname );
+        assertFalse( returnvalue );
+
         tearDownPhenotypes();
     }
 
@@ -242,7 +252,6 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
         projectDao.update( project );
 
-        
         return subject;
     }
 
@@ -264,7 +273,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         PhenotypeFilterConfig phenoConfig = new PhenotypeFilterConfig();
         phenoConfig.setRestriction( restriction );
         phenoConfig.setActiveProjectIds( activeProjectIds );
-        
+
         Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
         filters.add( projConfig );
         filters.add( phenoConfig );
@@ -275,14 +284,14 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
     /**
      * Tests for absence of Phenotypes
-     * @throws Exception 
+     * 
+     * @throws Exception
      */
     @Test
     public void testPhenoHasNoValueSubjects() throws Exception {
-        //super.runAsAdmin();
-        
+
         setUpPhenotypes();
-        
+
         try {
             int found = 0;
 
@@ -369,14 +378,14 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
     /**
      * Tests for presence of Phenotypes
-     * @throws Exception 
+     * 
+     * @throws Exception
      */
     @Test
     public void testPhenoHasValueSubjects() throws Exception {
-        //super.runAsAdmin();
-        
+
         setUpPhenotypes();
-        
+
         try {
             Collection<String> phenoNames = phenotypeDao.getExistingNames( activeProjectIds );
             assertEquals( 4, phenoNames.size() );
@@ -450,6 +459,23 @@ public class QueryServiceTest extends BaseSpringContextTest {
         return ret;
     }
 
+    private Map<Integer, Integer> getSubjectVariantCountForPhenocarta( String phenotypeURI )
+            throws NotLoggedInException, ExternalDependencyException {
+        SimpleRestriction simpleRe = new SimpleRestriction();
+        simpleRe.setOperator( Operator.IS_IN_SET );
+        simpleRe.setProperty( new NeurocartaPhenotypeProperty() );
+        NeurocartaPhenotypeValueObject vo = new NeurocartaPhenotypeValueObject();
+        Collection<GeneValueObject> gvo = neurocartaQueryService.fetchGenesAssociatedWithPhenotype( phenotypeURI );
+        // System.out.println(gvo.size() + " genes found for URI " + phenotypeURI);
+        vo.setGenes( gvo );
+        simpleRe.setValue( vo );
+
+        Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
+        filters.add( new VariantFilterConfig( simpleRe ) );
+        Map<Integer, Integer> ret = queryService.getSubjectVariantCounts( filters );
+        return ret;
+    }
+
     /**
      * @throws ExternalDependencyException
      * @throws NotLoggedInException
@@ -514,5 +540,73 @@ public class QueryServiceTest extends BaseSpringContextTest {
         // cleanup
         subjectDao.remove( s );
     }
-    
+
+    @Test
+    public void testGetSubjectVariantCountsForPhenocarta() throws NotLoggedInException, ExternalDependencyException {
+
+        String patientId = "testGetSubjectVariantCountsForLocation";
+
+        String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_219"; // colon cancer (~321 genes)
+        // String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_0060041"; // autism spectrum disorder (~853 genes)
+
+        // look at how many there are currently in the database
+        Map<Integer, Integer> ret = getSubjectVariantCountForPhenocarta( phenotypeURI );
+        int subjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
+        int variantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+
+        // add some variants the would overlap
+        // 17:37885247-37885647
+        // 4:72247-5545043
+        Subject s = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
+        CNV cnv1 = persistentTestObjectHelper.createPersistentTestCNVObject();
+        cnv1.setSubject( s );
+        cnv1.getLocation().setChromosome( "17" );
+        cnv1.getLocation().setStart( 37885247 );
+        cnv1.getLocation().setEnd( 37885647 );
+        cnvDao.update( cnv1 );
+        CNV cnv2 = persistentTestObjectHelper.createPersistentTestCNVObject();
+        cnv2.setSubject( s );
+        cnv2.getLocation().setChromosome( "4" );
+        cnv2.getLocation().setStart( 72247 );
+        cnv2.getLocation().setEnd( 5545043 );
+        cnvDao.update( cnv2 );
+        CNV cnv3 = persistentTestObjectHelper.createPersistentTestCNVObject(); // this one doesn't count
+        cnv3.setSubject( s );
+        cnv3.getLocation().setChromosome( "4" );
+        cnv3.getLocation().setStart( 1 );
+        cnv3.getLocation().setEnd( 2 );
+        cnvDao.update( cnv3 );
+        s.addVariant( cnv1 );
+        s.addVariant( cnv2 );
+        s.addVariant( cnv3 );
+        subjectDao.update( s );
+
+        assertEquals( patientId, s.getPatientId() );
+        assertEquals( 3, s.getVariants().size() );
+
+        // now there should be one more
+        StopWatch watch = new StopWatch();
+        watch.start();
+        ret = getSubjectVariantCountForPhenocarta( phenotypeURI );
+        watch.stop();
+        // System.out.println("time to get variants = " + watch );
+        int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
+        int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+
+        assertEquals( subjectCount + 1, addedSubjectCount ); // one subject was added
+        assertEquals( variantCount + s.getVariants().size() - 1, addedVariantCount ); // no new variants were added!
+
+        // cleanup
+        List<Variant> sv = s.getVariants();
+        s.setVariants( null );
+        subjectDao.update( s );
+        for ( Variant v : sv ) {
+            CNV c = ( CNV ) v;
+            c.setSubject( null );
+            cnvDao.update( c );
+            cnvDao.remove( c );
+        }
+        subjectDao.remove( s );
+
+    }
 }
