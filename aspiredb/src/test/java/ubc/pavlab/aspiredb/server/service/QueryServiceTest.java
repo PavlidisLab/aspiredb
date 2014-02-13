@@ -18,30 +18,35 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
+import ubc.pavlab.aspiredb.server.dao.CNVDao;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
+import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
+import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
@@ -51,11 +56,19 @@ import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.AspireDbPagingLoadConfig;
 import ubc.pavlab.aspiredb.shared.AspireDbPagingLoadConfigBean;
+import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
+import ubc.pavlab.aspiredb.shared.TextValue;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.ExternalSubjectIdProperty;
+import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
+import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.PhenotypeFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.SubjectFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
+import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 
 /**
  * author: anton date: 22/05/13
@@ -67,7 +80,10 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
     @Autowired
     private PersistentTestObjectHelper persistentTestObjectHelper;
-
+    
+    @Autowired
+    private CNVDao cnvDao;
+    
     @Autowired
     private ProjectDao projectDao;
 
@@ -93,27 +109,30 @@ public class QueryServiceTest extends BaseSpringContextTest {
     private Collection<Long> activeProjectIds;
 
     private static Log log = LogFactory.getLog( QueryServiceTest.class.getName() );
-    String username = RandomStringUtils.randomAlphabetic( 6 );
+    String username = "jimmy";
     String testname = RandomStringUtils.randomAlphabetic( 6 );
+    
     @Before
     public void setUp() {
-        createSubjectWithPhenotypes( "1", "0", "0", "0" );
-        createSubjectWithPhenotypes( "0", "1", "0", "0" );
-        createSubjectWithPhenotypes( "0", "0", "1", "0" );
-        createSubjectWithPhenotypes( "0", "0", "0", "1" );
-        createSubjectWithPhenotypes( "1", "0", "1", "0" );
-        
         try {
             userManager.loadUserByUsername( username );
         } catch ( UsernameNotFoundException e ) {
             userManager.createUser( new UserDetailsImpl( "jimmy", username, true, null, RandomStringUtils
                     .randomAlphabetic( 10 ) + "@gmail.com", "key", new Date() ) );
         }
-
+        
+        super.runAsAdmin();
+    }
+    
+    public void setUpPhenotypes() {
+        createSubjectWithPhenotypes( "1", "0", "0", "0" );
+        createSubjectWithPhenotypes( "0", "1", "0", "0" );
+        createSubjectWithPhenotypes( "0", "0", "1", "0" );
+        createSubjectWithPhenotypes( "0", "0", "0", "1" );
+        createSubjectWithPhenotypes( "1", "0", "1", "0" );
     }
 
-    @After
-    public void tearDown() throws Exception {
+    public void tearDownPhenotypes() throws Exception {
         super.runAsAdmin();
         for ( Subject s : project.getSubjects() ) {
             try {
@@ -130,8 +149,12 @@ public class QueryServiceTest extends BaseSpringContextTest {
         }
         projectDao.remove( project );
     }
+    
     @Test
-    public void testIsQueryName() {
+    public void testIsQueryName() throws Exception {
+        
+        setUpPhenotypes();
+        
         //run save query as administrator in filter window
         super.runAsAdmin();
         Collection<Long> projectIds = new HashSet<Long>();
@@ -157,7 +180,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         boolean returnvalue = queryService.isQueryName( testname);
         assertFalse(returnvalue);
         
-        
+        tearDownPhenotypes();
     }
 
     private Subject createSubjectWithPhenotypes( String headPhenoValue, String facePhenoValue, String mouthPhenoValue,
@@ -252,10 +275,14 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
     /**
      * Tests for absence of Phenotypes
+     * @throws Exception 
      */
     @Test
-    public void testPhenoHasNoValueSubjects() {
-        super.runAsAdmin();
+    public void testPhenoHasNoValueSubjects() throws Exception {
+        //super.runAsAdmin();
+        
+        setUpPhenotypes();
+        
         try {
             int found = 0;
 
@@ -337,14 +364,19 @@ public class QueryServiceTest extends BaseSpringContextTest {
             fail( e.getMessage() );
         }
 
+        tearDownPhenotypes();
     }
 
     /**
      * Tests for presence of Phenotypes
+     * @throws Exception 
      */
     @Test
-    public void testPhenoHasValueSubjects() {
-        super.runAsAdmin();
+    public void testPhenoHasValueSubjects() throws Exception {
+        //super.runAsAdmin();
+        
+        setUpPhenotypes();
+        
         try {
             Collection<String> phenoNames = phenotypeDao.getExistingNames( activeProjectIds );
             assertEquals( 4, phenoNames.size() );
@@ -386,6 +418,101 @@ public class QueryServiceTest extends BaseSpringContextTest {
             fail( e.getMessage() );
         }
 
+        tearDownPhenotypes();
     }
 
+    private Map<Integer, Integer> getSubjectVariantCountForPatientId( String patientId ) throws NotLoggedInException,
+            ExternalDependencyException {
+        SimpleRestriction simpleRe = new SimpleRestriction();
+        simpleRe.setOperator( Operator.TEXT_EQUAL );
+        simpleRe.setProperty( new ExternalSubjectIdProperty() );
+        simpleRe.setValue( new TextValue( patientId ) );
+
+        Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
+        filters.add( new SubjectFilterConfig( simpleRe ) );
+
+        // System.out.println("getSubjectCount=" + queryService.getSubjectCount( filters ));
+
+        Map<Integer, Integer> ret = queryService.getSubjectVariantCounts( filters );
+        return ret;
+    }
+
+    private Map<Integer, Integer> getSubjectVariantCountForChromosome( String chromosome ) throws NotLoggedInException,
+            ExternalDependencyException {
+        SimpleRestriction simpleRe = new SimpleRestriction();
+        simpleRe.setOperator( Operator.IS_IN_SET );
+        simpleRe.setProperty( new GenomicLocationProperty() );
+        simpleRe.setValue( new GenomicRange( chromosome ) );
+
+        Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
+        filters.add( new VariantFilterConfig( simpleRe ) );
+        Map<Integer, Integer> ret = queryService.getSubjectVariantCounts( filters );
+        return ret;
+    }
+
+    /**
+     * @throws ExternalDependencyException
+     * @throws NotLoggedInException
+     */
+    @Test
+    public void testGetSubjectVariantCountsForLocation() throws NotLoggedInException, ExternalDependencyException {
+
+        String chr = "1";
+        String patientId = "testGetSubjectVariantCountsForLocation";
+
+        // look at how many there are currently in the database
+        Map<Integer, Integer> ret = getSubjectVariantCountForChromosome( chr );
+        int subjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
+        int variantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+
+        // add a variant in Chr 1
+        Subject s = persistentTestObjectHelper.createPersistentTestSubjectObjectWithCNV( patientId );
+        CNV cnv = ( CNV ) s.getVariants().iterator().next();
+        cnv.getLocation().setChromosome( chr );
+        cnv.getLocation().setStart( 1 );
+        cnv.getLocation().setEnd( 100 );
+        cnvDao.update( cnv );
+        subjectDao.update( s );
+
+        // now there should be one more
+        ret = getSubjectVariantCountForChromosome( chr );
+        int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
+        int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+
+        assertEquals( subjectCount + 1, addedSubjectCount );
+        assertEquals( variantCount + 1, addedVariantCount );
+
+        // cleanup
+        s.getVariants().remove( cnv );
+        subjectDao.update( s );
+        cnvDao.remove( cnv );
+        subjectDao.remove( s );
+    }
+
+    @Test
+    public void testGetSubjectVariantCountsForPatientId() throws NotLoggedInException, ExternalDependencyException {
+
+        String patientId = "testGetSubjectVariantCountsForPatientId";
+
+        // look at how many there are currently in the database
+        Map<Integer, Integer> ret = getSubjectVariantCountForPatientId( patientId );
+        int subjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
+        int variantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+        // add a subject
+        Subject s = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
+
+        assertEquals( patientId, s.getPatientId() );
+
+        // now there should be one more
+        ret = getSubjectVariantCountForPatientId( patientId );
+        int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
+        int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+
+        assertEquals( subjectCount + 1, addedSubjectCount ); // one subject was added
+        assertEquals( variantCount, addedVariantCount ); // no new variants were added!
+
+        // cleanup
+        subjectDao.remove( s );
+    }
+    
 }
