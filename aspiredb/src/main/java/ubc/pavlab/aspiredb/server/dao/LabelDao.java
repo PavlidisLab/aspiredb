@@ -38,6 +38,9 @@ public interface LabelDao extends SecurableDaoBase<Label> {
     Collection<Label> getSubjectLabels();
     
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    Collection<Label> getSubjectLabelsBySubjectId(Long id);
+    
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     Collection<Label> getSubjectLabelsByProjectId( Long projectId );
 
     @Deprecated

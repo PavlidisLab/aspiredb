@@ -25,6 +25,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	alias : 'widget.phenotypeGrid',
 	title : 'Phenotype',
 	id : 'phenotypeGrid',
+	disableSelection:true,
 
 	config : {
 
