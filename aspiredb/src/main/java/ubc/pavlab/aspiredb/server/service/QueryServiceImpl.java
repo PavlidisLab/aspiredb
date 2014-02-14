@@ -45,17 +45,16 @@ import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
-import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Query;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
+import ubc.pavlab.aspiredb.server.util.ConfigUtils;
 import ubc.pavlab.aspiredb.shared.BoundedList;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.OntologyTermValueObject;
-import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
@@ -305,15 +304,32 @@ public class QueryServiceImpl implements QueryService {
             }
         }
 
-        List<SubjectValueObject> svos = querySubjects( filtersTrimmed ).getItems();
+        StopWatch timer = new StopWatch();
+        timer.start();
         List<VariantValueObject> vvos = queryVariants( filtersTrimmed ).getItems();
-
-        for ( SubjectValueObject s : svos ) {
-            svoIds.add( s.getId() );
-        }
-
+        timer.stop();
+        log.info(" query variants took " + timer );
         for ( VariantValueObject v : vvos ) {
             vvoIds.add( v.getId() );
+        }
+        
+        // need a separate call for Subject and Variants because 
+        // we can have a Subject without any Variants and those won't get counted!
+        if ( ConfigUtils.hasSubjectConfig(filters) ) {
+            timer = new StopWatch();
+            timer.start();
+            List<SubjectValueObject> svos = querySubjects( filtersTrimmed ).getItems();
+            timer.stop();
+            log.info(" query subjects took " + timer );
+            for ( SubjectValueObject s : svos ) {
+                svoIds.add( s.getId() );
+            }
+        } else {
+            // if there's no Subject filter then we can just get it 
+            // from Variant IDs! This saves us from executing redundant queries.
+            for ( VariantValueObject v : vvos ) {
+                svoIds.add( v.getSubjectId() );
+            }
         }
 
         // intersect PhenoIds with Ids from other filters
@@ -550,6 +566,8 @@ public class QueryServiceImpl implements QueryService {
                     Collection<GeneValueObject> geneValueObjects = this.neurocartaQueryService
                             .fetchGenesAssociatedWithPhenotype( vo.getUri() );
                     vo.setGenes( geneValueObjects );
+                    
+                    log.info("Fetched " + vo.getGenes().size() + " genes associated with phenotype '" + vo.getName() + "' (" + vo.getUri() + ")" );
                 }
             } else if ( restriction.getProperty() instanceof GeneProperty ) {
                 Collection<Object> values = restriction.getValues();
