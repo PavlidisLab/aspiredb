@@ -172,7 +172,7 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
             
             variant2SpecialVariantOverlapDao.deleteByOverlapProjectId( projectWithOverlap.getId() );
 
-            projectManager.populateSpecialProjectOverlap( projectName, projectNameWithOverlap );
+            projectManager.populateProjectToProjectOverlap( projectName, projectNameWithOverlap );
        
 
         } catch ( Exception e ) {

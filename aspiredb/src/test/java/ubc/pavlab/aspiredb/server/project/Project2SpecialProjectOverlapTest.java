@@ -152,7 +152,7 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
 
         
 
-        Collection<Project> overlapProjects = projectDao.getOverlapProjects();
+        Collection<Project> overlapProjects = projectDao.getSpecialOverlapProjects();
         Collection<Long> overlapProjectIds = new ArrayList<Long>();
         
         for (Project p: overlapProjects){
@@ -164,7 +164,7 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
                 
         try {
             
-            projectManager.populateSpecialProjectOverlap( projectName, projectNameWithOverlap );
+            projectManager.populateProjectToProjectOverlap( projectName, projectNameWithOverlap );
        
 
         } catch ( Exception e ) {

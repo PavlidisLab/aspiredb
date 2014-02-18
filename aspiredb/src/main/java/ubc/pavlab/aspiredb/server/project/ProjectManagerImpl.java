@@ -655,10 +655,10 @@ public class ProjectManagerImpl implements ProjectManager {
 
     @Override
     @Transactional
-    public void populateSpecialProjectOverlap( String projectName, String specialProjectName )
+    public void populateProjectToProjectOverlap( String projectName, String overlappingProjectName )
             throws ExternalDependencyException, NotLoggedInException {
 
-        Project specialProject = projectDao.findByProjectName( specialProjectName );
+        Project specialProject = projectDao.findByProjectName( overlappingProjectName );
 
         Project projectToPopulate = projectDao.findByProjectName( projectName );
 
@@ -714,6 +714,7 @@ public class ProjectManagerImpl implements ProjectManager {
                     overlapInfo.setVariantId( vvo.getId() );
                     overlapInfo.setOverlapSpecialVariantId( vvoOverlapped.getId() );
                     overlapInfo.setOverlapProjectId( specialProject.getId() );
+                    overlapInfo.setProjectId( projectToPopulate.getId() );
 
                     variant2SpecialVariantOverlapDao.create( overlapInfo );
                     

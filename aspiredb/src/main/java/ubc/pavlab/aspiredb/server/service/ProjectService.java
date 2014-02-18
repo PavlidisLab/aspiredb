@@ -32,7 +32,7 @@ public interface ProjectService  {
     
     public List<ProjectValueObject> getProjects( ) throws NotLoggedInException;
     
-    public List<ProjectValueObject> getOverlapProjects( );
+    public List<ProjectValueObject> getOverlapProjects(Collection<Long> projectIds );
     
     public ProjectValueObject getDgvProject();
     

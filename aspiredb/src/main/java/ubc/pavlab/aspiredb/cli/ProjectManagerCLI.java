@@ -198,7 +198,7 @@ public class ProjectManagerCLI extends AbstractCLI {
             }
 
             try {
-                projectManager.populateSpecialProjectOverlap( projectName, overlapProjectName );
+                projectManager.populateProjectToProjectOverlap( projectName, overlapProjectName );
             } catch ( Exception e ) {
                 log.error( e.getMessage() );
                 return e;
