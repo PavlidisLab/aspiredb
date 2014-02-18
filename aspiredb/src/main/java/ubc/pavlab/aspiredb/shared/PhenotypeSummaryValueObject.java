@@ -6,7 +6,7 @@ import java.util.*;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
-@DataTransferObject(javascript = "VariantValueObject")
+@DataTransferObject(javascript = "PhenotypeSummaryValueObject")
 public class PhenotypeSummaryValueObject implements Serializable, Comparable<PhenotypeSummaryValueObject> {
 
 	
@@ -24,6 +24,10 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
     private String valueType;
     
     private String displaySummary;
+    
+    private String selectedSubjectPhenotypes;
+    
+    private Map<String, Integer> phenoSummaryMap;
 
     public String getDisplaySummary() {
         return displaySummary;
@@ -88,5 +92,23 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
     @Override
     public int compareTo(PhenotypeSummaryValueObject summaryValueObject) {
         return this.name.compareTo(summaryValueObject.getName());
+    }
+
+    public Map<String, Integer> getPhenoSummaryMap() {
+        return phenoSummaryMap;
+    }
+
+    public void setPhenoSummaryMap( Map<String, Integer> phenoSummaryMap ) {
+        this.phenoSummaryMap = phenoSummaryMap;
+    }
+
+  
+
+    public String getSelectedSubjectPhenotypes() {
+        return selectedSubjectPhenotypes;
+    }
+
+    public void setSelectedSubjectPhenotypes( String selectedSubjectPhenotypes ) {
+        this.selectedSubjectPhenotypes = selectedSubjectPhenotypes;
     }
 }

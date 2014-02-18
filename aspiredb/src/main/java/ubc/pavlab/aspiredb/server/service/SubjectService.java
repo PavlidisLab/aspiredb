@@ -40,6 +40,7 @@ import java.util.List;
 public interface SubjectService {
 
     public SubjectValueObject getSubject (Long projectId, Long subjectId );
+    public Collection<SubjectValueObject> getSubjects(Long projectId, List<Long> subjectId );
 
     public Collection<Property> suggestProperties();
 

@@ -26,6 +26,11 @@ Ext.define('ASPIREdb.store.PhenotypeStore', {
 			return phenSummary.dbValue;
 		},
 	},
+	{
+		name : 'selectedSubjectPhenotypes',
+		type :'string'
+	
+	},
 
 	{
 		name : 'value',

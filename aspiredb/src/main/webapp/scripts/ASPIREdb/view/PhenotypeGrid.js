@@ -116,7 +116,17 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			var ret = "<span " + style + ">" + displayVal + "</span>";
 			return ret;
 		},
-	} , {
+	} , 
+	{
+		text : 'Select subject values',
+		hidden : true,
+		dataIndex : 'selectedSubjectPhenotypes',
+		renderer : function(value) {
+			return value;
+		},
+		flex :1
+	},
+	{
 		text : 'Value (subject count)',
 		dataIndex : 'value',
 		flex : 1
@@ -169,7 +179,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 						
 						// [ phenSummary.name, phenSummary.selectedPhenotype, subjectVal]
 						// TODO find a more elegant way of doing this ...
-						var row = [ phenSummary, phenSummary, phenSummary.displaySummary ];
+						var row = [ phenSummary, phenSummary, '',phenSummary.displaySummary ];
 						data.push(row);
 					}
 
@@ -198,9 +208,9 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	 * 
 	 * @param subjectId
 	 */
-	subjectSelectHandler : function(subjectId) {
+	subjectSelectHandler : function(subjectIds) {//todo
 		
-		if (!subjectId){
+		if (!subjectIds){
 			var col = this.columns[this.SELECTED_VALUES_COL_IDX];
 			
 			col.setText("");
@@ -213,11 +223,15 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		var activeProjectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
 		
 		var ref = this;
+		console.log("on subject select handler");
 		
-		SubjectService.getSubject(activeProjectId, subjectId, { 
+	
+		if (subjectIds.length ==1){
+		  SubjectService.getSubject(activeProjectId, subjectIds[0], { 
 			callback : function(svo) {
 				if ( svo != null ) {
 					ref.setLoading(true);
+					
 					PhenotypeService.getPhenotypes( svo.id, {
 						callback : function(vos) {
 		
@@ -228,7 +242,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 							for ( var key in ref.phenotypeStore ) {
 								var phenSummary = ref.phenotypeStore[key];
 								var subjectPhenotype = vos[phenSummary.name];
-								phenSummary.selectedPhenotype = subjectPhenotype;
+								phenSummary.selectedPhenotype= subjectPhenotype;
 							}
 							
 							ref.getView().refresh(true);
@@ -237,7 +251,32 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 					});
 				}
 			}
-		});
+		  });
+		}
+		else{
+			SubjectService.getPhenotypeSummaries(subjectIds, ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
+				callback : function(vos) {
+					
+					if ( vos != null ) {
+					ref.setLoading(true);
+										
+					var col = ref.columns[2];
+					col.setVisible(true);	
+					
+					var data = [];
+					for (var key in ref.phenotypeStore){
+							var phenSummary = vos[key];
+							var phenStore= ref.phenotypeStore[key];
+							phenStore.selectedValue=phenSummary.displaySummary;						
+					}
+					ref.getView().refresh(true);
+					ref.setLoading(false);
+				}
+				}
+			});
+		
+		}
+		
 	},
 	
 	saveButtonHandler : function(text) {

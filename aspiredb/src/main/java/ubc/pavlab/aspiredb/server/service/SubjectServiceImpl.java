@@ -36,6 +36,7 @@ import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Label;
+import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
@@ -83,6 +84,23 @@ public class SubjectServiceImpl implements SubjectService {
 
         return vo;
     }
+    
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<SubjectValueObject> getSubjects(Long projectId, List<Long> subjectIds ){
+        //throwGwtExceptionIfNotLoggedIn();
+        Collection<Subject> subjects = subjectDao.load( subjectIds);
+        if ( subjects.isEmpty() ) return null;
+        List<SubjectValueObject> vo = new ArrayList<SubjectValueObject>(); 
+        for ( Subject subject : subjects ) {
+               vo.add(subject.convertToValueObject());
+               //Integer numVariants = cnvDao.findBySubjectPatientId( subject.getPatientId() ).size();
+              // vo. .setVariants( numVariants != null ? numVariants : 0 );
+        }
+        return vo;
+    }
+    
 
     @Override
     @RemoteMethod

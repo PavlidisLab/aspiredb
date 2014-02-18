@@ -159,7 +159,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);
 
 		this.on('selectionchange', me.selectionChangeHandler, me);
-		this.on('select', me.onSelectHandler, me);
+		//this.on('select', me.onSelectHandler, me);
 		
 		ASPIREdb.EVENT_BUS.on('label_change', function() {
 			me.getView().refresh();
@@ -258,7 +258,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 	},
 
 	selectionChangeHandler : function() {
-
+		console.log("on selection  chnage Handler");
 		this.selSubjects = this.getSelectionModel().getSelection();
 
 		if (this.selSubjects.length == 0) {
@@ -267,16 +267,23 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		} else {
 			this.down('#makeLabel').enable();
 		}
-	},
-
-	onSelectHandler : function(ref, record, index, eOpts) {
-		if (this.getSelectionModel().getSelection().length==1){		
-			ASPIREdb.EVENT_BUS.fireEvent('subject_selected', record.get('id'));
-		}else{
+				
+		if (this.selSubjects.length>=1){
+			console.log("fire subject_selected event");
+			var ids=[];
+			
+			for ( var i = 0; i < this.selSubjects.length; i++) {
+				ids.push(this.selSubjects[i].data.id);
+			}
+			ASPIREdb.EVENT_BUS.fireEvent('subject_selected',ids );
+		}else
+		{
 			ASPIREdb.EVENT_BUS.fireEvent('subject_selected', null);
 			
 		}
 	},
+
+	
 	
 	/**
 	 * Assigns a Label
