@@ -266,10 +266,15 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 						filterContainer.doLayout();
 						dgvProjectOverlapFilterPanel.setFilterConfig(filters[i]);
 						
+					}else{
+						//This will be the user project overlap functionality
+						var projectOverlapFilterPanel = Ext.create('ASPIREdb.view.filter.ProjectOverlapFilterPanel');					
+						
+						filterContainer.add(projectOverlapFilterPanel);
+						filterContainer.doLayout();
+						projectOverlapFilterPanel.setFilterConfig(filters[i]);
+						
 					}
-					
-					
-					
 
 				}
 

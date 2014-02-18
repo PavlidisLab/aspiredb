@@ -104,7 +104,10 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 		
 		var filterContainer = this.getComponent('filterContainer');		
 		
-		var combobox = filterContainer.getComponent('overlapProjectComboBox');
+		//this doesn't set the overlapCombo box because the saved overlapped project might not be applicable to the active project you are searching in,
+		//i.e. you saved the query with 'evicas' as the active project, and searching for overlap with 'suzannes'.
+		//but then you try to load the query again with 'suzannes' as the active project, so you would be searching for 'suzannes' overlap with itself
+		
 				
 		filterContainer.getComponent('overlapItem').setRestrictionExpression(config.restriction1);
 		
