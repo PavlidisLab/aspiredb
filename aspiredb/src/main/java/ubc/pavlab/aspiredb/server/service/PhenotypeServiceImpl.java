@@ -165,6 +165,36 @@ public class PhenotypeServiceImpl implements PhenotypeService {
 
         return valueObjectsMap;
     }
+    
+    @Override
+    @RemoteMethod
+    @Transactional
+    public Map<String, PhenotypeValueObject> getPhenotypesMulti( Collection<Long> subjectIds ) throws NotLoggedInException {
+
+        StopWatch timer = new StopWatch();
+        timer.start();
+        
+        Long subjectId = subjectIds.iterator().next();
+
+        Collection<Phenotype> phenotypes = phenotypeDao.findBySubjectId( subjectId );
+
+        if ( timer.getTime() > 100 ) {
+            log.info( "loading phenotypes for subjectId: " + subjectId + " took " + timer.getTime() + "ms" );
+        }
+
+        // Insert phenotype loaded from DB.
+        Map<String, PhenotypeValueObject> valueObjectsMap = new HashMap<String, PhenotypeValueObject>();
+        for ( Phenotype phenotype : phenotypes ) {
+            valueObjectsMap.put( phenotype.getName(), phenotype.convertToValueObject() );
+        }
+
+        // FIXME: disabled temporarily
+        // Insert inferred phenotype values using Ontology.
+        // valueObjectsMap = addDescendantsAndAncestors(valueObjectsMap);
+        // propagateAbsentPresentValues(valueObjectsMap);
+
+        return valueObjectsMap;
+    }
 
     @Override
     @RemoteMethod

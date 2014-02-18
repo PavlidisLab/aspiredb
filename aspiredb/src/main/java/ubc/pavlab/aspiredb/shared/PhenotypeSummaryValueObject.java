@@ -25,8 +25,6 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
     
     private String displaySummary;
     
-    private String selectedSubjectPhenotypes;
-    
     private Map<String, Integer> phenoSummaryMap;
 
     public String getDisplaySummary() {
@@ -42,6 +40,8 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
     
     private PhenotypeValueObject selectedPhenotype;
     
+    private PhenotypeValueObject selectedPhenotypeMulti;
+    
 
   
     public PhenotypeValueObject getSelectedPhenotype() {
@@ -52,7 +52,15 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
 		this.selectedPhenotype = selectedPhenotype;
 	}
 
-	public PhenotypeSummaryValueObject() {
+	public PhenotypeValueObject getSelectedPhenotypeMulti() {
+        return selectedPhenotypeMulti;
+    }
+
+    public void setSelectedPhenotypeMulti( PhenotypeValueObject selectedPhenotypeMulti ) {
+        this.selectedPhenotypeMulti = selectedPhenotypeMulti;
+    }
+
+    public PhenotypeSummaryValueObject() {
 		
 	}
 	
@@ -101,14 +109,7 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
     public void setPhenoSummaryMap( Map<String, Integer> phenoSummaryMap ) {
         this.phenoSummaryMap = phenoSummaryMap;
     }
-
   
 
-    public String getSelectedSubjectPhenotypes() {
-        return selectedSubjectPhenotypes;
-    }
-
-    public void setSelectedSubjectPhenotypes( String selectedSubjectPhenotypes ) {
-        this.selectedSubjectPhenotypes = selectedSubjectPhenotypes;
-    }
+   
 }

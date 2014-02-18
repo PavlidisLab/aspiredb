@@ -20,18 +20,22 @@ Ext.define('ASPIREdb.store.PhenotypeStore', {
 		name : 'selectedPhenotype',
 		type : 'auto',
 		sortType : function(value) {
-			var phenSummary = value.selectedPhenotype;
-			if (phenSummary == null)
+			var pvo = value.selectedPhenotype;
+			if (pvo == null)
 				return -1;
-			return phenSummary.dbValue;
+			return pvo.dbValue;
 		},
 	},
 	{
-		name : 'selectedSubjectPhenotypes',
-		type :'string'
-	
+		name : 'selectedPhenotypeMulti',
+		type : 'auto',
+		sortType : function(value) {
+			var pvo = value.selectedPhenotypeMulti;
+			if (pvo == null)
+				return -1;
+			return pvo.dbValue;
+		},
 	},
-
 	{
 		name : 'value',
 		type : 'string'

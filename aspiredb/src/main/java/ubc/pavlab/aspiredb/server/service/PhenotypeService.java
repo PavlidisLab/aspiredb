@@ -28,6 +28,8 @@ import java.util.Map;
 public interface PhenotypeService {
 
     public Map<String, PhenotypeValueObject> getPhenotypes(Long subjectId) throws NotLoggedInException, NotLoggedInException;
+    
+    public Map<String, PhenotypeValueObject> getPhenotypesMulti(Collection<Long> subjectIds) throws NotLoggedInException, NotLoggedInException;
 
     // NOT IMPLEMENTED YET
     public Collection<PhenotypeProperty> suggestPhenotypes(SuggestionContext suggestionContext)

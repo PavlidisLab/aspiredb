@@ -101,8 +101,10 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 	},
 
 	setRestrictionExpression : function(config) {
-		var filterContainer = this.getComponent('filterContainer');
 		
+		var filterContainer = this.getComponent('filterContainer');		
+		
+		var combobox = filterContainer.getComponent('overlapProjectComboBox');
 				
 		filterContainer.getComponent('overlapItem').setRestrictionExpression(config.restriction1);
 		

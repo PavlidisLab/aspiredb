@@ -32,7 +32,9 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		// member variables
 
 		// column id of selectedValuesColumn
-		SELECTED_VALUES_COL_IDX : 1,
+		SELECTED_VALUES_COL_IDX : 2,
+		
+		SELECTED_VALUES_MULTI_COL_IDX : 1,
 		
 		// PhenotypeSummary styles
 		STYLE_DEFAULT : "style='color: black'",
@@ -90,24 +92,26 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			return ret;
 		},
 		width : 350,
-	}, { 
+	},
+	
+	{ 
 		// populated dynamically when a Subject is selected
 		text : '',
-		dataIndex : 'selectedPhenotype',
+		dataIndex : 'selectedPhenotypeMulti',
 		hidden : true,
 		width : 80,
 		renderer : function(value) {
 
-			var phenSummary = value.selectedPhenotype;
-			if (phenSummary == null) return ret;
+			var phenValueObject = value.selectedPhenotypeMulti;
+			if (phenValueObject == null) return ret;
 			var style = this.STYLE_DEFAULT;
-			var displayVal = phenSummary.dbValue;
+			var displayVal = phenValueObject.dbValue;
 			
-			if (phenSummary.valueType == "HPONTOLOGY") {
-				if (phenSummary.dbValue == this.DB_VAL_HPO_ABSENT) {
+			if (phenValueObject.valueType == "HPONTOLOGY") {
+				if (phenValueObject.dbValue == this.DB_VAL_HPO_ABSENT) {
 					style = this.STYLE_HPO_ABSENT;
 					displayVal = "Absent";
-				} else if (phenSummary.dbValue == this.DB_VAL_HPO_PRESENT) {
+				} else if (phenValueObject.dbValue == this.DB_VAL_HPO_PRESENT) {
 					style = this.STYLE_HPO_PRESENT;
 					displayVal = "Present";	
 				}
@@ -116,15 +120,33 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			var ret = "<span " + style + ">" + displayVal + "</span>";
 			return ret;
 		},
-	} , 
-	{
-		text : 'Select subject values',
+	},
+	{ 
+		// populated dynamically when a Subject is selected
+		text : '',
+		dataIndex : 'selectedPhenotype',
 		hidden : true,
-		dataIndex : 'selectedSubjectPhenotypes',
+		width : 80,
 		renderer : function(value) {
-			return value;
+
+			var phenValueObject = value.selectedPhenotype;
+			if (phenValueObject == null) return ret;
+			var style = this.STYLE_DEFAULT;
+			var displayVal = phenValueObject.dbValue;
+			
+			if (phenValueObject.valueType == "HPONTOLOGY") {
+				if (phenValueObject.dbValue == this.DB_VAL_HPO_ABSENT) {
+					style = this.STYLE_HPO_ABSENT;
+					displayVal = "Absent";
+				} else if (phenValueObject.dbValue == this.DB_VAL_HPO_PRESENT) {
+					style = this.STYLE_HPO_PRESENT;
+					displayVal = "Present";	
+				}
+			}
+			
+			var ret = "<span " + style + ">" + displayVal + "</span>";
+			return ret;
 		},
-		flex :1
 	},
 	{
 		text : 'Value (subject count)',
@@ -179,7 +201,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 						
 						// [ phenSummary.name, phenSummary.selectedPhenotype, subjectVal]
 						// TODO find a more elegant way of doing this ...
-						var row = [ phenSummary, phenSummary, '',phenSummary.displaySummary ];
+						var row = [ phenSummary, phenSummary, phenSummary,phenSummary.displaySummary ];
 						data.push(row);
 					}
 
@@ -233,16 +255,16 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 					ref.setLoading(true);
 					
 					PhenotypeService.getPhenotypes( svo.id, {
-						callback : function(vos) {
+						callback : function(vos) { //vos is Map<String, PhenotypeValueObject>
 		
 							var col = ref.columns[ref.SELECTED_VALUES_COL_IDX];
 							col.setText(svo.patientId);
 							col.setVisible(true);
 							
 							for ( var key in ref.phenotypeStore ) {
-								var phenSummary = ref.phenotypeStore[key];
-								var subjectPhenotype = vos[phenSummary.name];
-								phenSummary.selectedPhenotype= subjectPhenotype;
+								var row = ref.phenotypeStore[key];
+								var subjectPhenotype = vos[row.name];
+								row.selectedPhenotype= subjectPhenotype;
 							}
 							
 							ref.getView().refresh(true);
@@ -254,24 +276,21 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		  });
 		}
 		else{
-			SubjectService.getPhenotypeSummaries(subjectIds, ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
-				callback : function(vos) {
+			PhenotypeService.getPhenotypesMulti( subjectIds, {
+				callback : function(vos) { //vos is Map<String, PhenotypeValueObject>
+
+					var col = ref.columns[ref.SELECTED_VALUES_MULTI_COL_IDX];
+					col.setText("CHANGE ME");
+					col.setVisible(true);
 					
-					if ( vos != null ) {
-					ref.setLoading(true);
-										
-					var col = ref.columns[2];
-					col.setVisible(true);	
-					
-					var data = [];
-					for (var key in ref.phenotypeStore){
-							var phenSummary = vos[key];
-							var phenStore= ref.phenotypeStore[key];
-							phenStore.selectedValue=phenSummary.displaySummary;						
+					for ( var key in ref.phenotypeStore ) {
+						var row = ref.phenotypeStore[key];
+						var subjectPhenotype = vos[row.name];
+						row.selectedPhenotypeMulti= subjectPhenotype;
 					}
+					
 					ref.getView().refresh(true);
 					ref.setLoading(false);
-				}
 				}
 			});
 		
