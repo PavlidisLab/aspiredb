@@ -58,7 +58,7 @@ public interface ProjectManager {
     public String createUserAndAssignToGroup(String userName, String password, String groupName);
     
     @Secured({"GROUP_ADMIN"})
-    public void populateSpecialProjectOverlap(String projectName, String specialProjectName) throws Exception;
+    public void populateProjectToProjectOverlap(String projectName, String specialProjectName) throws Exception;
     
     
 

@@ -73,9 +73,9 @@ public class ProjectServiceImpl implements ProjectService{
     }
     
     @RemoteMethod 
-    public List<ProjectValueObject> getOverlapProjects(){        
+    public List<ProjectValueObject> getOverlapProjects(Collection<Long> ids){        
 
-        Collection<Project> projects = projectDao.getOverlapProjects();
+        Collection<Project> projects = projectDao.getOverlapProjects(ids);
         List<ProjectValueObject> vos = new ArrayList<ProjectValueObject>();
 
         for ( Project p : projects ) {
@@ -91,7 +91,7 @@ public class ProjectServiceImpl implements ProjectService{
         
         ProjectValueObject pvo = new ProjectValueObject();
         
-        Collection<Project> projects = projectDao.getOverlapProjects();
+        Collection<Project> projects = projectDao.getSpecialOverlapProjects();
         
         for ( Project p : projects ) {
             
@@ -113,7 +113,7 @@ public class ProjectServiceImpl implements ProjectService{
         
         ProjectValueObject pvo = new ProjectValueObject();
         
-        Collection<Project> projects = projectDao.getOverlapProjects();
+        Collection<Project> projects = projectDao.getSpecialOverlapProjects();
         
         for ( Project p : projects ) {
             

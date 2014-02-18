@@ -304,6 +304,11 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
     }
 
     public List<Long> getProjectOverlapVariantIds( ProjectOverlapFilterConfig overlapFilter ) {
+        
+        //overlapProjectIds are required for this method
+        if (overlapFilter.getOverlapProjectIds()== null || overlapFilter.getOverlapProjectIds().isEmpty()){
+            return new ArrayList<Long>();
+        }
 
         List<Long> activeProjectsVariantIds = getVariantIdsForProjects( overlapFilter.getProjectIds() );
 

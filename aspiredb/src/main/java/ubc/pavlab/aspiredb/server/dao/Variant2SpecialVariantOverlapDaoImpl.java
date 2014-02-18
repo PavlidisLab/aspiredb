@@ -137,6 +137,23 @@ public class Variant2SpecialVariantOverlapDaoImpl extends DaoBaseImpl<Variant2Sp
         
     }
     
+    @Override
+    @Transactional(readOnly = true)
+    public Collection<Variant2SpecialVariantOverlap> loadByProjectIdAndOverlapProjectId(Long projectId, Long overlapProjectId) {
+        
+        
+        if (overlapProjectId == null){
+            return new ArrayList<Variant2SpecialVariantOverlap>();
+        }
+        
+        String[] paramNames = { "projectId", "overlapProjectId" };
+        Object[] objectValues = { projectId, overlapProjectId };
+        
+        return this.getHibernateTemplate().findByNamedParam(
+                "from Variant2SpecialVariantOverlap where projectId =:projectId and overlapProjectId =:overlapProjectId", paramNames, objectValues );
+        
+    }
+    
     
     @Override
     @Transactional

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
@@ -90,7 +91,7 @@ public interface QueryService {
      * avoids redundant filtering.
      * 
      * @param filters
-     * @return
+     * @return Map with keys {@link VariantDao.SUBJECT_IDS_KEY} and {@link VariantDao.VARIANT_IDS_KEY}
      * @throws NotLoggedInException
      * @throws ExternalDependencyException
      */

@@ -22,9 +22,13 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * TODO Document Me
+ * This table is used to hold data about overlap between two variants.
  * 
- * @author ??
+ * Originally this was only to be used for overlap with 'special' variants in DGV and DECIPHER, hence the 'special' in the name of the table
+ * 
+ * new requirements were added to allow this functionality between two user projects so the 'special' is unnecessary in the name and should be removed/renamed
+ * 
+ * @author cmcdonald
  * @version $Id:$
  */
 @Entity
@@ -84,6 +88,9 @@ public class Variant2SpecialVariantOverlap implements Serializable  {
     @Column(name="OVERLAP_PROJECTID")
     private Long overlapProjectId;
     
+    @Column(name="PROJECTID")
+    private Long projectId;
+    
     public Variant2SpecialVariantOverlap(){
         
     }
@@ -134,6 +141,14 @@ public class Variant2SpecialVariantOverlap implements Serializable  {
 
     public void setOverlapProjectId( Long overlapProjectId ) {
         this.overlapProjectId = overlapProjectId;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId( Long projectId ) {
+        this.projectId = projectId;
     }
     
     
