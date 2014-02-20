@@ -27,6 +27,8 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
     
     private Map<String, Integer> phenoSummaryMap;
 
+    private Set<String> phenoSet;
+    
     public String getDisplaySummary() {
         return displaySummary;
     }
@@ -108,6 +110,14 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
 
     public void setPhenoSummaryMap( Map<String, Integer> phenoSummaryMap ) {
         this.phenoSummaryMap = phenoSummaryMap;
+    }
+
+    public Set<String> getPhenoSet() {
+        return phenoSet;
+    }
+
+    public void setPhenoSet(Set<String> phenoset) {
+        this.phenoSet = phenoset;;
     }
   
 

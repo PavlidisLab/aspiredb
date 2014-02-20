@@ -19,6 +19,7 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
+import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
@@ -30,6 +31,7 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * TODO Document Me
@@ -48,6 +50,8 @@ public interface SubjectService {
 
     public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
             throws  ExternalDependencyException;
+    
+    public Map<String,PhenotypeSummaryValueObject> getPhenotypeSummaryValueObjects( List<Long> subjectIds, Collection<Long> projectIds ) throws NeurocartaServiceException;
 
     public String getPhenotypeTextDownloadBySubjectIds( List<Long> subjectIds );
 
