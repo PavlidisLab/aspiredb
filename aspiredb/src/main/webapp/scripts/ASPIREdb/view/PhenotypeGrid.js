@@ -129,29 +129,8 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			
 			var phenSummary = value.phenoSummaryMap;
 			if (phenSummary!= null){
-				var phenMap=phenSummary.phenoSummaryMap;
-				var keyArray =value.phenoSet;
-				if (phenSummary == null) return ret;
-				var style = this.STYLE_DEFAULT;
-				var displayVal = '';
-			
-			
-				for (var i=0;i<keyArray.length;i++){
-					if (phenSummary.valueType == "HPONTOLOGY") {
-						if (keyArray[i] =="Present"){
-							displayVal =displayVal+"Present("+phenMap["Present"]+")";
-							displayVal = "<span " + "style='color: red'" + ">" + displayVal + "</span>";
-						}
-						else if (keyArray[i]=="Absent"){
-							displayVal =displayVal+"Absent("+phenMap["Absent"]+")";
-							displayVal = "<span " + "style='color: green'" + ">" + displayVal + "</span>";
-						}
-						else displayVal =displayVal+keyArray[i]+"("+phenMap[keyArray[i]]+")";
-					}
-					else displayVal =displayVal+keyArray[i]+"("+phenMap[keyArray[i]]+")";
-				}
-	
-				var ret = "<span " + style + ">" + displayVal + "</span>";
+				
+				var ret = "<canvas width='50' height='12' id=multi"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
 				return ret;
 			} else return "";
 			},
@@ -167,9 +146,6 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	initComponent : function() {
 		this.callParent();
 
-		this.width = 20;
-		this.height = 40;
-		
 		this.getDockedComponent('phenotypeGridToolbar').getComponent('analyzeButton').on('click', this.getPhenotypeEnrichment, this);
 		
 		var ref = this;
@@ -315,6 +291,8 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 												
 						}
 						ref.getView().refresh(true);
+						
+						ref.updatePhenotypeSummaryCanvases();
 						ref.setLoading(false);
 					}
 					
@@ -322,6 +300,27 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			});
 		
 		}
+		
+	},
+	
+	updatePhenotypeSummaryCanvases : function (){
+		
+		for (var key in this.phenotypeStore){
+			var phenSummary = this.phenotypeStore[key];
+			
+			
+			var canvas = document.getElementById("multi"+phenSummary.name.replace(/ /g,''));
+			
+			var ctx = canvas.getContext("2d");
+			ctx.fillStyle = "#FF0000";
+			ctx.fillRect(0,0,50,12);
+			
+			
+			
+								
+		}
+		
+		
 		
 	},
 	
