@@ -125,12 +125,13 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		text : 'Select Subject values',
 		hidden : true,
 		dataIndex : 'phenoSummaryMap',
-			renderer : function(value) {
+			renderer : function(value, metadata, record) {
 			
 			var phenSummary = value.phenoSummaryMap;
 			if (phenSummary!= null){
-				
-				var ret = "<canvas width='50' height='12' id=multi"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
+				//myToolTipText= phenSummary.phenSet[0]
+				//metadata.tdAttr = 'data-qtip="' + myToolTipText + '"';
+				var ret = "<canvas width='50' height='80' id=multi"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
 				return ret;
 			} else return "";
 			},
@@ -307,13 +308,77 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		
 		for (var key in this.phenotypeStore){
 			var phenSummary = this.phenotypeStore[key];
-			
+			var keyArray =phenSummary.phenoSet;
+			var phenMap=phenSummary.phenoSummaryMap.phenoSummaryMap;
+			var total=0;
+			for (var i=0; i<keyArray.length;i++){
+				total = total+phenMap[keyArray[i]];
+			}
 			
 			var canvas = document.getElementById("multi"+phenSummary.name.replace(/ /g,''));
 			
 			var ctx = canvas.getContext("2d");
-			ctx.fillStyle = "#FF0000";
-			ctx.fillRect(0,0,50,12);
+			ctx.font = "bold 8px sans-serif";
+			ctx.textAlign = "center";
+			
+			
+			var k=0;
+			var j=2;
+			var width=80;
+			var height=20;
+			var colors = ["red", "green", "black", "purple","blue", "yellow","orange", "grey"];
+			var displayVal = '';
+			
+									
+			for (var i=0;i<keyArray.length;i++){
+				var fillTextWidth=i * width / keyArray.length + (width / keyArray.length) / 2;
+				var fillTextHeight=height +5;
+								
+				if (phenSummary.valueType == "HPONTOLOGY") {
+					
+					if (keyArray[i] =="Present"){
+						ctx.fillStyle = colors[0];
+						ctx.fillRect(k,0,10,(phenMap["Present"]*height)/total);
+						k=k+15;
+						displayVal =displayVal+"Present("+phenMap["Present"]+")";
+						//displayVal = "<span " + "style='color: red'" + ">" + displayVal + "</span>";						//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);
+						
+												
+					}
+					else if (keyArray[i]=="Absent"){
+						
+						ctx.fillStyle =colors[1];
+						ctx.fillRect(k,0,10,(phenMap["Absent"]*height)/total);
+						k=k+15;
+						displayVal =displayVal+"Absent("+phenMap["Absent"]+")";
+						//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);
+						
+					}
+					else {
+						k=k+10;
+						
+						ctx.fillStyle =colors[j];
+						ctx.fillRect(k,0,10,(phenMap[keyArray[i]]*height)/total);
+						j++;
+						k=k+15;
+						displayVal =displayVal+keyArray[i]+"("+phenMap[keyArray[i]]+")";
+						//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);						
+						}
+				}
+				
+				else {
+					
+					ctx.fillStyle =colors[j];
+					ctx.fillRect(k,0,10,(phenMap[keyArray[i]]*height)/total);
+					j++;
+					k=k+15;
+					displayVal =displayVal+keyArray[i]+"("+phenMap[keyArray[i]]+")";
+					//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);
+				};
+			}
+			
+			//ctx.fillText(displayVal,15,35);
+			
 			
 			
 			
@@ -323,6 +388,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		
 		
 	},
+	
 	
 	saveButtonHandler : function(text) {
 		ASPIREdb.TextDataDownloadWindow.setLoading(false);

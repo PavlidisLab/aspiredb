@@ -281,7 +281,8 @@ public class SubjectServiceImpl implements SubjectService {
             
             pvo.setDisplaySummary( displaySummary );
             pvo.setPhenoSummaryMap( phenoSummaryMap );
-            //valueObjects.add( pvo );
+            pvo.setPhenoSet(phenoSummaryMap.keySet());
+            
             summaryValueObjectsMap.put( sum.getName(), pvo );
            
             
