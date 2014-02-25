@@ -129,9 +129,8 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			
 			var phenSummary = value.phenoSummaryMap;
 			if (phenSummary!= null){
-				//myToolTipText= phenSummary.phenSet[0]
-				//metadata.tdAttr = 'data-qtip="' + myToolTipText + '"';
 				var ret = "<canvas width='50' height='80' id=multi"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
+				metadata.tdAttr = 'data-qtip="'+phenSummary.displaySummary + ret + '"';
 				return ret;
 			} else return "";
 			},

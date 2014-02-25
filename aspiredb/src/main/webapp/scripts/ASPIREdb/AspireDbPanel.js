@@ -96,7 +96,7 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 				}
 				
 			}
-			
+			/**
 			if (isFilter){
 				aspireDbPanel.down('#filterActivated').setText('Filter Activated');
 				aspireDbPanel.down('#filterButton').setBorder(4);	
@@ -106,7 +106,8 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 				aspireDbPanel.down('#filterActivated').setText('');
 				aspireDbPanel.down('#filterButton').setBorder(1);	
 				aspireDbPanel.down('#filterButton').setTooltip("Filter Not Activated");
-			}
+				
+			}*/
 		});
 		
 		

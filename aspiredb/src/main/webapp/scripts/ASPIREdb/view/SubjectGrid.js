@@ -195,13 +195,13 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 	 * @param me
 	 */
 	filterSubmitHandler : function(filterConfigs) {
-
+		
 		var me = this;
 		
 		me.setLoading(true);
 		me.getStore().removeAll();
 		me.visibleLabels = me.createVisibleLabels();
-		
+			
 		
 		QueryService.querySubjects(filterConfigs, {
 			callback : function(pageLoad) {
@@ -210,6 +210,16 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 				var data = [];
 				
 				console.log(me.valueObjects.length + " subjects being processed into value objects");
+				
+				ProjectService.numSubjects(filterConfigs[0].projectIds, {
+					callback : function(NoOfSubjects){
+						if (NoOfSubjects > me.valueObjects.length) {
+							me.setTitle( "Subject :"+me.valueObjects.length+" of "+NoOfSubjects +" filtered");
+						}
+						else if  (NoOfSubjects == me.valueObjects.length)
+								me.setTitle( "Subject") ;
+					}
+				});
 				
 				for ( var i = 0; i < me.valueObjects.length; i++) {
 					var val = me.valueObjects[i];

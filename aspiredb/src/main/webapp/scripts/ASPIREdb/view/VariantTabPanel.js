@@ -171,6 +171,16 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					
 					var vvos = pageLoad.items;
 					
+					ProjectService.numVariants(filterConfigs[0].projectIds, {
+						callback : function(NoOfVariants){
+							if (NoOfVariants > vvos.length){
+								ref.setTitle( "Variant :"+vvos.length+" of "+NoOfVariants +" filtered");
+							}
+							else if  (NoOfVariants == vvos.length)
+								ref.setTitle( "Variant") ;
+						}
+					});
+					
 					var ideogram = ref.getComponent('ideogram');
 					ideogram.drawChromosomes();
 					ideogram.drawVariants(vvos);
