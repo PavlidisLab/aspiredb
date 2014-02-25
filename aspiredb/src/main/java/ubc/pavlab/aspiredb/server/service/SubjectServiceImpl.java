@@ -164,7 +164,8 @@ public class SubjectServiceImpl implements SubjectService {
             LinkedHashMap<String, Integer> phenoSummaryMap = new LinkedHashMap<String, Integer>();
             
             Set<String> keyArray = sum.getDbValueToSubjectSet().keySet();
-            
+            String[] colors = {"red", "green", "black", "purple","blue", "yellow","orange", "grey"};
+            int j=2;
             for (String key: keyArray){
                 
                 Integer size = sum.getDbValueToSubjectSet().get( key ).size();
@@ -173,20 +174,22 @@ public class SubjectServiceImpl implements SubjectService {
                     if (key.equals( "1")) {
                         phenoSummaryMap.put("Present", size);
                         displaySummary = displaySummary + " Present(" + size + ')';
-                        displaySummary = "<span " + "style='color: red'" + ">" + displaySummary + "</span>";
+                        displaySummary = "<span " + "style='color:"+colors[0]+"'" + ">" + displaySummary + "</span>";
                     }else if (key.equals( "0")) {
                         phenoSummaryMap.put("Absent", size);
                         displaySummary = displaySummary + " Absent(" + size + ')';
-                        displaySummary = "<span " + "style='color: green'" + ">" + displaySummary + "</span>";
+                        displaySummary = "<span " + "style='color: "+colors[1]+"'" + ">" + displaySummary + "</span>";
                     } else {
                         phenoSummaryMap.put(key, size);
                         displaySummary = displaySummary + ' ' + key + " (" + size + ')';
-                        displaySummary = "<span " + "style='color: black'" + ">" + displaySummary + "</span>";
+                        displaySummary = "<span " + "style='color: "+colors[j]+"'" + ">" + displaySummary + "</span>";
+                        j++;
                     }
                 } else {
                     phenoSummaryMap.put(key, size);
                     displaySummary = displaySummary + ' ' + key + " (" + size + ')';
-                    displaySummary = "<span " + "style='color: black'" + ">" + displaySummary + "</span>";
+                    displaySummary = "<span " + "style='color:"+colors[j]+"'" + ">" + displaySummary + "</span>";
+                    j++;
                 }
                 
                 
@@ -214,7 +217,7 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     @RemoteMethod
     @Transactional
-    public Map<String,PhenotypeSummaryValueObject> getPhenotypeSummaryValueObjects( List<Long> subjectIds, Collection<Long> projectIds ) throws NeurocartaServiceException{
+    public Map<String,PhenotypeSummaryValueObject> getPhenotypeSummaryValueObjects( List<Long> subjectIds, Collection<Long> projectIds) throws NeurocartaServiceException{
         
         Collection<Subject> subjects = subjectDao.load(subjectIds);
         
@@ -230,8 +233,8 @@ public class SubjectServiceImpl implements SubjectService {
         
         //List<PhenotypeSummaryValueObject> valueObjects = new ArrayList<PhenotypeSummaryValueObject>();   
         Map<String, PhenotypeSummaryValueObject> summaryValueObjectsMap = new HashMap<String, PhenotypeSummaryValueObject>();
-              
-        
+        LinkedHashMap<String, Integer> allPhenoSummaryMap = new LinkedHashMap<String, Integer>();     
+       
                 
         //convert PhenotypeSummaries to lighter PhenotypeValueObjects
         
@@ -241,6 +244,8 @@ public class SubjectServiceImpl implements SubjectService {
             LinkedHashMap<String, Integer> phenoSummaryMap = new LinkedHashMap<String, Integer>();
             
             Set<String> keyArray = sum.getDbValueToSubjectSet().keySet();
+            String[] colors = {"red", "green", "black", "purple","blue", "yellow","orange", "grey"};
+            int j=2;
             
             for (String key: keyArray){
                 
@@ -250,20 +255,22 @@ public class SubjectServiceImpl implements SubjectService {
                     if (key.equals( "1")) {
                         phenoSummaryMap.put("Present", size);
                         displaySummary = displaySummary + " Present(" + size + ')';
-                        displaySummary = "<span " + "style='color: red'" + ">" + displaySummary + "</span>";
+                        displaySummary = "<span " + "style='color: "+colors[0]+"'" + ">" + displaySummary + "</span>";
                     }else if (key.equals( "0")) {
                         phenoSummaryMap.put("Absent", size);
                         displaySummary = displaySummary + " Absent(" + size + ')';
-                        displaySummary = "<span " + "style='color: green'" + ">" + displaySummary + "</span>";
+                        displaySummary = "<span " + "style='color: "+colors[1]+"'" + ">" + displaySummary + "</span>";
                     } else {
                         phenoSummaryMap.put(key, size);
                         displaySummary = displaySummary + ' ' + key + " (" + size + ')';
-                        displaySummary = "<span " + "style='color: black'" + ">" + displaySummary + "</span>";
+                        displaySummary = "<span " + "style='color: "+colors[j]+"'" + ">" + displaySummary + "</span>";
+                        j++;
                     }
                 } else {
                     phenoSummaryMap.put(key, size);
                     displaySummary = displaySummary + ' ' + key + " (" + size + ')';
-                    displaySummary = "<span " + "style='color: black'" + ">" + displaySummary + "</span>";
+                    displaySummary = "<span " + "style='color:"+colors[j]+"'" + ">" + displaySummary + "</span>";
+                    j++;
                 }
                 
                 
@@ -279,7 +286,7 @@ public class SubjectServiceImpl implements SubjectService {
             pvo.setNeurocartaPhenotype( sum.isNeurocartaPhenotype() );
             
             pvo.setDisplaySummary( displaySummary );
-            pvo.setPhenoSummaryMap( phenoSummaryMap );
+            pvo.setPhenoSummaryMap( phenoSummaryMap );                         
             pvo.setPhenoSet(phenoSummaryMap.keySet());
             
             summaryValueObjectsMap.put( sum.getName(), pvo );
