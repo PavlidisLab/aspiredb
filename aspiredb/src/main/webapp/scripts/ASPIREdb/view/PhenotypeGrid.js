@@ -43,7 +43,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		DB_VAL_HPO_ABSENT : 0,
 
 		// collection of all the PhenotypeSummaryValueObject loaded
-		phenotypeStore : {},
+		phenotypeSummaryValueObjects : [],
 		
 	},
 	constructor : function(cfg) {
@@ -179,13 +179,13 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			});
 
 			SubjectService.getPhenotypeSummaries(subjectIds, ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
-				callback : function(vos) {
+				callback : function(vos) {//vos is a list of phenotypeSummaryValueobjects (converted to a javascript Array)
 
 					var data = [];
-					for ( var key in vos) {
-						var phenSummary = vos[key];
+					for ( var i = 0; i < vos.length ; i++) {
+						var phenSummary = vos[i];
 
-						ref.phenotypeStore[key] = phenSummary;
+						ref.phenotypeSummaryValueObjects[i] = phenSummary;
 						
 						// [ phenSummary.name, phenSummary.selectedPhenotype, subjectVal]
 						// TODO find a more elegant way of doing this ...
@@ -248,7 +248,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 					ref.setLoading(true);
 					
 					PhenotypeService.getPhenotypes( svo.id, {
-						callback : function(vos) {
+						callback : function(voMap) {//these vos a
 						
 							ref.columns[2].setVisible(false);
 							
@@ -256,9 +256,9 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 							col.setText(svo.patientId);
 							col.setVisible(true);
 							
-							for ( var key in ref.phenotypeStore ) {
-								var phenSummary = ref.phenotypeStore[key];
-								var subjectPhenotype = vos[phenSummary.name];
+							for ( var i = 0 ; i < ref.phenotypeSummaryValueObjects.length; i++ ) {
+								var phenSummary = ref.phenotypeSummaryValueObjects[i];
+								var subjectPhenotype = voMap[phenSummary.name];
 								phenSummary.selectedPhenotype= subjectPhenotype;
 							}
 							
@@ -273,9 +273,9 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		else{
 			
 			SubjectService.getPhenotypeSummaryValueObjects(subjectIds, ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
-				callback : function(vos) {
+				callback : function(voMap) {//voMap is a <String, PhenotypeSummaryValueObject>Map
 					
-					if ( vos != null ) {
+					if ( voMap != null ) {
 						ref.setLoading(true);
 					
 						//validate that single case column is hidden
@@ -285,15 +285,16 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 						col.setVisible(true);	
 					
 						var data = [];
-						for (var key in ref.phenotypeStore){
-							var phenSummary = ref.phenotypeStore[key];
-							var phenoSummaryValueObject = vos[phenSummary.name];
-							phenSummary.phenoSummaryMap= phenoSummaryValueObject;
+						for (var i = 0; i < ref.phenotypeSummaryValueObjects.length; i++){
+							var phenSummary = ref.phenotypeSummaryValueObjects[i];
+							var phenoSummaryValueObject = voMap[phenSummary.name];
+							//we are attaching a new property to phenSummary here, calling it phenoSummaryMapSelectedSubjects
+							phenSummary.phenoSummaryMapSelectedSubjects= phenoSummaryValueObject.phenoSummaryMap;
 												
 						}
 						ref.getView().refresh(true);
 						
-						ref.updatePhenotypeSummaryCanvases();
+						ref.updatePhenotypeSummaryCanvasesSelectedSubjects();
 						ref.setLoading(false);
 					}
 					
@@ -304,86 +305,109 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		
 	},
 	
-	updatePhenotypeSummaryCanvases : function (){
+	updatePhenotypeSummaryCanvasesSelectedSubjects : function (){
 		
-		for (var key in this.phenotypeStore){
-			var phenSummary = this.phenotypeStore[key];
-			var keyArray =phenSummary.phenoSet;
-			var phenMap=phenSummary.phenoSummaryMap.phenoSummaryMap;
-			var total=0;
-			for (var i=0; i<keyArray.length;i++){
-				total = total+phenMap[keyArray[i]];
-			}
+		for (var i = 0 ; i < this.phenotypeSummaryValueObjects.length; i++){
+			var phenSummary = this.phenotypeSummaryValueObjects[i];
 			
+			//phenSummary.phenoSummaryMapSelectedSubjects is the new parameter we added in the javascript
+			var phenMap=phenSummary.phenoSummaryMapSelectedSubjects;
+						
 			var canvas = document.getElementById("multi"+phenSummary.name.replace(/ /g,''));
 			
-			var ctx = canvas.getContext("2d");
-			ctx.font = "bold 8px sans-serif";
-			ctx.textAlign = "center";
-			
-			
-			var k=0;
-			var j=2;
-			var width=80;
-			var height=20;
-			var colors = ["red", "green", "black", "purple","blue", "yellow","orange", "grey"];
-			var displayVal = '';
-			
-									
-			for (var i=0;i<keyArray.length;i++){
-				var fillTextWidth=i * width / keyArray.length + (width / keyArray.length) / 2;
-				var fillTextHeight=height +5;
-								
-				if (phenSummary.valueType == "HPONTOLOGY") {
-					
-					if (keyArray[i] =="Present"){
-						ctx.fillStyle = colors[0];
-						ctx.fillRect(k,0,10,(phenMap["Present"]*height)/total);
-						k=k+15;
-						displayVal =displayVal+"Present("+phenMap["Present"]+")";
-						//displayVal = "<span " + "style='color: red'" + ">" + displayVal + "</span>";						//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);
-						
-												
-					}
-					else if (keyArray[i]=="Absent"){
-						
-						ctx.fillStyle =colors[1];
-						ctx.fillRect(k,0,10,(phenMap["Absent"]*height)/total);
-						k=k+15;
-						displayVal =displayVal+"Absent("+phenMap["Absent"]+")";
-						//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);
-						
-					}
-					else {
-						k=k+10;
-						
-						ctx.fillStyle =colors[j];
-						ctx.fillRect(k,0,10,(phenMap[keyArray[i]]*height)/total);
-						j++;
-						k=k+15;
-						displayVal =displayVal+keyArray[i]+"("+phenMap[keyArray[i]]+")";
-						//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);						
-						}
-				}
-				
-				else {
-					
-					ctx.fillStyle =colors[j];
-					ctx.fillRect(k,0,10,(phenMap[keyArray[i]]*height)/total);
-					j++;
-					k=k+15;
-					displayVal =displayVal+keyArray[i]+"("+phenMap[keyArray[i]]+")";
-					//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);
-				};
-			}
-			
-			//ctx.fillText(displayVal,15,35);
-			
-			
-			
+			this.drawCanvas(canvas, phenSummary, phenMap);
 			
 								
 		}
+		
+		
+		
+	},
+	
+	
+	updatePhenotypeSummaryCanvasesAllSubjects : function (){
+		
+		//TODO for Gaya to finish
+		
+		//use phenSummary.phenoSummaryMap
+		
+		//this.drawCanvas(canvas, keyArray, phenSummary);
+		
+		
+		
+		
+	},
+	
+	
+	drawCanvas : function(canvas,  phenSummary, phenMap){
+		var keyArray =phenSummary.phenoSet;
+		
+		var total=0;
+		for (var j=0; j<keyArray.length;j++){
+			total = total+phenMap[keyArray[j]];
+		}
+		
+		var ctx = canvas.getContext("2d");
+		ctx.font = "bold 8px sans-serif";
+		ctx.textAlign = "center";
+		
+		
+		var xValue=0;
+		var colorIndex=2;
+		var width=80;
+		var height=20;
+		var colors = ["red", "green", "black", "purple","blue", "yellow","orange", "grey"];
+		var displayVal = '';
+		
+								
+		for (var k=0;k<keyArray.length;k++){
+			var fillTextWidth=k * width / keyArray.length + (width / keyArray.length) / 2;
+			var fillTextHeight=height +5;
+							
+			if (phenSummary.valueType == "HPONTOLOGY") {
+				
+				if (keyArray[k] =="Present"){
+					ctx.fillStyle = colors[0];
+					ctx.fillRect(xValue,0,10,(phenMap["Present"]*height)/total);
+					xValue=xValue+15;
+					displayVal =displayVal+"Present("+phenMap["Present"]+")";
+					//displayVal = "<span " + "style='color: red'" + ">" + displayVal + "</span>";						//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);
+					
+											
+				}
+				else if (keyArray[k]=="Absent"){
+					
+					ctx.fillStyle =colors[1];
+					ctx.fillRect(xValue,0,10,(phenMap["Absent"]*height)/total);
+					xValue=xValue+15;
+					displayVal =displayVal+"Absent("+phenMap["Absent"]+")";
+					//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);
+					
+				}
+				else {
+					xValue=xValue+10;
+					
+					ctx.fillStyle =colors[colorIndex];
+					ctx.fillRect(xValue,0,10,(phenMap[keyArray[k]]*height)/total);
+					colorIndex++;
+					xValue=xValue+15;
+					displayVal =displayVal+keyArray[k]+"("+phenMap[keyArray[k]]+")";
+					//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);						
+					}
+			}
+			
+			else {
+				
+				ctx.fillStyle =colors[colorIndex];
+				ctx.fillRect(xValue,0,10,(phenMap[keyArray[k]]*height)/total);
+				colorIndex++;
+				xValue=xValue+15;
+				displayVal =displayVal+keyArray[k]+"("+phenMap[keyArray[k]]+")";
+				//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);
+			};
+		}
+		
+		//ctx.fillText(displayVal,15,35);
 		
 		
 		

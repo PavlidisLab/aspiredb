@@ -207,8 +207,7 @@ public class SubjectServiceImpl implements SubjectService {
             valueObjects.add( pvo );
             
         }
-        
-        
+                
         return valueObjects;
 	}
     

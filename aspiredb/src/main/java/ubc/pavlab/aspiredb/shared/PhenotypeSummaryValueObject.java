@@ -42,9 +42,6 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
     
     private PhenotypeValueObject selectedPhenotype;
     
-    private PhenotypeValueObject selectedPhenotypeMulti;
-    
-
   
     public PhenotypeValueObject getSelectedPhenotype() {
         return selectedPhenotype;
@@ -53,14 +50,6 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
 	public void setSelectedPhenotype(PhenotypeValueObject selectedPhenotype) {
 		this.selectedPhenotype = selectedPhenotype;
 	}
-
-	public PhenotypeValueObject getSelectedPhenotypeMulti() {
-        return selectedPhenotypeMulti;
-    }
-
-    public void setSelectedPhenotypeMulti( PhenotypeValueObject selectedPhenotypeMulti ) {
-        this.selectedPhenotypeMulti = selectedPhenotypeMulti;
-    }
 
     public PhenotypeSummaryValueObject() {
 		
