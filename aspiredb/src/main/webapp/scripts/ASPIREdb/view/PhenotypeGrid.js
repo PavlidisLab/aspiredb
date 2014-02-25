@@ -127,17 +127,28 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		dataIndex : 'phenoSummaryMap',
 			renderer : function(value, metadata, record) {
 			
-			var phenSummary = value.phenoSummaryMap;
+			var phenSummary = value.phenoSummaryMapSelectedSubjects;
+			var displaySummary = value.displaySummarySelectedSubjects
 			if (phenSummary!= null){
 				var ret = "<canvas width='50' height='80' id=multi"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
-				metadata.tdAttr = 'data-qtip="'+phenSummary.displaySummary + ret + '"';
+				metadata.tdAttr = 'data-qtip="'+displaySummary + ret + '"';
 				return ret;
 			} else return "";
 			},
 	},
 	{
 		text : 'Value (subject count)',
-		dataIndex : 'value',
+		dataIndex : 'allPhenoSummaryMap',
+		renderer : function(value, metadata, record) {
+		
+		var phenSummary = value.phenoSummaryMap;
+		
+		if (phenSummary!= null){
+			var ret = "<canvas width='50' height='50' id=all"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
+			metadata.tdAttr = 'data-qtip="'+value.displaySummary + ret + '"';
+			return ret;
+		} else return "";
+		},
 		flex : 1
 	} ],
 
@@ -181,18 +192,20 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 				callback : function(vos) {//vos is a list of phenotypeSummaryValueobjects (converted to a javascript Array)
 
 					var data = [];
+					ref.phenotypeSummaryValueObjects=[];
 					for ( var i = 0; i < vos.length ; i++) {
 						var phenSummary = vos[i];
-
+						
 						ref.phenotypeSummaryValueObjects[i] = phenSummary;
 						
 						// [ phenSummary.name, phenSummary.selectedPhenotype, subjectVal]
 						// TODO find a more elegant way of doing this ...
-						var row = [ phenSummary, phenSummary, phenSummary,phenSummary.displaySummary ];
+						var row = [ phenSummary, phenSummary, phenSummary,phenSummary ];
 						data.push(row);
 					}
 					
 					ref.store.loadData(data);
+					ref.updatePhenotypeSummaryCanvasesAllSubjects();
 					ref.setLoading(false);
 					
 				}
@@ -262,6 +275,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 							}
 							
 							ref.getView().refresh(true);
+							ref.updatePhenotypeSummaryCanvasesAllSubjects();
 							ref.setLoading(false);
 						}
 					});
@@ -284,6 +298,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 						col.setVisible(true);	
 					
 						var data = [];
+						
 						for (var i = 0; i < ref.phenotypeSummaryValueObjects.length; i++){
 							var phenSummary = ref.phenotypeSummaryValueObjects[i];
 							var phenoSummaryValueObject = voMap[phenSummary.name];
@@ -291,13 +306,14 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 							
 							if (phenoSummaryValueObject){
 								phenSummary.phenoSummaryMapSelectedSubjects= phenoSummaryValueObject.phenoSummaryMap;
+								phenSummary.displaySummarySelectedSubjects= phenoSummaryValueObject.displaySummary;
 							} else{//if phenoSummaryValueObject is null or undefined
 								console.log("null or undefined phenoSummaryValueObject: "+ phenSummary.name);
 							}
 												
 						}
 						ref.getView().refresh(true);
-						
+						ref.updatePhenotypeSummaryCanvasesAllSubjects();
 						ref.updatePhenotypeSummaryCanvasesSelectedSubjects();
 						ref.setLoading(false);
 					}
@@ -330,12 +346,19 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	
 	
 	updatePhenotypeSummaryCanvasesAllSubjects : function (){
-		
-		//TODO for Gaya to finish
-		
-		//use phenSummary.phenoSummaryMap
-		
-		//this.drawCanvas(canvas, keyArray, phenSummary);
+				
+		for (var i = 0 ; i < this.phenotypeSummaryValueObjects.length; i++){
+			var phenSummary = this.phenotypeSummaryValueObjects[i];
+			
+			//phenSummary.phenoSummaryMapSelectedSubjects is the new parameter we added in the javascript
+			var phenMap=phenSummary.phenoSummaryMap;
+						
+			var canvas = document.getElementById("all"+phenSummary.name.replace(/ /g,''));
+			
+			this.drawCanvas(canvas, phenSummary, phenMap);
+			
+								
+		}
 		
 		
 		
@@ -357,9 +380,10 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		
 		
 		var xValue=0;
+		var yValue= 0;
 		var colorIndex=2;
-		var width=80;
-		var height=20;
+		var width=50;
+		var height=50;
 		var colors = ["red", "green", "black", "purple","blue", "yellow","orange", "grey"];
 		var displayVal = '';
 		
@@ -372,46 +396,42 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 				
 				if (keyArray[k] =="Present"){
 					ctx.fillStyle = colors[0];
-					ctx.fillRect(xValue,0,10,(phenMap["Present"]*height)/total);
-					xValue=xValue+15;
-					displayVal =displayVal+"Present("+phenMap["Present"]+")";
-					//displayVal = "<span " + "style='color: red'" + ">" + displayVal + "</span>";						//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);
-					
-											
+					ctx.fillRect(xValue,yValue,10,(phenMap["Present"]*height)/total);
+					xValue=xValue+10;
+					displayVal =displayVal+"Present("+phenMap["Present"]+")";				
+																
 				}
 				else if (keyArray[k]=="Absent"){
 					
 					ctx.fillStyle =colors[1];
-					ctx.fillRect(xValue,0,10,(phenMap["Absent"]*height)/total);
-					xValue=xValue+15;
+					ctx.fillRect(xValue,yValue,10,(phenMap["Absent"]*height)/total);
+					xValue=xValue+10;
 					displayVal =displayVal+"Absent("+phenMap["Absent"]+")";
-					//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);
-					
+									
 				}
 				else {
-					xValue=xValue+10;
-					
+								
 					ctx.fillStyle =colors[colorIndex];
-					ctx.fillRect(xValue,0,10,(phenMap[keyArray[k]]*height)/total);
+					ctx.fillRect(xValue,yValue,10,(phenMap[keyArray[k]]*height)/total);
 					colorIndex++;
-					xValue=xValue+15;
+					xValue=xValue+10;
 					displayVal =displayVal+keyArray[k]+"("+phenMap[keyArray[k]]+")";
-					//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);						
+									
 					}
 			}
 			
 			else {
 				
 				ctx.fillStyle =colors[colorIndex];
-				ctx.fillRect(xValue,0,10,(phenMap[keyArray[k]]*height)/total);
+				ctx.fillRect(xValue,yValue,10,(phenMap[keyArray[k]]*height)/total);
 				colorIndex++;
-				xValue=xValue+15;
+				xValue=xValue+10;
 				displayVal =displayVal+keyArray[k]+"("+phenMap[keyArray[k]]+")";
-				//ctx.fillText(displayVal,fillTextWidth,fillTextHeight);
+				
 			};
 		}
 		
-		//ctx.fillText(displayVal,15,35);
+	
 		
 		
 		

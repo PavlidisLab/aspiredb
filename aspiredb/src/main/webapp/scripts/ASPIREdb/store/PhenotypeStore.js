@@ -37,8 +37,8 @@ Ext.define('ASPIREdb.store.PhenotypeStore', {
 		},
 	},
 	{
-		name : 'value',
-		type : 'string'
+		name : 'allPhenoSummaryMap',
+		type : 'auto'
 	} ],
 
 	storeId : 'phenotypes'
