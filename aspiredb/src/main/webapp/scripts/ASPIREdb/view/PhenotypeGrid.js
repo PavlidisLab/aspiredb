@@ -288,7 +288,12 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 							var phenSummary = ref.phenotypeSummaryValueObjects[i];
 							var phenoSummaryValueObject = voMap[phenSummary.name];
 							//we are attaching a new property to phenSummary here, calling it phenoSummaryMapSelectedSubjects
-							phenSummary.phenoSummaryMapSelectedSubjects= phenoSummaryValueObject.phenoSummaryMap;
+							
+							if (phenoSummaryValueObject){
+								phenSummary.phenoSummaryMapSelectedSubjects= phenoSummaryValueObject.phenoSummaryMap;
+							} else{//if phenoSummaryValueObject is null or undefined
+								console.log("null or undefined phenoSummaryValueObject: "+ phenSummary.name);
+							}
 												
 						}
 						ref.getView().refresh(true);
