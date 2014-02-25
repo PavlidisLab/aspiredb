@@ -130,7 +130,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			var phenSummary = value.phenoSummaryMapSelectedSubjects;
 			var displaySummary = value.displaySummarySelectedSubjects
 			if (phenSummary!= null){
-				var ret = "<canvas width='50' height='80' id=multi"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
+				var ret = "<canvas width='50' height='50' id=multi"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
 				metadata.tdAttr = 'data-qtip="'+displaySummary + ret + '"';
 				return ret;
 			} else return "";
@@ -377,26 +377,38 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		var ctx = canvas.getContext("2d");
 		ctx.font = "bold 8px sans-serif";
 		ctx.textAlign = "center";
-		
-		
-		var xValue=0;
-		var yValue= 0;
-		var colorIndex=2;
+				
 		var width=50;
 		var height=50;
+		var xValue=0;
+		var yValue=height;
+		var colorIndex=2;
+
 		var colors = ["red", "green", "black", "purple","blue", "yellow","orange", "grey"];
 		var displayVal = '';
 		
-								
+		//draw Y axis
+		ctx.beginPath();
+		ctx.moveTo(0,50);
+		ctx.lineTo(0,0);
+		ctx.closePath();
+		ctx.stroke();
+		
+		//draw Y axis	   
+	    ctx.beginPath();
+		ctx.moveTo(0,50);
+		ctx.lineTo(50,50);
+		ctx.closePath();
+	    ctx.stroke();
+		
 		for (var k=0;k<keyArray.length;k++){
-			var fillTextWidth=k * width / keyArray.length + (width / keyArray.length) / 2;
-			var fillTextHeight=height +5;
-							
+										
 			if (phenSummary.valueType == "HPONTOLOGY") {
 				
 				if (keyArray[k] =="Present"){
+					
 					ctx.fillStyle = colors[0];
-					ctx.fillRect(xValue,yValue,10,(phenMap["Present"]*height)/total);
+					ctx.fillRect(xValue,yValue,10,-(phenMap["Present"]*height)/total);
 					xValue=xValue+10;
 					displayVal =displayVal+"Present("+phenMap["Present"]+")";				
 																
@@ -404,7 +416,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 				else if (keyArray[k]=="Absent"){
 					
 					ctx.fillStyle =colors[1];
-					ctx.fillRect(xValue,yValue,10,(phenMap["Absent"]*height)/total);
+					ctx.fillRect(xValue,yValue,10,-(phenMap["Absent"]*height)/total);
 					xValue=xValue+10;
 					displayVal =displayVal+"Absent("+phenMap["Absent"]+")";
 									
@@ -412,7 +424,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 				else {
 								
 					ctx.fillStyle =colors[colorIndex];
-					ctx.fillRect(xValue,yValue,10,(phenMap[keyArray[k]]*height)/total);
+					ctx.fillRect(xValue,yValue,10,-(phenMap[keyArray[k]]*height)/total);
 					colorIndex++;
 					xValue=xValue+10;
 					displayVal =displayVal+keyArray[k]+"("+phenMap[keyArray[k]]+")";
@@ -423,7 +435,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			else {
 				
 				ctx.fillStyle =colors[colorIndex];
-				ctx.fillRect(xValue,yValue,10,(phenMap[keyArray[k]]*height)/total);
+				ctx.fillRect(xValue,yValue,10,-(phenMap[keyArray[k]]*height)/total);
 				colorIndex++;
 				xValue=xValue+10;
 				displayVal =displayVal+keyArray[k]+"("+phenMap[keyArray[k]]+")";
