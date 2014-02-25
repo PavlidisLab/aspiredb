@@ -187,6 +187,9 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		this.enableDisableQueryManager();
 
 		this.down('#savedQueryComboBox').on('select', this.savedQueryComboBoxSelectHandler, this);
+		
+		ASPIREdb.EVENT_BUS.on('project_select', this.clearButtonHandler, this);	
+			
 
 		filterTypeComboBox.on('select', function(combo, records) {
 			var record = records[0];
@@ -387,7 +390,8 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		this.hide();
 
 	},
-
+	
+	
 	clearButtonHandler : function() {
 		
 		this.down('#filterContainer').removeAll();
