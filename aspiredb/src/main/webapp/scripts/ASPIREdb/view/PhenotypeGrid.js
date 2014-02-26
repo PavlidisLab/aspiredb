@@ -382,7 +382,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		var height=50;
 		var xValue=0;
 		var yValue=height;
-		var colorIndex=2;
+		var colorIndex=3;
 
 		var colors = ["red", "green", "black", "purple","blue", "yellow","orange", "grey"];
 		var displayVal = '';
@@ -402,6 +402,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	    ctx.stroke();
 		
 		for (var k=0;k<keyArray.length;k++){
+		  if (keyArray[k]!="Unknown"){
 										
 			if (phenSummary.valueType == "HPONTOLOGY") {
 				
@@ -431,7 +432,6 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 									
 					}
 			}
-			
 			else {
 				
 				ctx.fillStyle =colors[colorIndex];
@@ -442,7 +442,19 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 				
 			};
 		}
+		  else {
+			  var unknown=phenMap["Unknown"];
+		  }
 		
+	}
+		if (unknown!=null){
+			ctx.fillStyle =colors[2];
+			ctx.fillRect(xValue,yValue,10,-(phenMap["Unknown"]*height)/total);
+			xValue=xValue+10;
+			displayVal =displayVal+"Unknown("+phenMap["Unknown"]+")";									
+	
+}
+	
 	
 		
 		

@@ -165,27 +165,30 @@ public class SubjectServiceImpl implements SubjectService {
             
             Set<String> keyArray = sum.getDbValueToSubjectSet().keySet();
             String[] colors = {"red", "green", "black", "purple","blue", "yellow","orange", "grey"};
-            int j=2;
+            int j=3;
+            int unknown=0;
             for (String key: keyArray){
                 
                 Integer size = sum.getDbValueToSubjectSet().get( key ).size();
-                
-                if (sum.getValueType().equals( "HPONTOLOGY")) {
-                    if (key.equals( "1")) {
-                        phenoSummaryMap.put("Present", size);
-                        displaySummary = displaySummary + " Present(" + size + ')';
-                        displaySummary = "<span " + "style='color:"+colors[0]+"'" + ">" + displaySummary + "</span>";
-                    }else if (key.equals( "0")) {
-                        phenoSummaryMap.put("Absent", size);
-                        displaySummary = displaySummary + " Absent(" + size + ')';
-                        displaySummary = "<span " + "style='color: "+colors[1]+"'" + ">" + displaySummary + "</span>";
-                    } else {
-                        phenoSummaryMap.put(key, size);
-                        displaySummary = displaySummary + ' ' + key + " (" + size + ')';
-                        displaySummary = "<span " + "style='color: "+colors[j]+"'" + ">" + displaySummary + "</span>";
-                        j++;
-                    }
-                } else {
+                if (key.equals("Unknown")){
+                    unknown =size;
+                }else if (sum.getValueType().equals( "HPONTOLOGY")) {
+                        if (key.equals( "1")) {
+                            phenoSummaryMap.put("Present", size);
+                            displaySummary = displaySummary + " Present(" + size + ')';
+                            displaySummary = "<span " + "style='color:"+colors[0]+"'" + ">" + displaySummary + "</span>";
+                        }else if (key.equals( "0")) {
+                            phenoSummaryMap.put("Absent", size);
+                            displaySummary = displaySummary + " Absent(" + size + ')';
+                            displaySummary = "<span " + "style='color: "+colors[1]+"'" + ">" + displaySummary + "</span>";
+                        } 
+                        else {
+                            phenoSummaryMap.put(key, size);
+                            displaySummary = displaySummary + ' ' + key + " (" + size + ')';
+                            displaySummary = "<span " + "style='color: "+colors[j]+"'" + ">" + displaySummary + "</span>";
+                            j++;
+                        }
+                }else{
                     phenoSummaryMap.put(key, size);
                     displaySummary = displaySummary + ' ' + key + " (" + size + ')';
                     displaySummary = "<span " + "style='color:"+colors[j]+"'" + ">" + displaySummary + "</span>";
@@ -195,6 +198,11 @@ public class SubjectServiceImpl implements SubjectService {
                 
                 
                 
+            }
+            if (unknown!=0){
+                phenoSummaryMap.put("Unknown", unknown);
+                displaySummary = displaySummary + " Unknown(" + unknown + ')';
+                displaySummary = "<span " + "style='color: "+colors[2]+"'" + ">" + displaySummary + "</span>";
             }
             
             PhenotypeSummaryValueObject pvo = new PhenotypeSummaryValueObject();
@@ -245,27 +253,30 @@ public class SubjectServiceImpl implements SubjectService {
             
             Set<String> keyArray = sum.getDbValueToSubjectSet().keySet();
             String[] colors = {"red", "green", "black", "purple","blue", "yellow","orange", "grey"};
-            int j=2;
-            
+            int j=3;
+            int unknown=0;
+                    
             for (String key: keyArray){
                 
                 Integer size = sum.getDbValueToSubjectSet().get( key ).size();
                 
-                if (sum.getValueType().equals( "HPONTOLOGY")) {
-                    if (key.equals( "1")) {
-                        phenoSummaryMap.put("Present", size);
-                        displaySummary = displaySummary + " Present(" + size + ')';
-                        displaySummary = "<span " + "style='color: "+colors[0]+"'" + ">" + displaySummary + "</span>";
-                    }else if (key.equals( "0")) {
-                        phenoSummaryMap.put("Absent", size);
-                        displaySummary = displaySummary + " Absent(" + size + ')';
-                        displaySummary = "<span " + "style='color: "+colors[1]+"'" + ">" + displaySummary + "</span>";
-                    } else {
-                        phenoSummaryMap.put(key, size);
-                        displaySummary = displaySummary + ' ' + key + " (" + size + ')';
-                        displaySummary = "<span " + "style='color: "+colors[j]+"'" + ">" + displaySummary + "</span>";
-                        j++;
-                    }
+                if (key.equals("Unknown")){
+                    unknown =size;
+                }else if (sum.getValueType().equals( "HPONTOLOGY")) {
+                        if (key.equals( "1")) {
+                            phenoSummaryMap.put("Present", size);
+                            displaySummary = displaySummary + " Present(" + size + ')';
+                            displaySummary = "<span " + "style='color: "+colors[0]+"'" + ">" + displaySummary + "</span>";
+                        }else if (key.equals( "0")) {
+                            phenoSummaryMap.put("Absent", size);
+                            displaySummary = displaySummary + " Absent(" + size + ')';
+                            displaySummary = "<span " + "style='color: "+colors[1]+"'" + ">" + displaySummary + "</span>";
+                        } else {
+                            phenoSummaryMap.put(key, size);
+                            displaySummary = displaySummary + ' ' + key + " (" + size + ')';
+                            displaySummary = "<span " + "style='color: "+colors[j]+"'" + ">" + displaySummary + "</span>";
+                            j++;
+                        }
                 } else {
                     phenoSummaryMap.put(key, size);
                     displaySummary = displaySummary + ' ' + key + " (" + size + ')';
@@ -276,6 +287,11 @@ public class SubjectServiceImpl implements SubjectService {
                 
                 
                 
+            }
+            if (unknown!=0){
+                phenoSummaryMap.put("Unknown", unknown);
+                displaySummary = displaySummary + " Unknown(" + unknown + ')';
+                displaySummary = "<span " + "style='color: "+colors[2]+"'" + ">" + displaySummary + "</span>";
             }
             
             PhenotypeSummaryValueObject pvo = new PhenotypeSummaryValueObject();

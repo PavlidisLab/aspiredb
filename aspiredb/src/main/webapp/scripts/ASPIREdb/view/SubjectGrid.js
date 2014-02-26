@@ -70,10 +70,10 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 							continue;
 						}
 						if (label.isShown) {
-
-							ret += "<span style='background-color: "
+							var fontcolor = (parseInt(label.colour, 16) > 0xffffff/2) ? 'black' : 'white';	
+							ret += "<font color="+fontcolor+"><span style='background-color: "
 									+ label.colour + "'>" + label.name
-									+ "</span>&nbsp;";
+									+ "</span></font>&nbsp;";
 						}
 					}
 					return ret;

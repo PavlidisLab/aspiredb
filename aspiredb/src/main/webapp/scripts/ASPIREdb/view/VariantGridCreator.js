@@ -134,8 +134,11 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 						continue;
 					}
 					if (label.isShown) {
-
-						ret += "<span style='background-color: " + label.colour + "'>" + label.name + "</span>&nbsp;";
+						var fontcolor = (parseInt(label.colour, 16) > 0xffffff/2) ? 'black' : 'white';	
+						ret += "<font color="+fontcolor+"><span style='background-color: "
+								+ label.colour + "'>" + label.name
+								+ "</span></font>&nbsp;";
+						
 					}
 				}
 				return ret;
