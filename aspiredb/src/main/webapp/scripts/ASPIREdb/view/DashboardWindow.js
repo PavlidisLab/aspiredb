@@ -11,11 +11,18 @@ Ext.define('ASPIREdb.view.DashboardWindow', {
 	height : 250,
 	layout : {
 		type : 'vbox',
-		align : 'left'
+		align : 'center'
 	},
 	bodyStyle : 'padding: 5px;',
 	border: false,
 
+	config : {
+
+		//active project ID values holder
+		activeProjectIds : [],
+		
+	},
+	
 	initComponent : function() {
 
 		this.callParent();
@@ -76,32 +83,42 @@ Ext.define('ASPIREdb.view.DashboardWindow', {
 		var okButton = Ext.create('Ext.Button', {
 			text : 'ok',
 			handler : function() {
-
+				//var selectedProjectId=0;
+				
 				if (!projectComboBox.getValue()) {
 
 					projectComboBox.setActiveError('Please select project');
 					return;
 				}
+				else {
+					var selectedProjectId=projectComboBox.getValue();
+					//TODO : Now only one project is loaded at a time, but in future this might change
+					if (selectedProjectId!=ref.activeProjectIds[0]){
 				
-				ASPIREdb.ActiveProjectSettings.setActiveProject([ {
-					id : projectComboBox.getValue(),
-					name : projectComboBox.getRawValue(),
-					description : ''
-				} ]);
-
-				var filterConfigs = [];
-				var activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
-				var projectFilter = new ProjectFilterConfig;
-				projectFilter.projectIds = activeProjectIds;
-				filterConfigs.push(projectFilter);
-				console.log("filter_submit event from DashBoard window");
-				ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);
 				
-				console.log("query_update event from DashboardWindow");
-				ASPIREdb.EVENT_BUS.fireEvent('query_update');
-				ASPIREdb.EVENT_BUS.fireEvent('project_select');
-				ref.close();
+						ASPIREdb.ActiveProjectSettings.setActiveProject([ {
+							id : projectComboBox.getValue(),
+							name : projectComboBox.getRawValue(),
+							description : ''
+						} ]);
 
+						var filterConfigs = [];			
+								
+						ref.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+						var projectFilter = new ProjectFilterConfig;
+						projectFilter.projectIds = ref.activeProjectIds;
+						filterConfigs.push(projectFilter);
+						console.log("filter_submit event from DashBoard window");
+						ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);
+				
+						console.log("query_update event from DashboardWindow");
+						ASPIREdb.EVENT_BUS.fireEvent('query_update');
+						ASPIREdb.EVENT_BUS.fireEvent('project_select');
+						
+				}
+					ref.close();
+
+			}
 			}
 		});
 
