@@ -125,6 +125,22 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			ref.down('#variantGrid').getView().refresh();
 		});
 		
+		ASPIREdb.EVENT_BUS.on('subject_selected',  function(subjectIds) {
+			
+			var grid = ref.down('#variantGrid');
+			grid.setVisible(true);
+			
+			var projectIds= ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+			
+			SubjectService.getSubject(projectIds[0],subjectIds[0], {
+				callback : function(subjectValueObject) {
+					grid.features[0].expand(subjectValueObject.patientId, true); 							
+				}
+			});
+			grid.getView().refresh();
+			
+		});
+		
 		this.saveButton.on('click', function() {
 			ref.saveButtonHandler();
 
@@ -149,6 +165,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 				// newCard is the grid
 				currentlySelectedRecords = this.selectedVariants;
 				this.selectAllButton.enable();
+				
 			}
 
 			this.enableActionButtonsBySelectedRecords(currentlySelectedRecords);
@@ -185,21 +202,27 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					ideogram.drawChromosomes();
 					ideogram.drawVariants(vvos);
 
-					var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid(vvos, properties);
-
+					var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid(vvos, properties);	
+					
+					
+					
 					ref.remove('variantGrid', true);
 
 					grid.on('selectionchange', ref.selectionChangeHandler, ref);
-
+					
 					grid.on('show', function() {
 
 						if (ref.newIdeogramLabel) {
 							grid.getView().refresh();
 							ref.newIdeogramLabel = undefined;
 						}
+						
+						
 					});
-
+					
+													
 					ref.add(grid);
+					
 
 					var toolbar = ref.getDockedComponent('variantTabPanelToolbar');
 
@@ -216,6 +239,8 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		});
 
 	},
+	
+	
 
 	selectionChangeHandler : function(model, records) {
 

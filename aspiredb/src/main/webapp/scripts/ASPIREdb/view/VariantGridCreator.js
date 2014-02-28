@@ -226,7 +226,8 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 			title : 'Table View',
 			requires : [ 'Ext.grid.feature.Grouping' ],
 			features : [ Ext.create('Ext.grid.feature.Grouping', {
-				groupHeaderTpl : '{name} ({rows.length} Item{[values.rows.length > 1 ? "s" : ""]})'
+				groupHeaderTpl : '{name} ({rows.length} Item{[values.rows.length > 1 ? "s" : ""]})',
+				startCollapsed:true
 			}) ],
 			visibleLabels : visibleLabels
 
