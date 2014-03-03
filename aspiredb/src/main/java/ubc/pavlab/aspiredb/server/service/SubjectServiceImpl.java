@@ -93,13 +93,17 @@ public class SubjectServiceImpl implements SubjectService {
         //throwGwtExceptionIfNotLoggedIn();
         Collection<Subject> subjects = subjectDao.load( subjectIds);
         if ( subjects.isEmpty() ) return null;
-        List<SubjectValueObject> vo = new ArrayList<SubjectValueObject>(); 
+        
+        List<SubjectValueObject> vos = new ArrayList<SubjectValueObject>(); 
+        
         for ( Subject subject : subjects ) {
-               vo.add(subject.convertToValueObject());
-               //Integer numVariants = cnvDao.findBySubjectPatientId( subject.getPatientId() ).size();
-              // vo. .setVariants( numVariants != null ? numVariants : 0 );
+            
+            SubjectValueObject vo = subject.convertToValueObject();
+            Integer numVariants = cnvDao.findBySubjectPatientId( subject.getPatientId() ).size();
+            vo.setVariants( numVariants != null ? numVariants : 0 );
+            vos.add(vo);
         }
-        return vo;
+        return vos;
     }
     
 

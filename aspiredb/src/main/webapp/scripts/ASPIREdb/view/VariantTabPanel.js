@@ -17,7 +17,7 @@
  *
  */
 
-Ext.require([ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel', 'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.VariantGridCreator' ]);
+Ext.require([ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel', 'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.VariantGridCreator' , 'ASPIREdb.IdeogramDownloadWindow']);
 
 // TODO js documentation
 
@@ -115,6 +115,14 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
 
 		});
+		
+		this.exportButton = Ext.create('Ext.Button', {
+			id : 'exportButton',
+			text : '',
+			tooltip : 'Download ideogram as png',
+			icon : 'scripts/ASPIREdb/resources/images/icons/export.png'
+
+		});
 
 		// adding buttons to toolbar in filterSubmitHandler with the grid
 		// because extJS was
@@ -125,16 +133,33 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			ref.down('#variantGrid').getView().refresh();
 		});
 		
+			
+		//when subjects selected it is focused in variant grid
 		ASPIREdb.EVENT_BUS.on('subject_selected',  function(subjectIds) {
+			
+			//collapse all the records already expanded		
+			/**SubjectService.getSubjects(projectIds[0],this.selectedVariants, {
+				callback : function(subjectValueObjects) {
+					for ( var idx in subjectValueObjects) {
+						var subjectValueObject = subjectValueObjects[idx];
+						grid.features.collapse(subjectValueObject.patientId); 
+					}
+				}
+			});*/
 			
 			var grid = ref.down('#variantGrid');
 			grid.setVisible(true);
 			
+			
 			var projectIds= ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
 			
-			SubjectService.getSubject(projectIds[0],subjectIds[0], {
-				callback : function(subjectValueObject) {
-					grid.features[0].expand(subjectValueObject.patientId, true); 							
+			//expand only the selected subjects
+			SubjectService.getSubjects(projectIds[0],subjectIds, {
+				callback : function(subjectValueObjects) {
+					for ( var idx in subjectValueObjects) {
+						var subjectValueObject = subjectValueObjects[idx];
+						grid.features[0].expand(subjectValueObject.patientId, true); 
+					}
 				}
 			});
 			grid.getView().refresh();
@@ -143,6 +168,11 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		
 		this.saveButton.on('click', function() {
 			ref.saveButtonHandler();
+
+		});
+		
+		this.exportButton.on('click', function() {
+			ref.exportButtonHandler();
 
 		});
 
@@ -230,6 +260,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					toolbar.add(ref.labelsButton);
 					toolbar.add(ref.selectAllButton);
 					toolbar.add(ref.saveButton);
+					toolbar.add(ref.exportButton);
 					
 					ref.setLoading(false);
 
@@ -272,6 +303,18 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		if (grid) {
 			ASPIREdb.TextDataDownloadWindow.showVariantsDownload(grid.getStore().getRange(), grid.columnHeaders);
 		}
+
+	},
+	
+	exportButtonHandler : function() {
+
+		var ideogram = this.getComponent('ideogram');
+		var canvas=ideogram.getComponent('canvasBox');
+		var imgsrc    = canvas.el.dom.toDataURL('image/png');
+        
+		//if (img) {
+			ASPIREdb.IdeogramDownloadWindow.showIdeogramDownload(imgsrc);
+		//}
 
 	},
 

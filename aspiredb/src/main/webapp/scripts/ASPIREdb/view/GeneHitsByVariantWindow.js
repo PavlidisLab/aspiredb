@@ -30,7 +30,8 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantWindow', {
 	height : 500,
 	layout : 'fit',
 	bodyStyle : 'padding: 5px;',
-
+	
+	
 	items : [ {
 		xtype : 'geneHitsByVariantGrid',
 		itemId : 'geneHitsByVariantGrid'
@@ -53,12 +54,17 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantWindow', {
 		
 		GeneService.getGenesInsideVariants(ids, {
 			callback : function(vos) {
+				ASPIREdb.view.GeneHitsByVariantWindow.getComponent('geneHitsByVariantGrid').setLodedvariantvalueObjects(vos);
 				
 				ASPIREdb.view.GeneHitsByVariantWindow.populateGrid(vos);
+				
+				
 			}
 		});
 		
 	},
+	
+	
 
 	//VariantValueObject
 	populateGrid : function(vos) {		
@@ -73,11 +79,12 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantWindow', {
 			
 			if (vo.geneBioType == "protein_coding"){
 				linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl(vo.symbol);
+				var row = [ vo.symbol, vo.geneBioType, vo.name, linkToGemma ];
+				data.push(row);
 			}
 			
-
-			var row = [ vo.symbol, vo.geneBioType, vo.name, linkToGemma ];
-			data.push(row);
+			
+			
 		}
 
 		grid.store.loadData(data);
@@ -85,7 +92,8 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantWindow', {
 		
 		grid.enableToolbar(vos);
 
-	},
+	},	
+	
 	
 	clearGridAndMask : function(){
 		ASPIREdb.view.GeneHitsByVariantWindow.getComponent('geneHitsByVariantGrid').store.removeAll();

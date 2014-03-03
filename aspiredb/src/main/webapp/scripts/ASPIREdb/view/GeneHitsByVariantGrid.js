@@ -25,6 +25,12 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 	alias : 'widget.geneHitsByVariantGrid',
 	emptyText : 'No genes found',
 	border: false,
+	config:{
+		// collection of all the PhenotypeSummaryValueObject loaded
+		LoadedVariantValueObjects : [],
+		
+	
+	},
 
 	dockedItems : [ {
 		xtype : 'toolbar',
@@ -65,6 +71,11 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 
 	},
 	
+	setLodedvariantvalueObjects :function(vvo){
+		
+		this.LoadedVariantValueObjects =vvo;
+	},	
+	
 	enableToolbar : function(vos) {
 
 		if (vos.length < 1) {
@@ -92,20 +103,7 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 			}
 		};
 		
-		/**
-		//This kind of weird technique is being used because the baked in extjs button href config way was not working
-		var viewProteinCodingGeneOnly = {
-			xtype : 'checkbox',
-			itemId: 'viewProteinCodingGeneOnlyCheckbox',
-			defaultType: 'checkboxfield',
-			fieldLabel:'Protein-coding',
-			checked: true,
-			handler: function(){
-				
-			}
-			
-		};*/
-	
+		
 		
 		this.getDockedComponent('geneHitsByVariantGridToolbar').remove('viewCoexpressionNetworkButton');
 		this.getDockedComponent('geneHitsByVariantGridToolbar').remove('saveButtonGeneHits');
@@ -114,8 +112,56 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 		
 		this.getDockedComponent('geneHitsByVariantGridToolbar').add('-');
 		
-		//this.getDockedComponent('geneHitsByVariantGridToolbar').add(viewProteinCodingGeneOnly);
-		//this.getDockedComponent('geneHitsByVariantGridToolbar').add('-');
+		this.getDockedComponent('geneHitsByVariantGridToolbar').add({
+			xtype : 'checkbox',
+			itemId: 'viewProteinCodingGeneOnlyCheckbox',
+			defaultType: 'checkboxfield',
+			fieldLabel:'Protein-coding',
+			checked: true,
+			uncheckedValue :'',
+			scope :this,
+			handler: function(){
+										
+					if (this.uncheckedValue=='unchecked'){
+						this.store.removeAll(true);
+						for ( var i = 0; i < this.LoadedVariantValueObjects.length; i++) {
+							
+							var vvo = this.LoadedVariantValueObjects[i];
+								
+							
+							
+							if (vvo.geneBioType == "protein_coding"){
+								this.store.add(vvo);
+							}
+							//else this.store.remove(vvo);
+							
+						}
+										
+						this.getView().refresh(true);
+						this.setLoading(false);
+						this.uncheckedValue='';
+					}
+					else {
+						for ( var i = 0; i < this.LoadedVariantValueObjects.length; i++) {
+							
+							var vvo = this.LoadedVariantValueObjects[i];
+									
+							
+							if (vvo.geneBioType != "protein_coding"){
+								this.store.add(vvo);
+							}
+							
+						}
+										
+						this.getView().refresh(true);
+						this.setLoading(false);
+						this.uncheckedValue='unchecked';
+					}
+			}				
+				
+		});
+		
+		this.getDockedComponent('geneHitsByVariantGridToolbar').add('-');
 		
 		var ref = this;
 		
@@ -126,7 +172,7 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 			tooltip : 'Download table contents as text',
 			icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
 			handler: function(){
-				ASPIREdb.TextDataDownloadWindow.showGenesDownload(ref.getStore().getRange(), ['Gene Symbol', 'Type','Gene Name']);
+				ASPIREdb.TextDataDownloadWindow.showGenesDownload(ref.getStore().getRange(), ['Gene Symbol', 'Type','Gene Name','Genome coordinates']);
 			}
 		});
 
