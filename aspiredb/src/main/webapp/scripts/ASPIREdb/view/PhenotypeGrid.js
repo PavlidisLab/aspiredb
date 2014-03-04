@@ -105,18 +105,42 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			if (phenSummary == null) return ret;
 			var style = this.STYLE_DEFAULT;
 			var displayVal = phenSummary.dbValue;
-			
+			var colors = ["red", "green", "black", "purple","blue", "yellow","orange", "grey"];
+			var colorIdx=5;
+			//TODO : This is not a good workaround to display the color, have to figure out a way to do this better
 			if (phenSummary.valueType == "HPONTOLOGY") {
 				if (phenSummary.dbValue == this.DB_VAL_HPO_ABSENT) {
-					style = this.STYLE_HPO_ABSENT;
+					style = colors[1];
 					displayVal = "Absent";
 				} else if (phenSummary.dbValue == this.DB_VAL_HPO_PRESENT) {
-					style = this.STYLE_HPO_PRESENT;
+					style = colors[0];
 					displayVal = "Present";	
+				}else if (phenSummary.dbValue == "Unknown"){
+					style = colors[2];
+					displayVal = "Unknown";	
 				}
 			}
+			else if (phenSummary.dbValue == "Unknown"){
+				style = colors[2];
+				displayVal = "Unknown";	
+			}else if (phenSummary.dbValue == "N") {
+				style = colors[3];
+				displayVal ="N";
+			}else if (phenSummary.dbValue == "Y") {
+				style = colors[4];
+				displayVal = "Y";					
+			}else if (phenSummary.dbValue == "F") {
+				style = colors[3];
+				displayVal = "F";					
+			}else if (phenSummary.dbValue == "M") {
+				style = colors[4];
+				displayVal = "M";					
+			}else {
+				style = colors[colorIdx];
+				displayVal = phenSummary.dbValue;					
+			}
 			
-			var ret = "<span " + style + ">" + displayVal + "</span>";
+			var ret = "<span  style='color:" + style + "'>" + displayVal + "</span>";
 			return ret;
 		},
 	} ,

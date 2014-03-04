@@ -42,8 +42,9 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 	config : {
 		// selected subjects records in the grid
-		selectedVariants : []
-
+		selectedVariants : [],
+		loadedSubjects : [],
+		
 	},
 
 	constructor : function(cfg) {
@@ -133,36 +134,48 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			ref.down('#variantGrid').getView().refresh();
 		});
 		
+		ASPIREdb.EVENT_BUS.on('subjects_loaded', function(subjectIds) {
+			ref.loadedSubjects =subjectIds;
+		});
 			
 		//when subjects selected it is focused in variant grid
 		ASPIREdb.EVENT_BUS.on('subject_selected',  function(subjectIds) {
-			
-			//collapse all the records already expanded		
-			/**SubjectService.getSubjects(projectIds[0],this.selectedVariants, {
-				callback : function(subjectValueObjects) {
-					for ( var idx in subjectValueObjects) {
-						var subjectValueObject = subjectValueObjects[idx];
-						grid.features.collapse(subjectValueObject.patientId); 
-					}
-				}
-			});*/
-			
-			var grid = ref.down('#variantGrid');
-			grid.setVisible(true);
-			
-			
+						
 			var projectIds= ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
 			
-			//expand only the selected subjects
-			SubjectService.getSubjects(projectIds[0],subjectIds, {
-				callback : function(subjectValueObjects) {
-					for ( var idx in subjectValueObjects) {
-						var subjectValueObject = subjectValueObjects[idx];
-						grid.features[0].expand(subjectValueObject.patientId, true); 
+			var grid = ref.down('#variantGrid');
+			
+			//when variant table view is selected
+			if (grid.isVisible()){
+				//collapse all the records already expanded		
+				SubjectService.getSubjects(projectIds[0],ref.loadedSubjects, {
+					callback : function(subjectValueObjects) {
+					
+						for ( var i = 0; i < subjectValueObjects.length ; i++) {
+							var subjectValueObject = subjectValueObjects[i];
+							grid.features[0].collapse(subjectValueObject.patientId); 
+						}
+					
+						//expand only the selected subjects
+						SubjectService.getSubjects(projectIds[0],subjectIds, {
+							callback : function(subjectValueObjects) {
+								for ( var i = 0; i < subjectValueObjects.length ; i++) {
+									var subjectValueObject = subjectValueObjects[i];
+									grid.features[0].expand(subjectValueObject.patientId, true); 								
+								}
+							}
+						});
 					}
-				}
-			});
+				});
+			}
+			//When Ideogram view selected
+			else {
+				
+			}
+				
+				
 			grid.getView().refresh();
+			grid.setLoading(false);
 			
 		});
 		
@@ -246,8 +259,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 							grid.getView().refresh();
 							ref.newIdeogramLabel = undefined;
 						}
-						
-						
+												
 					});
 					
 													
@@ -312,9 +324,9 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		var canvas=ideogram.getComponent('canvasBox');
 		var imgsrc    = canvas.el.dom.toDataURL('image/png');
         
-		//if (img) {
+		if (imgsrc) {
 			ASPIREdb.IdeogramDownloadWindow.showIdeogramDownload(imgsrc);
-		//}
+		}
 
 	},
 
