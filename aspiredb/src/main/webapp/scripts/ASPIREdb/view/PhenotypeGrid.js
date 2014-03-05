@@ -412,7 +412,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		var displayVal = '';
 		
 		//draw Y axis
-		ctx.beginPath();
+		/**ctx.beginPath();
 		ctx.moveTo(0,50);
 		ctx.lineTo(0,0);
 		ctx.closePath();
@@ -423,7 +423,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		ctx.moveTo(0,50);
 		ctx.lineTo(50,50);
 		ctx.closePath();
-	    ctx.stroke();
+	    ctx.stroke();*/
 		
 		for (var k=0;k<keyArray.length;k++){
 		  if (keyArray[k]!="Unknown"){
