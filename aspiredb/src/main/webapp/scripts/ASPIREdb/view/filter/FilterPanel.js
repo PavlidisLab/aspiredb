@@ -32,7 +32,7 @@ Ext.define('ASPIREdb.view.filter.FilterPanel', {
         	{
         		xtype : 'image',
         		itemId: 'closeImage',
-    			margin : '5 5 5 5',
+    			margin : '5 5 5 650',
     			
     				src : 'scripts/ASPIREdb/resources/images/icons/cross.png',
     				listeners: {
