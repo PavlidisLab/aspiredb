@@ -222,14 +222,11 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 			itemId : 'variantGrid',
 			columns : columnConfig,
 			columnHeaders : columnHeaders,
-			stateful:true,
-			stateId:'state_mgr',
-			stateEvents:['groupclick'],
 			listeners: {
 				cellclick: function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
-					
-					rowIndex = record.get('id');								
-
+													
+					this.selModel.select(record.index, false, false);
+				
 				}
 			},
 			selModel : Ext.create('Ext.selection.CellModel', {
