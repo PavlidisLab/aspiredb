@@ -36,6 +36,9 @@ import java.util.List;
 public interface VariantService {
 
     public VariantValueObject getVariant(Long variantId);
+    
+    public List<VariantValueObject> getSubjectsVariants(String patientId);
+    
     public Integer getTotalNoOfVariantsBySubjectId(String patientId);
             
     public Collection<Property> suggestVariantLocationProperties();

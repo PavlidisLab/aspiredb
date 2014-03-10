@@ -280,6 +280,20 @@ public class VariantServiceImpl implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
+    public List<VariantValueObject> getSubjectsVariants(String patientId) {
+        List<VariantValueObject> vvo = new ArrayList<VariantValueObject>();
+        
+            Collection<Variant> variantCollection =variantDao.findBySubjectPatientId(patientId);
+            for (Variant variant :variantCollection){
+                vvo.add( variant.toValueObject() );
+            }     
+       
+        return vvo;
+    }
+    
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
     public Integer getTotalNoOfVariantsBySubjectId (String patientId) {
         Collection<Variant> variantCollection = variantDao.findBySubjectPatientId(patientId );
         

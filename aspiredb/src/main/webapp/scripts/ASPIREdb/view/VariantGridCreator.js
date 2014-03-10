@@ -29,7 +29,7 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 
 	initComponent : function() {
 		this.callParent();
-
+		
 	},
 
 	/**
@@ -38,6 +38,7 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
      * @param {string[]} properties     
      */
 	createVariantGrid : function(vvos, properties) {
+		
 		
 		var fieldData = [];
 		
@@ -77,7 +78,8 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 		var store = Ext.create('Ext.data.ArrayStore', {
 			fields : fieldData,
 			data : storeData,
-			groupField : 'patientId'
+			groupField : 'patientId',
+			
 		});
 
 		var columnHeaders = [ 'Patient Id', 'Type', 'Genome Coordinates', 'Copy Number', 'CNV Type', 'CNV Length', 'DB SNP ID', 'Observed Base', 'Reference Base', 'Indel Length' ];
@@ -210,15 +212,34 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 			columnHeaders.push(characteristicNames[i]);
 
 		}
-
+		Ext.state.Manager.setProvider(new Ext.state.CookieProvider({
+		      expires: new Date(new Date().getTime()+(1000*60*60*24*7))
+		  }));
+		
 		// TODO styling
 		grid = Ext.create('Ext.grid.Panel', {
 			store : store,
 			itemId : 'variantGrid',
 			columns : columnConfig,
 			columnHeaders : columnHeaders,
-			selModel : Ext.create('Ext.selection.RowModel', {
-				mode : 'MULTI'
+			/**stateful:true,
+			stateId:'state_mgr',
+			stateEvents:['groupclick'],*/
+			listeners: {
+				cellclick: function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+					
+					rowindex = record.get('id');
+					
+					this.selModel.select(rowindex,false, false);
+					//var test=this.selModel.selected;
+					//this.selModel.selected =rowindex;
+				     //  Ext.Msg.alert('Record ' + record.get('id')+' Selected', 'cellindex :'+cellIndex+'\nrecord: '+record.index+'\nrow index :'+rowIndex);
+
+				}
+			},
+			selModel : Ext.create('Ext.selection.CellModel', {
+				mode : 'MULTI',				
+				
 			}),
 			stripeRows : true,
 			height : 180,
@@ -226,8 +247,48 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 			title : 'Table View',
 			requires : [ 'Ext.grid.feature.Grouping' ],
 			features : [ Ext.create('Ext.grid.feature.Grouping', {
+				//extend : 'Ext.grid.feature.GroupingSummary',
 				groupHeaderTpl : '{name} ({rows.length} Item{[values.rows.length > 1 ? "s" : ""]})',
-				startCollapsed:true
+				startCollapsed:true,
+				// Expand nodes based on an array of ids passed 
+				/**expandNodes: function(nodes){
+				    var self = this;
+				   for(i=0; i < nodes.length ; i++){
+				  self.expand(Ext.get(nodes[i]));
+				  }
+				 },
+				// Return an array of this grids collapsed nodes id's
+				getCollapsedNodes: function(){
+				    var groups = this.view.el.query('.x-grid-group-body.x-grid-group-collapsed'); 
+				    var ids = [];
+				   Ext.Array.forEach(groups, function (group) {         
+				    ids.push(group.id);
+				  }); 
+				return ids;
+				},
+				// Return an array of this grids expanded nodes id's
+				getExpandedNodes: function(){
+				    var  groups = this.view.el.query('.x-grid-group-body:not(.x-grid-group-collapsed)'); 
+				    var ids = [];
+				    Ext.Array.forEach(groups, function (group) {         
+				      ids.push(group.id);
+				    });
+				return ids;
+				},
+				getState : function () {
+					//this is place where we state what things are to be saved
+					var nodes = this.getView().getFeature(0).getExpandedNodes();
+					     
+					return {
+					                    'expandedNodes': nodes
+					             }
+					},
+					applyState: function(state){
+					    var me = this; // remember me when I'm in the store load function
+					    this.getStore().on('load', function () {            me.getView().getFeature(0).expandNodes(state.expandedNodes);
+					   });
+					},*/
+								
 			}) ],
 			visibleLabels : visibleLabels
 
