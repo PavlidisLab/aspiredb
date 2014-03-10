@@ -30,15 +30,15 @@ Ext.define('ASPIREdb.store.PhenotypeStore', {
 		name : 'phenoSummaryMap',
 		type : 'auto',
 		sortType : function(value) {
-			var pvo = value.phenoSummaryMap;
-			if (pvo == null)
-				return -1;
-			return pvo.phenoSummaryMap;
+			return value.sortValue;
 		},
 	},
 	{
 		name : 'allPhenoSummaryMap',
-		type : 'auto'
+		type : 'auto',
+		sortType : function(value) {
+			return value.sortValue;
+		},
 	} ],
 
 	storeId : 'phenotypes'

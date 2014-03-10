@@ -50,7 +50,7 @@ public interface SubjectService {
 
     public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
             throws  ExternalDependencyException;
-    
+        
     public Map<String,PhenotypeSummaryValueObject> getPhenotypeSummaryValueObjects( List<Long> subjectIds, Collection<Long> projectIds ) throws NeurocartaServiceException;
 
     public String getPhenotypeTextDownloadBySubjectIds( List<Long> subjectIds );

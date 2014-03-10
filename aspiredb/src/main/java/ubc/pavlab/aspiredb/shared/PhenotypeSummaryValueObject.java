@@ -23,6 +23,8 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
 	private String uri;
     private String valueType;
     
+    private long sortValue;
+    
     private String displaySummary;
     
     private Map<String, Integer> phenoSummaryMap;
@@ -108,6 +110,14 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
     public void setPhenoSet(Set<String> phenoset) {
         this.phenoSet = phenoset;;
     }
+
+	public long getSortValue() {
+		return sortValue;
+	}
+
+	public void setSortValue(long sortValue) {
+		this.sortValue = sortValue;
+	}
   
 
    

@@ -14,8 +14,12 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -137,7 +141,7 @@ public class SubjectServiceImpl implements SubjectService {
         }
         return values;
     }
-
+   
     @Override
     @RemoteMethod
     @Transactional
@@ -171,6 +175,10 @@ public class SubjectServiceImpl implements SubjectService {
             String[] colors = {"red", "green", "black", "purple","blue", "yellow","orange", "grey"};
             int j=3;
             int unknown=0;
+            int present=0;
+            int denominator=0;
+            int absent=0;
+            
             for (String key: keyArray){
                 
                 Integer size = sum.getDbValueToSubjectSet().get( key ).size();
@@ -178,10 +186,14 @@ public class SubjectServiceImpl implements SubjectService {
                 if (sum.getValueType().equals( "HPONTOLOGY")) {
                     if (key.equals( "1")) {
                         phenoSummaryMap.put("Present", size);
+                        present =size;
+                        denominator=denominator+size;
                         displaySummary = displaySummary + " Present(" + size + ')';
                         displaySummary = "<span " + "style='color: "+colors[0]+"'" + ">" + displaySummary + "</span>";
                     }else if (key.equals( "0")) {
                         phenoSummaryMap.put("Absent", size);
+                        absent=size;
+                        denominator=denominator+size;
                         displaySummary = displaySummary + " Absent(" + size + ')';
                         displaySummary = "<span " + "style='color: "+colors[1]+"'" + ">" + displaySummary + "</span>";
                     } else if (key.equals("Unknown")){
@@ -216,6 +228,8 @@ public class SubjectServiceImpl implements SubjectService {
             pvo.setDisplaySummary( displaySummary );
             pvo.setPhenoSummaryMap( phenoSummaryMap );
             pvo.setPhenoSet(phenoSummaryMap.keySet());
+            //if (denominator!=0)
+        		pvo.setSortValue(present);
             valueObjects.add( pvo );
             
         }
@@ -256,6 +270,9 @@ public class SubjectServiceImpl implements SubjectService {
             String[] colors = {"red", "green", "black", "purple","blue", "yellow","orange", "grey"};
             int j=3;
             int unknown=0;
+            int present=0;
+            int denominator=0;
+            int absent=0;
                     
             for (String key: keyArray){
                 
@@ -264,10 +281,14 @@ public class SubjectServiceImpl implements SubjectService {
                 if (sum.getValueType().equals( "HPONTOLOGY")) {
                         if (key.equals( "1")) {
                             phenoSummaryMap.put("Present", size);
+                            present =size;
+                            denominator=denominator+size;
                             displaySummary = displaySummary + " Present(" + size + ')';
                             displaySummary = "<span " + "style='color: "+colors[0]+"'" + ">" + displaySummary + "</span>";
                         }else if (key.equals( "0")) {
                             phenoSummaryMap.put("Absent", size);
+                            absent=size;
+                            denominator=denominator+size;
                             displaySummary = displaySummary + " Absent(" + size + ')';
                             displaySummary = "<span " + "style='color: "+colors[1]+"'" + ">" + displaySummary + "</span>";
                         } else if (key.equals("Unknown")){
@@ -303,7 +324,8 @@ public class SubjectServiceImpl implements SubjectService {
             pvo.setDisplaySummary( displaySummary );
             pvo.setPhenoSummaryMap( phenoSummaryMap );                         
             pvo.setPhenoSet(phenoSummaryMap.keySet());
-            
+           // if (denominator!=0)
+             pvo.setSortValue(present);
             summaryValueObjectsMap.put( sum.getName(), pvo );
            
             

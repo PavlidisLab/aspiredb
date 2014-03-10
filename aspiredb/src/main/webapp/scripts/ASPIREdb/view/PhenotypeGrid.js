@@ -158,23 +158,32 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 				metadata.tdAttr = 'data-qtip="'+displaySummary + ret + '"';
 				return ret;
 			} else return "";
-			},
+		},
+		
 	},
 	{
 		text : 'Value (subject count)',
 		dataIndex : 'allPhenoSummaryMap',
 		renderer : function(value, metadata, record) {
+			var phenSummary = value.phenoSummaryMap;
 		
-		var phenSummary = value.phenoSummaryMap;
-		
-		if (phenSummary!= null){
-			var ret = "<canvas width='50' height='50' id=all"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
-			metadata.tdAttr = 'data-qtip="'+value.displaySummary + ret + '"';
-			return ret;
-		} else return "";
-		},
+			if (phenSummary!= null){
+				var ret = "<canvas width='50' height='50' id=all"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
+				metadata.tdAttr = 'data-qtip="'+value.displaySummary + ret + '"';
+				return ret;
+			} else return "";
+		},		
 		flex : 1
 	} ],
+	listeners: {
+        sortchange: function(phenotypeGrid, sortinfo) {
+           
+            if (sortinfo.dataIndex =='allPhenoSummaryMap')
+            	ASPIREdb.EVENT_BUS.fireEvent('allPhenoSummary_sorted');
+            if (sortinfo.dataIndex =='phenoSummaryMap')
+            	ASPIREdb.EVENT_BUS.fireEvent('selectedPhenoSummary_sorted');
+        }
+    },
 
 	store : Ext.create('ASPIREdb.store.PhenotypeStore'),
 
@@ -248,12 +257,35 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		});
 		
 		ASPIREdb.EVENT_BUS.on('subject_selected', this.subjectSelectHandler, this);
+		ASPIREdb.EVENT_BUS.on('allPhenoSummary_sorted', this.sortAllPhenoSummary,this);
+		ASPIREdb.EVENT_BUS.on('selectedPhenoSummary_sorted', this.sortSelectedPhenoSummary,this);
+		
 		
 		
 
 	},
 	
+	/**
+	 * when all phenotype summary canvas sorted
+	 */
+	sortAllPhenoSummary :function(){
+		
+		this.updatePhenotypeSummaryCanvasesAllSubjects();
+		this.updatePhenotypeSummaryCanvasesSelectedSubjects();
+		this.setLoading(false);
 	
+		
+	},
+	/**
+	 * when all phenotype summary canvas sorted
+	 */
+	sortSelectedPhenoSummary :function(){
+		this.updatePhenotypeSummaryCanvasesAllSubjects();
+		this.updatePhenotypeSummaryCanvasesSelectedSubjects();
+		this.setLoading(false);
+	
+		
+	},
 	/**
 	 * Loads selected Subject's phenotypes
 	 * 
@@ -274,7 +306,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		var activeProjectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
 		
 		var ref = this;
-		console.log("on subject select handler");
+		console.log("on subject select handler ...........");
 		
 	
 		if (subjectIds.length ==1){
@@ -308,7 +340,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		  });
 		}
 		else{
-			
+			console.log("on subject select handler ........... in multiple subject select"+subjectIds);
 			SubjectService.getPhenotypeSummaryValueObjects(subjectIds, ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
 				callback : function(voMap) {//voMap is a <String, PhenotypeSummaryValueObject>Map
 					
@@ -338,7 +370,9 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 						}
 						ref.getView().refresh(true);
 						ref.updatePhenotypeSummaryCanvasesAllSubjects();
+						console.log(" before update selected");
 						ref.updatePhenotypeSummaryCanvasesSelectedSubjects();
+						console.log(" after update selected");
 						ref.setLoading(false);
 					}
 					
