@@ -136,6 +136,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		});
 		
 		ASPIREdb.EVENT_BUS.on('subjects_loaded', function(subjectIds) {
+			ref.loadedSubjects=[];
 			ref.loadedSubjects =subjectIds;
 		});
 			
@@ -257,32 +258,29 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		
 		//when variant table view is selected
 		if (grid.isVisible()){
+			console.log("when the variant grid is selected");
+			//collapse all the grids first - to open only the selected one
+			grid.features[0].collapseAll();						
 			
-						
-			//collapse all the records already expanded		
-			SubjectService.getSubjects(projectIds[0],this.loadedSubjects, {
-				callback : function(subjectValueObjects) {
-				
-					for ( var i = 0; i < subjectValueObjects.length ; i++) {
-						var subjectValueObject = subjectValueObjects[i];
-						grid.features[0].collapse(subjectValueObject.patientId); 
-					}
-				
 					//expand only the selected subjects
 					SubjectService.getSubjects(projectIds[0],subjectIds, {
-						callback : function(subjectValueObjects) {
-							for ( var i = 0; i < subjectValueObjects.length ; i++) {
-								var subjectValueObject = subjectValueObjects[i];
-								grid.features[0].expand(subjectValueObject.patientId, true);
-								this.selectedSubjectVariants=subjectValueObject.patientId;
+						callback : function(selectedSubjectValueObjects) {
+						
+							for ( var i = 0; i < selectedSubjectValueObjects.length ; i++) {
+								var selectedSubjectValueObjects = selectedSubjectValueObjects[i];
+								grid.features[0].expand(selectedSubjectValueObjects.patientId, true);
+								this.selectedSubjectVariants=selectedSubjectValueObjects.patientId;								
+								
 							}
+							
 						}
+										
 					});
-				}
-			});
+
 		}
 		//When Ideogram view selected
 		else {
+			console.log("when the variant ideogram is selected");
 			var ideogram = this.getComponent('ideogram');
 			var selectedSubjectVariants=[];
 			//heighlight the selected subject in ideogram
