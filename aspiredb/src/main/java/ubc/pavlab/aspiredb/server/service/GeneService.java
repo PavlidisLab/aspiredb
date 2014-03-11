@@ -37,4 +37,9 @@ public interface GeneService {
 
     public Collection<GeneValueObject> findGenesWithNeurocartaPhenotype(String phenotypeValueUri)
             throws NotLoggedInException, ExternalDependencyException;
+    
+    public Long saveUserGeneSet(String geneName,List<GeneValueObject> genes);
+    
+    public boolean isGeneSetName(String name);
+    
 }

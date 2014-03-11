@@ -17,15 +17,16 @@
  *
  */
 
-Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow','ASPIREdb.GemmaURLUtils' ]);
+Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow','ASPIREdb.GemmaURLUtils', 'Ext.selection.CheckboxModel', 'ASPIREdb.view.SaveUserGeneSetWindow' ]);
 
 // TODO js documentation
-
 Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.neurocartaGeneGrid',
+	id : 'neurocartaGeneGrid',
 	emptyText : 'No genes found',
 	border: false,
+	multiSelect : true,
 
 	dockedItems : [ {
 		xtype : 'toolbar',
@@ -59,14 +60,50 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 			return '<a href="' + value + '" target="_blank" > <img src="scripts/ASPIREdb/resources/images/gemmaTiny.gif" /> </a>';
 		}
 	} ],
+	config :{
+		selectedgenes :[],
+	},
+	
+	selModel : Ext.create('Ext.selection.CheckboxModel', {
+		mode: 'MULTI',
+		/**listeners: {
+	        selectionchange: function(sm, selections) {
+	        	var selectedGenes = selections;
+	        	// And then you can iterate over the selected items, e.g.: 
+	        	selected = [];
+	        	Ext.each(selectedGenes, function (item) {
+	        	  selected.push(item.data.someField);
+	        	});
+	        		        		
+	        	ASPIREdb.view.NeurocartaGeneWindow.fireEvent('new_geneSet_selected',selected);
+	        }
+	    },*/
+    }),
+
 
 	store : Ext.create('ASPIREdb.store.GeneStore'),
 
 	initComponent : function() {
 		this.callParent();
-
+		//ASPIREdb.EVENT_BUS.on('new_geneSet_selected', this.geneSelectHandler, this);
+		
+		var me = this;
+		
+		this.on('select', me.geneSelectHandler, me);
 	},
 	
+	geneSelectHandler : function(ref, record, index, eOpts) {
+		var selGenes = this.getSelectionModel().getSelection();
+		this.selectedgenes=[];
+		for (var i=0; i<selGenes.length; i++){
+			this.selectedgenes.push(selGenes[i].data);
+		}
+		
+		ASPIREdb.EVENT_BUS.fireEvent('new_geneSet_selected', this.selectedgenes);
+		ASPIREdb.view.NeurocartaGeneWindow.down('#saveButtonGeneSet').enable();
+	},
+	
+			
 	enableToolbar : function(vos,uri) {
 
 		if (vos.length < 1) {
@@ -150,6 +187,25 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 				ASPIREdb.TextDataDownloadWindow.showGenesDownload(ref.getStore().getRange(), ['Gene Symbol', 'Type','Gene Name']);
 			}
 		});
+		
+		this.getDockedComponent('neurocartaGeneGridToolbar').add({
+			xtype : 'button',
+			id : 'saveButtonGeneSet',
+			text : 'Save to Gene Lists',
+			tooltip : 'Save Genes to User gene Set',
+			disabled: true,
+			handler: function(){
+				/**ASPIREdb.EVENT_BUS.on('new_geneSet_selected', function(genes){
+					ASPIREdb.view.SaveUserGeneSetWindow.initAndShow(genes);
+				});*/
+				ASPIREdb.view.SaveUserGeneSetWindow.initAndShow(ref.selectedgenes);
+				
+				
+			}
+		});
+		
+		
+		
 
 	}
 });
