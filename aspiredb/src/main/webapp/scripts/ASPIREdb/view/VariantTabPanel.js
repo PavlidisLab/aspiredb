@@ -45,6 +45,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		selectedVariants : [],
 		loadedSubjects : [],
 		selectedSubjectVariants: [],
+		loadedVariants:[],
 		
 	},
 
@@ -195,6 +196,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 					
 					var vvos = pageLoad.items;
+					this.loadedVariants =vvos;
 					
 					ProjectService.numVariants(filterConfigs[0].projectIds, {
 						callback : function(NoOfVariants){
@@ -288,18 +290,18 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 				callback : function(subjectValueObjects) {
 					for ( var i = 0; i < subjectValueObjects.length ; i++) {
 						var subjectValueObject = subjectValueObjects[i];
+						ideogram.redrawHighlightedSubjects(subjectValueObject.id, this.loadedVariants);
 								 
-						VariantService.getSubjectsVariants(subjectValueObject.patientId, {
+						/**VariantService.getSubjectsVariants(subjectValueObject.patientId, {
 								callback : function(vvo) {
-									ideogram.drawVariantsWithSubjectHighlighted(subjectValueObject.id, vvo);
+									ideogram.redrawHighlightedSubjects(subjectValueObject.id, vvo);
 									}
-						});
+						});*/
 					}
 				}
 			});
 			
-			
-			
+						
 		}
 			
 			

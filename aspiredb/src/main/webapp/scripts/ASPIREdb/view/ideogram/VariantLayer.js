@@ -116,7 +116,7 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
         var segment = {
             start: variant.genomicRange.baseStart,
             end: variant.genomicRange.baseEnd,
-            color: "rgba(0,0,0, 0.4)",
+            color: "rgb(128,128,128)",//"rgba(0,0,0, 0.4)",
             emphasize: false
         };
 
@@ -165,7 +165,7 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
         var segment = {
             start: variant.genomicRange.baseStart,
             end: variant.genomicRange.baseEnd,
-            color: this.pickColor(variant, property),
+            color: "rgb(255,0,0)", //this.pickColor(variant, property),
             emphasize: false
         };
         // pick track layer

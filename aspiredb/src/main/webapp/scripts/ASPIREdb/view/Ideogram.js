@@ -476,6 +476,15 @@ Ext.define('ASPIREdb.view.Ideogram', {
 		this.drawVariants(variants);
 		this.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap, this.displayedProperty);
 	},
+	/**
+	 * @public
+	 */
+	redrawHighlightedSubjects : function(subjectIds,vvo) {
+		this.drawChromosomes();
+		this.drawVariantsWithSubjectHighlighted(subjectIds,vvo);
+		this.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap, this.displayedProperty);
+	},
+	
 
 	/**
 	 * @private
