@@ -80,10 +80,10 @@ Ext.define('ASPIREdb.view.SaveUserGeneSetWindow', {
 		var geneSetName = this.down('#geneSetName').getValue();
 			
 		//check whether the query name exist in the database
-		GeneService.isGeneSetName(geneSetName,{
+		UserGeneSetService.isGeneSetName(geneSetName,{
 			callback : function(gvoSta) {
 				if (gvoSta){
-					//Ext.Msg.alert('Status', 'Query name already exist. Choose another name');}
+					
 					Ext.Msg.show({
 						title:'Save gene set overwrite',
 						msg:'Gene set name already exist. Do you want to overwrite it?',
@@ -115,7 +115,7 @@ Ext.define('ASPIREdb.view.SaveUserGeneSetWindow', {
 				
 				}
 				else {
-					GeneService.saveUserGeneSet(geneSetName, ref.geneSetValueobjects, {
+					UserGeneSetService.saveUserGeneSet(geneSetName, ref.geneSetValueobjects, {
 						callback : function(gvoId) {
 
 							ASPIREdb.view.SaveUserGeneSetWindow.down('#geneSetName').setValue('');

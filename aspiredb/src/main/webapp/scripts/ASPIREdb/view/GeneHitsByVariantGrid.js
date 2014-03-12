@@ -24,11 +24,14 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.geneHitsByVariantGrid',
 	emptyText : 'No genes found',
+	id : 'geneHitsByVariantGrid',
 	border: false,
+	multiSelect : true,
 	config:{
 		// collection of all the PhenotypeSummaryValueObject loaded
 		LoadedVariantValueObjects : [],
-		
+		//collection of selected gene value objects
+		selectedgenes :[],
 	
 	},
 
@@ -63,12 +66,29 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 			return '<a href="' + value + '" target="_blank" > <img src="scripts/ASPIREdb/resources/images/gemmaTiny.gif" /> </a>';
 		}
 	} ],
+		
+	selModel : Ext.create('Ext.selection.CheckboxModel', {
+		mode: 'MULTI',
+	}),
 
 	store : Ext.create('ASPIREdb.store.GeneStore'),
 
 	initComponent : function() {
 		this.callParent();
+		var me = this;
+		this.on('select', me.geneSelectHandler, me);
 
+	},
+	
+	geneSelectHandler : function(ref, record, index, eOpts) {
+		var selGenes = this.getSelectionModel().getSelection();
+		this.selectedgenes=[];
+		for (var i=0; i<selGenes.length; i++){
+			this.selectedgenes.push(selGenes[i].data);
+		}
+		
+		ASPIREdb.EVENT_BUS.fireEvent('new_geneSet_selected', this.selectedgenes);
+		this.down('#saveButtonGeneSet').enable();
 	},
 	
 	setLodedvariantvalueObjects :function(vvo){
@@ -173,6 +193,18 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 			icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
 			handler: function(){
 				ASPIREdb.TextDataDownloadWindow.showGenesDownload(ref.getStore().getRange(), ['Gene Symbol', 'Type','Gene Name','Genome coordinates']);
+			}
+		});
+		
+		this.getDockedComponent('geneHitsByVariantGridToolbar').add({
+			xtype : 'button',
+			id : 'saveButtonGeneSet',
+			text : 'Save to Gene Lists',
+			tooltip : 'Save Genes to User gene Set',
+			disabled: true,
+			handler: function(){
+				ASPIREdb.view.SaveUserGeneSetWindow.initAndShow(ref.selectedgenes);
+								
 			}
 		});
 
