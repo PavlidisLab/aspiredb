@@ -23,6 +23,7 @@
         <mapping class="ubc.pavlab.aspiredb.server.model.Translocation" />
         <mapping class="ubc.pavlab.aspiredb.server.model.Gene" />
      	<mapping class="ubc.pavlab.aspiredb.server.model.GeneGroup" />
+     	<mapping class="ubc.pavlab.aspiredb.server.model.UserGeneSet" />
    		<mapping class="ubc.pavlab.aspiredb.server.model.GenomicLocation" />
     	<mapping class="ubc.pavlab.aspiredb.server.model.Subject" />      	
        	<mapping class="ubc.pavlab.aspiredb.server.model.Phenotype" />
