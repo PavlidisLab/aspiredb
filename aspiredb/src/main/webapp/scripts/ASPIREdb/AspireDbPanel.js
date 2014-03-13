@@ -1,4 +1,4 @@
-Ext.require([ 'ASPIREdb.MainPanel', 'ASPIREdb.EVENT_BUS', 'ASPIREdb.view.filter.FilterWindow', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.DashboardWindow' ]);
+Ext.require([ 'ASPIREdb.MainPanel', 'ASPIREdb.EVENT_BUS', 'ASPIREdb.view.filter.FilterWindow', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.DashboardWindow','ASPIREdb.view.GeneManagerWindow' ]);
 
 /**
  * Events: - login - logout
@@ -197,7 +197,18 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 				this.up('#aspireDbPanel').disableToolbarButtonsForDashboard(true);
 				ASPIREdb.view.DashboardWindow.show();
 			}
-		}, {
+		}, 
+		{
+			xtype : 'button',
+			text : 'Gene Manager',
+			itemId : 'geneManagerButton',
+			height : 30,
+			margin : '5 5 5 5',
+			handler : function() {
+				this.up('#aspireDbPanel').disableToolbarButtonsForDashboard(true);
+				ASPIREdb.view.GeneManagerWindow.show();
+			}
+		},{
 			xtype : 'button',
 			text : 'Help',
 			itemId : 'helpButton',

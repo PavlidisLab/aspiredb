@@ -210,7 +210,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					
 					var ideogram = ref.getComponent('ideogram');
 					ideogram.drawChromosomes();
-					ideogram.drawVariants(vvos);
+					ideogram.drawVariants(vvos,"rgb(255,0,0)");
 					
 					
 					
@@ -284,23 +284,26 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		else {
 			console.log("when the variant ideogram is selected");
 			var ideogram = this.getComponent('ideogram');
-			var selectedSubjectVariants=[];
+			ideogram.drawChromosomes();
+						
 			//heighlight the selected subject in ideogram
 			SubjectService.getSubjects(projectIds[0],subjectIds, {
-				callback : function(subjectValueObjects) {
+				callback : function(subjectValueObjects) {					
 					for ( var i = 0; i < subjectValueObjects.length ; i++) {
 						var subjectValueObject = subjectValueObjects[i];
-						ideogram.redrawHighlightedSubjects(subjectValueObject.id, this.loadedVariants);
-								 
-						/**VariantService.getSubjectsVariants(subjectValueObject.patientId, {
+						if (i==0)
+							ideogram.redrawHighlightedSubjects(subjectValueObject.id, this.loadedVariants);
+						else {							 
+						VariantService.getSubjectsVariants(subjectValueObject.patientId, {
 								callback : function(vvo) {
 									ideogram.redrawHighlightedSubjects(subjectValueObject.id, vvo);
 									}
-						});*/
+						});
+						}
 					}
 				}
 			});
-			
+			ideogram.redraw();
 						
 		}
 			

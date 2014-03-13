@@ -397,7 +397,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	 * @param {VariantValueObject[]}
 	 *            variantValueObjects
 	 */
-	drawVariants : function(variantValueObjects) {
+	drawVariants : function(variantValueObjects,color) {
 		/* List<VariantValueObject> */
 		var variants = variantValueObjects.slice(); // make a copy
 		this.sortVariantsBySize(variants);
@@ -406,7 +406,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 			var chrName = variant.genomicRange.chromosome;
 			/* ChromosomeIdeogram */
 			var chrIdeogram = this.chromosomeIdeograms[chrName];
-			chrIdeogram.drawVariant(variant, this.displayedProperty);
+			chrIdeogram.drawVariant(variant, this.displayedProperty,color);
 		}
 	},
 
@@ -479,9 +479,9 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	/**
 	 * @public
 	 */
-	redrawHighlightedSubjects : function(subjectIds,vvo) {
-		this.drawChromosomes();
-		this.drawVariantsWithSubjectHighlighted(subjectIds,vvo);
+	redrawHighlightedSubjects : function(subjectId,vvo) {
+		
+		this.drawVariantsWithSubjectHighlighted(subjectId,vvo);
 		this.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap, this.displayedProperty);
 	},
 	
