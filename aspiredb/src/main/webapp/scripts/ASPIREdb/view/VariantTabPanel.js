@@ -142,7 +142,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		});
 			
 		//when subjects selected it is focused in variant grid
-		ASPIREdb.EVENT_BUS.on('subject_selected', this.subjectSubmitHandler, this); 
+		ASPIREdb.EVENT_BUS.on('subject_selected', this.subjectSelectionHandler, this); 
 		
 		
 		this.saveButton.on('click', function() {
@@ -252,37 +252,37 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 	},
 	
-	subjectSubmitHandler :function(subjectIds) {
-		
+	subjectSelectionHandler :function(subjectIds) {
+		console.log("subject selected  on variant tab panel........");
 		var projectIds= ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
 		
 		var grid = this.down('#variantGrid');
 		
+		
 		//when variant table view is selected
-		if (grid.isVisible()){
-			console.log("when the variant grid is selected");
-			//collapse all the grids first - to open only the selected one
-			grid.features[0].collapseAll();						
+		if (grid.isVisible()){									
 			
-					//expand only the selected subjects
-					SubjectService.getSubjects(projectIds[0],subjectIds, {
-						callback : function(selectedSubjectValueObjects) {
-						
+			//collapse all the grids first - to open only the selected one
+			grid.features[0].collapseAll();	
+			
+			//expand only the selected subjects
+			SubjectService.getSubjects(projectIds[0],subjectIds, {
+					callback : function(selectedSubjectValueObjects) {					
 							for ( var i = 0; i < selectedSubjectValueObjects.length ; i++) {
 								var selectedSubjectValueObjects = selectedSubjectValueObjects[i];
 								grid.features[0].expand(selectedSubjectValueObjects.patientId, true);
-								this.selectedSubjectVariants=selectedSubjectValueObjects.patientId;								
-								
+								this.selectedSubjectVariants=selectedSubjectValueObjects.patientId;	
 							}
 							
-						}
-										
-					});
+					}
+									
+			});
 
 		}
 		//When Ideogram view selected
 		else {
 			console.log("when the variant ideogram is selected");
+						
 			var ideogram = this.getComponent('ideogram');
 			ideogram.drawChromosomes();
 						
@@ -294,16 +294,16 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 						if (i==0)
 							ideogram.redrawHighlightedSubjects(subjectValueObject.id, this.loadedVariants);
 						else {							 
-						VariantService.getSubjectsVariants(subjectValueObject.patientId, {
+							VariantService.getSubjectsVariants(subjectValueObject.patientId, {
 								callback : function(vvo) {
 									ideogram.redrawHighlightedSubjects(subjectValueObject.id, vvo);
 									}
-						});
+							});
 						}
 					}
 				}
 			});
-			ideogram.redraw();
+			//ideogram.redraw();
 						
 		}
 			
@@ -314,7 +314,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	},
 
 	selectionChangeHandler : function(model, records) {
-
+		console.log('on grid selection change handler variant tab panel');
 		this.selectedVariants = records;
 
 		this.enableActionButtonsBySelectedRecords(records);

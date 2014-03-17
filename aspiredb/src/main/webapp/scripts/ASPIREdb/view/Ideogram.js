@@ -12,6 +12,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	autoScroll : true,
 	title : 'Ideogram',
 	closable : false,
+	//resizable : true,
 	layout : 'absolute',
 	items : [ {
 		xtype : 'component',
@@ -480,9 +481,9 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	 * @public
 	 */
 	redrawHighlightedSubjects : function(subjectId,vvo) {
-		
+		//this.drawChromosomes();
 		this.drawVariantsWithSubjectHighlighted(subjectId,vvo);
-		this.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap, this.displayedProperty);
+		//this.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap, this.displayedProperty);
 	},
 	
 

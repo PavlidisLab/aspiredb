@@ -268,7 +268,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 	},
 
 	selectionChangeHandler : function() {
-		console.log("on selection  chnage Handler");
+		console.log("on selection  change Handler");
 		this.selSubjects = this.getSelectionModel().getSelection();
 
 		if (this.selSubjects.length == 0) {
@@ -293,7 +293,14 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		}
 	},
 
-	
+	onSelectHandler : function(ref, record, index, eOpts) {
+		if (this.getSelectionModel().getSelection().length==1){		
+			ASPIREdb.EVENT_BUS.fireEvent('subject_selected', record.get('id'));
+		}else{
+			ASPIREdb.EVENT_BUS.fireEvent('subject_selected', null);
+			
+		}
+	},
 	
 	/**
 	 * Assigns a Label
