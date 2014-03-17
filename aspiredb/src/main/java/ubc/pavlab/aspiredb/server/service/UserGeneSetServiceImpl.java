@@ -41,6 +41,7 @@ import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
+import ubc.pavlab.aspiredb.server.model.Query;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.util.ConfigUtils;
@@ -113,6 +114,36 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         
         return false;              
              
+    }
+    @Override
+    @RemoteMethod
+    public Set<GeneValueObject> loadUserGeneSet( String name ){
+    	 List<UserGeneSet> genesets = userGeneSetDao.findByName( name );
+    	 Set<GeneValueObject> geneValueObjects = ( Set<GeneValueObject> ) genesets.iterator().next().getObject();
+                  
+         // should only be one for one user
+         return geneValueObjects;
+    	
+    }
+    
+    @Override
+    @RemoteMethod
+    public Collection<String> getSavedUserGeneSetNames(){
+    	Collection<String> geneSetNames = new ArrayList<String>();
+        Collection<UserGeneSet> genesets = userGeneSetDao.loadAll();
+
+        for ( UserGeneSet geneset : genesets ) {
+        	geneSetNames.add( geneset.getName() );
+        }
+        return geneSetNames;
+    	
+    }
+    
+    @Override
+    @RemoteMethod
+    public void deleteUserGeneSet( String name ){
+    	List<UserGeneSet> genesets = userGeneSetDao.findByName( name );
+    	userGeneSetDao.remove( genesets.iterator().next() );
     }
     
 }

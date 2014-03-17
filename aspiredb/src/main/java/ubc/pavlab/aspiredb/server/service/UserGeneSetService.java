@@ -34,11 +34,11 @@ import com.sencha.gxt.data.shared.loader.PagingLoadResult;
  */
 public interface UserGeneSetService {
 
-    //public Set<UserGeneSet> loadUserGeneSet( String name );
+    public Set<GeneValueObject> loadUserGeneSet( String name );
 
-    //public Collection<String> getSavedUserGeneSetNames();
+    public Collection<String> getSavedUserGeneSetNames();
 
-    //public void deleteUserGeneSet( String name );
+    public void deleteUserGeneSet( String name );
         
     public Long saveUserGeneSet(String geneName,List<GeneValueObject> genes);
     

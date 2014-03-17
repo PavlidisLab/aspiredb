@@ -206,7 +206,8 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			margin : '5 5 5 5',
 			handler : function() {
 				this.up('#aspireDbPanel').disableToolbarButtonsForDashboard(true);
-				ASPIREdb.view.GeneManagerWindow.show();
+				ASPIREdb.view.GeneManagerWindow.initGridAndShow();
+				//ASPIREdb.view.GeneManagerWindow.show();
 			}
 		},{
 			xtype : 'button',

@@ -17,7 +17,7 @@
  *
  */
 
-Ext.require([ 'Ext.Window', 'ASPIREdb.view.GeneManagerGrid','ASPIREdb.GemmaURLUtils' ]);
+Ext.require([ 'Ext.Window', 'ASPIREdb.view.GeneManagerPanel','ASPIREdb.GemmaURLUtils' ]);
 
 Ext.define('ASPIREdb.view.GeneManagerWindow', {
 	extend : 'Ext.Window',
@@ -32,10 +32,10 @@ Ext.define('ASPIREdb.view.GeneManagerWindow', {
 	bodyStyle : 'padding: 5px;',
 	
 	
-	items : [ {
-		xtype : 'geneManagerGrid',
-		itemId : 'geneManagerGrid'
-	} ],
+	items : [{
+		region : 'center',
+		xtype : 'ASPIREdb_genemanagerpanel'
+	}],
 
 	initComponent : function() {
 		var ref = this;
@@ -43,61 +43,20 @@ Ext.define('ASPIREdb.view.GeneManagerWindow', {
 
 	},
 	
-	initGridAndShow : function(ids){
+	initGridAndShow : function(){
 		
 		var ref = this;
-		
-		var grid = ASPIREdb.view.GeneManagerWindow.getComponent('geneManagerGrid');
-		
+		//ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);
 		ref.show();
-		grid.setLoading(true);
-		
-		GeneService.getGenesInsideVariants(ids, {
-			callback : function(vos) {
-				ASPIREdb.view.GeneManagerWindow.getComponent('geneManagerGrid').setLodedvariantvalueObjects(vos);
-				
-				ASPIREdb.view.GeneManagerWindow.populateGrid(vos);
-				
-				
-			}
-		});
+
 		
 	},
 	
 	
-
-	//VariantValueObject
-	populateGrid : function(vos) {		
-		
-		var grid = ASPIREdb.view.GeneManagerWindow.getComponent('geneManagerGrid');
-		
-		var data = [];
-		for ( var i = 0; i < vos.length; i++) {
-			var vo = vos[i];
-			
-			var linkToGemma = "";
-			
-			if (vo.geneBioType == "protein_coding"){
-				linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl(vo.symbol);
-				var row = [ vo.symbol, vo.geneBioType, vo.name, linkToGemma ];
-				data.push(row);
-			}
-			
-			
-			
-		}
-
-		grid.store.loadData(data);
-		grid.setLoading(false);
-		
-		grid.enableToolbar(vos);
-
-	},	
-	
 	
 	clearGridAndMask : function(){
-		ASPIREdb.view.GeneManagerWindow.getComponent('geneManagerGrid').store.removeAll();
-		ASPIREdb.view.GeneManagerWindow.getComponent('geneManagerGrid').setLoading(true);				
+		ASPIREdb.view.GeneManagerWindow.getComponent('ASPIREdb_genemanagerpanel').store.removeAll();
+		ASPIREdb.view.GeneManagerWindow.getComponent('ASPIREdb_genemanagerpanel').setLoading(true);				
 	}
 
 });

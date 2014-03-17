@@ -20,39 +20,66 @@
 Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow' ]);
 
 // TODO js documentation
-Ext.define('ASPIREdb.view.GeneManagerGrid', {
+Ext.define('ASPIREdb.view.GeneGrid', {
 	extend : 'Ext.grid.Panel',
-	alias : 'widget.geneManagerGrid',
+	alias : 'widget.geneGrid',
 	emptyText : 'No genes found',
-	id : 'geneManagerGrid',
-	border: false,
+	id : 'geneGrid',
+	border: true,
+	//columnLines : true,
 	multiSelect : true,
 	config:{
 		// collection of all the PhenotypeSummaryValueObject loaded
-		LoadedVariantValueObjects : [],
+		LoadedGeneSetNames : [],
 		//collection of selected gene value objects
 		selectedgenes :[],	
 	},
 
 	dockedItems : [ {
 		xtype : 'toolbar',
-		itemId : 'geneManagerGridToolbar',
-		dock : 'top'
-	} ],
-
-	columns : [ {
-		header : 'Gene Symbol',
-		dataIndex : 'symbol',
-		flex : 1
-	}, {
-		header : 'Type',
-		dataIndex : 'geneBioType',
-		flex : 1
-	}, {
-		header : 'Gene Name',
-		dataIndex : 'name',
-		flex : 1
-	}],		
+		dock: 'bottom',
+		ui : 'footer',
+		layout :{
+			pack :'center'
+		},
+		itemId : 'geneGridToolbar',
+		//dock : 'top'
+		items : [{
+			minWidth: 80,
+			text: 'Save'
+		},{
+			minWidth: 80,
+			text: 'Cancel'
+		}]
+}, {
+    xtype: 'toolbar',
+    items: [{
+        text:'Add',
+        tooltip:'Add new gene set',
+        icon:'scripts/ASPIREdb/resources/images/icons/add.png'
+    }, '-', {
+        text:'Edit',
+        tooltip:'Set options',
+        icon:'scripts/ASPIREdb/resources/images/icons/add.png'
+    },'-',{
+        itemId: 'removeGeneSet',
+        text:'Remove',
+        tooltip:'Remove the selected gene set',
+        icon:'scripts/ASPIREdb/resources/images/icons/delete.png',
+        disabled: true
+    }],
+}],
+	columns : [ 
+	            {
+	            	header : 'Gene Symbol',
+	            	dataIndex : 'symbol',
+	            	flex : 1
+	            }, {
+	            	header : 'Gene Name',
+	            	dataIndex : 'name',
+	            	flex : 1
+	            }
+	],		
 	selModel : Ext.create('Ext.selection.CheckboxModel', {
 		mode: 'MULTI',
 	}),
@@ -77,38 +104,22 @@ Ext.define('ASPIREdb.view.GeneManagerGrid', {
 		this.down('#saveButtonGeneSet').enable();
 	},
 	
-	setLodedvariantvalueObjects :function(vvo){
+	setLodedGeneSetNames :function(names){
 		
-		this.LoadedVariantValueObjects =vvo;
+		this.LoadedGeneSetNames =names;
 	},	
 	
-	enableToolbar : function(vos) {
-
-		if (vos.length < 1) {
-			return;
-		}
-
-		var geneSymbols = [];
-
-		for ( var i = 0; i < vos.length; i++) {
-			var vo = vos[i];
-			geneSymbols.push(vo.symbol);
-		}
-
-		var url = ASPIREdb.GemmaURLUtils.makeViewGeneNetworkInGemmaURL(geneSymbols);
-
-	
+	enableToolbar : function(names) {
+					
+		this.getDockedComponent('geneGridToolbar').remove('saveButtonGene');
 		
-		
-		this.getDockedComponent('geneManagerGridToolbar').remove('saveButtonGeneHits');
-		
-		this.getDockedComponent('geneManagerGridToolbar').add('-');
+		this.getDockedComponent('geneGridToolbar').add('-');
 		
 		var ref = this;
 					
-		this.getDockedComponent('geneManagerGridToolbar').add({
+		this.getDockedComponent('geneGridToolbar').add({
 			xtype : 'button',
-			id : 'saveButtonGeneSet',
+			id : 'saveButtonGene',
 			text : 'Save to Gene Lists',
 			tooltip : 'Save Genes to User gene Set',
 			disabled: true,
@@ -117,6 +128,7 @@ Ext.define('ASPIREdb.view.GeneManagerGrid', {
 								
 			}
 		});
+		
 
 	}
 });
