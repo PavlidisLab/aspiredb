@@ -27,7 +27,7 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 	id : 'geneGrid',
 	border: true,
 	//columnLines : true,
-	multiSelect : true,
+	
 	config:{
 		// collection of all the PhenotypeSummaryValueObject loaded
 		LoadedGeneSetNames : [],
@@ -37,38 +37,10 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 
 	dockedItems : [ {
 		xtype : 'toolbar',
-		dock: 'bottom',
-		ui : 'footer',
-		layout :{
-			pack :'center'
-		},
-		itemId : 'geneGridToolbar',
-		//dock : 'top'
-		items : [{
-			minWidth: 80,
-			text: 'Save'
-		},{
-			minWidth: 80,
-			text: 'Cancel'
-		}]
-}, {
-    xtype: 'toolbar',
-    items: [{
-        text:'Add',
-        tooltip:'Add new gene set',
-        icon:'scripts/ASPIREdb/resources/images/icons/add.png'
-    }, '-', {
-        text:'Edit',
-        tooltip:'Set options',
-        icon:'scripts/ASPIREdb/resources/images/icons/add.png'
-    },'-',{
-        itemId: 'removeGeneSet',
-        text:'Remove',
-        tooltip:'Remove the selected gene set',
-        icon:'scripts/ASPIREdb/resources/images/icons/delete.png',
-        disabled: true
-    }],
-}],
+		itemId : 'geneSetGridToolbar',
+		dock : 'top'
+		}],
+
 	columns : [ 
 	            {
 	            	header : 'Gene Symbol',
@@ -89,46 +61,42 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 	initComponent : function() {
 		this.callParent();
 		var me = this;
-		this.on('select', me.geneSelectHandler, me);
+		me.enableToolbar();
 
 	},
 	
-	geneSelectHandler : function(ref, record, index, eOpts) {
-		var selGenes = this.getSelectionModel().getSelection();
-		this.selectedgenes=[];
-		for (var i=0; i<selGenes.length; i++){
-			this.selectedgenes.push(selGenes[i].data);
-		}
-		
-		ASPIREdb.EVENT_BUS.fireEvent('new_geneSet_selected', this.selectedgenes);
-		this.down('#saveButtonGeneSet').enable();
-	},
-	
-	setLodedGeneSetNames :function(names){
-		
-		this.LoadedGeneSetNames =names;
-	},	
 	
 	enableToolbar : function(names) {
-					
-		this.getDockedComponent('geneGridToolbar').remove('saveButtonGene');
 		
-		this.getDockedComponent('geneGridToolbar').add('-');
+		this.getDockedComponent('geneSetGridToolbar').remove('addGeneset');
+		this.getDockedComponent('geneSetGridToolbar').remove('editGeneset');
+		this.getDockedComponent('geneSetGridToolbar').remove('removeGeneset');
 		
-		var ref = this;
-					
-		this.getDockedComponent('geneGridToolbar').add({
+		this.getDockedComponent('geneSetGridToolbar').add({
 			xtype : 'button',
-			id : 'saveButtonGene',
-			text : 'Save to Gene Lists',
-			tooltip : 'Save Genes to User gene Set',
-			disabled: true,
+			id : 'addGene',
+			text : 'Add genes to selected gene set',
+			tooltip : 'Add new gene',
+			icon:'scripts/ASPIREdb/resources/images/icons/add.png',
 			handler: function(){
-				ASPIREdb.view.SaveUserGeneSetWindow.initAndShow(ref.selectedgenes);
+				//TODO: have to populate human taxon gene list auto complete features
 								
 			}
 		});
 		
-
+		this.getDockedComponent('geneSetGridToolbar').add('-');
+		
+		this.getDockedComponent('geneSetGridToolbar').add({
+			xtype : 'button',
+			id : 'removeGene',
+			text : 'Delete gene',
+			tooltip : 'Remove the selected gene',
+			icon:'scripts/ASPIREdb/resources/images/icons/delete.png',
+			handler: function(){
+				//remove the selected gene from the gene set
+								
+			}
+		});
+	
 	}
 });

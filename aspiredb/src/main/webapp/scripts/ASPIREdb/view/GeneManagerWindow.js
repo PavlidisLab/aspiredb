@@ -27,33 +27,68 @@ Ext.define('ASPIREdb.view.GeneManagerWindow', {
 	closable : true,
 	closeAction : 'hide',
 	width : 1000,
-	height : 800,
+	height : 500,
 	layout : 'fit',
 	bodyStyle : 'padding: 5px;',
 	
 	
 	items : [{
 		region : 'center',
-		xtype : 'ASPIREdb_genemanagerpanel'
+		itemId : 'ASPIREdb_genemanagerpanel',
+		xtype : 'ASPIREdb_genemanagerpanel',
 	}],
 
 	initComponent : function() {
+	
 		var ref = this;
 		this.callParent();
+		
 
 	},
+	
+	
 	
 	initGridAndShow : function(){
 		
 		var ref = this;
-		//ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);
-		ref.show();
-
+		var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
+		var grid =panel.down ('#geneSetGrid');
 		
+		ref.show();
+		grid.setLoading(true);
+		
+		UserGeneSetService.getSavedUserGeneSetNames( {
+			callback : function(geneSetNames) {	
+				ASPIREdb.view.GeneManagerWindow.populateGeneSetGrid(geneSetNames);			
+			}
+		});
+		
+	
 	},
 	
 	
 	
+	//GeneSet Names
+	populateGeneSetGrid : function(names) {
+		
+		var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
+		var grid =panel.down ('#geneSetGrid');
+		
+			
+		var data = [];
+		for ( var i = 0; i < names.length; i++) {
+			var row = [ names[i],'',''];		
+			data.push(row);					
+		}
+			
+		grid.store.loadData(data);
+		grid.setLoading(false);		
+		grid.getView().refresh();
+		grid.enableToolbar(names);
+	},	
+	
+	
+		
 	clearGridAndMask : function(){
 		ASPIREdb.view.GeneManagerWindow.getComponent('ASPIREdb_genemanagerpanel').store.removeAll();
 		ASPIREdb.view.GeneManagerWindow.getComponent('ASPIREdb_genemanagerpanel').setLoading(true);				

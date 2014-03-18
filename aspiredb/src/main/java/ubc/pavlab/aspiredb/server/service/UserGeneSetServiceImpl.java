@@ -115,15 +115,22 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         return false;              
              
     }
+    @SuppressWarnings("unchecked")
     @Override
     @RemoteMethod
-    public Set<GeneValueObject> loadUserGeneSet( String name ){
+    public List<GeneValueObject> loadUserGeneSet( String name ){
     	 List<UserGeneSet> genesets = userGeneSetDao.findByName( name );
-    	 Set<GeneValueObject> geneValueObjects = ( Set<GeneValueObject> ) genesets.iterator().next().getObject();
-                  
+    	 
+    	 List<GeneValueObject> geneValueObjects=new ArrayList<GeneValueObject>();
+    	 
+    	 if (genesets.size() > 0) {  
+    		 geneValueObjects = (List<GeneValueObject>)genesets.iterator().next().getObject();
+    	 }
+    	 else geneValueObjects=null;
+		  
          // should only be one for one user
          return geneValueObjects;
-    	
+       
     }
     
     @Override

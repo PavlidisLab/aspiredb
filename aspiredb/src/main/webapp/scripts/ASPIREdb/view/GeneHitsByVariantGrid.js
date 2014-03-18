@@ -87,7 +87,7 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 			this.selectedgenes.push(selGenes[i].data);
 		}
 		
-		ASPIREdb.EVENT_BUS.fireEvent('new_geneSet_selected', this.selectedgenes);
+		//ASPIREdb.EVENT_BUS.fireEvent('new_geneSet_selected', this.selectedgenes);
 		this.down('#saveButtonGeneSet').enable();
 	},
 	

@@ -12,6 +12,7 @@ Ext.define('ASPIREdb.GeneManagerPanel',{
         {
             region: 'west',
             xtype:'geneSetGrid',
+            id : 'geneSetGrid',
             width: 480,
             collapsible: true,
             split: true,
@@ -20,10 +21,14 @@ Ext.define('ASPIREdb.GeneManagerPanel',{
         {
             region: 'east',
             xtype:'geneGrid',
+            id :'geneGrid',
             width: 480,
             collapsible: true,
             split: true,
             title:'Associated Genes'
         }
-    ]
+    ],
+
+
+
 });

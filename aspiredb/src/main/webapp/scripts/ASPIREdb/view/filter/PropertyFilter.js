@@ -38,7 +38,8 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			return simpleRestriction;
 		}
 	},
-
+	
+	//pass restriction to popukate the gene list in variant filter
 	setRestrictionExpression : function(restriction) {
 
 		if (restriction instanceof Conjunction || restriction instanceof Disjunction) {
@@ -92,7 +93,8 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 		singleValueField.show();
 
 	},
-
+	
+	//populate gene list in variant filter??????
 	populateMultiComboItem : function(restriction) {
 
 		var r = restriction;
@@ -124,7 +126,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 		
 
 	},
-	
+	//populate gene list from the text box in variant filter
 	populateMultiComboItemFromImportList : function(vos) {
 
 		

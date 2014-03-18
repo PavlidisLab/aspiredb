@@ -154,7 +154,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			var phenSummary = value.phenoSummaryMapSelectedSubjects;
 			var displaySummary = value.displaySummarySelectedSubjects
 			if (phenSummary!= null){
-				var ret = "<canvas width='50' height='50' id=multi"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
+				var ret = "<canvas width='50' height='12' id=multi"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
 				metadata.tdAttr = 'data-qtip="'+displaySummary + ret + '"';
 				return ret;
 			} else return "";
@@ -168,7 +168,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			var phenSummary = value.phenoSummaryMap;
 		
 			if (phenSummary!= null){
-				var ret = "<canvas width='50' height='50' id=all"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
+				var ret = "<canvas width='50' height='12' id=all"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
 				metadata.tdAttr = 'data-qtip="'+value.displaySummary + ret + '"';
 				return ret;
 			} else return "";
@@ -306,7 +306,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		var activeProjectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
 		
 		var ref = this;
-		console.log("on subject select handler ...........");
+		console.log("on subject select handler in phenotype grid ...........");
 		
 	
 		if (subjectIds.length ==1){

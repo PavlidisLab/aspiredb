@@ -1,6 +1,7 @@
 Ext.require([ 'ASPIREdb.MainPanel', 'ASPIREdb.EVENT_BUS', 'ASPIREdb.view.filter.FilterWindow', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.DashboardWindow','ASPIREdb.view.GeneManagerWindow' ]);
 
 /**
+ * Main Panel which trigger the Main Panel after user's successful login
  * Events: - login - logout
  */
 Ext.define('ASPIREdb.AspireDbPanel', {
@@ -10,6 +11,7 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 	config : {
 		loginForm : null
 	},
+	
 	initComponent : function() {
 		this.callParent();
 
@@ -20,7 +22,7 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			aspireDbPanel.getComponent('topToolbar').getComponent('logoutForm').show();
 			
 			aspireDbPanel.disableToolbarButtonsForDashboard(true);
-
+			
 			ASPIREdb.view.DashboardWindow.show();
 
 			var runner = new Ext.util.TaskRunner();
@@ -116,6 +118,10 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 		
 	},
 	
+	/**
+	 * Disable the filter button and clear filter button before closing the dashboard window
+	 * @param: 'yes' or 'no'
+	 */
 	disableToolbarButtonsForDashboard: function(yes){
 		
 		if (yes){
@@ -205,9 +211,8 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			height : 30,
 			margin : '5 5 5 5',
 			handler : function() {
-				this.up('#aspireDbPanel').disableToolbarButtonsForDashboard(true);
 				ASPIREdb.view.GeneManagerWindow.initGridAndShow();
-				//ASPIREdb.view.GeneManagerWindow.show();
+				
 			}
 		},{
 			xtype : 'button',

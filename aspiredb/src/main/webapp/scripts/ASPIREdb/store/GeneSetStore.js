@@ -22,14 +22,15 @@ Ext.require([ 'Ext.data.ArrayStore' ]);
 Ext.define('ASPIREdb.store.GeneSetStore', {
     extend: 'Ext.data.ArrayStore',
     alias: 'store.geneSetStore',
-        
+    autoSync : true,
+    
     fields: [
-             {name: 'name',  type: 'string'},
-             {name: 'description',   type: 'string'},
-             {name: 'size',  type: 'string'}
+             {name: 'geneSetName', type: 'string'},
+             {name: 'geneDescription',   type: 'string'},
+             {name: 'geneSetSize',  type: 'string'}
          ],         
-	
-    storeId: 'geneSetStore'
+   
+   storeId: 'geneSetStore'
     
     
 });

@@ -34,7 +34,7 @@ import com.sencha.gxt.data.shared.loader.PagingLoadResult;
  */
 public interface UserGeneSetService {
 
-    public Set<GeneValueObject> loadUserGeneSet( String name );
+    public List<GeneValueObject> loadUserGeneSet( String name );
 
     public Collection<String> getSavedUserGeneSetNames();
 

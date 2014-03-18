@@ -20,7 +20,9 @@
 Ext.require([ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel', 'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.VariantGridCreator' , 'ASPIREdb.IdeogramDownloadWindow']);
 
 // TODO js documentation
-
+/**
+ * Variant Tab Panel contains both Ideogram view and Variant table view
+ */
 Ext.define('ASPIREdb.view.VariantTabPanel', {
 	extend : 'Ext.tab.Panel',
 	alias : 'widget.variantTabPanel',
@@ -182,7 +184,9 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		});
 
 	},
-
+    /**
+     * Filter the variants of the subject selected. Initially it loads all the variants associated with all the subjects
+     */
 	filterSubmitHandler : function(filterConfigs) {
 
 		var ref = this;
@@ -219,7 +223,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					
 					
 					ref.remove('variantGrid', true);
-
+					//when subjects are selected 
 					grid.on('selectionchange', ref.selectionChangeHandler, ref);
 					
 					grid.on('show', function() {
@@ -251,7 +255,9 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		});
 
 	},
-	
+	/**
+	 * When subjects are selected in the subject grid highlist the variants of selected subjects in ideogram and in table view
+	 */
 	subjectSelectionHandler :function(subjectIds) {
 		console.log("subject selected  on variant tab panel........");
 		var projectIds= ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
@@ -285,18 +291,21 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 						
 			var ideogram = this.getComponent('ideogram');
 			ideogram.drawChromosomes();
-						
+			//ideogram.redrawHighlightedSubjects(null, this.loadedVariants);
 			//heighlight the selected subject in ideogram
 			SubjectService.getSubjects(projectIds[0],subjectIds, {
 				callback : function(subjectValueObjects) {					
 					for ( var i = 0; i < subjectValueObjects.length ; i++) {
 						var subjectValueObject = subjectValueObjects[i];
-						if (i==0)
+						if (i==0){
 							ideogram.redrawHighlightedSubjects(subjectValueObject.id, this.loadedVariants);
+							console.log('drawing variants of subject: '+ subjectValueObject.patientId+'  in Variant tab panel');
+						}
 						else {							 
 							VariantService.getSubjectsVariants(subjectValueObject.patientId, {
 								callback : function(vvo) {
 									ideogram.redrawHighlightedSubjects(subjectValueObject.id, vvo);
+									console.log('drawing variants of subject: '+ subjectValueObject.patientId+'  in Variant tab panel');
 									}
 							});
 						}
