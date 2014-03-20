@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.GenomeCoordinateConverter;
+import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
 import ubc.pavlab.aspiredb.server.dao.Page;
 import ubc.pavlab.aspiredb.server.dao.UserGeneSetDao;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
@@ -81,18 +82,37 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
     @Autowired 
     private UserGeneSetDao userGeneSetDao;
 
+	 @Autowired
+    private BioMartQueryService bioMartQueryService;
+	 
+	/**
+	 * saving the user selected gene listed in the phenotype and variant window
+	 * @param geneSetName
+	 * @param Gene value objects holding only the symbol, name and type of a gene
+	 * @return saved gene set id 
+	 */
     @Override
     @Transactional
     @RemoteMethod
-    public Long saveUserGeneSet(String geneSetName,List<GeneValueObject> genes) {
-        final List<UserGeneSet> geneSet = userGeneSetDao.findByName(geneSetName);
+    public Long saveUserGeneSet(String geneSetName,List<GeneValueObject> genes)throws BioMartServiceException {
+        final List<UserGeneSet> geneSet = userGeneSetDao.findByName(geneSetName);        
+        
+        
+        List<String> geneSymbols=new ArrayList<String>();
+      //storing the gene symbols
+        for (GeneValueObject gvo: genes){
+        	geneSymbols.add(gvo.getSymbol());        	
+        }
+        //getting the actual gene value objects. Gene value object will return null unless the gene value object id is specified. so we need to do this workaround to obtain the complete gene value object 
+        List<GeneValueObject> geneValueObjects= bioMartQueryService.getGenes(geneSymbols);   
+        
         UserGeneSet savedUserGeneSet=null;
         if ( geneSet.isEmpty() ) {
-        	UserGeneSet userGeneSet = new UserGeneSet(geneSetName, ( Serializable ) genes);
+        	UserGeneSet userGeneSet = new UserGeneSet(geneSetName, ( Serializable ) geneValueObjects);
         	savedUserGeneSet = userGeneSetDao.create( userGeneSet );
         } else if ( geneSet.size() == 1 ) {
         	UserGeneSet userGeneSet = geneSet.iterator().next();
-        	userGeneSet.setObject( ( Serializable ) genes );
+        	userGeneSet.setObject( ( Serializable ) geneValueObjects );
             userGeneSetDao.update( userGeneSet );
             savedUserGeneSet = userGeneSet;
         } else {
@@ -100,6 +120,17 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         }
         return savedUserGeneSet.getId();
     }
+    
+    @Override
+    @Transactional
+    @RemoteMethod
+    public List<GeneValueObject> getGenes(String geneSymbol)throws BioMartServiceException {
+    	List<String> geneSymbols=new ArrayList<String>();
+    	geneSymbols.add(geneSymbol);
+    	return bioMartQueryService.getGenes(geneSymbols); 
+    }
+    
+    
     
     @Override
     @RemoteMethod
@@ -118,7 +149,7 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
     @SuppressWarnings("unchecked")
     @Override
     @RemoteMethod
-    public List<GeneValueObject> loadUserGeneSet( String name ){
+    public List<GeneValueObject> loadUserGeneSet( String name ) {
     	 List<UserGeneSet> genesets = userGeneSetDao.findByName( name );
     	 
     	 List<GeneValueObject> geneValueObjects=new ArrayList<GeneValueObject>();
@@ -127,7 +158,8 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
     		 geneValueObjects = (List<GeneValueObject>)genesets.iterator().next().getObject();
     	 }
     	 else geneValueObjects=null;
-		  
+    	 
+    	 	  
          // should only be one for one user
          return geneValueObjects;
        

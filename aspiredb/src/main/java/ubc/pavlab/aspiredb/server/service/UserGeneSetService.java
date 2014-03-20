@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.shared.BoundedList;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
-
 
 import com.sencha.gxt.data.shared.loader.PagingLoadResult;
 
@@ -40,9 +40,11 @@ public interface UserGeneSetService {
 
     public void deleteUserGeneSet( String name );
         
-    public Long saveUserGeneSet(String geneName,List<GeneValueObject> genes);
+    public Long saveUserGeneSet(String geneName,List<GeneValueObject> genes) throws BioMartServiceException;
     
     public boolean isGeneSetName(String name);
+    
+    public List<GeneValueObject> getGenes(String geneSymbol)throws BioMartServiceException;
 
   
 }

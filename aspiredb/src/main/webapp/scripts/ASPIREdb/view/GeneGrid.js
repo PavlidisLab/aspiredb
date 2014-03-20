@@ -33,6 +33,7 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 		LoadedGeneSetNames : [],
 		//collection of selected gene value objects
 		selectedgenes :[],	
+		gvos : [],
 	},
 
 	dockedItems : [ {
@@ -52,9 +53,7 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 	            	flex : 1
 	            }
 	],		
-	selModel : Ext.create('Ext.selection.CheckboxModel', {
-		mode: 'MULTI',
-	}),
+	
 
 	store : Ext.create('ASPIREdb.store.GeneStore'),
 
@@ -73,28 +72,60 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 		this.getDockedComponent('geneSetGridToolbar').remove('removeGeneset');
 		
 		this.getDockedComponent('geneSetGridToolbar').add({
-			xtype : 'button',
-			id : 'addGene',
-			text : 'Add genes to selected gene set',
-			tooltip : 'Add new gene',
+			xtype : 'textfield',
+			id : 'geneName',
+			text : '',			
+			//tooltip : 'Gene Names',
 			icon:'scripts/ASPIREdb/resources/images/icons/add.png',
 			handler: function(){
 				//TODO: have to populate human taxon gene list auto complete features
-								
+				//BioMartQueryService.getGenes(genesymbol),			
 			}
 		});
 		
+		
 		this.getDockedComponent('geneSetGridToolbar').add('-');
 		
+		var ref=this;
+		this.getDockedComponent('geneSetGridToolbar').add({
+			xtype : 'button',
+			id : 'addGene',
+			text : '',
+			tooltip : 'Add genes to selected gene set',
+			icon:'scripts/ASPIREdb/resources/images/icons/add.png',
+			handler: function(){
+				//TODO: have to populate human taxon gene list auto complete features
+				var genesymbol =ref.down('#geneName').getValue();
+				UserGeneSetService.getGenes(genesymbol,{
+						callback : function(gvo) {
+							ref.gvos.push(gvo);
+						}
+				});
+				var data = [];
+				for ( var i = 0; i < ref.gvos.length; i++) {
+					var gvo = ref.gvos[i];
+					var row = [ gvo.symbol,'',gvo.name,''];		
+					data.push(row);					
+				}
+					
+				ref.store.loadData(data);
+				//TODO : refresh grid when loaded
+				//ref.getView.refresh();
+				ASPIREdb.EVENT_BUS.fireEvent('gene_added', ref.gvos);
+			}
+		});
+				
 		this.getDockedComponent('geneSetGridToolbar').add({
 			xtype : 'button',
 			id : 'removeGene',
-			text : 'Delete gene',
+			text : '',
 			tooltip : 'Remove the selected gene',
 			icon:'scripts/ASPIREdb/resources/images/icons/delete.png',
 			handler: function(){
 				//remove the selected gene from the gene set
-								
+				
+				//TODO : refresh grid when loaded
+				ref.store.getView.refresh();				
 			}
 		});
 	

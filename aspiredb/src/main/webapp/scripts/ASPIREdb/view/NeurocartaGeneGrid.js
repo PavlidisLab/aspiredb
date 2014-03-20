@@ -78,7 +78,9 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 		
 		this.on('select', me.geneSelectHandler, me);
 	},
-	
+	/*
+	 * when gene displayed are selected 
+	 */
 	geneSelectHandler : function(ref, record, index, eOpts) {
 		var selGenes = this.getSelectionModel().getSelection();
 		this.selectedgenes=[];

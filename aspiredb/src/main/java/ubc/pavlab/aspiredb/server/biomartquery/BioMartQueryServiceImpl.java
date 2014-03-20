@@ -167,7 +167,11 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
 
 		return bioMartCache.findGenes(queryString);
 	}
-
+	/**
+	 * get the genes using the list of gene ids or list of gene symbols
+	 * @param List of gene strings
+	 * @return Gene value Objects associated with the given gene string list
+	 */
 	@Override
 	public List<GeneValueObject> getGenes(List<String> geneStrings) throws BioMartServiceException {
 		updateCacheIfExpired();
