@@ -291,35 +291,41 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 						
 			var ideogram = this.getComponent('ideogram');
 			ideogram.drawChromosomes();
-			//ideogram.redrawHighlightedSubjects(null, this.loadedVariants);
+			
 			//heighlight the selected subject in ideogram
 			SubjectService.getSubjects(projectIds[0],subjectIds, {
-				callback : function(subjectValueObjects) {					
+				callback : function(subjectValueObjects) {		
+					
+					var subjectIDS=[];
+					var patientIDS=[];
 					for ( var i = 0; i < subjectValueObjects.length ; i++) {
-						var subjectValueObject = subjectValueObjects[i];
-						if (i==0){
-							ideogram.redrawHighlightedSubjects(subjectValueObject.id, this.loadedVariants);
-							console.log('drawing variants of subject: '+ subjectValueObject.patientId+'  in Variant tab panel');
-						}
-						else {							 
-							VariantService.getSubjectsVariants(subjectValueObject.patientId, {
-								callback : function(vvo) {
-									ideogram.redrawHighlightedSubjects(subjectValueObject.id, vvo);
-									console.log('drawing variants of subject: '+ subjectValueObject.patientId+'  in Variant tab panel');
-									}
-							});
-						}
+						subjectIDS.push(subjectValueObjects[i].id);	
+						patientIDS.push(subjectValueObjects[i].patientId);					
 					}
+					ideogram.drawVariantsWithSubjectsHighlighted(subjectIDS,this.loadedVariants);
+					
+				 	VariantService.getSubjectsVariants(patientIDS, {
+						callback : function(vvo) {
+							var notSelectedVariants=[];
+							var flag='no';
+							for (var j=0;j<this.loadedVariants.length;j++){
+								
+								for (var k=0;k<vvo.length;k++){
+									if (this.loadedVariants[j]!=vvo[k]){
+									 	flag='yes';
+									}								 
+								}
+								if (flag == 'yes')
+									notSelectedVariants.push(this.loadedVariants[j]);
+							}
+							ideogram.drawDimmedVariants(notSelectedVariants);							
+							}
+					});
+				
 				}
-			});
-			//ideogram.redraw();
-						
+			});			
 		}
-			
-			
-		grid.getView().refresh();
-		
-		
+		grid.getView().refresh();		
 	},
 
 	selectionChangeHandler : function(model, records) {

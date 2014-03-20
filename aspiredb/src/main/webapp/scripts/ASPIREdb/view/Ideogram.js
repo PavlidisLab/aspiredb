@@ -444,10 +444,46 @@ Ext.define('ASPIREdb.view.Ideogram', {
 			/* ChromosomeIdeogram */
 			var chrIdeogram = this.chromosomeIdeograms[chrName];
 			if (variant.subjectId === subjectId) {
+				console.log('drawing red variants of subject id :'+subjectId+' in dieogam view');
 				chrIdeogram.drawHighlightedVariant(variant, this.displayedProperty);
 			} else {
 				chrIdeogram.drawDimmedVariant(variant);
 			}
+		}
+	},
+	
+	drawVariantsWithSubjectsHighlighted : function(subjectIds, variantValueObjects) {
+		/* List<VariantValueObject> */
+		var variants = variantValueObjects.slice(); // copy array
+		this.sortVariantsBySize(variants);
+
+		for ( var i = 0; i < variants.length; i++) {
+			var variant = variants[i];
+			var chrName = variant.genomicRange.chromosome;
+			/* ChromosomeIdeogram */
+			var chrIdeogram = this.chromosomeIdeograms[chrName];
+			//color heighlighted variants in red
+			for (var j=0; j<subjectIds.length;j++){
+				var subjectId=subjectIds[j];
+				if (variant.subjectId === subjectId) {
+					console.log('drawing red variants of subject id :'+subjectId+' in dieogam view');
+					chrIdeogram.drawHighlightedVariant(variant, this.displayedProperty);
+				} 
+			}
+			
+		}
+	},
+	
+	drawDimmedVariants : function(variantValueObjects) {
+		/* List<VariantValueObject> */
+		var variants = variantValueObjects.slice(); // make a copy
+		this.sortVariantsBySize(variants);
+		for ( var i = 0; i < variants.length; i++) {
+			var variant = variants[i];
+			var chrName = variant.genomicRange.chromosome;
+			/* ChromosomeIdeogram */
+			var chrIdeogram = this.chromosomeIdeograms[chrName];
+			chrIdeogram.drawDimmedVariant(variant);
 		}
 	},
 
@@ -480,8 +516,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	/**
 	 * @public
 	 */
-	redrawHighlightedSubjects : function(subjectId,vvo) {
-		//this.drawChromosomes();
+	redrawHighlightedSubjects : function(subjectId,vvo) {		
 		this.drawVariantsWithSubjectHighlighted(subjectId,vvo);
 		//this.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap, this.displayedProperty);
 	},

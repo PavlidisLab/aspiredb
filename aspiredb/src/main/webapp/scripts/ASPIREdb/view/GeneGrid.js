@@ -26,7 +26,7 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 	emptyText : 'No genes found',
 	id : 'geneGrid',
 	border: true,
-	//columnLines : true,
+	store : Ext.create('ASPIREdb.store.GeneStore'),
 	
 	config:{
 		// collection of all the PhenotypeSummaryValueObject loaded
@@ -55,7 +55,7 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 	],		
 	
 
-	store : Ext.create('ASPIREdb.store.GeneStore'),
+	
 
 	initComponent : function() {
 		this.callParent();
@@ -99,18 +99,18 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 				UserGeneSetService.getGenes(genesymbol,{
 						callback : function(gvo) {
 							ref.gvos.push(gvo);
+							var data = [];
+							var row = [ gvo.symbol,'',gvo.name,''];		
+							data.push(row);
+							var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
+							var grid =panel.down ('#geneGrid');
+							//TODO : refresh grid when loaded
+							grid.store.loadData(data);
+							grid.setLoading(false);		
+							grid.getView().refresh();
 						}
 				});
-				var data = [];
-				for ( var i = 0; i < ref.gvos.length; i++) {
-					var gvo = ref.gvos[i];
-					var row = [ gvo.symbol,'',gvo.name,''];		
-					data.push(row);					
-				}
-					
-				ref.store.loadData(data);
-				//TODO : refresh grid when loaded
-				//ref.getView.refresh();
+				
 				ASPIREdb.EVENT_BUS.fireEvent('gene_added', ref.gvos);
 			}
 		});
