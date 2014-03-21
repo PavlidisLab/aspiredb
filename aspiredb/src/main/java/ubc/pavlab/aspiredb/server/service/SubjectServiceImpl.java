@@ -172,7 +172,11 @@ public class SubjectServiceImpl implements SubjectService {
             LinkedHashMap<String, Integer> phenoSummaryMap = new LinkedHashMap<String, Integer>();
             
             Set<String> keyArray = sum.getDbValueToSubjectSet().keySet();
-            String[] colors = {"red", "green", "black", "purple","blue", "yellow","orange", "grey"};
+            /**
+             * Used the Color Brewer 2.0 system for coloring the chart
+             * Thanks for Cynthia Brewer, Mark Harrower and The Pennsylvania State University
+             */
+            String[] colors = {"#e34a33", "#31a354", "#636363", "#7570b3","#2c7fb8", "#addd8e","#3182bd", "#a6bddb"};
             int j=3;
             int unknown=0;
             int present=0;
@@ -267,7 +271,11 @@ public class SubjectServiceImpl implements SubjectService {
             LinkedHashMap<String, Integer> phenoSummaryMap = new LinkedHashMap<String, Integer>();
             
             Set<String> keyArray = sum.getDbValueToSubjectSet().keySet();
-            String[] colors = {"red", "green", "black", "purple","blue", "yellow","orange", "grey"};
+            /**
+             * Used the Color Brewer 2.0 system for coloring the chart
+             * Thanks for Cynthia Brewer, Mark Harrower and The Pennsylvania State University
+             */
+            String[] colors = {"#e34a33", "#31a354", "#636363", "#7570b3","#2c7fb8", "#addd8e","#3182bd", "#a6bddb"};
             int j=3;
             int unknown=0;
             int present=0;

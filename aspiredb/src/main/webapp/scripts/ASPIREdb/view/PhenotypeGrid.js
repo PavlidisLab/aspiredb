@@ -105,7 +105,11 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			if (phenSummary == null) return ret;
 			var style = this.STYLE_DEFAULT;
 			var displayVal = phenSummary.dbValue;
-			var colors = ["red", "green", "black", "purple","blue", "yellow","orange", "grey"];
+			 /**
+             * Used the Color Brewer 2.0 system for coloring the chart
+             * Thanks for Cynthia Brewer, Mark Harrower and The Pennsylvania State University
+             */
+			var colors = ["#e34a33", "#31a354", "#636363", "#7570b3","#2c7fb8", "#addd8e","#3182bd", "#a6bddb"];
 			var colorIdx=5;
 			//TODO : This is not a good workaround to display the color, have to figure out a way to do this better
 			if (phenSummary.valueType == "HPONTOLOGY") {
@@ -154,7 +158,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			var phenSummary = value.phenoSummaryMapSelectedSubjects;
 			var displaySummary = value.displaySummarySelectedSubjects
 			if (phenSummary!= null){
-				var ret = "<canvas width='50' height='12' id=multi"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
+				var ret = "<canvas width='50' height='20' id=multi"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
 				metadata.tdAttr = 'data-qtip="'+displaySummary + ret + '"';
 				return ret;
 			} else return "";
@@ -168,7 +172,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			var phenSummary = value.phenoSummaryMap;
 		
 			if (phenSummary!= null){
-				var ret = "<canvas width='50' height='12' id=all"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
+				var ret = "<canvas width='50' height='20' id=all"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
 				metadata.tdAttr = 'data-qtip="'+value.displaySummary + ret + '"';
 				return ret;
 			} else return "";
@@ -435,12 +439,15 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		ctx.textAlign = "center";
 				
 		var width=50;
-		var height=50;
+		var height=20;
 		var yValue=0;
 		var xValue=0;
 		var colorIndex=3;
-
-		var colors = ["red", "green", "black", "purple","blue", "yellow","orange", "grey"];
+		 /**
+         * Used the Color Brewer 2.0 system for coloring the chart
+         * Thanks for Cynthia Brewer, Mark Harrower and The Pennsylvania State University
+         */
+		var colors = ["#e34a33", "#31a354", "#636363", "#7570b3","#2c7fb8", "#addd8e","#3182bd", "#a6bddb"];
 		var displayVal = '';
 		
 		//draw Y axis

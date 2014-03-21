@@ -131,7 +131,11 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
     }
     
     
-    
+    /**
+     * Check weather the geneset name exist
+     * @param Gene Set Name
+     * @return true or false 
+     */
     @Override
     @RemoteMethod
     public boolean isGeneSetName(String name) {
