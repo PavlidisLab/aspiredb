@@ -71,7 +71,9 @@ import com.sencha.gxt.data.shared.loader.PagingLoadResult;
 import com.sencha.gxt.data.shared.loader.PagingLoadResultBean;
 
 /**
- * @author anton
+ * User Gene Set Service DWR's Created to access the User Gene Set Mysql values for the client side development
+ * @author Gaya Charath
+ * @since: 11/03/14
  */
 @Service("userGeneSetService")
 @RemoteProxy(name = "UserGeneSetService")
@@ -86,7 +88,8 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
     private BioMartQueryService bioMartQueryService;
 	 
 	/**
-	 * saving the user selected gene listed in the phenotype and variant window
+	 * 
+	 * DWR - Saving the user selected gene listed in the phenotype and variant window
 	 * @param geneSetName
 	 * @param Gene value objects holding only the symbol, name and type of a gene
 	 * @return saved gene set id 
@@ -98,7 +101,7 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         final List<UserGeneSet> geneSet = userGeneSetDao.findByName(geneSetName);        
         
         
-        List<String> geneSymbols=new ArrayList<String>();
+        List<String> geneSymbols=new ArrayList<>();
       //storing the gene symbols
         for (GeneValueObject gvo: genes){
         	geneSymbols.add(gvo.getSymbol());        	
@@ -125,7 +128,7 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
     @Transactional
     @RemoteMethod
     public List<GeneValueObject> getGenes(String geneSymbol)throws BioMartServiceException {
-    	List<String> geneSymbols=new ArrayList<String>();
+    	List<String> geneSymbols=new ArrayList<>();
     	geneSymbols.add(geneSymbol);
     	return bioMartQueryService.getGenes(geneSymbols); 
     }
@@ -156,7 +159,7 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
     public List<GeneValueObject> loadUserGeneSet( String name ) {
     	 List<UserGeneSet> genesets = userGeneSetDao.findByName( name );
     	 
-    	 List<GeneValueObject> geneValueObjects=new ArrayList<GeneValueObject>();
+    	 List<GeneValueObject> geneValueObjects=new ArrayList<>();
     	 
     	 if (genesets.size() > 0) {  
     		 geneValueObjects = (List<GeneValueObject>)genesets.iterator().next().getObject();
@@ -172,7 +175,7 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
     @Override
     @RemoteMethod
     public Collection<String> getSavedUserGeneSetNames(){
-    	Collection<String> geneSetNames = new ArrayList<String>();
+    	Collection<String> geneSetNames = new ArrayList<>();
         Collection<UserGeneSet> genesets = userGeneSetDao.loadAll();
 
         for ( UserGeneSet geneset : genesets ) {

@@ -30,7 +30,8 @@ import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import com.sencha.gxt.data.shared.loader.PagingLoadResult;
 
 /**
- * @author anton
+ * @author Gaya
+ * 
  */
 public interface UserGeneSetService {
 
