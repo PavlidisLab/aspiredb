@@ -32,7 +32,7 @@ public class NeurocartaPhenotypeProperty extends Property<GenomicRangeDataType> 
 
     public NeurocartaPhenotypeProperty() {
         this.dataType = new GenomicRangeDataType();
-        this.displayName = "Neurocarta Phenotype";
+        this.displayName = "Phenocarta Phenotype";
         this.exampleValues = "Examples: <b>autism spectrum disorder</b>, <b>colon cancer</b>";
         this.operators = Arrays.asList(Operator.IS_IN_SET, Operator.IS_NOT_IN_SET);
         this.supportsSuggestions = true;

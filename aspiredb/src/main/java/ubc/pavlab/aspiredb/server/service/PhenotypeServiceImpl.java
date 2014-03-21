@@ -27,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +44,6 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.TextValue;
 import ubc.pavlab.aspiredb.shared.query.PhenotypeProperty;
 import ubc.pavlab.aspiredb.shared.query.PropertyValue;
-import ubc.pavlab.aspiredb.shared.suggestions.PhenotypeSuggestion;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 import ubic.basecode.math.MultipleTestCorrection;
 import ubic.basecode.math.SpecFunc;
@@ -56,7 +54,7 @@ import cern.colt.list.DoubleArrayList;
 
 @RemoteProxy(name = "PhenotypeService")
 @Service("phenotypeService")
-public class PhenotypeServiceImpl extends GwtService implements PhenotypeService {
+public class PhenotypeServiceImpl implements PhenotypeService {
 
     protected static Log log = LogFactory.getLog( PhenotypeServiceImpl.class );
 
@@ -125,9 +123,9 @@ public class PhenotypeServiceImpl extends GwtService implements PhenotypeService
             Integer.parseInt( value );
         } catch ( NumberFormatException nfe ) {
             if ( value != null && value.trim().equalsIgnoreCase( "Y" ) ) {
-                return "1";
+                return PhenotypeUtil.VALUE_PRESENT;
             }
-            return "0";
+                return PhenotypeUtil.VALUE_ABSENT;
 
         }
 
@@ -141,11 +139,9 @@ public class PhenotypeServiceImpl extends GwtService implements PhenotypeService
     }
 
     @Override
+    @RemoteMethod
     @Transactional
     public Map<String, PhenotypeValueObject> getPhenotypes( Long subjectId ) throws NotLoggedInException {
-        throwGwtExceptionIfNotLoggedIn();
-
-        log.info( "getPhenotypes" );
 
         StopWatch timer = new StopWatch();
         timer.start();
@@ -335,22 +331,24 @@ public class PhenotypeServiceImpl extends GwtService implements PhenotypeService
             for ( PhenotypeValueObject child : phenotype.getDescendantPhenotypes().values() ) {
                 // Propagate 'Present' (1) values to ancestor.
                 if ( child.getDbValue() != null && phenotype.getDbValue() == null ) {
-                    if ( child.getDbValue().equals( "1" ) ) {
-                        phenotype.setInferredValue( "1" );
+                    if ( child.getDbValue().equals( PhenotypeUtil.VALUE_PRESENT ) ) {
+                        phenotype.setInferredValue( PhenotypeUtil.VALUE_PRESENT );
                         continue;
                     }
                 }
                 // Propagate 'Absent' (0) values to descendants.
                 if ( phenotype.getDbValue() != null && child.getDbValue() == null ) {
-                    if ( phenotype.getDbValue().equals( "0" ) ) {
-                        child.setInferredValue( "0" );
+                    if ( phenotype.getDbValue().equals( PhenotypeUtil.VALUE_ABSENT ) ) {
+                        child.setInferredValue( PhenotypeUtil.VALUE_ABSENT );
                     }
                 }
             }
         }
     }
 
-    @Transactional
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
     public List<PhenotypeEnrichmentValueObject> getPhenotypeEnrichmentValueObjects( Collection<Long> activeProjects,
             Collection<Long> subjectIds ) throws NotLoggedInException {
 

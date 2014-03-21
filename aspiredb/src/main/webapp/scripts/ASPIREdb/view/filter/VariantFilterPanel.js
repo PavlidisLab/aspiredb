@@ -1,140 +1,302 @@
-Ext.require([
-    'Ext.layout.container.*',
-    'ASPIREdb.view.filter.AndFilterContainer',
-    'ASPIREdb.view.filter.OrFilterContainer',
-    'ASPIREdb.view.filter.FilterPanel'
-]);
+Ext.require([ 'Ext.layout.container.*', 'ASPIREdb.view.filter.AndFilterContainer', 'ASPIREdb.view.filter.OrFilterContainer', 'ASPIREdb.view.filter.FilterPanel' ]);
 
 Ext.define('ASPIREdb.view.filter.VariantFilterPanel', {
-    extend: 'ASPIREdb.view.filter.FilterPanel',
-    alias: 'widget.filter_variant',
-    title: 'Variant Filter',
-    bodyStyle: 'background: #FFFFD0;',
-    items: [
-        {
-            xtype: 'filter_and',
-            title: 'Variant Location:',
-            itemId: 'locationFilterContainer',
-            filterItemType: 'ASPIREdb.view.filter.OrFilterContainer',
-            suggestValuesRemoteFunction: VariantService.suggestValues,
-            propertyStore: {
-                autoLoad: true,
-                proxy : {
-                    type: 'dwr',
-                    dwrFunction : VariantService.suggestVariantLocationProperties,
-                    model: 'ASPIREdb.model.Property',
-                    reader : {
-                        type: 'json',
-                        root: 'data',
-                        totalProperty: 'count'
-                    }
-                }
-            }
-        },
-        {
-            xtype: 'label',
-            text: 'Variant characteristics:'
-        },
-        {
-            xtype: 'panel',
-            itemId: 'cnvFilterPanel',
-            bodyStyle: 'background: #FFFFD0;',
-            title: 'CNV:',
-            collapsible: true,
-            collapsed: true,
-            animCollapse: false,
-            getRestrictionExpression: function() {
-                var filterContainer = this.getComponent('cnvCharacteristicFilterContainer');
-                return filterContainer.getRestrictionExpression();
-            },
-            items: {
-                xtype: 'filter_and',
-                itemId: 'cnvCharacteristicFilterContainer',
-                suggestValuesRemoteFunction: VariantService.suggestValues,
-                propertyStore: {
-                    autoLoad: true,
-                    proxy : {
-                        type: 'dwr',
-                        dwrFunction : VariantService.suggestPropertiesForVariantType,
-                        dwrParams: ['CNV'],
-                        model: 'ASPIREdb.model.Property',
-                        reader : {
-                            type: 'json',
-                            root: 'data',
-                            totalProperty: 'count'
-                        }
-                    }
-                },
-                filterItemType: 'ASPIREdb.view.filter.PropertyFilter'
-            }
-        },
-        {
-            xtype: 'panel',
-            itemId: 'indelFilterPanel',
-            bodyStyle: 'background: #FFFFD0;',
-            title: 'Indel:',
-            collapsible: true,
-            collapsed: true,
-            animCollapse: false,
-            getRestrictionExpression: function() {
-                var filterContainer = this.getComponent('indelCharacteristicFilterContainer');
-                return filterContainer.getRestrictionExpression();
-            },
-            items: {
-                xtype: 'filter_and',
-                itemId: 'indelCharacteristicFilterContainer',
-                suggestValuesRemoteFunction: VariantService.suggestValues,
-                propertyStore: {
-                    autoLoad: true,
-                    proxy : {
-                        type: 'dwr',
-                        dwrFunction : VariantService.suggestPropertiesForVariantType,
-                        dwrParams: ['INDEL'],
-                        model: 'ASPIREdb.model.Property',
-                        reader : {
-                            type: 'json',
-                            root: 'data',
-                            totalProperty: 'count'
-                        }
-                    }
-                },
-                filterItemType: 'ASPIREdb.view.filter.PropertyFilter'
-            }
-        }
-    ],
+	extend : 'ASPIREdb.view.filter.FilterPanel',
+	alias : 'widget.filter_variant',
+	title : 'Variant Filter',
+	bodyStyle : 'background: #FFFFC2;',
+	items : [ {
+		xtype : 'filter_and',
+		title : 'Variant Location:',
+		itemId : 'locationFilterContainer',
+		filterItemType : 'ASPIREdb.view.filter.OrFilterContainer',
+		suggestValuesRemoteFunction : VariantService.suggestValues,
+		propertyStore : {
+			// autoLoad: true,
+			proxy : {
+				type : 'dwr',
+				dwrFunction : VariantService.suggestVariantLocationProperties,
+				model : 'ASPIREdb.model.Property',
+				reader : {
+					type : 'json',
+					root : 'data',
+					totalProperty : 'count'
+				}
+			}
+		}
+	}, {
+		xtype : 'label',
+		text : 'Variant characteristics:',
+		padding: '5 5 5 5',
+	}, {
+		xtype : 'panel',
+		itemId : 'cnvFilterPanel',
+		bodyStyle : 'background: #FFFFC2;',
+		title : 'CNV:',
+		collapsible : true,
+		collapsed : true,
+		animCollapse : false,
+		getRestrictionExpression : function() {
+			var filterContainer = this.getComponent('cnvCharacteristicFilterContainer');
+			
+			var cnvRestrictionExpression = filterContainer.getRestrictionExpression();
+			
+			var variantRestriction = new VariantTypeRestriction();
+			
+			variantRestriction.type = "CNV";
+			
+			cnvRestrictionExpression.restrictions.push(variantRestriction);
+			
+			return cnvRestrictionExpression;
+			
+		},
+		setRestrictionExpression : function(restriction) {
+			// and filter container
+			var filterContainer = this.getComponent('cnvCharacteristicFilterContainer');
+			filterContainer.setRestrictionExpression(restriction);
+		},
+		items : {
+			xtype : 'filter_and',
+			itemId : 'cnvCharacteristicFilterContainer',
+			suggestValuesRemoteFunction : VariantService.suggestValues,
+			propertyStore : {
+				//autoLoad : true,
+				proxy : {
+					type : 'dwr',
+					dwrFunction : VariantService.suggestPropertiesForVariantType,
+					dwrParams : [ 'CNV' ],
+					model : 'ASPIREdb.model.Property',
+					reader : {
+						type : 'json',
+						root : 'data',
+						totalProperty : 'count'
+					}
+				}
+			},
+			filterItemType : 'ASPIREdb.view.filter.PropertyFilter'
+		}
+	}, {
+		xtype : 'panel',
+		itemId : 'indelFilterPanel',
+		bodyStyle : 'background: #FFFFC2;',
+		title : 'Indel:',
+		collapsible : true,
+		collapsed : true,
+		animCollapse : false,
+		getRestrictionExpression : function() {
+						
+			var filterContainer = this.getComponent('indelCharacteristicFilterContainer');
+			
+			var indelRestrictionExpression = filterContainer.getRestrictionExpression();
+			
+			var variantRestriction = new VariantTypeRestriction();
+			
+			variantRestriction.type = "INDEL";
+			
+			indelRestrictionExpression.restrictions.push(variantRestriction);
+			
+			return indelRestrictionExpression;
+			
+		},
+		setRestrictionExpression : function(restriction) {
+			// and filter container
+			var filterContainer = this.getComponent('indelCharacteristicFilterContainer');
+			filterContainer.setRestrictionExpression(restriction);
+		},
+		items : {
+			xtype : 'filter_and',
+			itemId : 'indelCharacteristicFilterContainer',
+			suggestValuesRemoteFunction : VariantService.suggestValues,
+			propertyStore : {
+				//autoLoad : true,
+				proxy : {
+					type : 'dwr',
+					dwrFunction : VariantService.suggestPropertiesForVariantType,
+					dwrParams : [ 'INDEL' ],
+					model : 'ASPIREdb.model.Property',
+					reader : {
+						type : 'json',
+						root : 'data',
+						totalProperty : 'count'
+					}
+				}
+			},
+			filterItemType : 'ASPIREdb.view.filter.PropertyFilter'
+		}
+	}, {
+		xtype : 'panel',
+		itemId : 'snvFilterPanel',
+		bodyStyle : 'background: #FFFFC2;',
+		title : 'SNV:',
+		collapsible : true,
+		collapsed : true,
+		animCollapse : false,
+		getRestrictionExpression : function() {
+						
+			var filterContainer = this.getComponent('snvCharacteristicFilterContainer');
+			
+			var snvRestrictionExpression = filterContainer.getRestrictionExpression();
+			
+			var variantRestriction = new VariantTypeRestriction();
+			
+			variantRestriction.type = "SNV";
+			
+			snvRestrictionExpression.restrictions.push(variantRestriction);
+			
+			return snvRestrictionExpression;
+			
+		},
+		setRestrictionExpression : function(restriction) {
+			// and filter container
+			var filterContainer = this.getComponent('snvCharacteristicFilterContainer');
+			filterContainer.setRestrictionExpression(restriction);
+		},
+		items : {
+			xtype : 'filter_and',
+			itemId : 'snvCharacteristicFilterContainer',
+			suggestValuesRemoteFunction : VariantService.suggestValues,
+			propertyStore : {
+				//autoLoad : true,
+				proxy : {
+					type : 'dwr',
+					dwrFunction : VariantService.suggestPropertiesForVariantType,
+					dwrParams : [ 'SNV' ],
+					model : 'ASPIREdb.model.Property',
+					reader : {
+						type : 'json',
+						root : 'data',
+						totalProperty : 'count'
+					}
+				}
+			},
+			filterItemType : 'ASPIREdb.view.filter.PropertyFilter'
+		}
+	} ],
 
-    getFilterConfig: function() {
-        var cnvFilterPanel = this.getComponent('cnvFilterPanel');
-        var indelFilterPanel = this.getComponent('indelFilterPanel');
-        var config = new VariantFilterConfig();
-        var conjunction = new Conjunction();
-        conjunction.restrictions = [];
+	getFilterConfig : function() {
+		var cnvFilterPanel = this.getComponent('cnvFilterPanel');
+		var indelFilterPanel = this.getComponent('indelFilterPanel');
+		var snvFilterPanel = this.getComponent('snvFilterPanel');
+		var config = new VariantFilterConfig();
+		var conjunction = new Conjunction();
+		conjunction.restrictions = [];
 
-        var locationConjunction = new Conjunction();
-        locationConjunction.restrictions = [];
+		var locationConjunction = new Conjunction();
+		locationConjunction.restrictions = [];
 
-        var locationFilterContainer = this.getComponent('locationFilterContainer');
-        conjunction.restrictions.push( locationFilterContainer.getRestrictionExpression() );
+		var locationFilterContainer = this.getComponent('locationFilterContainer');
+		conjunction.restrictions.push(locationFilterContainer.getRestrictionExpression());
 
-        var disjunction = new Disjunction();
-        disjunction.restrictions = [];
-        if (!cnvFilterPanel.getCollapsed()) {
-            disjunction.restrictions.push(cnvFilterPanel.getRestrictionExpression());
-        }
-        if (!indelFilterPanel.getCollapsed()) {
-            disjunction.restrictions.push(indelFilterPanel.getRestrictionExpression());
-        }
+		var disjunction = new Disjunction();
+		disjunction.restrictions = [];
 
-        if (disjunction.restrictions.length > 0) {
-            conjunction.restrictions.push(disjunction);
-        }
+		disjunction.restrictions.push(cnvFilterPanel.getRestrictionExpression());
 
-        config.restriction = conjunction;
-        return config;
-    },
+		disjunction.restrictions.push(indelFilterPanel.getRestrictionExpression());
+		
+		disjunction.restrictions.push(snvFilterPanel.getRestrictionExpression());
 
-    initComponent: function() {
-        this.callParent();
-    }
+		conjunction.restrictions.push(disjunction);
+
+		config.restriction = conjunction;
+		return config;
+	},
+	
+	
+
+	setFilterConfig : function(config) {
+
+		var cnvFilterPanel = this.getComponent('cnvFilterPanel');
+		var indelFilterPanel = this.getComponent('indelFilterPanel');
+		var snvFilterPanel = this.getComponent('snvFilterPanel');
+		var locationFilterContainer = this.getComponent('locationFilterContainer');
+		
+		
+		var locationRestrictions = new Conjunction();
+		var conjunctions = [];
+		
+		var cnvRestrictions = new Conjunction();
+		var indelRestrictions = new Conjunction();
+		var snvRestrictions = new Conjunction();
+		var variantTypeDisjunctions = [];
+		
+		if (config.restriction.restrictions){
+			
+			restrictions = config.restriction.restrictions;
+			
+			for (var i = 0 ; i<restrictions.length ; i++){
+				
+				if (restrictions[i] instanceof Conjunction){
+					conjunctions.push(restrictions[i]);
+				}else if (restrictions[i] instanceof Disjunction){
+					variantTypeDisjunctions.push(restrictions[i]);
+				}
+				
+			}			
+			
+		}
+		
+		locationRestrictions.restrictions = conjunctions;
+
+		locationFilterContainer.setRestrictionExpression(locationRestrictions);
+				
+		cnvRestrictions.restrictions = this.separateVariantDisjunctions(variantTypeDisjunctions, "CNV");
+		
+		if(this.shouldExpandVariantTypeBox(cnvRestrictions)){
+			cnvFilterPanel.setRestrictionExpression(cnvRestrictions);
+			cnvFilterPanel.expand();
+		}
+		
+		indelRestrictions.restrictions = this.separateVariantDisjunctions(variantTypeDisjunctions, "INDEL");
+		
+		if(this.shouldExpandVariantTypeBox(indelRestrictions)){
+			indelFilterPanel.setRestrictionExpression(indelRestrictions);
+			indelFilterPanel.expand();
+		}
+		
+		snvRestrictions.restrictions = this.separateVariantDisjunctions(variantTypeDisjunctions, "SNV");
+		
+		if(this.shouldExpandVariantTypeBox(snvRestrictions)){
+			snvFilterPanel.setRestrictionExpression(snvRestrictions);
+			snvFilterPanel.expand();
+		}
+
+	},
+	
+	separateVariantDisjunctions : function(disjunctions, variantType){		
+				
+		var separatedDisjunctions = [];
+		
+		var addVariantRestrictionToDisjunctions = function(innerRestriction, outerRestriction, somethingElseToDo){
+			
+			if (innerRestriction.type  && innerRestriction.type == variantType){
+				
+				separatedDisjunctions.push(outerRestriction);
+				
+			}
+			
+		};
+		
+		var somethingElseToDoFunction = function(){
+			//Questioner: There's nothing else to do?!?!? Are you sure????  Answer: Yes, I am sure.  Questioner: Do the dishes.
+		};
+		
+		FilterUtil.traverseRidiculousObjectQueryGraphAndDoSomething(disjunctions, null, addVariantRestrictionToDisjunctions, somethingElseToDoFunction);
+		
+		return separatedDisjunctions;
+		
+	},
+	
+	shouldExpandVariantTypeBox : function(restrictions){
+		if (restrictions.restrictions.length> 0 && restrictions.restrictions[0].restrictions.length > 1){
+			return true;
+		}
+		
+		return false;
+	},
+
+	initComponent : function() {
+		this.callParent();
+	}
 
 });

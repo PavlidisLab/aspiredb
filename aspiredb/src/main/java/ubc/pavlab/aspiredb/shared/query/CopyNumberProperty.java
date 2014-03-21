@@ -26,6 +26,8 @@ import org.directwebremoting.annotations.DataTransferObject;
  */
 @DataTransferObject(javascript = "CopyNumberProperty")
 public class CopyNumberProperty extends NumericProperty {
+    private static final long serialVersionUID = 1L;
+
     public CopyNumberProperty() {
         super("Copy Number", "copyNumber");
     }

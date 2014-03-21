@@ -16,6 +16,7 @@ package ubc.pavlab.aspiredb.server.service;
 
 import com.sencha.gxt.data.shared.SortInfo;
 import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
+
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
 import ubc.pavlab.aspiredb.server.dao.CharacteristicDao;
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
@@ -50,7 +52,7 @@ import java.util.Map;
  */
 @RemoteProxy(name = "VariantService")
 @Service("variantService")
-public class VariantServiceImpl extends GwtService implements VariantService {
+public class VariantServiceImpl implements VariantService {
 
     private static Logger log = LoggerFactory.getLogger(VariantServiceImpl.class);
 
@@ -66,6 +68,8 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     private NeurocartaQueryService neurocartaQueryService;
     @Autowired
     private ChromosomeService chromosomeService;
+    
+    private String patientId;
 
     private String getSortColumn(PagingLoadConfig config) {
         // default value
@@ -107,6 +111,63 @@ public class VariantServiceImpl extends GwtService implements VariantService {
         }
         return properties;
     }
+    
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<Property> suggestPropertiesForProjectOverlap(){
+        Collection<Property> properties = new ArrayList<Property>();
+        properties.add(new OverlapBasesProperty());        
+        properties.add( new MutualOverlapPercentageProperty() );
+        properties.add( new OverlapPercentageMyVariantProperty() );
+        properties.add( new OverlapPercentageOtherVariantProperty() );
+        return properties;
+        
+    }
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<Property> suggestPropertiesForNumberOfVariantsInProjectOverlap(){
+        Collection<Property> properties = new ArrayList<Property>();
+        properties.add(new DoesOverlapWithXProperty());
+        return properties;
+        
+    }
+    
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<Property> suggestPropertiesForSupportOfVariantsInProjectOverlap(){
+        Collection<Property> properties = new ArrayList<Property>();
+        properties.add(new SupportValueProperty());
+        return properties;
+        
+    }
+    
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<Property> suggestEntityPropertiesByStringName(String variantType){
+        
+        variantType = variantType.toUpperCase();
+        
+        VariantType type = VariantType.CNV;
+        
+        if (variantType.equals( "CNV" )){
+            type = VariantType.CNV;            
+        } else if (variantType.equals( "INDEL" )){
+            type = VariantType.INDEL;
+        } else if (variantType.equals( "SNV" )){
+            type = VariantType.SNV;
+        } else if (variantType.equals( "INVERSION" )){
+            type = VariantType.INVERSION;
+        } else if (variantType.equals( "TRANSLOCATION" )){
+            type = VariantType.TRANSLOCATION;
+        }
+        
+        return suggestEntityProperties(type);       
+        
+    }
 
     private Collection<Property> suggestEntityProperties(VariantType variantType) {
         Collection<Property> properties = new ArrayList<Property>();
@@ -137,7 +198,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<Property> suggestProperties() throws NotLoggedInException {
+    public Collection<Property> suggestProperties() {
         Collection<Property> properties = new ArrayList<Property>();
         for (VariantType type : VariantType.values()) {
             properties.addAll(suggestEntityProperties(type));
@@ -156,7 +217,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext) throws NotLoggedInException, BioMartServiceException, NeurocartaServiceException {
+    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext) throws BioMartServiceException, NeurocartaServiceException {
         List<PropertyValue> values = new ArrayList<PropertyValue>();
         if (property instanceof CharacteristicProperty) {
             Collection<String> stringValues = characteristicDao.getValuesForKey(property.getName());
@@ -205,19 +266,61 @@ public class VariantServiceImpl extends GwtService implements VariantService {
         return characteristicDao.getValuesForKey(property.getName());
     }
 
+    
+
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public VariantValueObject getVariant(Long id) throws NotLoggedInException {
-        throwGwtExceptionIfNotLoggedIn();
-
+    public VariantValueObject getVariant(Long id) {
+       
         Variant variant = variantDao.load(id);
         return variant.toValueObject();
     }
+    
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public List<VariantValueObject> getSubjectVariants(String patientId) {
+        List<VariantValueObject> vvo = new ArrayList<VariantValueObject>();
+        
+            Collection<Variant> variantCollection =variantDao.findBySubjectPatientId(patientId);
+            for (Variant variant :variantCollection){
+                vvo.add( variant.toValueObject() );
+            }     
+       
+        return vvo;
+    }
+    
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public List<VariantValueObject> getSubjectsVariants(List<String> patientIds){
+    	List<VariantValueObject> vvo = new ArrayList<VariantValueObject>();
+    	
+    		for (String patientId : patientIds){
+    			Collection<Variant> variantCollection =variantDao.findBySubjectPatientId(patientId);
+        		for (Variant variant :variantCollection){
+        			vvo.add( variant.toValueObject() );
+        		}  
+    		}
+    		
+    	
+    	return vvo;
+    }
+    
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Integer getTotalNoOfVariantsBySubjectId (String patientId) {
+        Collection<Variant> variantCollection = variantDao.findBySubjectPatientId(patientId );
+        
+        return variantCollection.size();
+    }
+    
 
     @Override
     @RemoteMethod
-    public Collection<Property> suggestVariantLocationProperties() throws NotLoggedInException {
+    public Collection<Property> suggestVariantLocationProperties() {
         Collection<Property> properties = new ArrayList<Property>();
 
         properties.add(new GenomicLocationProperty());
@@ -230,7 +333,7 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     @Override
     @RemoteMethod
     public Collection<PropertyValue> suggestVariantLocationValues(Property property, SuggestionContext suggestionContext)
-            throws NotLoggedInException, BioMartServiceException, NeurocartaServiceException {
+            throws BioMartServiceException, NeurocartaServiceException {
         Collection<PropertyValue> values = new ArrayList<PropertyValue>();
 
         if (property instanceof GeneProperty) {
@@ -306,9 +409,10 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     }
 
     @Override
+    @RemoteMethod
     @Transactional
-    public LabelValueObject addLabel(Long id, LabelValueObject label) throws NotLoggedInException {
-        throwGwtExceptionIfNotLoggedIn();
+    public LabelValueObject addLabel(Long id, LabelValueObject label) {
+        
         Variant variant = variantDao.load(id);
         Label labelEntity = labelDao.findOrCreate(label);
         variant.addLabel(labelEntity);
@@ -316,9 +420,10 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     }
 
     @Override
+    @RemoteMethod
     @Transactional
-    public LabelValueObject addLabel(Collection<Long> ids, LabelValueObject label) throws NotLoggedInException {
-        throwGwtExceptionIfNotLoggedIn();
+    public LabelValueObject addLabel(Collection<Long> ids, LabelValueObject label) {
+        
         Collection<Variant> variants = variantDao.load(ids);
         Label labelEntity = labelDao.findOrCreate(label);
         for (Variant variant : variants) {
@@ -329,8 +434,9 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     }
 
     @Override
+    @RemoteMethod
     @Transactional
-    public void removeLabel(Long id, LabelValueObject label) throws NotLoggedInException {
+    public void removeLabel(Long id, LabelValueObject label) {
         Variant variant = variantDao.load(id);
         Label labelEntity = labelDao.load(label.getId());
         variant.removeLabel(labelEntity);
@@ -338,14 +444,16 @@ public class VariantServiceImpl extends GwtService implements VariantService {
     }
 
     @Override
+    @RemoteMethod
     @Transactional
-    public void removeLabel(Collection<Long> variantIds, LabelValueObject label) throws NotLoggedInException {
+    public void removeLabel(Collection<Long> variantIds, LabelValueObject label) {
         for (Long variantId : variantIds) {
             removeLabel(variantId, label);
         }
     }
 
     @Override
+    @RemoteMethod
     @Transactional(readOnly = true)
     public List<LabelValueObject> suggestLabels(SuggestionContext suggestionContext) {
         // TODO: filter out labels non-applicable to variants

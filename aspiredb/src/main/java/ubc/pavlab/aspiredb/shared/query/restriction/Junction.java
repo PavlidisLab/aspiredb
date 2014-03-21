@@ -29,6 +29,8 @@ import java.util.List;
  */
 @DataTransferObject
 public abstract class Junction implements RestrictionExpression {
+    private static final long serialVersionUID = 1L;
+    
     protected List<RestrictionExpression> restrictions = new ArrayList<RestrictionExpression>();
 
     public void setRestrictions(List<RestrictionExpression> restrictions) {

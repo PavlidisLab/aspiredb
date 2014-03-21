@@ -29,7 +29,7 @@ import java.util.List;
  */
 @DataTransferObject
 public class BoundedList<T> {
-    private static int MAX_SIZE = 1000;
+    private static int MAX_SIZE = 50000;
     private List<T> items = new ArrayList<T>();
     private boolean moreResultsAvailable = false;
     private int totalSize;

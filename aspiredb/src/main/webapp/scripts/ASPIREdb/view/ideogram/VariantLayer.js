@@ -49,11 +49,11 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
     statics: {
         colors: [
             "rgb(255,0,0)",
-            "rgb(0,125,0)",
             "rgb(0,0,255)",
             "rgb(0.255,255)",
             "rgb(255,0,255)",
-            "rgb(125,125,0)"
+            "rgb(125,125,0)",
+            "rgb(0,125,0)",
         ],
         defaultColour: "rgba(0,0,0,0.5)",
         nextColourIndex: 0,
@@ -116,7 +116,7 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
         var segment = {
             start: variant.genomicRange.baseStart,
             end: variant.genomicRange.baseEnd,
-            color: "rgba(0,0,0, 0.4)",
+            color: "rgb(128,128,128)",//"rgba(0,0,0, 0.4)",//grey
             emphasize: false
         };
 
@@ -141,8 +141,8 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
         var segment = {
             start: variant.genomicRange.baseStart,
             end: variant.genomicRange.baseEnd,
-            color: this.pickColor(variant, property),
-            emphasize: true
+            color: "rgb(255,0,0)",//this.pickColor(variant, property),//red
+            emphasize: false
         };
         // pick track layer
         for (var trackIndex = 0; trackIndex < this.trackLayers.length; trackIndex++) {
@@ -160,12 +160,12 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
      * @param {VariantValueObject} variant
      * @param {PropertyValueObject} property
      */
-    drawVariant: function (variant, property) {
+    drawVariant: function (variant, property,color) {
         /*VariantSegment*/
         var segment = {
             start: variant.genomicRange.baseStart,
             end: variant.genomicRange.baseEnd,
-            color: this.pickColor(variant, property),
+            color: color, //this.pickColor(variant, property),
             emphasize: false
         };
         // pick track layer

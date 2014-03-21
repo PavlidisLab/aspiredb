@@ -19,29 +19,39 @@
 package ubc.pavlab.aspiredb.server.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.dao.CNVDao;
 import ubc.pavlab.aspiredb.server.dao.IndelDao;
 import ubc.pavlab.aspiredb.server.dao.InversionDao;
+import ubc.pavlab.aspiredb.server.dao.LabelDao;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SNVDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.TranslocationDao;
+import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantOverlapDao;
+import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Characteristic;
 import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.server.model.GenomicLocation;
 import ubc.pavlab.aspiredb.server.model.Indel;
+import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.model.Variant;
+import ubc.pavlab.aspiredb.server.project.ProjectManager;
+import ubc.pavlab.aspiredb.server.service.LabelService;
+import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 /**
  * Class for tests to use to create and remove persistent objects This class will become unnecessary one we have
@@ -55,6 +65,9 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     @Autowired
     IndelDao indelDao;
+    
+    @Autowired
+    LabelDao labelDao;
 
     @Autowired
     TranslocationDao translocationDao;
@@ -69,17 +82,24 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     InversionDao inversionDao;
 
     @Autowired
-    SubjectDao individualDao;
+    SubjectDao subjectDao;
 
     @Autowired
     ProjectDao projectDao;
+    
+    @Autowired
+    Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
 
     @Autowired
     PhenotypeDao phenotypeDao;
 
     @Autowired
     PhenotypeUtil phenotypeUtil;
-
+    
+    @Autowired
+    VariantDao variantDao;
+    
+   
     public PersistentTestObjectHelperImpl() {
     }
 
@@ -237,7 +257,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
         Subject individual = createDetachedIndividualObject( patientId );
 
-        return individualDao.create( individual );
+        return subjectDao.create( individual );
     }
     
     @Transactional
@@ -274,6 +294,18 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     }
     
     @Transactional
+    public Subject addSubjectToProject(Subject s, Project p){        
+               
+        s.getProjects().add( p );
+        
+        subjectDao.update( s );
+        
+        
+        return s;
+        
+    }
+    
+    @Transactional
     public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypesForEnrichmentTest( String patientId, String phenName, String phenUri, String phenValue ){
         
         Subject subject = createPersistentTestIndividualObject( patientId );
@@ -288,4 +320,47 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     public Project createPersistentProject( Project p ) {
         return projectDao.create( p );
     }
+    @Transactional
+    public List<Subject> getSubjectsForProject(Project p){
+        return p.getSubjects();
+    }
+    @Transactional
+    public Collection<LabelValueObject> getLabelsForSubject(Long subjectId){
+               
+        return Label.toValueObjects( labelDao.getSubjectLabelsBySubjectId(subjectId) );
+    }
+    
+    @Transactional
+    public void deleteProject(String projectName){
+       
+        
+        Project project = projectDao.findByProjectName( projectName );
+        
+        if (project == null){
+            
+            return;
+            
+        }
+        
+        variant2SpecialVariantOverlapDao.deleteByOverlapProjectId( project.getId() );
+        for ( Subject s : project.getSubjects() ) {
+            try {
+                
+                for (Phenotype p : s.getPhenotypes() ) {
+                    phenotypeDao.remove( p );
+                }
+                
+                for (Variant v: s.getVariants()){
+                    variantDao.remove( v );
+                }
+                subjectDao.remove( s );
+                
+            } catch ( Exception e ) {
+                e.printStackTrace();
+            }
+        }
+        projectDao.remove( project );
+    }
+    
+    
 }

@@ -23,13 +23,21 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
+import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Repository("projectDao")
 public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements ProjectDao{
-    
+       
     protected static Log log = LogFactory.getLog( ProjectDaoImpl.class );
+    
+    @Autowired
+    Variant2SpecialVariantOverlapDao v2vOverlapDao;
+    
     
     @Autowired
     public ProjectDaoImpl( SessionFactory sessionFactory ) {
@@ -81,22 +89,59 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
     }
     
     @Override
-    @Transactional
-    public void addSubjectToProject(Project project, Subject subject){
+    @Transactional(readOnly=true)
+    public Collection<Project> getOverlapProjects(Collection<Long> ids){
         
-        Collection<Subject> currentSubjects = project.getSubjects();
+        //Currently Only supports 1 project
         
-        for (Subject s: currentSubjects){
-            if (s.getPatientId().equals( subject.getPatientId() )){                
-                log.error( "Subject names need to be unique in projects. Subject not added" );
-                return;
-            }
+        if (ids == null || ids.isEmpty()){
+            return new ArrayList<Project>();
         }
         
-        currentSubjects.add( subject);
+        Long activeProjectId = ids.iterator().next();
+        
+        
+        Collection<Project> projects = this.loadAll();
+        Collection<Project> overlapProjects = new ArrayList<Project>();
+
+        for ( Project p : projects ) {
+            
+            if (p.getSpecialData()==null || !p.getSpecialData()){            
+                
+                Collection<Variant2SpecialVariantOverlap> overlaps = v2vOverlapDao.loadByProjectIdAndOverlapProjectId( activeProjectId, p.getId() );
+                
+                if (overlaps.size()>0){
+                    overlapProjects.add( p );                    
+                }
+            }
+        }
+
+        return overlapProjects;
         
     }
     
+    @Override
+    @Transactional(readOnly=true)
+    public Collection<Project> getSpecialOverlapProjects(){
         
+        
+        Collection<Project> projects = this.loadAll();
+        Collection<Project> overlapProjects = new ArrayList<Project>();
+
+        for ( Project p : projects ) {
+            
+            if (p.getSpecialData()!=null && p.getSpecialData()){            
+                overlapProjects.add( p );
+            }
+        }
+
+        return overlapProjects;
+        
+    }
     
+    @Override
+    @Transactional(readOnly=true)
+    public String getOverlapProjectVariantSupportCharacteristicKey(Long projectId){
+        return this.load( projectId ).getVariantSupportCharacteristicKey();
+    }
 }

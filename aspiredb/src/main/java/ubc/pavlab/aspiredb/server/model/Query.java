@@ -18,13 +18,15 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
-import ubc.pavlab.aspiredb.shared.query.QueryValueObject;
-import ubc.pavlab.aspiredb.shared.query.RestrictionFilterConfig;
-
-import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 
 /**
  * author: anton date: 14/04/13
@@ -77,11 +79,5 @@ public class Query implements Securable {
         this.object = object;
     }
 
-    public QueryValueObject toValueObject() {
-        QueryValueObject vo = new QueryValueObject();
-        vo.setId( this.getId() );
-        vo.setName( this.getName() );
-        vo.setQuery( ( Set<RestrictionFilterConfig> ) this.getObject() );
-        return vo;
-    }
+    
 }

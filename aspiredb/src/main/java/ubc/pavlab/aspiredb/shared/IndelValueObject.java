@@ -23,7 +23,7 @@ import ubc.pavlab.aspiredb.shared.query.Property;
  * 
  * @version $Id: IndelValueObject.java,v 1.2 2013/07/04 17:26:00 anton Exp $
  */
-@DataTransferObject
+@DataTransferObject(javascript = "IndelValueObject")
 public class IndelValueObject extends VariantValueObject {
 
 	/**

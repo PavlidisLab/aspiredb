@@ -15,10 +15,11 @@
 
 package ubc.pavlab.aspiredb.server.project;
 
-
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.logging.Log;
@@ -35,7 +36,10 @@ import ubc.pavlab.aspiredb.cli.InvalidDataException;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
+import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantOverlapDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
+import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
+import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Characteristic;
 import ubc.pavlab.aspiredb.server.model.CnvType;
@@ -47,17 +51,30 @@ import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
+import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
 import ubc.pavlab.aspiredb.server.security.SecurityService;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
+import ubc.pavlab.aspiredb.server.service.QueryService;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
+import ubc.pavlab.aspiredb.shared.BoundedList;
 import ubc.pavlab.aspiredb.shared.CNVValueObject;
 import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
+import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.IndelValueObject;
 import ubc.pavlab.aspiredb.shared.InversionValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.SNVValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
+import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
+import ubc.pavlab.aspiredb.shared.query.GenomicRangeDataType;
+import ubc.pavlab.aspiredb.shared.query.Operator;
+import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.restriction.Conjunction;
+import ubc.pavlab.aspiredb.shared.query.restriction.Disjunction;
+import ubc.pavlab.aspiredb.shared.query.restriction.SetRestriction;
 
 /**
  * TODO Document Me
@@ -80,6 +97,9 @@ public class ProjectManagerImpl implements ProjectManager {
     VariantDao variantDao;
 
     @Autowired
+    Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
+
+    @Autowired
     PhenotypeDao phenotypeDao;
 
     @Autowired
@@ -87,10 +107,13 @@ public class ProjectManagerImpl implements ProjectManager {
 
     @Autowired
     SecurityService securityService;
-    
+
     @Autowired
     UserManager userManager;
-    
+
+    @Autowired
+    QueryService queryService;
+
     ShaPasswordEncoder passwordEncoder = new ShaPasswordEncoder();
 
     @Transactional
@@ -106,10 +129,39 @@ public class ProjectManagerImpl implements ProjectManager {
         return projectDao.create( p );
     }
 
-    
-    /* (non-Javadoc)
-     * @see ubc.pavlab.aspiredb.server.project.ProjectManager#addSubjectVariantsToProject(java.lang.String, boolean, java.util.List)
-     * createProject parameter is included to make accidental overwriting via cli's more difficult
+    @Transactional
+    public Project createSpecialProject( String name, boolean deleteProject ) throws Exception {
+
+        name = name.toUpperCase();
+
+        if ( !name.equals( "DECIPHER" ) && !name.equals( "DGV" ) ) {
+            throw new Exception( "Special project names limited to 'DECIPHER' or 'DGV'" );
+        }
+
+        if ( projectDao.findByProjectName( name ) != null ) {
+
+            if ( deleteProject ) {
+
+                deleteProject( name );
+
+            } else {
+                return projectDao.findByProjectName( name );
+            }
+
+        }
+
+        Project p = new Project();
+        p.setName( name );
+        p.setSpecialData( true );
+
+        return projectDao.create( p );
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ubc.pavlab.aspiredb.server.project.ProjectManager#addSubjectVariantsToProject(java.lang.String, boolean,
+     * java.util.List) createProject parameter is included to make accidental overwriting via cli's more difficult
      */
     @Transactional
     public void addSubjectVariantsToProject( String projectName, boolean createProject, List<VariantValueObject> voList )
@@ -126,7 +178,24 @@ public class ProjectManagerImpl implements ProjectManager {
         createSubjectVariantsFromVariantValueObjects( proj, voList );
 
     }
-    
+
+    @Transactional
+    public void addSubjectVariantsToSpecialProject( String projectName, boolean deleteProject,
+            List<VariantValueObject> voList, boolean existingProject ) throws Exception {
+
+        Project proj= null;
+        
+        if (!existingProject){        
+            proj = createSpecialProject( projectName, deleteProject );        
+        }        
+        else{
+            proj = projectDao.findByProjectName( projectName );
+        }
+
+        createSubjectVariantsFromVariantValueObjects( proj, voList, true );
+
+    }
+
     /**
      * @param projectName
      * @param voList
@@ -137,114 +206,167 @@ public class ProjectManagerImpl implements ProjectManager {
             throws Exception {
 
         Project proj;
-        
+
         proj = projectDao.findByProjectName( projectName );
         if ( proj == null ) {
             proj = createProject( projectName );
-        } 
+        }
 
         createSubjectVariantsFromVariantValueObjects( proj, voList );
 
     }
 
-    @Transactional
     private void createSubjectVariantsFromVariantValueObjects( Project project, List<VariantValueObject> voList ) {
+        createSubjectVariantsFromVariantValueObjects( project, voList, false );
+    }
 
+    @Transactional
+    private void createSubjectVariantsFromVariantValueObjects( Project project, List<VariantValueObject> voList,
+            Boolean specialProject ) {
+        log.info( "Adding " + voList.size() + " value objects" );
+        int counter = 0;
         for ( VariantValueObject vo : voList ) {
+
             if ( vo instanceof CNVValueObject ) {
-                createSubjectVariantFromCNVValueObject( project, ( CNVValueObject ) vo );
+                createSubjectVariantFromCNVValueObject( project, ( CNVValueObject ) vo, specialProject );
             } else if ( vo instanceof SNVValueObject ) {
-                createSubjectVariantFromSNVValueObject( project, ( SNVValueObject ) vo );
+                createSubjectVariantFromSNVValueObject( project, ( SNVValueObject ) vo, specialProject );
             } else if ( vo instanceof IndelValueObject ) {
-                createSubjectVariantFromIndelValueObject( project, ( IndelValueObject ) vo );
+                createSubjectVariantFromIndelValueObject( project, ( IndelValueObject ) vo, specialProject );
             } else if ( vo instanceof InversionValueObject ) {
-                createSubjectVariantFromInversionValueObject( project, ( InversionValueObject ) vo );
+                createSubjectVariantFromInversionValueObject( project, ( InversionValueObject ) vo, specialProject );
             } else {
                 log.error( "unsupported VariantValueObject" );
             }
+
+            counter++;
+            
+            if (counter%500==0){
+                log.info( "Added " + counter + " variant" );
+            }
         }
 
     }
 
     @Transactional
-    private void createSubjectVariantFromCNVValueObject( Project project, CNVValueObject cnv ) {
+    private void createSubjectVariantFromCNVValueObject( Project project, CNVValueObject cnv, Boolean specialProject ) {
 
-        CNV cnvEntity = ( CNV ) getVariant(cnv);
-        
+        CNV cnvEntity;
+
+        if ( specialProject ) {
+            cnvEntity = ( CNV ) getSpecialProjectVariant( cnv );
+        } else {
+            cnvEntity = ( CNV ) getVariant( cnv );
+        }
         cnvEntity.setType( CnvType.valueOf( cnv.getType().toUpperCase() ) );
         cnvEntity.setCopyNumber( cnv.getCopyNumber() );
         cnvEntity.setCnvLength( cnv.getCnvLength() );
-        
-        
-        if ( cnvEntity.getId()==null ) {
-            addSubjectVariantToProject( project, cnv.getPatientId(), cnvEntity );
+
+        if ( cnvEntity.getId() == null ) {
+            addSubjectVariantToProject( project, cnv.getPatientId(), cnvEntity, specialProject );
         }
     }
 
     @Transactional
-    private void createSubjectVariantFromSNVValueObject( Project project, SNVValueObject snv ) {
-        SNV snvEntity = ( SNV ) getVariant(snv);
-        
+    private void createSubjectVariantFromSNVValueObject( Project project, SNVValueObject snv, Boolean specialProject ) {
+        SNV snvEntity;
+
+        if ( specialProject ) {
+            snvEntity = ( SNV ) getSpecialProjectVariant( snv );
+        } else {
+            snvEntity = ( SNV ) getVariant( snv );
+        }
+
         snvEntity.setReferenceBase( snv.getReferenceBase() );
         snvEntity.setObservedBase( snv.getObservedBase() );
-        
-        snvEntity.setDbSNPID( snv.getDbSNPID() );        
-        
-        if ( snvEntity.getId()==null ) {
-            addSubjectVariantToProject( project, snv.getPatientId(), snvEntity );
+
+        snvEntity.setDbSNPID( snv.getDbSNPID() );
+
+        if ( snvEntity.getId() == null ) {
+            addSubjectVariantToProject( project, snv.getPatientId(), snvEntity, specialProject );
         }
     }
 
     @Transactional
-    private void createSubjectVariantFromIndelValueObject( Project project, IndelValueObject indel ) {
-        
-        Indel indelEntity = ( Indel ) getVariant(indel);
-        
+    private void createSubjectVariantFromIndelValueObject( Project project, IndelValueObject indel,
+            Boolean specialProject ) {
+
+        Indel indelEntity = ( Indel ) getVariant( indel );
+
+        if ( specialProject ) {
+            indelEntity = ( Indel ) getSpecialProjectVariant( indel );
+        } else {
+            indelEntity = ( Indel ) getVariant( indel );
+        }
+
         indelEntity.setIndelLength( indel.getLength() );
 
-        if (indelEntity.getId()==null){
-            addSubjectVariantToProject( project, indel.getPatientId(), indelEntity );
+        if ( indelEntity.getId() == null ) {
+            addSubjectVariantToProject( project, indel.getPatientId(), indelEntity, specialProject );
         }
     }
 
     @Transactional
-    private void createSubjectVariantFromInversionValueObject( Project project, InversionValueObject inversion ) {
+    private void createSubjectVariantFromInversionValueObject( Project project, InversionValueObject inversion,
+            Boolean specialProject ) {
 
-        Inversion inversionEntity = (Inversion) getVariant(inversion);
-        
-        if (inversionEntity.getId()==null){
-            addSubjectVariantToProject( project, inversion.getPatientId(), inversionEntity );
+        Inversion inversionEntity = ( Inversion ) getVariant( inversion );
+
+        if ( specialProject ) {
+            inversionEntity = ( Inversion ) getSpecialProjectVariant( inversion );
+        } else {
+            inversionEntity = ( Inversion ) getVariant( inversion );
+        }
+
+        if ( inversionEntity.getId() == null ) {
+            addSubjectVariantToProject( project, inversion.getPatientId(), inversionEntity, specialProject );
         }
 
     }
-    
-    private Variant getVariant(VariantValueObject vvo){
-        
+
+    private Variant getVariant( VariantValueObject vvo ) {
+
         Variant entity = variantDao.findByUserVariantId( vvo.getUserVariantId(), vvo.getPatientId() );
-        if ( entity == null ) {            
-            if (vvo instanceof CNVValueObject){
-                entity = new CNV();
-                entity.setUserVariantId( vvo.getUserVariantId() );
-            }else if (vvo instanceof SNVValueObject){
-                entity = new SNV();
-                entity.setUserVariantId( vvo.getUserVariantId() );
-            }else if (vvo instanceof IndelValueObject){
-                entity = new Indel();
-                entity.setUserVariantId( vvo.getUserVariantId() );
-            }else if (vvo instanceof InversionValueObject){
-                entity = new Inversion();
-                entity.setUserVariantId( vvo.getUserVariantId() );
-            }else{
-                throw new RuntimeException();
-            }
-            
+        if ( entity == null ) {
+            entity = getVariantEntity( vvo );
         }
-        
-                
+
         addCommonVariantData( entity, vvo );
-        
+
         return entity;
-        
+
+    }
+
+    private Variant getSpecialProjectVariant( VariantValueObject vvo ) {
+
+        Variant entity = getVariantEntity( vvo );
+
+        addCommonVariantData( entity, vvo );
+
+        return entity;
+
+    }
+
+    private Variant getVariantEntity( VariantValueObject vvo ) {
+        Variant entity;
+        if ( vvo instanceof CNVValueObject ) {
+            entity = new CNV();
+            entity.setUserVariantId( vvo.getUserVariantId() );
+        } else if ( vvo instanceof SNVValueObject ) {
+            entity = new SNV();
+            entity.setUserVariantId( vvo.getUserVariantId() );
+        } else if ( vvo instanceof IndelValueObject ) {
+            entity = new Indel();
+            entity.setUserVariantId( vvo.getUserVariantId() );
+        } else if ( vvo instanceof InversionValueObject ) {
+            entity = new Inversion();
+            entity.setUserVariantId( vvo.getUserVariantId() );
+        } else {
+            throw new RuntimeException();
+        }
+
+        return entity;
+
     }
 
     @Transactional
@@ -267,13 +389,24 @@ public class ProjectManagerImpl implements ProjectManager {
 
     }
 
-    // The PhenotypeValueObject class doesn't really fit well with this, using it anyway    
-    private void createSubjectPhenotypesFromPhenotypeValueObjects( Project project, List<PhenotypeValueObject> voList ) throws InvalidDataException {
+    @Transactional
+    public void addSubjectPhenotypesToSpecialProject( String projectName, boolean deleteProject,
+            List<PhenotypeValueObject> voList ) throws Exception {
 
+        Project proj = createSpecialProject( projectName, deleteProject );
+
+        createSubjectPhenotypesFromPhenotypeValueObjects( proj, voList );
+
+    }
+
+    // The PhenotypeValueObject class doesn't really fit well with this, using it anyway
+    private void createSubjectPhenotypesFromPhenotypeValueObjects( Project project, List<PhenotypeValueObject> voList )
+            throws InvalidDataException {
+        log.info( "Adding " + voList.size() + " valueobjects" );
         for ( PhenotypeValueObject vo : voList ) {
 
             Phenotype p = new Phenotype();
-            
+
             p.setName( vo.getName() );
             p.setValue( vo.getDbValue() );
             p.setValueType( vo.getValueType() );
@@ -284,12 +417,15 @@ public class ProjectManagerImpl implements ProjectManager {
             Subject subject = subjectDao.findByPatientId( project, vo.getExternalSubjectId() );
 
             if ( subject == null ) {
+                log.info( "Adding new Subject and phenotype" );
                 subject = new Subject();
                 subject.setPatientId( vo.getExternalSubjectId() );
                 subject = subjectDao.create( subject );
                 subject.addPhenotype( p );
-                projectDao.addSubjectToProject( project, subject );
+                subject.getProjects().add( project );
+
             } else {
+                log.info( "Adding phenotype to existing subject " + p.getUri() );
                 subject.addPhenotype( p );
             }
         }
@@ -318,24 +454,24 @@ public class ProjectManagerImpl implements ProjectManager {
     }
 
     private String getNewVariantId( String patientId ) {
-        
+
         String userVariantId;
-        int ridiculousnessCount=0;
-        do{           
-           userVariantId = RandomStringUtils.randomAlphanumeric( 6 );
-           
-           ridiculousnessCount++;           
-           if (ridiculousnessCount>1000){
-               log.error( "This is ridiculous" );
-               break;
-           }
-        } while (variantDao.findByUserVariantId( userVariantId, patientId )!=null);
-        
-        return userVariantId;        
+        int ridiculousnessCount = 0;
+        do {
+            userVariantId = RandomStringUtils.randomAlphanumeric( 6 );
+
+            ridiculousnessCount++;
+            if ( ridiculousnessCount > 1000 ) {
+                log.error( "This is ridiculous" );
+                break;
+            }
+        } while ( variantDao.findByUserVariantId( userVariantId, patientId ) != null );
+
+        return userVariantId;
 
     }
 
-    private void addSubjectVariantToProject( Project project, String patientId, Variant v ) {
+    private void addSubjectVariantToProject( Project project, String patientId, Variant v, Boolean specialProject ) {
 
         Subject subject = subjectDao.findByPatientId( project, patientId );
 
@@ -343,19 +479,19 @@ public class ProjectManagerImpl implements ProjectManager {
         if ( subject == null ) {
             newSubject = true;
             subject = new Subject();
-            subject.setPatientId ( patientId );
+            subject.setPatientId( patientId );
             subject = subjectDao.create( subject );
         }
 
-        if ( v.getUserVariantId() == null || v.getUserVariantId().trim().isEmpty() ) {
-            v.setUserVariantId( getNewVariantId(patientId) );
+        if ( !specialProject && ( v.getUserVariantId() == null || v.getUserVariantId().trim().isEmpty() ) ) {
+            v.setUserVariantId( getNewVariantId( patientId ) );
         }
-        
+
         v = variantDao.create( v );
         subject.addVariant( v );
 
         if ( newSubject ) {
-            projectDao.addSubjectToProject( project, subject );
+            subject.getProjects().add( project );
         }
     }
 
@@ -365,109 +501,110 @@ public class ProjectManagerImpl implements ProjectManager {
         v.setDescription( vvo.getDescription() );
         v.setExternalId( vvo.getExternalId() );
     }
-    
+
     @Transactional
     public void alterGroupWritePermissions( String projectName, String groupName, boolean grant ) {
-        log.info( (grant?"Granting":"Removing") + " write permissions for group:"+groupName+" on project:"+projectName );
-        
+        log.info( ( grant ? "Granting" : "Removing" ) + " write permissions for group:" + groupName + " on project:"
+                + projectName );
+
         Project proj = projectDao.findByProjectName( projectName );
-        
-        if (proj==null){
-            log.error( "This project doesn't exist");
+
+        if ( proj == null ) {
+            log.error( "This project doesn't exist" );
             return;
         }
-        
-        alterWritePermissionForGroup( proj,  groupName, grant );
-        log.info( "FINISHED "+ (grant?"Granting":"Removing") + " write permissions for group:"+groupName+" on project:"+projectName );
+
+        alterWritePermissionForGroup( proj, groupName, grant );
+        log.info( "FINISHED " + ( grant ? "Granting" : "Removing" ) + " write permissions for group:" + groupName
+                + " on project:" + projectName );
     }
-    
-    
+
     private void alterWritePermissionForGroup( Project project, String groupName, boolean grant ) {
 
         List<Subject> subjects = project.getSubjects();
-                
-        if (grant){
-            securityService.makeWriteableByGroup( project, groupName );
-        }else{
-            securityService.makeUnreadableByGroup( project, groupName );
-        }        
 
-        //TODO labels? other stuff that has been added?
+        if ( grant ) {
+            securityService.makeWriteableByGroup( project, groupName );
+        } else {
+            securityService.makeUnreadableByGroup( project, groupName );
+        }
+
+        // TODO labels? other stuff that has been added?
         for ( Subject s : subjects ) {
-               
-            if (grant){
+
+            if ( grant ) {
                 securityService.makeWriteableByGroup( s, groupName );
-            }else{
+            } else {
                 securityService.makeUnreadableByGroup( s, groupName );
             }
-           
+
             for ( Variant v : s.getVariants() ) {
-                
-                if (grant){
+
+                if ( grant ) {
                     securityService.makeWriteableByGroup( v, groupName );
-                }else{
+                } else {
                     securityService.makeUnreadableByGroup( v, groupName );
                 }
-                
-                for (Characteristic c: v.getCharacteristics()){
-                    if (grant){
+
+                for ( Characteristic c : v.getCharacteristics() ) {
+                    if ( grant ) {
                         securityService.makeWriteableByGroup( c, groupName );
-                    }else{
+                    } else {
                         securityService.makeUnreadableByGroup( c, groupName );
                     }
-                    
+
                 }
-                
+
             }
 
             for ( Phenotype phen : s.getPhenotypes() ) {
 
-                if (grant){
+                if ( grant ) {
                     securityService.makeWriteableByGroup( phen, groupName );
-                }else{
+                } else {
                     securityService.makeUnreadableByGroup( phen, groupName );
                 }
-                
+
             }
-            
-            
+
         }
     }
-    
-    
+
     @Transactional
     public void deleteProject( String name ) throws Exception {
-        
+
         Project project = projectDao.findByProjectName( name );
-        
+
         if ( project == null ) {
             log.error( "That project doesn't exist" );
         }
-        
+
         List<Subject> subjectsToRemove = new ArrayList<Subject>();
         List<Subject> subjects = project.getSubjects();
-        
-        for (Subject s: subjects){            
-            if (s.getProjects().size()>1){
-                s.getProjects().remove( project );
-            }else{
+
+        for ( Subject s : subjects ) {
+            s.getProjects().remove( project );
+            if ( s.getProjects().size() == 1 ) {
                 subjectsToRemove.add( s );
-            }            
+            } else {
+                // this is when a subject has more than one project
+            }
         }
-        
-        //might have to individually remove variants/labels/phenotypes etc. to get rid of acls
-        for (Subject s: subjectsToRemove){
+
+        // might have to individually remove variants/labels/phenotypes etc. to get rid of acls
+        for ( Subject s : subjectsToRemove ) {
+
             subjectDao.remove( s );
         }
-        
-        
+
         projectDao.remove( project );
+
     }
-    
+
     @Override
-    @Transactional    
-    public String createUserAndAssignToGroup(String userName, String password, String groupName){
-        
+    @Transactional
+    public String createUserAndAssignToGroup( String userName, String password, String groupName ) {
+
         if ( password == null || userName == null ) {
             log.error( "missing username or password options" );
             return "missing username or password options";
@@ -476,48 +613,160 @@ public class ProjectManagerImpl implements ProjectManager {
         try {
 
             userManager.loadUserByUsername( userName );
-            
+
             log.info( "User already exists" );
-            
+
         } catch ( UsernameNotFoundException e ) {
 
             String encodedPassword = passwordEncoder.encodePassword( password, userName );
-            UserDetailsImpl u = new UserDetailsImpl( encodedPassword, userName, true, null, null, null,
-                    new Date() );
+            UserDetailsImpl u = new UserDetailsImpl( encodedPassword, userName, true, null, null, null, new Date() );
 
             userManager.createUser( u );
 
         }
-        
-        
+
         if ( userManager.groupExists( groupName ) ) {
             log.info( "Group already exists" );
-            
-        }else{
+
+        } else {
 
             List<GrantedAuthority> authos = new ArrayList<GrantedAuthority>();
             authos.add( new GrantedAuthorityImpl( groupName ) );
             userManager.createGroup( groupName, authos );
-        
+
         }
-        
+
         userManager.addUserToGroup( userName, groupName );
-        
+
         return "success";
-        
+
     }
-    
+
     @Override
-    public List<String> getVariantUploadWarnings(String projectName, List<VariantValueObject> valueObjects){
-            
-            //TODO we need to warn the user when we are modifying a subject that exists in another project
-        //this is currently impossible because the upload code will always make a new subject if the patientId doesn't
-        //exist in the current project.
-        
+    public List<String> getVariantUploadWarnings( String projectName, List<VariantValueObject> valueObjects ) {
+
+        // TODO we need to warn the user when we are modifying a subject that exists in another project
+        // this is currently impossible because the upload code will always make a new subject if the patientId doesn't
+        // exist in the current project.
+
         return null;
-        
-        
-        
+
+    }
+
+    @Override
+    @Transactional
+    public void populateProjectToProjectOverlap( String projectName, String overlappingProjectName )
+            throws ExternalDependencyException, NotLoggedInException {
+
+        Project specialProject = projectDao.findByProjectName( overlappingProjectName );
+
+        Project projectToPopulate = projectDao.findByProjectName( projectName );
+
+        ProjectFilterConfig specialProjectFilterConfig = getProjectFilterConfigById( specialProject );
+
+        ProjectFilterConfig projectToPopulateFilterConfig = getProjectFilterConfigById( projectToPopulate );
+
+        HashSet<AspireDbFilterConfig> projSet = new HashSet<AspireDbFilterConfig>();
+        projSet.add( projectToPopulateFilterConfig );
+
+        BoundedList<VariantValueObject> projToPopulateVvos = queryService.queryVariants( projSet );
+
+        // This probably won't work for all variant types
+        for ( VariantValueObject vvo : projToPopulateVvos.getItems() ) {
+
+            Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
+
+            filters.add( specialProjectFilterConfig );
+            filters.add( getVariantFilterConfigForSingleVariant( vvo ) );
+
+            BoundedList<VariantValueObject> overLappedVvos = queryService.queryVariants( filters );
+
+            for ( VariantValueObject vvoOverlapped : overLappedVvos.getItems() ) {
+
+                if ( !vvo.getGenomicRange().getChromosome().equals( vvoOverlapped.getGenomicRange().getChromosome() ) ) {
+                    continue;
+                }
+
+                Variant2SpecialVariantOverlap overlapInfo = new Variant2SpecialVariantOverlap();
+
+                int start = Math.max( vvo.getGenomicRange().getBaseStart(), vvoOverlapped.getGenomicRange()
+                        .getBaseStart() );
+                int end = Math.min( vvo.getGenomicRange().getBaseEnd(), vvoOverlapped.getGenomicRange().getBaseEnd() );
+
+                // genius
+                if ( start < end ) {
+
+                    int overlap = end - start;
+
+                    float vvoSize = vvo.getGenomicRange().getBaseEnd() - vvo.getGenomicRange().getBaseStart();
+                    float vvoOverlappedSize = vvoOverlapped.getGenomicRange().getBaseEnd()
+                            - vvoOverlapped.getGenomicRange().getBaseStart();
+
+                    float vvoPercentageOverlap = overlap / vvoSize * 100;
+                    float vvoOverlappedPercentageOverlap = overlap / vvoOverlappedSize * 100;
+
+                    overlapInfo.setOverlap( overlap );
+                    overlapInfo.setOverlapPercentage( Math.round( vvoPercentageOverlap ) );
+                    // set the percentage overlap of the OverlapSpecialVariantId-variant, I realize that these method
+                    // and variable names kind of suck
+                    overlapInfo.setOverlappedOverlapPercentage( Math.round( vvoOverlappedPercentageOverlap ) );
+                    
+                    overlapInfo.setVariantId( vvo.getId() );
+                    overlapInfo.setOverlapSpecialVariantId( vvoOverlapped.getId() );
+                    overlapInfo.setOverlapProjectId( specialProject.getId() );
+                    overlapInfo.setProjectId( projectToPopulate.getId() );
+
+                    variant2SpecialVariantOverlapDao.create( overlapInfo );
+                    
+                } else {
+                    log.info( "No Overlap" );                    
+                }
+
+            }
+
+        }
+
+    }
+
+    private ProjectFilterConfig getProjectFilterConfigById( Project p ) {
+
+        ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();
+
+        ArrayList<Long> projectIds = new ArrayList<Long>();
+
+        projectIds.add( p.getId() );
+
+        projectFilterConfig.setProjectIds( projectIds );
+
+        return projectFilterConfig;
+
+    }
+
+    private VariantFilterConfig getVariantFilterConfigForSingleVariant( VariantValueObject v ) {
+
+        SetRestriction genomicRangeRestriction = new SetRestriction();
+
+        GenomicLocationProperty genomicLocationProperty = new GenomicLocationProperty();
+
+        genomicLocationProperty.setDataType( new GenomicRangeDataType() );
+
+        genomicRangeRestriction.setProperty( genomicLocationProperty );
+
+        genomicRangeRestriction.setOperator( Operator.IS_IN_SET );
+
+        GenomicRange gr = v.getGenomicRange();
+
+        Set genomicRangeSet = new HashSet();
+
+        genomicRangeSet.add( gr );
+
+        genomicRangeRestriction.setValues( genomicRangeSet );
+
+        VariantFilterConfig variantFilterConfig = new VariantFilterConfig();
+
+        variantFilterConfig.setRestriction( genomicRangeRestriction );
+
+        return variantFilterConfig;
     }
 
 }

@@ -10,12 +10,16 @@ Ext.require([
 Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
     extend: 'Ext.Container',
     alias: 'widget.multivalue_combo',
-    layout: 'column',
+    layout : { 
+    	type : 'column',
+    	autoSize : true,
+    }, 
+    minHeight : '50',
     autoEl: {
       tag:  'ul'
     },
     cls: 'multiValueSuggestBox-list',
-    width: 200,
+    width : 'auto',
     config: {
         suggestValuesRemoteFunction: null
     },
@@ -55,18 +59,47 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
         var comboBox = this.getComponent('invisibleCombo');
         comboBox.lastQuery = null;
     },
-
+	
     /**
-     * @private
-     * @param item
-     */
-    addItem: function(item) {
-        var itemElement = Ext.create('ASPIREdb.view.filter.multicombo.Item',
-            {
-                text: item.data.displayValue,
-                value: item.raw.value
-            }
-        );
+	 * @private
+	 * @param item
+	 */
+	addItem : function(item) {
+
+	    if (!item) return;
+	    	
+		var itemElement;
+
+		// if this is gene don't display full description
+		if (item.data && item.data.value && item.data.value.ensemblId) {
+			itemElement = Ext.create('ASPIREdb.view.filter.multicombo.Item', {
+				text : item.data.value.label,
+				value : item.raw.value
+			});
+
+		} else {
+			itemElement = Ext.create('ASPIREdb.view.filter.multicombo.Item', {
+				text : item.data.displayValue,
+				value : item.raw.value
+			});
+
+		}
+
+		itemElement.on('remove', function(itemToRemove) {
+			this.items.remove(itemToRemove);
+			itemToRemove.destroy();
+		}, this);
+
+		var comboBox = this.getComponent('invisibleCombo');
+		var items = this.items;
+		items.insert(items.getCount() - 1, itemElement);
+		comboBox.clearValue();
+		this.doLayout();
+		ASPIREdb.EVENT_BUS.fireEvent('query_update');
+	},
+    
+    addMultiComboItem: function(item) {
+        var itemElement = item;
         itemElement.on('remove', function(itemToRemove) {
             this.items.remove(itemToRemove);
             itemToRemove.destroy();
@@ -77,6 +110,8 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
         items.insert(items.getCount() - 1, itemElement);
         comboBox.clearValue();
         this.doLayout();
+        ASPIREdb.EVENT_BUS.fireEvent('query_update');
+        
     },
 
     /**
@@ -88,6 +123,7 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
             var item = this.items.removeAt(this.items.getCount() - 2);
             item.destroy();
             this.doLayout();
+            ASPIREdb.EVENT_BUS.fireEvent('query_update');
         }
     },
 
@@ -96,13 +132,14 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
             {
                 xtype: 'combo',
                 itemId:'invisibleCombo',
-                width: 100,
+                width: 150,
                 minChars: 0,
                 matchFieldWidth: false,
                 hideTrigger: true,
                 cls: 'multiValueSuggestBox-list-input',
                 triggerAction: 'query',
-                autoSelect: true,
+                autoSelect: false, 
+                
                 enableKeyEvents: true,
                 displayField: 'displayValue',
                 store: Ext.create('ASPIREdb.ValueSuggestionStore',{
@@ -110,27 +147,65 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
                 }),
                 listConfig: {
                     loadingText: 'Searching...',
-                    emptyText: 'No results found.'
+                    emptyText: 'No results found.',
+                    listeners: {
+                        itemclick: function(list, record) {
+                        	// this fires a 'select' event
+                        	comboBox.clearValue(); 
+                        }
+                    }
+                },
+                listeners: {
+                    change: function(field, newValue) {
+                    	
+                        field.setValue(newValue);
+                        
+                        
+                    }
                 }
             }
         ];
 
         this.callParent();
-
+		
         var multiCombo = this;
-        var comboBox = this.getComponent('invisibleCombo');
+		var comboBox = this.getComponent('invisibleCombo');
 
-        comboBox.on('keydown', function(obj, event) {
-            if (event.getKey() === event.BACKSPACE) {
-                if (comboBox.getRawValue() === "") {
-                    multiCombo.removeItem();
-                    comboBox.collapse();
-                }
-            }
-        });
+		var addItemHack = function() {
+			var currentValue = comboBox.getValue();
+			var record = comboBox.findRecordByValue(currentValue);
+
+			var records = [];
+			records.push(record);
+
+			comboBox.fireEvent('select', comboBox, records);
+		};
+
+		comboBox.on('keydown', function(obj, event) {
+			if (event.getKey() === event.BACKSPACE) {
+				if (comboBox.getRawValue() === "") {
+					multiCombo.removeItem();
+					comboBox.collapse();
+				}
+			}
+
+			if (event.getKey() === event.ENTER || event.getKey() === event.TAB) {
+
+				addItemHack();
+
+			}
+		});
 
         comboBox.on('select', function(obj, records) {
             multiCombo.addItem(records[0]);
+        });
+        
+        
+        // ExtJs wasn't firing the select event when we selected the
+		// currently highlighted item in the combolist, this is
+		// a workaround
+        comboBox.on('blur', function(obj, records) {
+        	addItemHack();
         });
 
         this.on('afterrender', function() {

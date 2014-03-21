@@ -14,8 +14,16 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+
+import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
+import ubc.pavlab.aspiredb.shared.GenomicRange;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 import javax.persistence.*;
 
@@ -52,6 +60,29 @@ public class Translocation extends Variant {
 
     public void setTargetLocation( GenomicLocation targetLocation ) {
         this.targetLocation = targetLocation;
+    }
+    
+    @Override
+    public VariantValueObject toValueObject() {
+        VariantValueObject vo = new VariantValueObject();
+        vo.setId( this.getId() );
+        vo.setVariantType( this.getClass().getSimpleName() );
+        vo.setPatientId( this.getSubject().getPatientId() );
+        vo.setSubjectId( this.getSubject().getId() );
+        vo.setUserVariantId( this.getUserVariantId() );
+
+        GenomicRange genomicRange = new GenomicRange( this.getLocation().getChromosome(),
+                this.getLocation().getStart(), this.getLocation().getEnd() );
+        vo.setGenomicRange( genomicRange );
+        Collection<CharacteristicValueObject> characteristicValueObjects = Characteristic
+                .toValueObjects( this.characteristics );
+        Map<String, CharacteristicValueObject> map = new HashMap<String, CharacteristicValueObject>();
+        for ( CharacteristicValueObject characteristicValueObject : characteristicValueObjects ) {
+            map.put( characteristicValueObject.getKey(), characteristicValueObject );
+        }
+        vo.setCharacteristics( map );
+        vo.setLabels( Label.toValueObjects( this.labels ) );
+        return vo;
     }
 
 }

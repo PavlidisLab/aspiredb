@@ -77,6 +77,7 @@ public class SNV extends Variant {
         vo.setVariantType( SNV.class.getSimpleName() );
         vo.setPatientId( this.getSubject().getPatientId() );
         vo.setSubjectId( this.getSubject().getId() );
+        vo.setUserVariantId( this.getUserVariantId() );
         vo.setDbSNPID( this.getDbSNPID() );
         vo.setObservedBase( this.getObservedBase() );
         vo.setReferenceBase( this.getReferenceBase() );

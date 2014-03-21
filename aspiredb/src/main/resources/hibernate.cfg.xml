@@ -7,9 +7,7 @@
     <session-factory>
 
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
-
-	    <!-- Echo all executed SQL to stdout -->
-	    <property name="show_sql">false</property>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
 	    
 	    <!-- We shouldn't use other options (validate is ok).
 	    We should be manually updating database schema on production. It's too risky to
@@ -25,6 +23,7 @@
         <mapping class="ubc.pavlab.aspiredb.server.model.Translocation" />
         <mapping class="ubc.pavlab.aspiredb.server.model.Gene" />
      	<mapping class="ubc.pavlab.aspiredb.server.model.GeneGroup" />
+     	<mapping class="ubc.pavlab.aspiredb.server.model.UserGeneSet" />
    		<mapping class="ubc.pavlab.aspiredb.server.model.GenomicLocation" />
     	<mapping class="ubc.pavlab.aspiredb.server.model.Subject" />      	
        	<mapping class="ubc.pavlab.aspiredb.server.model.Phenotype" />
@@ -37,6 +36,7 @@
       	<mapping class="ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User" />
       	<mapping class="ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup" />
       	<mapping class="ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority" />
+      	<mapping class="ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap" />
       	
     </session-factory>
 </hibernate-configuration>

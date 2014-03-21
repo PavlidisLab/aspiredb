@@ -25,7 +25,8 @@ import org.directwebremoting.annotations.DataTransferObject;
 
 @DataTransferObject(type="enum", javascript = "VariantType")
 public enum VariantType {
-    CNV, SNV, INDEL, INVERSION, TRANSLOCATION;        
+    //DGV and DECIPHER probably shouldn't be here,but using anyway just for the parsers
+    CNV, SNV, INDEL, INVERSION, TRANSLOCATION, DECIPHER, DGV;        
 
     public static VariantType findByName( String name ) {
         

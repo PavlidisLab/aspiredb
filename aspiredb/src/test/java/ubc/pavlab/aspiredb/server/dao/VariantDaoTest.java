@@ -82,11 +82,9 @@ public class VariantDaoTest extends BaseSpringContextTest {
                 cnv = testObjectHelper.createPersistentTestCNVObject();
                 cnv.setSubject( subject );
                 label = labelDao.findOrCreate(new LabelValueObject("CNV_TEST_LABEL"));
-                try {
-                    variantService.addLabel(cnv.getId(), new LabelValueObject(label.getId(), "CNV_TEST_LABEL"));
-                } catch (NotLoggedInException e) {
-                    fail();
-                }
+                
+                   variantService.addLabel(cnv.getId(), new LabelValueObject(label.getId(), "CNV_TEST_LABEL"));
+                
             }
         }.execute();
     }

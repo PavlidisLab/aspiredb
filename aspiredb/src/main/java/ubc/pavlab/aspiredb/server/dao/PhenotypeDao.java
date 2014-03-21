@@ -14,13 +14,13 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.transaction.annotation.Transactional;
-import ubc.pavlab.aspiredb.server.model.Phenotype;
-
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.transaction.annotation.Transactional;
+
+import ubc.pavlab.aspiredb.server.model.Phenotype;
 
 /**
  * TODO Document Me
@@ -30,34 +30,56 @@ import java.util.Set;
  */
 public interface PhenotypeDao extends SecurableDaoBase<Phenotype> {
 
-    @Secured({"GROUP_USER" ,"AFTER_ACL_COLLECTION_READ"})
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<Phenotype> findBySubjectId( Long id );
+    
+    @Secured({ "GROUP_USER"})
+    public Integer findPhenotypeCountBySubjectId( Long id );
 
-//    @Secured({"GROUP_USER" ,"AFTER_ACL_COLLECTION_READ"})
-    @Secured({"GROUP_USER"})
+    // @Secured({"GROUP_USER" ,"AFTER_ACL_COLLECTION_READ"})
+    @Secured({ "GROUP_USER" })
     public Collection<Phenotype> loadBySubjectIds( Collection<Long> subjectIds );
 
+    @Transactional(readOnly = true)
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public List<String> getExistingValues( String name );
+
+    /**
+     * Returns the list of Phenotype names that is specific to activeProjectIds. If activeProjectIds is null, return all
+     * the Phenotype names.
+     * 
+     * @param activeProjectIds
+     * @return
+     */
+    @Transactional(readOnly = true)
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    public List<String> getExistingNames( Collection<Long> activeProjectIds );
 
     // TODO: reuse for suggestions
     @Transactional(readOnly = true)
-	public List<String> getExistingPhenotypes(String query, boolean isExactMatch, Collection<Long> activeProjects);
+    public List<String> getExistingPhenotypes( String query, boolean isExactMatch, Collection<Long> activeProjects );
+
+    @Transactional(readOnly = true)
+    public List<String> getExistingURIs( String name );
 
     // TODO: reuse for suggestions
-    @Secured({"GROUP_USER"})
-    public List<String> getListOfPossibleValuesByName( Collection<Long> projectIds,
-                                                       String name);
+    @Secured({ "GROUP_USER" })
+    public List<String> getListOfPossibleValuesByName( Collection<Long> projectIds, String name );
 
-    @Secured({"GROUP_USER"})
-    public List<String> getListOfPossibleValuesByUri( Collection<Long> projectIds,
-                                                      String uri);
+    @Secured({ "GROUP_USER" })
+    public List<String> getListOfPossibleValuesByUri( Collection<Long> projectIds, String uri );
 
     @Transactional(readOnly = true)
     boolean isInDatabase( Collection<String> names );
-    
-    @Secured({"GROUP_USER","AFTER_ACL_COLLECTION_READ"})
-    public List<String> getDistinctOntologyUris(Collection<Long> activeProjects);
-    
-    @Secured({"GROUP_USER","AFTER_ACL_COLLECTION_READ"})
+
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    public List<String> getDistinctOntologyUris( Collection<Long> activeProjects );
+
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<Phenotype> findPresentByProjectIdsAndUri( Collection<Long> ids, String uri );
+
+    @Transactional(readOnly = true)
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    public Collection<Phenotype> loadAllByProjectIds( Collection<Long> projectIds );
+
 }

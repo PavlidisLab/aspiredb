@@ -14,70 +14,96 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import com.sencha.gxt.data.shared.loader.PagingLoadResult;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
-import ubc.pavlab.aspiredb.shared.*;
+import ubc.pavlab.aspiredb.shared.BoundedList;
+import ubc.pavlab.aspiredb.shared.GeneValueObject;
+import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
+import ubc.pavlab.aspiredb.shared.OntologyTermValueObject;
+import ubc.pavlab.aspiredb.shared.SubjectValueObject;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.Property;
-import ubc.pavlab.aspiredb.shared.query.QueryValueObject;
 import ubc.pavlab.aspiredb.shared.suggestions.PhenotypeSuggestion;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import com.sencha.gxt.data.shared.loader.PagingLoadResult;
 
 /**
- *
  * @author anton
  */
 public interface QueryService {
 
-    public BoundedList<SubjectValueObject> querySubjects(Set<AspireDbFilterConfig> filters)
+    public BoundedList<SubjectValueObject> querySubjects( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException;
 
-    public BoundedList<VariantValueObject> queryVariants(Set<AspireDbFilterConfig> filters)
+    public BoundedList<VariantValueObject> queryVariants( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException;
 
-    public int getSubjectCount(AspireDbPagingLoadConfig config)
+    public PagingLoadResult<OntologyTermValueObject> getOntologyTermSuggestions( String query );
+
+    public List<String> getValuesForOntologyTerm( String ontologyTermUri );
+
+    public PagingLoadResult<PhenotypeSuggestion> getPhenotypeSuggestionLoadResult( String query,
+            Collection<Long> activeProjects );
+
+    public PagingLoadResult<GeneValueObject> getGeneSuggestionLoadResult( String query )
+            throws BioMartServiceException, BioMartServiceException;
+
+    public PagingLoadResult<NeurocartaPhenotypeValueObject> getNeurocartaPhenotypeSuggestionLoadResult( String query )
+            throws NeurocartaServiceException, NeurocartaServiceException;
+
+    public PagingLoadResult<SubjectValueObject> getSubjectSuggestionLoadResult( String query );
+
+    public List<Serializable> getVariantLocationValueObjects( Property property, List<String> text )
+            throws BioMartServiceException, NeurocartaServiceException;
+
+    public List<PhenotypeSuggestion> getPhenotypeSuggestions( List<String> names );
+
+    public List<SubjectValueObject> getSubjects( List<String> subjectIds );
+
+    public Long saveQuery( String name, Set<AspireDbFilterConfig> filters );
+
+    public Set<AspireDbFilterConfig> loadQuery( String name );
+
+    public Collection<String> getSavedQueryNames();
+
+    public void deleteQuery( String name );
+    
+    public boolean isQueryName(String name);
+
+    public int getSubjectCount( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException,
+            ExternalDependencyException;
+
+    public int getVariantCount( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException,
+            ExternalDependencyException;
+
+    /**
+     * Combination of {@link QueryService#getSubjectCount(Set)} and {@link QueryService#getVariantCount(Set)} that
+     * avoids redundant filtering.
+     * 
+     * @param filters
+     * @return Map with keys {@link VariantDao.SUBJECT_IDS_KEY} and {@link VariantDao.VARIANT_IDS_KEY}
+     * @throws NotLoggedInException
+     * @throws ExternalDependencyException
+     */
+    public Map<Integer, Integer> getSubjectVariantCounts( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException;
 
-    public int getVariantCount(AspireDbPagingLoadConfig config)
-            throws NotLoggedInException, ExternalDependencyException;
-
-    public PagingLoadResult<OntologyTermValueObject> getOntologyTermSuggestions(String query);
-	
-	public List<String> getValuesForOntologyTerm(String ontologyTermUri);
-
-    public PagingLoadResult<PhenotypeSuggestion> getPhenotypeSuggestionLoadResult(String query, Collection<Long> activeProjects);
-
-    public PagingLoadResult<GeneValueObject> getGeneSuggestionLoadResult(String query) throws BioMartServiceException, BioMartServiceException;
-
-	public PagingLoadResult<NeurocartaPhenotypeValueObject> getNeurocartaPhenotypeSuggestionLoadResult(String query) throws NeurocartaServiceException, NeurocartaServiceException;
-
-	public PagingLoadResult<SubjectValueObject> getSubjectSuggestionLoadResult(String query);
-	
-	public List<GwtSerializable> getVariantLocationValueObjects(Property property, List<String> text) throws BioMartServiceException, NeurocartaServiceException;
-	
-	public List<PhenotypeSuggestion> getPhenotypeSuggestions(List<String> names);
-	
-	public List<SubjectValueObject> getSubjects(List<String> subjectIds);
-
-    public QueryValueObject saveQuery(QueryValueObject queryVO);
-
-    public QueryValueObject loadQuery(Long id);
-
-    public Collection<QueryValueObject> getSavedQueries() throws NotLoggedInException;
-
-    public void deleteQuery(QueryValueObject query);
-
-//    // TODO: To be removed
-//    @Deprecated
-//    public Collection<GeneValueObject> getGeneSuggestions(String query) throws BioMartServiceException;
-//
-//    // TODO: To be removed
-//    @Deprecated
-//    public Collection<NeurocartaPhenotypeValueObject> getNeurocartaPhenotypeSuggestions(String query) throws NeurocartaServiceException;
+    // // TODO: To be removed
+    // @Deprecated
+    // public Collection<GeneValueObject> getGeneSuggestions(String query) throws BioMartServiceException;
+    //
+    // // TODO: To be removed
+    // @Deprecated
+    // public Collection<NeurocartaPhenotypeValueObject> getNeurocartaPhenotypeSuggestions(String query) throws
+    // NeurocartaServiceException;
 }

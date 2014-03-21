@@ -40,7 +40,13 @@ public interface ProjectManager {
     public void addSubjectPhenotypesToProject( String projectName, boolean createproject, List<PhenotypeValueObject> voList ) throws Exception;
     
     @Secured({ "GROUP_ADMIN" })
+    public void addSubjectPhenotypesToSpecialProject( String projectName, boolean deleteProject, List<PhenotypeValueObject> voList ) throws Exception;
+    
+    @Secured({ "GROUP_ADMIN" })
     public void addSubjectVariantsToProject( String projectName, boolean createproject, List<VariantValueObject>  voList) throws Exception;
+    
+    @Secured({ "GROUP_ADMIN" })
+    public void addSubjectVariantsToSpecialProject( String projectName, boolean deleteProject, List<VariantValueObject>  voList, boolean existingProject) throws Exception;
     
     @Secured({ "GROUP_ADMIN" })
     public void addSubjectVariantsToProjectForceCreate( String projectName, List<VariantValueObject>  voList) throws Exception;
@@ -50,6 +56,9 @@ public interface ProjectManager {
     
     @Secured({"GROUP_ADMIN"})
     public String createUserAndAssignToGroup(String userName, String password, String groupName);
+    
+    @Secured({"GROUP_ADMIN"})
+    public void populateProjectToProjectOverlap(String projectName, String specialProjectName) throws Exception;
     
     
 

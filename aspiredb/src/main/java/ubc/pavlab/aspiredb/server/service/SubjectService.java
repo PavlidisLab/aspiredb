@@ -19,8 +19,10 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
+import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
+import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.query.Property;
@@ -29,6 +31,7 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * TODO Document Me
@@ -38,28 +41,25 @@ import java.util.List;
  */
 public interface SubjectService {
 
-    public SubjectValueObject getSubject (Long projectId, Long subjectId )
-            throws NotLoggedInException;
+    public SubjectValueObject getSubject (Long projectId, Long subjectId );
+    public Collection<SubjectValueObject> getSubjects(Long projectId, List<Long> subjectId );
 
-    public Collection<Property> suggestProperties()
-            throws NotLoggedInException;
+    public Collection<Property> suggestProperties();
 
-    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext)
-            throws NotLoggedInException;
+    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext);
 
     public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
-            throws NotLoggedInException, ExternalDependencyException;
+            throws  ExternalDependencyException;
+        
+    public Map<String,PhenotypeSummaryValueObject> getPhenotypeSummaryValueObjects( List<Long> subjectIds, Collection<Long> projectIds ) throws NeurocartaServiceException;
 
-    public List<SubjectValueObject> getSubjectsWithPhenotypesBySubjectIds( List<Long> subjectIds )
-            throws NotLoggedInException;
+    public String getPhenotypeTextDownloadBySubjectIds( List<Long> subjectIds );
 
-    public LabelValueObject addLabel(Collection<Long> subjectIds, LabelValueObject label) throws NotLoggedInException;
+    public LabelValueObject addLabel(Collection<Long> subjectIds, LabelValueObject label) ;
 
-    public void removeLabel(Collection<Long> subjectIds, LabelValueObject label)
-            throws NotLoggedInException;
+    public void removeLabel(Collection<Long> subjectIds, LabelValueObject label);
 
-    public void removeLabel(Long subjectId, LabelValueObject label)
-            throws NotLoggedInException;
+    public void removeLabel(Long subjectId, LabelValueObject label);
 
-    public List<LabelValueObject> suggestLabels(SuggestionContext suggestionContext) throws NotLoggedInException;
+    public List<LabelValueObject> suggestLabels(SuggestionContext suggestionContext);
 }

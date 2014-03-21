@@ -29,7 +29,7 @@ import java.util.List;
  */
 public interface QueryDao extends SecurableDaoBase<Query> {
 
-    @Secured({"GROUP_USER","AFTER_ACL_READ"})
+    @Secured({"GROUP_USER","AFTER_ACL_COLLECTION_READ"})
     public List<Query> findByName(String queryName);
 
 }

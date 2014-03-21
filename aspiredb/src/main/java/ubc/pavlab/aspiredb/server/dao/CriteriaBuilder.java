@@ -246,9 +246,9 @@ public class CriteriaBuilder {
 
     private static Criterion processRestrictionExpression( VariantTypeRestriction restriction, EntityType target ) {
         if ( target == EntityType.SUBJECT ) {
-            return Restrictions.eq( "variant.class", restriction.getType().name() );
+            return Restrictions.eq( "variant.class", restriction.getType() );
         } else {
-            return Restrictions.eq( "class", restriction.getType().name() );
+            return Restrictions.eq( "class", restriction.getType() );
         }
     }
 

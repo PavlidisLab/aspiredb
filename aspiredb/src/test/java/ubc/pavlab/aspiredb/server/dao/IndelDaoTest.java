@@ -79,7 +79,7 @@ public class IndelDaoTest extends BaseSpringContextTest {
         
         detachedProject.setName( projectName);
         
-        Project p1 = projectDao.create( detachedProject );
+        Project p1 = testObjectHelper.createPersistentProject(detachedProject);
         
         projectId = p1.getId();
 
@@ -158,6 +158,8 @@ public class IndelDaoTest extends BaseSpringContextTest {
                 individual.setPatientId( patientId );
 
                 Indel indel = testObjectHelper.createDetachedTestIndelObject();
+                
+                indelDao.create( indel );
                 
                 individual.addVariant( indel );
 

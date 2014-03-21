@@ -25,8 +25,10 @@ import ubc.pavlab.aspiredb.shared.LabelValueObject;
  * date: 10/06/13
  */
 public interface LabelService {
-
+    
     public void deleteSubjectLabel(LabelValueObject label);
 
     public void deleteVariantLabel(LabelValueObject label);
+
+    public void updateLabel( LabelValueObject label );
 }

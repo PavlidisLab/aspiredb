@@ -25,4 +25,5 @@ import org.directwebremoting.annotations.DataTransferObject;
  */
 @DataTransferObject(javascript = "Conjunction")
 public class Conjunction extends Junction {
+    private static final long serialVersionUID = 1L;
 }

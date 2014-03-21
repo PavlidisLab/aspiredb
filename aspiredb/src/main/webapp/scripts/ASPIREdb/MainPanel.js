@@ -1,10 +1,13 @@
 Ext.require([
     'Ext.panel.Panel',
     'ASPIREdb.view.Ideogram',
-    'ASPIREdb.view.subject.SubjectGrid',
-    'ASPIREdb.view.PhenotypeGrid'
+    'ASPIREdb.view.SubjectGrid',
+    'ASPIREdb.view.PhenotypeGrid',
+    'ASPIREdb.view.VariantTabPanel'
 ]);
-
+/**
+ * Main panel contains grid Panels "subjectGrid", "variantTabPanel" and "phenotypeGrid'
+ */
 Ext.define('ASPIREdb.MainPanel',{
     extend: 'Ext.panel.Panel',
     alias: 'widget.ASPIREdb_mainpanel',
@@ -20,7 +23,7 @@ Ext.define('ASPIREdb.MainPanel',{
         },
         {
             region: 'center',
-            xtype: 'ideogram',
+            xtype: 'variantTabPanel',
             title:'Variant'
         },
         {

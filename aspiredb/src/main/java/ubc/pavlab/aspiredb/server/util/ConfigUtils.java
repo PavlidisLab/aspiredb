@@ -15,14 +15,26 @@
 
 package ubc.pavlab.aspiredb.server.util;
 
-import org.apache.commons.configuration.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Properties;
+import java.util.Set;
+
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.SystemConfiguration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.SubjectFilterConfig;
 
 /**
  * Convenience class to access aspiredb properties defined in a resource. Methods will look in aspiredb.properties,
@@ -130,6 +142,12 @@ public class ConfigUtils {
         if ( !url.endsWith( "/" ) ) {
             return url + "/";
         }
+        return url;
+    }
+    
+    public static String getGemmaBaseUrl() {
+        String url = getString( "gemma.base.url", "http://chibi.ubc.ca/Gemma" );
+       
         return url;
     }
 
@@ -580,6 +598,23 @@ public class ConfigUtils {
      */
     public static void setProperty( String key, Object value ) {
         config.setProperty( key, value );
+    }
+
+
+    /**
+     * Returns true if filters has an instance of {@link SubjectFilterConfig}
+     * 
+     * @param filters
+     * @return
+     */
+    public static boolean hasSubjectConfig( Set<AspireDbFilterConfig> filters ) {
+        boolean found = false;
+        for ( AspireDbFilterConfig cfg : filters ) {
+            if ( cfg instanceof SubjectFilterConfig ) {
+                return true;
+            }
+        }
+        return found;
     }
 
 }

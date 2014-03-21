@@ -18,6 +18,8 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import java.io.Serializable;
+
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
@@ -25,7 +27,11 @@ import org.directwebremoting.annotations.DataTransferObject;
  * date: 11/06/13
  */
 @DataTransferObject(javascript = "NumericValue")
-public class NumericValue {
+public class NumericValue implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private Integer value;
 
     public NumericValue() {

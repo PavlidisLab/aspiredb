@@ -2,7 +2,10 @@
 
 Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
     extend: 'Ext.Container',
+    alias : 'widget.filter_phenotype_property',
+    
     layout: 'hbox',
+    width: 850,
     /**
      * @private
      * @override
@@ -12,9 +15,11 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
             {
                 xtype: 'combo',
                 itemId: 'nameCombo',
+                emptyText: 'phenotype',
+                width: 400,
                 matchFieldWidth: false,
                 triggerAction: 'query',
-                autoSelect: true,
+                //autoSelect: true,
                 hideTrigger: true,
                 displayField: 'displayName',
                 store: Ext.create('ASPIREdb.PhenotypeSuggestionStore',{
@@ -32,14 +37,16 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
                             valueCombo.clearValue();
                             valueCombo.lastQuery = null;
                             valueCombo.getStore().setProperty(record.raw);
+                            ASPIREdb.EVENT_BUS.fireEvent('query_update');
                         },
                         scope: this
-                    }
+                    },
                 }
             },
             {
                 xtype: 'combo',
                 itemId: 'valueCombo',
+                emptyText: 'value',
                 displayField: 'displayValue',
                 triggerAction: 'query',
                 minChars: 0,
@@ -50,6 +57,14 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
                 store: Ext.create('ASPIREdb.ValueSuggestionStore',{
                     remoteFunction: PhenotypeService.suggestPhenotypeValues
                 }),
+                listeners: {
+                	select: {
+                		fn: function(obj, records) {
+                			ASPIREdb.EVENT_BUS.fireEvent('query_update');
+                        },
+                        scope : this,
+                	}
+                },
                 listConfig: {
                     loadingText: 'Searching...',
                     emptyText: 'No results found.'
@@ -71,6 +86,10 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
             var filterContainer = item.ownerCt;
             filterContainer.remove(item);
             filterContainer.doLayout();
+            
+            if(filterContainer.ownerCt.closeEmptyFilter) filterContainer.ownerCt.closeEmptyFilter();
+            
+            ASPIREdb.EVENT_BUS.fireEvent('query_update');
         });
 
     },
@@ -83,5 +102,12 @@ Ext.define('ASPIREdb.view.filter.PhenotypeFilter', {
         phenotypeRestriction.name = nameCombo.getValue();
         phenotypeRestriction.value = valueCombo.getValue();
         return phenotypeRestriction;
+    },
+    
+    setRestrictionExpression: function(phenotypeRestriction) {
+        var nameCombo = this.getComponent("nameCombo");
+        var valueCombo = this.getComponent("valueCombo");
+        nameCombo.setValue(phenotypeRestriction.name);
+        valueCombo.setValue(phenotypeRestriction.value);        
     }
 });

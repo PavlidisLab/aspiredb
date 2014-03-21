@@ -88,12 +88,10 @@ public class VariantServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testGetVariant() {
-        try {
+        
             VariantValueObject variantValueObject = variantService.getVariant(variant.getId());
             assertNotNull(variantValueObject);
-        } catch (NotLoggedInException e) {
-            fail();
-        }
+        
     }
 
     @Test

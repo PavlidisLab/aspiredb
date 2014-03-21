@@ -34,7 +34,7 @@ public interface VariantDaoBase<T extends Variant> extends SecurableDaoBase<T>, 
     public Collection<T> findByGenomicLocation(GenomicRange range, Collection<Long> activeProjectIds);
 
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
-    public Collection<T> findBySubjectId( String id );
+    public Collection<T> findBySubjectPatientId( String id );
 
     public Collection<String> suggestValuesForEntityProperty(Property property, SuggestionContext suggestionContext);
 

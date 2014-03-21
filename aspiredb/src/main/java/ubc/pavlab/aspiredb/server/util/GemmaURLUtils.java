@@ -25,7 +25,8 @@ import java.util.List;
  */
 public class GemmaURLUtils {
     
-    private static final String GEMMA_URL = "http://chibi.ubc.ca/Gemma";
+    private static final String GEMMA_URL = ConfigUtils.getGemmaBaseUrl();
+        
     private static final String GEMMA_WEB_SERVICE_URL = GEMMA_URL + "/rest";
     
     private static final String HELP_PAGE_URL = "http://aspiredb.sites.olt.ubc.ca/";

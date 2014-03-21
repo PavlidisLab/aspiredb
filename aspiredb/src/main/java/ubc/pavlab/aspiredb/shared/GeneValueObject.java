@@ -14,9 +14,9 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 import java.io.Serializable;
+
+import org.directwebremoting.annotations.DataTransferObject;
 
 /**
  * TODO Document Me
@@ -26,37 +26,37 @@ import java.io.Serializable;
  */
 @DataTransferObject(javascript = "GeneValueObject")
 public class GeneValueObject implements Displayable, Serializable {
-    private static final long serialVersionUID = -7411514301896256147L;
+	private static final long serialVersionUID = -7411514301896256147L;
 
-    private String key;
-    private String symbol;
-    private String name;
-    private String taxon;
-    private String ensemblId;
-    private String linkToGemma;
-    private String geneBioType;
-    private GenomicRange genomicRange;
+	private String key;
+	private String symbol;
+	private String name;
+	private String taxon;
+	private String ensemblId;
+	private String linkToGemma;
+	private String geneBioType;
+	private GenomicRange genomicRange;
 
-    public GeneValueObject() {
-    }
+	public GeneValueObject() {
+	}
 
-    public String getSymbol() {
-        return symbol;
-    }
+	public String getSymbol() {
+		return symbol;
+	}
 
-    public void setSymbol( String symbol ) {
-        this.symbol = symbol;
-    }
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName( String name ) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public String getGeneBioType() {
+	public String getGeneBioType() {
 		return geneBioType;
 	}
 
@@ -64,46 +64,47 @@ public class GeneValueObject implements Displayable, Serializable {
 		this.geneBioType = geneBioType;
 	}
 
-	public GeneValueObject( String ensemblId, String symbol, String geneName, String gene_biotype, String taxon ) {
-		this.ensemblId = ensemblId;		
-        this.symbol = symbol;
-        this.name = geneName;
-        this.geneBioType = gene_biotype;
-        this.taxon = taxon;
-        this.key = symbol + ":" + taxon;
-    }
+	public GeneValueObject(String ensemblId, String symbol, String geneName,
+			String gene_biotype, String taxon) {
+		this.ensemblId = ensemblId;
+		this.symbol = symbol;
+		this.name = geneName;
+		this.geneBioType = gene_biotype;
+		this.taxon = taxon;
+		this.key = symbol + ":" + taxon;
+	}
 
-    public String getKey() {
-        return key;
-    }
+	public String getKey() {
+		return key;
+	}
 
-    public void setKey( String key ) {
-        this.key = key;
-    }
+	public void setKey(String key) {
+		this.key = key;
+	}
 
-    public String getEnsemblId() {
-        return ensemblId;
-    }
+	public String getEnsemblId() {
+		return ensemblId;
+	}
 
-    public void setEnsemblId( String ensemblId ) {
-        this.ensemblId = ensemblId;
-    }
+	public void setEnsemblId(String ensemblId) {
+		this.ensemblId = ensemblId;
+	}
 
-    public String getLinkToGemma() {
-        return linkToGemma;
-    }
+	public String getLinkToGemma() {
+		return linkToGemma;
+	}
 
-    public void setLinkToGemma( String linkToGemma ) {
-        this.linkToGemma = linkToGemma;
-    }
+	public void setLinkToGemma(String linkToGemma) {
+		this.linkToGemma = linkToGemma;
+	}
 
-    public String getTaxon() {
-        return taxon;
-    }
+	public String getTaxon() {
+		return taxon;
+	}
 
-    public void setTaxon( String taxon ) {
-        this.taxon = taxon;
-    }
+	public void setTaxon(String taxon) {
+		this.taxon = taxon;
+	}
 
 	public GenomicRange getGenomicRange() {
 		return this.genomicRange;
@@ -115,7 +116,7 @@ public class GeneValueObject implements Displayable, Serializable {
 
 	@Override
 	public String getLabel() {
-        return symbol.equals("") ? ensemblId : symbol;
+		return symbol.equals("") ? ensemblId : symbol;
 	}
 
 	@Override
@@ -125,6 +126,10 @@ public class GeneValueObject implements Displayable, Serializable {
 
 	@Override
 	public String getTooltip() {
-		return getLabel() + ": " + name + " - " + this.genomicRange.toString();
+		String ret = getLabel() + ": " + name;
+		if (this.genomicRange != null) {
+			ret += " - " + this.genomicRange.toString();
+		}
+		return ret;
 	}
 }

@@ -16,22 +16,25 @@ package ubc.pavlab.aspiredb.shared.query.restriction;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
+import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
+
 @DataTransferObject(javascript = "PhenotypeRestriction")
 public class PhenotypeRestriction implements RestrictionExpression {
-	private static final long serialVersionUID = -4503829624276270831L;
+    private static final long serialVersionUID = -4503829624276270831L;
 
-	private String name;
+    private String name;
     private String value;
-	private String uri;
+    private String uri;
 
-	public PhenotypeRestriction() {}
+    public PhenotypeRestriction() {
+    }
 
-    public PhenotypeRestriction(String name, String value) {
-		this.name = name;
-		this.value = value;
-	}
+    public PhenotypeRestriction( String name, String value ) {
+        this.name = name;
+        this.value = value;
+    }
 
-    public PhenotypeRestriction(String name, String value, String uri) {
+    public PhenotypeRestriction( String name, String value, String uri ) {
         this.name = name;
         this.value = value;
         this.uri = uri;
@@ -41,35 +44,45 @@ public class PhenotypeRestriction implements RestrictionExpression {
         return uri;
     }
 
-    public void setUri(String uri) {
+    public void setUri( String uri ) {
         this.uri = uri;
     }
 
-    public void setName(String name) {
+    public void setName( String name ) {
         this.name = name;
     }
 
-    public void setValue(String value) {
+    public void setValue( String value ) {
         this.value = value;
     }
 
     public String getName() {
-		return this.name;
-	}
-	
-	public String getValue() {
-		return this.value;
-	}
+        return this.name;
+    }
+
+    public String getValue() {
+        return this.value;
+    }
 
     public boolean isOntologyTerm() {
         return this.uri != null;
     }
 
     public boolean isAbsent() {
-        return this.value.equals("0"); // FIXME! We should probably have special phenotype type for absent/present.
+        
+        if (this.value == null){
+            return false;
+        }
+        
+        return this.value.equals( PhenotypeUtil.VALUE_ABSENT ); // FIXME! We should probably have special phenotype type
+                                                                // for absent/present.
     }
 
     public boolean isPresent() {
-        return this.value.equals("1"); // FIXME!
+        if (this.value == null){
+            return false;
+        }
+        
+        return this.value.equals( PhenotypeUtil.VALUE_PRESENT ); // FIXME!
     }
 }

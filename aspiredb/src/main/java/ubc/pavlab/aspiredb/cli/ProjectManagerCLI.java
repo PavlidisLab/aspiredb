@@ -40,10 +40,13 @@ public class ProjectManagerCLI extends AbstractCLI {
     private static UserManager userManager;
 
     private String projectName = "";
+    private String overlapProjectName = "";
     private String groupName = "";
     private boolean grant = false;
     private boolean restrict = false;
     private boolean delete = false;
+    
+    private boolean populateOverlap = false;
 
     private static BeanFactory applicationContext;
 
@@ -88,13 +91,20 @@ public class ProjectManagerCLI extends AbstractCLI {
 
         Option project = OptionBuilder.isRequired().hasArg().withArgName( "Project name" )
                 .withDescription( "The project that will be affected by these operations" ).create( "project" );
+        
+        Option projectOverlap = OptionBuilder.hasArg().withArgName( "Overlap Project name" )
+                .withDescription( "The project that the other project will have its overlaps calculated against" ).create( "overlapProject" );
 
         addOption( "delete", false, "Using this option will delete the project" );
         addOption( "grant", false, "Using this option will grant the group read permissions on the project" );
         addOption( "restrict", false, "Using this option will remove the group's read permissions on the project" );
+        
+        addOption( "populateOverlap", false, "Using this option will populate the overlap between project and overlapProject" );
 
         addOption( groupname );
         addOption( project );
+        
+        addOption( projectOverlap );
     }
 
     @Override
@@ -161,6 +171,41 @@ public class ProjectManagerCLI extends AbstractCLI {
                 log.error( e.getMessage() );
                 return e;
             }
+        } else if (populateOverlap == true){
+            
+            if ( projectName == null ) {
+                log.error( "missing -project option" );
+                bail( AbstractCLI.ErrorCode.MISSING_OPTION );
+            }
+
+            Project proj = projectDao.findByProjectName( projectName );
+
+            if ( proj == null ) {
+                log.error( "Project does not exist" );
+                bail( ErrorCode.INVALID_OPTION );
+            }
+            
+            if ( overlapProjectName == null ) {
+                log.error( "missing -overlapProject option" );
+                bail( AbstractCLI.ErrorCode.MISSING_OPTION );
+            }
+
+            Project overlapProj = projectDao.findByProjectName( overlapProjectName );
+
+            if ( overlapProj == null ) {
+                log.error( "Overlap Project does not exist" );
+                bail( ErrorCode.INVALID_OPTION );
+            }
+
+            try {
+                projectManager.populateProjectToProjectOverlap( projectName, overlapProjectName );
+            } catch ( Exception e ) {
+                log.error( e.getMessage() );
+                return e;
+            }
+            
+            
+            
         }
 
         return null;
@@ -188,6 +233,12 @@ public class ProjectManagerCLI extends AbstractCLI {
         }
         if ( this.hasOption( "delete" ) ) {
             delete = true;
+        }
+        if( this.hasOption("populateOverlap")){
+            populateOverlap = true;
+        }
+        if ( this.hasOption( "overlapProject" ) ) {
+            overlapProjectName = this.getOptionValue( "overlapProject" );
         }
     }
 

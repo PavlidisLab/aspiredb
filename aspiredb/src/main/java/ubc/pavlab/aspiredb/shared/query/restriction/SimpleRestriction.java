@@ -19,11 +19,11 @@
 package ubc.pavlab.aspiredb.shared.query.restriction;
 
 import org.directwebremoting.annotations.DataTransferObject;
-import ubc.pavlab.aspiredb.shared.GwtSerializable;
+
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.Property;
 
-import java.io.Serializable;
+
 
 /**
  * author: anton
@@ -31,6 +31,11 @@ import java.io.Serializable;
  */
 @DataTransferObject(javascript = "SimpleRestriction")
 public class SimpleRestriction implements RestrictionExpression {
+    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7926398222172096531L;
     protected Property property;
     protected Operator operator;
     protected Object value;

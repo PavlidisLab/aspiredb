@@ -173,9 +173,11 @@ public class SubjectDaoTest extends BaseSpringContextTest {
     public void testFindByPatientId() throws Exception {
         Project p1 = new Project();
         p1.setName(project1Name);
-        p1.getSubjects().add(testObjectHelper.createPersistentTestSubjectObjectWithCNV(patientId));
-
+        
         p1 = testObjectHelper.createPersistentProject(p1);
+        
+        
+        testObjectHelper.addSubjectToProject( testObjectHelper.createPersistentTestSubjectObjectWithCNV(patientId), p1 );
 
         Project p2 = new Project();
         p2.setName(project2Name);

@@ -29,54 +29,58 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * We are using spring4gwt to call spring beans from client code. One thing that's a bit ugly is that services exposed
- * in this way have to implement gwt's RemoteService (it's just a marking interface), in other words GWT and Server side
- * are not fully isolated. That's not a big deal, it's just not ideal.
- * 
+ 
  * @author azoubare
  * @version $Id: VariantService.java,v 1.19 2013/06/13 19:57:16 anton Exp $
  */
 public interface VariantService {
 
-    public VariantValueObject getVariant(Long variantId)
-            throws NotLoggedInException;
-
-    public Collection<Property> suggestVariantLocationProperties()
-            throws NotLoggedInException;
-
+    public VariantValueObject getVariant(Long variantId);
+    
+    public List<VariantValueObject> getSubjectVariants(String patientId);
+    public List<VariantValueObject> getSubjectsVariants(List<String> patientIds);
+    
+    public Integer getTotalNoOfVariantsBySubjectId(String patientId);
+            
+    public Collection<Property> suggestVariantLocationProperties();
+    
     public Collection<PropertyValue> suggestVariantLocationValues(Property property, SuggestionContext suggestionContext)
-            throws NotLoggedInException, BioMartServiceException, NeurocartaServiceException, BioMartServiceException, NeurocartaServiceException;
+            throws BioMartServiceException, NeurocartaServiceException, BioMartServiceException, NeurocartaServiceException;
 
-    public Collection<Property> suggestPropertiesForVariantType(VariantType variantType)
-            throws NotLoggedInException;
-
-    public Collection<Property> suggestProperties()
-            throws NotLoggedInException, NotLoggedInException;
-
+    public Collection<Property> suggestEntityPropertiesByStringName(String variantType);
+    
+    public Collection<Property> suggestPropertiesForVariantType(VariantType variantType);
+    
+    public Collection<Property> suggestPropertiesForProjectOverlap();
+    
+    public Collection<Property> suggestPropertiesForNumberOfVariantsInProjectOverlap();
+    
+    public Collection<Property> suggestPropertiesForSupportOfVariantsInProjectOverlap();
+    
+    public Collection<Property> suggestProperties();
+            
     public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext)
-            throws NotLoggedInException, BioMartServiceException, NeurocartaServiceException;
+            throws  BioMartServiceException, NeurocartaServiceException;
 
     @Deprecated
-    public Collection<String> suggestCharacteristicPropertyValues(CharacteristicProperty property)
-            throws NotLoggedInException;
+    public Collection<String> suggestCharacteristicPropertyValues(CharacteristicProperty property);
+           
 
     @Deprecated
-    public List<LabelValueObject> suggestLabels(SuggestionContext suggestionContext)
-            throws NotLoggedInException;
+    public List<LabelValueObject> suggestLabels(SuggestionContext suggestionContext);
+           
 
-    public LabelValueObject addLabel(Long variantId, LabelValueObject label)
-            throws NotLoggedInException;
+    public LabelValueObject addLabel(Long variantId, LabelValueObject label);
+            
 
-    public LabelValueObject addLabel(Collection<Long> variantIds, LabelValueObject label)
-            throws NotLoggedInException;
+    public LabelValueObject addLabel(Collection<Long> variantIds, LabelValueObject label);
+           
 
-    public void removeLabel(Long variantId, LabelValueObject label)
-            throws NotLoggedInException;
+    public void removeLabel(Long variantId, LabelValueObject label);
+            
 
-    public void removeLabel(Collection<Long> variantIds, LabelValueObject label)
-            throws NotLoggedInException;
+    public void removeLabel(Collection<Long> variantIds, LabelValueObject label);
+            
 
-    //    public PagingLoadResult<VariantValueObject> getVariants( AspireDbPagingLoadConfig config )
-    //    throws NotLoggedInException, ExternalDependencyException;
 
 }

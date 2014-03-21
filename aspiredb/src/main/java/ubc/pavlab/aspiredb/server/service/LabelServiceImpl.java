@@ -18,8 +18,11 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import org.directwebremoting.annotations.RemoteMethod;
+import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
@@ -36,6 +39,8 @@ import java.util.Collection;
  * date: 10/06/13
  */
 @Component("labelService")
+@Service("labelService")
+@RemoteProxy(name="LabelService")
 public class LabelServiceImpl implements LabelService {
 
     @Autowired
@@ -47,8 +52,21 @@ public class LabelServiceImpl implements LabelService {
     @Autowired
     private VariantDao variantDao;
 
+
     @Override
     @Transactional
+    @RemoteMethod
+    public void updateLabel(LabelValueObject label) {
+        Label labelEntity = labelDao.load(label.getId());
+        labelEntity.setName( label.getName() );
+        labelEntity.setColour( label.getColour() );
+        labelEntity.setIsShown( label.getIsShown() );
+        labelDao.update(labelEntity);
+    }
+    
+    @Override
+    @Transactional
+    @RemoteMethod
     public void deleteSubjectLabel(LabelValueObject label) {
         Label labelEntity = labelDao.load(label.getId());
         Collection<Subject> subjects = subjectDao.findByLabel(label);
@@ -61,6 +79,7 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     @Transactional
+    @RemoteMethod
     public void deleteVariantLabel(LabelValueObject label) {
         Label labelEntity = labelDao.load(label.getId());
         Collection<Variant> variants = variantDao.findByLabel(label);

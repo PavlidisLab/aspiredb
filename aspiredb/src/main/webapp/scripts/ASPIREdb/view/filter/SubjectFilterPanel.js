@@ -9,14 +9,14 @@ Ext.define('ASPIREdb.view.filter.SubjectFilterPanel', {
     extend: 'ASPIREdb.view.filter.FilterPanel',
     alias: 'widget.filter_subject',
     title: 'Subject Filter',
-    bodyStyle: 'background: #FFE5B4;',
-    items: {
+    bodyStyle: 'background: #FFDAA3;',
+    items: [{
         xtype: 'filter_and',
         itemId: 'subjectFilterContainer',
         filterItemType: 'ASPIREdb.view.filter.PropertyFilter',
         suggestValuesRemoteFunction: SubjectService.suggestValues,
         propertyStore: {
-            autoLoad: true,
+            autoLoad: false,
             proxy : {
                 type: 'dwr',
                 dwrFunction : SubjectService.suggestProperties,
@@ -27,8 +27,8 @@ Ext.define('ASPIREdb.view.filter.SubjectFilterPanel', {
                     totalProperty: 'count'
                 }
             }
-        }
-    },
+        }}
+    ],
 
     getFilterConfig: function() {
         var config = new SubjectFilterConfig();
@@ -36,8 +36,22 @@ Ext.define('ASPIREdb.view.filter.SubjectFilterPanel', {
         config.restriction = subjectFilterContainer.getRestrictionExpression();
         return config;
     },
+    
+    setFilterConfig: function(config) {
+        
+        var subjectFilterContainer = this.down('#subjectFilterContainer');
+        subjectFilterContainer.setRestrictionExpression(config.restriction);
+        
+    },
+    
+    handleCloseImageClick: function(){
+    	this.close();
+    },
 
     initComponent: function () {
         this.callParent();
+        
+       
+        
     }
 });

@@ -83,18 +83,21 @@ public class PhenotypeServiceTest extends BaseSpringContextTest {
                 
                 p1 = new Project();
                 p1.setName(RandomStringUtils.randomAlphabetic(5));
-                p1.getSubjects().add(subject1);
-                p1.getSubjects().add(subject2);
-                p1.getSubjects().add(subject3);
-                p1.getSubjects().add(subject4);
-                p1.getSubjects().add(subject5);
-                p1.getSubjects().add(subject6);
-                p1.getSubjects().add(subject7);
-                p1.getSubjects().add(subject8);
-                p1.getSubjects().add(subject9);
-                p1.getSubjects().add( subjectNoPhenotypes );
-
+                
                 p1 = testObjectHelper.createPersistentProject(p1);
+                
+                testObjectHelper.addSubjectToProject( subject1, p1 );
+                testObjectHelper.addSubjectToProject( subject2, p1 );
+                testObjectHelper.addSubjectToProject( subject3, p1 );
+                testObjectHelper.addSubjectToProject( subject4, p1 );
+                testObjectHelper.addSubjectToProject( subject5, p1 );
+                testObjectHelper.addSubjectToProject( subject6, p1 );
+                testObjectHelper.addSubjectToProject( subject7, p1 );
+                testObjectHelper.addSubjectToProject( subject8, p1 );
+                testObjectHelper.addSubjectToProject( subject9, p1 );
+                testObjectHelper.addSubjectToProject( subjectNoPhenotypes, p1 );
+                
+                
                 
             }
         }.execute();

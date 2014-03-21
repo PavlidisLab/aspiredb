@@ -79,8 +79,8 @@ public class CNVDaoTest extends BaseSpringContextTest {
         Project detachedProject = new Project();
 
         detachedProject.setName( projectName );
-
-        Project p1 = projectDao.create( detachedProject );
+        
+        Project p1 = testObjectHelper.createPersistentProject(detachedProject);
 
         projectId = p1.getId();
 
@@ -199,8 +199,8 @@ public class CNVDaoTest extends BaseSpringContextTest {
                 cnv1.setCopyNumber( 1 );
                 cnv1.setType( CnvType.valueOf( "LOSS" ) );                
                 
-                cnv1.setSubject( individual );
-
+                cnvDao.create( cnv1 );
+                
                 individual.addVariant( cnv1 );
 
                 Phenotype ph = new Phenotype();

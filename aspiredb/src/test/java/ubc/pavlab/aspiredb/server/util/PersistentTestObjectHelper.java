@@ -18,11 +18,17 @@
  */
 package ubc.pavlab.aspiredb.server.util;
 
+import java.util.Collection;
+import java.util.List;
+
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Indel;
+import ubc.pavlab.aspiredb.server.model.Label;
+import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 /**
  * Class for tests to use to create and remove persistent objects This interface will become unnecessary one we have
@@ -50,6 +56,8 @@ public interface PersistentTestObjectHelper {
     
     public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypes( String patientId );
     
+    public Phenotype createPersistentTestPhenotypeObject( String name, String uri, String valueType, String value );
+    
     public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypesForEnrichmentTest( String patientId, String phenName, String phenUri, String phenValue );
 
     public Subject createPersistentTestIndividualObject( String patientId );
@@ -57,5 +65,14 @@ public interface PersistentTestObjectHelper {
     public Subject createDetachedIndividualObject( String patientId );
 
     public Project createPersistentProject( Project p );
-
+    
+    public Subject addSubjectToProject(Subject s, Project p);
+    
+    public List<Subject> getSubjectsForProject(Project p);
+    
+    public Collection<LabelValueObject> getLabelsForSubject(Long subjectId);
+    
+    public void deleteProject(String projectName);
+    
+    
 }
