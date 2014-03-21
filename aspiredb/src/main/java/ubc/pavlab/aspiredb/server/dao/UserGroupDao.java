@@ -20,14 +20,10 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 
 import java.util.Collection;
 
-
-
-
 /**
  * TODO Document Me
  * 
  * @author cmcdonald
- * @version $Id: UserGroupDao.java,v 1.2 2013/06/11 22:30:45 anton Exp $
  */
 public interface UserGroupDao extends DaoBase<UserGroup> {
 
