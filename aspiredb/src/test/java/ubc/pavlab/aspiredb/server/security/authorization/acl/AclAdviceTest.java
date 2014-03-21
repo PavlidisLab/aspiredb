@@ -37,19 +37,16 @@ import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 public class AclAdviceTest extends BaseSpringContextTest {
 
     @Autowired
-    MutableAclService aclService;
+    private AclTestUtils aclTestUtils;
 
     @Autowired
-    AclTestUtils aclTestUtils;
+    private PersistentTestObjectHelper testObjectHelper;
 
     @Autowired
-    PersistentTestObjectHelper testObjectHelper;
+    private SubjectDao indDao;
 
     @Autowired
-    SubjectDao indDao;
-    
-    @Autowired
-    VariantDao variantDao;
+    private VariantDao variantDao;
 
     /**
      * @throws Exception
@@ -61,7 +58,7 @@ public class AclAdviceTest extends BaseSpringContextTest {
 
         aclTestUtils.checkHasAcl( cnv );
 
-        variantDao.remove( (Variant)cnv );
+        variantDao.remove( ( Variant ) cnv );
 
         aclTestUtils.checkDeletedAcl( cnv );
 
@@ -78,8 +75,7 @@ public class AclAdviceTest extends BaseSpringContextTest {
         indDao.remove( ind );
 
         aclTestUtils.checkDeletedAcl( ind );
-        
-        
+
     }
 
 }
