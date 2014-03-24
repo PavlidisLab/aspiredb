@@ -59,7 +59,8 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			xtype : 'button',
 			text : 'Analyze',
 			disabled : 'true',
-			itemId : 'analyzeButton'
+			itemId : 'analyzeButton',
+			tooltip: 'Report the phenotype that is enriched for the list of filtered subjects',
 
 		},{			
 			itemId : 'saveButton',
@@ -109,7 +110,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
              * Used the Color Brewer 2.0 system for coloring the chart
              * Thanks for Cynthia Brewer, Mark Harrower and The Pennsylvania State University
              */
-			var colors = ["#e34a33", "#31a354", "#636363", "#7570b3","#2c7fb8", "#addd8e","#3182bd", "#a6bddb"];
+			var colors = ["#b35806", "#31a354", "#636363", "#d8b365","#2c7fb8", "#addd8e","#7570b3", "#a6bddb"];
 			var colorIdx=5;
 			//TODO : This is not a good workaround to display the color, have to figure out a way to do this better
 			if (phenSummary.valueType == "HPONTOLOGY") {
@@ -447,7 +448,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
          * Used the Color Brewer 2.0 system for coloring the chart
          * Thanks for Cynthia Brewer, Mark Harrower and The Pennsylvania State University
          */
-		var colors = ["#e34a33", "#31a354", "#636363", "#7570b3","#2c7fb8", "#addd8e","#3182bd", "#a6bddb"];
+		var colors = ["#b35806", "#31a354", "#636363", "#d8b365","#2c7fb8", "#addd8e","#7570b3", "#a6bddb"];
 		var displayVal = '';
 		
 		//draw Y axis
