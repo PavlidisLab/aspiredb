@@ -128,6 +128,22 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			icon : 'scripts/ASPIREdb/resources/images/icons/export.png'
 
 		});
+		
+		this.zoomInButton = Ext.create('Ext.Button', {
+			id : 'zoomOutButton',
+			text : '',
+			tooltip : 'Zoom out ideogram',
+			icon : 'scripts/ASPIREdb/resources/images/icons/zoom_in.png'
+
+		});
+		
+		this.zoomOutButton = Ext.create('Ext.Button', {
+			id : 'zoomInButton',
+			text : '',
+			tooltip : 'Zoom in ideogram',
+			icon : 'scripts/ASPIREdb/resources/images/icons/zoom_out.png'
+
+		});
 
 		// adding buttons to toolbar in filterSubmitHandler with the grid
 		// because extJS was
@@ -154,6 +170,16 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		
 		this.exportButton.on('click', function() {
 			ref.exportButtonHandler();
+
+		});
+		
+		this.zoomInButton.on('click', function() {
+			ref.zoomInButtonHandler();
+
+		});
+		
+		this.zoomOutButton.on('click', function() {
+			ref.zoomOutButtonHandler();
 
 		});
 
@@ -200,7 +226,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 					
 					var vvos = pageLoad.items;
-					this.loadedVariants =vvos;
+					ref.loadedVariants =vvos;
 					
 					ProjectService.numVariants(filterConfigs[0].projectIds, {
 						callback : function(NoOfVariants){
@@ -213,9 +239,12 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					});
 					
 					var ideogram = ref.getComponent('ideogram');
+					ideogram.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap,properties);
+					console.log('updating varint properties'+properties);
+					console.log('updating variant value to color map'+ASPIREdb.view.ideogram.VariantLayer.valueToColourMap);
 					ideogram.drawChromosomes();
-					ideogram.drawVariants(vvos,"rgb(255,0,0)");
-					
+					ideogram.drawVariants(vvos);
+					//ideogram.showColourLegend();					
 					
 					
 					var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid(vvos, properties);	
@@ -246,6 +275,8 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					toolbar.add(ref.selectAllButton);
 					toolbar.add(ref.saveButton);
 					toolbar.add(ref.exportButton);
+					toolbar.add(ref.zoomInButton);
+					toolbar.add(ref.zoomOutButton);
 					
 					ref.setLoading(false);
 
@@ -291,6 +322,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 						
 			var ideogram = this.getComponent('ideogram');
 			ideogram.drawChromosomes();
+			var ref=this;
 			
 			//heighlight the selected subject in ideogram
 			SubjectService.getSubjects(projectIds[0],subjectIds, {
@@ -302,21 +334,21 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 						subjectIDS.push(subjectValueObjects[i].id);	
 						patientIDS.push(subjectValueObjects[i].patientId);					
 					}
-					ideogram.drawVariantsWithSubjectsHighlighted(subjectIDS,this.loadedVariants);
+					ideogram.drawVariantsWithSubjectsHighlighted(subjectIDS,ref.loadedVariants);
 					
 				 	VariantService.getSubjectsVariants(patientIDS, {
 						callback : function(vvo) {
 							var notSelectedVariants=[];
 							var flag='no';
-							for (var j=0;j<this.loadedVariants.length;j++){
+							for (var j=0;j<ref.loadedVariants.length;j++){
 								
 								for (var k=0;k<vvo.length;k++){
-									if (this.loadedVariants[j]!=vvo[k]){
+									if (ref.loadedVariants[j]!=vvo[k]){
 									 	flag='yes';
 									}								 
 								}
 								if (flag == 'yes')
-									notSelectedVariants.push(this.loadedVariants[j]);
+									notSelectedVariants.push(ref.loadedVariants[j]);
 							}
 							ideogram.drawDimmedVariants(notSelectedVariants);							
 							}
@@ -370,6 +402,20 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		if (imgsrc) {
 			ASPIREdb.IdeogramDownloadWindow.showIdeogramDownload(imgsrc);
 		}
+
+	},
+	
+	zoomInButtonHandler : function() {
+
+		var ideogram = this.getComponent('ideogram');
+		ideogram.changeZoom(2, this.loadedVariants);
+
+	},
+	
+	zoomOutButtonHandler : function() {
+
+		var ideogram = this.getComponent('ideogram');
+		ideogram.changeZoom(1, this.loadedVariants);
 
 	},
 

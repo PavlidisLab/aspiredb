@@ -128,8 +128,8 @@ ChromosomeIdeogram.prototype.getDisplaySize = function() {
  * @param {VariantValueObject} variant
  * @param {PropertyValueObject} property
  */
-ChromosomeIdeogram.prototype.drawVariant = function(variant, property,color) {
-    this.variantLayer.drawVariant(variant, property,color);
+ChromosomeIdeogram.prototype.drawVariant = function(variant, property) {
+    this.variantLayer.drawVariant(variant, property);
 };
 
 /**

@@ -43,7 +43,8 @@ Ext.define('ASPIREdb.view.Ideogram', {
 		this.colourLegend = Ext.create('ASPIREdb.view.ideogram.ColourLegend');
 
 		this.fetchChromosomeInfo();
-
+		
+		//Is this happening??????		
 		this.setDisplayedProperty(new VariantTypeProperty());
 
 		this.on('afterrender', this.registerMouseEventListeners, this);
@@ -287,11 +288,11 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	 * @param {number}
 	 *            newZoom
 	 */
-	changeZoom : function(newZoom) {
+	changeZoom : function(newZoom, variants) {
 		this.zoom = newZoom;
 		this.width = Math.round(850 * this.zoom);
 		this.height = Math.round(this.boxHeight * this.zoom);
-		this.redraw();
+		this.redraw(variants);
 	},
 
 	/**
@@ -342,7 +343,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 			this.chromosomeIdeograms[name] = chromosomeIdeogram;
 		}
 	},
-	/**
+	/**Create the Ideogram overlay
 	 * @private
 	 */
 	initCanvasSize : function() {
@@ -398,7 +399,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	 * @param {VariantValueObject[]}
 	 *            variantValueObjects
 	 */
-	drawVariants : function(variantValueObjects,color) {
+	drawVariants : function(variantValueObjects) {
 		/* List<VariantValueObject> */
 		var variants = variantValueObjects.slice(); // make a copy
 		this.sortVariantsBySize(variants);
@@ -407,7 +408,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 			var chrName = variant.genomicRange.chromosome;
 			/* ChromosomeIdeogram */
 			var chrIdeogram = this.chromosomeIdeograms[chrName];
-			chrIdeogram.drawVariant(variant, this.displayedProperty,color);
+			chrIdeogram.drawVariant(variant, this.displayedProperty);
 		}
 	},
 
@@ -508,9 +509,10 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	/**
 	 * @public
 	 */
-	redraw : function() {
+	redraw : function(variants) {
 		this.drawChromosomes();
 		this.drawVariants(variants);
+		//setting the color legend for the ideogram
 		this.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap, this.displayedProperty);
 	},
 	/**
@@ -518,7 +520,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	 */
 	redrawHighlightedSubjects : function(subjectId,vvo) {		
 		this.drawVariantsWithSubjectHighlighted(subjectId,vvo);
-		//this.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap, this.displayedProperty);
+		this.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap, this.displayedProperty);
 	},
 	
 

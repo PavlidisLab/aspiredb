@@ -66,7 +66,7 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
     },
 
     /**
-     *
+     * TODO: color legend function is broken/ not complete check getPropertyStringValue and property
      * @param {VariantValueObject} variant
      * @param {PropertyValueObject} property
      * @returns {string}
@@ -74,8 +74,8 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
     pickColor: function (variant, property) {
         if (property == null) return this.self.defaultColour;
 
-//        var value = getPropertyStringValue(property);
-        var value = null;
+        //var value = getPropertyStringValue(property);
+       var value = null;
 
         if (property instanceof VariantTypeProperty) {
             value = variant.variantType;
@@ -141,7 +141,7 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
         var segment = {
             start: variant.genomicRange.baseStart,
             end: variant.genomicRange.baseEnd,
-            color: "rgb(255,0,0)",//this.pickColor(variant, property),//red
+            color: this.pickColor(variant, property),//red "rgb(255,0,0)"
             emphasize: false
         };
         // pick track layer
@@ -160,12 +160,12 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
      * @param {VariantValueObject} variant
      * @param {PropertyValueObject} property
      */
-    drawVariant: function (variant, property,color) {
+    drawVariant: function (variant, property) {
         /*VariantSegment*/
         var segment = {
             start: variant.genomicRange.baseStart,
             end: variant.genomicRange.baseEnd,
-            color: color, //this.pickColor(variant, property),
+            color: this.pickColor(variant, property),
             emphasize: false
         };
         // pick track layer
