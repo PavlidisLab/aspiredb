@@ -96,7 +96,7 @@ public class UserGroupDaoImpl extends DaoBaseImpl<UserGroup> implements UserGrou
     @Override
     public Collection<UserGroup> findGroupsForUser( User user ) {
         return this.getHibernateTemplate().findByNamedParam(
-                "from UserGroup ug join ug.groupMembers memb where memb = :user", "user", user );
+                "select ug from UserGroup ug join ug.groupMembers memb where memb = :user", "user", user );
     }
 
     @Override
