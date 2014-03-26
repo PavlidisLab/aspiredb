@@ -17,7 +17,8 @@
  *
  */
 
-Ext.require([ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel', 'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.VariantGridCreator' , 'ASPIREdb.IdeogramDownloadWindow']);
+Ext.require([ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel', 'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.VariantGridCreator' , 'ASPIREdb.IdeogramDownloadWindow','Ext.data.ArrayStore',
+      		'Ext.form.ComboBox']);
 
 // TODO js documentation
 /**
@@ -74,7 +75,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 				disabled : false,
 				handler : this.labelSettingsHandler,
 				scope : this
-			} ]
+			}]
 		});
 
 		this.labelsButton = Ext.create('Ext.Button', {
@@ -140,10 +141,48 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		this.zoomOutButton = Ext.create('Ext.Button', {
 			id : 'zoomInButton',
 			text : '',
+			hidden: true,
 			tooltip : 'Zoom in ideogram',
 			icon : 'scripts/ASPIREdb/resources/images/icons/zoom_out.png'
 
 		});
+		
+		 var data =[
+		            ['type','Variant type'],
+		            ['cnvType','CNV type'],
+		            [ 'commonCNV', 'Common CNV'],
+		            [ 'characteristics','Characteristics'],
+		            [ 'inheritance', 'Inheritance'],
+		            [ 'arrayReport','Array Report'],		            
+		            [ 'arrayPlatform', 'Array Platform'],
+		            [ 'markers','Markers'],
+		            [ 'labels','Variant Labels'],
+		            [ 'SubjectLabels','Subject Labels']
+		            ];         
+
+		
+		var variantCharacteristics = Ext.create('Ext.data.ArrayStore', {
+			storeId :'varChar',
+			fields : [ {name :'id',type:'string'},{name: 'name', type:'string'} ],
+			data : data,
+			autoLoad : true,
+			autoSync : true,
+		});
+		
+		this.colourVariantByCombo = Ext.create('Ext.form.ComboBox', {
+			itemId :'colorCode',
+		    fieldLabel: 'Color code',
+		    store: variantCharacteristics,
+		    displayField : 'name',
+			valueField : 'id',
+			queryMode : 'local',
+			//renderTo : Ext.getBody(),
+			editable : false,
+			forceSelection : true,		   
+		});
+		
+		this.colourVariantByCombo.on('select', this.colourVariantByHandler,this);
+		
 
 		// adding buttons to toolbar in filterSubmitHandler with the grid
 		// because extJS was
@@ -239,9 +278,6 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					});
 					
 					var ideogram = ref.getComponent('ideogram');
-					ideogram.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap,properties);
-					console.log('updating varint properties'+properties);
-					console.log('updating variant value to color map'+ASPIREdb.view.ideogram.VariantLayer.valueToColourMap);
 					ideogram.drawChromosomes();
 					ideogram.drawVariants(vvos);
 					//ideogram.showColourLegend();					
@@ -277,6 +313,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					toolbar.add(ref.exportButton);
 					toolbar.add(ref.zoomInButton);
 					toolbar.add(ref.zoomOutButton);
+					toolbar.add(ref.colourVariantByCombo);
 					
 					ref.setLoading(false);
 
@@ -285,6 +322,124 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 		});
 
+	},
+	/**
+	 * 
+	 */
+	colourVariantByHandler : function(combo, records, eOpts){
+			
+			var ideogram = this.getComponent('ideogram');
+			
+			if (ideogram.isVisible()){
+				var selectedValue = records[0].data.id;	
+				
+				switch (selectedValue){
+				  case 'type': {
+					   var property =new VariantTypeProperty();
+					  property.name ='type';
+		        	  property.displayName ='Variant Type';
+					  ideogram.setDisplayedProperty(property);
+					  ideogram.drawChromosomes();
+					  ideogram.drawColouredVariants(this.loadedVariants);
+					  ideogram.showColourLegend();
+					  break;
+					  }
+				  case 'cnvType':{
+					  var property =new CNVTypeProperty();
+					  property.name ='cnvType';
+		        	  property.displayName ='CNV Type';
+					  ideogram.setDisplayedProperty(property);
+					  ideogram.drawChromosomes();
+					  ideogram.drawColouredVariants(this.loadedVariants);
+					  ideogram.showColourLegend();
+					  break;
+				  }
+				  case 'characteristics':{
+					  var property =new CharacteristicProperty();
+					  property.name ='characteristics';
+		        	  property.displayName ='Characteristics';
+					  ideogram.setDisplayedProperty(property);
+					   ideogram.drawChromosomes();
+					  ideogram.drawColouredVariants(this.loadedVariants);
+					  ideogram.showColourLegend();
+					  break;
+				  }
+				  case 'inheritance':{
+					  var property =new CharacteristicProperty();
+					  property.name ='inheritance';
+		        	  property.displayName ='Inheritance';
+					  ideogram.setDisplayedProperty(property);
+					  ideogram.drawChromosomes();
+					  ideogram.drawColouredVariants(this.loadedVariants);
+					  ideogram.showColourLegend();
+					  break;
+				  }
+				  case 'subjectLabels':{
+					  var property =new LabelProperty();
+					  property.name ='subjectLabels';
+		        	  property.displayName ='Subject Label';
+					  ideogram.setDisplayedProperty(property);
+					  ideogram.drawChromosomes();
+					  ideogram.drawVariants(this.loadedVariants);
+					  ideogram.showColourLegend();
+					  break;
+				  }
+				  case 'labels':{
+					  var property =new VariantLabelProperty();
+					  property.name ='labels';
+		        	  property.displayName ='Variant Labels';
+					  ideogram.setDisplayedProperty(property);
+					  ideogram.drawChromosomes();
+					  ideogram.drawVariants(this.loadedVariants);
+					  ideogram.showColourLegend();
+					  break;
+				  }
+				  case 'commonCNV':{
+					  var property =new CharacteristicProperty();
+					  property.name ='commonCNV';
+		        	  property.displayName ='Common CNV';
+					  ideogram.setDisplayedProperty(property);
+					  ideogram.drawChromosomes();
+					  ideogram.drawColouredVariants(this.loadedVariants);
+					  ideogram.showColourLegend();
+					  break;
+				  }
+				  case 'arrayReport':{
+					  var property =new CharacteristicProperty();
+					  property.name ='arrayReport';
+		        	  property.displayName ='Array Report';
+					  ideogram.setDisplayedProperty(property);
+					  ideogram.drawChromosomes();
+					  ideogram.drawColouredVariants(this.loadedVariants);
+					  ideogram.showColourLegend();
+					  break;
+				  }
+				  case 'arrayPlatform':{
+					  var property =new CharacteristicProperty();
+					  property.name ='arrayPlatform';
+		        	  property.displayName ='Array Platform';
+					  ideogram.setDisplayedProperty(property);
+					  ideogram.drawChromosomes();
+					  ideogram.drawColouredVariants(this.loadedVariants);
+					  ideogram.showColourLegend();
+					  break;
+				  }
+				  case 'markers':{
+					  var property =new CharacteristicProperty();
+					  property.name ='markers';
+		        	  property.displayName ='Markers';
+					  ideogram.setDisplayedProperty(property);
+					  ideogram.drawChromosomes();
+					  ideogram.drawColouredVariants(this.loadedVariants);
+					  ideogram.showColourLegend();
+					  break;
+				  }
+				  				  
+				}
+				
+			}
+			
+			
 	},
 	/**
 	 * When subjects are selected in the subject grid highlist the variants of selected subjects in ideogram and in table view
@@ -406,14 +561,16 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	},
 	
 	zoomInButtonHandler : function() {
-
+		this.zoomInButton.setVisible(false);
+		this.zoomOutButton.setVisible(true);
 		var ideogram = this.getComponent('ideogram');
 		ideogram.changeZoom(2, this.loadedVariants);
 
 	},
 	
 	zoomOutButtonHandler : function() {
-
+		this.zoomOutButton.setVisible(false)
+		this.zoomInButton.setVisible(true);
 		var ideogram = this.getComponent('ideogram');
 		ideogram.changeZoom(1, this.loadedVariants);
 

@@ -48,23 +48,69 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
 
     statics: {
         colors: [
-            "rgb(255,0,0)",
-            "rgb(0,0,255)",
-            "rgb(0.255,255)",
-            "rgb(255,0,255)",
-            "rgb(125,125,0)",
-            "rgb(0,125,0)",
+            "red",
+            "blue",
+            "orange",
+            "green",
+            "purple",
+            "black",
         ],
         defaultColour: "rgba(0,0,0,0.5)",
         nextColourIndex: 0,
         /** @type {Object.<string,string>} */
-        valueToColourMap: {},
-        resetDisplayProperty: function () {
-            this.nextColourIndex = 0;
-            this.valueToColourMap = {};
+        valueToColourMap: [],
+        resetDisplayProperty: function (property) {
+        	
+        	this.nextColourIndex = 0;
+           if (property.displayType!=undefined){
+                    //if variant type property : CNV, SNV, indel, translocation, inversion
+            		if (property instanceof VariantTypeProperty) {
+            			
+            			if (property.displayType.indexOf('CNV')!=-1)
+            				this.valueToColourMap.push(['CNV','<font color="'+this.colors[this.nextColourIndex]+'">'+this.colors[this.nextColourIndex]+'</font>\n']);   
+            			else if (property.displayType.indexOf('SNV')!=-1)
+            				this.valueToColourMap.push(['SNV','<font color="'+this.colors[++this.nextColourIndex]+'">'+this.colors[this.nextColourIndex]+'</font>\n']); 
+            			else if (property.displayType.indexOf('indel')!=-1)
+            				this.valueToColourMap.push(['Indel','<font color="'+this.colors[++this.nextColourIndex]+'">'+this.colors[this.nextColourIndex]+'</font>\n']);
+            			else if (property.displayType.indexOf('translocation')!=-1)
+            				this.valueToColourMap.push(['Translocation',' : <font color="'+this.colors[++this.nextColourIndex]+'">'+this.colors[this.nextColourIndex]+'</font>\n']);
+            			else if (property.displayType.indexOf('inversion')!=-1)
+            				this.valueToColourMap.push(['Inversion',' : <font color="'+this.colors[++this.nextColourIndex]+'">'+this.colors[this.nextColourIndex]+'</font>\n']);
+            		} 
+            		//if CNV type : LOSS, GAIN
+            		if (property instanceof CNVTypeProperty) {
+            			//this.nextColourIndex = 0;
+            			this.valueToColourMap=[];
+            			if (property.displayType.indexOf('LOSS')!=-1)
+            				this.valueToColourMap.push(["LOSS"," : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"]);             
+            			if (property.displayType.indexOf('GAIN')!=-1)
+            				this.valueToColourMap.push(["GAIN"," : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"]);   
+            			    //this.valueToColourMap["GAIN"]="<font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>";   
+            			
+            		}
+            		
+            		if (property instanceof CharacteristicProperty) {
+            			var characteristicValueObject = variant.characteristics[property.name];
+            			if (characteristicValueObject !== null) {
+            				//if Characteristic type : benign, pathogenic, unknown
+            				if (property.name == 'chracteristics'){
+            					//this.nextColourIndex = 0;
+            					if (property.displayType.indexOf('benign')!=-1)
+                      			  this.valueToColourMap.push(['benign',' : <font color="'+this.colors[this.nextColourIndex]+'">'+this.colors[this.nextColourIndex]+'</font>\n']);   
+            					else if (property.displayType.indexOf('pathogenic')!=-1)
+                      				this.valueToColourMap.push(['pathogenic',' : <font color="'+this.colors[++this.nextColourIndex]+'">'+this.colors[this.nextColourIndex]+'</font>\n']);
+            					else if (property.displayType.indexOf('unknown')!=-1)
+                      				this.valueToColourMap.push(['unknown',' : <font color="'+this.colors[++this.nextColourIndex]+'">'+this.colors[this.nextColourIndex]+'</font>\n']); 
+            				}
+            				
+            			}
+            		}               
+           }else 
+            	this.valueToColourMap=[];
         }
     },
-
+    
+       
     /**
      * TODO: color legend function is broken/ not complete check getPropertyStringValue and property
      * @param {VariantValueObject} variant
@@ -74,17 +120,25 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
     pickColor: function (variant, property) {
         if (property == null) return this.self.defaultColour;
 
-        //var value = getPropertyStringValue(property);
-       var value = null;
-
+        //var value = variant.getPropertyStringValue(property);
+        var value = null;
+        //if variant type property : CNV, SNV, indel, translocation, inversion
         if (property instanceof VariantTypeProperty) {
             value = variant.variantType;
-        } else if (property instanceof CharacteristicProperty) {
-            var characteristicValueObject = variant.characteristics[property.name];
+           
+        } 
+        //if CNV type : LOSS, GAIN
+        if (property instanceof CNVTypeProperty) {
+             value = variant.type;  
+        }
+        //if Characteristic type : benign, pathogenic, unknown
+        if (property instanceof CharacteristicProperty) {
+           var characteristicValueObject = variant.characteristics[property.name];
             if (characteristicValueObject !== null) {
                 value = characteristicValueObject.value;
             }
         }
+      
 
         if (value == null) return this.self.defaultColour;
 
@@ -102,7 +156,7 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
                     this.self.nextColourIndex = 0; //TODO: for now just wrap around, think of a better way
                 }
             }
-            this.self.valueToColourMap[value] = color;
+            this.self.valueToColourMap[1] = color;
         }
         return color;
     },

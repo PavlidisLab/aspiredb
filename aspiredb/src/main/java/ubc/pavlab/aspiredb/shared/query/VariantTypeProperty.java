@@ -18,6 +18,8 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import java.util.Arrays;
+
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
@@ -26,6 +28,6 @@ import org.directwebremoting.annotations.DataTransferObject;
 @DataTransferObject(javascript = "VariantTypeProperty")
 public class VariantTypeProperty extends TextProperty {
     public VariantTypeProperty() {
-        super("Variant Type", "");
+        super("Variant Type", "type", Arrays.asList("CNV","SNV","indel","Inversion","Translocation"));
     }
 }
