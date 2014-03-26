@@ -450,15 +450,25 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	            	propertyValues.push(characteristicValueObject.value);
 	            }
 	        }
+	        //if labels
+	        if (property instanceof VariantLabelProperty) {
+	        	propertyValues.push(variant.labels[0].name);
+	        }
+	        
 	        this.displayedProperty=property;	               
 			chrIdeogram.drawVariant(variant, this.displayedProperty);
 						
 		}
 		this.displayedProperty.displayType =propertyValues;
+		
 		this.setDisplayedProperty(this.displayedProperty);
+		var valuetoColourArray =[];
+		for (values in ASPIREdb.view.ideogram.VariantLayer.valueToColourMap){
+			valuetoColourArray.push([values,ASPIREdb.view.ideogram.VariantLayer.valueToColourMap[values]]);
+		}
 		
 		//setting the colors for the ideogram ledgent
-		this.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap,this.displayedProperty); 
+		this.colourLegend.update(valuetoColourArray,this.displayedProperty); 
 
 		
 	},

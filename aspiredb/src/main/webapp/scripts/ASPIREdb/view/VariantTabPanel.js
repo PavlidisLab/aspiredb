@@ -157,7 +157,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		            [ 'arrayPlatform', 'Array Platform'],
 		            [ 'markers','Markers'],
 		            [ 'labels','Variant Labels'],
-		            [ 'SubjectLabels','Subject Labels']
+		            [ 'subjectLabels','Subject Labels']
 		            ];         
 
 		
@@ -338,108 +338,90 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					   var property =new VariantTypeProperty();
 					  property.name ='type';
 		        	  property.displayName ='Variant Type';
-					  ideogram.setDisplayedProperty(property);
-					  ideogram.drawChromosomes();
-					  ideogram.drawColouredVariants(this.loadedVariants);
-					  ideogram.showColourLegend();
+		        	  this.redrawIdeogram(property);
 					  break;
 					  }
 				  case 'cnvType':{
 					  var property =new CNVTypeProperty();
 					  property.name ='cnvType';
 		        	  property.displayName ='CNV Type';
-					  ideogram.setDisplayedProperty(property);
-					  ideogram.drawChromosomes();
-					  ideogram.drawColouredVariants(this.loadedVariants);
-					  ideogram.showColourLegend();
+		        	  this.redrawIdeogram(property);
 					  break;
 				  }
 				  case 'characteristics':{
 					  var property =new CharacteristicProperty();
-					  property.name ='characteristics';
+					  property.name ='Characteristics';
 		        	  property.displayName ='Characteristics';
-					  ideogram.setDisplayedProperty(property);
-					   ideogram.drawChromosomes();
-					  ideogram.drawColouredVariants(this.loadedVariants);
-					  ideogram.showColourLegend();
+		        	  this.redrawIdeogram(property);
 					  break;
 				  }
 				  case 'inheritance':{
 					  var property =new CharacteristicProperty();
-					  property.name ='inheritance';
+					  property.name ='Inheritance';
 		        	  property.displayName ='Inheritance';
-					  ideogram.setDisplayedProperty(property);
-					  ideogram.drawChromosomes();
-					  ideogram.drawColouredVariants(this.loadedVariants);
-					  ideogram.showColourLegend();
+		        	  this.redrawIdeogram(property);
 					  break;
 				  }
 				  case 'subjectLabels':{
-					  var property =new LabelProperty();
-					  property.name ='subjectLabels';
+					  var property =new SubjectLabelProperty();
+					  property.name ='Subject Labels';
 		        	  property.displayName ='Subject Label';
-					  ideogram.setDisplayedProperty(property);
-					  ideogram.drawChromosomes();
-					  ideogram.drawVariants(this.loadedVariants);
-					  ideogram.showColourLegend();
+		        	  this.redrawIdeogram(property);
 					  break;
 				  }
 				  case 'labels':{
 					  var property =new VariantLabelProperty();
-					  property.name ='labels';
+					  property.name ='Labels';
 		        	  property.displayName ='Variant Labels';
-					  ideogram.setDisplayedProperty(property);
-					  ideogram.drawChromosomes();
-					  ideogram.drawVariants(this.loadedVariants);
-					  ideogram.showColourLegend();
+		        	  this.redrawIdeogram(property);
 					  break;
 				  }
 				  case 'commonCNV':{
 					  var property =new CharacteristicProperty();
-					  property.name ='commonCNV';
+					  property.name ='Common CNV';
 		        	  property.displayName ='Common CNV';
-					  ideogram.setDisplayedProperty(property);
-					  ideogram.drawChromosomes();
-					  ideogram.drawColouredVariants(this.loadedVariants);
-					  ideogram.showColourLegend();
-					  break;
+		        	  this.redrawIdeogram(property);
 				  }
 				  case 'arrayReport':{
 					  var property =new CharacteristicProperty();
-					  property.name ='arrayReport';
+					  property.name ='Array Report';
 		        	  property.displayName ='Array Report';
-					  ideogram.setDisplayedProperty(property);
-					  ideogram.drawChromosomes();
-					  ideogram.drawColouredVariants(this.loadedVariants);
-					  ideogram.showColourLegend();
+		        	  this.redrawIdeogram(property);
 					  break;
 				  }
 				  case 'arrayPlatform':{
 					  var property =new CharacteristicProperty();
-					  property.name ='arrayPlatform';
+					  property.name ='Array Platform';
 		        	  property.displayName ='Array Platform';
-					  ideogram.setDisplayedProperty(property);
-					  ideogram.drawChromosomes();
-					  ideogram.drawColouredVariants(this.loadedVariants);
-					  ideogram.showColourLegend();
+		        	  this.redrawIdeogram(property);
 					  break;
 				  }
 				  case 'markers':{
 					  var property =new CharacteristicProperty();
-					  property.name ='markers';
+					  property.name ='Markers';
 		        	  property.displayName ='Markers';
-					  ideogram.setDisplayedProperty(property);
-					  ideogram.drawChromosomes();
-					  ideogram.drawColouredVariants(this.loadedVariants);
-					  ideogram.showColourLegend();
+		        	  this.redrawIdeogram(property);
 					  break;
 				  }
+				 
 				  				  
 				}
 				
 			}
 			
 			
+	},
+	
+	/**
+	 * Redraw the ideogram basd on colour code
+	 */
+	redrawIdeogram : function(property){
+		  var ideogram = this.getComponent('ideogram');
+		  
+		  ideogram.setDisplayedProperty(property);
+		  ideogram.drawChromosomes();
+		  ideogram.drawColouredVariants(this.loadedVariants);
+		  ideogram.showColourLegend();
 	},
 	/**
 	 * When subjects are selected in the subject grid highlist the variants of selected subjects in ideogram and in table view
