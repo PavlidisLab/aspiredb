@@ -100,11 +100,15 @@ Ext.define('ASPIREdb.view.SaveUserGeneSetWindow', {
 
 										ASPIREdb.view.SaveUserGeneSetWindow.down('#geneSetName').setValue('');
 										ASPIREdb.view.SaveUserGeneSetWindow.close();
-										ASPIREdb.view.SaveUserGeneSetWindow.fireEvent('new_geneSet_saved');
+										ASPIREdb.EVENT_BUS.fireEvent('new_geneSet_saved');
 
 									}
 								});
 								ref.down('#geneSetName').clearValue();
+								
+								
+								
+								
 				    		
 							}
 							
@@ -117,11 +121,12 @@ Ext.define('ASPIREdb.view.SaveUserGeneSetWindow', {
 				else {
 					UserGeneSetService.saveUserGeneSet(geneSetName, ref.geneSetValueobjects, {
 						callback : function(gvoId) {
-
+														
 							ASPIREdb.view.SaveUserGeneSetWindow.down('#geneSetName').setValue('');
 							ASPIREdb.view.SaveUserGeneSetWindow.close();
-							ASPIREdb.view.SaveUserGeneSetWindow.fireEvent('new_geneSet_saved');
+							ASPIREdb.EVENT_BUS.fireEvent('new_geneSet_saved', geneSetName);
 							//ASPIREdb.view.DeleteQueryWindow.updateDeleteQueryCombo();
+							
 
 						}
 					});

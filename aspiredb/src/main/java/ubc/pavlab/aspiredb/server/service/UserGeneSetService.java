@@ -38,6 +38,8 @@ public interface UserGeneSetService {
     public List<GeneValueObject> loadUserGeneSet( String name );
 
     public Collection<String> getSavedUserGeneSetNames();
+    
+    public void addGenes(String geneName,List<GeneValueObject> genes) throws BioMartServiceException;
 
     public void deleteUserGeneSet( String name );
         

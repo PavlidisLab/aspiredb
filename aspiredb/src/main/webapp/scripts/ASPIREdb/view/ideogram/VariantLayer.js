@@ -125,7 +125,16 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
           				this.valueToColourMap['paternal']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"; 
 					if (property.displayType.indexOf('unclassified')!=-1)
           				this.valueToColourMap['unclassified']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"; 
-				}	    			
+				}	
+				
+				if (property.name == 'Common CNV'){
+					this.nextColourIndex = 0;
+					if (property.displayType.indexOf('Y')!=-1)
+          				this.valueToColourMap['Y']=" : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";
+					if (property.displayType.indexOf('N')!=-1)
+            			  this.valueToColourMap['N']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";   
+					
+				}
     		
 				if (property.name == 'Array Report'){
 					this.nextColourIndex = 0;
@@ -265,6 +274,17 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
                         		console.log('unclassified : '+color);
                         }
                	  
+                    }
+               }
+                
+                if (property.name =='Common CNV'){                	
+                    var color = this.self.valueToColourMap[value];
+                    if (color == null) {
+                   	 if (value.toLowerCase() === "y") {            
+                            color = this.self.colors[colorIndex];                            
+                        } else if (value.toLowerCase() === "n") {            	
+                            	color = this.self.colors[colorIndex+1];
+                        }                                      	  
                     }
                }
                 

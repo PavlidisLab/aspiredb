@@ -34,6 +34,8 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 		//collection of selected gene value objects
 		selectedgenes :[],	
 		gvos : [],
+		selectedGeneSet : [],
+		
 	},
 
 	dockedItems : [ {
@@ -47,7 +49,8 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 	            	header : 'Gene Symbol',
 	            	dataIndex : 'symbol',
 	            	flex : 1
-	            }, {
+	            }, 
+	            {
 	            	header : 'Gene Name',
 	            	dataIndex : 'name',
 	            	flex : 1
@@ -61,9 +64,13 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 		this.callParent();
 		var me = this;
 		me.enableToolbar();
-
+		ASPIREdb.EVENT_BUS.on('geneSet_selected', this.geneSetSelectHandler, this);
+		
 	},
 	
+	geneSetSelectHandler : function(selGeneSet){
+			this.selectedGeneSet= selGeneSet;		
+	},
 	
 	enableToolbar : function(names) {
 		
@@ -98,16 +105,44 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 				var genesymbol =ref.down('#geneName').getValue();
 				UserGeneSetService.getGenes(genesymbol,{
 						callback : function(gvo) {
-							ref.gvos.push(gvo);
-							var data = [];
-							var row = [ gvo.symbol,'',gvo.name,''];		
-							data.push(row);
 							var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
 							var grid =panel.down ('#geneGrid');
-							//TODO : refresh grid when loaded
-							grid.store.loadData(data);
-							grid.setLoading(false);		
-							grid.getView().refresh();
+							
+							ref.gvos.push(gvo);
+							var data = [];
+							var row = [ gvo[0].symbol,'',gvo[0].name,''];		
+							data.push(row);
+							
+							//activate confirmation window
+							Ext.MessageBox.confirm('Where to save the gene', 'Save it in the existing gene set?', function(btn){
+							   if(btn === 'yes'){
+								   
+								   UserGeneSetService.addGenes(ref.selectedGeneSet[0].data.geneSetName, gvo, {				
+										callback : function() {
+											//TODO : refresh grid when loaded
+										    grid.store.add(data);
+											grid.getView().refresh(true);
+											grid.setLoading(false);
+											
+										}
+								   });
+								   
+							   }
+							   else if (btn === 'no'){															   
+								   
+								   	ASPIREdb.view.SaveUserGeneSetWindow.initAndShow(gvo);
+								  //TODO : refresh grid when loaded
+								    grid.store.removeAll(true);
+									grid.store.add(data);
+									grid.getView().refresh(true);
+									grid.setLoading(false);
+									
+							   }
+							   
+							   
+							   
+							 }, ref);						
+													
 						}
 				});
 				
