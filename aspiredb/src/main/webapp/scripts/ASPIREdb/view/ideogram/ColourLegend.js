@@ -6,7 +6,7 @@ Ext.define('ASPIREdb.view.ideogram.ColourLegend', {
     height: 200,
     autoScroll: true,
     title: 'Ideogram',
-    closable: false,
+    closable: true,
     layout: 'absolute',
     items: [
         {

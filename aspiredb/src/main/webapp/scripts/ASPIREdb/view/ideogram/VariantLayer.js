@@ -89,18 +89,22 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
     				this.valueToColourMap["GAIN"]= " : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>"+"\n";    			
     		} 
     		
-    		//if CNV type : LOSS, GAIN
+    		//if variant label
     		if (property instanceof VariantLabelProperty) {
-    					
+    			/**for(var i=0; i < property.displayType.length;i++){
+    				this.valueToColourMap[property.displayType[i]]= " : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>"+"\n";
+    			}*/
+    			
     		} 
     		
-    		//if CNV type : LOSS, GAIN
+    		//if subject label
     		if (property instanceof SubjectLabelProperty) {
     			
     		} 
     		
-    		if (property instanceof CharacteristicProperty) {    			
-    			//if Characteristic type : benign, pathogenic, unknown
+    		//if Characteristic type : benign, pathogenic, unknown
+    		if (property instanceof CharacteristicProperty) {
+    			
     			if (property.name == 'Characteristics'){
     				this.nextColourIndex = 0;
     				if (property.displayType.indexOf('Pathogenic')!=-1)
@@ -203,27 +207,24 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
         
         //if  variant labels
         if (property instanceof VariantLabelProperty) {
-        	if (variant.labels.length >0){
-        		value = variant.labels[0].name;
-        	 	color =variant.labels[0].color;
-        	 	
-        	 	var color = this.self.valueToColourMap[value];
-                if (color == null) {
-               	 color = "black";
-                }
-        	}
-        	                         
-             
+        	
+           	if (variant.labels.length >0){
+        		value = variant.labels[0].name;        		
+          		var color = variant.labels[0].colour;
+        		console.log('variant label color :'+color);
+        		this.self.valueToColourMap[value]=" : <font color='"+color+"'>"+color+"</font>\n"; 	                         
+           	} 
         }
         
-        //if  variant labels
+        //if  subject labels
         if (property instanceof SubjectLabelProperty) {
-             value = variant.subjecId;
-                         
-             var color = this.self.valueToColourMap[value];
-             if (color == null) {
-            	
-            }
+             subject = variant.subject;
+             if (subject.labels.length >0){
+         		value = subject.labels[0].name;        		
+           		var color = subject.labels[0].colour;
+         		console.log('subject label color :'+color);
+         		this.self.valueToColourMap[value]=" : <font color='"+color+"'>"+color+"</font>\n"; 	                         
+            	}            
         }
         
         //if Characteristic type : benign, pathogenic, unknown

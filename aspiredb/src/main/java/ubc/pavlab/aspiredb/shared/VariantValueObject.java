@@ -15,6 +15,7 @@
 package ubc.pavlab.aspiredb.shared;
 
 import org.directwebremoting.annotations.DataTransferObject;
+
 import ubc.pavlab.aspiredb.shared.query.*;
 
 import java.io.Serializable;
@@ -32,6 +33,7 @@ public class VariantValueObject implements Serializable {
 
     protected Long subjectId;
     protected String details="";
+    protected SubjectValueObject subject;
 	
 	protected String patientId;
 	protected Map<String, CharacteristicValueObject> characteristics;
@@ -66,6 +68,14 @@ public class VariantValueObject implements Serializable {
 
     public Long getSubjectId() {
         return subjectId;
+    }
+    
+    public SubjectValueObject getSubject() {
+        return subject;
+    }
+    
+    public void setSubject(SubjectValueObject subject) {
+        this.subject=subject;
     }
 
     public void setSubjectId(Long subjectId) {

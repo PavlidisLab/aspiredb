@@ -49,6 +49,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		loadedSubjects : [],
 		selectedSubjectVariants: [],
 		loadedVariants:[],
+		property: new VariantTypeProperty(),
 		
 	},
 
@@ -193,6 +194,11 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			ref.down('#variantGrid').getView().refresh();
 		});
 		
+		ASPIREdb.EVENT_BUS.on('property_changed', function(property){
+			ref.property =[];
+			ref.property = property;
+		});
+		
 		ASPIREdb.EVENT_BUS.on('subjects_loaded', function(subjectIds) {
 			ref.loadedSubjects=[];
 			ref.loadedSubjects =subjectIds;
@@ -335,9 +341,10 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 				
 				switch (selectedValue){
 				  case 'type': {
-					   var property =new VariantTypeProperty();
+					  var property =new VariantTypeProperty();
 					  property.name ='type';
 		        	  property.displayName ='Variant Type';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
 		        	  this.redrawIdeogram(property);
 					  break;
 					  }
@@ -345,6 +352,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					  var property =new CNVTypeProperty();
 					  property.name ='cnvType';
 		        	  property.displayName ='CNV Type';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
 		        	  this.redrawIdeogram(property);
 					  break;
 				  }
@@ -352,6 +360,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					  var property =new CharacteristicProperty();
 					  property.name ='Characteristics';
 		        	  property.displayName ='Characteristics';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
 		        	  this.redrawIdeogram(property);
 					  break;
 				  }
@@ -359,6 +368,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					  var property =new CharacteristicProperty();
 					  property.name ='Inheritance';
 		        	  property.displayName ='Inheritance';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
 		        	  this.redrawIdeogram(property);
 					  break;
 				  }
@@ -366,6 +376,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					  var property =new SubjectLabelProperty();
 					  property.name ='Subject Labels';
 		        	  property.displayName ='Subject Label';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
 		        	  this.redrawIdeogram(property);
 					  break;
 				  }
@@ -373,6 +384,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					  var property =new VariantLabelProperty();
 					  property.name ='Labels';
 		        	  property.displayName ='Variant Labels';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
 		        	  this.redrawIdeogram(property);
 					  break;
 				  }
@@ -380,12 +392,14 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					  var property =new CharacteristicProperty();
 					  property.name ='Common CNV';
 		        	  property.displayName ='Common CNV';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
 		        	  this.redrawIdeogram(property);
 				  }
 				  case 'arrayReport':{
 					  var property =new CharacteristicProperty();
 					  property.name ='Array Report';
 		        	  property.displayName ='Array Report';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
 		        	  this.redrawIdeogram(property);
 					  break;
 				  }
@@ -393,6 +407,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					  var property =new CharacteristicProperty();
 					  property.name ='Array Platform';
 		        	  property.displayName ='Array Platform';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
 		        	  this.redrawIdeogram(property);
 					  break;
 				  }
@@ -400,6 +415,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					  var property =new CharacteristicProperty();
 					  property.name ='Markers';
 		        	  property.displayName ='Markers';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
 		        	  this.redrawIdeogram(property);
 					  break;
 				  }
@@ -546,16 +562,18 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		this.zoomInButton.setVisible(false);
 		this.zoomOutButton.setVisible(true);
 		var ideogram = this.getComponent('ideogram');
+		//ideogram.changeZoom(2, this.loadedVariants, this.property);
 		ideogram.changeZoom(2, this.loadedVariants);
-
+				
 	},
 	
 	zoomOutButtonHandler : function() {
 		this.zoomOutButton.setVisible(false)
 		this.zoomInButton.setVisible(true);
 		var ideogram = this.getComponent('ideogram');
+		//ideogram.changeZoom(1, this.loadedVariants, this.property);
 		ideogram.changeZoom(1, this.loadedVariants);
-
+	
 	},
 
 	viewGenesHandler : function() {

@@ -1,4 +1,4 @@
-Ext.require([ 'Ext.panel.Panel', 'Ext.Component', 'ASPIREdb.view.ideogram.ColourLegend', 'ASPIREdb.view.ideogram.VariantLayer' ]);
+Ext.require([ 'Ext.panel.Panel', 'Ext.Component', 'ASPIREdb.view.ideogram.ColourLegend', 'ASPIREdb.view.ideogram.VariantLayer','ASPIREdb.ActiveProjectSettings' ]);
 
 // TODO: events: GenomeRegionSelectionEvent
 //
@@ -288,11 +288,13 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	 * @param {number}
 	 *            newZoom
 	 */
+	//changeZoom : function(newZoom, variants,property) {
 	changeZoom : function(newZoom, variants) {
 		this.zoom = newZoom;
 		this.width = Math.round(850 * this.zoom);
 		this.height = Math.round(this.boxHeight * this.zoom);
 		this.redraw(variants);
+		//this.redraw(variants, property);
 	},
 
 	/**
@@ -450,11 +452,22 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	            	propertyValues.push(characteristicValueObject.value);
 	            }
 	        }
-	        //if labels
+	        //if variant labels
 	        if (property instanceof VariantLabelProperty) {
-	        	propertyValues.push(variant.labels[0].name);
+	        	if (variant.labels.length >0){
+	        		propertyValues.push(variant.labels[0].name);
+	        		console.log('variant label name :'+variant.labels[0].name);
+	        	}
 	        }
-	        
+	      //if subject labels
+	        if (property instanceof SubjectLabelProperty) {
+	        	subject = variant.subject
+	        	if (subject.labels.length >0){
+	        		propertyValues.push(subject.labels[0].name);
+	        		console.log('variant label name :'+subject.labels[0].name);
+	        	}
+	        	
+	        }
 	        this.displayedProperty=property;	               
 			chrIdeogram.drawVariant(variant, this.displayedProperty);
 						
@@ -571,10 +584,11 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	 * @public
 	 */
 	redraw : function(variants) {
+		this.setDisplayedProperty(this.displayedProperty);
 		this.drawChromosomes();
-		this.drawVariants(variants);
-		//setting the colors for the ideogram ledgent
-		this.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap, this.displayedProperty);
+		this.drawColouredVariants(variants);
+		this.showColourLegend();
+
 	},
 	
 
