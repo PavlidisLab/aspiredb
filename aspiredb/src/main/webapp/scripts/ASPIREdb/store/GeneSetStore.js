@@ -23,6 +23,7 @@ Ext.define('ASPIREdb.store.GeneSetStore', {
     extend: 'Ext.data.ArrayStore',
     alias: 'store.geneSetStore',
     autoSync : true,
+    autoLoad : true,
     
     fields: [
              {name: 'geneSetName', type: 'string'},

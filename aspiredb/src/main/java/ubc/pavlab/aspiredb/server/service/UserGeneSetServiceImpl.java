@@ -98,17 +98,21 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
     @Transactional
     @RemoteMethod
     public Long saveUserGeneSet(String geneSetName,List<GeneValueObject> genes)throws BioMartServiceException {
-        final List<UserGeneSet> geneSet = userGeneSetDao.findByName(geneSetName);        
-        
-        
+        final List<UserGeneSet> geneSet = userGeneSetDao.findByName(geneSetName);       
+       
         List<String> geneSymbols=new ArrayList<>();
-      //storing the gene symbols
-        for (GeneValueObject gvo: genes){
-        	geneSymbols.add(gvo.getSymbol());        	
-        }
-        //getting the actual gene value objects. Gene value object will return null unless the gene value object id is specified. so we need to do this workaround to obtain the complete gene value object 
-        List<GeneValueObject> geneValueObjects= bioMartQueryService.getGenes(geneSymbols);   
+        List<GeneValueObject> geneValueObjects = new ArrayList<GeneValueObject>();
         
+        if (genes.get(0).getEnsemblId()==null){
+        	//null gene value objects
+        } else {
+        	//storing the gene symbols
+        	for (GeneValueObject gvo: genes){
+        		geneSymbols.add(gvo.getSymbol());        	
+        	}
+        	//getting the actual gene value objects. Gene value object will return null unless the gene value object id is specified. so we need to do this workaround to obtain the complete gene value object 
+        	geneValueObjects= bioMartQueryService.getGenes(geneSymbols);   
+        }
         UserGeneSet savedUserGeneSet=null;
         if ( geneSet.isEmpty() ) {
         	UserGeneSet userGeneSet = new UserGeneSet(geneSetName, ( Serializable ) geneValueObjects);

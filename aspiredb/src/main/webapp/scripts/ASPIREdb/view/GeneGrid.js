@@ -19,7 +19,9 @@
 
 Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow' ]);
 
-// TODO js documentation
+/**
+ * Create Gene Grid
+ */
 Ext.define('ASPIREdb.view.GeneGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.geneGrid',
@@ -68,22 +70,28 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 		
 	},
 	
+	/**
+	 * Store the gene value object when selected
+	 * @param GeneSetValueObject selGeneSet
+	 */
 	geneSetSelectHandler : function(selGeneSet){
 			this.selectedGeneSet= selGeneSet;		
 	},
 	
-	enableToolbar : function(names) {
+	/**
+	 * Enable the tool bar in Gene grid
+	 *  
+	 */
+	enableToolbar : function() {
 		
-		this.getDockedComponent('geneSetGridToolbar').remove('addGeneset');
-		this.getDockedComponent('geneSetGridToolbar').remove('editGeneset');
-		this.getDockedComponent('geneSetGridToolbar').remove('removeGeneset');
+		this.getDockedComponent('geneSetGridToolbar').removeAll();
+		
 		
 		this.getDockedComponent('geneSetGridToolbar').add({
 			xtype : 'textfield',
 			id : 'geneName',
 			text : '',			
-			//tooltip : 'Gene Names',
-			icon:'scripts/ASPIREdb/resources/images/icons/add.png',
+			allowBlank : false,
 			handler: function(){
 				//TODO: have to populate human taxon gene list auto complete features
 				//BioMartQueryService.getGenes(genesymbol),			
@@ -112,7 +120,19 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 							var data = [];
 							var row = [ gvo[0].symbol,'',gvo[0].name,''];		
 							data.push(row);
-							
+							if (ref.selectedGeneSet[0]!=null){
+								UserGeneSetService.addGenes(ref.selectedGeneSet[0].data.geneSetName, gvo, {				
+									callback : function() {
+										//TODO : refresh grid when loaded
+									    grid.store.add(data);
+										grid.getView().refresh(true);
+										grid.setLoading(false);
+										
+									}
+								});
+							}
+							else  Ext.Msg.alert('error','select the Gene Set Name to add Genes ');
+							 /**
 							//activate confirmation window
 							Ext.MessageBox.confirm('Where to save the gene', 'Save it in the existing gene set?', function(btn){
 							   if(btn === 'yes'){
@@ -141,7 +161,7 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 							   
 							   
 							   
-							 }, ref);						
+							 }, ref);	*/					
 													
 						}
 				});

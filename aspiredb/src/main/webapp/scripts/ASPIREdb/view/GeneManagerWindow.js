@@ -18,7 +18,9 @@
  */
 
 Ext.require([ 'Ext.Window', 'ASPIREdb.view.GeneManagerPanel','ASPIREdb.GemmaURLUtils' ]);
-
+/**
+ * Gene manager has Gene Panel
+ */
 Ext.define('ASPIREdb.view.GeneManagerWindow', {
 	extend : 'Ext.Window',
 	alias : 'widget.geneManagerWindow',
@@ -38,16 +40,17 @@ Ext.define('ASPIREdb.view.GeneManagerWindow', {
 		xtype : 'ASPIREdb_genemanagerpanel',
 	}],
 
+	
 	initComponent : function() {
 	
 		var ref = this;
-		this.callParent();
-		
+		this.callParent();		
 
 	},
 	
-	
-	
+	/**
+	 * Show the gene manager window
+	 */	
 	initGridAndShow : function(){
 		
 		var ref = this;
@@ -68,7 +71,9 @@ Ext.define('ASPIREdb.view.GeneManagerWindow', {
 	
 	
 	
-	//GeneSet Names
+	/**
+	 * Populate and gene set names in the gene set grid
+	 */
 	populateGeneSetGrid : function(names) {
 		
 		var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
@@ -84,7 +89,7 @@ Ext.define('ASPIREdb.view.GeneManagerWindow', {
 		grid.store.loadData(data);
 		grid.setLoading(false);		
 		grid.getView().refresh();
-		grid.enableToolbar(names);
+		grid.enableToolbar();
 	},	
 	
 	

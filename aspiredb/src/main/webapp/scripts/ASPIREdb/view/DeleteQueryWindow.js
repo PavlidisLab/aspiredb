@@ -13,10 +13,14 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * limitations under the License. * 
+ * 
  */
 
+/**
+ * @author Gaya Charath
+ * This is widjet is created to handler the delete query window
+ */
 Ext.require([ 'Ext.Window' ]);
 
 Ext.define('ASPIREdb.view.DeleteQueryWindow', {
@@ -64,7 +68,10 @@ Ext.define('ASPIREdb.view.DeleteQueryWindow', {
 		} ]
 
 	} ],
-
+	
+	/**
+	 * init 
+	 */
 	initComponent : function() {
 		this.callParent();
 
@@ -83,7 +90,9 @@ Ext.define('ASPIREdb.view.DeleteQueryWindow', {
 		this.show();
 
 	},
-	
+	/**
+	 * When delete button is pressed
+	 */
 	deleteButtonHandler : function() {
 		
 		var ref = this;
@@ -117,6 +126,9 @@ Ext.define('ASPIREdb.view.DeleteQueryWindow', {
 
 	},
 	
+	/**
+	 * when query is deleted, update the combobox store
+	 */
 	updateDeleteQueryCombo : function() {
 
 		var deleteQueryComboBox = this.down('#deleteQueryComboBox');

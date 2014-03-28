@@ -20,7 +20,6 @@
 Ext.require([ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel', 'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.VariantGridCreator' , 'ASPIREdb.IdeogramDownloadWindow','Ext.data.ArrayStore',
       		'Ext.form.ComboBox']);
 
-// TODO js documentation
 /**
  * Variant Tab Panel contains both Ideogram view and Variant table view
  */
