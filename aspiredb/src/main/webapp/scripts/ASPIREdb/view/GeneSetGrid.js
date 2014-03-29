@@ -17,7 +17,13 @@
  *
  */
 
-Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneSetStore','ASPIREdb.TextDataDownloadWindow' ]);
+Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneSetStore','ASPIREdb.TextDataDownloadWindow', 'Ext.grid.*', 'Ext.data.*' ]);
+
+var rowEditing = Ext.create('Ext.grid.plugin.RowEditing',{
+	clicksToEdit: 2,
+	clicksToMoveEditor : 1,
+	
+	});
 
 // TODO js documentation
 Ext.define('ASPIREdb.view.GeneSetGrid', {
@@ -25,7 +31,10 @@ Ext.define('ASPIREdb.view.GeneSetGrid', {
 	alias : 'widget.geneSetGrid',
 	emptyText : 'No gene sets found',
 	id : 'geneSetGrid',
+	plugins: [rowEditing],
 	border: true,
+	editing:true,
+	
 	store : Ext.create('ASPIREdb.store.GeneSetStore'),
 		
 	config:{
@@ -137,7 +146,7 @@ Ext.define('ASPIREdb.view.GeneSetGrid', {
 		});
 		
 		
-		this.getDockedComponent('geneSetGridToolbar').add('-');
+		//this.getDockedComponent('geneSetGridToolbar').add('-');
 			
 		var ref=this;
 		
@@ -148,7 +157,7 @@ Ext.define('ASPIREdb.view.GeneSetGrid', {
 			tooltip : 'Add new gene set',
 			icon:'scripts/ASPIREdb/resources/images/icons/add.png',
 			handler: function(){
-				
+			
 				var newGeneSetName =ref.down('#geneSetName').getValue();
 				
 				geneValueObjects =[];
@@ -174,9 +183,6 @@ Ext.define('ASPIREdb.view.GeneSetGrid', {
 						}
 				});
 		
-				
-				
-								
 			}
 		});
 				
@@ -191,18 +197,12 @@ Ext.define('ASPIREdb.view.GeneSetGrid', {
 				//Delete gene set
 				UserGeneSetService.deleteUserGeneSet(ref.selGeneSet[0].data.geneSetName, {
 					callback : function() {
-						var data = [];
-						var row = [ref.selGeneSet[0].data.geneSetName,'',''];		
-						data.push(row);
-						
 						var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
 						var geneSetGrid = panel.down ('#geneSetGrid');
-						geneSetGrid.store.remove(data);
-						var newData = geneSetGrid.store.data;
-						
-						geneSetGrid.store.load(newData);
-						geneSetGrid.getView().refresh(true);
-						geneSetGrid.setLoading(false);
+						var selection = geneSetGrid.getView().getSelectionModel().getSelection()[0];
+	                    if (selection) {
+	                    	geneSetGrid.store.remove(selection);
+	                    }
 						
 						console.log('selected geneset :'+ref.selGeneSet[0].data.geneSetName+' deleted')
 					}
@@ -211,7 +211,9 @@ Ext.define('ASPIREdb.view.GeneSetGrid', {
 			}
 		});
 		
-		
+		this.getSelectionModel().on('selectionchange', function(selModel, selections){
+	        this.down('#removeGeneset').setDisabled(selections.length === 0);
+	    });
 		
 	
 	}

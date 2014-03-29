@@ -132,37 +132,7 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 								});
 							}
 							else  Ext.Msg.alert('error','select the Gene Set Name to add Genes ');
-							 /**
-							//activate confirmation window
-							Ext.MessageBox.confirm('Where to save the gene', 'Save it in the existing gene set?', function(btn){
-							   if(btn === 'yes'){
-								   
-								   UserGeneSetService.addGenes(ref.selectedGeneSet[0].data.geneSetName, gvo, {				
-										callback : function() {
-											//TODO : refresh grid when loaded
-										    grid.store.add(data);
-											grid.getView().refresh(true);
-											grid.setLoading(false);
-											
-										}
-								   });
-								   
-							   }
-							   else if (btn === 'no'){															   
-								   
-								   	ASPIREdb.view.SaveUserGeneSetWindow.initAndShow(gvo);
-								  //TODO : refresh grid when loaded
-								    grid.store.removeAll(true);
-									grid.store.add(data);
-									grid.getView().refresh(true);
-									grid.setLoading(false);
-									
-							   }
-							   
-							   
-							   
-							 }, ref);	*/					
-													
+							
 						}
 				});
 				
@@ -177,12 +147,22 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 			tooltip : 'Remove the selected gene',
 			icon:'scripts/ASPIREdb/resources/images/icons/delete.png',
 			handler: function(){
-				//remove the selected gene from the gene set
+				var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
+				var geneGrid = panel.down ('#geneGrid');
 				
-				//TODO : refresh grid when loaded
-				ref.store.getView.refresh();				
+				var selection = geneGrid.getView().getSelectionModel().getSelection()[0];
+                if (selection) {
+                	geneGrid.store.remove(selection);
+                }
+						
 			}
 		});
+		
+		this.getSelectionModel().on('selectionchange', function(selModel, selections){
+	        this.down('#removeGenes').setDisabled(selections.length === 0);
+	    });
+		
+		
 	
 	}
 });
