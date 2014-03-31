@@ -226,19 +226,48 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
          } else {
              throw new IllegalStateException( "Found more than one saved gene sets with same name belonging to one user." );
          }
-    	
-    	
-    	
-    	
-    	Collection<String> geneSetNames = new ArrayList<>();
+   
+         Collection<String> geneSetNames = new ArrayList<>();
         Collection<UserGeneSet> genesets = userGeneSetDao.loadAll();
 
         for ( UserGeneSet geneset : genesets ) {
         	geneSetNames.add( geneset.getName() );
         }
-        
+    }
+    
+    @Override
+    @RemoteMethod
+    public void deleteGene(String geneSetName,String geneSymbol) throws BioMartServiceException{
+    	 final List<UserGeneSet> geneSet = userGeneSetDao.findByName(geneSetName);     
+        	 
+    	 List<GeneValueObject> existingGeneValueObjects=new ArrayList<>();
+         
+         if (geneSet.size() > 0) {  
+        	 existingGeneValueObjects = (List<GeneValueObject>)geneSet.iterator().next().getObject();
+    	 }
+    	 else existingGeneValueObjects=null;   
+      
+         List<GeneValueObject> newGeneValueObjects=new ArrayList<>();
+         
+       //removing the gene to the gene set         
+         for (GeneValueObject gvo: existingGeneValueObjects){
+         	 	if (gvo.getSymbol().contentEquals(geneSymbol)){
+         	 		//do nothing
+         	 	}else newGeneValueObjects.add(gvo);
+         }
+         
+         if ( geneSet.isEmpty() ) {
+          	UserGeneSet userGeneSet = new UserGeneSet(geneSetName, ( Serializable ) newGeneValueObjects);          	
+          } else if ( geneSet.size() == 1 ) {
+          	UserGeneSet userGeneSet = geneSet.iterator().next();
+          	userGeneSet.setObject( ( Serializable ) newGeneValueObjects );
+              userGeneSetDao.update( userGeneSet );  
+          } else {
+              throw new IllegalStateException( "Found more than one saved gene sets with same name belonging to one user." );
+          }
     	
     }
+    
     
     @Override
     @RemoteMethod

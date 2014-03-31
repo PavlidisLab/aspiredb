@@ -42,6 +42,8 @@ public interface UserGeneSetService {
     public void addGenes(String geneName,List<GeneValueObject> genes) throws BioMartServiceException;
 
     public void deleteUserGeneSet( String name );
+    
+    public void deleteGene(String geneSetName,String geneSymbol) throws BioMartServiceException;
         
     public Long saveUserGeneSet(String geneName,List<GeneValueObject> genes) throws BioMartServiceException;
     

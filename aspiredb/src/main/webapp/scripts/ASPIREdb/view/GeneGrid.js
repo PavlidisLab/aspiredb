@@ -17,7 +17,13 @@
  *
  */
 
-Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow' ]);
+Ext.require([ 'Ext.grid.*', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow', 'Ext.data.*','Ext.util.*', 'Ext.state.*', 'Ext.form.*' ]);
+
+var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
+    //clicksToMoveEditor: 1,
+	clicksToEdit: 2,
+     autoCancel: false
+});
 
 /**
  * Create Gene Grid
@@ -34,7 +40,7 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 		// collection of all the PhenotypeSummaryValueObject loaded
 		LoadedGeneSetNames : [],
 		//collection of selected gene value objects
-		selectedgenes :[],	
+		selectedGene :[],	
 		gvos : [],
 		selectedGeneSet : [],
 		
@@ -42,7 +48,7 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 
 	dockedItems : [ {
 		xtype : 'toolbar',
-		itemId : 'geneSetGridToolbar',
+		itemId : 'geneGridToolbar',
 		dock : 'top'
 		}],
 
@@ -50,22 +56,38 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 	            {
 	            	header : 'Gene Symbol',
 	            	dataIndex : 'symbol',
-	            	flex : 1
+	            	flex : 1,
+	            	editor: {
+		                // defaults to textfield if no xtype is supplied
+		                allowBlank: false
+		            }
 	            }, 
 	            {
 	            	header : 'Gene Name',
 	            	dataIndex : 'name',
-	            	flex : 1
+	            	flex : 1,
+	            	editor: {
+		                // defaults to textfield if no xtype is supplied
+		                allowBlank: false
+		            }
 	            }
 	],		
 	
-
+	plugins: [rowEditing],
+	listeners: {
+        'selectionchange': function(view, records) {
+            this.down('#removeGene').setDisabled(!records.length);
+            this.selectedGene=this.getSelectionModel().getSelection();
+            console.log('selected gene sumbol : '+this.selectedGene[0].data.symbol);
+        }
+    },
 	
 
 	initComponent : function() {
 		this.callParent();
 		var me = this;
 		me.enableToolbar();
+		
 		ASPIREdb.EVENT_BUS.on('geneSet_selected', this.geneSetSelectHandler, this);
 		
 	},
@@ -84,25 +106,23 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 	 */
 	enableToolbar : function() {
 		
-		this.getDockedComponent('geneSetGridToolbar').removeAll();
+		this.getDockedComponent('geneGridToolbar').removeAll();
 		
 		
-		this.getDockedComponent('geneSetGridToolbar').add({
+		this.getDockedComponent('geneGridToolbar').add({
 			xtype : 'textfield',
 			id : 'geneName',
 			text : '',			
 			allowBlank : false,
-			handler: function(){
-				//TODO: have to populate human taxon gene list auto complete features
-				//BioMartQueryService.getGenes(genesymbol),			
-			}
+			
 		});
 		
 		
-		this.getDockedComponent('geneSetGridToolbar').add('-');
+		this.getDockedComponent('geneGridToolbar').add('-');
 		
 		var ref=this;
-		this.getDockedComponent('geneSetGridToolbar').add({
+		
+		this.getDockedComponent('geneGridToolbar').add({
 			xtype : 'button',
 			id : 'addGene',
 			text : '',
@@ -140,28 +160,32 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 			}
 		});
 				
-		this.getDockedComponent('geneSetGridToolbar').add({
+		this.getDockedComponent('geneGridToolbar').add({
 			xtype : 'button',
 			id : 'removeGene',
 			text : '',
 			tooltip : 'Remove the selected gene',
 			icon:'scripts/ASPIREdb/resources/images/icons/delete.png',
 			handler: function(){
-				var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
-				var geneGrid = panel.down ('#geneGrid');
-				
-				var selection = geneGrid.getView().getSelectionModel().getSelection()[0];
-                if (selection) {
-                	geneGrid.store.remove(selection);
-                }
+				var geneSymbol =ref.selectedGene[0].data.symbol;
+				UserGeneSetService.deleteGene(ref.selectedGeneSet[0].data.geneSetName, geneSymbol, {				
+					callback : function() {
 						
+						var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
+						var geneGrid = panel.down ('#geneGrid');
+				
+						var selection = geneGrid.getView().getSelectionModel().getSelection()[0];
+						if (selection) {
+							geneGrid.store.remove(selection);
+						}
+						//console.log('selected gene :'+ref.selectedGene[0].data.symbol+' deleted');
+					}
+				
+				});
 			}
 		});
 		
-		this.getSelectionModel().on('selectionchange', function(selModel, selections){
-	        this.down('#removeGenes').setDisabled(selections.length === 0);
-	    });
-		
+				
 		
 	
 	}

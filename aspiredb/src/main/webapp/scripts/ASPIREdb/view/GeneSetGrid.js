@@ -17,25 +17,24 @@
  *
  */
 
-Ext.require([ 'Ext.grid.Panel', 'ASPIREdb.store.GeneSetStore','ASPIREdb.TextDataDownloadWindow', 'Ext.grid.*', 'Ext.data.*' ]);
+Ext.require([ 'ASPIREdb.store.GeneSetStore','ASPIREdb.TextDataDownloadWindow', 'Ext.grid.*', 'Ext.data.*','Ext.util.*', 'Ext.state.*', 'Ext.form.*' ]);
 
-var rowEditing = Ext.create('Ext.grid.plugin.RowEditing',{
-	clicksToEdit: 2,
-	clicksToMoveEditor : 1,
-	
-	});
+
+var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
+    //clicksToMoveEditor: 1,
+    clicksToEdit: 2,
+    autoCancel: false
+});
 
 // TODO js documentation
 Ext.define('ASPIREdb.view.GeneSetGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.geneSetGrid',
 	emptyText : 'No gene sets found',
-	id : 'geneSetGrid',
-	plugins: [rowEditing],
+	id : 'geneSetGrid',	
 	border: true,
-	editing:true,
-	
 	store : Ext.create('ASPIREdb.store.GeneSetStore'),
+	
 		
 	config:{
 		// collection of all the PhenotypeSummaryValueObject loaded
@@ -55,26 +54,44 @@ Ext.define('ASPIREdb.view.GeneSetGrid', {
 	            
 			header : 'Name',
 			dataIndex : 'geneSetName',
-			flex : 1     		
+			flex : 1,
+			 editor: {
+	                // defaults to textfield if no xtype is supplied
+	                allowBlank: false
+	            }
 	    },
 	    {
 	        header : 'Description',
 	        dataIndex : 'geneDescription',
-	        flex : 1
+	        flex : 1,
+	        editor: {
+                // defaults to textfield if no xtype is supplied
+                allowBlank: false
+            }
 	    },
 	    {
 	       	header : 'size',
 	        dataIndex : 'geneSetSize',
-	        flex : 1	       	
+	        flex : 1,
+	        editor: {
+                allowBlank: false,
+            }
 	}],	
 	
-
+	
+    plugins: [rowEditing],
+    listeners: {
+        'selectionchange': function(view, records) {
+            this.down('#removeGeneset').setDisabled(!records.length);
+        }
+    },
+   
 	initComponent : function() {
 		
 		this.callParent();
 		this.on('select', this.geneSetSelectHandler, this);	
 		ASPIREdb.EVENT_BUS.on('gene_added', this.geneAddedHandler, this);
-		//ASPIREdb.EVENT_BUS.on('new_geneSet_saved', this.updateGeneSetGridHandler, this);		
+			
 	
 	},
 	
@@ -146,7 +163,7 @@ Ext.define('ASPIREdb.view.GeneSetGrid', {
 		});
 		
 		
-		//this.getDockedComponent('geneSetGridToolbar').add('-');
+		this.getDockedComponent('geneSetGridToolbar').add('-');
 			
 		var ref=this;
 		
@@ -156,6 +173,7 @@ Ext.define('ASPIREdb.view.GeneSetGrid', {
 			text : '',
 			tooltip : 'Add new gene set',
 			icon:'scripts/ASPIREdb/resources/images/icons/add.png',
+			//TODO: Need a better workaround
 			handler: function(){
 			
 				var newGeneSetName =ref.down('#geneSetName').getValue();
@@ -204,16 +222,14 @@ Ext.define('ASPIREdb.view.GeneSetGrid', {
 	                    	geneSetGrid.store.remove(selection);
 	                    }
 						
-						console.log('selected geneset :'+ref.selGeneSet[0].data.geneSetName+' deleted')
+						console.log('selected geneset :'+ref.selGeneSet[0].data.geneSetName+' deleted');
 					}
 				});
 				
 			}
 		});
 		
-		this.getSelectionModel().on('selectionchange', function(selModel, selections){
-	        this.down('#removeGeneset').setDisabled(selections.length === 0);
-	    });
+		
 		
 	
 	}
