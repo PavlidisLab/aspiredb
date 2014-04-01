@@ -47,7 +47,13 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 		header : 'Gene Name',
 		dataIndex : 'name',
 		flex : 1
-	}, {
+	}, 
+	{
+		header : 'Phenotype Name',
+		dataIndex : 'pheneName',
+		flex : 1
+	},
+	{
 		header : 'View in Gemma',
 		dataIndex : 'linkToGemma',
 		flex : 1,

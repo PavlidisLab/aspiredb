@@ -56,23 +56,43 @@ Ext.define('ASPIREdb.view.NeurocartaGeneWindow', {
 		
 		var ontologyPrefix = "http://purl.obolibrary.org/obo/";
 	
-		GeneService.findGenesWithNeurocartaPhenotype( ontologyPrefix + uri, function(vos){
-			
-			ref.populateGrid(vos, uri);
+		/**GeneService.findGenesWithNeurocartaPhenotype( ontologyPrefix + uri, function(gvos){
+			console.log('gene value objects returned from neurocarta'+gvos);
+			ref.populateGrid(gvos, uri);
 			grid.setLoading(false);
 			
-		});		
+		});	*/
+		
+		PhenotypeService.populateDescendantPhenotypes( ontologyPrefix + uri, function(pvos){
+			
+			var phenotypeGeneMap= pvos;
+			var map = new Ext.util.HashMap();
+			for(var key in pvos) {
+			    var pheneValueArray = pvos[key];
+			    
+			    if (pheneValueArray.length > 0){   
+			    	for ( var k = 0; k < pheneValueArray.length; k++) {
+			    		map.add(key, pheneValueArray[k]);	
+			    		console.log('nerucarta returned decendandt phenotype'+key+ " , "+ pheneValueArray[k]);		    		
+			    	}
+			    }			    
+			}
+			ref.populateNeurocartaGrid(map,uri);
+    		grid.setLoading(false);
+			
+			
+		});
 		
 	},
 
 	//GeneValueObject
-	populateGrid : function(vos,uri) {		
+	populateGrid : function(gvos,uri) {		
 		
 		var grid = ASPIREdb.view.NeurocartaGeneWindow.getComponent('neurocartaGeneGrid');
 		
 		var data = [];
-		for ( var i = 0; i < vos.length; i++) {
-			var vo = vos[i];
+		for ( var i = 0; i < gvos.length; i++) {
+			var vo = gvos[i];
 			
 			var linkToGemma = "";
 			
@@ -84,6 +104,35 @@ Ext.define('ASPIREdb.view.NeurocartaGeneWindow', {
 			var row = [ vo.symbol, vo.geneBioType, vo.name, linkToGemma ];
 			data.push(row);
 		}
+
+		grid.store.loadData(data);
+		grid.setLoading(false);
+		
+		grid.enableToolbar(gvos,uri);
+
+	},
+	
+	//GeneValueObject
+	populateNeurocartaGrid: function(map, uri) {		
+		
+		var grid = ASPIREdb.view.NeurocartaGeneWindow.getComponent('neurocartaGeneGrid');
+		
+		var data = [];
+		var vos =[];
+		
+		map.each(function(key, value, length){
+		    console.log(key, value, length);
+		    var linkToGemma = "";
+			
+			if (value.geneBioType == "protein_coding"){
+				linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl(value.symbol);
+			}
+			vos.push(value);
+
+			var row = [ value.symbol, value.geneBioType, value.name, key, linkToGemma ];
+			data.push(row);
+		});
+		
 
 		grid.store.loadData(data);
 		grid.setLoading(false);

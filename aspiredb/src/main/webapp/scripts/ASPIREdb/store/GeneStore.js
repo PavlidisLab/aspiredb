@@ -27,6 +27,7 @@ Ext.define('ASPIREdb.store.GeneStore', {
              {name: 'symbol',   type: 'string'},
              {name: 'geneBioType',  type: 'string'},
              {name: 'name',  type: 'string'},
+             {name: 'pheneName',  type: 'string'},             
              {name: 'linkToGemma',  type: 'string'}
          ],         
 	
