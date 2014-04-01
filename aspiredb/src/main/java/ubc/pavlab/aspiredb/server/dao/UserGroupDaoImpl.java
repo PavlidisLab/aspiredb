@@ -1,7 +1,7 @@
 /*
  * The aspiredb project
  * 
- * Copyright (c) 2012 University of British Columbia
+ * Copyright (c) 2014 University of British Columbia
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -20,31 +20,42 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
+ * TODO document me
  * 
+ * @author gaya
  */
 @Repository
 public class UserGroupDaoImpl extends DaoBaseImpl<UserGroup> implements UserGroupDao {
 
-    protected final Log log = LogFactory.getLog( getClass() );
+    protected final Log log = LogFactory.getLog( UserGroupDaoImpl.class );
 
     /**
      * @param sessionFactory
      */
     @Autowired
     public UserGroupDaoImpl( SessionFactory sessionFactory ) {
-        super(UserGroup.class);
+        super( UserGroup.class );
         super.setSessionFactory( sessionFactory );
     }
 
-    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * ubc.pavlab.aspiredb.server.dao.UserGroupDao#addAuthority(ubc.pavlab.aspiredb.server.model.common.auditAndSecurity
+     * .UserGroup, java.lang.String)
+     */
     @Override
     public void addAuthority( UserGroup group, String authority ) {
 
@@ -64,21 +75,30 @@ public class UserGroupDaoImpl extends DaoBaseImpl<UserGroup> implements UserGrou
 
     }
 
-   
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * ubc.pavlab.aspiredb.server.dao.UserGroupDao#addToGroup(ubc.pavlab.aspiredb.server.model.common.auditAndSecurity
+     * .UserGroup, ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User)
+     */
     @Override
     public void addToGroup( UserGroup group, User user ) {
         group.getGroupMembers().add( user );
         this.getHibernateTemplate().update( group );
     }
 
-    
+    @Override
+    public UserGroup findByUserGroupName( final java.lang.String name ) {
+        return this.findByUserGroupName( "from UserGroup as userGroup where userGroup.name = :name", name );
+    }
+
     @Override
     public Collection<UserGroup> findGroupsForUser( User user ) {
         return this.getHibernateTemplate().findByNamedParam(
-                "select ug from UserGroup ug inner join ug.groupMembers memb where memb = :user", "user", user );
+                "select ug from UserGroup ug join ug.groupMembers memb where memb = :user", "user", user );
     }
 
-    
     @Override
     public void removeAuthority( UserGroup group, String authority ) {
 
@@ -91,26 +111,20 @@ public class UserGroupDaoImpl extends DaoBaseImpl<UserGroup> implements UserGrou
 
         this.getHibernateTemplate().update( group );
     }
-    
-    @Override
-    public UserGroup findByUserGroupName( final java.lang.String name ) {
-        return this.findByUserGroupName(
-                "from UserGroup as userGroup where userGroup.name = :name",
-                name );
-    }
-    
-    public UserGroup findByUserGroupName( final java.lang.String queryString, final java.lang.String name ) {
-        java.util.List<String> argNames = new java.util.ArrayList<String>();
-        java.util.List<Object> args = new java.util.ArrayList<Object>();
-        args.add( name );
-        argNames.add( "name" );
-        java.util.Set<UserGroup> results = new java.util.LinkedHashSet<UserGroup>( this.getHibernateTemplate()
-                .findByNamedParam( queryString, argNames.toArray( new String[argNames.size()] ), args.toArray() ) );
+
+    /**
+     * @param queryString
+     * @param name
+     * @return
+     */
+    private UserGroup findByUserGroupName( final java.lang.String queryString, final java.lang.String name ) {
+        Set<UserGroup> results = new LinkedHashSet<UserGroup>( this.getHibernateTemplate().findByNamedParam(
+                queryString, new String[] { "name" }, new Object[] { name } ) );
         Object result = null;
         if ( results.size() > 1 ) {
             throw new org.springframework.dao.InvalidDataAccessResourceUsageException(
-                    "More than one instance of 'UserGroup"
-                            + "' was found when executing query --> '" + queryString + "'" );
+                    "More than one instance of 'UserGroup" + "' was found when executing query --> '" + queryString
+                            + "'" );
         } else if ( results.size() == 1 ) {
             result = results.iterator().next();
         }

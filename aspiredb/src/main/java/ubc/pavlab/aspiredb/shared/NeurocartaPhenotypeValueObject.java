@@ -33,7 +33,7 @@ public class NeurocartaPhenotypeValueObject extends PhenotypeValueObject impleme
 
     private int geneCount;
 	
-	public NeurocartaPhenotypeValueObject() {}
+	public NeurocartaPhenotypeValueObject() {};
 
 	public int getGeneCount() {
 		return this.geneCount;

@@ -17,10 +17,12 @@
  *
  */
 
-Ext.require([ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel', 'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.VariantGridCreator' , 'ASPIREdb.IdeogramDownloadWindow']);
+Ext.require([ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel', 'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.VariantGridCreator' , 'ASPIREdb.IdeogramDownloadWindow','Ext.data.ArrayStore',
+      		'Ext.form.ComboBox']);
 
-// TODO js documentation
-
+/**
+ * Variant Tab Panel contains both Ideogram view and Variant table view
+ */
 Ext.define('ASPIREdb.view.VariantTabPanel', {
 	extend : 'Ext.tab.Panel',
 	alias : 'widget.variantTabPanel',
@@ -45,6 +47,8 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		selectedVariants : [],
 		loadedSubjects : [],
 		selectedSubjectVariants: [],
+		loadedVariants:[],
+		property: new VariantTypeProperty(),
 		
 	},
 
@@ -71,7 +75,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 				disabled : false,
 				handler : this.labelSettingsHandler,
 				scope : this
-			} ]
+			}]
 		});
 
 		this.labelsButton = Ext.create('Ext.Button', {
@@ -125,6 +129,60 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			icon : 'scripts/ASPIREdb/resources/images/icons/export.png'
 
 		});
+		
+		this.zoomInButton = Ext.create('Ext.Button', {
+			id : 'zoomOutButton',
+			text : '',
+			tooltip : 'Zoom out ideogram',
+			icon : 'scripts/ASPIREdb/resources/images/icons/zoom_in.png'
+
+		});
+		
+		this.zoomOutButton = Ext.create('Ext.Button', {
+			id : 'zoomInButton',
+			text : '',
+			hidden: true,
+			tooltip : 'Zoom in ideogram',
+			icon : 'scripts/ASPIREdb/resources/images/icons/zoom_out.png'
+
+		});
+		
+		 var data =[
+		            ['type','Variant type'],
+		            ['cnvType','CNV type'],
+		            [ 'commonCNV', 'Common CNV'],
+		            [ 'characteristics','Characteristics'],
+		            [ 'inheritance', 'Inheritance'],
+		            [ 'arrayReport','Array Report'],		            
+		            [ 'arrayPlatform', 'Array Platform'],
+		            [ 'markers','Markers'],
+		            [ 'labels','Variant Labels'],
+		            [ 'subjectLabels','Subject Labels']
+		            ];         
+
+		
+		var variantCharacteristics = Ext.create('Ext.data.ArrayStore', {
+			storeId :'varChar',
+			fields : [ {name :'id',type:'string'},{name: 'name', type:'string'} ],
+			data : data,
+			autoLoad : true,
+			autoSync : true,
+		});
+		
+		this.colourVariantByCombo = Ext.create('Ext.form.ComboBox', {
+			itemId :'colorCode',
+		    fieldLabel: 'Color code',
+		    store: variantCharacteristics,
+		    displayField : 'name',
+			valueField : 'id',
+			queryMode : 'local',
+			//renderTo : Ext.getBody(),
+			editable : false,
+			forceSelection : true,		   
+		});
+		
+		this.colourVariantByCombo.on('select', this.colourVariantByHandler,this);
+		
 
 		// adding buttons to toolbar in filterSubmitHandler with the grid
 		// because extJS was
@@ -135,13 +193,18 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			ref.down('#variantGrid').getView().refresh();
 		});
 		
+		ASPIREdb.EVENT_BUS.on('property_changed', function(property){
+			ref.property =[];
+			ref.property = property;
+		});
+		
 		ASPIREdb.EVENT_BUS.on('subjects_loaded', function(subjectIds) {
 			ref.loadedSubjects=[];
 			ref.loadedSubjects =subjectIds;
 		});
 			
 		//when subjects selected it is focused in variant grid
-		ASPIREdb.EVENT_BUS.on('subject_selected', this.subjectSubmitHandler, this); 
+		ASPIREdb.EVENT_BUS.on('subject_selected', this.subjectSelectionHandler, this); 
 		
 		
 		this.saveButton.on('click', function() {
@@ -151,6 +214,16 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		
 		this.exportButton.on('click', function() {
 			ref.exportButtonHandler();
+
+		});
+		
+		this.zoomInButton.on('click', function() {
+			ref.zoomInButtonHandler();
+
+		});
+		
+		this.zoomOutButton.on('click', function() {
+			ref.zoomOutButtonHandler();
 
 		});
 
@@ -181,7 +254,9 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		});
 
 	},
-
+    /**
+     * Filter the variants of the subject selected. Initially it loads all the variants associated with all the subjects
+     */
 	filterSubmitHandler : function(filterConfigs) {
 
 		var ref = this;
@@ -195,6 +270,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 					
 					var vvos = pageLoad.items;
+					ref.loadedVariants =vvos;
 					
 					ProjectService.numVariants(filterConfigs[0].projectIds, {
 						callback : function(NoOfVariants){
@@ -209,7 +285,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					var ideogram = ref.getComponent('ideogram');
 					ideogram.drawChromosomes();
 					ideogram.drawVariants(vvos);
-					
+					//ideogram.showColourLegend();					
 					
 					
 					var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid(vvos, properties);	
@@ -217,7 +293,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					
 					
 					ref.remove('variantGrid', true);
-
+					//when subjects are selected 
 					grid.on('selectionchange', ref.selectionChangeHandler, ref);
 					
 					grid.on('show', function() {
@@ -240,6 +316,9 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					toolbar.add(ref.selectAllButton);
 					toolbar.add(ref.saveButton);
 					toolbar.add(ref.exportButton);
+					toolbar.add(ref.zoomInButton);
+					toolbar.add(ref.zoomOutButton);
+					toolbar.add(ref.colourVariantByCombo);
 					
 					ref.setLoading(false);
 
@@ -249,67 +328,192 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		});
 
 	},
+	/**
+	 * 
+	 */
+	colourVariantByHandler : function(combo, records, eOpts){
+			
+			var ideogram = this.getComponent('ideogram');
+			
+			if (ideogram.isVisible()){
+				var selectedValue = records[0].data.id;	
+				
+				switch (selectedValue){
+				  case 'type': {
+					  var property =new VariantTypeProperty();
+					  property.name ='type';
+		        	  property.displayName ='Variant Type';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
+		        	  this.redrawIdeogram(property);
+					  break;
+					  }
+				  case 'cnvType':{
+					  var property =new CNVTypeProperty();
+					  property.name ='cnvType';
+		        	  property.displayName ='CNV Type';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
+		        	  this.redrawIdeogram(property);
+					  break;
+				  }
+				  case 'characteristics':{
+					  var property =new CharacteristicProperty();
+					  property.name ='Characteristics';
+		        	  property.displayName ='Characteristics';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
+		        	  this.redrawIdeogram(property);
+					  break;
+				  }
+				  case 'inheritance':{
+					  var property =new CharacteristicProperty();
+					  property.name ='Inheritance';
+		        	  property.displayName ='Inheritance';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
+		        	  this.redrawIdeogram(property);
+					  break;
+				  }
+				  case 'subjectLabels':{
+					  var property =new SubjectLabelProperty();
+					  property.name ='Subject Labels';
+		        	  property.displayName ='Subject Label';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
+		        	  this.redrawIdeogram(property);
+					  break;
+				  }
+				  case 'labels':{
+					  var property =new VariantLabelProperty();
+					  property.name ='Labels';
+		        	  property.displayName ='Variant Labels';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
+		        	  this.redrawIdeogram(property);
+					  break;
+				  }
+				  case 'commonCNV':{
+					  var property =new CharacteristicProperty();
+					  property.name ='Common CNV';
+		        	  property.displayName ='Common CNV';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
+		        	  this.redrawIdeogram(property);
+				  }
+				  case 'arrayReport':{
+					  var property =new CharacteristicProperty();
+					  property.name ='Array Report';
+		        	  property.displayName ='Array Report';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
+		        	  this.redrawIdeogram(property);
+					  break;
+				  }
+				  case 'arrayPlatform':{
+					  var property =new CharacteristicProperty();
+					  property.name ='Array Platform';
+		        	  property.displayName ='Array Platform';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
+		        	  this.redrawIdeogram(property);
+					  break;
+				  }
+				  case 'markers':{
+					  var property =new CharacteristicProperty();
+					  property.name ='Markers';
+		        	  property.displayName ='Markers';
+		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
+		        	  this.redrawIdeogram(property);
+					  break;
+				  }
+				 
+				  				  
+				}
+				
+			}
+			
+			
+	},
 	
-	subjectSubmitHandler :function(subjectIds) {
-		
+	/**
+	 * Redraw the ideogram basd on colour code
+	 */
+	redrawIdeogram : function(property){
+		  var ideogram = this.getComponent('ideogram');
+		  
+		  ideogram.setDisplayedProperty(property);
+		  ideogram.drawChromosomes();
+		  ideogram.drawColouredVariants(this.loadedVariants);
+		  ideogram.showColourLegend();
+	},
+	/**
+	 * When subjects are selected in the subject grid highlist the variants of selected subjects in ideogram and in table view
+	 */
+	subjectSelectionHandler :function(subjectIds) {
+		console.log("subject selected  on variant tab panel........");
 		var projectIds= ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
 		
 		var grid = this.down('#variantGrid');
 		
+		
 		//when variant table view is selected
-		if (grid.isVisible()){
-			console.log("when the variant grid is selected");
-			//collapse all the grids first - to open only the selected one
-			grid.features[0].collapseAll();						
+		if (grid.isVisible()){									
 			
-					//expand only the selected subjects
-					SubjectService.getSubjects(projectIds[0],subjectIds, {
-						callback : function(selectedSubjectValueObjects) {
-						
+			//collapse all the grids first - to open only the selected one
+			grid.features[0].collapseAll();	
+			
+			//expand only the selected subjects
+			SubjectService.getSubjects(projectIds[0],subjectIds, {
+					callback : function(selectedSubjectValueObjects) {					
 							for ( var i = 0; i < selectedSubjectValueObjects.length ; i++) {
 								var selectedSubjectValueObjects = selectedSubjectValueObjects[i];
 								grid.features[0].expand(selectedSubjectValueObjects.patientId, true);
-								this.selectedSubjectVariants=selectedSubjectValueObjects.patientId;								
-								
+								this.selectedSubjectVariants=selectedSubjectValueObjects.patientId;	
 							}
 							
-						}
-										
-					});
+					}
+									
+			});
 
 		}
 		//When Ideogram view selected
 		else {
 			console.log("when the variant ideogram is selected");
+						
 			var ideogram = this.getComponent('ideogram');
-			var selectedSubjectVariants=[];
+			ideogram.drawChromosomes();
+			var ref=this;
+			
 			//heighlight the selected subject in ideogram
 			SubjectService.getSubjects(projectIds[0],subjectIds, {
-				callback : function(subjectValueObjects) {
+				callback : function(subjectValueObjects) {		
+					
+					var subjectIDS=[];
+					var patientIDS=[];
 					for ( var i = 0; i < subjectValueObjects.length ; i++) {
-						var subjectValueObject = subjectValueObjects[i];
-								 
-						VariantService.getSubjectsVariants(subjectValueObject.patientId, {
-								callback : function(vvo) {
-									ideogram.drawVariantsWithSubjectHighlighted(subjectValueObject.id, vvo);
-									}
-						});
+						subjectIDS.push(subjectValueObjects[i].id);	
+						patientIDS.push(subjectValueObjects[i].patientId);					
 					}
+					ideogram.drawVariantsWithSubjectsHighlighted(subjectIDS,ref.loadedVariants);
+					
+				 	VariantService.getSubjectsVariants(patientIDS, {
+						callback : function(vvo) {
+							var notSelectedVariants=[];
+							var flag='no';
+							for (var j=0;j<ref.loadedVariants.length;j++){
+								
+								for (var k=0;k<vvo.length;k++){
+									if (ref.loadedVariants[j]!=vvo[k]){
+									 	flag='yes';
+									}								 
+								}
+								if (flag == 'yes')
+									notSelectedVariants.push(ref.loadedVariants[j]);
+							}
+							ideogram.drawDimmedVariants(notSelectedVariants);							
+							}
+					});
+				
 				}
-			});
-			
-			
-			
+			});			
 		}
-			
-			
-		grid.getView().refresh();
-		
-		
+		grid.getView().refresh();		
 	},
 
 	selectionChangeHandler : function(model, records) {
-
+		console.log('on grid selection change handler variant tab panel');
 		this.selectedVariants = records;
 
 		this.enableActionButtonsBySelectedRecords(records);
@@ -351,6 +555,24 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			ASPIREdb.IdeogramDownloadWindow.showIdeogramDownload(imgsrc);
 		}
 
+	},
+	
+	zoomInButtonHandler : function() {
+		this.zoomInButton.setVisible(false);
+		this.zoomOutButton.setVisible(true);
+		var ideogram = this.getComponent('ideogram');
+		//ideogram.changeZoom(2, this.loadedVariants, this.property);
+		ideogram.changeZoom(2, this.loadedVariants);
+				
+	},
+	
+	zoomOutButtonHandler : function() {
+		this.zoomOutButton.setVisible(false)
+		this.zoomInButton.setVisible(true);
+		var ideogram = this.getComponent('ideogram');
+		//ideogram.changeZoom(1, this.loadedVariants, this.property);
+		ideogram.changeZoom(1, this.loadedVariants);
+	
 	},
 
 	viewGenesHandler : function() {

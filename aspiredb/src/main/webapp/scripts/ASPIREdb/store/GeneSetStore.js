@@ -16,18 +16,22 @@
  * limitations under the License.
  *
  */
-package ubc.pavlab.aspiredb.shared.query;
 
-import java.util.Arrays;
+Ext.require([ 'Ext.data.ArrayStore' ]);
 
-import org.directwebremoting.annotations.DataTransferObject;
-
-/**
- * @author anton
- */
-@DataTransferObject(javascript = "VariantTypeProperty")
-public class VariantTypeProperty extends TextProperty {
-    public VariantTypeProperty() {
-        super("Variant Type", "type", Arrays.asList("CNV","SNV","indel","Inversion","Translocation"));
-    }
-}
+Ext.define('ASPIREdb.store.GeneSetStore', {
+    extend: 'Ext.data.ArrayStore',
+    alias: 'store.geneSetStore',
+    autoSync : true,
+    autoLoad : true,
+    
+    fields: [
+             {name: 'geneSetName', type: 'string'},
+             {name: 'geneDescription',   type: 'string'},
+             {name: 'geneSetSize',  type: 'string'}
+         ],         
+   
+   storeId: 'geneSetStore'
+    
+    
+});

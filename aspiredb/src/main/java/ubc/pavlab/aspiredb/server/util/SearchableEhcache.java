@@ -55,8 +55,9 @@ public abstract class SearchableEhcache<T> {
 	}
 
 	public boolean hasExpired() {
+		//Causes all elements stored in the Cache to be synchronously checked for expiry (every 5 minutues), and if expired, evicted.
 		this.cache.evictExpiredElements();
-		
+		//Gets the size of the cache.This number is the actual number of elements, including expired elements that have NOT BEEN REMOVED.
 		return (this.cache.getSize() <= 0);
 	}
 

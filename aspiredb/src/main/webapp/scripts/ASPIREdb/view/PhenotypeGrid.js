@@ -59,7 +59,8 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			xtype : 'button',
 			text : 'Analyze',
 			disabled : 'true',
-			itemId : 'analyzeButton'
+			itemId : 'analyzeButton',
+			tooltip: 'Report the phenotype that is enriched for the list of filtered subjects',
 
 		},{			
 			itemId : 'saveButton',
@@ -105,7 +106,11 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			if (phenSummary == null) return ret;
 			var style = this.STYLE_DEFAULT;
 			var displayVal = phenSummary.dbValue;
-			var colors = ["red", "green", "black", "purple","blue", "yellow","orange", "grey"];
+			 /**
+             * Used the Color Brewer 2.0 system for coloring the chart
+             * Thanks for Cynthia Brewer, Mark Harrower and The Pennsylvania State University
+             */
+			var colors = ["#b35806", "#31a354", "#636363", "#d8b365","#2c7fb8", "#addd8e","#7570b3", "#a6bddb"];
 			var colorIdx=5;
 			//TODO : This is not a good workaround to display the color, have to figure out a way to do this better
 			if (phenSummary.valueType == "HPONTOLOGY") {
@@ -154,7 +159,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			var phenSummary = value.phenoSummaryMapSelectedSubjects;
 			var displaySummary = value.displaySummarySelectedSubjects
 			if (phenSummary!= null){
-				var ret = "<canvas width='50' height='50' id=multi"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
+				var ret = "<canvas width='50' height='20' id=multi"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
 				metadata.tdAttr = 'data-qtip="'+displaySummary + ret + '"';
 				return ret;
 			} else return "";
@@ -168,7 +173,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			var phenSummary = value.phenoSummaryMap;
 		
 			if (phenSummary!= null){
-				var ret = "<canvas width='50' height='50' id=all"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
+				var ret = "<canvas width='50' height='20' id=all"+ value.name.replace(/ /g,'') + ">"+"</canvas>";
 				metadata.tdAttr = 'data-qtip="'+value.displaySummary + ret + '"';
 				return ret;
 			} else return "";
@@ -306,7 +311,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		var activeProjectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
 		
 		var ref = this;
-		console.log("on subject select handler ...........");
+		console.log("on subject select handler in phenotype grid ...........");
 		
 	
 		if (subjectIds.length ==1){
@@ -340,7 +345,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		  });
 		}
 		else{
-			console.log("on subject select handler ........... in multiple subject select"+subjectIds);
+			
 			SubjectService.getPhenotypeSummaryValueObjects(subjectIds, ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
 				callback : function(voMap) {//voMap is a <String, PhenotypeSummaryValueObject>Map
 					
@@ -369,10 +374,8 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 												
 						}
 						ref.getView().refresh(true);
-						ref.updatePhenotypeSummaryCanvasesAllSubjects();
-						console.log(" before update selected");
-						ref.updatePhenotypeSummaryCanvasesSelectedSubjects();
-						console.log(" after update selected");
+						ref.updatePhenotypeSummaryCanvasesAllSubjects();				
+						ref.updatePhenotypeSummaryCanvasesSelectedSubjects();		
 						ref.setLoading(false);
 					}
 					
@@ -437,12 +440,15 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		ctx.textAlign = "center";
 				
 		var width=50;
-		var height=50;
+		var height=20;
+		var yValue=0;
 		var xValue=0;
-		var yValue=height;
 		var colorIndex=3;
-
-		var colors = ["red", "green", "black", "purple","blue", "yellow","orange", "grey"];
+		 /**
+         * Used the Color Brewer 2.0 system for coloring the chart
+         * Thanks for Cynthia Brewer, Mark Harrower and The Pennsylvania State University
+         */
+		var colors = ["#b35806", "#31a354", "#636363", "#d8b365","#2c7fb8", "#addd8e","#7570b3", "#a6bddb"];
 		var displayVal = '';
 		
 		//draw Y axis
@@ -463,29 +469,29 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		  if (keyArray[k]!="Unknown"){
 										
 			if (phenSummary.valueType == "HPONTOLOGY") {
-				
+				// horizontal = -(phenMap["Present"]*width)/total,5)
 				if (keyArray[k] =="Present"){
 					
 					ctx.fillStyle = colors[0];
-					ctx.fillRect(xValue,yValue,10,-(phenMap["Present"]*height)/total);
-					xValue=xValue+10;
+					ctx.fillRect(xValue,yValue,(phenMap["Present"]*width)/total,5);
+					yValue=yValue+5;
 					displayVal =displayVal+"Present("+phenMap["Present"]+")";				
 																
 				}
 				else if (keyArray[k]=="Absent"){
 					
 					ctx.fillStyle =colors[1];
-					ctx.fillRect(xValue,yValue,10,-(phenMap["Absent"]*height)/total);
-					xValue=xValue+10;
+					ctx.fillRect(xValue,yValue,(phenMap["Absent"]*width)/total,5);
+					yValue=yValue+5;
 					displayVal =displayVal+"Absent("+phenMap["Absent"]+")";
 									
 				}
 				else {
 								
 					ctx.fillStyle =colors[colorIndex];
-					ctx.fillRect(xValue,yValue,10,-(phenMap[keyArray[k]]*height)/total);
+					ctx.fillRect(xValue,yValue,(phenMap[keyArray[k]]*width)/total,5);
 					colorIndex++;
-					xValue=xValue+10;
+					yValue=yValue+5;
 					displayVal =displayVal+keyArray[k]+"("+phenMap[keyArray[k]]+")";
 									
 					}
@@ -493,9 +499,9 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			else {
 				
 				ctx.fillStyle =colors[colorIndex];
-				ctx.fillRect(xValue,yValue,10,-(phenMap[keyArray[k]]*height)/total);
+				ctx.fillRect(xValue,yValue,(phenMap[keyArray[k]]*width)/total,5);
 				colorIndex++;
-				xValue=xValue+10;
+				yValue=yValue+5;
 				displayVal =displayVal+keyArray[k]+"("+phenMap[keyArray[k]]+")";
 				
 			};
@@ -507,8 +513,8 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	}
 		if (unknown!=null){
 			ctx.fillStyle =colors[2];
-			ctx.fillRect(xValue,yValue,10,-(phenMap["Unknown"]*height)/total);
-			xValue=xValue+10;
+			ctx.fillRect(xValue,yValue,(phenMap["Unknown"]*width)/total,5);
+			yValue=yValue+5;
 			displayVal =displayVal+"Unknown("+phenMap["Unknown"]+")";									
 	
 }

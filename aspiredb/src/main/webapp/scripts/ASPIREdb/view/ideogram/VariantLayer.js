@@ -48,25 +48,124 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
 
     statics: {
         colors: [
-            "rgb(255,0,0)",
-            "rgb(0,125,0)",
-            "rgb(0,0,255)",
-            "rgb(0.255,255)",
-            "rgb(255,0,255)",
-            "rgb(125,125,0)"
+            "red",
+            "blue",
+            "green",
+            "purple",
+            "brown",
+            "black",
+            "olive",
+            "maroon"
         ],
         defaultColour: "rgba(0,0,0,0.5)",
         nextColourIndex: 0,
         /** @type {Object.<string,string>} */
         valueToColourMap: {},
-        resetDisplayProperty: function () {
-            this.nextColourIndex = 0;
-            this.valueToColourMap = {};
+        resetDisplayProperty: function (property) {
+      
+        if (property.displayType!=undefined){
+        	
+        	//if variant type property : CNV, SNV, indel, translocation, inversion
+    		if (property instanceof VariantTypeProperty) {
+    			this.nextColourIndex = 0;
+    			if (property.displayType.indexOf('CNV')!=-1)
+    				this.valueToColourMap['CNV']=" : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";
+    			if (property.displayType.indexOf('SNV')!=-1)
+    				this.valueToColourMap['SNV']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"; 
+    			if (property.displayType.indexOf('indel')!=-1)
+    				this.valueToColourMap['Indel']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";
+    			if (property.displayType.indexOf('translocation')!=-1)
+    				this.valueToColourMap['Translocation']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";
+    			if (property.displayType.indexOf('inversion')!=-1)
+    				this.valueToColourMap['Inversion']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";
+    		}
+    		
+        	//if CNV type : LOSS, GAIN
+    		if (property instanceof CNVTypeProperty) {
+    			this.nextColourIndex = 0;
+    			if (property.displayType.indexOf('LOSS')!=-1)
+    				this.valueToColourMap["LOSS"]= " : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>"+"\n";
+    			if (property.displayType.indexOf('GAIN')!=-1)
+    				this.valueToColourMap["GAIN"]= " : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>"+"\n";    			
+    		} 
+    		
+    		//if variant label
+    		if (property instanceof VariantLabelProperty) {
+    			/**for(var i=0; i < property.displayType.length;i++){
+    				this.valueToColourMap[property.displayType[i]]= " : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>"+"\n";
+    			}*/
+    			
+    		} 
+    		
+    		//if subject label
+    		if (property instanceof SubjectLabelProperty) {
+    			
+    		} 
+    		
+    		//if Characteristic type : benign, pathogenic, unknown
+    		if (property instanceof CharacteristicProperty) {
+    			
+    			if (property.name == 'Characteristics'){
+    				this.nextColourIndex = 0;
+    				if (property.displayType.indexOf('Pathogenic')!=-1)
+              			this.valueToColourMap['Pathogenic']=" : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";
+    				if (property.displayType.indexOf('Benign')!=-1)
+                		  this.valueToColourMap['Benign']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";   
+    				if (property.displayType.indexOf('Unknown')!=-1)
+              			this.valueToColourMap['Unknown']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"; 
+    			}	    			
+    		
+				if (property.name == 'Inheritance'){
+					this.nextColourIndex = 0;
+					if (property.displayType.indexOf('de novo')!=-1)
+          				this.valueToColourMap['de novo']=" : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";
+					if (property.displayType.indexOf('maternal')!=-1)
+            			  this.valueToColourMap['maternal']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";   
+					if (property.displayType.indexOf('paternal')!=-1)
+          				this.valueToColourMap['paternal']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"; 
+					if (property.displayType.indexOf('unclassified')!=-1)
+          				this.valueToColourMap['unclassified']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"; 
+				}	
+				
+				if (property.name == 'Common CNV'){
+					this.nextColourIndex = 0;
+					if (property.displayType.indexOf('Y')!=-1)
+          				this.valueToColourMap['Y']=" : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";
+					if (property.displayType.indexOf('N')!=-1)
+            			  this.valueToColourMap['N']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";   
+					
+				}
+    		
+				if (property.name == 'Array Report'){
+					this.nextColourIndex = 0;
+					if (property.displayType.indexOf('Normal')!=-1)
+          				this.valueToColourMap['Normal']=" : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";
+					if (property.displayType.indexOf('Abnormal')!=-1)
+            			  this.valueToColourMap['Abnormal']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";   
+					if (property.displayType.indexOf('Uncertain')!=-1)
+          				this.valueToColourMap['Uncertain']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"; 
+				}	    			
+    		
+				if (property.name == 'Array Platform'){
+					this.nextColourIndex = 0;
+					if (property.displayType.indexOf('Normal')!=-1)
+          				this.valueToColourMap['Normal']=" : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";
+					if (property.displayType.indexOf('Abnormal')!=-1)
+            			  this.valueToColourMap['Abnormal']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n";   
+					if (property.displayType.indexOf('Uncertain')!=-1)
+          				this.valueToColourMap['Uncertain']=" : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"; 
+				}	    			
+    		} 
+    		
+    		
+        }else this.valueToColourMap={};
+        	
         }
     },
-
+    
+       
     /**
-     *
+     * TODO: color legend function is broken/ not complete check getPropertyStringValue and property
      * @param {VariantValueObject} variant
      * @param {PropertyValueObject} property
      * @returns {string}
@@ -74,37 +173,156 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
     pickColor: function (variant, property) {
         if (property == null) return this.self.defaultColour;
 
-//        var value = getPropertyStringValue(property);
         var value = null;
-
+        var colorIndex=0;
+        
+        //if variant type property : CNV, SNV, indel, translocation, inversion
         if (property instanceof VariantTypeProperty) {
             value = variant.variantType;
-        } else if (property instanceof CharacteristicProperty) {
-            var characteristicValueObject = variant.characteristics[property.name];
+            
+            var color = this.self.valueToColourMap[value];
+             if (color == null) {            	
+            	if (value.toLowerCase() === "cnv") {            
+                    color = this.self.colors[colorIndex];                    
+                } else if (value.toLowerCase() === "snv") {            	
+                    color = this.self.colors[++colorIndex];
+                } else if (value.toLowerCase() === "indel") { 
+                	 colorIndex++;
+                    color = this.self.colors[++colorIndex];
+                } else if (value.toLowerCase() === "translocation") {  
+                	 colorIndex++;
+                    color = this.self.colors[++colorIndex];
+                } else if (value.toLowerCase() === "inversion") {   
+                	 colorIndex++;
+                    color = this.self.colors[++colorIndex];
+                }
+        
+            }         
+        } 
+        
+        //if CNV type : LOSS, GAIN
+        if (property instanceof CNVTypeProperty) {
+             value = variant.type;
+                         
+             var color = this.self.valueToColourMap[value];
+             if (color == null) {
+            	 if (value.toLowerCase() === "loss") {            
+                     color = this.self.colors[colorIndex];                     
+                 } else if (value.toLowerCase() === "gain") {            	
+                     color = this.self.colors[++colorIndex];
+                 }
+            }
+        }
+        
+        //if  variant labels
+        if (property instanceof VariantLabelProperty) {
+        	
+           	if (variant.labels.length >0){
+        		value = variant.labels[0].name;        		
+          		var color = variant.labels[0].colour;
+        		console.log('variant label color :'+color);
+        		this.self.valueToColourMap[value]=" : <font color='"+color+"'>"+color+"</font>\n"; 	                         
+           	} 
+        }
+        
+        //if  subject labels
+        if (property instanceof SubjectLabelProperty) {
+             subject = variant.subject;
+             if (subject.labels.length >0){
+         		value = subject.labels[0].name;        		
+           		var color = subject.labels[0].colour;
+         		console.log('subject label color :'+color);
+         		this.self.valueToColourMap[value]=" : <font color='"+color+"'>"+color+"</font>\n"; 	                         
+            	}            
+        }
+        
+        //if Characteristic type : benign, pathogenic, unknown
+        if (property instanceof CharacteristicProperty) {
+           var characteristicValueObject = variant.characteristics[property.name];
+           
             if (characteristicValueObject !== null) {
                 value = characteristicValueObject.value;
-            }
-        }
-
-        if (value == null) return this.self.defaultColour;
-
-        var color = this.self.valueToColourMap[value];
-        if (color == null) {
-            // Special cases
-            if (value.toLowerCase() === "loss") {
-                color = "red";
-            } else if (value.toLowerCase() === "gain") {
-                color = "blue";
-            } else {
-                color = this.self.colors[this.self.nextColourIndex];
-                this.self.nextColourIndex++;
-                if (this.self.nextColourIndex >= this.self.colors.length) {
-                    this.self.nextColourIndex = 0; //TODO: for now just wrap around, think of a better way
+                
+                if (property.name =='Characteristics'){                	                	
+                     var color = this.self.valueToColourMap[value];
+                     if (color == null) {
+                    	 if (value.toLowerCase() === "pathogenic") {            
+                             color = this.self.colors[colorIndex];                              
+                         } else if (value.toLowerCase() === "benign") {   
+                        	 color = this.self.colors[colorIndex+1];                          
+                         }
+                         else if (value.toLowerCase() === "unknown") { 
+                        	 color = this.self.colors[colorIndex+2];                             
+                         }
+                	  
+                     }
                 }
+                
+                if (property.name =='Inheritance'){                	
+                    var color = this.self.valueToColourMap[value];
+                    if (color == null) {
+                   	 if (value.toLowerCase() === "de novo") {            
+                            color = this.self.colors[colorIndex];                            
+                        } else if (value.toLowerCase() === "maternal") {            	
+                            	color = this.self.colors[colorIndex+1];
+                        }
+                        else if (value.toLowerCase() === "paternal") {                         	        	
+                        		color = this.self.colors[colorIndex+2];
+                        }
+                        else if (value.toLowerCase() === "unclassified") {     
+                        		color = this.self.colors[colorIndex+3];
+                        		console.log('unclassified : '+color);
+                        }
+               	  
+                    }
+               }
+                
+                if (property.name =='Common CNV'){                	
+                    var color = this.self.valueToColourMap[value];
+                    if (color == null) {
+                   	 if (value.toLowerCase() === "y") {            
+                            color = this.self.colors[colorIndex];                            
+                        } else if (value.toLowerCase() === "n") {            	
+                            	color = this.self.colors[colorIndex+1];
+                        }                                      	  
+                    }
+               }
+                
+                if (property.name =='Array Report'){                	
+                    var color = this.self.valueToColourMap[value];
+                    if (color == null) {
+                   	 if (value.toLowerCase() === "normal") {            
+                            color = this.self.colors[colorIndex];                            
+                        }
+                   	    else if (value.toLowerCase() === "abnormal") {            	
+                   	    		color = this.self.colors[colorIndex+1];
+                        }
+                        else if (value.toLowerCase() === "uncertain") {  
+                        		color = this.self.colors[colorIndex+2];
+                        }
+                      
+                    }
+               }
+               
+                if (property.name =='Array Platform'){                	
+                    var color = this.self.valueToColourMap[value];
+                    if (color == null) {
+                   	 if (value.toLowerCase() === "normal") {            
+                            color = this.self.colors[colorIndex];                            
+                        } else if (value.toLowerCase() === "abnormal") {            	
+                            	color = this.self.colors[colorIndex+1];
+                        }
+                        else if (value.toLowerCase() === "uncertain") { 
+                        	    color = this.self.colors[colorIndex+2];
+                        }                      
+                    }
+               }
+                
+                
             }
-            this.self.valueToColourMap[value] = color;
         }
-        return color;
+      
+       return color;
     },
 
     /**
@@ -116,7 +334,7 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
         var segment = {
             start: variant.genomicRange.baseStart,
             end: variant.genomicRange.baseEnd,
-            color: "rgba(0,0,0, 0.4)",
+            color: "rgb(128,128,128)",//"rgba(0,0,0, 0.4)",//grey
             emphasize: false
         };
 
@@ -141,8 +359,8 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
         var segment = {
             start: variant.genomicRange.baseStart,
             end: variant.genomicRange.baseEnd,
-            color: this.pickColor(variant, property),
-            emphasize: true
+            color: this.pickColor(variant, property),//red "rgb(255,0,0)"
+            emphasize: false
         };
         // pick track layer
         for (var trackIndex = 0; trackIndex < this.trackLayers.length; trackIndex++) {

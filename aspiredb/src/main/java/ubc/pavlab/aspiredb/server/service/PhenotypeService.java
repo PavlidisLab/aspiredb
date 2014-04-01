@@ -14,7 +14,10 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
+import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeEnrichmentValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.query.PhenotypeProperty;
@@ -29,6 +32,7 @@ public interface PhenotypeService {
 
     public Map<String, PhenotypeValueObject> getPhenotypes(Long subjectId) throws NotLoggedInException, NotLoggedInException;   
    
+    public Map<String, Collection<GeneValueObject>> populateDescendantPhenotypes (String phenotypeUri ) throws NeurocartaServiceException, BioMartServiceException;
 
     // NOT IMPLEMENTED YET
     public Collection<PhenotypeProperty> suggestPhenotypes(SuggestionContext suggestionContext)

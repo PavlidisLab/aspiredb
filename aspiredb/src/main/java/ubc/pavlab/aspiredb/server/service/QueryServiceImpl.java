@@ -266,7 +266,13 @@ public class QueryServiceImpl implements QueryService {
         List<VariantValueObject> vos = convertToValueObjects( variants );
 
         log.info( "returning " + vos.size() + " variants" );
-
+        
+        //adding subject value object to variants
+        for (VariantValueObject vvo: vos){
+        	Subject subject=subjectDao.findByPatientId(vvo.getPatientId());        	
+        	vvo.setSubject(subject.convertToValueObject());
+        }
+        
         return new BoundedList<VariantValueObject>( vos );
     }
 

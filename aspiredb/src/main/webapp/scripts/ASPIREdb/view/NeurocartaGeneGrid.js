@@ -47,7 +47,13 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 		header : 'Gene Name',
 		dataIndex : 'name',
 		flex : 1
-	}, {
+	}, 
+	{
+		header : 'Phenotype Name',
+		dataIndex : 'pheneName',
+		flex : 1
+	},
+	{
 		header : 'View in Gemma',
 		dataIndex : 'linkToGemma',
 		flex : 1,
@@ -65,19 +71,7 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 	},
 	
 	selModel : Ext.create('Ext.selection.CheckboxModel', {
-		mode: 'MULTI',
-		/**listeners: {
-	        selectionchange: function(sm, selections) {
-	        	var selectedGenes = selections;
-	        	// And then you can iterate over the selected items, e.g.: 
-	        	selected = [];
-	        	Ext.each(selectedGenes, function (item) {
-	        	  selected.push(item.data.someField);
-	        	});
-	        		        		
-	        	ASPIREdb.view.NeurocartaGeneWindow.fireEvent('new_geneSet_selected',selected);
-	        }
-	    },*/
+		mode: 'MULTI',		
     }),
 
 
@@ -85,13 +79,14 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 
 	initComponent : function() {
 		this.callParent();
-		//ASPIREdb.EVENT_BUS.on('new_geneSet_selected', this.geneSelectHandler, this);
-		
+				
 		var me = this;
 		
 		this.on('select', me.geneSelectHandler, me);
 	},
-	
+	/*
+	 * when gene displayed are selected 
+	 */
 	geneSelectHandler : function(ref, record, index, eOpts) {
 		var selGenes = this.getSelectionModel().getSelection();
 		this.selectedgenes=[];
@@ -195,9 +190,6 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 			tooltip : 'Save Genes to User gene Set',
 			disabled: true,
 			handler: function(){
-				/**ASPIREdb.EVENT_BUS.on('new_geneSet_selected', function(genes){
-					ASPIREdb.view.SaveUserGeneSetWindow.initAndShow(genes);
-				});*/
 				ASPIREdb.view.SaveUserGeneSetWindow.initAndShow(ref.selectedgenes);
 				
 				

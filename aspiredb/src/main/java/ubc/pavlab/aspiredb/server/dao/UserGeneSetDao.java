@@ -26,8 +26,9 @@ import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import java.util.List;
 
 /**
- * author: gaya
- * date: 11/03/14
+ * User gene Set interface to access the User Gene Set model
+ * @author: Gaya Charath 
+ * @since: 11/03/14
  */
 public interface UserGeneSetDao extends SecurableDaoBase<UserGeneSet> {
 

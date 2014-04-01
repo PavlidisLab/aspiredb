@@ -95,7 +95,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 			}],
 
 	/**
-	 * init
+	 * Create tool bar and buttons on top of subject grid
 	 */
 	initComponent : function() {
 
@@ -150,25 +150,27 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		this.toolbar.add(this.saveButton);
 		this.addDocked(this.toolbar);
 
-		// add event handlers to buttons
+		// When Save button is clicked open text data downlaod window
 		this.saveButton.on('click', function() {
 			ASPIREdb.TextDataDownloadWindow
 					.showSubjectDownload(me.valueObjects);
 		}, this);
-
-		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);
-
-		this.on('selectionchange', me.selectionChangeHandler, me);
-		//this.on('select', me.onSelectHandler, me);
 		
+		//when subject filter submit
+		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);
+		
+		//when subject selected
+		this.on('selectionchange', me.selectionChangeHandler, me);
+		
+		//when subject label change
 		ASPIREdb.EVENT_BUS.on('label_change', function() {
 			me.getView().refresh();
 		});
 	},
 
 	/**
-	 * 
-	 * @param visibleLabels
+	 * Load subject labels created by the user
+	 * @return visibleLabels
 	 */
 	createVisibleLabels : function() {
 		var visibleLabels = [];
@@ -191,8 +193,8 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 	
 	/**
 	 * Populate grid with Subjects and Labels
+	 * @param : subject filter configurations
 	 * 
-	 * @param me
 	 */
 	filterSubmitHandler : function(filterConfigs) {
 		
@@ -200,9 +202,10 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		
 		me.setLoading(true);
 		me.getStore().removeAll();
+		//load existing subject labels
 		me.visibleLabels = me.createVisibleLabels();
 			
-		
+		//DWR : get subjects match the subject filter configuration
 		QueryService.querySubjects(filterConfigs, {
 			callback : function(pageLoad) {
 				me.valueObjects = pageLoad.items;
@@ -210,7 +213,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 				var data = [];
 				
 				console.log(me.valueObjects.length + " subjects being processed into value objects");
-				
+				// find the number of subjects filtered
 				ProjectService.numSubjects(filterConfigs[0].projectIds, {
 					callback : function(NoOfSubjects){
 						if (NoOfSubjects > me.valueObjects.length) {
@@ -266,9 +269,12 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 			}
 		});
 	},
-
+	
+	/**
+	 * This method called when subject are selected in the subject grid
+	 */
 	selectionChangeHandler : function() {
-		console.log("on selection  chnage Handler");
+		console.log("on selection  change Handler");
 		this.selSubjects = this.getSelectionModel().getSelection();
 
 		if (this.selSubjects.length == 0) {
@@ -294,10 +300,9 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 	},
 
 	
-	
 	/**
 	 * Assigns a Label
-	 * 
+	 * @param : event
 	 */
 	makeLabelHandler : function(event) {
 
@@ -348,6 +353,10 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 
 	},
 	
+	/**
+	 * Add the label to the store
+	 * @param: label value object, selected subject Ids
+	 */
 	addLabelHandler: function(vo,selSubjectIds) {
 		 
 		 var me=this;
@@ -380,6 +389,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 
 	/**
 	 * Display LabelSettingsWindow
+	 * @param : event
 	 */
 	labelSettingsHandler : function(event) {
 		var me = this;
@@ -393,6 +403,9 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		labelControlWindow.show();
 	},
 	
+	/**
+	 * When all the subjects are sselected this is executed
+	 */
 	selectAllHandler : function() {
 
 		//boolean true to suppressEvent

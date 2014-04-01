@@ -18,39 +18,37 @@
  */
 Ext.require([
     'Ext.panel.Panel',
-    'ASPIREdb.view.Ideogram',
-    'ASPIREdb.view.SubjectGrid',
-    'ASPIREdb.view.PhenotypeGrid',
-    'ASPIREdb.view.VariantTabPanel'
+    'ASPIREdb.view.GeneSetGrid',
+    'ASPIREdb.view.GeneGrid', 
 ]);
 /**
- * Main panel contains grid Panels "subjectGrid", "variantTabPanel" and "phenotypeGrid'
+ * gene panel includes GeneSetGrid and GeneGrid 
  */
-Ext.define('ASPIREdb.MainPanel',{
+Ext.define('ASPIREdb.GeneManagerPanel',{
     extend: 'Ext.panel.Panel',
-    alias: 'widget.ASPIREdb_mainpanel',
+    alias: 'widget.ASPIREdb_genemanagerpanel',
     layout: 'border',
     items:[
         {
             region: 'west',
-            xtype:'subjectGrid',
-            width: 300,
+            xtype:'geneSetGrid',
+            id : 'geneSetGrid',
+            width: 480,
             collapsible: true,
             split: true,
-            title:'Subject'
-        },
-        {
-            region: 'center',
-            xtype: 'variantTabPanel',
-            title:'Variant'
+            title:'Gene Sets'
         },
         {
             region: 'east',
-            xtype:'phenotypeGrid',
-            width: 700,
+            xtype:'geneGrid',
+            id :'geneGrid',
+            width: 480,
             collapsible: true,
             split: true,
-            title:'Phenotype'
+            title:'Associated Genes'
         }
-    ]
+    ],
+
+
+
 });

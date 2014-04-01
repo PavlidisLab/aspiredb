@@ -15,6 +15,14 @@
 
 package ubc.pavlab.aspiredb.server.security;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -23,8 +31,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.vote.AuthenticatedVoter;
-import org.springframework.security.acls.domain.*;
-import org.springframework.security.acls.model.*;
+import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.domain.GrantedAuthoritySid;
+import org.springframework.security.acls.domain.ObjectIdentityImpl;
+import org.springframework.security.acls.domain.ObjectIdentityRetrievalStrategyImpl;
+import org.springframework.security.acls.domain.PrincipalSid;
+import org.springframework.security.acls.model.AccessControlEntry;
+import org.springframework.security.acls.model.Acl;
+import org.springframework.security.acls.model.MutableAcl;
+import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.acls.model.ObjectIdentity;
+import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.acls.model.Sid;
+import org.springframework.security.acls.model.SidRetrievalStrategy;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,6 +56,7 @@ import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
@@ -43,14 +64,10 @@ import ubc.pavlab.aspiredb.server.security.authentication.UserService;
 import ubc.pavlab.aspiredb.server.security.authorization.acl.AclService;
 import ubc.pavlab.aspiredb.server.util.AuthorityConstants;
 
-import java.util.*;
-
-
-
 /**
- * Methods for changing security on objects, creating and modifying groups, checking security on objects.
- * modified from Gemma, some methods should be removed after we decide that we don't need them due to differing
- * Gemma/AspireDB security models
+ * Methods for changing security on objects, creating and modifying groups, checking security on objects. modified from
+ * Gemma, some methods should be removed after we decide that we don't need them due to differing Gemma/AspireDB
+ * security models
  * 
  * @author keshav
  * @author paul
@@ -729,7 +746,7 @@ public class SecurityServiceImpl implements SecurityService {
         }
 
     }
-    
+
     @Override
     public boolean isPrivate( Securable s ) {
 
@@ -779,7 +796,6 @@ public class SecurityServiceImpl implements SecurityService {
         return !isPrivate( s );
     }
 
-    
     /*
      * (non-Javadoc)
      * 
@@ -787,7 +803,7 @@ public class SecurityServiceImpl implements SecurityService {
      * java.lang.String)
      */
     @Override
-    @Transactional(readOnly=true)
+    @Transactional(readOnly = true)
     @Secured("ACL_SECURABLE_READ")
     public boolean isReadableByGroup( Securable s, String groupName ) {
         List<Permission> requiredPermissions = new ArrayList<Permission>();
@@ -891,8 +907,6 @@ public class SecurityServiceImpl implements SecurityService {
         addPrincipalAuthority( s, BasePermission.WRITE, userName );
         addPrincipalAuthority( s, BasePermission.READ, userName );
     }
-
-    
 
     /*
      * (non-Javadoc)
@@ -1411,9 +1425,9 @@ public class SecurityServiceImpl implements SecurityService {
         return numberAclsToRemove;
 
     }
-    
+
     public static String getCurrentUsername() {
-        UserDetails user = (UserDetails)(getAuthentication().getPrincipal());
+        UserDetails user = ( UserDetails ) ( getAuthentication().getPrincipal() );
         return user.getUsername();
     }
 

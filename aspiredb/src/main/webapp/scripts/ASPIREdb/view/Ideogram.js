@@ -1,4 +1,22 @@
-Ext.require([ 'Ext.panel.Panel', 'Ext.Component', 'ASPIREdb.view.ideogram.ColourLegend', 'ASPIREdb.view.ideogram.VariantLayer' ]);
+/*
+ * The aspiredb project
+ * 
+ * Copyright (c) 2013 University of British Columbia
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+Ext.require([ 'Ext.panel.Panel', 'Ext.Component', 'ASPIREdb.view.ideogram.ColourLegend', 'ASPIREdb.view.ideogram.VariantLayer','ASPIREdb.ActiveProjectSettings' ]);
 
 // TODO: events: GenomeRegionSelectionEvent
 //
@@ -12,6 +30,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	autoScroll : true,
 	title : 'Ideogram',
 	closable : false,
+	//resizable : true,
 	layout : 'absolute',
 	items : [ {
 		xtype : 'component',
@@ -42,7 +61,8 @@ Ext.define('ASPIREdb.view.Ideogram', {
 		this.colourLegend = Ext.create('ASPIREdb.view.ideogram.ColourLegend');
 
 		this.fetchChromosomeInfo();
-
+		
+		//deafult : set the display property to variant type property		
 		this.setDisplayedProperty(new VariantTypeProperty());
 
 		this.on('afterrender', this.registerMouseEventListeners, this);
@@ -286,11 +306,13 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	 * @param {number}
 	 *            newZoom
 	 */
-	changeZoom : function(newZoom) {
+	//changeZoom : function(newZoom, variants,property) {
+	changeZoom : function(newZoom, variants) {
 		this.zoom = newZoom;
 		this.width = Math.round(850 * this.zoom);
 		this.height = Math.round(this.boxHeight * this.zoom);
-		this.redraw();
+		this.redraw(variants);
+		//this.redraw(variants, property);
 	},
 
 	/**
@@ -341,7 +363,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 			this.chromosomeIdeograms[name] = chromosomeIdeogram;
 		}
 	},
-	/**
+	/**Create the Ideogram overlay
 	 * @private
 	 */
 	initCanvasSize : function() {
@@ -398,6 +420,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	 *            variantValueObjects
 	 */
 	drawVariants : function(variantValueObjects) {
+		
 		/* List<VariantValueObject> */
 		var variants = variantValueObjects.slice(); // make a copy
 		this.sortVariantsBySize(variants);
@@ -407,7 +430,78 @@ Ext.define('ASPIREdb.view.Ideogram', {
 			/* ChromosomeIdeogram */
 			var chrIdeogram = this.chromosomeIdeograms[chrName];
 			chrIdeogram.drawVariant(variant, this.displayedProperty);
+						
 		}
+				
+	},
+	
+	/**
+	 * @private
+	 * @param {VariantValueObject[]}
+	 *            variantValueObjects
+	 */
+	drawColouredVariants : function(variantValueObjects) {
+		
+		/* List<VariantValueObject> */
+		var variants = variantValueObjects.slice(); // make a copy
+		this.sortVariantsBySize(variants);
+		var propertyValues=[];
+		
+		for ( var i = 0; i < variants.length; i++) {
+			var variant = variants[i];
+			var chrName = variant.genomicRange.chromosome;
+			/* ChromosomeIdeogram */
+			var chrIdeogram = this.chromosomeIdeograms[chrName];
+			//populating the displayed properties
+			var property =this.displayedProperty;
+			
+			//if variant type property : CNV, SNV, indel, translocation, inversion
+			if (property instanceof VariantTypeProperty) {
+				propertyValues.push(variant.variantType);
+			}
+			//if CNV type : LOSS, GAIN
+	        if (property instanceof CNVTypeProperty) {
+	        	propertyValues.push(variant.type);
+	        }
+	      //if Characteristic type : benign, pathogenic, unknown
+	        if (property instanceof CharacteristicProperty) {
+	           var characteristicValueObject = variant.characteristics[property.name];
+	            if (characteristicValueObject !== null) {
+	            	propertyValues.push(characteristicValueObject.value);
+	            }
+	        }
+	        //if variant labels
+	        if (property instanceof VariantLabelProperty) {
+	        	if (variant.labels.length >0){
+	        		propertyValues.push(variant.labels[0].name);
+	        		console.log('variant label name :'+variant.labels[0].name);
+	        	}
+	        }
+	      //if subject labels
+	        if (property instanceof SubjectLabelProperty) {
+	        	subject = variant.subject
+	        	if (subject.labels.length >0){
+	        		propertyValues.push(subject.labels[0].name);
+	        		console.log('variant label name :'+subject.labels[0].name);
+	        	}
+	        	
+	        }
+	        this.displayedProperty=property;	               
+			chrIdeogram.drawVariant(variant, this.displayedProperty);
+						
+		}
+		this.displayedProperty.displayType =propertyValues;
+		
+		this.setDisplayedProperty(this.displayedProperty);
+		var valuetoColourArray =[];
+		for (values in ASPIREdb.view.ideogram.VariantLayer.valueToColourMap){
+			valuetoColourArray.push([values,ASPIREdb.view.ideogram.VariantLayer.valueToColourMap[values]]);
+		}
+		
+		//setting the colors for the ideogram ledgent
+		this.colourLegend.update(valuetoColourArray,this.displayedProperty); 
+
+		
 	},
 
 	/**
@@ -443,10 +537,46 @@ Ext.define('ASPIREdb.view.Ideogram', {
 			/* ChromosomeIdeogram */
 			var chrIdeogram = this.chromosomeIdeograms[chrName];
 			if (variant.subjectId === subjectId) {
+				console.log('drawing red variants of subject id :'+subjectId+' in dieogam view');
 				chrIdeogram.drawHighlightedVariant(variant, this.displayedProperty);
 			} else {
 				chrIdeogram.drawDimmedVariant(variant);
 			}
+		}
+	},
+	
+	drawVariantsWithSubjectsHighlighted : function(subjectIds, variantValueObjects) {
+		/* List<VariantValueObject> */
+		var variants = variantValueObjects.slice(); // copy array
+		this.sortVariantsBySize(variants);
+
+		for ( var i = 0; i < variants.length; i++) {
+			var variant = variants[i];
+			var chrName = variant.genomicRange.chromosome;
+			/* ChromosomeIdeogram */
+			var chrIdeogram = this.chromosomeIdeograms[chrName];
+			//color heighlighted variants in red
+			for (var j=0; j<subjectIds.length;j++){
+				var subjectId=subjectIds[j];
+				if (variant.subjectId === subjectId) {
+					console.log('drawing red variants of subject id :'+subjectId+' in dieogam view');
+					chrIdeogram.drawHighlightedVariant(variant, this.displayedProperty);
+				} 
+			}
+			
+		}
+	},
+	
+	drawDimmedVariants : function(variantValueObjects) {
+		/* List<VariantValueObject> */
+		var variants = variantValueObjects.slice(); // make a copy
+		this.sortVariantsBySize(variants);
+		for ( var i = 0; i < variants.length; i++) {
+			var variant = variants[i];
+			var chrName = variant.genomicRange.chromosome;
+			/* ChromosomeIdeogram */
+			var chrIdeogram = this.chromosomeIdeograms[chrName];
+			chrIdeogram.drawDimmedVariant(variant);
 		}
 	},
 
@@ -457,7 +587,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	 */
 	setDisplayedProperty : function(displayedProperty) {
 		this.displayedProperty = displayedProperty;
-		ASPIREdb.view.ideogram.VariantLayer.resetDisplayProperty();
+		ASPIREdb.view.ideogram.VariantLayer.resetDisplayProperty(displayedProperty);
 	},
 
 	/**
@@ -471,11 +601,14 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	/**
 	 * @public
 	 */
-	redraw : function() {
+	redraw : function(variants) {
+		this.setDisplayedProperty(this.displayedProperty);
 		this.drawChromosomes();
-		this.drawVariants(variants);
-		this.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap, this.displayedProperty);
+		this.drawColouredVariants(variants);
+		this.showColourLegend();
+
 	},
+	
 
 	/**
 	 * @private

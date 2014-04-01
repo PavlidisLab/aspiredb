@@ -37,7 +37,8 @@ public interface VariantService {
 
     public VariantValueObject getVariant(Long variantId);
     
-    public List<VariantValueObject> getSubjectsVariants(String patientId);
+    public List<VariantValueObject> getSubjectVariants(String patientId);
+    public List<VariantValueObject> getSubjectsVariants(List<String> patientIds);
     
     public Integer getTotalNoOfVariantsBySubjectId(String patientId);
             

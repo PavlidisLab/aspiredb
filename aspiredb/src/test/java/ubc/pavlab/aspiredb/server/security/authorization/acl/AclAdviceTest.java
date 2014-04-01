@@ -43,12 +43,12 @@ public class AclAdviceTest extends BaseSpringContextTest {
 
     @Autowired
     MutableAclService aclService;
+    
+    @Autowired
+    private AclTestUtils aclTestUtils;
 
     @Autowired
-    AclTestUtils aclTestUtils;
-
-    @Autowired
-    PersistentTestObjectHelper testObjectHelper;
+    private PersistentTestObjectHelper testObjectHelper;
 
     @Autowired
     SubjectDao indDao;
@@ -92,7 +92,6 @@ public class AclAdviceTest extends BaseSpringContextTest {
     @Test
     public void testPhenotypeAcls() throws Exception {
         Collection<Phenotype> phenos = new HashSet<Phenotype>();
-        
         Phenotype pheno = testObjectHelper.createPersistentTestPhenotypeObject(
                 RandomStringUtils.randomAlphabetic( 4 ), RandomStringUtils.randomAlphabetic( 4 ),
                 RandomStringUtils.randomAlphabetic( 1 ), RandomStringUtils.randomAlphabetic( 4 ) );
@@ -110,7 +109,7 @@ public class AclAdviceTest extends BaseSpringContextTest {
             aclTestUtils.checkHasAcl( apheno );
             phenotypeDao.remove( apheno );
             aclTestUtils.checkDeletedAcl( apheno );
-        }
-
     }
+
+}
 }

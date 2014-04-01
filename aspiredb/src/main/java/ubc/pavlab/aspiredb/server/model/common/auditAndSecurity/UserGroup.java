@@ -52,6 +52,7 @@ public class UserGroup implements SecuredNotChild {
         authorities = new HashSet<GroupAuthority>();
     }
 
+    @Override
     public Long getId() {
         return id;
     }

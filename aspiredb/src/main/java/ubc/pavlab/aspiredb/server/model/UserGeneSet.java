@@ -30,7 +30,8 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 
 /**
  * This table is created to hold the user interested gene set. Even though now the requirement is only to create user interested gene set, this model can hold multiple gene sets for a user
- * author: Gaya date: 11/03/14
+ * @author: Gaya Charath
+ * @since: 11/03/14
  */
 @Entity
 @Table(name = "USERGENESET")

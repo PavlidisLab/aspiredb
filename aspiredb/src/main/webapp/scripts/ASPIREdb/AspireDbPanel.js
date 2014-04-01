@@ -1,6 +1,25 @@
-Ext.require([ 'ASPIREdb.MainPanel', 'ASPIREdb.EVENT_BUS', 'ASPIREdb.view.filter.FilterWindow', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.DashboardWindow' ]);
+/*
+ * The aspiredb project
+ * 
+ * Copyright (c) 2013 University of British Columbia
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+Ext.require([ 'ASPIREdb.MainPanel', 'ASPIREdb.EVENT_BUS', 'ASPIREdb.view.filter.FilterWindow', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.DashboardWindow','ASPIREdb.view.GeneManagerWindow' ]);
 
 /**
+ * Main Panel which trigger the Main Panel after user's successful login
  * Events: - login - logout
  */
 Ext.define('ASPIREdb.AspireDbPanel', {
@@ -10,6 +29,7 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 	config : {
 		loginForm : null
 	},
+	
 	initComponent : function() {
 		this.callParent();
 
@@ -20,7 +40,7 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 			aspireDbPanel.getComponent('topToolbar').getComponent('logoutForm').show();
 			
 			aspireDbPanel.disableToolbarButtonsForDashboard(true);
-
+			
 			ASPIREdb.view.DashboardWindow.show();
 
 			var runner = new Ext.util.TaskRunner();
@@ -116,6 +136,10 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 		
 	},
 	
+	/**
+	 * Disable the filter button and clear filter button before closing the dashboard window
+	 * @param: 'yes' or 'no'
+	 */
 	disableToolbarButtonsForDashboard: function(yes){
 		
 		if (yes){
@@ -197,7 +221,18 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 				this.up('#aspireDbPanel').disableToolbarButtonsForDashboard(true);
 				ASPIREdb.view.DashboardWindow.show();
 			}
-		}, {
+		}, 
+		{
+			xtype : 'button',
+			text : 'Gene Manager',
+			itemId : 'geneManagerButton',
+			height : 30,
+			margin : '5 5 5 5',
+			handler : function() {
+				ASPIREdb.view.GeneManagerWindow.initGridAndShow();
+				
+			}
+		},{
 			xtype : 'button',
 			text : 'Help',
 			itemId : 'helpButton',

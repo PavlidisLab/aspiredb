@@ -12,7 +12,7 @@
 	    <!-- We shouldn't use other options (validate is ok).
 	    We should be manually updating database schema on production. It's too risky to
 	    let hbm2ddl to handle schema updates. -->
-        <property name="hbm2ddl.auto">validate</property> 
+        <property name="hbm2ddl.auto">Validate</property> 
 	    	 
 	 	<!-- Add new entity classes here so that hibernate tools see it. -->
 	 	<mapping class="ubc.pavlab.aspiredb.server.model.Variant" />
@@ -23,6 +23,7 @@
         <mapping class="ubc.pavlab.aspiredb.server.model.Translocation" />
         <mapping class="ubc.pavlab.aspiredb.server.model.Gene" />
      	<mapping class="ubc.pavlab.aspiredb.server.model.GeneGroup" />
+     	<mapping class="ubc.pavlab.aspiredb.server.model.UserGeneSet" />
    		<mapping class="ubc.pavlab.aspiredb.server.model.GenomicLocation" />
     	<mapping class="ubc.pavlab.aspiredb.server.model.Subject" />      	
        	<mapping class="ubc.pavlab.aspiredb.server.model.Phenotype" />

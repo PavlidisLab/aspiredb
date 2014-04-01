@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,7 +73,12 @@ public class SubjectServiceImpl implements SubjectService {
     @Autowired private CNVDao cnvDao;
     @Autowired private PhenotypeBrowserService phenotypeBrowserService;
     @Autowired private LabelDao labelDao;
-
+    
+    /**
+     * Get the Subject value Object of the given subject Id
+     * @param projectId, subjectId
+     * @return SubjectValueObject
+     */
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
@@ -90,6 +94,11 @@ public class SubjectServiceImpl implements SubjectService {
         return vo;
     }
     
+    /**
+     * Get the list of Subject value Objects of the given subject Ids
+     * @param projectId, subjectId
+     * @return SubjectValueObject
+     */
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
@@ -98,7 +107,7 @@ public class SubjectServiceImpl implements SubjectService {
         Collection<Subject> subjects = subjectDao.load( subjectIds);
         if ( subjects.isEmpty() ) return null;
         
-        List<SubjectValueObject> vos = new ArrayList<SubjectValueObject>(); 
+        List<SubjectValueObject> vos = new ArrayList<>(); 
         
         for ( Subject subject : subjects ) {
             
@@ -141,7 +150,13 @@ public class SubjectServiceImpl implements SubjectService {
         }
         return values;
     }
-   
+    
+    /**
+     * Get the Phenotype summary value objects for the given list of subject Ids and Project Ids.
+     * @exception NeurocartaServiceException
+     * @param List of subjectIds, Collection of projectIds
+     * @return List of Phenotype summary value objects
+     */
     @Override
     @RemoteMethod
     @Transactional
@@ -169,10 +184,14 @@ public class SubjectServiceImpl implements SubjectService {
         for (PhenotypeSummary sum: phenotypeSummaries){
             
             String displaySummary = "";
-            LinkedHashMap<String, Integer> phenoSummaryMap = new LinkedHashMap<String, Integer>();
+            HashMap<String, Integer> phenoSummaryMap = new HashMap<String, Integer>();
             
             Set<String> keyArray = sum.getDbValueToSubjectSet().keySet();
-            String[] colors = {"red", "green", "black", "purple","blue", "yellow","orange", "grey"};
+            /**
+             * Used the Color Brewer 2.0 system for coloring the chart
+             * Thanks for Cynthia Brewer, Mark Harrower and The Pennsylvania State University
+             */
+            String[] colors = {"#b35806", "#31a354", "#636363", "#d8b365","#2c7fb8", "#addd8e","#7570b3", "#a6bddb"};
             int j=3;
             int unknown=0;
             int present=0;
@@ -237,6 +256,13 @@ public class SubjectServiceImpl implements SubjectService {
         return valueObjects;
 	}
     
+    /**
+     * Get the map of Phenotype Name and Phenotype Summary Value Objects for the given list of subject Ids and list of Project Ids.
+     * @exception NeurocartaServiceException
+     * @param List of subjectIds, Collection of projectIds
+     * @return Map of Phenotype Name and Phenotype summary value objects
+     * @author Gaya Charath
+     */
     @Override
     @RemoteMethod
     @Transactional
@@ -256,7 +282,7 @@ public class SubjectServiceImpl implements SubjectService {
         
         //List<PhenotypeSummaryValueObject> valueObjects = new ArrayList<PhenotypeSummaryValueObject>();   
         Map<String, PhenotypeSummaryValueObject> summaryValueObjectsMap = new HashMap<String, PhenotypeSummaryValueObject>();
-        LinkedHashMap<String, Integer> allPhenoSummaryMap = new LinkedHashMap<String, Integer>();     
+        HashMap<String, Integer> allPhenoSummaryMap = new HashMap<String, Integer>();     
        
                 
         //convert PhenotypeSummaries to lighter PhenotypeValueObjects
@@ -264,10 +290,14 @@ public class SubjectServiceImpl implements SubjectService {
         for (PhenotypeSummary sum: phenotypeSummaries){
             
             String displaySummary = "";
-            LinkedHashMap<String, Integer> phenoSummaryMap = new LinkedHashMap<String, Integer>();
+            HashMap<String, Integer> phenoSummaryMap = new HashMap<String, Integer>();
             
             Set<String> keyArray = sum.getDbValueToSubjectSet().keySet();
-            String[] colors = {"red", "green", "black", "purple","blue", "yellow","orange", "grey"};
+            /**
+             * Used the Color Brewer 2.0 system for coloring the chart
+             * Thanks for Cynthia Brewer, Mark Harrower and The Pennsylvania State University
+             */
+            String[] colors = {"#b35806", "#31a354", "#636363", "#d8b365","#2c7fb8", "#addd8e","#7570b3", "#a6bddb"};
             int j=3;
             int unknown=0;
             int present=0;
@@ -334,7 +364,11 @@ public class SubjectServiceImpl implements SubjectService {
         
         return summaryValueObjectsMap;
     }
-    
+    /**
+     * Create the Text to download the phenotype property values of given subject Ids
+     * @param List of subject Ids
+     * @return Long text of given subjects phenotype summary 
+     */
     @Override
     @RemoteMethod
     @Transactional
@@ -355,7 +389,7 @@ public class SubjectServiceImpl implements SubjectService {
         
         StringBuffer text = new StringBuffer();
 
-        LinkedHashMap<String, String> phenotypeFileColumnsMap = new LinkedHashMap<String, String>();
+        HashMap<String, String> phenotypeFileColumnsMap = new HashMap<String, String>();
 
         for ( SubjectValueObject svo : svoList ) {
 
