@@ -21,7 +21,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.*;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
+
 import ubc.pavlab.aspiredb.server.security.authentication.ManualAuthenticationService;
+import ubc.pavlab.aspiredb.server.util.ConfigUtils;
 
 import java.io.File;
 import java.util.*;
@@ -55,7 +57,7 @@ public abstract class AbstractCLI {
 
     private static final char VERBOSITY_OPTION = 'v';
     private static final String HEADER = "Options:";
-    public static final String FOOTER = "The aspiredb project, Copyright (c) 2013 University of British Columbia.";
+    public static final String FOOTER = "The aspiredb project, Copyright (c) 2014 University of British Columbia.";
     private static final int DEFAULT_PORT = 3306;
     private static int DEFAULT_VERBOSITY = 4; // info.
     protected static Log log = LogFactory.getLog( AbstractCLI.class );
@@ -590,7 +592,7 @@ public abstract class AbstractCLI {
     protected final Exception processCommandLine( String commandName, String[] args ) {
         /* COMMAND LINE PARSER STAGE */
         BasicParser parser = new BasicParser();
-        // System.err.println( "Gemma version " + ConfigUtils.getAppVersion() );
+        System.err.println( "ASPIREdb version " + ConfigUtils.getAppVersion() );
 
         if ( args == null ) {
             printHelp( commandName );
