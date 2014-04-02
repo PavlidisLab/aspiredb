@@ -77,6 +77,8 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 		
 		if (overlapProjectComboBox.getValue() !='PROJECT_PLACEHOLDER'){
 			overlapProjectIds.push(overlapProjectComboBox.getValue()); 
+			filterContainer.getComponent('overlappedVariants').enable();
+
 		}
 		projectOverlapConfig.overlapProjectIds = overlapProjectIds;
 		
@@ -182,6 +184,17 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 
 		var supportOfVariantsOverlapItem = getNewVariantSupportOverlapItem();
 		
+		filterContainer.insert(0, {
+		
+				xtype : 'button',
+				flex : 1,
+				itemId:'overlappedVariants',
+				text : 'Overlapped Variants',
+				disabled :true,
+				handler : this.overlappedVariantsHandler,
+				scope : this
+		});
+		
 		filterContainer.insert(0,{xtype:"checkbox", itemId:"invertCheckbox" });
 		filterContainer.insert(0, {
 			xtype : 'label',
@@ -218,7 +231,7 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 			xtype: 'combo',
 			itemId: 'overlapProjectComboBox',
 			editable: false,
-			forceSelection: true,			
+			forceSelection: true,	
 			value: 'PROJECT_PLACEHOLDER',
 			store: [['PROJECT_PLACEHOLDER', '<Project Name>']]
 			
@@ -231,11 +244,21 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 		});
 
 		this.updateOverlapProjectCombo();
+	
 		
 	},
 	
+	overlappedVariantsHandler : function(){
+		var filterContainer = this.getComponent("filterContainer");
+		var overlapProjectComboBox = filterContainer.getComponent('overlapProjectComboBox');
+		ASPIREdb.view.filter.FilterWindow.overlappedVariantsHandler(overlapProjectComboBox.getValue());
+		console.log('overlap project selected : '+overlapProjectComboBox.getValue());
+		
+	},
 	
+		
 	updateOverlapProjectCombo : function(){
+		
 		
 		var overlapProjectComboBox = this.down('#overlapProjectComboBox');
 		

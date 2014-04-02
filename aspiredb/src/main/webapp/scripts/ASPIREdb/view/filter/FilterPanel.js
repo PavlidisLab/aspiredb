@@ -7,7 +7,7 @@ Ext.define('ASPIREdb.view.filter.FilterPanel', {
     closable: true,
     collapsible: true,
     header: false,
-    width: 950,
+    width: 900,
     padding: '10 5 10 5' ,
     layout: {
         type: 'vbox',
@@ -32,7 +32,7 @@ Ext.define('ASPIREdb.view.filter.FilterPanel', {
         	{
         		xtype : 'image',
         		itemId: 'closeImage',
-    			margin : '5 5 5 650',
+    			margin : '5 5 5 750',
     			
     				src : 'scripts/ASPIREdb/resources/images/icons/cross.png',
     				listeners: {

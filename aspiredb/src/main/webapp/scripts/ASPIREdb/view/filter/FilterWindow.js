@@ -1,4 +1,4 @@
-Ext.require([ 'Ext.window.*', 'Ext.layout.container.Border', 'ASPIREdb.view.filter.AndFilterContainer', 'ASPIREdb.view.filter.VariantFilterPanel', 'ASPIREdb.view.filter.SubjectFilterPanel', 'ASPIREdb.view.filter.PhenotypeFilterPanel', 'ASPIREdb.view.SaveQueryWindow', 'ASPIREdb.view.filter.ProjectOverlapFilterPanel', 'ASPIREdb.view.filter.DecipherProjectOverlapFilterPanel', 'ASPIREdb.view.filter.DgvProjectOverlapFilterPanel','ASPIREdb.view.DeleteQueryWindow' ]);
+Ext.require([ 'Ext.window.*', 'Ext.layout.container.Border', 'ASPIREdb.view.filter.AndFilterContainer', 'ASPIREdb.view.filter.VariantFilterPanel', 'ASPIREdb.view.filter.SubjectFilterPanel', 'ASPIREdb.view.filter.PhenotypeFilterPanel', 'ASPIREdb.view.SaveQueryWindow', 'ASPIREdb.view.filter.ProjectOverlapFilterPanel', 'ASPIREdb.view.filter.DecipherProjectOverlapFilterPanel', 'ASPIREdb.view.filter.DgvProjectOverlapFilterPanel','ASPIREdb.view.DeleteQueryWindow', 'ASPIREdb.TextDataDownloadWindow']);
 
 
 Ext.define('ASPIREdb.view.filter.FilterWindow', {
@@ -19,7 +19,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		var me = this;
 		this.items = [ {
 			region : 'north',
-			width : 600,
+			width : 900,
 			items : [ {
 				xtype : 'container',
 				layout : {
@@ -207,9 +207,16 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 			me.invalidateResultCounts();
 		});
 		
+		//ASPIREdb.EVENT_BUS.on('overlapProject_selected', this.updateOverlappedProject, this);
+		
 		this.updateSpecialProjectValues(); 
 		
 				
+	},
+	
+	updateOverlappedProject : function(projectId){
+		this.getOverlappedFilterConfigs(projectId); 
+		console.log('overlapped project config updated');
 	},
 
 	loadQueryHandler : function(filters) {
@@ -358,8 +365,18 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 
 	},
 	
+	enableOverlappButton: function(){
+    	//var projectOverlapFilterContainer = ASPIREdb.view.filter.ProjectOverlapFilterPanel.getComponent('projectOverlapFilterContainer');
+    	var subjectFilterPanel = Ext.create('ASPIREdb.view.filter.ProjectOverlapFilterPanel');
+    	subjectFilterPanel.down('#overlappedVariants').enable();
+    },
+	
 	previewQueryHandler : function() {
-		
+		//this.enableOverlappButton();
+		//enable the overlapped variants button in filter container
+		var filterContainer = this.down('#filterContainer');
+		filterContainer.down('#overlappedVariants').enable();
+								
 		if (this.down('#numberOfSubjectsLabel').getEl() && this.down('#numberOfVariantsLabel').getEl()){
 			this.down('#numberOfSubjectsLabel').getEl().setOpacity(1, true);
 			this.down('#numberOfVariantsLabel').getEl().setOpacity(1, true);
@@ -416,6 +433,31 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 
 		return filterConfigs;
 	},
+	
+	getOverlappedFilterConfigs : function(projectId) {
+		/**
+		 * @type {Array.RestrictionFilterConfig}
+		 * Here we need to edit the project id to overlapped project id 
+		 */
+		var filterConfigs = [];
+		
+		var projectIds=[];
+		projectIds.push(projectId);
+		
+		var projectFilter = new ProjectFilterConfig();
+		projectFilter.projectIds = projectIds;
+		filterConfigs.push(projectFilter);
+		
+		var filterContainer = this.down('#filterContainer');
+		filterContainer.items.each(function(item, index, length) {
+			
+			var newFilterConfig = item.getFilterConfig();
+			newFilterConfig.projectIds=projectIds;
+			filterConfigs.push(newFilterConfig);
+		});
+
+		return filterConfigs;
+	},
 
 	invalidateResultCounts: function() {
 		
@@ -429,9 +471,148 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		
 	},
 	
+	/**
+	 * Populate the overlapped variants
+	 */
+	overlappedVariantsHandler : function(projectId){
+		
+		var me=this;
+				
+		VariantService.suggestProperties(function(properties) {
+			
+			
+		  QueryService.queryVariants(me.getOverlappedFilterConfigs(projectId), {
+			callback : function(pageLoad) {
+				
+				var vvos = pageLoad.items;
+				characteristicNames = [];
+
+				for ( var i = 0; i < properties.length; i++) {
+
+					if (properties[i].characteristic) {
+						characteristicNames.push(properties[i].name);
+					}
+
+				}
+				
+			
+					
+				var data=[];
+				var headers=['Id','Patient Id','Type', 'Genome Coordinates','Chromosome','Base Start', 'Base End','CNV Type','Copy Number','CNV Length'];
+				for ( var j = 0; j < characteristicNames.length; j++) {
+					headers.push(characteristicNames[j]);
+				}
+				
+				for ( var i = 0; i < vvos.length; i++) {
+
+					var vvo = vvos[i];
+
+					var dataRow = [];
+
+					dataRow.push(vvo.id);
+
+					dataRow.push(vvo.patientId);
+
+					dataRow.push(vvo.variantType);
+					dataRow.push(vvo.genomicRange.chromosome + ":" + vvo.genomicRange.baseStart + "-" + vvo.genomicRange.baseEnd);
+					dataRow.push(vvo.genomicRange.chromosome);
+					dataRow.push(vvo.genomicRange.baseStart);
+					dataRow.push(vvo.genomicRange.baseEnd);
+					
+					/**var visibleLabels = [];
+					var suggestionContext = new SuggestionContext();
+					
+					suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+					
+					// load all labels created by this user
+					VariantService.suggestLabels(suggestionContext, {
+						callback : function(labels) {
+							for ( var idx in labels) {
+								var label = labels[idx];
+								visibleLabels[label.id] = label;
+							}
+						}
+					});
+					
+					// create only one unique label instance
+					var labels = [];
+					for (var j = 0; j < vvo.labels.length; j++) {
+						var aLabel = visibleLabels[vvo.labels[j].id];
+
+						// this happens when a label has been assigned
+						// by the admin and the user has no permissions
+						// to modify the label
+						if (aLabel == undefined) {
+							aLabel = vvo.labels[j];
+						}
+
+						labels.push(aLabel.id);
+					}
+
+					dataRow.push(labels);*/
+
+					if (vvo.variantType == "CNV") {
+						dataRow.push(vvo.type);
+						dataRow.push(vvo.copyNumber);
+						dataRow.push(vvo.cnvLength);
+					} else {
+						dataRow.push("");
+						dataRow.push("");
+						dataRow.push("");
+					}
+
+					if (vvo.variantType == "SNV") {
+						dataRow.push(vvo.dbSNPID);
+						dataRow.push(vvo.observedBase);
+						dataRow.push(vvo.referenceBase);
+					} else {
+						dataRow.push("");
+						dataRow.push("");
+						dataRow.push("");
+					}
+
+					if (vvo.variantType == "INDEL") {
+						dataRow.push(vvo.length);
+					} else {
+						dataRow.push("");
+					}
+					
+					
+					for ( var j = 0; j < characteristicNames.length; j++) {
+
+						var dataRowValue = "";
+
+						for ( var char in vvo.characteristics) {
+							if (char == characteristicNames[j]) {
+								dataRowValue = vvo.characteristics[char].value;								
+								break;
+							}
+						}
+						
+						
+						dataRow.push(dataRowValue);
+					}
+
+					data.push(dataRow);
+				}
+				
+				ASPIREdb.TextDataDownloadWindow.initAndShow (data, headers);
+				
+			}
+		
+			});
+		});
+		
+	},
+	
+	
+	/**
+	 * Triggered by Preview query button in Filter Window
+	 * Updates the result count in the filter window
+	 */
 	updateSpecialProjectValues : function() {
 
-		var ref = this;
+		
 		
 		ProjectService.getDecipherProject({
 			
