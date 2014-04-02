@@ -128,6 +128,10 @@ public class ConfigUtils {
         }
 
     }
+    
+    public static String getAppVersion() {
+        return getString( "aspiredb.version" );
+    }
 
     public static String getAdminEmailAddress() {
         return getString( "aspiredb.admin.email" );
