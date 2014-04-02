@@ -24,14 +24,7 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterPanel', {
         return  projectOverlapFilterContainer.getRestrictionExpression();        
     },
     
-   setOverlappedProjectId: function() {
-    	//TODO fix this
-        var projectOverlapFilterContainer = this.getComponent('projectOverlapFilterContainer');
-        projectOverlapFilterContainer.overlapProjectUpdate();        
-    },
-    
-    
-    
+       
     setFilterConfig: function(config) {
         
         var projectOverlapFilterContainer = this.down('#projectOverlapFilterContainer');

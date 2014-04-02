@@ -77,8 +77,7 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 		
 		if (overlapProjectComboBox.getValue() !='PROJECT_PLACEHOLDER'){
 			overlapProjectIds.push(overlapProjectComboBox.getValue()); 
-			filterContainer.getComponent('overlappedVariants').enable();
-
+			
 		}
 		projectOverlapConfig.overlapProjectIds = overlapProjectIds;
 		

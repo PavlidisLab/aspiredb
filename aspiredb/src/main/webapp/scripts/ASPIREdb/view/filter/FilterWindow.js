@@ -506,6 +506,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 				for ( var i = 0; i < vvos.length; i++) {
 
 					var vvo = vvos[i];
+					console.log('filter window set variant load overlap filter vvo '+vvos[i]);
 
 					var dataRow = [];
 
@@ -612,7 +613,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	 */
 	updateSpecialProjectValues : function() {
 
-		
+		var ref = this;
 		
 		ProjectService.getDecipherProject({
 			
