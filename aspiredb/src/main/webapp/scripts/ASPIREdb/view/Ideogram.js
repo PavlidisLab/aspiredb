@@ -306,7 +306,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	 * @param {number}
 	 *            newZoom
 	 */
-	//changeZoom : function(newZoom, variants,property) {
+	//changeZoom : function(newZoom, variants, property) {
 	changeZoom : function(newZoom, variants) {
 		this.zoom = newZoom;
 		this.width = Math.round(850 * this.zoom);
@@ -466,8 +466,10 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	      //if Characteristic type : benign, pathogenic, unknown
 	        if (property instanceof CharacteristicProperty) {
 	           var characteristicValueObject = variant.characteristics[property.name];
-	            if (characteristicValueObject !== null) {
-	            	propertyValues.push(characteristicValueObject.value);
+	            if (characteristicValueObject != null) {
+	            	if (characteristicValueObject== undefined){
+	            		console.log('undefined characteristics : '+property.name);
+	            	}else propertyValues.push(characteristicValueObject.value);
 	            }
 	        }
 	        //if variant labels
@@ -493,9 +495,11 @@ Ext.define('ASPIREdb.view.Ideogram', {
 		this.displayedProperty.displayType =propertyValues;
 		
 		this.setDisplayedProperty(this.displayedProperty);
+		
 		var valuetoColourArray =[];
-		for (values in ASPIREdb.view.ideogram.VariantLayer.valueToColourMap){
-			valuetoColourArray.push([values,ASPIREdb.view.ideogram.VariantLayer.valueToColourMap[values]]);
+		
+		for (var i=0; i< ASPIREdb.view.ideogram.VariantLayer.valueToColourMap.length;i++){
+			valuetoColourArray.push(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap[i]);
 		}
 		
 		//setting the colors for the ideogram ledgent
@@ -602,8 +606,10 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	 * @public
 	 */
 	redraw : function(variants) {
-		this.setDisplayedProperty(this.displayedProperty);
+		//this.setDisplayedProperty(this.displayedProperty);
 		this.drawChromosomes();
+		var valuetoColourArray=[];
+		this.colourLegend.update(valuetoColourArray,this.displayedProperty); 
 		this.drawColouredVariants(variants);
 		this.showColourLegend();
 

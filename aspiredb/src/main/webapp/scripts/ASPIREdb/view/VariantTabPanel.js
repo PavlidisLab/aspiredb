@@ -155,7 +155,6 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		            [ 'inheritance', 'Inheritance'],
 		            [ 'arrayReport','Array Report'],		            
 		            [ 'arrayPlatform', 'Array Platform'],
-		            [ 'markers','Markers'],
 		            [ 'labels','Variant Labels'],
 		            [ 'subjectLabels','Subject Labels']
 		            ];         
@@ -409,17 +408,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
 		        	  this.redrawIdeogram(property);
 					  break;
-				  }
-				  case 'markers':{
-					  var property =new CharacteristicProperty();
-					  property.name ='Markers';
-		        	  property.displayName ='Markers';
-		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
-		        	  this.redrawIdeogram(property);
-					  break;
-				  }
-				 
-				  				  
+				  }			  
 				}
 				
 			}
