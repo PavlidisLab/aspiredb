@@ -18,17 +18,24 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import java.util.Collection;
+
+import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 /**
- * author: anton
- * date: 10/06/13
+ * author: anton date: 10/06/13
  */
 public interface LabelService {
-    
-    public void deleteSubjectLabel(LabelValueObject label);
 
-    public void deleteVariantLabel(LabelValueObject label);
+    public void deleteSubjectLabel( LabelValueObject label );
+
+    public void deleteVariantLabel( LabelValueObject label );
 
     public void updateLabel( LabelValueObject label );
+
+    public void deleteSubjectLabel( LabelValueObject label, Collection<Long> subjectIds );
+
+    public void deleteVariantLabel( LabelValueObject label, Collection<Long> variantIds );
 }

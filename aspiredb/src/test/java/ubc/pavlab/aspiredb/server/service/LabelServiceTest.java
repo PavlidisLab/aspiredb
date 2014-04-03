@@ -18,19 +18,16 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +38,8 @@ import ubc.pavlab.aspiredb.server.dao.LabelDao;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
-import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
-import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
-import ubc.pavlab.aspiredb.server.model.Label;
+import ubc.pavlab.aspiredb.server.dao.VariantDao;
+import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
@@ -53,24 +49,16 @@ import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
-import ubc.pavlab.aspiredb.shared.AspireDbPagingLoadConfig;
-import ubc.pavlab.aspiredb.shared.AspireDbPagingLoadConfigBean;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
-import ubc.pavlab.aspiredb.shared.SubjectValueObject;
-import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
-import ubc.pavlab.aspiredb.shared.query.PhenotypeFilterConfig;
-import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
-import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
-
 
 public class LabelServiceTest extends BaseSpringContextTest {
 
     @Autowired
     private LabelService labelService;
-    
+
     @Autowired
     private ProjectManager projectManager;
-    
+
     @Autowired
     private LabelDao labelDao;
 
@@ -82,19 +70,25 @@ public class LabelServiceTest extends BaseSpringContextTest {
 
     @Autowired
     private SubjectDao subjectDao;
-    
+
+    @Autowired
+    private VariantDao variantDao;
+
     @Autowired
     private SubjectService subjectService;
+
+    @Autowired
+    private VariantService variantService;
 
     @Autowired
     private PhenotypeDao phenotypeDao;
 
     @Autowired
     private PhenotypeUtil phenotypeUtil;
-    
+
     @Autowired
     private SecurityService securityService;
-    
+
     @Autowired
     UserManager userManager;
 
@@ -106,63 +100,89 @@ public class LabelServiceTest extends BaseSpringContextTest {
     private String HP_NERVOUS = "Abnormality of the nervous system";
 
     private Collection<Long> activeProjectIds;
-    
+
     private Long subjectId;
 
     private static Log log = LogFactory.getLog( QueryServiceTest.class.getName() );
     String username = RandomStringUtils.randomAlphabetic( 6 );
     String testname = RandomStringUtils.randomAlphabetic( 6 );
+
     @Before
     public void setUp() {
         Subject subject = createSubjectWithPhenotypes( "1", "0", "0", "0" );
-        
+
         subjectId = subject.getId();
-        
+
         createSubjectWithPhenotypes( "0", "1", "0", "0" );
         createSubjectWithPhenotypes( "0", "0", "1", "0" );
         createSubjectWithPhenotypes( "0", "0", "0", "1" );
         createSubjectWithPhenotypes( "1", "0", "1", "0" );
-        
+
         try {
             userManager.loadUserByUsername( username );
         } catch ( UsernameNotFoundException e ) {
             userManager.createUser( new UserDetailsImpl( "jimmy", username, true, null, RandomStringUtils
                     .randomAlphabetic( 10 ) + "@gmail.com", "key", new Date() ) );
         }
-        
-        
+
         String groupName = randomName();
         this.securityService.createGroup( groupName );
         this.securityService.makeWriteableByGroup( subject, groupName );
-       
+
         this.securityService.addUserToGroup( username, groupName );
 
     }
 
-    
     @Test
     public void testMultipleUsersCreateSameLabelName() {
-        
+
         super.runAsAdmin();
-        
+
         LabelValueObject lvo = new LabelValueObject();
-        
-        lvo.setColour( "red");
+
+        lvo.setColour( "red" );
         lvo.setName( "blah" );
         lvo.setIsShown( true );
-        
+
         Collection<Long> subjectIds = new ArrayList<Long>();
         subjectIds.add( subjectId );
-        
+
         subjectService.addLabel( subjectIds, lvo );
-       
+
         super.runAsUser( this.username );
         subjectService.addLabel( subjectIds, lvo );
-        
-        Collection<LabelValueObject> lvos= persistentTestObjectHelper.getLabelsForSubject( subjectId );
-        
+
+        Collection<LabelValueObject> lvos = persistentTestObjectHelper.getLabelsForSubject( subjectId );
+
         labelService.deleteSubjectLabel( lvos.iterator().next() );
-        
+
+    }
+
+    @Test
+    public void testDeleteVariant() {
+
+        super.runAsAdmin();
+
+        LabelValueObject lvo = new LabelValueObject();
+
+        lvo.setColour( "red" );
+        lvo.setName( "blah" );
+        lvo.setIsShown( true );
+
+        CNV v1 = persistentTestObjectHelper.createPersistentTestCNVObject();
+        Collection<Long> variantIds = new ArrayList<>();
+        variantIds.add( v1.getId() );
+        variantService.addLabel( variantIds, lvo );
+
+        Collection<LabelValueObject> lvos = persistentTestObjectHelper.getLabelsForVariant( v1.getId() );
+
+        assertEquals( 1, lvos.size() );
+
+        labelService.deleteVariantLabel( lvos.iterator().next(), variantIds );
+
+        lvos = persistentTestObjectHelper.getLabelsForVariant( v1.getId() );
+
+        assertEquals( 0, lvos.size() );
     }
 
     private Subject createSubjectWithPhenotypes( String headPhenoValue, String facePhenoValue, String mouthPhenoValue,
@@ -224,12 +244,7 @@ public class LabelServiceTest extends BaseSpringContextTest {
 
         projectDao.update( project );
 
-        
         return subject;
     }
-
-    
-
-   
 
 }

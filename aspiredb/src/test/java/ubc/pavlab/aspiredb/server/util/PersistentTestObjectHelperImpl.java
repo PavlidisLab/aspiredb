@@ -331,6 +331,12 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     }
     
     @Transactional
+    public Collection<LabelValueObject> getLabelsForVariant(Long variantId){
+               
+        return Label.toValueObjects( labelDao.getVariantLabelsByVariantId(variantId) );
+    }
+    
+    @Transactional
     public void deleteProject(String projectName){
        
         

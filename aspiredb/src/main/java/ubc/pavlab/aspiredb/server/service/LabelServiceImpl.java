@@ -18,12 +18,16 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
@@ -32,15 +36,12 @@ import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
-import java.util.Collection;
-
 /**
- * author: anton
- * date: 10/06/13
+ * author: anton date: 10/06/13
  */
 @Component("labelService")
 @Service("labelService")
-@RemoteProxy(name="LabelService")
+@RemoteProxy(name = "LabelService")
 public class LabelServiceImpl implements LabelService {
 
     @Autowired
@@ -52,41 +53,64 @@ public class LabelServiceImpl implements LabelService {
     @Autowired
     private VariantDao variantDao;
 
-
     @Override
     @Transactional
     @RemoteMethod
-    public void updateLabel(LabelValueObject label) {
-        Label labelEntity = labelDao.load(label.getId());
+    public void updateLabel( LabelValueObject label ) {
+        Label labelEntity = labelDao.load( label.getId() );
         labelEntity.setName( label.getName() );
         labelEntity.setColour( label.getColour() );
         labelEntity.setIsShown( label.getIsShown() );
-        labelDao.update(labelEntity);
-    }
-    
-    @Override
-    @Transactional
-    @RemoteMethod
-    public void deleteSubjectLabel(LabelValueObject label) {
-        Label labelEntity = labelDao.load(label.getId());
-        Collection<Subject> subjects = subjectDao.findByLabel(label);
-        for (Subject subject : subjects) {
-            subject.getLabels().remove(labelEntity);
-            subjectDao.update(subject);
-        }
-        labelDao.remove(labelEntity);
+        labelDao.update( labelEntity );
     }
 
     @Override
     @Transactional
     @RemoteMethod
-    public void deleteVariantLabel(LabelValueObject label) {
-        Label labelEntity = labelDao.load(label.getId());
-        Collection<Variant> variants = variantDao.findByLabel(label);
-        for (Variant variant : variants) {
-            variant.getLabels().remove(labelEntity);
-            variantDao.update(variant);
+    public void deleteSubjectLabel( LabelValueObject label ) {
+        Collection<Subject> subjects = subjectDao.findByLabel( label );
+        Collection<Long> subjectIds = new ArrayList<>();
+        for ( Subject s : subjects ) {
+            subjectIds.add( s.getId() );
         }
-        labelDao.remove(labelEntity);
+        deleteSubjectLabel( label, subjectIds );
+    }
+
+    @Override
+    @Transactional
+    @RemoteMethod
+    public void deleteSubjectLabel( LabelValueObject label, Collection<Long> subjectIds ) {
+        Label labelEntity = labelDao.load( label.getId() );
+        Collection<Subject> subjects = subjectDao.load( subjectIds );
+        for ( Subject subject : subjects ) {
+            subject.getLabels().remove( labelEntity );
+            subjectDao.update( subject );
+        }
+        labelDao.remove( labelEntity );
+    }
+
+    @Override
+    @Transactional
+    @RemoteMethod
+    public void deleteVariantLabel( LabelValueObject label ) {
+        Collection<Variant> variants = variantDao.findByLabel( label );
+        Collection<Long> variantIds = new ArrayList<>();
+        for ( Variant v : variants ) {
+            variantIds.add( v.getId() );
+        }
+        deleteVariantLabel( label, variantIds );
+    }
+
+    @Override
+    @Transactional
+    @RemoteMethod
+    public void deleteVariantLabel( LabelValueObject label, Collection<Long> variantIds ) {
+        Collection<Variant> variants = variantDao.load( variantIds );
+        Label labelEntity = labelDao.load( label.getId() );
+        for ( Variant variant : variants ) {
+            variant.getLabels().remove( labelEntity );
+            variantDao.update( variant );
+        }
+        labelDao.remove( labelEntity );
     }
 }

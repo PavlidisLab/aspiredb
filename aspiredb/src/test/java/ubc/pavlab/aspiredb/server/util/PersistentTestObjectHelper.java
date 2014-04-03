@@ -72,6 +72,8 @@ public interface PersistentTestObjectHelper {
     
     public Collection<LabelValueObject> getLabelsForSubject(Long subjectId);
     
+    public Collection<LabelValueObject> getLabelsForVariant(Long variantId);
+    
     public void deleteProject(String projectName);
     
     
