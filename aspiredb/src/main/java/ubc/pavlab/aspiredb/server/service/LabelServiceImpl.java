@@ -74,6 +74,8 @@ public class LabelServiceImpl implements LabelService {
             subjectIds.add( s.getId() );
         }
         deleteSubjectLabel( label, subjectIds );
+        Label labelEntity = labelDao.load( label.getId() );
+        labelDao.remove( labelEntity );
     }
 
     @Override
@@ -86,7 +88,6 @@ public class LabelServiceImpl implements LabelService {
             subject.getLabels().remove( labelEntity );
             subjectDao.update( subject );
         }
-        labelDao.remove( labelEntity );
     }
 
     @Override
@@ -99,6 +100,8 @@ public class LabelServiceImpl implements LabelService {
             variantIds.add( v.getId() );
         }
         deleteVariantLabel( label, variantIds );
+        Label labelEntity = labelDao.load( label.getId() );
+        labelDao.remove( labelEntity );
     }
 
     @Override
@@ -111,6 +114,5 @@ public class LabelServiceImpl implements LabelService {
             variant.getLabels().remove( labelEntity );
             variantDao.update( variant );
         }
-        labelDao.remove( labelEntity );
     }
 }

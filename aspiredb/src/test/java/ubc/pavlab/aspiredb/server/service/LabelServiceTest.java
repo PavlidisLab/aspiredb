@@ -170,19 +170,25 @@ public class LabelServiceTest extends BaseSpringContextTest {
         lvo.setIsShown( true );
 
         CNV v1 = persistentTestObjectHelper.createPersistentTestCNVObject();
-        Collection<Long> variantIds = new ArrayList<>();
-        variantIds.add( v1.getId() );
-        variantService.addLabel( variantIds, lvo );
+        CNV v2 = persistentTestObjectHelper.createPersistentTestCNVObject();
+        Collection<Long> variantIdsToLabel = new ArrayList<>();
+        variantIdsToLabel.add( v1.getId() );
+        variantIdsToLabel.add( v2.getId() );
+        variantService.addLabel( variantIdsToLabel, lvo );
+        Collection<LabelValueObject> lvos1 = persistentTestObjectHelper.getLabelsForVariant( v1.getId() );
+        Collection<LabelValueObject> lvos2 = persistentTestObjectHelper.getLabelsForVariant( v2.getId() );
+        assertEquals( 1, lvos1.size() );
+        assertEquals( 1, lvos2.size() );
 
-        Collection<LabelValueObject> lvos = persistentTestObjectHelper.getLabelsForVariant( v1.getId() );
+        // only delete label for v1 while keeping label for v2
+        Collection<Long> variantIdsToRemove = new ArrayList<>();
+        variantIdsToRemove.add( v1.getId() );
+        labelService.deleteVariantLabel( lvos1.iterator().next(), variantIdsToRemove );
 
-        assertEquals( 1, lvos.size() );
-
-        labelService.deleteVariantLabel( lvos.iterator().next(), variantIds );
-
-        lvos = persistentTestObjectHelper.getLabelsForVariant( v1.getId() );
-
-        assertEquals( 0, lvos.size() );
+        lvos1 = persistentTestObjectHelper.getLabelsForVariant( v1.getId() );
+        lvos2 = persistentTestObjectHelper.getLabelsForVariant( v2.getId() );
+        assertEquals( 0, lvos1.size() );
+        assertEquals( 1, lvos2.size() );
     }
 
     private Subject createSubjectWithPhenotypes( String headPhenoValue, String facePhenoValue, String mouthPhenoValue,
