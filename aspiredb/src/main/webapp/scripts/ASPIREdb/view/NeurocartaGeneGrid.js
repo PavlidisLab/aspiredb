@@ -90,7 +90,8 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 	geneSelectHandler : function(ref, record, index, eOpts) {
 		var selGenes = this.getSelectionModel().getSelection();
 		this.selectedgenes=[];
-		for (var i=0; i<selGenes.length; i++){
+		for (var i=0; i<selGenes.length; i++){			
+			delete selGenes[i].data.pheneName;			
 			this.selectedgenes.push(selGenes[i].data);
 		}
 		

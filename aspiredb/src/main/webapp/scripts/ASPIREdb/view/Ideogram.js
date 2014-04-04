@@ -488,7 +488,8 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	        	}
 	        	
 	        }
-	        this.displayedProperty=property;	               
+	        this.displayedProperty=property;	
+	        //this.displayedProperty.displayType.push(propertyValues[0]);
 			chrIdeogram.drawVariant(variant, this.displayedProperty);
 						
 		}
