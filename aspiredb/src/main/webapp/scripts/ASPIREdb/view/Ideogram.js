@@ -32,6 +32,10 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	closable : false,
 	//resizable : true,
 	layout : 'absolute',
+	config :{
+		selectedView: '',
+		selectedSubjectIds :[],
+	},
 	items : [ {
 		xtype : 'component',
 		autoEl : 'canvas',
@@ -74,7 +78,11 @@ Ext.define('ASPIREdb.view.Ideogram', {
 				me.drawChromosomes();
 			}
 		});
-
+		
+		ASPIREdb.EVENT_BUS.on('colorCoding_selected',this.selectDrawingType, this);
+		
+		ASPIREdb.EVENT_BUS.on('subject_selected', this.selectDrawingType, this);
+		
 	},
 
 	/**
@@ -440,7 +448,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	 * @param {VariantValueObject[]}
 	 *            variantValueObjects
 	 */
-	drawColouredVariants : function(variantValueObjects) {
+	drawColouredVariants : function(variantValueObjects, repeat) {
 		
 		/* List<VariantValueObject> */
 		var variants = variantValueObjects.slice(); // make a copy
@@ -504,7 +512,10 @@ Ext.define('ASPIREdb.view.Ideogram', {
 		}
 		
 		//setting the colors for the ideogram ledgent
-		this.colourLegend.update(valuetoColourArray,this.displayedProperty); 
+		if (repeat){
+			//do not update the ledgend
+		}
+		else this.colourLegend.update(valuetoColourArray,this.displayedProperty); 
 
 		
 	},
@@ -602,17 +613,32 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	getColourLegend : function() {
 		return ASPIREdb.view.ideogram.VariantLayer.valueToColourMap;
 	},
+	
+	selectDrawingType : function(subjectIds){
+		
+		if (subjectIds!=null){
+			this.selectedView = 'subject_selected';
+			this.selectedSubjectIds =subjectIds;
+		}else {
+			this.selectedView ='colourCoding_selected';			
+		}
+	},
 
 	/**
 	 * @public
+	 * Redraw when zoomed the ideogram
 	 */
 	redraw : function(variants) {
 		//this.setDisplayedProperty(this.displayedProperty);
 		this.drawChromosomes();
-		var valuetoColourArray=[];
-		this.colourLegend.update(valuetoColourArray,this.displayedProperty); 
-		this.drawColouredVariants(variants);
-		this.showColourLegend();
+		if (this.selectedView == 'subject_selected'){			
+			this.drawVariantsWithSubjectsHighlighted(this.selectedSubjectIds,variants);
+		}else if (this.selectedView == 'colourCoding_selected'){
+			this.drawColouredVariants(variants, true);
+			this.showColourLegend();
+		}else this.drawVariants(variants);
+		
+		
 
 	},
 	

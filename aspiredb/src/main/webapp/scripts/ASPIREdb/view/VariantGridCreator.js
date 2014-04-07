@@ -226,6 +226,7 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 				cellclick: function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
 													
 					this.selModel.select(record.index, false, false);
+					
 				
 				}
 			},
