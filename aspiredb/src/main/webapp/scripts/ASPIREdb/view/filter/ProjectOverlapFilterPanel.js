@@ -11,7 +11,7 @@ Ext.define('ASPIREdb.view.filter.ProjectOverlapFilterPanel', {
     extend: 'ASPIREdb.view.filter.FilterPanel',
     alias: 'widget.filter_projectoverlappanel',
     title: 'Project Overlap Filter',
-    bodyStyle: 'background: #FF9900;',
+    bodyStyle: 'background: #E0A3C2;',
     items: [{
 		xtype : 'filter_projectoverlap',
 		itemId : 'projectOverlapFilterContainer'
