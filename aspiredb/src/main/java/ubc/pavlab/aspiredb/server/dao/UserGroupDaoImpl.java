@@ -33,7 +33,7 @@ import java.util.Set;
 /**
  * TODO document me
  * 
- * @author gaya
+ * @author ????
  */
 @Repository
 public class UserGroupDaoImpl extends DaoBaseImpl<UserGroup> implements UserGroupDao {
@@ -115,7 +115,7 @@ public class UserGroupDaoImpl extends DaoBaseImpl<UserGroup> implements UserGrou
     /**
      * @param queryString
      * @param name
-     * @return
+     * @return user group name
      */
     private UserGroup findByUserGroupName( final java.lang.String queryString, final java.lang.String name ) {
         Set<UserGroup> results = new LinkedHashSet<UserGroup>( this.getHibernateTemplate().findByNamedParam(

@@ -261,7 +261,7 @@ public class SubjectServiceImpl implements SubjectService {
      * @exception NeurocartaServiceException
      * @param List of subjectIds, Collection of projectIds
      * @return Map of Phenotype Name and Phenotype summary value objects
-     * @author Gaya Charath
+     * 
      */
     @Override
     @RemoteMethod
