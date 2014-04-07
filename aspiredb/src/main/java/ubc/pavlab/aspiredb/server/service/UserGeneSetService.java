@@ -39,7 +39,7 @@ public interface UserGeneSetService {
 
     public Collection<String> getSavedUserGeneSetNames();
     
-    public void addGenes(String geneName,List<GeneValueObject> genes) throws BioMartServiceException;
+    public void addGenes(String geneName,String geneSymbol) throws BioMartServiceException;
 
     public void deleteUserGeneSet( String name );
     
@@ -48,6 +48,8 @@ public interface UserGeneSetService {
     public Long saveUserGeneSet(String geneName,List<GeneValueObject> genes) throws BioMartServiceException;
     
     public boolean isGeneSetName(String name);
+    
+    public boolean isGeneInGeneSet(String genSetName,String geneSymbol);
     
     public List<GeneValueObject> getGenes(String geneSymbol)throws BioMartServiceException;
 

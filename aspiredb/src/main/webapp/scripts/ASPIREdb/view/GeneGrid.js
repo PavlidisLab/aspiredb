@@ -78,7 +78,7 @@ Ext.define('ASPIREdb.view.GeneGrid', {
         'selectionchange': function(view, records) {
             this.down('#removeGene').setDisabled(!records.length);
             this.selectedGene=this.getSelectionModel().getSelection();
-            console.log('selected gene sumbol : '+this.selectedGene[0].data.symbol);
+           // console.log('selected gene sumbol : '+this.selectedGene[0].data.symbol);
         }
     },
 	
@@ -131,32 +131,44 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 			handler: function(){
 				//TODO: have to populate human taxon gene list auto complete features
 				var genesymbol =ref.down('#geneName').getValue();
-				UserGeneSetService.getGenes(genesymbol,{
-						callback : function(gvo) {
-							var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
-							var grid =panel.down ('#geneGrid');
-							
-							ref.gvos.push(gvo);
-							var data = [];
-							var row = [ gvo[0].symbol,'',gvo[0].name,''];		
-							data.push(row);
-							if (ref.selectedGeneSet[0]!=null){
-								UserGeneSetService.addGenes(ref.selectedGeneSet[0].data.geneSetName, gvo, {				
-									callback : function() {
-										//TODO : refresh grid when loaded
-									    grid.store.add(data);
-										grid.getView().refresh(true);
-										grid.setLoading(false);
-										
-									}
-								});
-							}
-							else  Ext.Msg.alert('error','select the Gene Set Name to add Genes ');
-							
+				var geneSetName =ref.selectedGeneSet[0].data.geneSetName;
+				var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
+				var grid =panel.down ('#geneGrid');
+				
+				UserGeneSetService.isGeneInGeneSet(geneSetName,genesymbol,{
+					callback : function(gvoSta) {
+						if (gvoSta){
+							Ext.Msg.alert('Gen Set','Gene already exist in gene set');
+							grid.down('#geneName').setValue('');
+						}else if (ref.selectedGeneSet[0]!=null){
+							  UserGeneSetService.addGenes(geneSetName, genesymbol,{
+								callback : function(geneName) {
+									
+									
+									//ref.gvos.push(gvo);
+									var data = [];
+									var row = [ genesymbol,'',geneName,''];		
+									data.push(row);
+																			
+									//TODO : refresh grid when loaded
+									grid.store.add(data);
+									grid.getView().refresh(true);
+									grid.setLoading(false);
+									grid.down('#geneName').setValue('');
+									ASPIREdb.EVENT_BUS.fireEvent('gene_added', data);
+															
+									
+								}
+						    });
 						}
+						else  Ext.Msg.alert('Error','select the Gene Set Name to add Genes ');
+						
+					}
 				});
 				
-				ASPIREdb.EVENT_BUS.fireEvent('gene_added', ref.gvos);
+				
+				
+				
 			}
 		});
 				

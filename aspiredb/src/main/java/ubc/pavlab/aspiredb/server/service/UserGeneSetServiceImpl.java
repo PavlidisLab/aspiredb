@@ -103,7 +103,7 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         List<String> geneSymbols=new ArrayList<>();
         List<GeneValueObject> geneValueObjects = new ArrayList<GeneValueObject>();
         
-        if (genes.isEmpty()){
+        if (genes.get(0).getEnsemblId()==null){
         	//null gene value objects
         } else {
         	//storing the gene symbols
@@ -151,12 +151,36 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         
         if (geneSet.size() >0){
                 return true;
-            }
-        
-        
-        return false;              
-             
+            }       
+        return false; 
     }
+    
+    /**
+     * Check weather the gene exist in the gene set
+     * @param Gene Set Name, gene symbol
+     * @return true or false 
+     */
+    @Override
+    @RemoteMethod
+    public boolean isGeneInGeneSet(String genSetName,String geneSymbol){
+    	
+    	List<UserGeneSet> geneSet = userGeneSetDao.findByName( genSetName );
+        
+    	List<GeneValueObject> geneValueObjects=new ArrayList<>();
+   	 
+   	 	if (geneSet.size() > 0) {  
+   	 		geneValueObjects = (List<GeneValueObject>)geneSet.iterator().next().getObject();
+   	 		if (geneValueObjects.size()>0){
+   	 			for (GeneValueObject gvo:geneValueObjects){
+   	 				if (gvo.getSymbol().matches(geneSymbol)){
+   	 					return true;  	 				
+   	 				}   	 			
+   	 			}
+   	 		}
+   	 	}
+    	return false;
+    }
+    
     @SuppressWarnings("unchecked")
     @Override
     @RemoteMethod
@@ -192,11 +216,13 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
     
     @Override
     @RemoteMethod
-    public void addGenes(String geneSetName,List<GeneValueObject> genes) throws BioMartServiceException{
+    public void addGenes(String geneSetName,String geneSymbol) throws BioMartServiceException{
+    	
     	 final List<UserGeneSet> geneSet = userGeneSetDao.findByName(geneSetName);     
-         
+    	 
          List<String> geneSymbols=new ArrayList<>();
          List<GeneValueObject> existingGeneValueObjects=new ArrayList<>();
+         
          if (geneSet.size() > 0) {  
         	 existingGeneValueObjects = (List<GeneValueObject>)geneSet.iterator().next().getObject();
     	 }
@@ -208,9 +234,8 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
           }
          
        //adding the gene to the gene set
-         for (GeneValueObject gvo: genes){
-         	geneSymbols.add(gvo.getSymbol());        	
-         }
+         geneSymbols.add(geneSymbol);        	
+         
          //getting the actual gene value objects. Gene value object will return null unless the gene value object id is specified. so we need to do this workaround to obtain the complete gene value object 
          List<GeneValueObject> geneValueObjects= bioMartQueryService.getGenes(geneSymbols);   
          
