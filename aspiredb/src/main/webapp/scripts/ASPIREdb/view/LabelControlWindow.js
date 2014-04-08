@@ -19,6 +19,12 @@
 Ext.require([ 'Ext.Window', 'ASPIREdb.store.LabelStore',
 		'Ext.grid.column.Action', 'Ext.ux.CheckColumn' ]);
 
+var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
+    //clicksToMoveEditor: 1,
+	clicksToEdit: 2,
+     autoCancel: false
+});
+
 /**
  * For removing and showing labels
  */
@@ -76,13 +82,19 @@ Ext
                                                     var label = this
                                                             .up('#labelControlWindow').visibleLabels[labelId];
                                                     var ret = "";
-                                                    ret += "<span style='background-color: "
-                                                            + label.colour
-                                                            + "'>"
-                                                            + label.name + "</span>&nbsp;";
+                                                    var fontcolor = (parseInt(label.colour, 16) > 0xffffff/2) ? 'black' : 'white';	
+                        							ret += "<font color="+fontcolor+"><span style='background-color: "
+                        									+ label.colour + "'>&nbsp&nbsp"+ label.name+"&nbsp</span></font>&nbsp&nbsp&nbsp";
+                                          
                                                     return ret;
-                                                }
+                                                },
+                                                editor: {
+                            		                // defaults to textfield if no xtype is supplied
+                            		                allowBlank: false,
+                            		               
+                            		            }
                                             },
+                                          
                                             {
                                                 header : 'Show',
                                                 dataIndex : 'show',
@@ -96,7 +108,8 @@ Ext
                                                 xtype : 'checkcolumn',
                                                 id : 'labelRemoveColumn',
                                                 flex : 1
-                                            }, ]
+                                            }, ],
+                                            plugins: [rowEditing],
                                         },// end of grid
                                         // buttons
                                         { xtype : 'container',
@@ -138,7 +151,7 @@ Ext
 						var loadData = [];
 						for ( var idx in me.visibleLabels ) {
 							var label = me.visibleLabels[idx];
-							loadData.push([ label.id, label.isShown ]);
+							loadData.push([ label.id, label.name,label.isShown ]);
 						}
                         
 						me.down('#labelSettingsGrid').store.loadData(loadData);

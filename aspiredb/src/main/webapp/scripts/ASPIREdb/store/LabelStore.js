@@ -26,6 +26,9 @@ Ext.define('ASPIREdb.store.LabelStore', {
 	fields : [ {
 		name : 'labelId',
 		type : 'int'
+	},{
+		name : 'labelName',
+		type : 'string'
 	}, {
 		name : 'show',
 		type : 'boolean'
