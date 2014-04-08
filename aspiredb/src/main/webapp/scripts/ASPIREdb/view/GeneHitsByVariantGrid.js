@@ -84,6 +84,7 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 		var selGenes = this.getSelectionModel().getSelection();
 		this.selectedgenes=[];
 		for (var i=0; i<selGenes.length; i++){
+			delete selGenes[i].data.pheneName;	
 			this.selectedgenes.push(selGenes[i].data);
 		}
 		
@@ -125,8 +126,8 @@ Ext.define('ASPIREdb.view.GeneHitsByVariantGrid', {
 		
 		
 		
-		this.getDockedComponent('geneHitsByVariantGridToolbar').remove('viewCoexpressionNetworkButton');
-		this.getDockedComponent('geneHitsByVariantGridToolbar').remove('saveButtonGeneHits');
+		//this.getDockedComponent('geneHitsByVariantGridToolbar').remove('viewCoexpressionNetworkButton');
+		//this.getDockedComponent('geneHitsByVariantGridToolbar').remove('saveButtonGeneHits');
 		
 		this.getDockedComponent('geneHitsByVariantGridToolbar').add(viewCoexpressionNetworkInGemmaLink);
 		

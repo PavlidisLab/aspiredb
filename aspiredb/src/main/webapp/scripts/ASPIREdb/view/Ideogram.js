@@ -32,6 +32,10 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	closable : false,
 	//resizable : true,
 	layout : 'absolute',
+	config :{
+		selectedView: '',
+		selectedSubjectIds :[],
+	},
 	items : [ {
 		xtype : 'component',
 		autoEl : 'canvas',
@@ -74,7 +78,11 @@ Ext.define('ASPIREdb.view.Ideogram', {
 				me.drawChromosomes();
 			}
 		});
-
+		
+		ASPIREdb.EVENT_BUS.on('colorCoding_selected',this.selectDrawingType, this);
+		
+		ASPIREdb.EVENT_BUS.on('subject_selected', this.selectDrawingType, this);
+		
 	},
 
 	/**
@@ -306,7 +314,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	 * @param {number}
 	 *            newZoom
 	 */
-	//changeZoom : function(newZoom, variants,property) {
+	//changeZoom : function(newZoom, variants, property) {
 	changeZoom : function(newZoom, variants) {
 		this.zoom = newZoom;
 		this.width = Math.round(850 * this.zoom);
@@ -440,7 +448,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	 * @param {VariantValueObject[]}
 	 *            variantValueObjects
 	 */
-	drawColouredVariants : function(variantValueObjects) {
+	drawColouredVariants : function(variantValueObjects, repeat) {
 		
 		/* List<VariantValueObject> */
 		var variants = variantValueObjects.slice(); // make a copy
@@ -466,8 +474,10 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	      //if Characteristic type : benign, pathogenic, unknown
 	        if (property instanceof CharacteristicProperty) {
 	           var characteristicValueObject = variant.characteristics[property.name];
-	            if (characteristicValueObject !== null) {
-	            	propertyValues.push(characteristicValueObject.value);
+	            if (characteristicValueObject != null) {
+	            	if (characteristicValueObject== undefined){
+	            		console.log('undefined characteristics : '+property.name);
+	            	}else propertyValues.push(characteristicValueObject.value);
 	            }
 	        }
 	        //if variant labels
@@ -486,20 +496,26 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	        	}
 	        	
 	        }
-	        this.displayedProperty=property;	               
+	        this.displayedProperty=property;	
+	        //this.displayedProperty.displayType.push(propertyValues[0]);
 			chrIdeogram.drawVariant(variant, this.displayedProperty);
 						
 		}
 		this.displayedProperty.displayType =propertyValues;
 		
 		this.setDisplayedProperty(this.displayedProperty);
+		
 		var valuetoColourArray =[];
-		for (values in ASPIREdb.view.ideogram.VariantLayer.valueToColourMap){
-			valuetoColourArray.push([values,ASPIREdb.view.ideogram.VariantLayer.valueToColourMap[values]]);
+		
+		for (var i=0; i< ASPIREdb.view.ideogram.VariantLayer.valueToColourMap.length;i++){
+			valuetoColourArray.push(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap[i]);
 		}
 		
 		//setting the colors for the ideogram ledgent
-		this.colourLegend.update(valuetoColourArray,this.displayedProperty); 
+		if (repeat){
+			//do not update the ledgend
+		}
+		else this.colourLegend.update(valuetoColourArray,this.displayedProperty); 
 
 		
 	},
@@ -597,15 +613,32 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	getColourLegend : function() {
 		return ASPIREdb.view.ideogram.VariantLayer.valueToColourMap;
 	},
+	
+	selectDrawingType : function(subjectIds){
+		
+		if (subjectIds!=null){
+			this.selectedView = 'subject_selected';
+			this.selectedSubjectIds =subjectIds;
+		}else {
+			this.selectedView ='colourCoding_selected';			
+		}
+	},
 
 	/**
 	 * @public
+	 * Redraw when zoomed the ideogram
 	 */
 	redraw : function(variants) {
-		this.setDisplayedProperty(this.displayedProperty);
+		//this.setDisplayedProperty(this.displayedProperty);
 		this.drawChromosomes();
-		this.drawColouredVariants(variants);
-		this.showColourLegend();
+		if (this.selectedView == 'subject_selected'){			
+			this.drawVariantsWithSubjectsHighlighted(this.selectedSubjectIds,variants);
+		}else if (this.selectedView == 'colourCoding_selected'){
+			this.drawColouredVariants(variants, true);
+			this.showColourLegend();
+		}else this.drawVariants(variants);
+		
+		
 
 	},
 	

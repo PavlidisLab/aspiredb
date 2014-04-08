@@ -56,7 +56,7 @@ Ext.define('ASPIREdb.view.GeneSetGrid', {
 			dataIndex : 'geneSetName',
 			flex : 1,
 			 editor: {
-	                // defaults to textfield if no xtype is supplied
+	                // defaults to text field if no xtype is supplied
 	                allowBlank: false
 	            }
 	    },
@@ -65,7 +65,7 @@ Ext.define('ASPIREdb.view.GeneSetGrid', {
 	        dataIndex : 'geneDescription',
 	        flex : 1,
 	        editor: {
-                // defaults to textfield if no xtype is supplied
+                // defaults to text field if no xtype is supplied
                 allowBlank: false
             }
 	    },
@@ -127,7 +127,7 @@ Ext.define('ASPIREdb.view.GeneSetGrid', {
 	},
 	
 		
-	//GeneValueObject
+	//Populate gens in gene grid
 	populateGeneGrid : function(gvos) {
 		
 		var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');

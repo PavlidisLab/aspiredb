@@ -156,7 +156,6 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		            [ 'inheritance', 'Inheritance'],
 		            [ 'arrayReport','Array Report'],		            
 		            [ 'arrayPlatform', 'Array Platform'],
-		            [ 'markers','Markers'],
 		            [ 'labels','Variant Labels'],
 		            [ 'subjectLabels','Subject Labels']
 		            ];         
@@ -177,7 +176,6 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		    displayField : 'name',
 			valueField : 'id',
 			queryMode : 'local',
-			//renderTo : Ext.getBody(),
 			editable : false,
 			forceSelection : true,		   
 		});
@@ -235,16 +233,19 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		this.on('beforetabchange', function(tabPanel, newCard, oldCard, eOpts) {
 
 			var currentlySelectedRecords = [];
-
+			var ideogram = ref.getComponent('ideogram');
+			
 			if (newCard.itemId == 'ideogram') {
 
 				currentlySelectedRecords = this.getIdeogramVariantRecordSelection();
 				this.selectAllButton.disable();
+				ideogram.showColourLegend();	
 
 			} else {
 				// newCard is the grid
 				currentlySelectedRecords = this.selectedVariants;
-				this.selectAllButton.enable();
+				this.selectAllButton.enable();				
+				ideogram.hideColourLegend();		
 				
 			}
 
@@ -286,7 +287,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					var ideogram = ref.getComponent('ideogram');
 					ideogram.drawChromosomes();
 					ideogram.drawVariants(vvos);
-					//ideogram.showColourLegend();					
+								
 					
 					
 					var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid(vvos, properties);	
@@ -302,13 +303,10 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 						if (ref.newIdeogramLabel) {
 							grid.getView().refresh();
 							ref.newIdeogramLabel = undefined;
-						}
-												
-					});
-					
+						}												
+					});					
 													
-					ref.add(grid);
-					
+					ref.add(grid);					
 
 					var toolbar = ref.getDockedComponent('variantTabPanelToolbar');
 
@@ -348,6 +346,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 			
 			if (ideogram.isVisible()){
 				var selectedValue = records[0].data.id;	
+				ASPIREdb.EVENT_BUS.fireEvent('colorCoding_selected');
 				
 				switch (selectedValue){
 				  case 'type': {
@@ -420,17 +419,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
 		        	  this.redrawIdeogram(property);
 					  break;
-				  }
-				  case 'markers':{
-					  var property =new CharacteristicProperty();
-					  property.name ='Markers';
-		        	  property.displayName ='Markers';
-		        	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
-		        	  this.redrawIdeogram(property);
-					  break;
-				  }
-				 
-				  				  
+				  }			  
 				}
 				
 			}
@@ -439,14 +428,14 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	},
 	
 	/**
-	 * Redraw the ideogram basd on colour code
+	 * Redraw the ideogram based on colour coding
 	 */
 	redrawIdeogram : function(property){
 		  var ideogram = this.getComponent('ideogram');
 		  
 		  ideogram.setDisplayedProperty(property);
 		  ideogram.drawChromosomes();
-		  ideogram.drawColouredVariants(this.loadedVariants);
+		  ideogram.drawColouredVariants(this.loadedVariants,false);
 		  ideogram.showColourLegend();
 	},
 	/**
@@ -571,7 +560,6 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		this.zoomInButton.setVisible(false);
 		this.zoomOutButton.setVisible(true);
 		var ideogram = this.getComponent('ideogram');
-		//ideogram.changeZoom(2, this.loadedVariants, this.property);
 		ideogram.changeZoom(2, this.loadedVariants);
 				
 	},
@@ -580,7 +568,6 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		this.zoomOutButton.setVisible(false)
 		this.zoomInButton.setVisible(true);
 		var ideogram = this.getComponent('ideogram');
-		//ideogram.changeZoom(1, this.loadedVariants, this.property);
 		ideogram.changeZoom(1, this.loadedVariants);
 	
 	},
