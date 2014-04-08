@@ -46,6 +46,9 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 
 		// selected subjects in the grid
 		selSubjects : [],
+        
+        // the current filters used
+        filterConfigs : []
 	},
 	constructor : function(cfg) {
 		this.initConfig(cfg);
@@ -163,9 +166,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		this.on('selectionchange', me.selectionChangeHandler, me);
 		
 		//when subject label change
-		ASPIREdb.EVENT_BUS.on('label_change', function() {
-			me.getView().refresh();
-		});
+        ASPIREdb.EVENT_BUS.on('label_subject_change', function() { this.refreshGridView() }, this);
 	},
 
 	/**
@@ -199,7 +200,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 	filterSubmitHandler : function(filterConfigs) {
 		
 		var me = this;
-		
+		me.filterConfigs = filterConfigs;
 		me.setLoading(true);
 		me.getStore().removeAll();
 		//load existing subject labels
@@ -274,7 +275,6 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 	 * This method called when subject are selected in the subject grid
 	 */
 	selectionChangeHandler : function() {
-		console.log("on selection  change Handler");
 		this.selSubjects = this.getSelectionModel().getSelection();
 
 		if (this.selSubjects.length == 0) {
@@ -285,7 +285,6 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		}
 				
 		if (this.selSubjects.length>=1){
-			console.log("fire subject_selected event");
 			var ids=[];
 			
 			for ( var i = 0; i < this.selSubjects.length; i++) {
@@ -387,6 +386,15 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 			});
 	},
 
+    /**
+     * Refresh grid view by reloading data from database because it was updated
+     */
+    refreshGridView : function(  ) {
+        var me = this;
+        me.filterSubmitHandler(me.filterConfigs);
+        me.getView().refresh();
+    },
+    
 	/**
 	 * Display LabelSettingsWindow
 	 * @param : event
@@ -394,10 +402,17 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 	labelSettingsHandler : function(event) {
 		var me = this;
 
+        var selectedSubjectIds = [];
+        
+        for ( var i = 0; i < this.selSubjects.length; i++) {
+            selectedSubjectIds.push(this.selSubjects[i].data.id);
+        }
+        
 		var labelControlWindow = Ext.create('ASPIREdb.view.LabelControlWindow',
 				{
 					visibleLabels : me.visibleLabels,
 					isSubjectLabel : true,
+                    selectedIds : selectedSubjectIds
 				});
 
 		labelControlWindow.show();

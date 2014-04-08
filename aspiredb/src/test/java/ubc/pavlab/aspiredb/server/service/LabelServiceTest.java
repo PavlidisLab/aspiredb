@@ -183,7 +183,7 @@ public class LabelServiceTest extends BaseSpringContextTest {
         // only delete label for v1 while keeping label for v2
         Collection<Long> variantIdsToRemove = new ArrayList<>();
         variantIdsToRemove.add( v1.getId() );
-        labelService.deleteVariantLabel( lvos1.iterator().next(), variantIdsToRemove );
+        labelService.removeLabelsFromVariants( lvos1, variantIdsToRemove );
 
         lvos1 = persistentTestObjectHelper.getLabelsForVariant( v1.getId() );
         lvos2 = persistentTestObjectHelper.getLabelsForVariant( v2.getId() );

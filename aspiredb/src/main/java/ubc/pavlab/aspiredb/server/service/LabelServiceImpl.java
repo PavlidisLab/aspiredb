@@ -67,26 +67,23 @@ public class LabelServiceImpl implements LabelService {
     @Override
     @Transactional
     @RemoteMethod
-    public void deleteSubjectLabel( LabelValueObject label ) {
-        Collection<Subject> subjects = subjectDao.findByLabel( label );
-        Collection<Long> subjectIds = new ArrayList<>();
-        for ( Subject s : subjects ) {
-            subjectIds.add( s.getId() );
+    public void deleteSubjectLabels( Collection<LabelValueObject> labels ) {
+        for ( LabelValueObject lvo : labels ) {
+            deleteSubjectLabel( lvo );
         }
-        deleteSubjectLabel( label, subjectIds );
-        Label labelEntity = labelDao.load( label.getId() );
-        labelDao.remove( labelEntity );
     }
 
     @Override
     @Transactional
     @RemoteMethod
-    public void deleteSubjectLabel( LabelValueObject label, Collection<Long> subjectIds ) {
-        Label labelEntity = labelDao.load( label.getId() );
+    public void removeLabelsFromSubjects( Collection<LabelValueObject> labels, Collection<Long> subjectIds ) {
+        // Collection<Label labelEntity = labelDao.load( labelIds );
         Collection<Subject> subjects = subjectDao.load( subjectIds );
         for ( Subject subject : subjects ) {
-            subject.getLabels().remove( labelEntity );
-            subjectDao.update( subject );
+            for ( LabelValueObject label : labels ) {
+                subject.getLabels().remove( labelDao.findOrCreate( label ) );
+                subjectDao.update( subject );
+            }
         }
     }
 
@@ -99,7 +96,9 @@ public class LabelServiceImpl implements LabelService {
         for ( Variant v : variants ) {
             variantIds.add( v.getId() );
         }
-        deleteVariantLabel( label, variantIds );
+        Collection<LabelValueObject> labels = new ArrayList<>();
+        labels.add( label );
+        removeLabelsFromVariants( labels, variantIds );
         Label labelEntity = labelDao.load( label.getId() );
         labelDao.remove( labelEntity );
     }
@@ -107,12 +106,39 @@ public class LabelServiceImpl implements LabelService {
     @Override
     @Transactional
     @RemoteMethod
-    public void deleteVariantLabel( LabelValueObject label, Collection<Long> variantIds ) {
-        Collection<Variant> variants = variantDao.load( variantIds );
-        Label labelEntity = labelDao.load( label.getId() );
-        for ( Variant variant : variants ) {
-            variant.getLabels().remove( labelEntity );
-            variantDao.update( variant );
+    public void deleteVariantLabels( Collection<LabelValueObject> labels ) {
+        for ( LabelValueObject lvo : labels ) {
+            deleteVariantLabel( lvo );
         }
+    }
+
+    @Override
+    @Transactional
+    @RemoteMethod
+    public void removeLabelsFromVariants( Collection<LabelValueObject> labels, Collection<Long> variantIds ) {
+        Collection<Variant> variants = variantDao.load( variantIds );
+        // Collection<Label> labels = labelDao.load( labelIds );
+        for ( Variant variant : variants ) {
+            for ( LabelValueObject label : labels ) {
+                variant.getLabels().remove( labelDao.findOrCreate( label ) );
+                variantDao.update( variant );
+            }
+        }
+    }
+
+    @Override
+    @Transactional
+    @RemoteMethod
+    public void deleteSubjectLabel( LabelValueObject label ) {
+        Collection<Subject> subjects = subjectDao.findByLabel( label );
+        Collection<Long> subjectIds = new ArrayList<>();
+        for ( Subject s : subjects ) {
+            subjectIds.add( s.getId() );
+        }
+        Collection<LabelValueObject> labels = new ArrayList<>();
+        labels.add( label );
+        removeLabelsFromSubjects( labels, subjectIds );
+        Label labelEntity = labelDao.load( label.getId() );
+        labelDao.remove( labelEntity );
     }
 }

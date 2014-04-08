@@ -36,71 +36,96 @@ Ext
 					layout : 'border',
 					bodyStyle : 'padding: 5px;',
 					layout : 'fit',
-					width : 300,
+					width : 320,
 					height : 320,
 					renderTo : Ext.getBody(),
 					config : {
 						visibleLabels : [],
 						isSubjectLabel : false,
+						selectedIds : []
 					},
 					constructor : function(cfg) {
 						this.initConfig(cfg);
 						this.callParent(arguments);
 					},
-					items : [ {
-						xtype : 'grid',
-						itemId : 'labelSettingsGrid',
-						store : Ext.create('ASPIREdb.store.LabelStore'),
-						columns : [
-								{
-									header : 'Label',
-									dataIndex : 'labelId',
-									width : 180,
-									renderer : function(labelId) {
-
-										var label = this
-												.up('#labelControlWindow').visibleLabels[labelId];
-										var ret = "";
-										ret += "<span style='background-color: "
-												+ label.colour
-												+ "'>"
-												+ label.name + "</span>&nbsp;";
-										return ret;
-									},
-								},
-								{
-									header : 'Show',
-									dataIndex : 'show',
-									xtype : 'checkcolumn',
-									id : 'labelCheckColumn',
-									flex : 1,
-								},
-								{
-									header : '',
-									xtype : 'actioncolumn',
-									id : 'labelActionColumn',
-									handler : function(view, rowIndex,
-											colIndex, item, e) {
-										var action = 'removeLabel';
-										this.fireEvent('itemclick', this,
-												action, view, rowIndex,
-												colIndex, item, e);
-									},
-
-									width : 30,
-									items : [ {
-										icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
-										tooltip : 'Remove label',
-
-									} ]
-								} ],
-					} ],
-
+                    
+                    items : [ { xtype : 'container',
+                                layout : {
+                                    type : 'vbox',
+                                    defaultMargins : {
+                                        top : 5,
+                                        right : 5,
+                                        left : 5,
+                                        bottom : 5
+                                    }
+                                }, 
+                                
+                                items : [ { xtype : 'grid',
+                                    flex : 1,
+                                    width : 290,
+                                    //height : 100,
+                                    itemId : 'labelSettingsGrid',
+                                    store : Ext.create('ASPIREdb.store.LabelStore'),
+                                    columns : [
+                                            {
+                                                header : 'Label',
+                                                dataIndex : 'labelId',
+                                                width : 160,
+                                                renderer : function(labelId) {
+            
+                                                    var label = this
+                                                            .up('#labelControlWindow').visibleLabels[labelId];
+                                                    var ret = "";
+                                                    ret += "<span style='background-color: "
+                                                            + label.colour
+                                                            + "'>"
+                                                            + label.name + "</span>&nbsp;";
+                                                    return ret;
+                                                }
+                                            },
+                                            {
+                                                header : 'Show',
+                                                dataIndex : 'show',
+                                                xtype : 'checkcolumn',
+                                                id : 'labelShowColumn',
+                                                flex : 1
+                                            },
+                                            {
+                                                header : 'Remove',
+                                                dataIndex : 'remove',
+                                                xtype : 'checkcolumn',
+                                                id : 'labelRemoveColumn',
+                                                flex : 1
+                                            }, ]
+                                        },// end of grid
+                                        // buttons
+                                        { xtype : 'container',
+                                            height : 25,
+                                            layout : {
+                                                type : 'hbox',
+                                                defaultMargins : {
+                                                    right : 5,
+                                                    left : 5
+                                                }
+                                            }, 
+                                            items : [ { xtype : 'button',
+                                                        flex : 1,
+                                                        text : 'OK',
+                                                        itemId : 'okButton',
+                                                    }, { xtype : 'button',
+                                                        flex : 1,
+                                                        text : 'Cancel',
+                                                        itemId : 'cancelButton',
+                                                    } ] 
+                                        } // end of button container
+                                     ] // items + buttons 
+                                  } ],
+                                  
 					initComponent : function() {
 						this.callParent();
 
 						var me = this;
-
+                        
 						var loadData = [];
 
 						if (me.isSubjectLabel) {
@@ -115,14 +140,96 @@ Ext
 							var label = me.visibleLabels[idx];
 							loadData.push([ label.id, label.isShown ]);
 						}
+                        
 						me.down('#labelSettingsGrid').store.loadData(loadData);
 						
-						me.down('#labelCheckColumn').on('checkchange',
-								me.onLabelCheckChange, this);
-						me.down('#labelActionColumn').on('itemclick',
-								me.onLabelActionColumnClick, this);
+						me.down('#labelShowColumn').on('checkchange',
+								me.onLabelShowCheckChange, this);
+
+                        me.down('#okButton').on('click', me.okButtonHandler, this);        
+                        me.down('#cancelButton').on('click', me.cancelButtonHandler, this);
 					},
 
+					cancelButtonHandler : function(event) {
+				        this.destroy();
+				    },
+				    
+				    
+				    okButtonHandler : function(event) {
+                        var me = this;
+                        
+				        var checkedRecords = me.down('#labelSettingsGrid').store.queryBy(function(rec) {
+				            return rec.get('remove') == true;
+				        }).items;
+				        
+				        var checkedLabels = [];
+                        for(var i = 0; i < checkedRecords.length; i++) {
+                            var rec = checkedRecords[i];
+				            var label = this.visibleLabels[rec.get('labelId')];
+				            checkedLabels.push( label );
+                        }
+				        this.removeLabels(checkedLabels);
+				    },
+				    
+				    removeSubjectLabels : function(labels) {
+				        var me = this;
+				        if ( me.selectedIds.length == 0 ) {
+                            Ext.MessageBox.confirm('Delete', 'Remove ' + labels.length + ' label(s) '
+                                    + 'for all subject(s)?', function(btn) {
+                                if (btn === 'yes') {
+                                    LabelService.deleteSubjectLabels( labels, {
+                                        callback : function() {
+                                            //me.down('#labelSettingsGrid').store.removeAt(rowIndex);
+                                            ASPIREdb.EVENT_BUS.fireEvent('label_subject_change', me.selectedIds);
+                                            me.destroy();
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            Ext.MessageBox.confirm('Delete', 'Remove ' + labels.length + ' label(s) '
+                                    + 'for ' + me.selectedIds.length + ' subject(s)?', function(btn) {
+                                if (btn === 'yes') {
+                                    LabelService.removeLabelsFromSubjects( labels, me.selectedIds, {
+                                        callback : function() {
+                                            ASPIREdb.EVENT_BUS.fireEvent('label_subject_change', me.selectedIds);
+                                            me.destroy();
+                                        }
+                                    });
+                                }
+                            });
+                        }
+				    },
+				    
+				    removeVariantLabels : function(labels) {
+				        var me = this;
+				        if ( me.selectedIds.length == 0 ) {
+				            Ext.MessageBox.confirm('Delete', 'Remove ' + labels.length + ' label(s) '
+                                    + 'for all variant(s)?', function(btn) {
+                                if (btn === 'yes') {
+                                    LabelService.deleteVariantLabels( labels, {
+                                        callback : function() {
+                                            ASPIREdb.EVENT_BUS.fireEvent('label_variant_change', me.selectedIds);
+                                            me.destroy();
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            Ext.MessageBox.confirm('Delete', 'Remove ' + labels.length + ' label(s) '
+                                    + 'for ' + me.selectedIds.length + ' variant(s)?', function(btn) {
+                                if (btn === 'yes') {
+                                    LabelService.removeLabelsFromVariants( labels, me.selectedIds, {
+                                        callback : function() {
+                                            ASPIREdb.EVENT_BUS.fireEvent('label_variant_change', me.selectedIds);
+                                            me.destroy();
+                                        }
+                                    } );
+                                }
+                            });
+                        }
+				    },
+				    
 					/**
 					 * Remove label?
 					 * 
@@ -134,32 +241,18 @@ Ext
 					 * @param item
 					 * @param e
 					 */
-					onLabelActionColumnClick : function(column, action, view,
-							rowIndex, colIndex, item, e) {
-
+				    removeLabels : function(labels) {
 						var me = this;
 
-						var rec = view.store.getAt(rowIndex);
-						var labelId = rec.get('labelId');
-						var label = this.visibleLabels[labelId];
-
-						if (action == 'removeLabel') {
-							Ext.MessageBox.confirm('Delete', 'Remove label "'
-									+ label.name + '"?', function(btn) {
-								if (btn === 'yes') {
-									me.down('#labelSettingsGrid').store
-											.removeAt(rowIndex);
-									delete me.visibleLabels[labelId];
-									if (me.isSubjectLabel) {
-										LabelService.deleteSubjectLabel(label);
-									} else {
-										LabelService.deleteVariantLabel(label);
-									}
-
-									ASPIREdb.EVENT_BUS.fireEvent('label_change');
-								}
-							});
-						}
+                        if ( labels != null && labels.length > 0 ) {
+						    if ( me.isSubjectLabel ) {
+						        me.removeSubjectLabels(labels);
+						    } else {
+						        me.removeVariantLabels(labels);
+						    }
+						} else {
+                            me.destroy();
+                        }
 					},
 
 					/**
@@ -170,12 +263,21 @@ Ext
 					 * @param checked
 					 * @param eOpts
 					 */
-					onLabelCheckChange : function(checkColumn, rowIndex,
+					onLabelShowCheckChange : function(checkColumn, rowIndex,
 							checked, eOpts) {
+                        var me = this;
 						var labelId = this.down('#labelSettingsGrid').store.data.items[rowIndex].data.labelId;
 						var label = this.visibleLabels[labelId];
 						label.isShown = checked;
-						LabelService.updateLabel(label);
-						ASPIREdb.EVENT_BUS.fireEvent('label_change');
-					},
+						LabelService.updateLabel(label, {
+                            callback : function() {
+                                if( me.isSubjectLabel ) {
+                                    ASPIREdb.EVENT_BUS.fireEvent('label_subject_change');
+                                } else {
+                                    ASPIREdb.EVENT_BUS.fireEvent('label_variant_change');
+                                }
+                            }
+                        });
+					}
+					
 				});

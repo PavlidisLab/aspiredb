@@ -49,7 +49,8 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		selectedSubjectVariants: [],
 		loadedVariants:[],
 		property: new VariantTypeProperty(),
-		
+		// the current filters used
+        filterConfigs : [],
 	},
 
 	constructor : function(cfg) {
@@ -182,16 +183,14 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		});
 		
 		this.colourVariantByCombo.on('select', this.colourVariantByHandler,this);
-		
 
 		// adding buttons to toolbar in filterSubmitHandler with the grid
 		// because extJS was
 		// bugging out when we added the dynamically created grid afterwords
 		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);
-
-		ASPIREdb.EVENT_BUS.on('label_change', function() {
-			ref.down('#variantGrid').getView().refresh();
-		});
+        
+        // when subject label change
+        ASPIREdb.EVENT_BUS.on('label_variant_change', function() { this.refreshGridView() }, this);
 		
 		ASPIREdb.EVENT_BUS.on('property_changed', function(property){
 			ref.property =[];
@@ -261,6 +260,8 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 
 		var ref = this;
 
+        ref.filterConfigs = filterConfigs;
+        
 		ref.setLoading(true);
 		
 		VariantService.suggestProperties(function(properties) {
@@ -328,6 +329,16 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		});
 
 	},
+    
+    /**
+     * Refresh grid view by reloading data from database because it was updated
+     */
+    refreshGridView : function(  ) {
+        var me = this;
+        me.filterSubmitHandler(me.filterConfigs);
+        me.down('#variantGrid').getView().refresh();
+    },
+    
 	/**
 	 * 
 	 */
@@ -442,7 +453,6 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	 * When subjects are selected in the subject grid highlist the variants of selected subjects in ideogram and in table view
 	 */
 	subjectSelectionHandler :function(subjectIds) {
-		console.log("subject selected  on variant tab panel........");
 		var projectIds= ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
 		
 		var grid = this.down('#variantGrid');
@@ -757,9 +767,16 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	labelSettingsHandler : function(event) {
 		var me = this;
 
+        var currentlySelectedRecords = me.getVariantRecordSelection();
+        var selectedVariantIds = [];
+        for ( var i = 0; i < currentlySelectedRecords.length; i++) {
+            selectedVariantIds.push(currentlySelectedRecords[i].get('id'));
+        }
+        
 		var labelControlWindow = Ext.create('ASPIREdb.view.LabelControlWindow', {
 			visibleLabels : me.down('#variantGrid').visibleLabels,
 			isSubjectLabel : false,
+            selectedIds : selectedVariantIds
 		});
 
 		labelControlWindow.show();
