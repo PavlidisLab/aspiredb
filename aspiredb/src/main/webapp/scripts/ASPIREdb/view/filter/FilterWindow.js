@@ -14,6 +14,9 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	bodyStyle : 'padding: 5px;',
 	border: false,
 	constrain:true,
+	config : {
+		isOverlapedProjects :'No',
+	},
 
 	initComponent : function() {
 		var me = this;
@@ -279,7 +282,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 					}else{
 						//This will be the user project overlap functionality
 						var projectOverlapFilterPanel = Ext.create('ASPIREdb.view.filter.ProjectOverlapFilterPanel');					
-						
+						this.isOverlapedProjects ='Yes';
 						filterContainer.add(projectOverlapFilterPanel);
 						filterContainer.doLayout();
 						projectOverlapFilterPanel.setFilterConfig(filters[i]);
@@ -367,15 +370,16 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	
 	enableOverlappButton: function(){
     	//var projectOverlapFilterContainer = ASPIREdb.view.filter.ProjectOverlapFilterPanel.getComponent('projectOverlapFilterContainer');
-    	var subjectFilterPanel = Ext.create('ASPIREdb.view.filter.ProjectOverlapFilterPanel');
-    	subjectFilterPanel.down('#overlappedVariants').enable();
+    	var projectOverlapFilterPanel = Ext.create('ASPIREdb.view.filter.ProjectOverlapFilterPanel');
+    	projectOverlapFilterPanel.down('#overlappedVariants').enable();
     },
 	
 	previewQueryHandler : function() {
-		//this.enableOverlappButton();
-		//enable the overlapped variants button in filter container
-		var filterContainer = this.down('#filterContainer');
-		filterContainer.down('#overlappedVariants').enable();
+		if (this.isOverlapedProjects == 'Yes'){
+			//if project overlap filter panel, then enable the overlapped variants button in filter container
+			var filterContainer = this.down('#filterContainer');
+			filterContainer.down('#overlappedVariants').enable();
+		}
 								
 		if (this.down('#numberOfSubjectsLabel').getEl() && this.down('#numberOfVariantsLabel').getEl()){
 			this.down('#numberOfSubjectsLabel').getEl().setOpacity(1, true);

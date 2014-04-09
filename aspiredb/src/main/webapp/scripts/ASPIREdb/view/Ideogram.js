@@ -306,6 +306,12 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	hideColourLegend : function() {
 		this.colourLegend.hide();
 	},
+	
+	refreshColourLegend : function() {
+		this.colourLegend.update(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap,this.displayedProperty);
+		this.colourLegend.show();
+		
+	},
 
 	/**
 	 * TODO: update callers (zoom() -> changeZoom())
@@ -476,7 +482,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	           var characteristicValueObject = variant.characteristics[property.name];
 	            if (characteristicValueObject != null) {
 	            	if (characteristicValueObject== undefined){
-	            		console.log('undefined characteristics : '+property.name);
+	            		//console.log('undefined characteristics : '+property.name);
 	            	}else propertyValues.push(characteristicValueObject.value);
 	            }
 	        }
@@ -484,16 +490,17 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	        if (property instanceof VariantLabelProperty) {
 	        	if (variant.labels.length >0){
 	        		propertyValues.push(variant.labels[0].name);
-	        		console.log('variant label name :'+variant.labels[0].name);
+	        		//console.log('variant label name :'+variant.labels[0].name);
 	        	}
 	        }
 	      //if subject labels
 	        if (property instanceof SubjectLabelProperty) {
-	        	subject = variant.subject
+	        	subject = variant.subject;
 	        	if (subject.labels.length >0){
 	        		propertyValues.push(subject.labels[0].name);
 	        		console.log('variant label name :'+subject.labels[0].name);
 	        	}
+	        	
 	        	
 	        }
 	        this.displayedProperty=property;	
@@ -516,7 +523,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 			//do not update the ledgend
 		}
 		else this.colourLegend.update(valuetoColourArray,this.displayedProperty); 
-
+		console.log('colour legend '+valuetoColourArray);
 		
 	},
 

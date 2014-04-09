@@ -188,7 +188,15 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);
         
         // when subject label change
-        ASPIREdb.EVENT_BUS.on('label_variant_change', function() { this.refreshGridView() }, this);
+        ASPIREdb.EVENT_BUS.on('label_variant_change',this.refreshGridView, this);
+        //when variant label changes
+        ASPIREdb.EVENT_BUS.on('label_subject_change', this.subjectlabelModifiedHandler,this);
+        
+        //when subject label created
+        ASPIREdb.EVENT_BUS.on('subject_label_created', this.subjectlabelAddedHandler,this);
+        
+      //when variant label created
+        ASPIREdb.EVENT_BUS.on('variant_label_created', this.refreshGridView,this);
 		
 		ASPIREdb.EVENT_BUS.on('property_changed', function(property){
 			ref.property =[];
@@ -331,11 +339,45 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
     /**
      * Refresh grid view by reloading data from database because it was updated
      */
-    refreshGridView : function(  ) {
+    refreshGridView : function() {
         var me = this;
         me.filterSubmitHandler(me.filterConfigs);
         me.down('#variantGrid').getView().refresh();
+        //refresh the variant labels in ideogram
+        var property =new VariantLabelProperty();
+        property.name ='Labels';
+  	  	property.displayName ='Variant Labels';
+        this.redrawIdeogram(property);
     },
+    /**
+     * Refresh the selected subjects in ideogram
+     */
+    subjectlabelModifiedHandler: function(labelIds) {
+    	this.filterSubmitHandler(this.filterConfigs);
+    	var property =new SubjectLabelProperty();
+		property.name ='Subject Labels';
+  	    property.displayName ='Subject Label';
+  	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
+        this.redrawIdeogram(property);
+    },
+    
+    subjectlabelAddedHandler: function() {
+    	var ideogram = this.getComponent('ideogram');
+
+    	//if (ideogram.colourLegend.isVisible()){
+    		//ideogram.hideColourLegend();
+    		
+    		var property =new SubjectLabelProperty();
+    		property.name ='Subject Labels';
+    		property.displayName ='Subject Label';
+    		ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);    		
+    		this.redrawIdeogram(property);
+    		
+    		//ideogram.refreshColourLegend();
+    	//}
+    },
+    
+   
     
 	/**
 	 * 
@@ -432,6 +474,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	 */
 	redrawIdeogram : function(property){
 		  var ideogram = this.getComponent('ideogram');
+		  this.filterSubmitHandler(this.filterConfigs);
 		  
 		  ideogram.setDisplayedProperty(property);
 		  ideogram.drawChromosomes();

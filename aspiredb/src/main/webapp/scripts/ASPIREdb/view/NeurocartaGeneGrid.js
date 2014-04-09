@@ -187,7 +187,7 @@ Ext.define('ASPIREdb.view.NeurocartaGeneGrid', {
 		this.getDockedComponent('neurocartaGeneGridToolbar').add({
 			xtype : 'button',
 			id : 'saveButtonGeneSet',
-			text : 'Save to Gene Lists',
+			text : 'Save to Gene Set',
 			tooltip : 'Save Genes to User gene Set',
 			disabled: true,
 			handler: function(){

@@ -70,27 +70,29 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
     		if (property instanceof VariantTypeProperty) {
     			this.nextColourIndex = 0;
     			if (property.displayType.indexOf('CNV')!=-1)
-    				this.valueToColourMap.push(["CNV"," : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"]);
+    				this.valueToColourMap.push(["<font color='"+this.colors[this.nextColourIndex]+"'>"+"CNV"+"</font><br>\n"]);
     			if (property.displayType.indexOf('SNV')!=-1)
-    				this.valueToColourMap.push(["SNV"," : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"]); 
+    				this.valueToColourMap.push(["<font color='"+this.colors[++this.nextColourIndex]+"'>"+"SNV"+"</font><br>\n"]); 
     			if (property.displayType.indexOf('indel')!=-1)
-    				this.valueToColourMap.push(["Indel"," : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"]);
+    				this.valueToColourMap.push(["<font color='"+this.colors[++this.nextColourIndex]+"'>"+"Indel"+"</font><br>\n"]);
     			if (property.displayType.indexOf('translocation')!=-1)
-    				this.valueToColourMap.push(["Translocation"," : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"]);
+    				this.valueToColourMap.push(["<font color='"+this.colors[++this.nextColourIndex]+"'>"+"Translocation"+"</font><br>\n"]);
     			if (property.displayType.indexOf('inversion')!=-1)
-    				this.valueToColourMap.push(["Inversion"," : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"]);
+    				this.valueToColourMap.push(["<font color='"+this.colors[++this.nextColourIndex]+"'>"+"Inversion"+"</font><br>\n"]);
     		}
     		
         	//if CNV type : LOSS, GAIN
     		if (property instanceof CNVTypeProperty) {
     			this.nextColourIndex = 0;
     			if (property.displayType.indexOf('LOSS')!=-1)
-    				this.valueToColourMap.push(["LOSS"," : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>"+"\n"]);
+    				this.valueToColourMap.push(["<font color='"+this.colors[this.nextColourIndex]+"'>"+"LOSS"+"</font><br>\n"]);
     			if (property.displayType.indexOf('GAIN')!=-1)
-    				this.valueToColourMap.push(["GAIN"," : <font color='"+this.colors[++this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>"+"\n"]);    			
+    				this.valueToColourMap.push(["<font color='"+this.colors[++this.nextColourIndex]+"'>"+"GAIN"+"</font><br>\n"]);    			
     		} 
     		
-    	    		
+    	
+    		
+    		    	    		
     		//if Characteristic type : benign, pathogenic, unknown
     		if (property instanceof CharacteristicProperty) {
     			
@@ -101,7 +103,7 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
     					  for (var i=0; i<property.displayType.length;i++){
     						  var value =property.displayType[i];     						  
     						  if (this.characteristicList.length ==0 || this.characteristicList.indexOf(value)==-1 ){
-    							  this.valueToColourMap.push([value," : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"]);
+    							  this.valueToColourMap.push(["<font color='"+this.colors[this.nextColourIndex]+"'>"+value+"</font><br>\n"]);
     							  this.characteristicList.push(value);  
     							  ++this.nextColourIndex;
     						  }
@@ -114,7 +116,7 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
 					  for (var i=0; i<property.displayType.length;i++){
 						  var value =property.displayType[i];     						  
 						  if (this.characteristicList.length ==0 || this.characteristicList.indexOf(value)==-1 ){
-							  this.valueToColourMap.push([value," : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"]);
+							  this.valueToColourMap.push(["<font color='"+this.colors[this.nextColourIndex]+"'>"+value+"</font><br>\n"]);
 							  this.characteristicList.push(value);  
 							  ++this.nextColourIndex;
 						  }
@@ -127,7 +129,7 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
 					  for (var i=0; i<property.displayType.length;i++){
 						  var value =property.displayType[i];     						  
 						  if (this.characteristicList.length ==0 || this.characteristicList.indexOf(value)==-1 ){
-							  this.valueToColourMap.push([value," : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"]);
+							  this.valueToColourMap.push(["<font color='"+this.colors[this.nextColourIndex]+"'>"+value+"</font><br>\n"]);
 							  this.characteristicList.push(value);  
 							  ++this.nextColourIndex;
 						  }
@@ -140,7 +142,7 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
 					  for (var i=0; i<property.displayType.length;i++){
 						  var value =property.displayType[i];     						  
 						  if (this.characteristicList.length ==0 || this.characteristicList.indexOf(value)==-1 ){
-							  this.valueToColourMap.push([value," : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"]);
+							  this.valueToColourMap.push(["<font color='"+this.colors[this.nextColourIndex]+"'>"+value+"</font><br>\n"]);
 							  this.characteristicList.push(value);  
 							  ++this.nextColourIndex;
 						  }
@@ -154,7 +156,7 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
 					  for (var i=0; i<property.displayType.length;i++){
 						  var value =property.displayType[i];     						  
 						  if (this.characteristicList.length ==0 || this.characteristicList.indexOf(value)==-1 ){
-							  this.valueToColourMap.push([value," : <font color='"+this.colors[this.nextColourIndex]+"'>"+this.colors[this.nextColourIndex]+"</font>\n"]);
+							  this.valueToColourMap.push(["<font color='"+this.colors[this.nextColourIndex]+"'>"+value+"</font><br>\n"]);
 							  this.characteristicList.push(value);  
 							  ++this.nextColourIndex;
 						  }
@@ -233,7 +235,7 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
         		console.log('variant label color :'+color);        		
         		
         		if (this.self.characteristicList.length ==0 || this.self.characteristicList.indexOf(value)==-1 ){
-        			this.self.valueToColourMap.push([value," : <font color='"+color+"'>"+color+"</font>\n"]);
+        			this.self.valueToColourMap.push(["<font color='"+color+"'>"+value+"</font><br>\n"]);
         			this.self.characteristicList.push(value);
         		}
            	} 
@@ -248,8 +250,9 @@ Ext.define('ASPIREdb.view.ideogram.VariantLayer', {
            		var color = subject.labels[0].colour;
            		color= this.hexToColorName('#'+color);
          		console.log('subject label color :'+color);
+         		
          		if (this.self.characteristicList.length ==0 || this.self.characteristicList.indexOf(value)==-1 ){
-         			this.self.valueToColourMap.push([value," : <font color='"+color+"'>"+color+"</font>\n"]); 
+         			this.self.valueToColourMap.push(["<font color='"+color+"'>"+value+"</font><br>\n"]); 
          			this.self.characteristicList.push(value);
          		}
             }            

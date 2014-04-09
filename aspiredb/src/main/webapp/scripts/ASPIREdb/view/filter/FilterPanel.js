@@ -7,7 +7,7 @@ Ext.define('ASPIREdb.view.filter.FilterPanel', {
     closable: true,
     collapsible: true,
     header: false,
-    width: 900,
+    width: 950,
     padding: '10 5 10 5' ,
     layout: {
         type: 'vbox',

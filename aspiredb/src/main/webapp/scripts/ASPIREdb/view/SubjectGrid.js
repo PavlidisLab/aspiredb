@@ -165,7 +165,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		this.on('selectionchange', me.selectionChangeHandler, me);
 		
 		//when subject label change
-        ASPIREdb.EVENT_BUS.on('label_subject_change', function() { this.refreshGridView() }, this);
+        ASPIREdb.EVENT_BUS.on('label_subject_change', this.refreshGridView, this);
 	},
 
 	/**
@@ -348,7 +348,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 
 		var labelWindow = new ASPIREdb.view.CreateLabelWindowSubject();
 		labelWindow.show();
-
+		
 	},
 	
 	/**
@@ -383,15 +383,17 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 					me.getView().refresh();
 				}
 			});
+			ASPIREdb.EVENT_BUS.fireEvent('subject_label_created');
 	},
 
     /**
      * Refresh grid view by reloading data from database because it was updated
      */
-    refreshGridView : function(  ) {
+    refreshGridView : function() {
         var me = this;
         me.filterSubmitHandler(me.filterConfigs);
         me.getView().refresh();
+       
     },
     
 	/**
