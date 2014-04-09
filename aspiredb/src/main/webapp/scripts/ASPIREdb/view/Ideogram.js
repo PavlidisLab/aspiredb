@@ -504,7 +504,7 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	        	
 	        }
 	        this.displayedProperty=property;	
-	        //this.displayedProperty.displayType.push(propertyValues[0]);
+	       
 			chrIdeogram.drawVariant(variant, this.displayedProperty);
 						
 		}
@@ -544,20 +544,15 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	},
 
 	/**
-	 * @private
-	 * @param subjectId
-	 * @param {VariantValueObject[]}
-	 *            variantValueObjects
-	 */
 	drawVariantsWithSubjectHighlighted : function(subjectId, variantValueObjects) {
-		/* List<VariantValueObject> */
+		// List<VariantValueObject> 
 		var variants = variantValueObjects.slice(); // copy array
 		this.sortVariantsBySize(variants);
 
 		for ( var i = 0; i < variants.length; i++) {
 			var variant = variants[i];
 			var chrName = variant.genomicRange.chromosome;
-			/* ChromosomeIdeogram */
+			//ChromosomeIdeogram 
 			var chrIdeogram = this.chromosomeIdeograms[chrName];
 			if (variant.subjectId === subjectId) {
 				console.log('drawing red variants of subject id :'+subjectId+' in dieogam view');
@@ -566,8 +561,14 @@ Ext.define('ASPIREdb.view.Ideogram', {
 				chrIdeogram.drawDimmedVariant(variant);
 			}
 		}
-	},
+	},*/
 	
+	/**
+	 * @private
+	 * @param subjectIds
+	 * @param {VariantValueObject[]}
+	 *            variantValueObjects
+	 */
 	drawVariantsWithSubjectsHighlighted : function(subjectIds, variantValueObjects) {
 		/* List<VariantValueObject> */
 		var variants = variantValueObjects.slice(); // copy array
@@ -584,7 +585,8 @@ Ext.define('ASPIREdb.view.Ideogram', {
 				if (variant.subjectId === subjectId) {
 					console.log('drawing red variants of subject id :'+subjectId+' in dieogam view');
 					chrIdeogram.drawHighlightedVariant(variant, this.displayedProperty);
-				} 
+				}
+				else chrIdeogram.drawDimmedVariant(variant);
 			}
 			
 		}

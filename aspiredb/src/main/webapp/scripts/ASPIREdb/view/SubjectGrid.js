@@ -330,6 +330,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 							   if(btn === 'yes'){
 								   me.addLabelHandler(vo,selSubjectIds);
 								   this.hide();
+								   ASPIREdb.EVENT_BUS.fireEvent('subject_label_created');
 							   }
 							   
 							   
@@ -339,6 +340,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 				else{
 					me.addLabelHandler(vo,selSubjectIds);
 					this.hide();
+					ASPIREdb.EVENT_BUS.fireEvent('subject_label_created');
 				}
 					
 				
@@ -383,7 +385,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 					me.getView().refresh();
 				}
 			});
-			ASPIREdb.EVENT_BUS.fireEvent('subject_label_created');
+			
 	},
 
     /**

@@ -53,7 +53,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 					itemId : 'savedQueryComboBox',
 					editable : false,
 					forceSelection : true,
-					value : 'FILTER_PLACEHOLDER',
+					value : 'QUERY_NAME_PLACEHOLDER',
 					store : [ [ 'QUERY_NAME_PLACEHOLDER', '<Query name>' ] ]
 				},
 				{
@@ -375,9 +375,9 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
     },
 	
 	previewQueryHandler : function() {
-		if (this.isOverlapedProjects == 'Yes'){
-			//if project overlap filter panel, then enable the overlapped variants button in filter container
-			var filterContainer = this.down('#filterContainer');
+		var filterContainer = this.down('#filterContainer');
+		if (filterContainer.down('#overlappedVariants') != undefined){
+			//if project overlap filter panel, then enable the overlapped variants button in filter container			
 			filterContainer.down('#overlappedVariants').enable();
 		}
 								
@@ -488,116 +488,20 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		  QueryService.queryVariants(me.getOverlappedFilterConfigs(projectId), {
 			callback : function(pageLoad) {
 				
-				var vvos = pageLoad.items;
-				characteristicNames = [];
-
-				for ( var i = 0; i < properties.length; i++) {
-
-					if (properties[i].characteristic) {
-						characteristicNames.push(properties[i].name);
-					}
-
-				}
-				
-			
-					
+				var vvos = pageLoad.items;								
 				var data=[];
-				var headers=['Id','Patient Id','Type', 'Genome Coordinates','Chromosome','Base Start', 'Base End','CNV Type','Copy Number','CNV Length'];
-				for ( var j = 0; j < characteristicNames.length; j++) {
-					headers.push(characteristicNames[j]);
-				}
+				var headers=['Patient Id     ', 'Genome Coordinates'];				
 				
 				for ( var i = 0; i < vvos.length; i++) {
 
 					var vvo = vvos[i];
-					console.log('filter window set variant load overlap filter vvo '+vvos[i]);
+					
 
 					var dataRow = [];
 
 					dataRow.push(vvo.id);
-
-					dataRow.push(vvo.patientId);
-
-					dataRow.push(vvo.variantType);
+					dataRow.push(vvo.patientId+"     ");
 					dataRow.push(vvo.genomicRange.chromosome + ":" + vvo.genomicRange.baseStart + "-" + vvo.genomicRange.baseEnd);
-					dataRow.push(vvo.genomicRange.chromosome);
-					dataRow.push(vvo.genomicRange.baseStart);
-					dataRow.push(vvo.genomicRange.baseEnd);
-					
-					/**var visibleLabels = [];
-					var suggestionContext = new SuggestionContext();
-					
-					suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
-					
-					// load all labels created by this user
-					VariantService.suggestLabels(suggestionContext, {
-						callback : function(labels) {
-							for ( var idx in labels) {
-								var label = labels[idx];
-								visibleLabels[label.id] = label;
-							}
-						}
-					});
-					
-					// create only one unique label instance
-					var labels = [];
-					for (var j = 0; j < vvo.labels.length; j++) {
-						var aLabel = visibleLabels[vvo.labels[j].id];
-
-						// this happens when a label has been assigned
-						// by the admin and the user has no permissions
-						// to modify the label
-						if (aLabel == undefined) {
-							aLabel = vvo.labels[j];
-						}
-
-						labels.push(aLabel.id);
-					}
-
-					dataRow.push(labels);*/
-
-					if (vvo.variantType == "CNV") {
-						dataRow.push(vvo.type);
-						dataRow.push(vvo.copyNumber);
-						dataRow.push(vvo.cnvLength);
-					} else {
-						dataRow.push("");
-						dataRow.push("");
-						dataRow.push("");
-					}
-
-					if (vvo.variantType == "SNV") {
-						dataRow.push(vvo.dbSNPID);
-						dataRow.push(vvo.observedBase);
-						dataRow.push(vvo.referenceBase);
-					} else {
-						dataRow.push("");
-						dataRow.push("");
-						dataRow.push("");
-					}
-
-					if (vvo.variantType == "INDEL") {
-						dataRow.push(vvo.length);
-					} else {
-						dataRow.push("");
-					}
-					
-					
-					for ( var j = 0; j < characteristicNames.length; j++) {
-
-						var dataRowValue = "";
-
-						for ( var char in vvo.characteristics) {
-							if (char == characteristicNames[j]) {
-								dataRowValue = vvo.characteristics[char].value;								
-								break;
-							}
-						}
-						
-						
-						dataRow.push(dataRowValue);
-					}
-
 					data.push(dataRow);
 				}
 				
@@ -611,10 +515,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 	},
 	
 	
-	/**
-	 * Triggered by Preview query button in Filter Window
-	 * Updates the result count in the filter window
-	 */
+
 	updateSpecialProjectValues : function() {
 
 		var ref = this;

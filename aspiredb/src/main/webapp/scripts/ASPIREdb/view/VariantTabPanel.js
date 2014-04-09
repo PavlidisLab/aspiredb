@@ -342,6 +342,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
     refreshGridView : function() {
         var me = this;
         me.filterSubmitHandler(me.filterConfigs);
+      
         me.down('#variantGrid').getView().refresh();
         //refresh the variant labels in ideogram
         var property =new VariantLabelProperty();
@@ -353,7 +354,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
      * Refresh the selected subjects in ideogram
      */
     subjectlabelModifiedHandler: function(labelIds) {
-    	this.filterSubmitHandler(this.filterConfigs);
+    	//this.filterSubmitHandler(this.filterConfigs);
     	var property =new SubjectLabelProperty();
 		property.name ='Subject Labels';
   	    property.displayName ='Subject Label';
@@ -364,8 +365,8 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
     subjectlabelAddedHandler: function() {
     	var ideogram = this.getComponent('ideogram');
 
-    	//if (ideogram.colourLegend.isVisible()){
-    		//ideogram.hideColourLegend();
+    	if (ideogram.colourLegend.isVisible()){
+    		ideogram.hideColourLegend();
     		
     		var property =new SubjectLabelProperty();
     		property.name ='Subject Labels';
@@ -374,7 +375,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
     		this.redrawIdeogram(property);
     		
     		//ideogram.refreshColourLegend();
-    	//}
+    	}
     },
     
    
@@ -474,8 +475,9 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	 */
 	redrawIdeogram : function(property){
 		  var ideogram = this.getComponent('ideogram');
-		  this.filterSubmitHandler(this.filterConfigs);
 		  
+		  this.filterSubmitHandler(this.filterConfigs);
+		 		  
 		  ideogram.setDisplayedProperty(property);
 		  ideogram.drawChromosomes();
 		  ideogram.drawColouredVariants(this.loadedVariants,false);
@@ -529,24 +531,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 						patientIDS.push(subjectValueObjects[i].patientId);					
 					}
 					ideogram.drawVariantsWithSubjectsHighlighted(subjectIDS,ref.loadedVariants);
-					
-				 	VariantService.getSubjectsVariants(patientIDS, {
-						callback : function(vvo) {
-							var notSelectedVariants=[];
-							var flag='no';
-							for (var j=0;j<ref.loadedVariants.length;j++){
-								
-								for (var k=0;k<vvo.length;k++){
-									if (ref.loadedVariants[j]!=vvo[k]){
-									 	flag='yes';
-									}								 
-								}
-								if (flag == 'yes')
-									notSelectedVariants.push(ref.loadedVariants[j]);
-							}
-							ideogram.drawDimmedVariants(notSelectedVariants);							
-							}
-					});
+			
 				
 				}
 			});			
