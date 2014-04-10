@@ -354,12 +354,14 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
      * Refresh the selected subjects in ideogram
      */
     subjectlabelModifiedHandler: function(labelIds) {
-    	//this.filterSubmitHandler(this.filterConfigs);
+    	
+    	ASPIREdb.EVENT_BUS.on('property_changed',function(){
     	var property =new SubjectLabelProperty();
 		property.name ='Subject Labels';
   	    property.displayName ='Subject Label';
   	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
         this.redrawIdeogram(property);
+    	});
     },
     
     subjectlabelAddedHandler: function() {

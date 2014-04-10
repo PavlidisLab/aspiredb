@@ -29,7 +29,11 @@ Ext.define('ASPIREdb.store.LabelStore', {
 	},{
 		name : 'labelName',
 		type : 'string'
-	}, {
+	}, 
+	{
+		name : 'labelColour',
+		type : 'string'
+	},{
 		name : 'show',
 		type : 'boolean'
 	}, {

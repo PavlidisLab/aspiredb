@@ -257,13 +257,13 @@ Ext
 
 						var value = null;
 						var colorIndex = 0;
-						/**var sVstat = 'No';
+						var sVstat = 'No';
 
 						for (var j = 0; j < this.selectedVariants.length; j++) {
 							if (this.selectedVariants[j] == variant)
 								sVstat = 'Yes';
 						}
-						if (sVstat == 'Yes') {*/
+						if (sVstat == 'Yes') {
 
 							// if variant type property : CNV, SNV, indel,
 							// translocation, inversion
@@ -481,7 +481,7 @@ Ext
 								}
 							}
 
-					//	}else color ="grey";
+						}else color ="grey";
 						return color;
 					},
 

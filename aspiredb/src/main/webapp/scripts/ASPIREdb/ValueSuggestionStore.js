@@ -4,7 +4,9 @@ Ext.require([
     'ASPIREdb.ActiveProjectSettings'
 ]);
 
-
+/**
+ * Store the suggested values for the filter window
+ */
 Ext.define('ASPIREdb.ValueSuggestionStore', {
     extend:'Ext.data.Store',
     model: 'ASPIREdb.model.PropertyValue',
