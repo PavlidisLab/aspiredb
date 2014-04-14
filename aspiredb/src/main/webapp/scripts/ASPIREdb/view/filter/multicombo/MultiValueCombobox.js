@@ -6,7 +6,9 @@ Ext.require([
     'ASPIREdb.model.PropertyValue',
     'ASPIREdb.ValueSuggestionStore'
 ]);
-
+/**
+ * Define multi combo values
+ */
 Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
     extend: 'Ext.Container',
     alias: 'widget.multivalue_combo',

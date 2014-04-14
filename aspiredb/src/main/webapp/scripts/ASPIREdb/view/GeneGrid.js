@@ -43,6 +43,7 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 		selectedGene :[],	
 		gvos : [],
 		selectedGeneSet : [],
+		suggestionContext: null,
 		
 	},
 
@@ -90,6 +91,7 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 		
 		ASPIREdb.EVENT_BUS.on('geneSet_selected', this.geneSetSelectHandler, this);
 		
+		
 	},
 	
 	/**
@@ -107,14 +109,30 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 	enableToolbar : function() {
 		
 		this.getDockedComponent('geneGridToolbar').removeAll();
-		
+		var me=this;
 		
 		this.getDockedComponent('geneGridToolbar').add({
-			xtype : 'textfield',
+			xtype : 'combo',
 			id : 'geneName',
-			text : '',			
-			allowBlank : false,
+			emptyText : 'Genes',			
+			//width :200,
+			displayField : 'displayName',
+			triggerAction : 'query',
+			minChars : 0,
+			matchFieldWidth : false,
+			//hideTrigger : true,
+			autoSelect : true,
+			enableKeyEvents : true,
+			store : Ext.create('ASPIREdb.GeneSuggestionStore', {
+				remoteFunction : VariantService.suggestValues
+			}),
 			
+			listConfig : {
+				loadingText : 'Searching...',
+				emptyText : 'No results found.'
+			},
+	
+	
 		});
 		
 		

@@ -51,19 +51,20 @@ Ext
 						zoom : null,
 						leftX : null,
 						chromosomeLayer : null,
-						selectedVariants : [],
+					// selectedVariants : [],
 					},
 
 					statics : {
 						colors : [ "red", "blue", "green", "purple", "brown",
-								"black", "olive", "maroon" ],
+								"olive", "maroon", "orange" ],
 						defaultColour : "rgba(0,0,0,0.5)",
 						nextColourIndex : 0,
 						/** @type {Object.<string,string>} */
 						valueToColourMap : [],
 						characteristicList : [],
+						selectedVariants : [],
 						resetDisplayProperty : function(property) {
-
+							this.selectedVariants = [];
 							if (property.displayType != undefined) {
 
 								// if variant type property : CNV, SNV, indel,
@@ -258,10 +259,13 @@ Ext
 						var value = null;
 						var colorIndex = 0;
 						var sVstat = 'No';
-
-						for (var j = 0; j < this.selectedVariants.length; j++) {
-							if (this.selectedVariants[j] == variant)
-								sVstat = 'Yes';
+						if (this.self.selectedVariants.length == 0) {
+							sVstat = 'Yes';
+						} else if (this.self.selectedVariants.length > 0) {
+							for (var j = 0; j < this.self.selectedVariants.length; j++) {
+								if (this.self.selectedVariants[j] == variant)
+									sVstat = 'Yes';
+							}
 						}
 						if (sVstat == 'Yes') {
 
@@ -287,9 +291,7 @@ Ext
 										colorIndex++;
 										color = this.self.colors[++colorIndex];
 									}
-									// this.self.valueToColourMap.push([value,"
-									// : <font
-									// color='"+color+"'>"+color+"</font>\n"]);
+
 								}
 							}
 
@@ -304,9 +306,7 @@ Ext
 									} else if (value.toLowerCase() === "gain") {
 										color = this.self.colors[++colorIndex];
 									}
-									// this.self.valueToColourMap.push([value,"
-									// : <font
-									// color='"+color+"'>"+color+"</font>\n"]);
+
 								}
 							}
 
@@ -391,30 +391,48 @@ Ext
 										value = characteristicValueObject.value;
 
 									if (property.name == 'Characteristics') {
-										for (var i = 0; i < this.self.valueToColourMap.length; i++) {
-											var color = this.self.valueToColourMap[i][value];
+
+										for (var i = 0; i < this.self.characteristicList.length; i++) {
+											var color = this.self.characteristicList[i][value];
 										}
 										if (color == null) {
-											/**
-											 * // for (var i=0; i<this.self.characteristicList.length;i++){ //
-											 * if (value.toLowerCase() ===
-											 * this.self.characteristicList[i]) {
-											 * value=property.displayValue;
-											 * this.self.characteristicList.push(value);
-											 * color =
-											 * this.self.colors[colorIndex];
-											 * this.self.valueToColourMap.push([value," :
-											 * <font color='"+color+"'>"+color+"</font>\n"]);
-											 * colorIndex++; // } // }
-											 */
+								/**		var pushvalue = "<font color='"
+													+ this.self.colors[colorIndex]
+													+ "'>" + value
+													+ "</font><br>\n";
+											var vtcmStat = 'No';
 
-											if (value.toLowerCase() === "pathogenic") {
+											if (this.self.valueToColourMap.length == 0) {
+												this.self.valueToColourMap.push([ pushvalue ]);
 												color = this.self.colors[colorIndex];
-											} else if (value.toLowerCase() === "benign") {
-												color = this.self.colors[colorIndex + 1];
-											} else if (value.toLowerCase() === "unknown") {
-												color = this.self.colors[colorIndex + 2];
+												colorIndex++;
 											}
+
+											for (var i = 0; i < this.self.valueToColourMap.length; i++) {
+												if (this.self.valueToColourMap[i] == pushvalue) {
+													vtcmStat = 'Yes';
+												}
+											}
+											if (vtcmStat == 'No') {
+												this.self.valueToColourMap
+														.push([ pushvalue ]);
+												color = this.self.colors[colorIndex];
+												colorIndex++;
+
+											}
+*/
+
+											
+											  if (value.toLowerCase() ===
+											  "pathogenic") { color =
+											  this.self.colors[colorIndex]; }
+											  else if (value.toLowerCase() ===
+											  "benign") { color =
+											  this.self.colors[colorIndex + 1]; }
+											  else if (value.toLowerCase() ===
+											  "unknown") { color =
+											  this.self.colors[colorIndex + 2]; }
+										
 
 										}
 									}
@@ -468,12 +486,16 @@ Ext
 										if (color == null) {
 
 											if (value.toLowerCase() === 'undefined') {
-												color = 'darkgray';
-											} else if (value.toLowerCase() === "normal") {
+												color = 'grey';
+											} else if (value.toLowerCase() === "ng 385k") {
 												color = this.self.colors[colorIndex];
-											} else if (value.toLowerCase() === "abnormal") {
+											} else if (value.toLowerCase() === "ag 105k") {
 												color = this.self.colors[colorIndex + 1];
-											} else if (value.toLowerCase() === "uncertain") {
+											} else if (value.toLowerCase() === "ag 105") {
+												color = this.self.colors[colorIndex + 2];
+											} else if (value.toLowerCase() === "affy 2.7m") {
+												color = this.self.colors[colorIndex + 2];
+											} else if (value.toLowerCase() === "sg 1mb") {
 												color = this.self.colors[colorIndex + 2];
 											}
 										}
@@ -481,41 +503,10 @@ Ext
 								}
 							}
 
-						}else color ="grey";
+						} else
+							color = "grey";
 						return color;
 					},
-
-					/**
-					 * hexToColorName : function(hex){ var colours = {"#f0f8ff":
-					 * "aliceblue","#faebd7":"antiquewhite","#00ffff":"aqua","#7fffd4":"aquamarine","#f0ffff":"azure",
-					 * "#f5f5dc":"beige","#ffe4c4":"bisque","#000000":"black","#ffebcd":"blanchedalmond","#0000ff":"blue","#8a2be2":"blueviolet","#a52a2a":"brown","#deb887":"burlywood",
-					 * "#5f9ea0":"cadetblue","#7fff00":"chartreuse","#d2691e":"chocolate","#ff7f50":"coral","#6495ed":"cornflowerblue","#fff8dc":"cornsilk","#dc143c":"crimson","#00ffff":"cyan",
-					 * "#00008b":"darkblue","#008b8b":"darkcyan","#b8860b":"darkgoldenrod","#a9a9a9":"darkgray","#006400":"darkgreen","#bdb76b":"darkkhaki","#8b008b":"darkmagenta","#556b2f":"darkolivegreen",
-					 * "#ff8c00":"darkorange","#9932cc":"darkorchid","#8b0000":"darkred","#e9967a":"darksalmon","#8fbc8f":"darkseagreen","#483d8b":"darkslateblue","#2f4f4f":"darkslategray","#00ced1":"darkturquoise",
-					 * "#9400d3":"darkviolet","#ff1493":"deeppink","#00bfff":"deepskyblue","#696969":"dimgray","#1e90ff":"dodgerblue",
-					 * "#b22222":"firebrick","#fffaf0":"floralwhite","#228b22":"forestgreen","#ff00ff":"fuchsia",
-					 * "#dcdcdc":"gainsboro","#f8f8ff":"ghostwhite","#ffd700":"gold","#daa520":"goldenrod","#808080":"gray","#008000":"green","#adff2f":"greenyellow",
-					 * "#f0fff0":"honeydew","#ff69b4":"hotpink",
-					 * "#cd5c5c":"indianred","#4b0082":"indigo","#fffff0":"ivory","#f0e68c":"khaki",
-					 * "#e6e6fa":"lavender","#fff0f5":"lavenderblush","#7cfc00":"lawngreen","#fffacd":"lemonchiffon","#add8e6":"lightblue","#f08080":"lightcoral","#e0ffff":"lightcyan","#fafad2":"lightgoldenrodyellow",
-					 * "#d3d3d3":"lightgrey","#90ee90":"lightgreen","#ffb6c1":"lightpink","#ffa07a":"lightsalmon","#20b2aa":"lightseagreen","#87cefa":"lightskyblue","#778899":"lightslategray","#b0c4de":"lightsteelblue",
-					 * "#ffffe0":"lightyellow","#00ff00":"lime","#32cd32":"limegreen","#faf0e6":"linen",
-					 * "#ff00ff":"magenta","#800000":"maroon","#66cdaa":"mediumaquamarine","#0000cd":"mediumblue","#ba55d3":"mediumorchid","#9370d8":"mediumpurple","#3cb371":"mediumseagreen","#7b68ee":"mediumslateblue",
-					 * "#00fa9a":"mediumspringgreen","#48d1cc":"mediumturquoise","#c71585":"mediumvioletred","#191970":"midnightblue","#f5fffa":"mintcream","#ffe4e1":"mistyrose","#ffe4b5":"moccasin",
-					 * "#ffdead":"navajowhite","#000080":"navy",
-					 * "#fdf5e6":"oldlace","#808000":"olive","#6b8e23":"olivedrab","#ffa500":"orange","#ff4500":"orangered","#da70d6":"orchid",
-					 * "#eee8aa":"palegoldenrod","#98fb98":"palegreen","#afeeee":"paleturquoise","#d87093":"palevioletred","#ffefd5":"papayawhip","#ffdab9":"peachpuff","#cd853f":"peru","#ffc0cb":"pink","#dda0dd":"plum","#b0e0e6":"powderblue","#800080":"purple",
-					 * "#ff0000":"red","#bc8f8f":"rosybrown","#4169e1":"royalblue",
-					 * "#8b4513":"saddlebrown","#fa8072":"salmon","#f4a460":"sandybrown","#2e8b57":"seagreen","#fff5ee":"seashell","#a0522d":"sienna","#c0c0c0":"silver","#87ceeb":"skyblue","#6a5acd":"slateblue","#708090":"slategray","#fffafa":"snow","#00ff7f":"springgreen","#4682b4":"steelblue",
-					 * "#d2b48c":"tan","#008080":"teal","#d8bfd8":"thistle","#ff6347":"tomato","#40e0d0":"turquoise",
-					 * "#ee82ee":"violet",
-					 * "#f5deb3":"wheat","#ffffff":"white","#f5f5f5":"whitesmoke",
-					 * "#ffff00":"yellow","#9acd32":"yellowgreen","#99CC00"
-					 * :"pistachio", "3366FF":"primary(blue)" };
-					 * 
-					 * if (typeof colours[hex.toLowerCase()] != 'undefined')
-					 * return colours[hex.toLowerCase()]; else return hex; },
-					 */
 
 					/**
 					 * @public
@@ -528,7 +519,7 @@ Ext
 							start : variant.genomicRange.baseStart,
 							end : variant.genomicRange.baseEnd,
 							color : "rgb(128,128,128)",// "rgba(0,0,0,
-														// 0.4)",//grey
+							// 0.4)",//grey
 							emphasize : false
 						};
 
@@ -552,15 +543,16 @@ Ext
 					 *            property
 					 */
 					drawHighlightedVariant : function(variant, property) {
+						this.self.selectedVariants.push(variant);
 						/* VariantSegment */
 						var segment = {
 							start : variant.genomicRange.baseStart,
 							end : variant.genomicRange.baseEnd,
 							color : this.pickColor(variant, property),// red
-																		// "rgb(255,0,0)"
+							// "rgb(255,0,0)"
 							emphasize : false
 						};
-						this.selectedVariants.push(variant);
+
 						// pick track layer
 						for (var trackIndex = 0; trackIndex < this.trackLayers.length; trackIndex++) {
 							var layer = this.trackLayers[trackIndex];
@@ -718,13 +710,13 @@ Ext
 										displayScaleFactor);
 
 						if (Math.round(yStart) === Math.round(yEnd)) { // Too
-																		// small
-																		// to
-																		// display?
-																		// bump
-																		// to 1
-																		// pixel
-																		// size.
+							// small
+							// to
+							// display?
+							// bump
+							// to 1
+							// pixel
+							// size.
 							yEnd += 1;
 						}
 
