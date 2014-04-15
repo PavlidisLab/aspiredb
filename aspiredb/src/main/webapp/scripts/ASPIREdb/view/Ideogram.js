@@ -503,20 +503,32 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	        	
 	        	
 	        }
-	        this.displayedProperty=property;	
+	        this.displayedProperty=property;
+	        this.displayedProperty.displayType =propertyValues;
+	        this.setDisplayedProperty(this.displayedProperty);
 	        
-			//chrIdeogram.drawVariant(variant, this.displayedProperty);
-						
+	        if(this.selectedSubjectIds.length==0){
+	        	//default case for color coding [color coding selected, but no subject selected means all subjects selected]
+	        	chrIdeogram.drawVariant(variant, this.displayedProperty);
+	        }
+	        else{
+	        	//if subject and color coding both selected case
+	        	if (this.selectedSubjectIds.indexOf(variant.subjectId) ==-1){
+	        		//color not selected subject variants in grey
+					chrIdeogram.drawDimmedVariant(variant);
+				}else{
+					//color selected subject variants in color based on selected property
+					chrIdeogram.drawHighlightedVariant(variant, this.displayedProperty);
+				}
+	        }
+	        
+							
 		}
 		
-		this.displayedProperty.displayType =propertyValues;
-		for ( var i = 0; i < variants.length; i++) {
-			var variant = variants[i];
-			this.displayedProperty=property;
-			chrIdeogram.drawVariant(variant, this.displayedProperty);
-		}	
+		//this.displayedProperty.displayType =propertyValues;
 		
-		this.setDisplayedProperty(this.displayedProperty);
+		
+		//this.setDisplayedProperty(this.displayedProperty);
 		
 		var valuetoColourArray =[];
 		

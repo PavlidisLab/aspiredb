@@ -61,183 +61,143 @@ Ext
 						nextColourIndex : 0,
 						/** @type {Object.<string,string>} */
 						valueToColourMap : [],
-						characteristicList : [],
+						characteristicList : {},
 						selectedVariants : [],
 						resetDisplayProperty : function(property) {
 							this.selectedVariants = [];
+							
+							
 							if (property.displayType != undefined) {
 
-								// if variant type property : CNV, SNV, indel,
-								// translocation, inversion
+								// if variant type property : CNV, SNV, indel,translocation, inversion
 								if (property instanceof VariantTypeProperty) {
-									this.nextColourIndex = 0;
-									if (property.displayType.indexOf('CNV') != -1)
-										this.valueToColourMap
-												.push([ "<font color='"
-														+ this.colors[this.nextColourIndex]
-														+ "'>" + "CNV"
-														+ "</font><br>\n" ]);
-									if (property.displayType.indexOf('SNV') != -1)
-										this.valueToColourMap
-												.push([ "<font color='"
-														+ this.colors[++this.nextColourIndex]
-														+ "'>" + "SNV"
-														+ "</font><br>\n" ]);
-									if (property.displayType.indexOf('indel') != -1)
-										this.valueToColourMap
-												.push([ "<font color='"
-														+ this.colors[++this.nextColourIndex]
-														+ "'>" + "Indel"
-														+ "</font><br>\n" ]);
-									if (property.displayType
-											.indexOf('translocation') != -1)
-										this.valueToColourMap
-												.push([ "<font color='"
-														+ this.colors[++this.nextColourIndex]
-														+ "'>"
-														+ "Translocation"
-														+ "</font><br>\n" ]);
-									if (property.displayType
-											.indexOf('inversion') != -1)
-										this.valueToColourMap
-												.push([ "<font color='"
-														+ this.colors[++this.nextColourIndex]
-														+ "'>" + "Inversion"
-														+ "</font><br>\n" ]);
+									
+									for (var i = 0; i < property.displayType.length; i++) {
+										var value = property.displayType[i];
+										if (this.characteristicList.length == 0
+												|| this.characteristicList[value] == undefined) {
+											this.valueToColourMap.push([ "<font color='"
+															+ this.colors[this.nextColourIndex]
+															+ "'>"
+															+ value
+															+ "</font><br>\n" ]);
+											this.characteristicList[value] = this.colors[this.nextColourIndex];
+											this.nextColourIndex++;
+									}
+								  }
+									
 								}
 
 								// if CNV type : LOSS, GAIN
 								if (property instanceof CNVTypeProperty) {
-									this.nextColourIndex = 0;
-									if (property.displayType.indexOf('LOSS') != -1)
-										this.valueToColourMap
-												.push([ "<font color='"
-														+ this.colors[this.nextColourIndex]
-														+ "'>" + "LOSS"
-														+ "</font><br>\n" ]);
-									if (property.displayType.indexOf('GAIN') != -1)
-										this.valueToColourMap
-												.push([ "<font color='"
-														+ this.colors[++this.nextColourIndex]
-														+ "'>" + "GAIN"
-														+ "</font><br>\n" ]);
+									for (var i = 0; i < property.displayType.length; i++) {
+										var value = property.displayType[i];
+										if (this.characteristicList.length == 0
+												|| this.characteristicList[value] == undefined) {
+											this.valueToColourMap.push([ "<font color='"
+															+ this.colors[this.nextColourIndex]
+															+ "'>"
+															+ value
+															+ "</font><br>\n" ]);
+											this.characteristicList[value] = this.colors[this.nextColourIndex];
+											this.nextColourIndex++;
+									}
+								  }
 								}
 
-								// if Characteristic type : benign, pathogenic,
-								// unknown
+								// if Characteristic type : benign, pathogenic, unknown
 								if (property instanceof CharacteristicProperty) {
 
 									if (property.name == 'Characteristics') {
-
-										this.nextColourIndex = 0;
-										this.characteristicList = [];
+										
 										for (var i = 0; i < property.displayType.length; i++) {
 											var value = property.displayType[i];
 											if (this.characteristicList.length == 0
-													|| this.characteristicList
-															.indexOf(value) == -1) {
-												this.valueToColourMap
-														.push([ "<font color='"
+													|| this.characteristicList[value] == undefined) {
+												this.valueToColourMap.push([ "<font color='"
 																+ this.colors[this.nextColourIndex]
 																+ "'>"
 																+ value
 																+ "</font><br>\n" ]);
-												this.characteristicList
-														.push(value);
-												++this.nextColourIndex;
-											}
+												this.characteristicList[value] = this.colors[this.nextColourIndex];
+												this.nextColourIndex++;
 										}
+									  }
 									}
 
 									if (property.name == 'Inheritance') {
-										this.nextColourIndex = 0;
-										this.characteristicList = [];
+										
 										for (var i = 0; i < property.displayType.length; i++) {
 											var value = property.displayType[i];
-											if (this.characteristicList.length == 0
-													|| this.characteristicList
-															.indexOf(value) == -1) {
-												this.valueToColourMap
-														.push([ "<font color='"
+											if (this.characteristicList.length == 0 || this.characteristicList[value] == undefined) {
+												this.valueToColourMap.push([ "<font color='"
 																+ this.colors[this.nextColourIndex]
 																+ "'>"
 																+ value
 																+ "</font><br>\n" ]);
-												this.characteristicList
-														.push(value);
-												++this.nextColourIndex;
+												this.characteristicList[value]= this.colors[this.nextColourIndex];
+												this.nextColourIndex++;
 											}
 										}
 									}
 
 									if (property.name == 'Common CNV') {
-										this.nextColourIndex = 0;
-										this.characteristicList = [];
+									
 										for (var i = 0; i < property.displayType.length; i++) {
 											var value = property.displayType[i];
-											if (this.characteristicList.length == 0
-													|| this.characteristicList
-															.indexOf(value) == -1) {
-												this.valueToColourMap
-														.push([ "<font color='"
+											if (this.characteristicList.length == 0 || this.characteristicList[value] == undefined) {
+												this.valueToColourMap.push([ "<font color='"
 																+ this.colors[this.nextColourIndex]
 																+ "'>"
 																+ value
 																+ "</font><br>\n" ]);
-												this.characteristicList
-														.push(value);
-												++this.nextColourIndex;
+												this.characteristicList[value] = this.colors[this.nextColourIndex];
+												this.nextColourIndex++;
 											}
 										}
 									}
 
 									if (property.name == 'Array Report') {
-										this.nextColourIndex = 0;
-										this.characteristicList = [];
+								
 										for (var i = 0; i < property.displayType.length; i++) {
 											var value = property.displayType[i];
-											if (this.characteristicList.length == 0
-													|| this.characteristicList
-															.indexOf(value) == -1) {
-												this.valueToColourMap
-														.push([ "<font color='"
+											if (this.characteristicList.length == 0 || this.characteristicList[value] == undefined) {
+												this.valueToColourMap.push([ "<font color='"
 																+ this.colors[this.nextColourIndex]
 																+ "'>"
 																+ value
 																+ "</font><br>\n" ]);
-												this.characteristicList
-														.push(value);
-												++this.nextColourIndex;
+												this.characteristicList[value] = this.colors[this.nextColourIndex];
+												this.nextColourIndex++;
 											}
 										}
 
 									}
 
 									if (property.name == 'Array Platform') {
-										this.nextColourIndex = 0;
-										this.characteristicList = [];
+									
 										for (var i = 0; i < property.displayType.length; i++) {
 											var value = property.displayType[i];
-											if (this.characteristicList.length == 0
-													|| this.characteristicList
-															.indexOf(value) == -1) {
-												this.valueToColourMap
-														.push([ "<font color='"
+											if (this.characteristicList.length == 0 || this.characteristicList[value] == undefined) {
+												this.valueToColourMap.push([ "<font color='"
 																+ this.colors[this.nextColourIndex]
 																+ "'>"
 																+ value
 																+ "</font><br>\n" ]);
-												this.characteristicList
-														.push(value);
-												++this.nextColourIndex;
+												this.characteristicList[value]= this.colors[this.nextColourIndex];
+												this.nextColourIndex++;
 											}
 										}
 									}
 
 								}
 
-							} else
+							} else{
+								this.characteristicList = {};
 								this.valueToColourMap = [];
+								this.nextColourIndex=0;
+							}
+								
 
 						}
 					},
@@ -258,39 +218,23 @@ Ext
 
 						var value = null;
 						var colorIndex = 0;
-						var sVstat = 'No';
-						if (this.self.selectedVariants.length == 0) {
-							sVstat = 'Yes';
-						} else if (this.self.selectedVariants.length > 0) {
-							for (var j = 0; j < this.self.selectedVariants.length; j++) {
-								if (this.self.selectedVariants[j] == variant)
-									sVstat = 'Yes';
-							}
-						}
-						if (sVstat == 'Yes') {
-
+		
 							// if variant type property : CNV, SNV, indel,
 							// translocation, inversion
 							if (property instanceof VariantTypeProperty) {
 								property.name = variant.variantType;
 								value = variant.variantType;
 
-								var color = this.self.valueToColourMap[value];
+								var color = this.self.characteristicList[value];
 								if (color == null) {
-									if (value.toLowerCase() === "cnv") {
-										color = this.self.colors[colorIndex];
-									} else if (value.toLowerCase() === "snv") {
-										color = this.self.colors[++colorIndex];
-									} else if (value.toLowerCase() === "indel") {
-										colorIndex++;
-										color = this.self.colors[++colorIndex];
-									} else if (value.toLowerCase() === "translocation") {
-										colorIndex++;
-										color = this.self.colors[++colorIndex];
-									} else if (value.toLowerCase() === "inversion") {
-										colorIndex++;
-										color = this.self.colors[++colorIndex];
-									}
+									var pushvalue = "<font color='"
+										+ this.self.colors[this.self.nextColourIndex]
+										+ "'>" + value
+										+ "</font><br>\n";
+									color = this.self.colors[this.self.nextColourIndex];
+									this.self.valueToColourMap.push([ pushvalue]);	
+									this.self.characteristicList[value] =color;
+									this.self.nextColourIndex++;
 
 								}
 							}
@@ -299,14 +243,18 @@ Ext
 							if (property instanceof CNVTypeProperty) {
 								value = variant.type;
 
-								var color = this.self.valueToColourMap[value];
+								var color = this.self.characteristicList[value];
 								if (color == null) {
-									if (value.toLowerCase() === "loss") {
-										color = this.self.colors[colorIndex];
-									} else if (value.toLowerCase() === "gain") {
-										color = this.self.colors[++colorIndex];
-									}
-
+									
+										var pushvalue = "<font color='"
+										+ this.self.colors[this.self.nextColourIndex]
+										+ "'>" + value
+										+ "</font><br>\n";
+									color = this.self.colors[this.self.nextColourIndex];
+									this.self.valueToColourMap.push([ pushvalue]);	
+									this.self.characteristicList[value] =color;
+									this.self.nextColourIndex++;				
+								
 								}
 							}
 
@@ -392,119 +340,87 @@ Ext
 
 									if (property.name == 'Characteristics') {
 
-										for (var i = 0; i < this.self.characteristicList.length; i++) {
-											var color = this.self.characteristicList[i][value];
-										}
-										if (color == null) {
-								/**		var pushvalue = "<font color='"
-													+ this.self.colors[colorIndex]
+										var color = this.self.characteristicList[value];
+										
+										if (color == null) {									
+																			
+												var pushvalue = "<font color='"
+													+ this.self.colors[this.self.nextColourIndex]
 													+ "'>" + value
 													+ "</font><br>\n";
-											var vtcmStat = 'No';
-
-											if (this.self.valueToColourMap.length == 0) {
-												this.self.valueToColourMap.push([ pushvalue ]);
-												color = this.self.colors[colorIndex];
-												colorIndex++;
-											}
-
-											for (var i = 0; i < this.self.valueToColourMap.length; i++) {
-												if (this.self.valueToColourMap[i] == pushvalue) {
-													vtcmStat = 'Yes';
-												}
-											}
-											if (vtcmStat == 'No') {
-												this.self.valueToColourMap
-														.push([ pushvalue ]);
-												color = this.self.colors[colorIndex];
-												colorIndex++;
-
-											}
-*/
-
-											
-											  if (value.toLowerCase() ===
-											  "pathogenic") { color =
-											  this.self.colors[colorIndex]; }
-											  else if (value.toLowerCase() ===
-											  "benign") { color =
-											  this.self.colors[colorIndex + 1]; }
-											  else if (value.toLowerCase() ===
-											  "unknown") { color =
-											  this.self.colors[colorIndex + 2]; }
-										
+												color = this.self.colors[this.self.nextColourIndex];
+												this.self.valueToColourMap.push([ pushvalue]);	
+												this.self.characteristicList[value] =color;
+												this.self.nextColourIndex++;																			
 
 										}
 									}
 
 									if (property.name == 'Inheritance') {
-										var color = this.self.valueToColourMap[value];
+										
+										var color = this.self.characteristicList[value];
+										
 										if (color == null) {
-											if (value.toLowerCase() === "de novo") {
-												color = this.self.colors[colorIndex];
-											} else if (value.toLowerCase() === "maternal") {
-												color = this.self.colors[colorIndex + 1];
-											} else if (value.toLowerCase() === "paternal") {
-												color = this.self.colors[colorIndex + 2];
-											} else if (value.toLowerCase() === "unclassified") {
-												color = this.self.colors[colorIndex + 3];
-												console.log('unclassified : '
-														+ color);
-											}
-
+											
+											var pushvalue = "<font color='"
+												+ this.self.colors[this.self.nextColourIndex]
+												+ "'>" + value
+												+ "</font><br>\n";
+											color = this.self.colors[this.self.nextColourIndex];
+											this.self.valueToColourMap.push([ pushvalue]);		
+											this.self.characteristicList[value] =color;
+											this.self.nextColourIndex++;	
+										
 										}
 									}
 
 									if (property.name == 'Common CNV') {
-										var color = this.self.valueToColourMap[value];
+										var color = this.self.characteristicList[value];
 										if (color == null) {
-											if (value.toLowerCase() === "y") {
-												color = this.self.colors[colorIndex];
-											} else if (value.toLowerCase() === "n") {
-												color = this.self.colors[colorIndex + 1];
-											}
+											var pushvalue = "<font color='"
+												+ this.self.colors[this.self.nextColourIndex]
+												+ "'>" + value
+												+ "</font><br>\n";
+											color = this.self.colors[this.self.nextColourIndex];
+											this.self.valueToColourMap.push([ pushvalue]);	
+											this.self.characteristicList[value] =color;
+											this.self.nextColourIndex++;
 										}
 									}
 
 									if (property.name == 'Array Report') {
-										var color = this.self.valueToColourMap[value];
+										var color = this.self.characteristicList[value];
 										if (color == null) {
-											if (value.toLowerCase() === "normal") {
-												color = this.self.colors[colorIndex];
-											} else if (value.toLowerCase() === "abnormal") {
-												color = this.self.colors[colorIndex + 1];
-											} else if (value.toLowerCase() === "uncertain") {
-												color = this.self.colors[colorIndex + 2];
-											}
+											var pushvalue = "<font color='"
+												+ this.self.colors[this.self.nextColourIndex]
+												+ "'>" + value
+												+ "</font><br>\n";
+											color = this.self.colors[this.self.nextColourIndex];
+											this.self.valueToColourMap.push([ pushvalue]);	
+											this.self.characteristicList[value] =color;
+											this.self.nextColourIndex++;
 
 										}
 									}
 
 									if (property.name == 'Array Platform') {
 
-										var color = this.self.valueToColourMap[value];
+										var color = this.self.characteristicList[value];
 										if (color == null) {
 
-											if (value.toLowerCase() === 'undefined') {
-												color = 'grey';
-											} else if (value.toLowerCase() === "ng 385k") {
-												color = this.self.colors[colorIndex];
-											} else if (value.toLowerCase() === "ag 105k") {
-												color = this.self.colors[colorIndex + 1];
-											} else if (value.toLowerCase() === "ag 105") {
-												color = this.self.colors[colorIndex + 2];
-											} else if (value.toLowerCase() === "affy 2.7m") {
-												color = this.self.colors[colorIndex + 2];
-											} else if (value.toLowerCase() === "sg 1mb") {
-												color = this.self.colors[colorIndex + 2];
-											}
+											var pushvalue = "<font color='"
+												+ this.self.colors[this.self.nextColourIndex]
+												+ "'>" + value
+												+ "</font><br>\n";
+											color = this.self.colors[this.self.nextColourIndex];
+											this.self.valueToColourMap.push([ pushvalue]);	
+											this.self.characteristicList[value] =color;
+											this.self.nextColourIndex++;
 										}
 									}
 								}
 							}
 
-						} else
-							color = "grey";
 						return color;
 					},
 

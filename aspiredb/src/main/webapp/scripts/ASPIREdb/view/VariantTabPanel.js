@@ -46,7 +46,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		// selected subjects records in the grid
 		selectedVariants : [],
 		loadedSubjects : [],
-		selectedSubjectVariants: [],
+		selectedSubjects: [],
 		loadedVariants:[],
 		property: new VariantTypeProperty(),
 		// the current filters used
@@ -188,15 +188,17 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		ASPIREdb.EVENT_BUS.on('filter_submit', this.filterSubmitHandler, this);
         
         // when subject label change
-        ASPIREdb.EVENT_BUS.on('label_variant_change',this.refreshGridView, this);
+        ASPIREdb.EVENT_BUS.on('variant_label_changed',this.variantLabelUpdateHandler, this);
+        
+        //when variant label created
+        ASPIREdb.EVENT_BUS.on('variant_label_created', this.variantLabelUpdateHandler,this);
+        
         //when variant label changes
-        ASPIREdb.EVENT_BUS.on('label_subject_change', this.subjectlabelModifiedHandler,this);
+        ASPIREdb.EVENT_BUS.on('subject_label_changed', this.subjectLabelUpdateHandler,this);
         
         //when subject label created
-        ASPIREdb.EVENT_BUS.on('subject_label_created', this.subjectlabelAddedHandler,this);
-        
-      //when variant label created
-        ASPIREdb.EVENT_BUS.on('variant_label_created', this.refreshGridView,this);
+        ASPIREdb.EVENT_BUS.on('subject_label_created', this.subjectLabelUpdateHandler,this);
+           
 		
 		ASPIREdb.EVENT_BUS.on('property_changed', function(property){
 			ref.property =[];
@@ -214,22 +216,18 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 		
 		this.saveButton.on('click', function() {
 			ref.saveButtonHandler();
-
 		});
 		
 		this.exportButton.on('click', function() {
 			ref.exportButtonHandler();
-
 		});
 		
 		this.zoomInButton.on('click', function() {
 			ref.zoomInButtonHandler();
-
 		});
 		
 		this.zoomOutButton.on('click', function() {
 			ref.zoomOutButtonHandler();
-
 		});
 
 		// selection is GenomicRange{baseEnd, baseStart, chromosome}
@@ -339,32 +337,25 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
     /**
      * Refresh grid view by reloading data from database because it was updated
      */
-    refreshGridView : function() {
+    variantLabelUpdateHandler : function() {
         var me = this;
         me.filterSubmitHandler(me.filterConfigs);
       
+        //refresh the variant in grid
         me.down('#variantGrid').getView().refresh();
+        
         //refresh the variant labels in ideogram
         var property =new VariantLabelProperty();
         property.name ='Labels';
   	  	property.displayName ='Variant Labels';
         this.redrawIdeogram(property);
     },
+
     /**
      * Refresh the selected subjects in ideogram
      */
-    subjectlabelModifiedHandler: function(labelIds) {
-    	//this.filterSubmitHandler(this.filterConfigs);
-    	//ASPIREdb.EVENT_BUS.on('property_changed',function(){
-    	var property =new SubjectLabelProperty();
-		property.name ='Subject Labels';
-  	    property.displayName ='Subject Label';
-  	  ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
-        this.redrawIdeogram(property);
-    	//});
-    },
-    
-    subjectlabelAddedHandler: function() {
+    subjectLabelUpdateHandler: function() {
+    	this.filterSubmitHandler(this.filterConfigs);
     	var ideogram = this.getComponent('ideogram');
 
     	if (ideogram.colourLegend.isVisible()){
@@ -373,10 +364,9 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
     		var property =new SubjectLabelProperty();
     		property.name ='Subject Labels';
     		property.displayName ='Subject Label';
-    		ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);    		
+    		//ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);    		
     		this.redrawIdeogram(property);
-    		
-    		//ideogram.refreshColourLegend();
+
     	}
     },
     
@@ -477,8 +467,6 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	 */
 	redrawIdeogram : function(property){
 		  var ideogram = this.getComponent('ideogram');
-		  
-		  this.filterSubmitHandler(this.filterConfigs);
 		 		  
 		  ideogram.setDisplayedProperty(property);
 		  ideogram.drawChromosomes();
@@ -490,7 +478,7 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 	 */
 	subjectSelectionHandler :function(subjectIds) {
 		var projectIds= ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
-		
+		this.selectedSubjects=subjectIds;
 		var grid = this.down('#variantGrid');
 		
 		
@@ -505,22 +493,20 @@ Ext.define('ASPIREdb.view.VariantTabPanel', {
 					callback : function(selectedSubjectValueObjects) {					
 							for ( var i = 0; i < selectedSubjectValueObjects.length ; i++) {
 								var selectedSubjectValueObjects = selectedSubjectValueObjects[i];
-								grid.features[0].expand(selectedSubjectValueObjects.patientId, true);
-								this.selectedSubjectVariants=selectedSubjectValueObjects.patientId;	
-							}
-							
-					}
-									
+								grid.features[0].expand(selectedSubjectValueObjects.patientId, true);								
+							}							
+					}									
 			});
 
 		}
 		//When Ideogram view selected
 		else {
 			console.log("when the variant ideogram is selected");
-						
+			
 			var ideogram = this.getComponent('ideogram');
 			ideogram.drawChromosomes();
 			var ref=this;
+			
 			
 			//heighlight the selected subject in ideogram
 			SubjectService.getSubjects(projectIds[0],subjectIds, {

@@ -61,6 +61,8 @@ public interface VariantService {
             
     public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext)
             throws  BioMartServiceException, NeurocartaServiceException;
+    
+    public Collection<PropertyValue> suggestGeneValues(SuggestionContext suggestionContext) throws BioMartServiceException, NeurocartaServiceException ;
 
     @Deprecated
     public Collection<String> suggestCharacteristicPropertyValues(CharacteristicProperty property);

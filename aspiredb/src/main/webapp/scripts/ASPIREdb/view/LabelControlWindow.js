@@ -206,9 +206,9 @@ Ext.define('ASPIREdb.view.LabelControlWindow',
 	                            callback : function() {
 	                            	me.down('#labelSettingsGrid').getView().refresh();
 	                                if( me.isSubjectLabel ) {
-	                                    ASPIREdb.EVENT_BUS.fireEvent('label_subject_change');
+	                                    ASPIREdb.EVENT_BUS.fireEvent('subject_label_changed');
 	                                } else {
-	                                    ASPIREdb.EVENT_BUS.fireEvent('label_variant_change');
+	                                    ASPIREdb.EVENT_BUS.fireEvent('variant_label_changed');
 	                                }
 	                            }
 	                        });
@@ -274,7 +274,7 @@ Ext.define('ASPIREdb.view.LabelControlWindow',
                                     LabelService.deleteSubjectLabels( labels, {
                                         callback : function() {
                                             //me.down('#labelSettingsGrid').store.removeAt(rowIndex);
-                                            ASPIREdb.EVENT_BUS.fireEvent('label_subject_change', me.selectedIds);
+                                            ASPIREdb.EVENT_BUS.fireEvent('subject_label_changed', me.selectedIds);
                                             me.destroy();
                                         }
                                     });
@@ -286,7 +286,7 @@ Ext.define('ASPIREdb.view.LabelControlWindow',
                                 if (btn === 'yes') {
                                     LabelService.removeLabelsFromSubjects( labels, me.selectedIds, {
                                         callback : function() {
-                                            ASPIREdb.EVENT_BUS.fireEvent('label_subject_change', me.selectedIds);
+                                            ASPIREdb.EVENT_BUS.fireEvent('subject_label_changed', me.selectedIds);
                                             me.destroy();
                                         }
                                     });
@@ -303,7 +303,7 @@ Ext.define('ASPIREdb.view.LabelControlWindow',
                                 if (btn === 'yes') {
                                     LabelService.deleteVariantLabels( labels, {
                                         callback : function() {
-                                            ASPIREdb.EVENT_BUS.fireEvent('label_variant_change', me.selectedIds);
+                                            ASPIREdb.EVENT_BUS.fireEvent('variant_label_changed', me.selectedIds);
                                             me.destroy();
                                         }
                                     });
@@ -315,7 +315,7 @@ Ext.define('ASPIREdb.view.LabelControlWindow',
                                 if (btn === 'yes') {
                                     LabelService.removeLabelsFromVariants( labels, me.selectedIds, {
                                         callback : function() {
-                                            ASPIREdb.EVENT_BUS.fireEvent('label_variant_change', me.selectedIds);
+                                            ASPIREdb.EVENT_BUS.fireEvent('variant_label_changed', me.selectedIds);
                                             me.destroy();
                                         }
                                     } );
@@ -366,9 +366,9 @@ Ext.define('ASPIREdb.view.LabelControlWindow',
 						LabelService.updateLabel(label, {
                             callback : function() {
                                 if( me.isSubjectLabel ) {
-                                    ASPIREdb.EVENT_BUS.fireEvent('label_subject_change');
+                                    ASPIREdb.EVENT_BUS.fireEvent('subject_label_changed');
                                 } else {
-                                    ASPIREdb.EVENT_BUS.fireEvent('label_variant_change');
+                                    ASPIREdb.EVENT_BUS.fireEvent('variant_label_changed');
                                 }
                             }
                         });
