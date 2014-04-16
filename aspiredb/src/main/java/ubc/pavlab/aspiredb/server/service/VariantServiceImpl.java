@@ -217,30 +217,22 @@ public class VariantServiceImpl implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<PropertyValue> suggestGeneValues(SuggestionContext suggestionContext) throws BioMartServiceException, NeurocartaServiceException {
-    	Property property = new GeneProperty();
-    
-        List<PropertyValue> values = new ArrayList<PropertyValue>();
-        if (property instanceof GeneProperty) {
+    public Collection<GeneProperty> suggestGeneValues(SuggestionContext suggestionContext) throws BioMartServiceException, NeurocartaServiceException {
+    	    
+    	Collection<GeneProperty> geneSymbols = new ArrayList<GeneProperty>();
+       
             String query = suggestionContext.getValuePrefix();
             if (query.length() >= 2) {
                 final Collection<GeneValueObject> genes = bioMartQueryService.findGenes(query);
                 for (GeneValueObject gene : genes) {
-                    values.add(new PropertyValue<GeneValueObject>(gene));
+                	GeneProperty geneProperty = new GeneProperty();
+                    geneProperty.setName(gene.getName());
+                    geneProperty.setDisplayName(gene.getSymbol());
+                    geneSymbols.add(geneProperty);
                 }
             }
-        } else if (property instanceof GenomicLocationProperty) {
-            values.addAll(suggestVariantLocationValues(property, suggestionContext));
-        } else if (property instanceof TextProperty) {
-            Collection<String> stringValues = ((TextProperty) property).getDataType().getAllowedValues();
-            if (stringValues.isEmpty()) {
-                stringValues = variantDao.suggestValuesForEntityProperty(property, suggestionContext);
-            }
-            for (String stringValue : stringValues) {
-                values.add(new PropertyValue<TextValue>(new TextValue(stringValue)));
-            }
-        }
-        return values;
+        
+        return geneSymbols;
     }
 
     @Override

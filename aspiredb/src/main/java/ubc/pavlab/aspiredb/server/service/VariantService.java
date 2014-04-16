@@ -21,6 +21,7 @@ import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.CharacteristicProperty;
+import ubc.pavlab.aspiredb.shared.query.GeneProperty;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.PropertyValue;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
@@ -62,7 +63,7 @@ public interface VariantService {
     public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext)
             throws  BioMartServiceException, NeurocartaServiceException;
     
-    public Collection<PropertyValue> suggestGeneValues(SuggestionContext suggestionContext) throws BioMartServiceException, NeurocartaServiceException ;
+    public Collection<GeneProperty> suggestGeneValues(SuggestionContext suggestionContext) throws BioMartServiceException, NeurocartaServiceException ;
 
     @Deprecated
     public Collection<String> suggestCharacteristicPropertyValues(CharacteristicProperty property);

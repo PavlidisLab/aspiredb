@@ -19,7 +19,8 @@
 Ext.require([
     'Ext.data.Store',
     'ASPIREdb.model.PropertyValue',
-    'ASPIREdb.ActiveProjectSettings'
+    'ASPIREdb.ActiveProjectSettings',
+    'ASPIREdb.model.GeneProperty'
 ]);
 
 Ext.define('ASPIREdb.GeneSuggestionStore', {
@@ -27,11 +28,12 @@ Ext.define('ASPIREdb.GeneSuggestionStore', {
     model: 'ASPIREdb.model.GeneProperty',
 
     suggestionContext: null,
-
+    property: null,
+    
     constructor: function (config) {
         config.proxy = {
             type: 'dwr',
-            dwrFunction: VariantService.suggestValues,
+            dwrFunction: VariantService.suggestGeneValues,
             reader: {
                 type: 'json',
                 root: 'data',
@@ -40,12 +42,12 @@ Ext.define('ASPIREdb.GeneSuggestionStore', {
         };
         this.callParent(arguments);
     },
-
+      
     load: function(options) {
         this.suggestionContext = new SuggestionContext();
         this.suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds() ;
         this.suggestionContext.valuePrefix = options.params.query;
-        this.proxy.dwrParams = [new GeneProperty(),this.suggestionContext];
+        this.proxy.dwrParams = [this.suggestionContext];
         this.callParent(options);
     }
 });

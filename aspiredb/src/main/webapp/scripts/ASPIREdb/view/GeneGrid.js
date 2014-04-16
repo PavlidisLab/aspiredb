@@ -17,7 +17,8 @@
  *
  */
 
-Ext.require([ 'Ext.grid.*', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow', 'Ext.data.*','Ext.util.*', 'Ext.state.*', 'Ext.form.*' ]);
+Ext.require([ 'Ext.grid.*', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow', 'Ext.data.*','Ext.util.*', 'Ext.state.*', 'Ext.form.*' ,'ASPIREdb.GeneSuggestionStore','ASPIREdb.model.GeneProperty',
+      		'ASPIREdb.model.PropertyValue']);
 
 var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
     //clicksToMoveEditor: 1,
@@ -109,29 +110,38 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 	enableToolbar : function() {
 		
 		this.getDockedComponent('geneGridToolbar').removeAll();
-		var me=this;
-		
+				
 		this.getDockedComponent('geneGridToolbar').add({
 			xtype : 'combo',
 			id : 'geneName',
 			emptyText : 'Genes',			
-			//width :200,
+			width :200,
 			displayField : 'displayName',
 			triggerAction : 'query',
 			minChars : 0,
 			matchFieldWidth : false,
 			//hideTrigger : true,
-			autoSelect : true,
+			triggerAction : 'query',
+			autoSelect : false,
 			enableKeyEvents : true,
 			store : Ext.create('ASPIREdb.GeneSuggestionStore', {
-				remoteFunction : VariantService.suggestValues
-			}),
-			
+				remoteFunction : VariantService.suggestGeneValues
+			}),			
 			listConfig : {
 				loadingText : 'Searching...',
-				emptyText : 'No results found.'
+				emptyText : 'No results found.',
+				
 			},
+			listeners : {
+				select : {
+					fn : function(obj, records) {
+						// ASPIREdb.EVENT_BUS.fireEvent('query_update');
 	
+					},
+					scope : this
+					,
+				}
+			},
 	
 		});
 		
@@ -149,6 +159,7 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 			handler: function(){
 				//TODO: have to populate human taxon gene list auto complete features
 				var genesymbol =ref.down('#geneName').getValue();
+				console.log('added genes name  : '+genesymbol);
 				var geneSetName =ref.selectedGeneSet[0].data.geneSetName;
 				var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
 				var grid =panel.down ('#geneGrid');
