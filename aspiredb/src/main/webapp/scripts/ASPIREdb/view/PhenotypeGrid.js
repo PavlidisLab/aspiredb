@@ -17,7 +17,7 @@
  *
  */
 
-Ext.require([ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.PhenotypeEnrichmentWindow', 'Ext.grid.column.Column', 'ASPIREdb.view.NeurocartaGeneWindow']);
+Ext.require([ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.PhenotypeEnrichmentWindow', 'Ext.grid.column.Column', 'ASPIREdb.view.NeurocartaGeneWindow', 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow']);
 
 // TODO js documentation
 Ext.define('ASPIREdb.view.PhenotypeGrid', {
@@ -69,6 +69,12 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			tooltip : 'Download table contents as text',
 			icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
 						
+		},{
+			xtype : 'button',
+			text : 'Heatmap',
+			itemId : 'heatmapButton',
+			tooltip: 'View subject-phenotype heatmap',
+
 		}]
 
 	} ],
@@ -196,6 +202,8 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		this.callParent();
 
 		this.getDockedComponent('phenotypeGridToolbar').getComponent('analyzeButton').on('click', this.getPhenotypeEnrichment, this);
+		
+		this.getDockedComponent('phenotypeGridToolbar').getComponent('heatmapButton').on('click', this.viewHeatmap, this);
 		
 		var ref = this;
 		
@@ -593,6 +601,14 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			}
 		});
 
+	},
+	
+	viewHeatmap : function() {
+		console.log("view heatmap");
+		
+		
+		ASPIREdb.view.SubjectPhenotypeHeatmapWindow.show();
+		ASPIREdb.view.SubjectPhenotypeHeatmapWindow.draw();
 	},
 	
 	viewNeurocartaGenes : function(value, name){

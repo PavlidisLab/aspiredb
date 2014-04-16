@@ -32,6 +32,22 @@
 <script src="scripts/ASPIREdb/view/ideogram/ChromosomeIdeogram.js"></script>
 <script src="scripts/ASPIREdb/view/filter/FilterUtil.js"></script>
 
+<!--  matrix2viz -->
+<script src="scripts/lib/matrix2viz/third-party/clusterfck.js"></script>
+<script src="scripts/lib/matrix2viz/third-party/transpose.js"></script>
+<script src="scripts/lib/matrix2viz/examples/sample_data.js"></script>
+<script src="scripts/lib/matrix2viz/js/Cell.js"></script>
+<script src="scripts/lib/matrix2viz/js/Label.js"></script>
+<script src="scripts/lib/matrix2viz/js/LabelPanel.js"></script>
+<script src="scripts/lib/matrix2viz/js/Dendrogram.js"></script>
+<script src="scripts/lib/matrix2viz/js/Matrix.js"></script>
+<script src="scripts/lib/matrix2viz/js/DefaultControlPanel.js"></script>
+<script src="scripts/lib/matrix2viz/js/VerticalLabelNames.js"></script>
+<script src="scripts/lib/matrix2viz/js/HorizontalLabelNames.js"></script>
+<script src="scripts/lib/matrix2viz/js/ClusterHelper.js"></script>
+<script src="scripts/lib/matrix2viz/js/Matrix2Viz.js"></script>
+<!--script src="scripts/lib/matrix2viz/examples/matrixviz.js"></script-->
+
 <script>
 
 
