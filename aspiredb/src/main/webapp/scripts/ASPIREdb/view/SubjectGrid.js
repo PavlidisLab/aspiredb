@@ -165,7 +165,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		this.on('selectionchange', me.selectionChangeHandler, me);
 		
 		//when subject label change
-        ASPIREdb.EVENT_BUS.on('label_subject_change', this.refreshGridView, this);
+        ASPIREdb.EVENT_BUS.on('subject_Label_changed', this.refreshGridView, this);
 	},
 
 	/**
