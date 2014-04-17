@@ -210,17 +210,12 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 			me.invalidateResultCounts();
 		});
 		
-		//ASPIREdb.EVENT_BUS.on('overlapProject_selected', this.updateOverlappedProject, this);
-		
+				
 		this.updateSpecialProjectValues(); 
 		
 				
 	},
-	
-	updateOverlappedProject : function(projectId){
-		this.getOverlappedFilterConfigs(projectId); 
-		console.log('overlapped project config updated');
-	},
+
 
 	loadQueryHandler : function(filters) {
 
@@ -438,30 +433,7 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		return filterConfigs;
 	},
 	
-	getOverlappedFilterConfigs : function(projectId) {
-		/**
-		 * @type {Array.RestrictionFilterConfig}
-		 * Here we need to edit the project id to overlapped project id 
-		 */
-		var filterConfigs = [];
-		
-		var projectIds=[];
-		projectIds.push(projectId);
-		
-		var projectFilter = new ProjectFilterConfig();
-		projectFilter.projectIds = projectIds;
-		filterConfigs.push(projectFilter);
-		
-		var filterContainer = this.down('#filterContainer');
-		filterContainer.items.each(function(item, index, length) {
-			
-			var newFilterConfig = item.getFilterConfig();
-			newFilterConfig.projectIds=projectIds;
-			filterConfigs.push(newFilterConfig);
-		});
-
-		return filterConfigs;
-	},
+	
 
 	invalidateResultCounts: function() {
 		
@@ -483,9 +455,12 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 		var me=this;
 				
 		VariantService.suggestProperties(function(properties) {
+			//find the filer configs of the overlapped project
+			var overlappedFilterConfigs = me.getFilterConfigs();
+			var projectIds =[];
+			overlappedFilterConfigs[1].projectsIds = projectIds;
 			
-			
-		  QueryService.queryVariants(me.getOverlappedFilterConfigs(projectId), {
+		  QueryService.queryVariants(overlappedFilterConfigs, {
 			callback : function(pageLoad) {
 				
 				var vvos = pageLoad.items;								

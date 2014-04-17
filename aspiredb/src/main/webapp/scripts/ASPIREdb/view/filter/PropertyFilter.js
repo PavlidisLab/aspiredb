@@ -94,7 +94,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 
 	},
 	
-	//populate gene list in variant filter??????
+	//populate multi combo based on property combo selection 
 	populateMultiComboItem : function(restriction) {
 
 		var r = restriction;
@@ -181,11 +181,18 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			layout : {
 				type : 'vbox'
 			},
+			/**listeners: {                    
+			         highlightitem: function(view, node, eOpts) {
+			             this.setValue(node.innerText);
+			          }
+			  
+			 },*/
 			items : [ {
 				xtype : 'multivalue_combo',
 				itemId : 'multicombo',
 				width : 450,
 				height : 20,
+				enableKeyEvents : true,
 				suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
 			}, {
 				xtype : 'numberfield',
@@ -193,7 +200,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 				width : 450,
 				height : 20,
 				enableKeyEvents : true,
-				hidden : true
+				hidden : true				
 			}, {
 				xtype : 'label',
 				itemId : 'example',
@@ -289,8 +296,26 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 		});
 
 		propertyComboBox.getStore().on('load', function(store, records, successful) {
+			
+			var properties=[];
+			for (var i=0; i<records.length;i++){
+				properties.push(records[i].data.displayName);
+			}
+			//add Gene Set to the propterty list
+			properties.push('GeneSet');
+			var geneSetProperty= new Property();
+			geneSetProperty.displayName ='GeneSet';
+			geneSetProperty.name='GeneSet';			
+			store.data.add(geneSetProperty);	
+			
 			propertyComboBox.select(store.getAt(0));
+			
 			propertyComboBox.fireEvent('select', propertyComboBox, [ store.getAt(0) ]);
+		});
+		
+		propertyComboBox.getStore().on('datachanged', function(store, e0pts) {
+			console.log('datachanged fired');
+			
 		});
 	},
 	
