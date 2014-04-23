@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -86,6 +87,14 @@ public class GeneServiceImpl implements GeneService {
             throws NotLoggedInException, ExternalDependencyException {
         
         return this.neurocartaQueryService.fetchGenesAssociatedWithPhenotype(phenotypeValueUri);
+    }
+    
+    @Override
+    @RemoteMethod
+    public Map< String,GeneValueObject> findGenesAndURIsWithNeurocartaPhenotype(String phenotypeValueUri)
+            throws NotLoggedInException, ExternalDependencyException {
+        
+        return this.neurocartaQueryService.findPhenotypeGenes(phenotypeValueUri);
     }
 
 

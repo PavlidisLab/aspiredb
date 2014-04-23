@@ -21,6 +21,7 @@ import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Neurocarta query service
@@ -34,6 +35,9 @@ public interface NeurocartaQueryService {
 	
 	public Collection<NeurocartaPhenotypeValueObject> findPhenotypes( String queryString )
             throws NeurocartaServiceException;
+	
+	public Map< String,GeneValueObject> findPhenotypeGenes( String queryString )
+            throws NeurocartaServiceException, BioMartServiceException;
 
 	public List<NeurocartaPhenotypeValueObject> getPhenotypes( List<String> names )
             throws NeurocartaServiceException;
