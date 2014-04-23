@@ -26,13 +26,14 @@ Ext.define('ASPIREdb.view.filter.FilterPanel', {
     	},
     	items: [
     	    {xtype: 'label',
-    	    	
+    	    width : 900,	
         	text: this.title,
         	padding: '5 5 5 5'    },
         	{
         		xtype : 'image',
         		itemId: 'closeImage',
-    			margin : '5 5 5 750',
+    			margin : '5 5 5 5',
+        		cls :'margin-right:auto',
     			
     				src : 'scripts/ASPIREdb/resources/images/icons/cross.png',
     				listeners: {

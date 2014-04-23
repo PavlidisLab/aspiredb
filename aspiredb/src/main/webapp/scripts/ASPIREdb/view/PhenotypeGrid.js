@@ -17,7 +17,7 @@
  *
  */
 
-Ext.require([ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.PhenotypeEnrichmentWindow', 'Ext.grid.column.Column', 'ASPIREdb.view.NeurocartaGeneWindow', 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow']);
+Ext.require([ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.PhenotypeEnrichmentWindow', 'Ext.grid.column.Column', 'ASPIREdb.view.NeurocartaGeneWindow', 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow','ASPIREdb.view.PhenotypeSubjectLabelWindow']);
 
 // TODO js documentation
 Ext.define('ASPIREdb.view.PhenotypeGrid', {
@@ -25,7 +25,8 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	alias : 'widget.phenotypeGrid',
 	title : 'Phenotype',
 	id : 'phenotypeGrid',
-	disableSelection:true,
+	multiSelect : true,
+	//disableSelection:true,
 	
 
 	config : {
@@ -44,6 +45,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 
 		// collection of all the PhenotypeSummaryValueObject loaded
 		phenotypeSummaryValueObjects : [],
+		selPhenotypes :[],
 		
 	},
 	constructor : function(cfg) {
@@ -74,6 +76,14 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			text : 'Heatmap',
 			itemId : 'heatmapButton',
 			tooltip: 'View subject-phenotype heatmap',
+
+		},
+		{
+			xtype : 'button',
+			text : 'Assign Labels',
+			disabled : 'true',
+			itemId : 'subjectLabelButton',
+			tooltip: 'View subject-phenotype labels',
 
 		}]
 
@@ -205,6 +215,8 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		
 		this.getDockedComponent('phenotypeGridToolbar').getComponent('heatmapButton').on('click', this.viewHeatmap, this);
 		
+		this.getDockedComponent('phenotypeGridToolbar').getComponent('subjectLabelButton').on('click', this.viewSubjectLabel, this);
+		
 		var ref = this;
 		
 		ASPIREdb.EVENT_BUS.on('filter_submit', function(){
@@ -213,6 +225,9 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			ref.getStore().removeAll();
 			
 		});
+		
+		//when phenotypes selected
+		this.on('selectionchange', this.selectionChangeHandler, this);
 
 		ASPIREdb.EVENT_BUS.on('subjects_loaded', function(subjectIds) {
 
@@ -287,6 +302,32 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		this.updatePhenotypeSummaryCanvasesSelectedSubjects();
 		this.setLoading(false);
 	
+		
+	},
+	
+	/**
+	 * This method called when phenotypes are selected in the phenotype grid
+	 */
+	selectionChangeHandler : function() {
+		this.selPhenotypes = this.getSelectionModel().getSelection();
+
+					
+		if (this.selPhenotypes.length>=1){
+			var names=[];
+			
+			for ( var i = 0; i < this.selPhenotypes.length; i++) {
+				names.push(this.selPhenotypes[i].data.name);
+			}
+			ASPIREdb.EVENT_BUS.fireEvent('phenotype_selected',names );
+			this.getDockedComponent('phenotypeGridToolbar').getComponent('subjectLabelButton').enable();
+			
+		}else
+		{
+			ASPIREdb.EVENT_BUS.fireEvent('phenotype_selected', null);
+			this.getDockedComponent('phenotypeGridToolbar').getComponent('subjectLabelButton').disable();
+		}
+		
+		
 		
 	},
 	/**
@@ -609,6 +650,12 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		
 		ASPIREdb.view.SubjectPhenotypeHeatmapWindow.show();
 		ASPIREdb.view.SubjectPhenotypeHeatmapWindow.draw();
+	},
+	
+	viewSubjectLabel: function(){
+		console.log("view subject labels");
+		ASPIREdb.view.PhenotypeSubjectLabelWindow.initGridAndShow(this.phenotypeSummaryValueObjects,this.selPhenotypes);	
+		
 	},
 	
 	viewNeurocartaGenes : function(value, name){

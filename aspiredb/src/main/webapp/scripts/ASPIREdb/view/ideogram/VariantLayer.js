@@ -219,8 +219,7 @@ Ext
 						var value = null;
 						var colorIndex = 0;
 		
-							// if variant type property : CNV, SNV, indel,
-							// translocation, inversion
+							// if variant type property : CNV, SNV, indel,translocation, inversion
 							if (property instanceof VariantTypeProperty) {
 								property.name = variant.variantType;
 								value = variant.variantType;

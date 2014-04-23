@@ -12,6 +12,7 @@ Ext.define('ASPIREdb.view.filter.DgvProjectOverlapFilterPanel', {
     alias: 'widget.filter_dgvprojectoverlappanel',
     title: 'DGV Overlap Filter',
     bodyStyle: 'background: #A3C1DD;',
+    width: 950,
     items: [{
 		xtype : 'filter_dgvprojectoverlap',
 		itemId : 'dgvProjectOverlapFilterContainer'

@@ -181,18 +181,12 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			layout : {
 				type : 'vbox'
 			},
-			/**listeners: {                    
-			         highlightitem: function(view, node, eOpts) {
-			             this.setValue(node.innerText);
-			          }
-			  
-			 },*/
 			items : [ {
 				xtype : 'multivalue_combo',
 				itemId : 'multicombo',
 				width : 450,
 				height : 20,
-				enableKeyEvents : true,
+				//enableKeyEvents : true,
 				suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
 			}, {
 				xtype : 'numberfield',
@@ -200,7 +194,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 				width : 450,
 				height : 20,
 				enableKeyEvents : true,
-				hidden : true				
+				hidden : true
 			}, {
 				xtype : 'label',
 				itemId : 'example',
@@ -308,8 +302,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			geneSetProperty.name='GeneSet';			
 			store.data.add(geneSetProperty);	
 			
-			propertyComboBox.select(store.getAt(0));
-			
+			propertyComboBox.select(store.getAt(0));			
 			propertyComboBox.fireEvent('select', propertyComboBox, [ store.getAt(0) ]);
 		});
 		

@@ -42,6 +42,8 @@ Ext.define('ASPIREdb.view.filter.FilterWindow', {
 					itemId : 'filterTypeComboBox',
 					editable : false,
 					forceSelection : true,
+					//selectOnFocus:true,
+					enableKeyEvents: true,
 					value : 'FILTER_PLACEHOLDER',
 					store : [ [ 'FILTER_PLACEHOLDER', '<Filter>' ], [ 'ASPIREdb.view.filter.SubjectFilterPanel', 'Subject Filter' ], [ 'ASPIREdb.view.filter.VariantFilterPanel', 'Variant Filter' ], [ 'ASPIREdb.view.filter.PhenotypeFilterPanel', 'Phenotype Filter' ], [ 'ASPIREdb.view.filter.DecipherProjectOverlapFilterPanel', 'Decipher Overlap' ], [ 'ASPIREdb.view.filter.DgvProjectOverlapFilterPanel', 'DGV Overlap' ],  [ 'ASPIREdb.view.filter.ProjectOverlapFilterPanel', 'Project Overlap' ] ]
 				}, {

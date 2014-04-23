@@ -243,7 +243,7 @@ public class SubjectServiceImpl implements SubjectService {
             pvo.setUri( sum.getUri() );
             pvo.setValueType( sum.getValueType() );
             pvo.setNeurocartaPhenotype( sum.isNeurocartaPhenotype() );
-            
+            pvo.setSubjects(sum.getDbValueToSubjectSet());
             pvo.setDisplaySummary( displaySummary );
             pvo.setPhenoSummaryMap( phenoSummaryMap );
             pvo.setPhenoSet(phenoSummaryMap.keySet());

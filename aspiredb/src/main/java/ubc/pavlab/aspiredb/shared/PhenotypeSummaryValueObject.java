@@ -31,6 +31,8 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
 
     private Set<String> phenoSet;
     
+    private Map<String, Set<Long>> subjects;
+    
     public String getDisplaySummary() {
         return displaySummary;
     }
@@ -118,6 +120,16 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
 	public void setSortValue(long sortValue) {
 		this.sortValue = sortValue;
 	}
+
+	public Map<String, Set<Long>> getSubjects() {
+		return subjects;
+	}
+
+	public void setSubjects(Map<String, Set<Long>> subjects) {
+		this.subjects = subjects;
+	}
+
+	
   
 
    

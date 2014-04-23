@@ -12,6 +12,7 @@ Ext.define('ASPIREdb.view.filter.DecipherProjectOverlapFilterPanel', {
     alias: 'widget.filter_decipherprojectoverlappanel',
     title: 'DECIPHER Overlap Filter',
     bodyStyle: 'background: #E68080;',
+    width: 950,
     items: [{
 		xtype : 'filter_decipherprojectoverlap',
 		itemId : 'decipherProjectOverlapFilterContainer'
