@@ -29,8 +29,9 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 	title : 'Subject Phenotype Heatmap',
 	closable : true,
 	closeAction : 'hide',
-	width : 600,
-	height : 600,
+    resizable: false,
+	width : 925,
+	height : 760,
 	//layout : 'fit',
 	bodyStyle : 'padding: 5px;',
 	id : 'subjectPhenotypeHeatmapWindow',
@@ -38,21 +39,37 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 	initComponent : function() {
 		this.callParent();
 	},
-
-	draw : function() {
-		
-		// sample_data.js
-		var dataMatrix = {
-			    dimensions: {numberOfRows: data.data.length, numberOfColumns: data.data[0].length},
-			    getDataAt: function (rowIndex, columnIndex) {
-			        return data.data[rowIndex][columnIndex];
-			    }
-			};
-
-		var convertedData = this.convertData(data.data, columns);
-
-		var order = h2m.ClusterHelper.produceClusteredOrder(convertedData);
-
+    
+	draw : function( matrix ) {
+   
+        var matrixColumnMetadata = [];
+        var matrixRowMetadata = [];
+        
+        for ( var i = 0 ; i < matrix.columnNames.length ; i++ ) {
+            var type;
+            if ( matrix.columnNames[i] == "Gender" || matrix.columnNames[i] == "Family history" ) {
+                type = 'gender';
+            } else {
+                type = 'binary';
+            }
+            matrixColumnMetadata.push( { label: matrix.columnNames[i], type: type } );
+        }
+        
+        for ( var i = 0 ; i < matrix.rowNames.length ; i++ ) {
+            matrixRowMetadata.push( { label: matrix.rowNames[i]  } );
+        }
+        
+        var convertedData = this.convertData(matrix.matrix, matrixColumnMetadata);
+        
+        var order = h2m.ClusterHelper.produceClusteredOrder(convertedData);
+   
+        var dataMatrix = {
+                dimensions: {numberOfRows: matrix.rowNames.length, numberOfColumns: matrix.columnNames.length},
+                getDataAt: function (rowIndex, columnIndex) {
+                    return matrix.matrix[rowIndex][columnIndex];
+                }
+            };
+        
 		M2V = {};
 		M2V.Util = {};
 		M2V.Util.dataType = {};
@@ -62,9 +79,9 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 
 		M2V.Util.dataType.renderGenderCell = function (ctx, gender, row, column, size) {
 		    var color;
-		    if (gender === "m") {
+		    if (gender.toUpperCase() === "M") {
 		        color = "rgb(72,209,204)";
-		    } else if (gender === "f") {
+		    } else if (gender.toUpperCase() === "F") {
 		        color = "rgb(255,105,180)";
 
 		    } else M2V.Util.dataType.renderNA(ctx, size);
@@ -73,13 +90,16 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 		};
 
 		M2V.Util.dataType.renderAbsentPresentCell = function (ctx, value, row, column, size) {
-		    if (value === 0) {
-		        ctx.fillStyle = "black";
-		        ctx.fillRect(size.width / 4, size.height / 4, size.width / 2, size.height / 2);
-		    } else if (value === 1) {
-		        ctx.strokeStyle = "black";
-		        ctx.strokeRect(size.width / 4, size.height / 4, size.width / 2, size.height / 2);
-		    } else M2V.Util.dataType.renderNA(ctx, size);
+		    // TODO write a legend
+            var color;
+            if (value === 0 || value === "0" || value === "N" || value === "M" ) {
+                color = "rgb(200,200,200)"; // grey
+		    } else if (value === 1 || value === "1" || value === "Y" || value === "F" ) {
+		        color = "rgb(0,0,0)"; // black
+		    }  else M2V.Util.dataType.renderNA(ctx, size);
+            
+            ctx.fillStyle = color;
+            ctx.fillRect(1, 1, size.width - 2, size.height - 2);
 		};
 		
 		//TODO: provide centering helper function
@@ -105,22 +125,8 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 		        ctx.fillRect(0, 1, box.width * value, box.height - 2);
 		    }
 		};
-
-		/*
-		console.log('items size='+this.items.length);
-		var testPanel = Ext.create('Ext.Panel', {
-			renderTo : Ext.getCmp('matrix_div').getEl(),
-			id : 'label_2',
-			width : 50,
-			height: 50,
-			html : "success<br/><br/><br/><br/>success<br/><br/><br/><br/>success<br/><br/><br/><br/>!"
-		});
-		console.log('testPanel='+testPanel);
-		this.add(testPanel);
-		console.log('items size='+this.items.length);
-		*/
 		
-		var matrix = Ext.create('Matrix2Viz', {
+		var heatmap = Ext.create('Matrix2Viz', {
 		    //renderTo: "matrix_div",
 			//renderTo: document.body,
 			//renderTo: this.down('#matrix_div').getEl(),
@@ -132,18 +138,19 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 		    labelFormat: {
 		        row: [
 		            {name: 'label', size: 90},
-		            {name: 'group', size: 50}
+		            //{name: 'group', size: 50}
 		        ],
 		        column: [
 		            {name: 'label', size: 100},
-		            {name: 'metaNumber', size: 10},
-		            {name: 'type', size: 50}
+		            //{name: 'metaNumber', size: 10},
+		            //{name: 'type', size: 50}
 		        ]
 		    },
 		    renderers: {
 		        cell: {
 		        	'gender': {
-		                render: M2V.Util.dataType.renderGenderCell
+		                //render: M2V.Util.dataType.renderGenderCell
+                        render: M2V.Util.dataType.renderAbsentPresentCell
 		            },
 		            'binary': {
 		                render: M2V.Util.dataType.renderAbsentPresentCell
@@ -160,27 +167,31 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 		            'label': {
 		                render: renderDefaults.text
 		            },
-		            'group': {
+		            /*'group': {
 		                render: renderDefaults.text
-		            }
+		            }*/
 		        },
 		        columnMetadata: {
 		            'label': {
 		                render: renderDefaults.text
 		            },
-		            'metaNumber': {
+		            /*'metaNumber': {
 		                render: renderDefaults.metaNumber
 		            },
 		            'type': {
 		                render: renderDefaults.text
-		            }
+		            }*/
 		        }
 		    },
 
-		    rows: rows, //sample_data.js
+		    // rows: rows, //sample_data.js
+            rows: matrixRowMetadata, 
+            
 		    rowOrder: order.rowOrder,
 
-		    columns: columns, //sample_data.js
+		    // columns: columns, //sample_data.js
+            columns: matrixColumnMetadata, 
+            
 		    columnOrder: order.columnOrder,
 
 		    clustering: order,
@@ -201,9 +212,10 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 		    }
 		});
 
-		this.add(matrix);
+        this.removeAll();
+		this.add(heatmap);
 		
-		matrix.draw();
+		heatmap.draw();
 		
 	},
 	
@@ -212,22 +224,31 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 	},
 
 	convertData : function (data, columns) {
-	    var converted = [];
+        var converted = [];
 	    for (var i = 0; i < data.length; i++) {
 	        var row = data[i];
 	        var convertedRow = [];
 	        for (var j = 0; j < row.length; j++) {
 	            var value = row[j];
 	            var convertedValue = value;
+                if ( value == null ) {
+                    continue;
+                }
 	            if (columns[j].type === 'gender') {
-	                if (value === 'm') {
+	                if (value.toUpperCase() === 'M') {
 	                    convertedValue = 1;
 	                } else {
 	                    convertedValue = 0;
 	                }
 	            } else if (columns[j].type === 'numeric') {
 	                convertedValue = this.bin(3, value, columns[j].range);
-	            }
+	            } else if (columns[j].type === 'binary') {
+                    if (value.toUpperCase() === 'Y' || value === '1') {
+                        convertedValue = 1;
+                    } else if (value.toUpperCase() === 'N' || value === '0') {
+                        convertedValue = 0;
+                    }
+                }
 	            convertedRow.push(convertedValue);
 	        }
 	        converted.push(convertedRow);

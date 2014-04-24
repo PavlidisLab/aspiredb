@@ -644,11 +644,15 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	},
 	
 	viewHeatmap : function() {
-		console.log("view heatmap");
-		
-		
-		ASPIREdb.view.SubjectPhenotypeHeatmapWindow.show();
-		ASPIREdb.view.SubjectPhenotypeHeatmapWindow.draw();
+        var ref = this;
+        var removeEmpty = true;
+        
+		SubjectService.getPhenotypeBySubjectIds(ref.currentSubjectIds, removeEmpty, {
+            callback : function( matrix ) {
+                ASPIREdb.view.SubjectPhenotypeHeatmapWindow.show();
+                ASPIREdb.view.SubjectPhenotypeHeatmapWindow.draw( matrix );
+            }
+        });
 	},
 	
 	viewSubjectLabel: function(){

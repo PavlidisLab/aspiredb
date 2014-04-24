@@ -14,12 +14,8 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,14 +34,13 @@ import ubc.pavlab.aspiredb.server.dao.CNVDao;
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
-import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Label;
-import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
+import ubc.pavlab.aspiredb.shared.StringMatrix;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.TextValue;
 import ubc.pavlab.aspiredb.shared.query.ExternalSubjectIdProperty;
@@ -57,33 +52,37 @@ import ubc.pavlab.aspiredb.shared.query.TextProperty;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 /**
- * TODO Document Me
- * TODO: Sorting needs some thought.
+ * TODO Document Me TODO: Sorting needs some thought.
  * 
  * @author Paul
  * @version $Id: SubjectServiceImpl.java,v 1.36 2013/06/24 23:26:39 cmcdonald Exp $
  */
 @Service("subjectService")
-@RemoteProxy(name="SubjectService")
+@RemoteProxy(name = "SubjectService")
 public class SubjectServiceImpl implements SubjectService {
-	protected static Log log = LogFactory.getLog( SubjectServiceImpl.class );
+    protected static Log log = LogFactory.getLog( SubjectServiceImpl.class );
 
-    @Autowired private SubjectDao subjectDao;
-    
-    @Autowired private CNVDao cnvDao;
-    @Autowired private PhenotypeBrowserService phenotypeBrowserService;
-    @Autowired private LabelDao labelDao;
-    
+    @Autowired
+    private SubjectDao subjectDao;
+
+    @Autowired
+    private CNVDao cnvDao;
+    @Autowired
+    private PhenotypeBrowserService phenotypeBrowserService;
+    @Autowired
+    private LabelDao labelDao;
+
     /**
      * Get the Subject value Object of the given subject Id
+     * 
      * @param projectId, subjectId
      * @return SubjectValueObject
      */
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public SubjectValueObject getSubject(Long projectId, Long subjectId ){
-        //throwGwtExceptionIfNotLoggedIn();
+    public SubjectValueObject getSubject( Long projectId, Long subjectId ) {
+        // throwGwtExceptionIfNotLoggedIn();
         Subject subject = subjectDao.load( subjectId );
         if ( subject == null ) return null;
 
@@ -93,32 +92,32 @@ public class SubjectServiceImpl implements SubjectService {
 
         return vo;
     }
-    
+
     /**
      * Get the list of Subject value Objects of the given subject Ids
+     * 
      * @param projectId, subjectId
      * @return SubjectValueObject
      */
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<SubjectValueObject> getSubjects(Long projectId, List<Long> subjectIds ){
-        //throwGwtExceptionIfNotLoggedIn();
-        Collection<Subject> subjects = subjectDao.load( subjectIds);
+    public Collection<SubjectValueObject> getSubjects( Long projectId, List<Long> subjectIds ) {
+        // throwGwtExceptionIfNotLoggedIn();
+        Collection<Subject> subjects = subjectDao.load( subjectIds );
         if ( subjects.isEmpty() ) return null;
-        
-        List<SubjectValueObject> vos = new ArrayList<>(); 
-        
+
+        List<SubjectValueObject> vos = new ArrayList<>();
+
         for ( Subject subject : subjects ) {
-            
+
             SubjectValueObject vo = subject.convertToValueObject();
             Integer numVariants = cnvDao.findBySubjectPatientId( subject.getPatientId() ).size();
             vo.setVariants( numVariants != null ? numVariants : 0 );
-            vos.add(vo);
+            vos.add( vo );
         }
         return vos;
     }
-    
 
     @Override
     @RemoteMethod
@@ -132,27 +131,28 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext){
+    public Collection<PropertyValue> suggestValues( Property property, SuggestionContext suggestionContext ) {
         List<PropertyValue> values = new ArrayList<PropertyValue>();
-        if (property instanceof LabelProperty) {
-            List<LabelValueObject> labels = suggestLabels(suggestionContext);
-            for (LabelValueObject label : labels) {
-                values.add( new PropertyValue<LabelValueObject>(label) );
+        if ( property instanceof LabelProperty ) {
+            List<LabelValueObject> labels = suggestLabels( suggestionContext );
+            for ( LabelValueObject label : labels ) {
+                values.add( new PropertyValue<LabelValueObject>( label ) );
             }
-        } else if (property instanceof TextProperty) {
-            Collection<String> stringValues = ((TextProperty) property).getDataType().getAllowedValues();
-            if (stringValues.isEmpty()) {
-                stringValues = subjectDao.suggestValuesForEntityProperty(property, suggestionContext);
+        } else if ( property instanceof TextProperty ) {
+            Collection<String> stringValues = ( ( TextProperty ) property ).getDataType().getAllowedValues();
+            if ( stringValues.isEmpty() ) {
+                stringValues = subjectDao.suggestValuesForEntityProperty( property, suggestionContext );
             }
-            for (String stringValue : stringValues) {
-                values.add( new PropertyValue<TextValue>(new TextValue(stringValue)) );
+            for ( String stringValue : stringValues ) {
+                values.add( new PropertyValue<TextValue>( new TextValue( stringValue ) ) );
             }
         }
         return values;
     }
-    
+
     /**
      * Get the Phenotype summary value objects for the given list of subject Ids and Project Ids.
+     * 
      * @exception NeurocartaServiceException
      * @param List of subjectIds, Collection of projectIds
      * @return List of Phenotype summary value objects
@@ -160,233 +160,233 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     @RemoteMethod
     @Transactional
-	public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds ) throws NeurocartaServiceException{
-        
-        Collection<Subject> subjects = subjectDao.load(subjectIds);
-        
+    public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
+            throws NeurocartaServiceException {
+
+        Collection<Subject> subjects = subjectDao.load( subjectIds );
+
         StopWatch timer = new StopWatch();
         timer.start();
 
-        log.info( "loading phenotypeSummaries for "+subjectIds.size()+" subjects" );
-        List<PhenotypeSummary> phenotypeSummaries =
-                phenotypeBrowserService.getPhenotypesBySubjectIds(subjectIds, projectIds);
-        log.info( "processing"+ phenotypeSummaries.size() + " phenotypeSummaries for "+subjectIds.size()+" subjects took " + timer.getTime() + "ms" );
-        
-        
-        
-        List<PhenotypeSummaryValueObject> valueObjects = new ArrayList<PhenotypeSummaryValueObject>();   
-        
-        
-        
-                
-        //convert PhenotypeSummaries to lighter PhenotypeValueObjects
-        
-        for (PhenotypeSummary sum: phenotypeSummaries){
-            
+        log.info( "loading phenotypeSummaries for " + subjectIds.size() + " subjects" );
+        List<PhenotypeSummary> phenotypeSummaries = phenotypeBrowserService.getPhenotypesBySubjectIds( subjectIds,
+                projectIds );
+        log.info( "processing" + phenotypeSummaries.size() + " phenotypeSummaries for " + subjectIds.size()
+                + " subjects took " + timer.getTime() + "ms" );
+
+        List<PhenotypeSummaryValueObject> valueObjects = new ArrayList<PhenotypeSummaryValueObject>();
+
+        // convert PhenotypeSummaries to lighter PhenotypeValueObjects
+
+        for ( PhenotypeSummary sum : phenotypeSummaries ) {
+
             String displaySummary = "";
             HashMap<String, Integer> phenoSummaryMap = new HashMap<String, Integer>();
-            
+
             Set<String> keyArray = sum.getDbValueToSubjectSet().keySet();
             /**
-             * Used the Color Brewer 2.0 system for coloring the chart
-             * Thanks for Cynthia Brewer, Mark Harrower and The Pennsylvania State University
+             * Used the Color Brewer 2.0 system for coloring the chart Thanks for Cynthia Brewer, Mark Harrower and The
+             * Pennsylvania State University
              */
-            String[] colors = {"#b35806", "#31a354", "#636363", "#d8b365","#2c7fb8", "#addd8e","#7570b3", "#a6bddb"};
-            int j=3;
-            int unknown=0;
-            int present=0;
-            int denominator=0;
-            int absent=0;
-            
-            for (String key: keyArray){
-                
+            String[] colors = { "#b35806", "#31a354", "#636363", "#d8b365", "#2c7fb8", "#addd8e", "#7570b3", "#a6bddb" };
+            int j = 3;
+            int unknown = 0;
+            int present = 0;
+            int denominator = 0;
+            int absent = 0;
+
+            for ( String key : keyArray ) {
+
                 Integer size = sum.getDbValueToSubjectSet().get( key ).size();
-                
-                if (sum.getValueType().equals( "HPONTOLOGY")) {
-                    if (key.equals( "1")) {
-                        phenoSummaryMap.put("Present", size);
-                        present =size;
-                        denominator=denominator+size;
+
+                if ( sum.getValueType().equals( "HPONTOLOGY" ) ) {
+                    if ( key.equals( "1" ) ) {
+                        phenoSummaryMap.put( "Present", size );
+                        present = size;
+                        denominator = denominator + size;
                         displaySummary = displaySummary + " Present(" + size + ')';
-                        displaySummary = "<span " + "style='color: "+colors[0]+"'" + ">" + displaySummary + "</span>";
-                    }else if (key.equals( "0")) {
-                        phenoSummaryMap.put("Absent", size);
-                        absent=size;
-                        denominator=denominator+size;
+                        displaySummary = "<span " + "style='color: " + colors[0] + "'" + ">" + displaySummary
+                                + "</span>";
+                    } else if ( key.equals( "0" ) ) {
+                        phenoSummaryMap.put( "Absent", size );
+                        absent = size;
+                        denominator = denominator + size;
                         displaySummary = displaySummary + " Absent(" + size + ')';
-                        displaySummary = "<span " + "style='color: "+colors[1]+"'" + ">" + displaySummary + "</span>";
-                    } else if (key.equals("Unknown")){
-                        unknown =size;
+                        displaySummary = "<span " + "style='color: " + colors[1] + "'" + ">" + displaySummary
+                                + "</span>";
+                    } else if ( key.equals( "Unknown" ) ) {
+                        unknown = size;
                     }
-            } else if (key.equals("Unknown")){
-                unknown =size;
-            }else {
-                phenoSummaryMap.put(key, size);
-                displaySummary = displaySummary + ' ' + key + " (" + size + ')';
-                displaySummary = "<span " + "style='color:"+colors[j]+"'" + ">" + displaySummary + "</span>";
-                j++;
+                } else if ( key.equals( "Unknown" ) ) {
+                    unknown = size;
+                } else {
+                    phenoSummaryMap.put( key, size );
+                    displaySummary = displaySummary + ' ' + key + " (" + size + ')';
+                    displaySummary = "<span " + "style='color:" + colors[j] + "'" + ">" + displaySummary + "</span>";
+                    j++;
+                }
+
             }
-            
-        }
-        if (unknown!=0){
-            phenoSummaryMap.put("Unknown", unknown);
-            displaySummary = displaySummary + " Unknown(" + unknown + ')';
-            displaySummary = "<span " + "style='color: "+colors[2]+"'" + ">" + displaySummary + "</span>";
-        }else{
-            phenoSummaryMap.put("Unknown", 0);
-            displaySummary = displaySummary + " Unknown(" + 0 + ')';
-            displaySummary = "<span " + "style='color: "+colors[2]+"'" + ">" + displaySummary + "</span>";
-        }
+            if ( unknown != 0 ) {
+                phenoSummaryMap.put( "Unknown", unknown );
+                displaySummary = displaySummary + " Unknown(" + unknown + ')';
+                displaySummary = "<span " + "style='color: " + colors[2] + "'" + ">" + displaySummary + "</span>";
+            } else {
+                phenoSummaryMap.put( "Unknown", 0 );
+                displaySummary = displaySummary + " Unknown(" + 0 + ')';
+                displaySummary = "<span " + "style='color: " + colors[2] + "'" + ">" + displaySummary + "</span>";
+            }
             PhenotypeSummaryValueObject pvo = new PhenotypeSummaryValueObject();
-            
+
             pvo.setName( sum.getName() );
             pvo.setUri( sum.getUri() );
             pvo.setValueType( sum.getValueType() );
             pvo.setNeurocartaPhenotype( sum.isNeurocartaPhenotype() );
-            pvo.setSubjects(sum.getDbValueToSubjectSet());
+            pvo.setSubjects( sum.getDbValueToSubjectSet() );
             pvo.setDisplaySummary( displaySummary );
             pvo.setPhenoSummaryMap( phenoSummaryMap );
-            pvo.setPhenoSet(phenoSummaryMap.keySet());
-            //if (denominator!=0)
-        		pvo.setSortValue(present);
+            pvo.setPhenoSet( phenoSummaryMap.keySet() );
+            // if (denominator!=0)
+            pvo.setSortValue( present );
             valueObjects.add( pvo );
-            
+
         }
-                
+
         return valueObjects;
-	}
-    
+    }
+
     /**
-     * Get the map of Phenotype Name and Phenotype Summary Value Objects for the given list of subject Ids and list of Project Ids.
+     * Get the map of Phenotype Name and Phenotype Summary Value Objects for the given list of subject Ids and list of
+     * Project Ids.
+     * 
      * @exception NeurocartaServiceException
      * @param List of subjectIds, Collection of projectIds
      * @return Map of Phenotype Name and Phenotype summary value objects
-     * 
      */
     @Override
     @RemoteMethod
     @Transactional
-    public Map<String,PhenotypeSummaryValueObject> getPhenotypeSummaryValueObjects( List<Long> subjectIds, Collection<Long> projectIds) throws NeurocartaServiceException{
-        
-        Collection<Subject> subjects = subjectDao.load(subjectIds);
-        
+    public Map<String, PhenotypeSummaryValueObject> getPhenotypeSummaryValueObjects( List<Long> subjectIds,
+            Collection<Long> projectIds ) throws NeurocartaServiceException {
+
+        Collection<Subject> subjects = subjectDao.load( subjectIds );
+
         StopWatch timer = new StopWatch();
         timer.start();
 
-        log.info( "loading phenotypeSummaries for "+subjectIds.size()+" subjects" );
-        List<PhenotypeSummary> phenotypeSummaries =
-                phenotypeBrowserService.getPhenotypesBySubjectIds(subjectIds, projectIds);
-        log.info( "processing"+ phenotypeSummaries.size() + " phenotypeSummaries for "+subjectIds.size()+" subjects took " + timer.getTime() + "ms" );
-        
-        
-        
-        //List<PhenotypeSummaryValueObject> valueObjects = new ArrayList<PhenotypeSummaryValueObject>();   
+        log.info( "loading phenotypeSummaries for " + subjectIds.size() + " subjects" );
+        List<PhenotypeSummary> phenotypeSummaries = phenotypeBrowserService.getPhenotypesBySubjectIds( subjectIds,
+                projectIds );
+        log.info( "processing" + phenotypeSummaries.size() + " phenotypeSummaries for " + subjectIds.size()
+                + " subjects took " + timer.getTime() + "ms" );
+
+        // List<PhenotypeSummaryValueObject> valueObjects = new ArrayList<PhenotypeSummaryValueObject>();
         Map<String, PhenotypeSummaryValueObject> summaryValueObjectsMap = new HashMap<String, PhenotypeSummaryValueObject>();
-        HashMap<String, Integer> allPhenoSummaryMap = new HashMap<String, Integer>();     
-       
-                
-        //convert PhenotypeSummaries to lighter PhenotypeValueObjects
-        
-        for (PhenotypeSummary sum: phenotypeSummaries){
-            
+        HashMap<String, Integer> allPhenoSummaryMap = new HashMap<String, Integer>();
+
+        // convert PhenotypeSummaries to lighter PhenotypeValueObjects
+
+        for ( PhenotypeSummary sum : phenotypeSummaries ) {
+
             String displaySummary = "";
             HashMap<String, Integer> phenoSummaryMap = new HashMap<String, Integer>();
-            
+
             Set<String> keyArray = sum.getDbValueToSubjectSet().keySet();
             /**
-             * Used the Color Brewer 2.0 system for coloring the chart
-             * Thanks for Cynthia Brewer, Mark Harrower and The Pennsylvania State University
+             * Used the Color Brewer 2.0 system for coloring the chart Thanks for Cynthia Brewer, Mark Harrower and The
+             * Pennsylvania State University
              */
-            String[] colors = {"#b35806", "#31a354", "#636363", "#d8b365","#2c7fb8", "#addd8e","#7570b3", "#a6bddb"};
-            int j=3;
-            int unknown=0;
-            int present=0;
-            int denominator=0;
-            int absent=0;
-                    
-            for (String key: keyArray){
-                
+            String[] colors = { "#b35806", "#31a354", "#636363", "#d8b365", "#2c7fb8", "#addd8e", "#7570b3", "#a6bddb" };
+            int j = 3;
+            int unknown = 0;
+            int present = 0;
+            int denominator = 0;
+            int absent = 0;
+
+            for ( String key : keyArray ) {
+
                 Integer size = sum.getDbValueToSubjectSet().get( key ).size();
-                
-                if (sum.getValueType().equals( "HPONTOLOGY")) {
-                        if (key.equals( "1")) {
-                            phenoSummaryMap.put("Present", size);
-                            present =size;
-                            denominator=denominator+size;
-                            displaySummary = displaySummary + " Present(" + size + ')';
-                            displaySummary = "<span " + "style='color: "+colors[0]+"'" + ">" + displaySummary + "</span>";
-                        }else if (key.equals( "0")) {
-                            phenoSummaryMap.put("Absent", size);
-                            absent=size;
-                            denominator=denominator+size;
-                            displaySummary = displaySummary + " Absent(" + size + ')';
-                            displaySummary = "<span " + "style='color: "+colors[1]+"'" + ">" + displaySummary + "</span>";
-                        } else if (key.equals("Unknown")){
-                            unknown =size;
-                        }
-                } else if (key.equals("Unknown")){
-                    unknown =size;
-                }else {
-                    phenoSummaryMap.put(key, size);
+
+                if ( sum.getValueType().equals( "HPONTOLOGY" ) ) {
+                    if ( key.equals( "1" ) ) {
+                        phenoSummaryMap.put( "Present", size );
+                        present = size;
+                        denominator = denominator + size;
+                        displaySummary = displaySummary + " Present(" + size + ')';
+                        displaySummary = "<span " + "style='color: " + colors[0] + "'" + ">" + displaySummary
+                                + "</span>";
+                    } else if ( key.equals( "0" ) ) {
+                        phenoSummaryMap.put( "Absent", size );
+                        absent = size;
+                        denominator = denominator + size;
+                        displaySummary = displaySummary + " Absent(" + size + ')';
+                        displaySummary = "<span " + "style='color: " + colors[1] + "'" + ">" + displaySummary
+                                + "</span>";
+                    } else if ( key.equals( "Unknown" ) ) {
+                        unknown = size;
+                    }
+                } else if ( key.equals( "Unknown" ) ) {
+                    unknown = size;
+                } else {
+                    phenoSummaryMap.put( key, size );
                     displaySummary = displaySummary + ' ' + key + " (" + size + ')';
-                    displaySummary = "<span " + "style='color:"+colors[j]+"'" + ">" + displaySummary + "</span>";
+                    displaySummary = "<span " + "style='color:" + colors[j] + "'" + ">" + displaySummary + "</span>";
                     j++;
                 }
-                
+
             }
-            if (unknown!=0){
-                phenoSummaryMap.put("Unknown", unknown);
+            if ( unknown != 0 ) {
+                phenoSummaryMap.put( "Unknown", unknown );
                 displaySummary = displaySummary + " Unknown(" + unknown + ')';
-                displaySummary = "<span " + "style='color: "+colors[2]+"'" + ">" + displaySummary + "</span>";
-            }else{
-                phenoSummaryMap.put("Unknown", 0);
+                displaySummary = "<span " + "style='color: " + colors[2] + "'" + ">" + displaySummary + "</span>";
+            } else {
+                phenoSummaryMap.put( "Unknown", 0 );
                 displaySummary = displaySummary + " Unknown(" + 0 + ')';
-                displaySummary = "<span " + "style='color: "+colors[2]+"'" + ">" + displaySummary + "</span>";
+                displaySummary = "<span " + "style='color: " + colors[2] + "'" + ">" + displaySummary + "</span>";
             }
-            
+
             PhenotypeSummaryValueObject pvo = new PhenotypeSummaryValueObject();
-            
+
             pvo.setName( sum.getName() );
             pvo.setUri( sum.getUri() );
             pvo.setValueType( sum.getValueType() );
             pvo.setNeurocartaPhenotype( sum.isNeurocartaPhenotype() );
-            
+
             pvo.setDisplaySummary( displaySummary );
-            pvo.setPhenoSummaryMap( phenoSummaryMap );                         
-            pvo.setPhenoSet(phenoSummaryMap.keySet());
-           // if (denominator!=0)
-             pvo.setSortValue(present);
+            pvo.setPhenoSummaryMap( phenoSummaryMap );
+            pvo.setPhenoSet( phenoSummaryMap.keySet() );
+            // if (denominator!=0)
+            pvo.setSortValue( present );
             summaryValueObjectsMap.put( sum.getName(), pvo );
-           
-            
+
         }
-        
-        
+
         return summaryValueObjectsMap;
     }
+
     /**
      * Create the Text to download the phenotype property values of given subject Ids
+     * 
      * @param List of subject Ids
-     * @return Long text of given subjects phenotype summary 
+     * @return Long text of given subjects phenotype summary
      */
     @Override
     @RemoteMethod
     @Transactional
-    public String getPhenotypeTextDownloadBySubjectIds( List<Long> subjectIds){
-        
-        
+    public String getPhenotypeTextDownloadBySubjectIds( List<Long> subjectIds ) {
+
         StopWatch timer = new StopWatch();
         timer.start();
-        
+
         List<SubjectValueObject> svoList = new ArrayList<SubjectValueObject>();
-        
+
         Collection<Subject> subjectList = subjectDao.load( subjectIds );
-        
-        for (Subject s: subjectList){            
+
+        for ( Subject s : subjectList ) {
             SubjectValueObject svo = s.convertToValueObjectWithPhenotypes();
-            svoList.add( svo );            
+            svoList.add( svo );
         }
-        
+
         StringBuffer text = new StringBuffer();
 
         HashMap<String, String> phenotypeFileColumnsMap = new HashMap<String, String>();
@@ -395,8 +395,7 @@ public class SubjectServiceImpl implements SubjectService {
 
             for ( PhenotypeValueObject pvo : svo.getPhenotypes().values() ) {
 
-                String columnName = pvo.getUri()!=null ? (pvo.getUri() +":"+pvo.getName() ): pvo
-                        .getName();
+                String columnName = pvo.getUri() != null ? ( pvo.getUri() + ":" + pvo.getName() ) : pvo.getName();
 
                 if ( !phenotypeFileColumnsMap.containsKey( columnName ) ) {
                     phenotypeFileColumnsMap.put( columnName, pvo.getName() );
@@ -419,28 +418,28 @@ public class SubjectServiceImpl implements SubjectService {
             Map<String, PhenotypeValueObject> phenotypeMap = svo.getPhenotypes();
 
             for ( String columnName : phenotypeFileColumnsMap.keySet() ) {
-                
+
                 PhenotypeValueObject vo = phenotypeMap.get( phenotypeFileColumnsMap.get( columnName ) );
-                
-                if (vo !=null){                
+
+                if ( vo != null ) {
                     text.append( vo.getDbValue() + "\t" );
                 }
             }
 
             text.append( "\n" );
         }
-        
+
         return text.toString();
     }
 
     @Override
     @RemoteMethod
     @Transactional
-    public LabelValueObject addLabel(Collection<Long> subjectIds, LabelValueObject labelVO) {
-        
-        Collection<Subject> subjects = subjectDao.load(subjectIds);
+    public LabelValueObject addLabel( Collection<Long> subjectIds, LabelValueObject labelVO ) {
+
+        Collection<Subject> subjects = subjectDao.load( subjectIds );
         Label label = labelDao.findOrCreate( labelVO );
-        for (Subject subject : subjects) {
+        for ( Subject subject : subjects ) {
             subject.addLabel( label );
             subjectDao.update( subject );
         }
@@ -450,37 +449,101 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     @RemoteMethod
     @Transactional
-    public void removeLabel(Long id, LabelValueObject label){
-       
-        Subject subject = subjectDao.load(id);
-        Label labelEntity = labelDao.load(label.getId());
-        subject.removeLabel(labelEntity);
+    public void removeLabel( Long id, LabelValueObject label ) {
+
+        Subject subject = subjectDao.load( id );
+        Label labelEntity = labelDao.load( label.getId() );
+        subject.removeLabel( labelEntity );
         subjectDao.update( subject );
     }
 
     @Override
     @RemoteMethod
     @Transactional
-    public void removeLabel(Collection<Long> subjectIds, LabelValueObject label){
-       
-        for (Long subjectId : subjectIds) {
-            removeLabel(subjectId, label);
+    public void removeLabel( Collection<Long> subjectIds, LabelValueObject label ) {
+
+        for ( Long subjectId : subjectIds ) {
+            removeLabel( subjectId, label );
         }
     }
 
     @Override
     @RemoteMethod
     @Transactional
-    public List<LabelValueObject> suggestLabels(SuggestionContext suggestionContext) {
+    public List<LabelValueObject> suggestLabels( SuggestionContext suggestionContext ) {
         Collection<Label> labels;
         if ( suggestionContext == null || suggestionContext.getActiveProjectIds().size() == 0 )
             labels = labelDao.getSubjectLabels();
-        else 
+        else
             labels = labelDao.getSubjectLabelsByProjectId( suggestionContext.getActiveProjectIds().iterator().next() );
         List<LabelValueObject> vos = new ArrayList<LabelValueObject>();
-        for (Label label : labels) {
+        for ( Label label : labels ) {
             vos.add( label.toValueObject() );
         }
         return vos;
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional
+    public StringMatrix<String, String> getPhenotypeBySubjectIds( Collection<Long> subjectIds, boolean removeEmpty ) {
+
+        List<String> columnNames = new ArrayList<>();
+        List<String> rowNames = new ArrayList<>();
+
+        List<SubjectValueObject> svoList = new ArrayList<SubjectValueObject>();
+
+        Collection<Subject> subjectList = subjectDao.load( subjectIds );
+
+        HashMap<String, String> phenotypeFileColumnsMap = new HashMap<String, String>();
+
+        for ( Subject s : subjectList ) {
+            SubjectValueObject svo = s.convertToValueObjectWithPhenotypes();
+            if ( removeEmpty && svo.getPhenotypes().size() == 0 ) {
+                continue;
+            }
+
+            svoList.add( svo );
+            rowNames.add( svo.getPatientId() );
+
+            for ( PhenotypeValueObject pvo : svo.getPhenotypes().values() ) {
+
+                String columnName = pvo.getUri() != null ? ( pvo.getUri() + ":" + pvo.getName() ) : pvo.getName();
+
+                if ( !phenotypeFileColumnsMap.containsKey( columnName ) ) {
+                    phenotypeFileColumnsMap.put( columnName, pvo.getName() );
+                    columnNames.add( columnName );
+                }
+
+            }
+
+        }
+
+        StringMatrix<String, String> matrix = new StringMatrix<String, String>( rowNames.size(), columnNames.size() );
+        matrix.setColumnNames( columnNames );
+        matrix.setRowNames( rowNames );
+
+        int i = 0;
+        for ( SubjectValueObject svo : svoList ) {
+            Map<String, PhenotypeValueObject> phenotypeMap = svo.getPhenotypes();
+
+            int j = 0;
+            for ( String columnName : columnNames ) {
+
+                PhenotypeValueObject vo = phenotypeMap.get( phenotypeFileColumnsMap.get( columnName ) );
+
+                if ( vo != null ) {
+                    matrix.set( i, j, vo.getDbValue() );
+                } else {
+                    matrix.set( i, j, "" );
+                }
+
+                j++;
+            }
+
+            i++;
+        }
+
+        return matrix;
     }
 }

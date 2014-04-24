@@ -24,10 +24,12 @@ import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
+import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.PropertyValue;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
+import ubc.pavlab.aspiredb.shared.StringMatrix;
 
 import java.util.Collection;
 import java.util.List;
@@ -54,6 +56,16 @@ public interface SubjectService {
     public Map<String,PhenotypeSummaryValueObject> getPhenotypeSummaryValueObjects( List<Long> subjectIds, Collection<Long> projectIds ) throws NeurocartaServiceException;
 
     public String getPhenotypeTextDownloadBySubjectIds( List<Long> subjectIds );
+
+    /**
+     * Rownames are Subject.patientId (e.g. 03_01)
+     * Colnames are PhenotypeValueUri:Name (e.g. HP_0001000:Abnormality of skin pigmentation)
+     * 
+     * @param subjectIds
+     * @param removeEmpty should Subjects with no phenotypes be excluded?
+     * @return
+     */
+    public StringMatrix<String, String> getPhenotypeBySubjectIds( Collection<Long> subjectIds, boolean removeEmpty );
 
     public LabelValueObject addLabel(Collection<Long> subjectIds, LabelValueObject label) ;
 
