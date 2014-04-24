@@ -103,7 +103,7 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         List<String> geneSymbols=new ArrayList<>();
         List<GeneValueObject> geneValueObjects = new ArrayList<GeneValueObject>();
         
-        if (genes.get(0).getEnsemblId()==null){
+        if (genes.isEmpty()){// .get(0).getEnsemblId()==null){
         	//null gene value objects
         } else {
         	//storing the gene symbols
