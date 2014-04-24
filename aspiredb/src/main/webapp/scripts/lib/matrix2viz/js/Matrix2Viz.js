@@ -256,13 +256,19 @@ Ext.define('Matrix2Viz', {
             height: this.getRows().length * this.getCellSize().height
         };
 
+       
         var verticalLabelWidth = 0;
-        for (i = 0; i < rowMetadata.length; i++) {
-            verticalLabelWidth = verticalLabelWidth + rowMetadata[i].size;
+        if (displayOptions.showRowLabels) {
+            for (i = 0; i < rowMetadata.length; i++) {
+                verticalLabelWidth = verticalLabelWidth + rowMetadata[i].size;
+            }
         }
+        
         var horizontalLabelHeight = 0;
-        for (i = 0; i < columnMetadata.length; i++) {
-            horizontalLabelHeight = horizontalLabelHeight + columnMetadata[i].size;
+        if (displayOptions.showColumnLabels) {
+            for (i = 0; i < columnMetadata.length; i++) {
+                horizontalLabelHeight = horizontalLabelHeight + columnMetadata[i].size;
+            }
         }
 
         var availableWidth = containerSize.width - dendrogramHeight - verticalLabelWidth - 20;//padding

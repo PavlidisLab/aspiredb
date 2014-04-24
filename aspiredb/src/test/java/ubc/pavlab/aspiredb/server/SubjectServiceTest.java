@@ -19,6 +19,7 @@
 package ubc.pavlab.aspiredb.server;
 
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,6 +44,7 @@ import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.service.SubjectService;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
+import ubc.pavlab.aspiredb.shared.StringMatrix;
 import ubc.pavlab.aspiredb.shared.TextValue;
 import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.query.*;
@@ -73,6 +75,7 @@ public class SubjectServiceTest extends BaseSpringContextTest {
         testSubjectId = RandomStringUtils.randomAlphanumeric(5);
         testSubject = testObjectHelper.createPersistentTestSubjectObjectWithCNV(testSubjectId);
         testVariant = testSubject.getVariants().iterator().next();
+        testSubject = testObjectHelper.createPersistentTestSubjectObjectWithHPOntologyPhenotypes( testSubjectId );
     }
 
     @Test
@@ -90,6 +93,22 @@ public class SubjectServiceTest extends BaseSpringContextTest {
         assertTrue(subjects.size() > 0);
     }
 
+    @Test
+    public void testGetPhenotypeBySubjectIds() {
+        Collection<Long> ids = new ArrayList<Long>();
+        ids.add(testSubject.getId());
+        
+        try{
+            StringMatrix<String, String> matrix = subjectService.getPhenotypeBySubjectIds( ids, false );
+            assertTrue(matrix.getRowNames().iterator().next().equals( testSubject.getPatientId() ));
+            assertEquals(testSubject.getPhenotypes().size(), matrix.getColumnNames().size());
+            assertEquals(testSubject.getPhenotypes().iterator().next().getValue(), matrix.get( 0, 0 ));
+        }catch(Exception e){
+            e.printStackTrace();
+            assertTrue( false );
+        }
+    }
+    
     @Test
     public void addSubjectLabel() {
         Collection<Long> ids = new ArrayList<Long>();
