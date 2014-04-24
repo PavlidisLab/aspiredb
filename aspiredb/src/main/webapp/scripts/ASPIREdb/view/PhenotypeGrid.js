@@ -80,7 +80,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		},
 		{
 			xtype : 'button',
-			text : 'Assign Labels',
+			text : 'Contingency table',
 			disabled : 'true',
 			itemId : 'subjectLabelButton',
 			tooltip: 'View subject-phenotype labels',
@@ -239,7 +239,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 					if (subjectIds.length > 0) {
 
 						if (subjectIds.length < numSubjects - 1) {
-							ref.getDockedComponent('phenotypeGridToolbar').getComponent('analyzeButton').enable();
+							ref.getDockedComponent('phenotypeGridToolbar').getComponent('analyzeButton').enable();	
 						} else {
 							ref.getDockedComponent('phenotypeGridToolbar').getComponent('analyzeButton').disable();
 						}
@@ -287,10 +287,7 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 		ASPIREdb.EVENT_BUS.on('subject_selected', this.subjectSelectHandler, this);
 		ASPIREdb.EVENT_BUS.on('allPhenoSummary_sorted', this.sortAllPhenoSummary,this);
 		ASPIREdb.EVENT_BUS.on('selectedPhenoSummary_sorted', this.sortSelectedPhenoSummary,this);
-		
-		
-		
-
+	
 	},
 	
 	/**
@@ -320,6 +317,8 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 			}
 			ASPIREdb.EVENT_BUS.fireEvent('phenotype_selected',names );
 			this.getDockedComponent('phenotypeGridToolbar').getComponent('subjectLabelButton').enable();
+			//var grid= ASPIREdb.view.PhenotypeSubjectLabelWindow.getComponent('phenotypeSubjectLabelGrid');
+			//grid.getStore().removeAll();
 			
 		}else
 		{
