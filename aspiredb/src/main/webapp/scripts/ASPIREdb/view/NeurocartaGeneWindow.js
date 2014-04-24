@@ -56,14 +56,14 @@ Ext.define('ASPIREdb.view.NeurocartaGeneWindow', {
 		
 		var ontologyPrefix = "http://purl.obolibrary.org/obo/";
 	
-		/**GeneService.findGenesWithNeurocartaPhenotype( ontologyPrefix + uri, function(gvos){
-			console.log('gene value objects returned from neurocarta'+gvos);
-			ref.populateGrid(gvos, uri);
+		GeneService.findGenesAndURIsWithNeurocartaPhenotype( ontologyPrefix + uri, function(gvos){
+						
+			ref.populateGrid(gvos,uri);
 			grid.setLoading(false);
 			
-		});	*/
+		});	
 		
-		PhenotypeService.populateDescendantPhenotypes( ontologyPrefix + uri, function(pvos){
+		/**PhenotypeService.populateDescendantPhenotypes( ontologyPrefix + uri, function(pvos){
 			
 			var phenotypeGeneMap= pvos;
 			var map = new Ext.util.HashMap();
@@ -81,18 +81,20 @@ Ext.define('ASPIREdb.view.NeurocartaGeneWindow', {
     		grid.setLoading(false);
 			
 			
-		});
+		});*/
 		
 	},
 
-	//GeneValueObject
+	
 	populateGrid : function(gvos,uri) {		
 		
 		var grid = ASPIREdb.view.NeurocartaGeneWindow.getComponent('neurocartaGeneGrid');
 		
 		var data = [];
-		for ( var i = 0; i < gvos.length; i++) {
-			var vo = gvos[i];
+		for (var key in gvos){
+			console.log('gene value objects returned from neurocarta'+gvos[key]);
+			var vo = gvos[key];
+			var pname= key.split('":"')
 			
 			var linkToGemma = "";
 			
@@ -100,11 +102,11 @@ Ext.define('ASPIREdb.view.NeurocartaGeneWindow', {
 				linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl(vo.symbol);
 			}
 			
-
-			var row = [ vo.symbol, vo.geneBioType, vo.name, linkToGemma ];
+			var row = [ vo.symbol, vo.geneBioType, vo.name,pname[1], linkToGemma ];
 			data.push(row);
-		}
-
+			}
+		
+	
 		grid.store.loadData(data);
 		grid.setLoading(false);
 		
@@ -112,7 +114,7 @@ Ext.define('ASPIREdb.view.NeurocartaGeneWindow', {
 
 	},
 	
-	//GeneValueObject
+	
 	populateNeurocartaGrid: function(map, uri) {		
 		
 		var grid = ASPIREdb.view.NeurocartaGeneWindow.getComponent('neurocartaGeneGrid');

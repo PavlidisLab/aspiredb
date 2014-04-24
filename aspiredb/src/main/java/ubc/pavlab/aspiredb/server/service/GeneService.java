@@ -25,6 +25,7 @@ import ubc.pavlab.aspiredb.shared.GeneValueObject;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * author: anton
@@ -36,6 +37,9 @@ public interface GeneService {
             throws NotLoggedInException, BioMartServiceException;
 
     public Collection<GeneValueObject> findGenesWithNeurocartaPhenotype(String phenotypeValueUri)
+            throws NotLoggedInException, ExternalDependencyException;
+    
+    public Map<String, GeneValueObject> findGenesAndURIsWithNeurocartaPhenotype(String phenotypeValueUri)
             throws NotLoggedInException, ExternalDependencyException;
     
     public Long saveUserGeneSet(String geneName,List<GeneValueObject> genes);
