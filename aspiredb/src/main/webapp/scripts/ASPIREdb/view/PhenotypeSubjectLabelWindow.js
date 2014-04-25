@@ -33,7 +33,7 @@ Ext.define('ASPIREdb.view.PhenotypeSubjectLabelWindow', {
 		var grid = ref.getComponent('phenotypeSubjectLabelGrid');
 		grid.populateGrid(psvos, selPhenotypes);
 		ref.show();
-		
+		////grid.updatePhenotypeSummaryMatrix();
 	},
 	
 populateGrid : function(psvos) {	
