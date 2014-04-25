@@ -212,6 +212,10 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 		    }
 		});
 
+        // hack to fix known Extjs bug with tooltip width being too small
+        // http://stackoverflow.com/questions/15834689/extjs-4-2-tooltips-not-wide-enough-to-see-contents
+        delete Ext.tip.Tip.prototype.minWidth;
+        
         var t = new Ext.ToolTip({
             floating: {
                 shadow: false
@@ -225,7 +229,12 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
         
         heatmap.on('cell-mouse-in', function(index) {
             //t.update('Cell Enter: '+index.row+','+index.col);
-            t.update("Value is " + this.matrix.data.getDataAt(this.matrix.rowOrder[index.row], this.matrix.colOrder[index.col]));
+            var colLabel = this.matrix.columns[this.matrix.colOrder[index.col]].Phenotype;
+            var rowLabel = this.matrix.rows[this.matrix.rowOrder[index.row]].Subject;
+            var cellValue = this.matrix.data.getDataAt(this.matrix.rowOrder[index.row], this.matrix.colOrder[index.col]);
+            t.update("Subject : " + rowLabel + "<br/>" + 
+                "Phenotype : " + colLabel + "<br/>" +
+                "Value : " + cellValue);
             t.show();
         });
         

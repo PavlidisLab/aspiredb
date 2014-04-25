@@ -16,45 +16,55 @@ Ext.define('DefaultControlPanel', {
         this.items = [
             {
                 xtype: 'panel',
-                layout: 'hbox',
-                width: 95,
-                height: 35,
+                layout: 'vbox',
+                pack : 'center',
+                width: 90,
+                height: 95,
                 items: [
                     {
-                        xtype: 'button',
-                        text: '5',
-                        width: 20,
-                        height: 20,
-                        handler: function() {
-                            this.updateCellSizes({width: 5, height: 5});
-                        },
-                        scope: this.getMatrix2viz()
+                        xtype : 'label',
+                        html : 'Zoom',
                     },
                     {
-                        xtype: 'button',
-                        text: '10',
-                        width: 20,
-                        height: 20,
-                        handler: function() {
-                            this.updateCellSizes({width: 10, height: 10});
-                        },
-                        scope: this.getMatrix2viz()
-                    },
-                    {
-                        xtype: 'button',
-                        text: '15',
-                        width: 20,
-                        height: 20,
-                        handler: function() {
-                            this.updateCellSizes({width: 15, height: 15});
-                        },
-                        scope: this.getMatrix2viz()
+                        layout : 'hbox',
+                        pack : 'center',
+                        items : [
+                            {
+                                xtype: 'button',
+                                text: '5',
+                                //width: 20,
+                                //height: 20,
+                                handler: function() {
+                                    this.updateCellSizes({width: 5, height: 5});
+                                },
+                                scope: this.getMatrix2viz()
+                            },
+                            {
+                                xtype: 'button',
+                                text: '10',
+                                //width: 20,
+                                //height: 20,
+                                handler: function() {
+                                    this.updateCellSizes({width: 10, height: 10});
+                                },
+                                scope: this.getMatrix2viz()
+                            },
+                            {
+                                xtype: 'button',
+                                text: '15',
+                                //width: 20,
+                                //height: 20,
+                                handler: function() {
+                                    this.updateCellSizes({width: 15, height: 15});
+                                },
+                                scope: this.getMatrix2viz()
+                            },]
                     },
                     {
                         xtype: 'button',
                         text: 'Fit',
-                        width: 30,
-                        height: 20,
+                        //width: 30,
+                        //height: 20,
                         handler: function() {
                             this.fitToScreen();
                         },
