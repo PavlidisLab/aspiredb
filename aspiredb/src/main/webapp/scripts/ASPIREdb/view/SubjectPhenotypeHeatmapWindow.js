@@ -29,10 +29,9 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 	title : 'Subject Phenotype Heatmap',
 	closable : true,
 	closeAction : 'hide',
-    resizable: false,
 	width : 925,
 	height : 760,
-	//layout : 'fit',
+	layout : 'fit',
 	bodyStyle : 'padding: 5px;',
 	id : 'subjectPhenotypeHeatmapWindow',
 	
@@ -89,6 +88,7 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 		    ctx.fillRect(1, 1, size.width - 2, size.height - 2);
 		};
 
+        // TODO support data types with more than 2 values
 		M2V.Util.dataType.renderAbsentPresentCell = function (ctx, value, row, column, size) {
 		    // TODO write a legend
             var color;
@@ -212,6 +212,11 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 		    }
 		});
 
+        var resizer = Ext.create('Ext.resizer.Resizer', {
+            handles: 'all',
+            target: heatmap
+        });
+        
         // hack to fix known Extjs bug with tooltip width being too small
         // http://stackoverflow.com/questions/15834689/extjs-4-2-tooltips-not-wide-enough-to-see-contents
         delete Ext.tip.Tip.prototype.minWidth;

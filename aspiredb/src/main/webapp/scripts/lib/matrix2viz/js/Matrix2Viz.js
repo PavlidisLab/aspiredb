@@ -134,8 +134,7 @@ Ext.define('Matrix2Viz', {
                 border: false,
                 collapsible: false,
                 layout: {
-                    type: 'hbox',
-                    align: 'top'
+                    type : 'border'
                 },
                 items: [
                     {
@@ -145,7 +144,9 @@ Ext.define('Matrix2Viz', {
                         propertiesToRender: this.getLabelFormat().row,
                         labelVisibleLength: panelSizes.verticalLabelWidth,
                         width: 100,
-                        height: 100
+                        height: 100,
+                        region : 'west',
+                        border : false
                     },
                     {
                         xtype: 'box',
@@ -161,7 +162,16 @@ Ext.define('Matrix2Viz', {
                         clusterTree: this.getClustering().columnClustering,
                         width: matrixContainerSize.width,
                         height: panelSizes.dendrogramHeight,
-                        border: false
+                        border: false,
+                        region : 'center'
+                    },
+                    {
+                        xtype: 'panel',
+                        itemId: 'bottomRightFillPanel',
+                        border: false,
+                        width: 100,
+                        height : 100,
+                        region : 'east'
                     }
                 ]
             },

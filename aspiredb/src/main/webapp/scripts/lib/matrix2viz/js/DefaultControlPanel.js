@@ -28,6 +28,7 @@ Ext.define('DefaultControlPanel', {
                     {
                         layout : 'hbox',
                         pack : 'center',
+                        border: false,
                         items : [
                             {
                                 xtype: 'button',
