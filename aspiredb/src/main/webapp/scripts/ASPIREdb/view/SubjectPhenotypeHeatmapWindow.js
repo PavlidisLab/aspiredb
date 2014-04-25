@@ -52,11 +52,11 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
             } else {
                 type = 'binary';
             }
-            matrixColumnMetadata.push( { label: matrix.columnNames[i], type: type } );
+            matrixColumnMetadata.push( { Phenotype : matrix.columnNames[i], type: type } );
         }
         
         for ( var i = 0 ; i < matrix.rowNames.length ; i++ ) {
-            matrixRowMetadata.push( { label: matrix.rowNames[i]  } );
+            matrixRowMetadata.push( { Subject : matrix.rowNames[i]  } );
         }
         
         var convertedData = this.convertData(matrix.matrix, matrixColumnMetadata);
@@ -137,11 +137,11 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 		    data: dataMatrix,
 		    labelFormat: {
 		        row: [
-		            {name: 'label', size: 90},
+		            {name: 'Subject', size: 90},
 		            //{name: 'group', size: 50}
 		        ],
 		        column: [
-		            {name: 'label', size: 100},
+		            {name: 'Phenotype', size: 100},
 		            //{name: 'metaNumber', size: 10},
 		            //{name: 'type', size: 50}
 		        ]
@@ -164,7 +164,7 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 		            }
 		        },
 		        rowMetadata: {
-		            'label': {
+		            'Subject': {
 		                render: renderDefaults.text
 		            },
 		            /*'group': {
@@ -172,7 +172,7 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 		            }*/
 		        },
 		        columnMetadata: {
-		            'label': {
+		            'Phenotype': {
 		                render: renderDefaults.text
 		            },
 		            /*'metaNumber': {
@@ -218,48 +218,43 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
             },
             html: 'Events',
             hideDelay: 1,
+            target : heatmap.el,
             closable: false
         });
         t.show();
         
         heatmap.on('cell-mouse-in', function(index) {
-            t.setTarget(this.matrix.el);
             //t.update('Cell Enter: '+index.row+','+index.col);
             t.update("Value is " + this.matrix.data.getDataAt(this.matrix.rowOrder[index.row], this.matrix.colOrder[index.col]));
             t.show();
         });
         
         heatmap.on('cell-mouse-out', function() {
-            t.setTarget(this.matrix.el);
             //t.update('Cell Leave');
             t.show();
         });
         
         heatmap.on('cell-mouse-click', function() {
-            t.setTarget(this.matrix.el);
             //t.update('Cell Click');
             t.show();
         });
         
         heatmap.on('label-mouse-in', function(index) {
-            t.setTarget(this.matrix.el);
             //t.update('Label Enter: '+index.index+','+index.subIndex);
             if (index.orientation == Orientation.HORIZONTAL) {
-                t.update(this.matrix.rows[this.matrix.rowOrder[index.index]].label);
+                t.update(this.matrix.rows[this.matrix.rowOrder[index.index]].Subject);
             } else if (index.orientation == Orientation.VERTICAL) {
-                t.update(this.matrix.columns[this.matrix.colOrder[index.index]].label);
+                t.update(this.matrix.columns[this.matrix.colOrder[index.index]].Phenotype);
             }
             t.show();
         });
         
         heatmap.on('label-mouse-out', function() {
-            t.setTarget(this.matrix.el);
             //t.update('Label leave: ');
             t.show();
         });
         
         heatmap.on('label-mouse-click', function(index) {
-            t.setTarget(this.matrix.el);
             //t.update('Label click: '+index.index+','+index.subIndex);
             t.show();
         });
