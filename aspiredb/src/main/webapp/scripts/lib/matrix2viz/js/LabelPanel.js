@@ -110,7 +110,8 @@ Ext.define('LabelPanel', {
 
         return {
             index: index,
-            subIndex: subIndex
+            subIndex: subIndex,
+            orientation: this.orientation
         };
     },
 

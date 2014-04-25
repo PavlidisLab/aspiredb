@@ -212,6 +212,58 @@ Ext.define('ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 		    }
 		});
 
+        var t = new Ext.ToolTip({
+            floating: {
+                shadow: false
+            },
+            html: 'Events',
+            hideDelay: 1,
+            closable: false
+        });
+        t.show();
+        
+        heatmap.on('cell-mouse-in', function(index) {
+            t.setTarget(this.matrix.el);
+            //t.update('Cell Enter: '+index.row+','+index.col);
+            t.update("Value is " + this.matrix.data.getDataAt(this.matrix.rowOrder[index.row], this.matrix.colOrder[index.col]));
+            t.show();
+        });
+        
+        heatmap.on('cell-mouse-out', function() {
+            t.setTarget(this.matrix.el);
+            //t.update('Cell Leave');
+            t.show();
+        });
+        
+        heatmap.on('cell-mouse-click', function() {
+            t.setTarget(this.matrix.el);
+            //t.update('Cell Click');
+            t.show();
+        });
+        
+        heatmap.on('label-mouse-in', function(index) {
+            t.setTarget(this.matrix.el);
+            //t.update('Label Enter: '+index.index+','+index.subIndex);
+            if (index.orientation == Orientation.HORIZONTAL) {
+                t.update(this.matrix.rows[this.matrix.rowOrder[index.index]].label);
+            } else if (index.orientation == Orientation.VERTICAL) {
+                t.update(this.matrix.columns[this.matrix.colOrder[index.index]].label);
+            }
+            t.show();
+        });
+        
+        heatmap.on('label-mouse-out', function() {
+            t.setTarget(this.matrix.el);
+            //t.update('Label leave: ');
+            t.show();
+        });
+        
+        heatmap.on('label-mouse-click', function(index) {
+            t.setTarget(this.matrix.el);
+            //t.update('Label click: '+index.index+','+index.subIndex);
+            t.show();
+        });
+
         this.removeAll();
 		this.add(heatmap);
 		

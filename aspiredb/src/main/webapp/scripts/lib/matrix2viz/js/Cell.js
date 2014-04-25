@@ -37,10 +37,6 @@ Cell.prototype.highlight = function () {
 };
 
 Cell.prototype.clearHighlight = function () {
-    if ( this.tip != null) {
-        this.tip.hide();
-    }
-    
     this.ctxOverlay.save();
     this.ctxOverlay.translate(this.position.x, this.position.y);
     this.ctxOverlay.clearRect(0, 0, this.size.width, this.size.height);
@@ -66,17 +62,4 @@ Cell.prototype.renderCellContentHighlight = function (ctx, data, row, column, si
     ctx.strokeStyle = "rgb(0,0,0)";
     ctx.lineWidth = 1;
     ctx.strokeRect(0.5, 0.5, size.width - 1, size.height - 1);
-    
-    if (this.tip == null) {
-        this.tip = Ext.create('Ext.tip.ToolTip', { 
-            html: "Value is " + this.data,
-            target: this.ctxOverlay.canvas,
-            anchorToTarget : true,
-            trackMouse : true,
-            hidden : true,
-            constrain : true,
-        });
-        
-    } 
-    this.tip.show();
 };
