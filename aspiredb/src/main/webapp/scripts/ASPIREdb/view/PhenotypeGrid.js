@@ -17,7 +17,7 @@
  *
  */
 
-Ext.require([ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.PhenotypeEnrichmentWindow', 'Ext.grid.column.Column', 'ASPIREdb.view.NeurocartaGeneWindow', 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow','ASPIREdb.view.PhenotypeSubjectLabelWindow']);
+Ext.require([ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.PhenotypeEnrichmentWindow', 'Ext.grid.column.Column', 'ASPIREdb.view.NeurocartaGeneWindow', 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow','ASPIREdb.view.PhenotypeContigencyTableWindow']);
 
 // TODO js documentation
 Ext.define('ASPIREdb.view.PhenotypeGrid', {
@@ -657,7 +657,9 @@ Ext.define('ASPIREdb.view.PhenotypeGrid', {
 	
 	viewSubjectLabel: function(){
 		console.log("view subject labels");
-		ASPIREdb.view.PhenotypeSubjectLabelWindow.initGridAndShow(this.phenotypeSummaryValueObjects,this.selPhenotypes);	
+		ASPIREdb.view.PhenotypeContigencyTableWindow.initGridAndShow(this.phenotypeSummaryValueObjects,this.selPhenotypes);
+		//ASPIREdb.view.MatrixWindow.show();
+        //ASPIREdb.view.MatrixWindow.draw( matrix );
 		
 	},
 	
