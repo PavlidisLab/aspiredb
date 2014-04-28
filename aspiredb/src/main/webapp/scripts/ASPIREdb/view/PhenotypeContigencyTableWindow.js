@@ -35,8 +35,9 @@ Ext.define('ASPIREdb.view.PhenotypeContigencyTableWindow', {
 
 	
 	initGridAndShow : function(psvos, selPhenotypes){
-
-		var ref = this;
+		
+		var tableContainer = this.down('#tableContainer');
+		tableContainer.removeAll(true);
 		
 		
 		//if only one phenotype is selected
@@ -159,11 +160,11 @@ Ext.define('ASPIREdb.view.PhenotypeContigencyTableWindow', {
 		
 		if (columnNames.length >1){
 			for (var i=0;i<columnNames.length; i++){
-				columns.push({header:columnNames[i],dataIndex :columnNames[i],flex :1});
+				columns.push({header:columnNames[i],dataIndex :columnNames[i],flex :1, renderer : function(value) {return value.length;}});
 			}			
 		}
 		else {
-			columns.push({header:'Subjects',dataIndex:'subjects',flex:1});
+			columns.push({header:'Subjects',dataIndex:'subjects',flex:1, renderer : function(value) {return value.length;}});
 		}
 		//create grid
 		var grid = Ext.create('Ext.grid.Panel',{
@@ -176,7 +177,27 @@ Ext.define('ASPIREdb.view.PhenotypeContigencyTableWindow', {
 		    autoRender:true,
 		    width: 850,
 		    columnLines : true,
-		    
+		    /**listeners: {
+				cellclick: function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+													
+					this.selModel.select(record.index, false, false);
+					
+				
+				}
+			},*/
+			selModel : Ext.create('Ext.selection.CellModel', {
+				mode : 'MULTI',					
+				 listeners: {
+				        click: {
+				        	
+				            element: 'el', //bind to the underlying el property on the panel
+				            fn: function(){ 
+				            	console.log('click el'); 
+				            	
+				            	}
+				        },
+				 }
+			}),
 		   
 		});
 	
