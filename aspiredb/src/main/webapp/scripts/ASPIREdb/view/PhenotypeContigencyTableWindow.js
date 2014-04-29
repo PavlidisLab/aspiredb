@@ -1,3 +1,22 @@
+/*
+ * The aspiredb project
+ * 
+ * Copyright (c) 2013 University of British Columbia
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 Ext.require([ 'Ext.window.*', 'Ext.layout.container.Border','ASPIREdb.view.CreateLabelWindow']);
 
 
@@ -110,21 +129,19 @@ Ext.define('ASPIREdb.view.PhenotypeContigencyTableWindow', {
 										var row=[];
 										row.push(rowSubjects[0]);
 										rowNames.push(rowSubjects[0]);
-										var resultSubjects=[];
+										
 						
 									for (var colName in colData){
 										if (colName!='transpose'){
+											var resultSubjects=[];
 											console.log('column names : '+colName);
 											var colSubjects = colData[colName];
-											//if(columnNames.indexOf(colSubjects[colName]== -1)){
 													for (var k=0;k<rowSubjects[1].length;k++){
 															if (colSubjects[1].indexOf(rowSubjects[1][k]) !=-1 ){  
 																	resultSubjects.push(rowSubjects[1][k]);
 															}
 													}
-													//columnNames.push(colSubjects[0]);
-													row.push(resultSubjects);								
-											//}											
+													row.push(resultSubjects);	
 										}	
 									}						
 							}
@@ -151,7 +168,7 @@ Ext.define('ASPIREdb.view.PhenotypeContigencyTableWindow', {
 				fields.push(columnNames[i]);
 			}
 		}else fields.push('subjects');
-		//creae store
+		//create store
 		var suggestContigencyTableStore = Ext.create('Ext.data.ArrayStore', {
 					fields : fields,
 					data : data,
@@ -185,20 +202,14 @@ Ext.define('ASPIREdb.view.PhenotypeContigencyTableWindow', {
 		    width: 850,
 		    columnLines : true,
 		    listeners: {
-				cellclick: function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
-						var test=record.cellIndex;
-						
+				cellclick: function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {							
 						ref.makeLabelHandler(record.raw[cellIndex]);
-					//this.selModel.select(record.index, false, false);
-					
-				
 				}
 			},
 			selModel : Ext.create('Ext.selection.CellModel', {
 				mode : 'MULTI',					
 				 listeners: {
-				        click: {
-				        	
+				        click: {				        	
 				            element: 'el', //bind to the underlying el property on the panel
 				            fn: function(){ 
 				            	console.log('click el'); 
@@ -218,7 +229,7 @@ Ext.define('ASPIREdb.view.PhenotypeContigencyTableWindow', {
 		},
 		
 		/**
-		 * Reusing the code n subject grid
+		 * Reusing the code in subject grid
 		 * Assigns a Label
 		 * @param : event
 		 */
@@ -275,7 +286,7 @@ Ext.define('ASPIREdb.view.PhenotypeContigencyTableWindow', {
 		},
 		
 		/**
-		 * Reusing the code i subject grid
+		 * Reusing the code in subject grid
 		 * Add the label to the store
 		 * @param: label value object, selected subject Ids
 		 */
@@ -309,6 +320,7 @@ Ext.define('ASPIREdb.view.PhenotypeContigencyTableWindow', {
 		},
 		
 		/**
+		 * Reusing the code in subject grid
 		 * Load subject labels created by the user
 		 * @return visibleLabels
 		 */
