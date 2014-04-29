@@ -1,4 +1,4 @@
-Ext.require([ 'Ext.window.*', 'Ext.layout.container.Border']);
+Ext.require([ 'Ext.window.*', 'Ext.layout.container.Border','ASPIREdb.view.CreateLabelWindow']);
 
 
 Ext.define('ASPIREdb.view.PhenotypeContigencyTableWindow', {
@@ -12,7 +12,11 @@ Ext.define('ASPIREdb.view.PhenotypeContigencyTableWindow', {
 	height : 450,
 	layout : 'fit',
 	bodyStyle : 'padding: 5px;',
-
+	
+	config :{
+		visibleLabels : {},
+		selSubjects :[]
+	},
 	items : [ {
 		region : 'center',
 		xtype : 'container',
@@ -30,6 +34,8 @@ Ext.define('ASPIREdb.view.PhenotypeContigencyTableWindow', {
 	initComponent : function() {
 
 		this.callParent();
+		//load existing subject labels
+		this.visibleLabels = this.createVisibleLabels();
 
 	},
 
@@ -136,6 +142,7 @@ Ext.define('ASPIREdb.view.PhenotypeContigencyTableWindow', {
 
 		createGridPanel :function (data,columnNames,gridPanelTitle){
 		
+			var ref=this;
 		var fields=[];
 		fields.push('rowName');
 		
@@ -177,14 +184,16 @@ Ext.define('ASPIREdb.view.PhenotypeContigencyTableWindow', {
 		    autoRender:true,
 		    width: 850,
 		    columnLines : true,
-		    /**listeners: {
+		    listeners: {
 				cellclick: function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
-													
-					this.selModel.select(record.index, false, false);
+						var test=record.cellIndex;
+						
+						ref.makeLabelHandler(record.raw[cellIndex]);
+					//this.selModel.select(record.index, false, false);
 					
 				
 				}
-			},*/
+			},
 			selModel : Ext.create('Ext.selection.CellModel', {
 				mode : 'MULTI',					
 				 listeners: {
@@ -206,6 +215,119 @@ Ext.define('ASPIREdb.view.PhenotypeContigencyTableWindow', {
 		tableContainer.add(grid);	
 		tableContainer.doLayout();
 				
+		},
+		
+		/**
+		 * Reusing the code n subject grid
+		 * Assigns a Label
+		 * @param : event
+		 */
+		makeLabelHandler : function(subjectIds) {
+
+			var me = this;
+			var projectIds= ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+			SubjectService.getSubjects(projectIds[0],subjectIds, {
+				callback : function(selectedSubjectValueObjects) {	
+					me.selSubjects=selectedSubjectValueObjects;											
+				}									
+			});
+
+			Ext.define('ASPIREdb.view.CreateLabelWindowSubject', {
+				isSubjectLabel : true,
+				extend : 'ASPIREdb.view.CreateLabelWindow',
+
+				// override
+				onOkButtonClick : function() {
+					
+					var labelCombo = this.down("#labelCombo");
+					var vo = this.getLabel();
+					if (vo== null){
+						return;
+					}
+					var labelIndex=labelCombo.getStore().findExact('display',vo.name);
+					if ( labelIndex!=-1){
+								//activate confirmation window
+								Ext.MessageBox.confirm('Label already exist', 'Label already exist. Add into it ?', function(btn){
+								   if(btn === 'yes'){
+									   me.addLabelHandler(vo,subjectIds);
+									   this.hide();
+									   //ASPIREdb.EVENT_BUS.fireEvent('subject_label_created');
+								   }
+								   
+								   
+								 }, this);
+
+					}
+					else{
+						me.addLabelHandler(vo,subjectIds);
+						this.hide();
+						//ASPIREdb.EVENT_BUS.fireEvent('subject_label_created');
+					}
+						
+					
+
+				}
+			});
+
+			var labelWindow = new ASPIREdb.view.CreateLabelWindowSubject();
+			labelWindow.show();
+			
+		},
+		
+		/**
+		 * Reusing the code i subject grid
+		 * Add the label to the store
+		 * @param: label value object, selected subject Ids
+		 */
+		addLabelHandler: function(vo,selSubjectIds) {
+			 
+			 var me=this;
+			    
+				// store in database
+				SubjectService.addLabel(selSubjectIds, vo, {
+					callback : function(addedLabel) {
+
+						addedLabel.isShown = true;
+						LabelService.updateLabel(addedLabel);
+
+						var existingLab = me.visibleLabels[addedLabel.id];
+						if (existingLab == undefined) {
+							me.visibleLabels[addedLabel.id] = addedLabel;
+						} else {
+							existingLab.isShown = true;
+						}
+						for ( var i = 0; i < me.selSubjects.length; i++) {
+							me.selSubjects[i].labels.push(
+									addedLabel);
+						}
+						
+						ASPIREdb.EVENT_BUS.fireEvent('subject_label_changed');
+					
+					}
+				});
+				
+		},
+		
+		/**
+		 * Load subject labels created by the user
+		 * @return visibleLabels
+		 */
+		createVisibleLabels : function() {
+			var visibleLabels = [];
+			var suggestionContext = new SuggestionContext();
+			suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+			
+			// load all labels created by this user
+			SubjectService.suggestLabels(suggestionContext, {
+				callback : function(labels) {
+					for ( var idx in labels) {
+						var label = labels[idx];
+						visibleLabels[label.id] = label;
+					}
+				}
+			});	
+			
+			return visibleLabels;
 		},
 
 	
