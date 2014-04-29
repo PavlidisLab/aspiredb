@@ -19,11 +19,7 @@
 Ext.require([ 'Ext.Window', 'ASPIREdb.store.LabelStore',
 		'Ext.grid.column.Action', 'Ext.ux.CheckColumn','Ext.form.field.*', 'Ext.picker.Color' ]);
 
-var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
-    //clicksToMoveEditor: 1,
-	clicksToEdit: 2,
-     autoCancel: false
-});
+
 /**Ext.define('Ext.ux.ColorPickerCombo', {
 	  extend: 'Ext.form.field.Trigger',
 	  alias: 'widget.colorcbo',
@@ -57,6 +53,33 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
 	  } 
 	});*/
 
+
+var colorPicker= Ext.create('Ext.picker.Color', {
+	itemId : 'colorPicker',
+	id :'colorPicker',
+	displayField: 'labelColour',
+    queryMode: 'local',
+	resizable: false,
+    draggable: true,
+    closeAction: 'hide',
+    width: 150,
+    height: 135,
+    border: true,
+    hidden: false,
+    //layout:'fit',
+    fixed :true,
+    frame:true,
+    formBind:true,
+    listeners: {
+        select: function(picker, selColor) {
+            alert(selColor);
+            //picker.setValue(selColor);
+            this.displayField.value=selColor;
+        }
+    }
+});
+
+
 /**
  * For removing and showing labels
  */
@@ -78,7 +101,9 @@ Ext.define('ASPIREdb.view.LabelControlWindow',
 					config : {
 						visibleLabels : [],
 						isSubjectLabel : false,
-						selectedIds : []
+						selectedIds : [],
+						XValue:0,
+						YValue:0,
 					},
 					constructor : function(cfg) {
 						this.initConfig(cfg);
@@ -144,13 +169,23 @@ Ext.define('ASPIREdb.view.LabelControlWindow',
                                             {
                                             	header : 'Color',
                                                 dataIndex : 'labelColour',
-                                                width : 100,
-                                                editor: {
-                                                	xtype: 'textfield',
-                            		                allowBlank: false,
-                            		                
-                                                }, 
-                                              
+                                                editor ://colorPicker,
+                                                {                                                	
+                                                	xtype:colorPicker,
+                                                	allowBlank: false,
+                                                	displayField :'labelColour',
+                                                	
+                                                },
+                                                width : 100,                                                 
+                                               listeners :{
+                                            	   click : function(e){ 
+                                            		    console.log('color picker X '+e.getX()+'and Y '+e.getY()); 
+                                            		    this.XValue = e.getX();
+                                            		    this.YValue =e.getY();
+                                            		    
+                                                		}
+                                            
+                                               }
                                             },
                                             {
                                                 header : 'Show',
@@ -166,7 +201,19 @@ Ext.define('ASPIREdb.view.LabelControlWindow',
                                                 id : 'labelRemoveColumn',
                                                 flex : 1
                                             }, ],
-                                            plugins: [rowEditing],
+                                            plugins: [Ext.create('Ext.grid.plugin.CellEditing', {
+                                                     	clicksToEdit: 2,
+                                                     	ptype:'cellEditing',
+                                                     	autoCancel: false,
+                                             
+                                            })],
+                                           listeners : {
+                                                cellclick : function(e) {
+                                                    console.log('hi. I am in grid listener'+e.getX());
+                                                    //console.log('testing ***************'+e.getEditor());
+                                                    //colorPicker.setPosition(e.getX(), e.getY());
+                                                }
+                                            }
                                         },// end of grid
                                         // buttons
                                         { xtype : 'container',
@@ -241,13 +288,21 @@ Ext.define('ASPIREdb.view.LabelControlWindow',
 								me.onLabelShowCheckChange, this);
 
                         me.down('#okButton').on('click', me.okButtonHandler, this);        
-                        me.down('#cancelButton').on('click', me.cancelButtonHandler, this);                        
+                        me.down('#cancelButton').on('click', me.cancelButtonHandler, this);    
+                        //me.down('#labelSettingsGrid').on('cellclick',me.xyPositionFoundHandler, this);
                     },
 
 					cancelButtonHandler : function(event) {
 				        this.destroy();
 				    },
 				    
+
+				    xyPositionFoundHandler : function (e){
+				    				    	console.log('get X and Y :'+e);
+				    				            this.X =e.getPageX();
+				                            	this.Y=e.getPageY();
+				                            	ASPIREdb.EVENT_BUS.fireEvent('position_found', this.X, this.Y);                   
+				    },
 				    
 				    okButtonHandler : function(event) {
                         var me = this;
