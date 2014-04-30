@@ -465,8 +465,7 @@ Ext
 						var segment = {
 							start : variant.genomicRange.baseStart,
 							end : variant.genomicRange.baseEnd,
-							color : "#989898", //"rgb(128,128,128)",// "rgba(0,0,0,
-							// 0.4)",//grey
+							color : "#989898", //"rgb(128,128,128)",// "rgba(0,0,0,0.4)",//grey
 							emphasize : false
 						};
 
