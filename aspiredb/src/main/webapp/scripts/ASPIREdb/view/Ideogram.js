@@ -481,17 +481,18 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	        if (property instanceof CharacteristicProperty) {
 	           var characteristicValueObject = variant.characteristics[property.name];
 	            if (characteristicValueObject != null) {
-	            	if (characteristicValueObject== undefined){
-	            		//console.log('undefined characteristics : '+property.name);
+	            	if (characteristicValueObject== undefined){	 
+	            		//considering only the first label given to the subject
 	            	}else propertyValues.push(characteristicValueObject.value);
 	            }
 	        }
 	        //if variant labels
 	        if (property instanceof VariantLabelProperty) {
 	        	if (variant.labels.length >0){
-	        		propertyValues.push(variant.labels[0].name);
-	        		//console.log('variant label name :'+variant.labels[0].name);
+	        		//considering only the first label given to the subject
+	        		propertyValues.push(variant.labels[0].name);	    
 	        	}
+	        	//else propertyValues.push('No Label');
 	        }
 	      //if subject labels
 	        if (property instanceof SubjectLabelProperty) {
@@ -500,7 +501,8 @@ Ext.define('ASPIREdb.view.Ideogram', {
 	        		propertyValues.push(subject.labels[0].name);
 	        		console.log('variant label name :'+subject.labels[0].name);
 	        	}
-	        	
+	        	//else propertyValues.push('No Label');
+	        		        	
 	        	
 	        }
 	        this.displayedProperty=property;
@@ -525,22 +527,21 @@ Ext.define('ASPIREdb.view.Ideogram', {
 							
 		}
 		
-		//this.displayedProperty.displayType =propertyValues;
-		
-		
-		//this.setDisplayedProperty(this.displayedProperty);
 		
 		var valuetoColourArray =[];
+		var displayText='';
 		
 		for (var i=0; i< ASPIREdb.view.ideogram.VariantLayer.valueToColourMap.length;i++){
 			valuetoColourArray.push(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap[i]);
+			displayText = displayText+ASPIREdb.view.ideogram.VariantLayer.valueToColourMap[i];
 		}
 		
 		//setting the colors for the ideogram ledgent
 		if (repeat){
 			//do not update the ledgend
 		}
-		else this.colourLegend.update(valuetoColourArray,this.displayedProperty); 
+		else this.colourLegend.update(displayText); 
+			//this.colourLegend.update(valuetoColourArray,this.displayedProperty); 
 		console.log('colour legend '+valuetoColourArray);
 		
 	},
@@ -566,7 +567,8 @@ Ext.define('ASPIREdb.view.Ideogram', {
 		// List<VariantValueObject> 
 		var variants = variantValueObjects.slice(); // copy array
 		this.sortVariantsBySize(variants);
-
+		
+		
 		for ( var i = 0; i < variants.length; i++) {
 			var variant = variants[i];
 			var chrName = variant.genomicRange.chromosome;
@@ -591,7 +593,9 @@ Ext.define('ASPIREdb.view.Ideogram', {
 		/* List<VariantValueObject> */
 		var variants = variantValueObjects.slice(); // copy array
 		this.sortVariantsBySize(variants);
-
+		this.displayedProperty.displayType =null;
+       	this.setDisplayedProperty(this.displayedProperty);
+		
 		for ( var i = 0; i < variants.length; i++) {
 			var variant = variants[i];
 			var chrName = variant.genomicRange.chromosome;
@@ -606,6 +610,18 @@ Ext.define('ASPIREdb.view.Ideogram', {
 				
 			
 		}
+		
+		var valuetoColourArray =[];
+		var displayText='';
+		
+		for (var i=0; i< ASPIREdb.view.ideogram.VariantLayer.valueToColourMap.length;i++){
+			valuetoColourArray.push(ASPIREdb.view.ideogram.VariantLayer.valueToColourMap[i]);
+			displayText = displayText+ASPIREdb.view.ideogram.VariantLayer.valueToColourMap[i];
+		}
+		
+		//setting the colors for the ideogram ledgend
+		this.colourLegend.update(displayText); 
+		
 	},
 	
 	drawDimmedVariants : function(variantValueObjects) {

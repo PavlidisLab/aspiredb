@@ -178,6 +178,7 @@ Ext
 									
 										for (var i = 0; i < property.displayType.length; i++) {
 											var value = property.displayType[i];
+											
 											if (this.characteristicList.length == 0 || this.characteristicList[value] == undefined) {
 												this.valueToColourMap.push([ "<font color='"
 																+ this.colors[this.nextColourIndex]
@@ -270,6 +271,7 @@ Ext
 									if (this.self.valueToColourMap.length == 0) {
 										this.self.valueToColourMap
 												.push([ pushvalue ]);
+										this.self.characteristicList[value] =color;
 									}
 
 									for (var i = 0; i < this.self.valueToColourMap.length; i++) {
@@ -280,12 +282,21 @@ Ext
 									if (vtcmStat == 'No') {
 										this.self.valueToColourMap
 												.push([ pushvalue ]);
+										this.self.characteristicList[value] =color;
 									}
 
 								} else {
-									color = "grey";
-									console.log('no subject label (default) :'
-											+ color);
+									value="No Label";
+									var color = this.self.characteristicList[value];
+									if (color ==null){
+										color = "#303030";
+										
+										var pushvalue = "<font color="+color+">" + value + "</font><br>\n";
+										this.self.valueToColourMap.push([ pushvalue ]);
+										this.self.characteristicList[value] =color;
+										console.log('no subject label (default) :'+ color);
+									}
+									
 								}
 							}
 
@@ -303,6 +314,7 @@ Ext
 									if (this.self.valueToColourMap.length == 0) {
 										this.self.valueToColourMap
 												.push([ pushvalue ]);
+										this.self.characteristicList[value] =color;
 									}
 
 									for (var i = 0; i < this.self.valueToColourMap.length; i++) {
@@ -313,12 +325,22 @@ Ext
 									if (vtcmStat == 'No') {
 										this.self.valueToColourMap
 												.push([ pushvalue ]);
+										this.self.characteristicList[value] =color;
 									}
 
 								} else {
-									color = "grey";
-									console.log('no subject label (default) :'
-											+ color);
+									value="No Label";
+									var color = this.self.characteristicList[value];
+									if (color ==null){
+										color = "#303030";
+										
+										var pushvalue = "<font color="+color+">" + value + "</font><br>\n";
+										this.self.valueToColourMap.push([ pushvalue ]);
+										this.self.characteristicList[value] =color;
+										console.log('no subject label (default) :'
+												+ color);
+									}
+									
 								}
 							}
 
@@ -329,20 +351,61 @@ Ext
 
 								if (characteristicValueObject !== null) {
 									if (characteristicValueObject == undefined) {
-										console
-												.log('characteristic is undefined : '
-														+ property.name
-														+ '  !!!!!');
-										value = 'undefined';
-									} else
-										value = characteristicValueObject.value;
-
-									if (property.name == 'Characteristics') {
-
+										console.log('characteristic is undefined : '+ property.name	+ '  !!!!!');
+										value = 'No data';
 										var color = this.self.characteristicList[value];
 										
-										if (color == null) {									
-																			
+										if (color == null) {
+											color = '#303030';
+											var pushvalue = "<font color="+color+">" + value+ "</font><br>\n";
+											
+											this.self.valueToColourMap.push([ pushvalue]);		
+											this.self.characteristicList[value] =color;
+										}
+										
+									} else{
+										
+										value = characteristicValueObject.value;
+
+										if (property.name == 'Characteristics') {
+
+											var color = this.self.characteristicList[value];
+											
+											if (color == null) {									
+																				
+													var pushvalue = "<font color='"
+														+ this.self.colors[this.self.nextColourIndex]
+														+ "'>" + value
+														+ "</font><br>\n";
+													color = this.self.colors[this.self.nextColourIndex];
+													this.self.valueToColourMap.push([ pushvalue]);	
+													this.self.characteristicList[value] =color;
+													this.self.nextColourIndex++;																			
+
+											}
+										}
+
+										if (property.name == 'Inheritance') {
+											
+											var color = this.self.characteristicList[value];
+											
+											if (color == null) {
+												
+												var pushvalue = "<font color='"
+													+ this.self.colors[this.self.nextColourIndex]
+													+ "'>" + value
+													+ "</font><br>\n";
+												color = this.self.colors[this.self.nextColourIndex];
+												this.self.valueToColourMap.push([ pushvalue]);		
+												this.self.characteristicList[value] =color;
+												this.self.nextColourIndex++;	
+											
+											}
+										}
+
+										if (property.name == 'Common CNV') {
+											var color = this.self.characteristicList[value];
+											if (color == null) {
 												var pushvalue = "<font color='"
 													+ this.self.colors[this.self.nextColourIndex]
 													+ "'>" + value
@@ -350,74 +413,43 @@ Ext
 												color = this.self.colors[this.self.nextColourIndex];
 												this.self.valueToColourMap.push([ pushvalue]);	
 												this.self.characteristicList[value] =color;
-												this.self.nextColourIndex++;																			
+												this.self.nextColourIndex++;
+											}
+										}
 
+										if (property.name == 'Array Report') {
+											var color = this.self.characteristicList[value];
+											if (color == null) {
+												var pushvalue = "<font color='"
+													+ this.self.colors[this.self.nextColourIndex]
+													+ "'>" + value
+													+ "</font><br>\n";
+												color = this.self.colors[this.self.nextColourIndex];
+												this.self.valueToColourMap.push([ pushvalue]);	
+												this.self.characteristicList[value] =color;
+												this.self.nextColourIndex++;
+
+											}
+										}
+
+										if (property.name == 'Array Platform') {
+
+											var color = this.self.characteristicList[value];
+											if (color == null) {
+
+												var pushvalue = "<font color='"
+													+ this.self.colors[this.self.nextColourIndex]
+													+ "'>" + value
+													+ "</font><br>\n";
+												color = this.self.colors[this.self.nextColourIndex];
+												this.self.valueToColourMap.push([ pushvalue]);	
+												this.self.characteristicList[value] =color;
+												this.self.nextColourIndex++;
+											}
 										}
 									}
-
-									if (property.name == 'Inheritance') {
+									}
 										
-										var color = this.self.characteristicList[value];
-										
-										if (color == null) {
-											
-											var pushvalue = "<font color='"
-												+ this.self.colors[this.self.nextColourIndex]
-												+ "'>" + value
-												+ "</font><br>\n";
-											color = this.self.colors[this.self.nextColourIndex];
-											this.self.valueToColourMap.push([ pushvalue]);		
-											this.self.characteristicList[value] =color;
-											this.self.nextColourIndex++;	
-										
-										}
-									}
-
-									if (property.name == 'Common CNV') {
-										var color = this.self.characteristicList[value];
-										if (color == null) {
-											var pushvalue = "<font color='"
-												+ this.self.colors[this.self.nextColourIndex]
-												+ "'>" + value
-												+ "</font><br>\n";
-											color = this.self.colors[this.self.nextColourIndex];
-											this.self.valueToColourMap.push([ pushvalue]);	
-											this.self.characteristicList[value] =color;
-											this.self.nextColourIndex++;
-										}
-									}
-
-									if (property.name == 'Array Report') {
-										var color = this.self.characteristicList[value];
-										if (color == null) {
-											var pushvalue = "<font color='"
-												+ this.self.colors[this.self.nextColourIndex]
-												+ "'>" + value
-												+ "</font><br>\n";
-											color = this.self.colors[this.self.nextColourIndex];
-											this.self.valueToColourMap.push([ pushvalue]);	
-											this.self.characteristicList[value] =color;
-											this.self.nextColourIndex++;
-
-										}
-									}
-
-									if (property.name == 'Array Platform') {
-
-										var color = this.self.characteristicList[value];
-										if (color == null) {
-
-											var pushvalue = "<font color='"
-												+ this.self.colors[this.self.nextColourIndex]
-												+ "'>" + value
-												+ "</font><br>\n";
-											color = this.self.colors[this.self.nextColourIndex];
-											this.self.valueToColourMap.push([ pushvalue]);	
-											this.self.characteristicList[value] =color;
-											this.self.nextColourIndex++;
-										}
-									}
-								}
 							}
 
 						return color;
@@ -433,7 +465,7 @@ Ext
 						var segment = {
 							start : variant.genomicRange.baseStart,
 							end : variant.genomicRange.baseEnd,
-							color : "rgb(128,128,128)",// "rgba(0,0,0,
+							color : "#989898", //"rgb(128,128,128)",// "rgba(0,0,0,
 							// 0.4)",//grey
 							emphasize : false
 						};
@@ -463,8 +495,7 @@ Ext
 						var segment = {
 							start : variant.genomicRange.baseStart,
 							end : variant.genomicRange.baseEnd,
-							color : this.pickColor(variant, property),// red
-							// "rgb(255,0,0)"
+							color : this.pickColor(variant, property),// red "rgb(255,0,0)"
 							emphasize : false
 						};
 
