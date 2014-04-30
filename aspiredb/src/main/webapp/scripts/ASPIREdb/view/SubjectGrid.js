@@ -428,13 +428,13 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 	 * When all the subjects are selected this is executed
 	 */
 	selectAllHandler : function() {
-		if (this.selectAllStatus=='No'){
-			
+		//if (this.selectAllStatus=='No'){
+			this.cancelBubble=true;
 			//boolean true to suppressEvent
 			this.getSelectionModel().selectAll(true);		
 			this.selectionChangeHandler();
-			this.selectAllStatus ='Yes';
-		}
+		//	this.selectAllStatus ='Yes';
+		//}
 		
 
 	}
