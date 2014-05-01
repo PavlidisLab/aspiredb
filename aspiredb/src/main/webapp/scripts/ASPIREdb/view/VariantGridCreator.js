@@ -229,17 +229,16 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             columns : columnConfig,
             columnHeaders : columnHeaders,
             // multiSelect : true,
-
             listeners : {
-               selectionchange : function(variantGrid, selected, eOpts) {
-                  // this.selModel.select(record.index, false, false);
-                  // var test=selected;
-                  // this.selModel.selected =selected;
-               }
+               cellclick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
 
+                  this.selModel.select( record.index, false, false );
+
+               }
             },
-            selModel : Ext.create( 'Ext.selection.RowModel', {
+            selModel : Ext.create( 'Ext.selection.CellModel', {
                mode : 'MULTI',
+
             } ),
             stripeRows : true,
             height : 180,
@@ -290,11 +289,8 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
        * if (vvo.patientId == subjectId){
        * 
        * switch (vvo.variantType){ case "CNV": countCNV++; break; case "SNV": countSNV++; break; case "INDEL":
-       * countINDEL++; break; }
+       * countINDEL++; break; } }
        *  }
-       * 
-       *  }
-       * 
        *  },
        */
       /**
