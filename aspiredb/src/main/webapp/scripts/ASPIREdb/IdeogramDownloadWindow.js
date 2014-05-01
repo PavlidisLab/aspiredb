@@ -17,68 +17,62 @@
  *
  */
 
-Ext.define('ASPIREdb.IdeogramDownloadWindow', {
-	extend : 'Ext.Window',
-	singleton : true,
-	closable : true,
-	closeAction : 'hide',
-	width : 900,
-	height : 500,
-	layout : 'fit',
-	border: false,
-	maximizable : true,
-	title : 'Ideogram image in PNG format',
-	renderTo: Ext.getBody(),
-	
-	initComponent : function() {
+Ext.define( 'ASPIREdb.IdeogramDownloadWindow', {
+   extend : 'Ext.Window',
+   singleton : true,
+   closable : true,
+   closeAction : 'hide',
+   width : 900,
+   height : 500,
+   layout : 'fit',
+   border : false,
+   maximizable : true,
+   title : 'Ideogram image in PNG format',
+   renderTo : Ext.getBody(),
 
-		var ref = this;
+   initComponent : function() {
 
-		Ext.apply(this, {
-			tbar : [ {
-				itemId : 'saveButton',
-				xtype : 'button',
-				text : 'Save',
-				scope : this,
-				handler : function() {
-					Ext.MessageBox.confirm('Confirm Download', 'Would you like to download the ideogram?', function(choice){
-	                    if(choice == 'yes'){
-	                    	var strDownloadMime = "image/octet-stream";
-	                    	var strData = ref.getComponent('imageComponent').el.dom.src;
-	                    	document.location.href = strData.replace("image/png", strDownloadMime);
-	                        
-	                    }
-	                });
-				}
-			} ],
-			items : [ {
-				xtype : 'component',
-				itemId : 'imageComponent',
-				autoEl:{
-					tag : 'img',
-					src :'',
-				}
-				
-				
-			} ],
+      var ref = this;
 
-			
-			
-		});
-		
-	
-		
-		this.callParent();
+      Ext.apply( this, {
+         tbar : [ {
+            itemId : 'saveButton',
+            xtype : 'button',
+            text : 'Save',
+            scope : this,
+            handler : function() {
+               Ext.MessageBox.confirm( 'Confirm Download', 'Would you like to download the ideogram?',
+                  function(choice) {
+                     if ( choice == 'yes' ) {
+                        var strDownloadMime = "image/octet-stream";
+                        var strData = ref.getComponent( 'imageComponent' ).el.dom.src;
+                        document.location.href = strData.replace( "image/png", strDownloadMime );
 
-	},
+                     }
+                  } );
+            }
+         } ],
+         items : [ {
+            xtype : 'component',
+            itemId : 'imageComponent',
+            autoEl : {
+               tag : 'img',
+               src : '',
+            }
+
+         } ],
+
+      } );
+
+      this.callParent();
+
+   },
 
    showIdeogramDownload : function(img) {
-	  var imgComponent =this.getComponent('imageComponent');
-	  imgComponent.el.dom.src =img;	 
-	  this.show();
+      var imgComponent = this.getComponent( 'imageComponent' );
+      imgComponent.el.dom.src = img;
+      this.show();
 
-	},	
-	
-	
-});
+   },
 
+} );

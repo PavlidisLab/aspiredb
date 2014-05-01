@@ -1,64 +1,64 @@
 /* MultiValueSuggestBox (START) */
 ul.multiValueSuggestBox-list {
-    overflow: hidden;
-    height: auto !important;
-/*
+	overflow: hidden;
+	height: auto !important;
+	/*
     height: 1%;
 */
-    border: 1px solid #8496ba;
-    cursor: text;
-/*
+	border: 1px solid #8496ba;
+	cursor: text;
+	/*
     font-size: 12px;
     font-family: Verdana;
 */
-    min-height: 1px;
-    z-index: 999;
-    margin: 0;
-    padding: 0;
-    background-color: #fff;
-    list-style-type: none;
+	min-height: 1px;
+	z-index: 999;
+	margin: 0;
+	padding: 0;
+	background-color: #fff;
+	list-style-type: none;
 }
 
 .multiValueSuggestBox-list-input input {
-    border: 0;
-/*
+	border: 0;
+	/*
     width: 700px;
 */
-    padding: 1px 3px;
-    background: white none;
-    margin: 0;
+	padding: 1px 3px;
+	background: white none;
+	margin: 0;
 }
 
 li.multiValueSuggestBox-token {
-    overflow: hidden;
-    height: auto !important;
-/*
+	overflow: hidden;
+	height: auto !important;
+	/*
     height: 1%;
 */
-    margin: 2px;
-    padding: 1px 3px;
-    background-color: #eff2f7;
-    color: #000;
-    cursor: default;
-    border: 1px solid #ccd5e4;
-    font-size: 11px;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    float: left;
+	margin: 2px;
+	padding: 1px 3px;
+	background-color: #eff2f7;
+	color: #000;
+	cursor: default;
+	border: 1px solid #ccd5e4;
+	font-size: 11px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	float: left;
 }
 
 p.multiValueSuggestBox-token-label {
-    display: inline;
-    padding: 0;
-    margin: 0;
+	display: inline;
+	padding: 0;
+	margin: 0;
 }
 
 span.multiValueSuggestBox-token-close {
-    color: #a6b3cf;
-    margin-left: 5px;
-    font-weight: bold;
-    cursor: pointer;
+	color: #a6b3cf;
+	margin-left: 5px;
+	font-weight: bold;
+	cursor: pointer;
 }
 
 /*li.multiValueSuggestBox-token-selected {

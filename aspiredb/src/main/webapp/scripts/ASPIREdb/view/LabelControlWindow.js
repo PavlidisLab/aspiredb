@@ -136,11 +136,8 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                                 },
                              /**
                                * editor ://colorPicker, { xtype:colorPicker, allowBlank: false, displayField
-                               * :'labelColour',
-                               *  }, width : 100, listeners :{ click : function(e){ console.log('color picker X
-                               * '+e.getX()+'and Y '+e.getY()); this.XValue = e.getX(); this.YValue =e.getY();
-                               *  }
-                               *  }
+                               * :'labelColour', }, width : 100, listeners :{ click : function(e){ console.log('color
+                               * picker X '+e.getX()+'and Y '+e.getY()); this.XValue = e.getX(); this.YValue =e.getY(); } }
                                */
                              }, {
                                 header : 'Show',

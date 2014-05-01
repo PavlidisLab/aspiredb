@@ -14,23 +14,23 @@
            http://www.springframework.org/schema/cache
            http://www.springframework.org/schema/cache/spring-cache-3.2.xsd">
 
-	<context:component-scan base-package="ubc.pavlab.aspiredb.server"/>
+	<context:component-scan base-package="ubc.pavlab.aspiredb.server" />
 
-    <context:annotation-config />
+	<context:annotation-config />
 	<tx:annotation-driven />
 	<cache:annotation-driven />
-	
+
 	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
-	
-	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
-   <property name="cacheManager" ref="ehcache"/>
-</bean>
 
-<bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
-   <property name="configLocation" value="classpath:/ehcache.xml"/>
-</bean>
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+		<property name="cacheManager" ref="ehcache" />
+	</bean>
+
+	<bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation" value="classpath:/ehcache.xml" />
+	</bean>
 
 
 </beans>

@@ -46,9 +46,9 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
       // the current filters used
       filterConfigs : [],
-      
+
       // subject select all status holder
-      selectAllStatus: 'No'
+      selectAllStatus : 'No'
    },
    constructor : function(cfg) {
       this.initConfig( cfg );
@@ -456,13 +456,13 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
     * When all the subjects are sselected this is executed
     */
    selectAllHandler : function() {
-		// if (this.selectAllStatus=='No'){
-			this.cancelBubble=true;
-			// boolean true to suppressEvent
-			this.getSelectionModel().selectAll(true);		
-			this.selectionChangeHandler();
-		// this.selectAllStatus ='Yes';
-		// }
+      // if (this.selectAllStatus=='No'){
+      this.cancelBubble = true;
+      // boolean true to suppressEvent
+      this.getSelectionModel().selectAll( true );
+      this.selectionChangeHandler();
+      // this.selectAllStatus ='Yes';
+      // }
 
    }
 

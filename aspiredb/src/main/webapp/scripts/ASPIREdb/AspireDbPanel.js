@@ -122,8 +122,7 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
           * aspireDbPanel.down('#filterButton').setBorder(4); aspireDbPanel.down('#filterButton').setTooltip("Filter
           * Activated"); } else { aspireDbPanel.down('#filterActivated').setText('');
           * aspireDbPanel.down('#filterButton').setBorder(1); aspireDbPanel.down('#filterButton').setTooltip("Filter Not
-          * Activated");
-          *  }
+          * Activated"); }
           */
       } );
 

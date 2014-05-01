@@ -17,68 +17,65 @@
  *
  */
 
-Ext.require([ 'ASPIREdb.store.PhenotypeEnrichmentStore', 'ASPIREdb.TextDataDownloadWindow' ]);
+Ext.require( [ 'ASPIREdb.store.PhenotypeEnrichmentStore', 'ASPIREdb.TextDataDownloadWindow' ] );
 
 // TODO js documentation
-Ext.define('ASPIREdb.view.PhenotypeEnrichmentGrid', {
-	extend : 'Ext.grid.Panel',
-	alias : 'widget.phenotypeEnrichmentGrid',
-	
-	dockedItems : [ {
-		xtype : 'toolbar',
-		itemId : 'phenotypeEnrichmentGridToolbar',
-		dock : 'top',
-		items : [ {
-			xtype : 'button',
-			itemId : 'saveButton',
-			text : '',
-			tooltip : 'Download table contents as text',
-			icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
-		} ]
+Ext.define( 'ASPIREdb.view.PhenotypeEnrichmentGrid', {
+   extend : 'Ext.grid.Panel',
+   alias : 'widget.phenotypeEnrichmentGrid',
 
-	} ],
+   dockedItems : [ {
+      xtype : 'toolbar',
+      itemId : 'phenotypeEnrichmentGridToolbar',
+      dock : 'top',
+      items : [ {
+         xtype : 'button',
+         itemId : 'saveButton',
+         text : '',
+         tooltip : 'Download table contents as text',
+         icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
+      } ]
 
-	columns : [ {
-		header : 'Name',
-		dataIndex : 'name',
-		flex : 1
-	}, {
-		header : 'In Group Present',
-		dataIndex : 'inGroupPresent',
-		flex : 1
-	}, {
-		header : 'Out Group Present',
-		dataIndex : 'outGroupPresent',
-		flex : 1
-	}, {
-		header : 'P-value',
-		dataIndex : 'pValue',
-		flex : 1
-	}, {
-		header : 'Corrected P-value',
-		dataIndex : 'corrpValue',
-		flex : 1
-	} ],
-	
-	valueObjects : [],
+   } ],
 
-	store : Ext.create('ASPIREdb.store.PhenotypeEnrichmentStore'),
+   columns : [ {
+      header : 'Name',
+      dataIndex : 'name',
+      flex : 1
+   }, {
+      header : 'In Group Present',
+      dataIndex : 'inGroupPresent',
+      flex : 1
+   }, {
+      header : 'Out Group Present',
+      dataIndex : 'outGroupPresent',
+      flex : 1
+   }, {
+      header : 'P-value',
+      dataIndex : 'pValue',
+      flex : 1
+   }, {
+      header : 'Corrected P-value',
+      dataIndex : 'corrpValue',
+      flex : 1
+   } ],
 
-	initComponent : function() {
-		this.callParent();
+   valueObjects : [],
 
-		var ref = this;
-		
-		var saveButton = this.getComponent('phenotypeEnrichmentGridToolbar').getComponent('saveButton');
-		
-		saveButton.on('click', function(){
-			ASPIREdb.TextDataDownloadWindow.showPhenotypeEnrichmentDownload(ref.valueObjects);
-						
-		}
-		);
+   store : Ext.create( 'ASPIREdb.store.PhenotypeEnrichmentStore' ),
 
-	}
-	
-	
-	
-});
+   initComponent : function() {
+      this.callParent();
+
+      var ref = this;
+
+      var saveButton = this.getComponent( 'phenotypeEnrichmentGridToolbar' ).getComponent( 'saveButton' );
+
+      saveButton.on( 'click', function() {
+         ASPIREdb.TextDataDownloadWindow.showPhenotypeEnrichmentDownload( ref.valueObjects );
+
+      } );
+
+   }
+
+} );

@@ -16,38 +16,34 @@
  * limitations under the License.
  *
  */
-Ext.require([
-    'Ext.data.Store',
-    'ASPIREdb.model.PropertyValue',
-    'ASPIREdb.ActiveProjectSettings',
-    'ASPIREdb.model.GeneProperty'
-]);
+Ext.require( [ 'Ext.data.Store', 'ASPIREdb.model.PropertyValue', 'ASPIREdb.ActiveProjectSettings',
+              'ASPIREdb.model.GeneProperty' ] );
 
-Ext.define('ASPIREdb.GeneSuggestionStore', {
-    extend:'Ext.data.Store',
-    model: 'ASPIREdb.model.GeneProperty',
+Ext.define( 'ASPIREdb.GeneSuggestionStore', {
+   extend : 'Ext.data.Store',
+   model : 'ASPIREdb.model.GeneProperty',
 
-    suggestionContext: null,
-    property: null,
-    
-    constructor: function (config) {
-        config.proxy = {
-            type: 'dwr',
-            dwrFunction: VariantService.suggestGeneValues,
-            reader: {
-                type: 'json',
-                root: 'data',
-                totalProperty: 'count'
-            }
-        };
-        this.callParent(arguments);
-    },
-      
-    load: function(options) {
-        this.suggestionContext = new SuggestionContext();
-        this.suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds() ;
-        this.suggestionContext.valuePrefix = options.params.query;
-        this.proxy.dwrParams = [this.suggestionContext];
-        this.callParent(options);
-    }
-});
+   suggestionContext : null,
+   property : null,
+
+   constructor : function(config) {
+      config.proxy = {
+         type : 'dwr',
+         dwrFunction : VariantService.suggestGeneValues,
+         reader : {
+            type : 'json',
+            root : 'data',
+            totalProperty : 'count'
+         }
+      };
+      this.callParent( arguments );
+   },
+
+   load : function(options) {
+      this.suggestionContext = new SuggestionContext();
+      this.suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+      this.suggestionContext.valuePrefix = options.params.query;
+      this.proxy.dwrParams = [ this.suggestionContext ];
+      this.callParent( options );
+   }
+} );

@@ -22,10 +22,13 @@
 <script src="scripts/lib/DwrProxy.js"></script>
 
 <!-- <link href="http://cdn.sencha.com/ext/gpl/4.2.0/resources/css/ext-all.css" rel="stylesheet" />-->
-<link rel="stylesheet" type="text/css" href="scripts/ASPIREdb/resources/css/multivaluecombo.css" />
+<link rel="stylesheet" type="text/css"
+	href="scripts/ASPIREdb/resources/css/multivaluecombo.css" />
 <!-- <link rel="stylesheet" type="text/css" href="scripts/lib/resources/css/ext-all-neptune.css">-->
-<link rel="stylesheet" type="text/css" href="scripts/lib/resources/css/ext-all-steelblue.css">
-<link rel="icon" type="image/x-icon" href="scripts/ASPIREdb/resources/images/favicon.ico" />
+<link rel="stylesheet" type="text/css"
+	href="scripts/lib/resources/css/ext-all-steelblue.css">
+<link rel="icon" type="image/x-icon"
+	href="scripts/ASPIREdb/resources/images/favicon.ico" />
 
 <script src="scripts/ASPIREdb/view/ideogram/IdeogramCursorLayer.js"></script>
 <script src="scripts/ASPIREdb/view/ideogram/ChromosomeLayer.js"></script>
@@ -49,21 +52,16 @@
 <!--script src="scripts/lib/matrix2viz/examples/matrixviz.js"></script-->
 
 <script>
+   Ext.application( {
+      name : 'ASPIREdb',
+      appFolder : 'scripts/ASPIREdb',
 
-
-    Ext.application({
-        name: 'ASPIREdb',
-        appFolder: 'scripts/ASPIREdb',
-
-        launch: function () {
-            //var win = Ext.create('ASPIREdb.view.LoginForm');
-            var viewport = Ext.create('ASPIREdb.AspireDbPanel');
-            //win.show();
-        }
-    });
-
-   
-
+      launch : function() {
+         //var win = Ext.create('ASPIREdb.view.LoginForm');
+         var viewport = Ext.create( 'ASPIREdb.AspireDbPanel' );
+         //win.show();
+      }
+   } );
 </script>
 
 <html>

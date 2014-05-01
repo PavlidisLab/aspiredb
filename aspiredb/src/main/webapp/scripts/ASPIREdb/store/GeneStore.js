@@ -17,21 +17,29 @@
  *
  */
 
-Ext.require([ 'Ext.data.ArrayStore' ]);
+Ext.require( [ 'Ext.data.ArrayStore' ] );
 
-Ext.define('ASPIREdb.store.GeneStore', {
-    extend: 'Ext.data.ArrayStore',
-    alias: 'store.geneStore',
-        
-    fields: [
-             {name: 'symbol',   type: 'string'},
-             {name: 'geneBioType',  type: 'string'},
-             {name: 'name',  type: 'string'},
-             {name: 'pheneName',  type: 'string'},             
-             {name: 'linkToGemma',  type: 'string'}
-         ],         
-	
-    storeId: 'geneStore'
-    
-    
-});
+Ext.define( 'ASPIREdb.store.GeneStore', {
+   extend : 'Ext.data.ArrayStore',
+   alias : 'store.geneStore',
+
+   fields : [ {
+      name : 'symbol',
+      type : 'string'
+   }, {
+      name : 'geneBioType',
+      type : 'string'
+   }, {
+      name : 'name',
+      type : 'string'
+   }, {
+      name : 'pheneName',
+      type : 'string'
+   }, {
+      name : 'linkToGemma',
+      type : 'string'
+   } ],
+
+   storeId : 'geneStore'
+
+} );

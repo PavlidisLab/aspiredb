@@ -18,139 +18,132 @@
  */
 
 /**
- * @author Gaya Charath
- * This is widjet is created to handler the delete query window
+ * @author Gaya Charath This is widjet is created to handler the delete query window
  */
-Ext.require([ 'Ext.Window' ]);
+Ext.require( [ 'Ext.Window' ] );
 
-Ext.define('ASPIREdb.view.DeleteQueryWindow', {
-	extend : 'Ext.Window',
-	alias : 'widget.deleteQueryWindow',
-	singleton : true,
-	title : 'Delete Query',
-	closable : true,
-	closeAction : 'hide',
-	width : 400,
-	height : 200,
-	layout : 'fit',
-	bodyStyle : 'padding: 5px;',
+Ext.define( 'ASPIREdb.view.DeleteQueryWindow', {
+   extend : 'Ext.Window',
+   alias : 'widget.deleteQueryWindow',
+   singleton : true,
+   title : 'Delete Query',
+   closable : true,
+   closeAction : 'hide',
+   width : 400,
+   height : 200,
+   layout : 'fit',
+   bodyStyle : 'padding: 5px;',
 
-	filterConfigs : [],
+   filterConfigs : [],
 
-	items : [ {
+   items : [ {
 
-		bodyPadding : 5,
-		width : 350,
+      bodyPadding : 5,
+      width : 350,
 
-		layout : 'anchor',
-		defaults : {
-			anchor : '100%'
-		},
+      layout : 'anchor',
+      defaults : {
+         anchor : '100%'
+      },
 
-		defaultType : 'textfield',
-		items : [{
-					xtype : 'label',
-					text : 'Select Query: '
-				},
-				{
-					xtype : 'combo',
-					itemId : 'deleteQueryComboBox',
-					editable : false,
-					forceSelection : true,
-					value : 'FILTER_PLACEHOLDER',
-					store : [ [ 'QUERY_NAME_PLACEHOLDER', '<Query name>' ] ]
-				}],
+      defaultType : 'textfield',
+      items : [ {
+         xtype : 'label',
+         text : 'Select Query: '
+      }, {
+         xtype : 'combo',
+         itemId : 'deleteQueryComboBox',
+         editable : false,
+         forceSelection : true,
+         value : 'FILTER_PLACEHOLDER',
+         store : [ [ 'QUERY_NAME_PLACEHOLDER', '<Query name>' ] ]
+      } ],
 
-		buttons : [ {
-			xtype : 'button',
-			itemId : 'deleteButton',
-			text : 'Delete'
-		} ]
+      buttons : [ {
+         xtype : 'button',
+         itemId : 'deleteButton',
+         text : 'Delete'
+      } ]
 
-	} ],
-	
-	/**
-	 * init 
-	 */
-	initComponent : function() {
-		this.callParent();
+   } ],
 
-		var ref = this;
+   /**
+    * init
+    */
+   initComponent : function() {
+      this.callParent();
 
-		this.updateDeleteQueryCombo();
-		this.down('#deleteButton').on('click', ref.deleteButtonHandler, ref);
-		this.on('query_deleted', this.updateDeleteQueryCombo, this);
-		
-		
-	},
+      var ref = this;
 
-	initAndShow : function(filters) {
+      this.updateDeleteQueryCombo();
+      this.down( '#deleteButton' ).on( 'click', ref.deleteButtonHandler, ref );
+      this.on( 'query_deleted', this.updateDeleteQueryCombo, this );
 
-		this.filterConfigs = filters;
-		this.show();
+   },
 
-	},
-	/**
-	 * When delete button is pressed
-	 */
-	deleteButtonHandler : function() {
-		
-		var ref = this;
-		
-		Ext.Msg.show({
-		    title:'Are you sure you want to delete query?',
-		    msg:'This operation is not reversible. Would you like to continue?',
-		    buttons:Ext.Msg.YESNOCANCEL,
-		    icon:Ext.Msg.QUESTION,
-		    fn:function(btn){
-		        if(btn=='cancel'){
-		            //do nothing
-		        }
-		        //display the query name and delete the selected query
-		        if(btn=='yes'){
-		        	var queryName = ref.down('#deleteQueryComboBox').getValue();
+   initAndShow : function(filters) {
 
-		    		QueryService.deleteQuery(queryName, {
-		    			callback : function() {			
-		    				ASPIREdb.view.DeleteQueryWindow.close();
-		    				ASPIREdb.view.DeleteQueryWindow.fireEvent('query_deleted');
-		    			}
-		    		});
-		    		ref.down('#deleteQueryComboBox').clearValue();
-		    		Ext.Msg.alert('Status', 'Query Deleted successfully.');
-		        }
-		    }
-		});
-		
-		
+      this.filterConfigs = filters;
+      this.show();
 
-	},
-	
-	/**
-	 * when query is deleted, update the combobox store
-	 */
-	updateDeleteQueryCombo : function() {
+   },
+   /**
+    * When delete button is pressed
+    */
+   deleteButtonHandler : function() {
 
-		var deleteQueryComboBox = this.down('#deleteQueryComboBox');
+      var ref = this;
 
-		QueryService.getSavedQueryNames({
-			callback : function(names) {
+      Ext.Msg.show( {
+         title : 'Are you sure you want to delete query?',
+         msg : 'This operation is not reversible. Would you like to continue?',
+         buttons : Ext.Msg.YESNOCANCEL,
+         icon : Ext.Msg.QUESTION,
+         fn : function(btn) {
+            if ( btn == 'cancel' ) {
+               // do nothing
+            }
+            // display the query name and delete the selected query
+            if ( btn == 'yes' ) {
+               var queryName = ref.down( '#deleteQueryComboBox' ).getValue();
 
-				var storedata = [ [ 'QUERY_NAME_PLACEHOLDER', '<Query name>' ] ];
+               QueryService.deleteQuery( queryName, {
+                  callback : function() {
+                     ASPIREdb.view.DeleteQueryWindow.close();
+                     ASPIREdb.view.DeleteQueryWindow.fireEvent( 'query_deleted' );
+                  }
+               } );
+               ref.down( '#deleteQueryComboBox' ).clearValue();
+               Ext.Msg.alert( 'Status', 'Query Deleted successfully.' );
+            }
+         }
+      } );
 
-				for ( var i = 0; i < names.length; i++) {
+   },
 
-					storedata.push([ names[i], names[i] ]);
+   /**
+    * when query is deleted, update the combobox store
+    */
+   updateDeleteQueryCombo : function() {
 
-				}
+      var deleteQueryComboBox = this.down( '#deleteQueryComboBox' );
 
-				deleteQueryComboBox.getStore().loadData(storedata);
+      QueryService.getSavedQueryNames( {
+         callback : function(names) {
 
-			}
-		});
+            var storedata = [ [ 'QUERY_NAME_PLACEHOLDER', '<Query name>' ] ];
 
-	},
-	
-			
+            for (var i = 0; i < names.length; i++) {
 
-});
+               storedata.push( [ names[i], names[i] ] );
+
+            }
+
+            deleteQueryComboBox.getStore().loadData( storedata );
+
+         }
+      } );
+
+   },
+
+} );

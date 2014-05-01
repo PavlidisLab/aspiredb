@@ -17,220 +17,205 @@
  *
  */
 
-Ext.require([ 'ASPIREdb.store.GeneSetStore','ASPIREdb.TextDataDownloadWindow', 'Ext.grid.*', 'Ext.data.*','Ext.util.*', 'Ext.state.*', 'Ext.form.*' ]);
+Ext.require( [ 'ASPIREdb.store.GeneSetStore', 'ASPIREdb.TextDataDownloadWindow', 'Ext.grid.*', 'Ext.data.*',
+              'Ext.util.*', 'Ext.state.*', 'Ext.form.*' ] );
 
-
-var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
-    //clicksToMoveEditor: 1,
-    clicksToEdit: 2,
-    autoCancel: false
-});
+var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
+   // clicksToMoveEditor: 1,
+   clicksToEdit : 2,
+   autoCancel : false
+} );
 
 // TODO js documentation
-Ext.define('ASPIREdb.view.GeneSetGrid', {
-	extend : 'Ext.grid.Panel',
-	alias : 'widget.geneSetGrid',
-	emptyText : 'No gene sets found',
-	id : 'geneSetGrid',	
-	border: true,
-	store : Ext.create('ASPIREdb.store.GeneSetStore'),
-	
-		
-	config:{
-		// collection of all the PhenotypeSummaryValueObject loaded
-		LoadedGeneSetNames : [],
-		//collection of selected gene set value objects
-		selGeneSet : [],	
-		geneValueObjects : [],
-	},
+Ext.define( 'ASPIREdb.view.GeneSetGrid', {
+   extend : 'Ext.grid.Panel',
+   alias : 'widget.geneSetGrid',
+   emptyText : 'No gene sets found',
+   id : 'geneSetGrid',
+   border : true,
+   store : Ext.create( 'ASPIREdb.store.GeneSetStore' ),
 
-	dockedItems : [ {
-		xtype : 'toolbar',
-		itemId : 'geneSetGridToolbar',
-		dock : 'top'
-		}],
-		
-	columns : [{
-	            
-			header : 'Name',
-			dataIndex : 'geneSetName',
-			flex : 1,
-			 editor: {
-	                // defaults to text field if no xtype is supplied
-	                allowBlank: false
-	            }
-	    },
-	    {
-	        header : 'Description',
-	        dataIndex : 'geneDescription',
-	        flex : 1,
-	        editor: {
-                // defaults to text field if no xtype is supplied
-                allowBlank: false
-            }
-	    },
-	    {
-	       	header : 'size',
-	        dataIndex : 'geneSetSize',
-	        flex : 1,
-	        editor: {
-                allowBlank: false,
-            }
-	}],	
-	
-	
-    plugins: [rowEditing],
-    listeners: {
-        'selectionchange': function(view, records) {
-            this.down('#removeGeneset').setDisabled(!records.length);
-        }
-    },
-   
-	initComponent : function() {
-		
-		this.callParent();
-		this.on('select', this.geneSetSelectHandler, this);	
-		ASPIREdb.EVENT_BUS.on('gene_added', this.geneAddedHandler, this);
-			
-	
-	},
-	
-	updateGeneSetGridHandler : function(geneSetName){
-		var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
-		var geneGrid = panel.down ('#geneSetGrid');
-		//TODO : refresh grid when loaded
-		
-		this.store.add(geneSetName);
-		this.getView().refresh(true);
-		this.setLoading(false);
-	},
-	
-	
-	geneAddedHandler : function (gvo){
-		this.geneValueObjects.push(gvo);
-		
-	},
-	
-	geneSetSelectHandler : function(ref, record, index, eOpts) {
-		var me=this;
-		this.selGeneSet = this.getSelectionModel().getSelection();
-		var geneSetName= this.selGeneSet[0].data.geneSetName;		
-		//TODO: This DWR is returning the null objects even though java is returning the correct objects
-		UserGeneSetService.loadUserGeneSet(geneSetName, {
-				callback : function(gvos) {
-					
-					me.populateGeneGrid(gvos);	
-				}
-			});
-		ASPIREdb.EVENT_BUS.fireEvent('geneSet_selected', this.selGeneSet);
-		
-	},
-	
-		
-	//Populate gens in gene grid
-	populateGeneGrid : function(gvos) {
-		
-		var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
-		var grid =panel.down ('#geneGrid');
-		
-			
-		var data = [];
-		for ( var i = 0; i < gvos.length; i++) {
-			var gvo = gvos[i];
-			var row = [ gvo.symbol,'',gvo.name,''];		
-			data.push(row);					
-		}
-			
-		grid.store.loadData(data);
-		grid.setLoading(false);		
-		grid.getView().refresh();
+   config : {
+      // collection of all the PhenotypeSummaryValueObject loaded
+      LoadedGeneSetNames : [],
+      // collection of selected gene set value objects
+      selGeneSet : [],
+      geneValueObjects : [],
+   },
 
-	},	
-	
-	
-	enableToolbar : function() {
-		
-	
-		this.getDockedComponent('geneSetGridToolbar').removeAll();
-		
-		this.getDockedComponent('geneSetGridToolbar').add({
-			xtype : 'textfield',
-			id : 'geneSetName',
-			text : '',
-			scope: this,
-			allowBlank : false,
-			
-		});
-		
-		
-		this.getDockedComponent('geneSetGridToolbar').add('-');
-			
-		var ref=this;
-		
-		this.getDockedComponent('geneSetGridToolbar').add({
-			xtype : 'button',
-			id : 'addGeneset',
-			text : '',
-			tooltip : 'Add new gene set',
-			icon:'scripts/ASPIREdb/resources/images/icons/add.png',
-			//TODO: Need a better workaround
-			handler: function(){
-			
-				var newGeneSetName =ref.down('#geneSetName').getValue();
-				
-				geneValueObjects =[];
-				geneValueObjects.push(new GeneValueObject());
-				UserGeneSetService.saveUserGeneSet(newGeneSetName, geneValueObjects, {				
-						callback : function(gvoId) {
-							var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
-							var geneSetGrid = panel.down ('#geneSetGrid');
-							//add gene set name to geneset grid
-							var data = [];
-							var row = [newGeneSetName,'',''];		
-							data.push(row);
-							geneSetGrid.store.add(data);
-							geneSetGrid.getView().refresh(true);
-							geneSetGrid.setLoading(false);
-							
-							var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
-							var grid =panel.down ('#geneGrid');
-							grid.store.removeAll(true);
-							ref.down('#geneSetName').setValue('');
-							console.log('returned gene value object : '+gvoId);
-							ASPIREdb.view.SaveUserGeneSetWindow.fireEvent('new_geneSet_saved');
-						}
-				});
-		
-			}
-		});
-				
-		
-		this.getDockedComponent('geneSetGridToolbar').add({
-			xtype : 'button',
-			id : 'removeGeneset',
-			text : '',
-			tooltip : 'Remove the selected gene set',
-			icon:'scripts/ASPIREdb/resources/images/icons/delete.png',
-			handler: function(){
-				//Delete gene set
-				UserGeneSetService.deleteUserGeneSet(ref.selGeneSet[0].data.geneSetName, {
-					callback : function() {
-						var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
-						var geneSetGrid = panel.down ('#geneSetGrid');
-						var selection = geneSetGrid.getView().getSelectionModel().getSelection()[0];
-	                    if (selection) {
-	                    	geneSetGrid.store.remove(selection);
-	                    }
-						
-						console.log('selected geneset :'+ref.selGeneSet[0].data.geneSetName+' deleted');
-					}
-				});
-				
-			}
-		});
-		
-		
-		
-	
-	}
-});
+   dockedItems : [ {
+      xtype : 'toolbar',
+      itemId : 'geneSetGridToolbar',
+      dock : 'top'
+   } ],
+
+   columns : [ {
+
+      header : 'Name',
+      dataIndex : 'geneSetName',
+      flex : 1,
+      editor : {
+         // defaults to text field if no xtype is supplied
+         allowBlank : false
+      }
+   }, {
+      header : 'Description',
+      dataIndex : 'geneDescription',
+      flex : 1,
+      editor : {
+         // defaults to text field if no xtype is supplied
+         allowBlank : false
+      }
+   }, {
+      header : 'size',
+      dataIndex : 'geneSetSize',
+      flex : 1,
+      editor : {
+         allowBlank : false,
+      }
+   } ],
+
+   plugins : [ rowEditing ],
+   listeners : {
+      'selectionchange' : function(view, records) {
+         this.down( '#removeGeneset' ).setDisabled( !records.length );
+      }
+   },
+
+   initComponent : function() {
+
+      this.callParent();
+      this.on( 'select', this.geneSetSelectHandler, this );
+      ASPIREdb.EVENT_BUS.on( 'gene_added', this.geneAddedHandler, this );
+
+   },
+
+   updateGeneSetGridHandler : function(geneSetName) {
+      var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
+      var geneGrid = panel.down( '#geneSetGrid' );
+      // TODO : refresh grid when loaded
+
+      this.store.add( geneSetName );
+      this.getView().refresh( true );
+      this.setLoading( false );
+   },
+
+   geneAddedHandler : function(gvo) {
+      this.geneValueObjects.push( gvo );
+
+   },
+
+   geneSetSelectHandler : function(ref, record, index, eOpts) {
+      var me = this;
+      this.selGeneSet = this.getSelectionModel().getSelection();
+      var geneSetName = this.selGeneSet[0].data.geneSetName;
+      // TODO: This DWR is returning the null objects even though java is returning the correct objects
+      UserGeneSetService.loadUserGeneSet( geneSetName, {
+         callback : function(gvos) {
+
+            me.populateGeneGrid( gvos );
+         }
+      } );
+      ASPIREdb.EVENT_BUS.fireEvent( 'geneSet_selected', this.selGeneSet );
+
+   },
+
+   // Populate gens in gene grid
+   populateGeneGrid : function(gvos) {
+
+      var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
+      var grid = panel.down( '#geneGrid' );
+
+      var data = [];
+      for (var i = 0; i < gvos.length; i++) {
+         var gvo = gvos[i];
+         var row = [ gvo.symbol, '', gvo.name, '' ];
+         data.push( row );
+      }
+
+      grid.store.loadData( data );
+      grid.setLoading( false );
+      grid.getView().refresh();
+
+   },
+
+   enableToolbar : function() {
+
+      this.getDockedComponent( 'geneSetGridToolbar' ).removeAll();
+
+      this.getDockedComponent( 'geneSetGridToolbar' ).add( {
+         xtype : 'textfield',
+         id : 'geneSetName',
+         text : '',
+         scope : this,
+         allowBlank : false,
+
+      } );
+
+      this.getDockedComponent( 'geneSetGridToolbar' ).add( '-' );
+
+      var ref = this;
+
+      this.getDockedComponent( 'geneSetGridToolbar' ).add( {
+         xtype : 'button',
+         id : 'addGeneset',
+         text : '',
+         tooltip : 'Add new gene set',
+         icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
+         // TODO: Need a better workaround
+         handler : function() {
+
+            var newGeneSetName = ref.down( '#geneSetName' ).getValue();
+
+            geneValueObjects = [];
+            geneValueObjects.push( new GeneValueObject() );
+            UserGeneSetService.saveUserGeneSet( newGeneSetName, geneValueObjects, {
+               callback : function(gvoId) {
+                  var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
+                  var geneSetGrid = panel.down( '#geneSetGrid' );
+                  // add gene set name to geneset grid
+                  var data = [];
+                  var row = [ newGeneSetName, '', '' ];
+                  data.push( row );
+                  geneSetGrid.store.add( data );
+                  geneSetGrid.getView().refresh( true );
+                  geneSetGrid.setLoading( false );
+
+                  var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
+                  var grid = panel.down( '#geneGrid' );
+                  grid.store.removeAll( true );
+                  ref.down( '#geneSetName' ).setValue( '' );
+                  console.log( 'returned gene value object : ' + gvoId );
+                  ASPIREdb.view.SaveUserGeneSetWindow.fireEvent( 'new_geneSet_saved' );
+               }
+            } );
+
+         }
+      } );
+
+      this.getDockedComponent( 'geneSetGridToolbar' ).add( {
+         xtype : 'button',
+         id : 'removeGeneset',
+         text : '',
+         tooltip : 'Remove the selected gene set',
+         icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
+         handler : function() {
+            // Delete gene set
+            UserGeneSetService.deleteUserGeneSet( ref.selGeneSet[0].data.geneSetName, {
+               callback : function() {
+                  var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
+                  var geneSetGrid = panel.down( '#geneSetGrid' );
+                  var selection = geneSetGrid.getView().getSelectionModel().getSelection()[0];
+                  if ( selection ) {
+                     geneSetGrid.store.remove( selection );
+                  }
+
+                  console.log( 'selected geneset :' + ref.selGeneSet[0].data.geneSetName + ' deleted' );
+               }
+            } );
+
+         }
+      } );
+
+   }
+} );

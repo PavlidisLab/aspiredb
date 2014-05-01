@@ -16,39 +16,30 @@
  * limitations under the License.
  *
  */
-Ext.require([
-    'Ext.panel.Panel',
-    'ASPIREdb.view.GeneSetGrid',
-    'ASPIREdb.view.GeneGrid', 
-]);
+Ext.require( [ 'Ext.panel.Panel', 'ASPIREdb.view.GeneSetGrid', 'ASPIREdb.view.GeneGrid', ] );
 /**
- * gene panel includes GeneSetGrid and GeneGrid 
+ * gene panel includes GeneSetGrid and GeneGrid
  */
-Ext.define('ASPIREdb.GeneManagerPanel',{
-    extend: 'Ext.panel.Panel',
-    alias: 'widget.ASPIREdb_genemanagerpanel',
-    layout: 'border',
-    items:[
-        {
-            region: 'west',
-            xtype:'geneSetGrid',
-            id : 'geneSetGrid',
-            width: 480,
-            collapsible: true,
-            split: true,
-            title:'Gene Sets'
-        },
-        {
-            region: 'east',
-            xtype:'geneGrid',
-            id :'geneGrid',
-            width: 480,
-            collapsible: true,
-            split: true,
-            title:'Associated Genes'
-        }
-    ],
+Ext.define( 'ASPIREdb.GeneManagerPanel', {
+   extend : 'Ext.panel.Panel',
+   alias : 'widget.ASPIREdb_genemanagerpanel',
+   layout : 'border',
+   items : [ {
+      region : 'west',
+      xtype : 'geneSetGrid',
+      id : 'geneSetGrid',
+      width : 480,
+      collapsible : true,
+      split : true,
+      title : 'Gene Sets'
+   }, {
+      region : 'east',
+      xtype : 'geneGrid',
+      id : 'geneGrid',
+      width : 480,
+      collapsible : true,
+      split : true,
+      title : 'Associated Genes'
+   } ],
 
-
-
-});
+} );

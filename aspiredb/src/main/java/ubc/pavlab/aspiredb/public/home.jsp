@@ -21,11 +21,11 @@
 		Loading <br /> <img src="ajax-loader.gif" />
 	</div>
 
-    <!-- Google Analytics -->
-    <%@include file="/common/analytics.jsp" %>
+	<!-- Google Analytics -->
+	<%@include file="/common/analytics.jsp"%>
 	<script type="text/javascript">	
 		googleAnalyticsTrackPageviewIfConfigured( "${pageContext.request.servletPath}" );
 	</script>
-	
+
 </body>
 </html>
