@@ -43,7 +43,7 @@ public class AclAdviceTest extends BaseSpringContextTest {
 
     @Autowired
     MutableAclService aclService;
-
+    
     @Autowired
     private AclTestUtils aclTestUtils;
 
@@ -95,21 +95,21 @@ public class AclAdviceTest extends BaseSpringContextTest {
         Phenotype pheno = testObjectHelper.createPersistentTestPhenotypeObject(
                 RandomStringUtils.randomAlphabetic( 4 ), RandomStringUtils.randomAlphabetic( 4 ),
                 RandomStringUtils.randomAlphabetic( 1 ), RandomStringUtils.randomAlphabetic( 4 ) );
-        phenos.add( pheno );
+        phenos.add(pheno);
+        
+        pheno = testObjectHelper.createPersistentTestPhenotypeObject(
+                RandomStringUtils.randomAlphabetic( 4 ), RandomStringUtils.randomAlphabetic( 4 ),
+                RandomStringUtils.randomAlphabetic( 1 ), RandomStringUtils.randomAlphabetic( 4 ) );
+        phenos.add(pheno);
 
-        pheno = testObjectHelper.createPersistentTestPhenotypeObject( RandomStringUtils.randomAlphabetic( 4 ),
-                RandomStringUtils.randomAlphabetic( 4 ), RandomStringUtils.randomAlphabetic( 1 ),
-                RandomStringUtils.randomAlphabetic( 4 ) );
-        phenos.add( pheno );
-
-        // TODO figure out why removing a collection throws an error
+        // TODO figure out why removing a collection throws an error 
         // phenotypeDao.remove( phenos );
-
-        for ( Phenotype apheno : phenos ) {
+        
+        for (Phenotype apheno : phenos) {
             aclTestUtils.checkHasAcl( apheno );
             phenotypeDao.remove( apheno );
             aclTestUtils.checkDeletedAcl( apheno );
-        }
-
     }
+
+}
 }

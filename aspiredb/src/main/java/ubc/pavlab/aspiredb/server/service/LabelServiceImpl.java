@@ -130,9 +130,6 @@ public class LabelServiceImpl implements LabelService {
     @Transactional
     @RemoteMethod
     public void deleteSubjectLabel( LabelValueObject label ) {
-        if ( label == null || label.getId() == null ) {
-            return;
-        }
         Collection<Subject> subjects = subjectDao.findByLabel( label );
         Collection<Long> subjectIds = new ArrayList<>();
         for ( Subject s : subjects ) {

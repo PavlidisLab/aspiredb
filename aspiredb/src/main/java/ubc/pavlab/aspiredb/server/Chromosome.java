@@ -18,15 +18,16 @@
  */
 package ubc.pavlab.aspiredb.server;
 
+import ubc.pavlab.aspiredb.shared.ChromosomeBand;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import ubc.pavlab.aspiredb.shared.ChromosomeBand;
-
 /**
+ *
  * @author: anton
  * @version $id$
  */
@@ -42,7 +43,7 @@ public class Chromosome implements Serializable {
     private NavigableMap<Integer, ChromosomeBand> baseToBand;
     private int centromereLocation;
 
-    public Chromosome( String name ) {
+    public Chromosome (String name) {
         this.baseToBand = new TreeMap<Integer, ChromosomeBand>();
         this.bands = new HashMap<String, ChromosomeBand>();
         this.name = name;
@@ -52,11 +53,11 @@ public class Chromosome implements Serializable {
         return name;
     }
 
-    public void addBand( Integer start, Integer end, String bandName, String stainingAgent ) {
+    public void addBand ( Integer start, Integer end, String bandName, String stainingAgent ) {
         ChromosomeBand band = new ChromosomeBand( start, end, bandName, stainingAgent );
-        this.baseToBand.put( start, band );
-        this.bands.put( bandName, band );
-        if ( stainingAgent.equals( "acen" ) && bandName.startsWith( "p" ) ) {
+        this.baseToBand.put(start, band);
+        this.bands.put(bandName, band);
+        if (stainingAgent.equals("acen") && bandName.startsWith("p")) {
             this.centromereLocation = end;
         }
     }
@@ -66,11 +67,11 @@ public class Chromosome implements Serializable {
         return lastBand.getEnd();
     }
 
-    public ChromosomeBand getBand( String bandName ) {
+    public ChromosomeBand getBand (String bandName) {
         return bands.get( bandName );
     }
 
-    public ChromosomeBand getBand( int baseCoordinate ) {
+    public ChromosomeBand getBand (int baseCoordinate) {
         return baseToBand.floorEntry( baseCoordinate ).getValue();
     }
 

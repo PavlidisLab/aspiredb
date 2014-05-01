@@ -41,18 +41,20 @@ import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
  */
 public class UserGeneServiceTest extends BaseSpringContextTest {
 
+    
+
     @Autowired
     private UserGeneSetService userGeneSetService;
-
+    
     @Autowired
     private PhenotypeDao phenotypeDao;
-
+    
     @Autowired
     private PersistentTestObjectHelper persistentTestObjectHelper;
 
     @Autowired
     UserManager userManager;
-
+    
     private Project project;
     private Collection<Long> activeProjectIds;
 
@@ -75,29 +77,56 @@ public class UserGeneServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testIsQueryName() throws Exception {
-        /**
-         * Collection<Long> projectIds = new HashSet<Long>(); projectIds.add( project.getId() ); ProjectFilterConfig
-         * projConfig = new ProjectFilterConfig(); projConfig.setProjectIds( projectIds ); List<GeneValueObject> genes
-         * =new ArrayList<GeneValueObject>(); GeneValueObject gvo = new GeneValueObject(); gvo.setEnsemblId("1");
-         * gvo.setSymbol("HAIRCH"); gvo.setName("Hairy chest gene."); gvo.setGeneBioType(""); gvo.setTaxon("human");
-         * gvo.setKey("HAIRCH:human"); genes.add(gvo); userGeneSetService.saveUserGeneSet( testname, genes); // run as
-         * user to check wheather the admin created query is accessble by the user super.runAsUser( this.username );
-         * boolean returnvalue = userGeneSetService.isGeneSetName( testname ); assertFalse( returnvalue );
-         */
+    	/**
+    	 Collection<Long> projectIds = new HashSet<Long>();
+         projectIds.add( project.getId() );
+         ProjectFilterConfig projConfig = new ProjectFilterConfig();
+         projConfig.setProjectIds( projectIds );
+    	
+    	List<GeneValueObject> genes =new ArrayList<GeneValueObject>();
+    	GeneValueObject gvo = new GeneValueObject();
+    	gvo.setEnsemblId("1");
+    	gvo.setSymbol("HAIRCH");
+    	gvo.setName("Hairy chest gene.");
+    	gvo.setGeneBioType("");
+    	gvo.setTaxon("human");
+    	gvo.setKey("HAIRCH:human");
+      
+    	genes.add(gvo);
+        userGeneSetService.saveUserGeneSet( testname, genes);
+
+        // run as user to check wheather the admin created query is accessble by the user
+        super.runAsUser( this.username );
+        boolean returnvalue = userGeneSetService.isGeneSetName( testname );
+        assertFalse( returnvalue );*/
 
     }
+
+   
 
     @Test
-    public void testSaveUserGeneSet() throws Exception {
-        /**
-         * Collection<Long> projectIds = new HashSet<Long>(); projectIds.add( project.getId() ); ProjectFilterConfig
-         * projConfig = new ProjectFilterConfig(); projConfig.setProjectIds( projectIds ); List<GeneValueObject> genes
-         * =new ArrayList<GeneValueObject>(); GeneValueObject gvo = new GeneValueObject(); gvo.setEnsemblId("1");
-         * gvo.setSymbol("HAIRCH"); gvo.setName("Hairy chest gene."); gvo.setGeneBioType(""); gvo.setTaxon("human");
-         * gvo.setKey("HAIRCH:human"); genes.add(gvo); // run as user to check wheather the admin created query is
-         * accessble by the user super.runAsUser( this.username ); Long geneSetId = userGeneSetService.saveUserGeneSet(
-         * testname, genes); assertFalse( geneSetId == null );
-         */
+    public void testSaveUserGeneSet() throws Exception {/**
+    	 Collection<Long> projectIds = new HashSet<Long>();
+         projectIds.add( project.getId() );
+         ProjectFilterConfig projConfig = new ProjectFilterConfig();
+         projConfig.setProjectIds( projectIds );
+
+    	List<GeneValueObject> genes =new ArrayList<GeneValueObject>();
+    	GeneValueObject gvo = new GeneValueObject();
+    	gvo.setEnsemblId("1");
+    	gvo.setSymbol("HAIRCH");
+    	gvo.setName("Hairy chest gene.");
+    	gvo.setGeneBioType("");
+    	gvo.setTaxon("human");
+    	gvo.setKey("HAIRCH:human");
+      
+    	genes.add(gvo);
+    	
+    	 // run as user to check wheather the admin created query is accessble by the user
+        super.runAsUser( this.username );
+        Long geneSetId = userGeneSetService.saveUserGeneSet( testname, genes);
+        assertFalse( geneSetId == null );*/
     }
 
+   
 }

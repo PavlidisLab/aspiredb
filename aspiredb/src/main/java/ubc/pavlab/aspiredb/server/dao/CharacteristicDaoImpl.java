@@ -18,34 +18,39 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
-import java.util.Collection;
-
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import ubc.pavlab.aspiredb.server.model.Characteristic;
 
+import java.util.Collection;
+
 @Repository
-public class CharacteristicDaoImpl extends SecurableDaoBaseImpl<Characteristic> implements CharacteristicDao {
+public class CharacteristicDaoImpl
+        extends SecurableDaoBaseImpl<Characteristic>
+        implements CharacteristicDao
+{
     @Autowired
-    public CharacteristicDaoImpl( SessionFactory sessionFactory ) {
-        super( Characteristic.class );
-        super.setSessionFactory( sessionFactory );
+    public CharacteristicDaoImpl(SessionFactory sessionFactory) {
+        super(Characteristic.class);
+        super.setSessionFactory(sessionFactory);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Collection<String> getKeysMatching( String partialName ) {
+    public Collection<String> getKeysMatching(String partialName) {
         return currentSession()
                 .createQuery( "select distinct c.key from Characteristic as c where c.key like :partialName" )
-                .setParameter( "partialName", "%" + partialName + "%" ).list();
+                .setParameter( "partialName", "%"+partialName+"%")
+                .list();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Collection<String> getValuesForKey( String key ) {
-        return currentSession().createQuery( "select distinct c.value from Characteristic as c where c.key = :key" )
-                .setParameter( "key", key ).list();
+    public Collection<String> getValuesForKey(String key) {
+        return currentSession()
+                .createQuery( "select distinct c.value from Characteristic as c where c.key = :key" )
+                .setParameter( "key", key)
+                .list();
     }
 }

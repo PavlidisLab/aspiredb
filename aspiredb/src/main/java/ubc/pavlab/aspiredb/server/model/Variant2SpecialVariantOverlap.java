@@ -22,17 +22,18 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * This table is used to hold data about overlap between two variants. Originally this was only to be used for overlap
- * with 'special' variants in DGV and DECIPHER, hence the 'special' in the name of the table new requirements were added
- * to allow this functionality between two user projects so the 'special' is unnecessary in the name and should be
- * removed/renamed
+ * This table is used to hold data about overlap between two variants.
+ * 
+ * Originally this was only to be used for overlap with 'special' variants in DGV and DECIPHER, hence the 'special' in the name of the table
+ * 
+ * new requirements were added to allow this functionality between two user projects so the 'special' is unnecessary in the name and should be removed/renamed
  * 
  * @author cmcdonald
  * @version $Id:$
  */
 @Entity
 @Table(name = "VARIANT2SPECIAL_VARIANT_INFO")
-public class Variant2SpecialVariantOverlap implements Serializable {
+public class Variant2SpecialVariantOverlap implements Serializable  {
 
     /**
      * 
@@ -63,35 +64,35 @@ public class Variant2SpecialVariantOverlap implements Serializable {
         return true;
     }
 
-    // note this is a composite key with variantId and overlapSpecialVariantId
-    @Id
-    @Column(name = "VARIANTID")
+    //note this is a composite key with variantId and overlapSpecialVariantId
+    @Id    
+    @Column(name="VARIANTID")
     private Long variantId;
-
+    
     @Id
-    @Column(name = "OVERLAPPED_VARIANTID")
+    @Column(name="OVERLAPPED_VARIANTID")
     private Long overlapSpecialVariantId;
-
-    @Column(name = "OVERLAP_LENGTH")
+    
+    @Column(name="OVERLAP_LENGTH")
     private Integer overlap;
-
-    // the percentage of the variantId-variant that is overlapped, storing for easier searching
-    // using integer as it is better for comparison, easy to change to float later if need be
-    @Column(name = "OVERLAP_PERCENTAGE")
+    
+    //the percentage of the variantId-variant that is overlapped, storing for easier searching
+    //using integer as it is better for comparison, easy to change to float later if need be
+    @Column(name="OVERLAP_PERCENTAGE")
     private Integer overlapPercentage;
-
-    // the percentage of the overlapSpecialVariantId-variant that is overlapped
-    @Column(name = "OVERLAPPED_OVERLAP_PERCENTAGE")
+    
+    //the percentage of the overlapSpecialVariantId-variant that is overlapped
+    @Column(name="OVERLAPPED_OVERLAP_PERCENTAGE")
     private Integer overlappedOverlapPercentage;
-
-    @Column(name = "OVERLAP_PROJECTID")
+    
+    @Column(name="OVERLAP_PROJECTID")
     private Long overlapProjectId;
-
-    @Column(name = "PROJECTID")
+    
+    @Column(name="PROJECTID")
     private Long projectId;
-
-    public Variant2SpecialVariantOverlap() {
-
+    
+    public Variant2SpecialVariantOverlap(){
+        
     }
 
     public Long getVariantId() {
@@ -149,5 +150,7 @@ public class Variant2SpecialVariantOverlap implements Serializable {
     public void setProjectId( Long projectId ) {
         this.projectId = projectId;
     }
-
+    
+    
+    
 }

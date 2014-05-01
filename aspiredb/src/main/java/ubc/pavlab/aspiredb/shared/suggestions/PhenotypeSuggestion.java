@@ -1,8 +1,8 @@
 package ubc.pavlab.aspiredb.shared.suggestions;
 
-import java.io.Serializable;
-
 import org.directwebremoting.annotations.DataTransferObject;
+
+import java.io.Serializable;
 
 @DataTransferObject(javascript = "PhenotypeSuggestion")
 public class PhenotypeSuggestion implements Serializable {
@@ -16,11 +16,11 @@ public class PhenotypeSuggestion implements Serializable {
     public PhenotypeSuggestion() {
     }
 
-    public PhenotypeSuggestion( String name ) {
+    public PhenotypeSuggestion (String name) {
         this.name = name;
     }
 
-    public PhenotypeSuggestion( String name, String uri ) {
+    public PhenotypeSuggestion (String name, String uri) {
         this.name = name;
         this.uri = uri;
         this.isOntologyTerm = true;
@@ -30,7 +30,7 @@ public class PhenotypeSuggestion implements Serializable {
         return name;
     }
 
-    public void setName( String name ) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -38,7 +38,7 @@ public class PhenotypeSuggestion implements Serializable {
         return uri;
     }
 
-    public void setUri( String uri ) {
+    public void setUri(String uri) {
         this.uri = uri;
     }
 
@@ -46,7 +46,7 @@ public class PhenotypeSuggestion implements Serializable {
         return isOntologyTerm;
     }
 
-    public void setOntologyTerm( boolean ontologyTerm ) {
+    public void setOntologyTerm(boolean ontologyTerm) {
         isOntologyTerm = ontologyTerm;
     }
 
@@ -54,7 +54,7 @@ public class PhenotypeSuggestion implements Serializable {
         return existInDatabase;
     }
 
-    public void setExistInDatabase( boolean existInDatabase ) {
+    public void setExistInDatabase(boolean existInDatabase) {
         this.existInDatabase = existInDatabase;
     }
 }

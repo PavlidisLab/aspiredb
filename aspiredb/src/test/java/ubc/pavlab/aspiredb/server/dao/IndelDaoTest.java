@@ -52,33 +52,35 @@ public class IndelDaoTest extends BaseSpringContextTest {
     private SubjectDao individualDao;
     @Autowired
     PersistentTestObjectHelper testObjectHelper;
-
+    
     @Autowired
     UserManager userManager;
-
+    
     @Autowired
     private ProjectDao projectDao;
-
+    
+    
     private Subject individual;
-
+        
     String authorizedUsername = RandomStringUtils.randomAlphabetic( 6 );
 
     String aDifferentUsername = RandomStringUtils.randomAlphabetic( 5 );
-
+    
     String projectName = RandomStringUtils.randomAlphabetic( 4 );
     String groupName = RandomStringUtils.randomAlphabetic( 4 );
-
+    
     Long projectId;
-
+    
+    
     @Before
     public void setup() throws Exception {
-
+        
         Project detachedProject = new Project();
-
-        detachedProject.setName( projectName );
-
-        Project p1 = testObjectHelper.createPersistentProject( detachedProject );
-
+        
+        detachedProject.setName( projectName);
+        
+        Project p1 = testObjectHelper.createPersistentProject(detachedProject);
+        
         projectId = p1.getId();
 
         try {
@@ -87,13 +89,15 @@ public class IndelDaoTest extends BaseSpringContextTest {
             userManager.createUser( new UserDetailsImpl( "jimmy", authorizedUsername, true, null, RandomStringUtils
                     .randomAlphabetic( 10 ) + "@gmail.com", "key", new Date() ) );
         }
-
+        
         List<GrantedAuthority> authos = new ArrayList<GrantedAuthority>();
         authos.add( new GrantedAuthorityImpl( groupName ) );
 
         userManager.createGroup( groupName, authos );
-
+        
         userManager.addUserToGroup( authorizedUsername, groupName );
+        
+        
 
         try {
             userManager.loadUserByUsername( aDifferentUsername );
@@ -118,25 +122,27 @@ public class IndelDaoTest extends BaseSpringContextTest {
             }
         } );
     }
-
+    
     @Test
-    public void testUpdateLoad() {
-
+    public void testUpdateLoad(){
+        
+        
         Indel indel = testObjectHelper.createPersistentTestIndelObject();
         Long id = indel.getId();
-
-        // 13214124 was the value set in testObjectHelper.createPersistentTestIndelObject()
-        assertEquals( indel.getIndelLength().intValue(), 13214124 );
-
+        
+        //13214124 was the value set in testObjectHelper.createPersistentTestIndelObject()
+        assertEquals( indel.getIndelLength().intValue(),13214124);
+        
         indel.setIndelLength( 93939393 );
-
+        
         indelDao.update( indel );
-
+        
         Indel updatedIndel = indelDao.load( id );
-
-        assertEquals( updatedIndel.getIndelLength().intValue(), 93939393 );
-
+        
+        assertEquals(updatedIndel.getIndelLength().intValue(), 93939393);        
+        
     }
+    
 
     @Before
     public void createIndividualAndIndels() {
@@ -146,14 +152,15 @@ public class IndelDaoTest extends BaseSpringContextTest {
             @Override
             public void doInTransactionWithoutResult( TransactionStatus status ) {
                 individual = new Subject();
+                
 
                 String patientId = "test_patient";
                 individual.setPatientId( patientId );
 
                 Indel indel = testObjectHelper.createDetachedTestIndelObject();
-
+                
                 indelDao.create( indel );
-
+                
                 individual.addVariant( indel );
 
                 Phenotype ph = new Phenotype();
@@ -165,5 +172,7 @@ public class IndelDaoTest extends BaseSpringContextTest {
             }
         } );
     }
+    
+    
 
 }

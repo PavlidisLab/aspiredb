@@ -26,5 +26,5 @@ import ubc.pavlab.aspiredb.shared.GenomicRange;
  *
  */
 public interface UCSCConnector {
-    public String constructCustomTracksFile( GenomicRange range, Collection<Long> activeProjectIds );
+    public String constructCustomTracksFile(GenomicRange range, Collection<Long> activeProjectIds);
 }

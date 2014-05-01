@@ -32,8 +32,8 @@ public interface PhenotypeDao extends SecurableDaoBase<Phenotype> {
 
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<Phenotype> findBySubjectId( Long id );
-
-    @Secured({ "GROUP_USER" })
+    
+    @Secured({ "GROUP_USER"})
     public Integer findPhenotypeCountBySubjectId( Long id );
 
     // @Secured({"GROUP_USER" ,"AFTER_ACL_COLLECTION_READ"})

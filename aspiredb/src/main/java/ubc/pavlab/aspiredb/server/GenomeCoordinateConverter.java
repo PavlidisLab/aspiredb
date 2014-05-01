@@ -1,16 +1,14 @@
 package ubc.pavlab.aspiredb.server;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import ubc.pavlab.aspiredb.shared.GenomicRange;
+
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import ubc.pavlab.aspiredb.shared.GenomicRange;
 
 /**
  * Convert from base coordinates to chromosome bands and vice versa. 1) Use db 2) Use some range datasctructure (easy:

@@ -14,15 +14,9 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
 
 /**
  * TODO Document Me. Users should be able to create gene groups and add genes to them. A gene might be in more than one

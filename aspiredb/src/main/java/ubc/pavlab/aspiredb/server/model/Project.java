@@ -14,18 +14,15 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
+
+
+
+import javax.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TODO Document Me
@@ -50,13 +47,12 @@ public class Project implements Securable {
 
     @Column(name = "DESCRIPTION")
     private String description;
-
-    // e.g. DECIPHER or DGV data
+    
+    //e.g. DECIPHER or DGV data
     @Column(name = "SPECIAL_DATA")
     private Boolean specialData;
-
-    // currently just for DGV data, the string referring to what characteristic will define the variants 'support', for
-    // DGV 'pubmedid'
+    
+    //currently just for DGV data, the string referring to what characteristic will define the variants 'support', for DGV 'pubmedid'
     @Column(name = "SPECIAL_DATA_SUPPORT_CHARACTERISTIC_KEY")
     private String variantSupportCharacteristicKey;
 

@@ -18,19 +18,20 @@ package ubc.pavlab.aspiredb.cli;
 /**
  * TODO Document Me
  * 
+ * 
  * @version $Id: InvalidDataException.java,v 1.1 2013/04/24 17:38:03 cmcdonald Exp $
  */
 public class InvalidDataException extends Exception {
+	
 
-    /**
+	/**
      * 
      */
     private static final long serialVersionUID = 4862794143098361617L;
 
-    public InvalidDataException() {
-    }
+    public InvalidDataException() {}
 
-    public InvalidDataException( String message ) {
-        super( message );
-    }
+	public InvalidDataException(String message) {
+		super(message);
+	}
 }

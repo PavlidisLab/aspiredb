@@ -35,9 +35,11 @@ public class SystemArchitectureAspect {
     /**
      * Encompasses the 'web' packages
      */
-    /*
-     * @Pointcut("within(ubc.pavlab.aspiredb.server..*)") public void inWebLayer() { }
-     */
+	/*
+    @Pointcut("within(ubc.pavlab.aspiredb.server..*)")
+    public void inWebLayer() {
+    }
+    */
 
     /**
      * Encompasses the 'model' packages

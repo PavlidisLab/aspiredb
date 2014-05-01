@@ -14,9 +14,9 @@
  */
 package ubc.pavlab.aspiredb.server.util;
 
-import java.util.List;
-
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
+
+import java.util.List;
 
 /**
  * Gemma URL Utils
@@ -24,40 +24,40 @@ import ubc.pavlab.aspiredb.shared.GeneValueObject;
  * @version $Id: GemmaURLUtils.java,v 1.3 2013/07/05 00:02:36 frances Exp $
  */
 public class GemmaURLUtils {
-
+    
     private static final String GEMMA_URL = ConfigUtils.getGemmaBaseUrl();
-
+        
     private static final String GEMMA_WEB_SERVICE_URL = GEMMA_URL + "/rest";
-
+    
     private static final String HELP_PAGE_URL = "http://aspiredb.sites.olt.ubc.ca/";
 
-    public static String makeViewGeneNetworkInGemmaURL( List<GeneValueObject> genes ) {
+    public static String makeViewGeneNetworkInGemmaURL( List<GeneValueObject>  genes) {
 
         String url = GEMMA_URL + "/home.html?taxon=1&geneList=";
-
-        for ( GeneValueObject gvo : genes ) {
-
-            url = url + gvo.getSymbol() + ",";
-
+        
+        for (GeneValueObject gvo : genes){
+            
+            url = url + gvo.getSymbol()+",";
+            
         }
-
+        
         return url;
-
+        
     }
 
-    public static String makeGeneUrl( String geneSymbol ) {
+    public static String makeGeneUrl (String geneSymbol) {        
         return GEMMA_URL + "/gene/showGene.html?name=" + geneSymbol + "&taxon=human";
     }
-
-    public static String makeNeurocartaPhenotypeUrl( String phenotypeUri ) {
-        return GEMMA_URL + "/phenotypes.html?phenotypeUrlId=" + phenotypeUri;
+ 
+    public static String makeNeurocartaPhenotypeUrl(String phenotypeUri) {
+    	return GEMMA_URL + "/phenotypes.html?phenotypeUrlId=" + phenotypeUri; 
     }
 
-    public static String makeWebServiceUrl( String path ) {
-        return GEMMA_WEB_SERVICE_URL + path;
+    public static String makeWebServiceUrl(String path) {
+    	return GEMMA_WEB_SERVICE_URL + path; 
     }
-
-    public static String getHelpPageURL() {
+    
+    public static String getHelpPageURL( ) {
         return HELP_PAGE_URL;
     }
 }

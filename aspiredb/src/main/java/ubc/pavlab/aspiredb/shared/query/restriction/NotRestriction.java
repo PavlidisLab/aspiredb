@@ -19,7 +19,8 @@
 package ubc.pavlab.aspiredb.shared.query.restriction;
 
 /**
- * author: anton date: 26/04/13
+ * author: anton
+ * date: 26/04/13
  */
 public class NotRestriction implements RestrictionExpression {
     private RestrictionExpression expression;
@@ -28,7 +29,7 @@ public class NotRestriction implements RestrictionExpression {
         return expression;
     }
 
-    public void setExpression( RestrictionExpression expression ) {
+    public void setExpression(RestrictionExpression expression) {
         this.expression = expression;
     }
 }

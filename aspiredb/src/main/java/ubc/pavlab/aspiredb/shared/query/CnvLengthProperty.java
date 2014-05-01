@@ -26,6 +26,6 @@ import org.directwebremoting.annotations.DataTransferObject;
 @DataTransferObject(javascript = "CnvLengthProperty")
 public class CnvLengthProperty extends NumericProperty {
     public CnvLengthProperty() {
-        super( "Length", "cnvLength" );
+        super("Length","cnvLength");
     }
 }

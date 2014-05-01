@@ -17,7 +17,6 @@ package ubc.pavlab.aspiredb.server.dao;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import ubc.pavlab.aspiredb.server.model.CNV;
 
 /**
@@ -28,7 +27,7 @@ import ubc.pavlab.aspiredb.server.model.CNV;
  */
 @Repository("cnvDao")
 public class CNVDaoImpl extends VariantDaoBaseImpl<CNV> implements CNVDao {
-
+    
     @Autowired
     public CNVDaoImpl( SessionFactory sessionFactory ) {
         super( CNV.class );

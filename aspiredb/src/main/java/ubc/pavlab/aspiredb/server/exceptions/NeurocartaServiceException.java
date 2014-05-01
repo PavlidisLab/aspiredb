@@ -23,12 +23,11 @@ package ubc.pavlab.aspiredb.server.exceptions;
  */
 public class NeurocartaServiceException extends ExternalDependencyException {
 
-    private static final long serialVersionUID = 6641834369716037306L;
+	private static final long serialVersionUID = 6641834369716037306L;
 
-    public NeurocartaServiceException() {
-    }
+	public NeurocartaServiceException() {}
 
-    public NeurocartaServiceException( String message ) {
-        super( message );
-    }
+	public NeurocartaServiceException(String message) {
+		super(message);
+	}
 }

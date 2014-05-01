@@ -18,13 +18,12 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
-import java.util.Collection;
-
 import ubc.pavlab.aspiredb.server.model.Characteristic;
 
-public interface CharacteristicDao extends SecurableDaoBase<Characteristic> {
-    public Collection<String> getKeysMatching( String query );
+import java.util.Collection;
 
-    public Collection<String> getValuesForKey( String key );
+public interface CharacteristicDao extends SecurableDaoBase<Characteristic> {
+    public Collection<String> getKeysMatching(String query);
+    public Collection<String> getValuesForKey(String key);
 
 }

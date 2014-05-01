@@ -19,7 +19,8 @@
 package ubc.pavlab.aspiredb.server;
 
 /**
- * author: anton date: 21/05/13
+ * author: anton
+ * date: 21/05/13
  */
 public class LabelTestScenarios {
 

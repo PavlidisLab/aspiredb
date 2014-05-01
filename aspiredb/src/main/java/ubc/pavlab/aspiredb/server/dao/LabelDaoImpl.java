@@ -33,37 +33,38 @@ import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 /**
- * author: anton date: 25/04/13
+ * author: anton
+ * date: 25/04/13
  */
 @Repository
 public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDao {
 
     @Autowired
-    public LabelDaoImpl( SessionFactory sessionFactory ) {
-        super( Label.class );
+    public LabelDaoImpl(SessionFactory sessionFactory) {
+        super(Label.class);
         super.setSessionFactory( sessionFactory );
     }
 
     @Override
     public Collection<Label> getVariantLabels() {
-        Collection<BigInteger> labelIds = currentSession().createSQLQuery(
-                "select distinct LABEL_FK from VARIANT_LABEL" ).list();
+        Collection<BigInteger> labelIds =
+                currentSession().createSQLQuery("select distinct LABEL_FK from VARIANT_LABEL").list();
         Collection<Long> ids = new ArrayList<Long>();
-        for ( BigInteger labelId : labelIds ) {
-            ids.add( labelId.longValue() );
+        for (BigInteger labelId : labelIds) {
+            ids.add(labelId.longValue());
         }
-        return load( ids );
+        return load(ids);
     }
 
     @Override
     public Collection<Label> getSubjectLabels() {
-        Collection<BigInteger> labelIds = currentSession().createSQLQuery(
-                "select distinct LABEL_FK from SUBJECT_LABEL" ).list();
+        Collection<BigInteger> labelIds =
+                currentSession().createSQLQuery("select distinct LABEL_FK from SUBJECT_LABEL").list();
         Collection<Long> ids = new ArrayList<Long>();
-        for ( BigInteger labelId : labelIds ) {
-            ids.add( labelId.longValue() );
+        for (BigInteger labelId : labelIds) {
+            ids.add(labelId.longValue());
         }
-        return load( ids );
+        return load(ids);
     }
 
     @Transactional(readOnly = true)
@@ -81,13 +82,13 @@ public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDa
         }
         return load( ids );
     }
-
+    
     @Transactional(readOnly = true)
-    public Collection<Label> getVariantLabelsByVariantId( Long id ) {
+    public Collection<Label> getVariantLabelsByVariantId(Long id){
 
         String sqlString = "select distinct LABEL_FK from VARIANT_LABEL vl WHERE vl.VARIANT_FK = :variantId ";
         Query query = currentSession().createSQLQuery( sqlString );
-        query.setLong( "variantId", id );
+        query.setLong( "variantId",id );
 
         Collection<BigInteger> labelIds = query.list();
 
@@ -97,13 +98,13 @@ public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDa
         }
         return load( ids );
     }
-
+    
     @Transactional(readOnly = true)
-    public Collection<Label> getSubjectLabelsBySubjectId( Long id ) {
+    public Collection<Label> getSubjectLabelsBySubjectId(Long id){
 
         String sqlString = "select distinct LABEL_FK from SUBJECT_LABEL sl WHERE sl.SUBJECT_FK = :subjectId ";
         Query query = currentSession().createSQLQuery( sqlString );
-        query.setLong( "subjectId", id );
+        query.setLong( "subjectId",id );
 
         Collection<BigInteger> labelIds = query.list();
 
@@ -113,21 +114,23 @@ public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDa
         }
         return load( ids );
     }
-
+    
     @Override
     @Transactional(readOnly = true)
     @SuppressWarnings("unchecked")
-    public List<Label> getLabelsMatching( String partialName ) {
-        return currentSession().createQuery( "select label from Label as label where label.name like :partialName" )
-                .setParameter( "partialName", "%" + partialName + "%" ).list();
+    public List<Label> getLabelsMatching(String partialName) {
+        return currentSession()
+                .createQuery("select label from Label as label where label.name like :partialName")
+                .setParameter("partialName", "%" + partialName + "%")
+                .list();
     }
 
     @Override
     @Transactional
-    public Label findOrCreate( LabelValueObject labelVO ) {
-        if ( labelVO.getId() == null ) {
+    public Label findOrCreate(LabelValueObject labelVO) {
+        if (labelVO.getId() == null) {
             Label label = new Label( labelVO.getName(), labelVO.getColour(), labelVO.getIsShown() );
-            this.create( label );
+            this.create(label);
             return label;
         } else {
             return this.load( labelVO.getId() );

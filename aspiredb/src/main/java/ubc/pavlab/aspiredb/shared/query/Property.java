@@ -18,13 +18,16 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 /**
- * author: anton date: 07/05/13 Class is concrete because I couldn't get DWR to see it when it is abstract.
+ * author: anton
+ * date: 07/05/13
+ *
+ * Class is concrete because I couldn't get DWR to see it when it is abstract.
  */
 @DataTransferObject(javascript = "Property")
 public class Property<D extends DataType> implements Serializable {
@@ -37,21 +40,21 @@ public class Property<D extends DataType> implements Serializable {
     protected boolean isCharacteristic = false;
 
     public boolean isCharacteristic() {
-        return isCharacteristic;
-    }
+		return isCharacteristic;
+	}
 
-    public void setCharacteristic( boolean isCharacteristic ) {
-        this.isCharacteristic = isCharacteristic;
-    }
+	public void setCharacteristic(boolean isCharacteristic) {
+		this.isCharacteristic = isCharacteristic;
+	}
 
-    public Property() {
+	public Property() {
     }
 
     public boolean isSupportsSuggestions() {
         return supportsSuggestions;
     }
 
-    public void setSupportsSuggestions( boolean supportsSuggestions ) {
+    public void setSupportsSuggestions(boolean supportsSuggestions) {
         this.supportsSuggestions = supportsSuggestions;
     }
 
@@ -75,23 +78,23 @@ public class Property<D extends DataType> implements Serializable {
         return operators;
     }
 
-    public void setName( String name ) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public void setDisplayName( String displayName ) {
+    public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
 
-    public void setDataType( D dataType ) {
+    public void setDataType(D dataType) {
         this.dataType = dataType;
     }
 
-    public void setExampleValues( String exampleValues ) {
+    public void setExampleValues(String exampleValues) {
         this.exampleValues = exampleValues;
     }
 
-    public void setOperators( Collection<Operator> operators ) {
+    public void setOperators(Collection<Operator> operators) {
         this.operators = operators;
     }
 }

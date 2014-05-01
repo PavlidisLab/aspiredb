@@ -79,8 +79,8 @@ public class CNVDaoTest extends BaseSpringContextTest {
         Project detachedProject = new Project();
 
         detachedProject.setName( projectName );
-
-        Project p1 = testObjectHelper.createPersistentProject( detachedProject );
+        
+        Project p1 = testObjectHelper.createPersistentProject(detachedProject);
 
         projectId = p1.getId();
 
@@ -140,42 +140,42 @@ public class CNVDaoTest extends BaseSpringContextTest {
 
     }
 
-    // @Test
-    // public void testMakeQueryAndFind() {
-    // super.runAsAdmin();
-    //
-    // // these are added
-    // ComparisonExpression ce1 = new ComparisonExpression( "Chromosome", OperatorType.EQ, "40" );
-    // ComparisonExpression ce2 = new ComparisonExpression( "Start", OperatorType.GTE, "50000000" );
-    // ComparisonExpression ce3 = new ComparisonExpression( "End", OperatorType.LTE, "55000000" );
-    //
-    // List<ComparisonExpression> ceList1 = new ArrayList<ComparisonExpression>();
-    // ceList1.add( ce1 );
-    // ceList1.add( ce2 );
-    // ceList1.add( ce3 );
-    //
-    // // this should not exist
-    // ComparisonExpression ce4 = new ComparisonExpression( "Chromosome", OperatorType.EQ, "50" );
-    // ComparisonExpression ce5 = new ComparisonExpression( "Start", OperatorType.GTE, "50000000" );
-    // ComparisonExpression ce6 = new ComparisonExpression( "End", OperatorType.LTE, "55000000" );
-    //
-    // List<ComparisonExpression> ceList2 = new ArrayList<ComparisonExpression>();
-    // ceList2.add( ce4 );
-    // ceList2.add( ce5 );
-    // ceList2.add( ce6 );
-    //
-    // Collection<CNV> cnvs1 = cnvDao.makeQueryAndFind( ceList1 );
-    // Collection<CNV> cnvs2 = cnvDao.makeQueryAndFind( ceList2 );
-    //
-    // for ( CNV cnv : cnvs1 ) {
-    // assertEquals( cnv1.getLocation().getChromosome(), cnv.getLocation().getChromosome() );
-    // assertTrue( cnv1.getLocation().getStart() >= 50000000 );
-    // assertTrue( cnv1.getLocation().getEnd() <= 55000000 );
-    // }
-    //
-    // assertTrue( cnvs2.isEmpty() );
-    //
-    // }
+//    @Test
+//    public void testMakeQueryAndFind() {
+//        super.runAsAdmin();
+//
+//        // these are added
+//        ComparisonExpression ce1 = new ComparisonExpression( "Chromosome", OperatorType.EQ, "40" );
+//        ComparisonExpression ce2 = new ComparisonExpression( "Start", OperatorType.GTE, "50000000" );
+//        ComparisonExpression ce3 = new ComparisonExpression( "End", OperatorType.LTE, "55000000" );
+//
+//        List<ComparisonExpression> ceList1 = new ArrayList<ComparisonExpression>();
+//        ceList1.add( ce1 );
+//        ceList1.add( ce2 );
+//        ceList1.add( ce3 );
+//
+//        // this should not exist
+//        ComparisonExpression ce4 = new ComparisonExpression( "Chromosome", OperatorType.EQ, "50" );
+//        ComparisonExpression ce5 = new ComparisonExpression( "Start", OperatorType.GTE, "50000000" );
+//        ComparisonExpression ce6 = new ComparisonExpression( "End", OperatorType.LTE, "55000000" );
+//
+//        List<ComparisonExpression> ceList2 = new ArrayList<ComparisonExpression>();
+//        ceList2.add( ce4 );
+//        ceList2.add( ce5 );
+//        ceList2.add( ce6 );
+//
+//        Collection<CNV> cnvs1 = cnvDao.makeQueryAndFind( ceList1 );
+//        Collection<CNV> cnvs2 = cnvDao.makeQueryAndFind( ceList2 );
+//
+//        for ( CNV cnv : cnvs1 ) {
+//            assertEquals( cnv1.getLocation().getChromosome(), cnv.getLocation().getChromosome() );
+//            assertTrue( cnv1.getLocation().getStart() >= 50000000 );
+//            assertTrue( cnv1.getLocation().getEnd() <= 55000000 );
+//        }
+//
+//        assertTrue( cnvs2.isEmpty() );
+//
+//    }
 
     @Before
     public void createIndividualAndCNVs() {
@@ -192,15 +192,15 @@ public class CNVDaoTest extends BaseSpringContextTest {
                 GenomicLocation genomicLocation1 = new GenomicLocation();
                 genomicLocation1.setChromosome( "40" );
                 genomicLocation1.setStart( 50500000 );
-                genomicLocation1.setEnd( 54500000 );
+                genomicLocation1.setEnd( 54500000 );                
 
                 cnv1 = new CNV();
                 cnv1.setLocation( genomicLocation1 );
                 cnv1.setCopyNumber( 1 );
-                cnv1.setType( CnvType.valueOf( "LOSS" ) );
-
+                cnv1.setType( CnvType.valueOf( "LOSS" ) );                
+                
                 cnvDao.create( cnv1 );
-
+                
                 individual.addVariant( cnv1 );
 
                 Phenotype ph = new Phenotype();
@@ -212,5 +212,7 @@ public class CNVDaoTest extends BaseSpringContextTest {
             }
         } );
     }
+
+    
 
 }

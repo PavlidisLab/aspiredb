@@ -14,14 +14,13 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
-import java.util.Collection;
-
 import org.springframework.security.access.annotation.Secured;
-
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
+
+import java.util.Collection;
 
 /**
  * TODO Document Me
@@ -31,12 +30,12 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
  */
 public interface VariantDaoBase<T extends Variant> extends SecurableDaoBase<T>, RemotePaging<T> {
 
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
-    public Collection<T> findByGenomicLocation( GenomicRange range, Collection<Long> activeProjectIds );
+    @Secured({"GROUP_USER" ,"AFTER_ACL_COLLECTION_READ"})
+    public Collection<T> findByGenomicLocation(GenomicRange range, Collection<Long> activeProjectIds);
 
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<T> findBySubjectPatientId( String id );
 
-    public Collection<String> suggestValuesForEntityProperty( Property property, SuggestionContext suggestionContext );
+    public Collection<String> suggestValuesForEntityProperty(Property property, SuggestionContext suggestionContext);
 
 }

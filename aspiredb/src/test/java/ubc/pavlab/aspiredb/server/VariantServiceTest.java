@@ -19,6 +19,7 @@
 package ubc.pavlab.aspiredb.server;
 
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -67,9 +68,9 @@ public class VariantServiceTest extends BaseSpringContextTest {
         new InlineTransaction() {
             @Override
             public void instructions() {
-                subject = testObjectHelper.createPersistentTestIndividualObject( "testSubjectVariantServiceTest" );
+                subject = testObjectHelper.createPersistentTestIndividualObject("testSubjectVariantServiceTest");
                 variant = testObjectHelper.createPersistentTestCNVObject();
-                variant.setSubject( subject );
+                variant.setSubject(subject);
             }
         }.execute();
     }
@@ -79,36 +80,36 @@ public class VariantServiceTest extends BaseSpringContextTest {
         new InlineTransaction() {
             @Override
             public void instructions() {
-                variantDao.remove( variant );
-                subjectDao.remove( subject );
+                variantDao.remove(variant);
+                subjectDao.remove(subject);
             }
         }.execute();
     }
 
     @Test
     public void testGetVariant() {
-
-        VariantValueObject variantValueObject = variantService.getVariant( variant.getId() );
-        assertNotNull( variantValueObject );
-
+        
+            VariantValueObject variantValueObject = variantService.getVariant(variant.getId());
+            assertNotNull(variantValueObject);
+        
     }
 
     @Test
     public void testSuggestProperties() throws NotLoggedInException {
-        Collection<Property> suggestions = variantService.suggestPropertiesForVariantType( VariantType.CNV );
-        assertTrue( suggestions.size() > 2 ); // TODO: test more thoroughly
+        Collection<Property> suggestions = variantService.suggestPropertiesForVariantType(VariantType.CNV);
+        assertTrue(suggestions.size() > 2); //TODO: test more thoroughly
     }
 
     @Test
     public void testSuggestValues() throws NotLoggedInException, BioMartServiceException, NeurocartaServiceException {
         SuggestionContext suggestionContext = new SuggestionContext();
-        CharacteristicProperty property = new CharacteristicProperty( "BENIGN" );
-        Collection<PropertyValue> suggestions = variantService.suggestValues( property, suggestionContext );
-        Collection<String> stringValues = new ArrayList<String>();
-        for ( PropertyValue suggestion : suggestions ) {
+        CharacteristicProperty property = new CharacteristicProperty("BENIGN");
+        Collection<PropertyValue> suggestions = variantService.suggestValues(property, suggestionContext);
+        Collection<String> stringValues =  new ArrayList<String>();
+        for (PropertyValue suggestion : suggestions) {
             stringValues.add( suggestion.getValue().toString() );
         }
-        assertTrue( suggestions.size() > 0 );
-        assertTrue( stringValues.contains( "YES" ) );
+        assertTrue(suggestions.size() > 0);
+        assertTrue(stringValues.contains("YES"));
     }
 }

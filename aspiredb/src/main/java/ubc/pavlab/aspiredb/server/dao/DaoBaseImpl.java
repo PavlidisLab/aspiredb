@@ -14,13 +14,13 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
-import java.util.Collection;
-import java.util.HashSet;
-
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 public abstract class DaoBaseImpl<T> extends HibernateDaoSupport implements DaoBase<T> {
 
@@ -112,6 +112,7 @@ public abstract class DaoBaseImpl<T> extends HibernateDaoSupport implements DaoB
         return this.getHibernateTemplate().loadAll( elementClass );
     }
 
+ 
     /**
      * 
      * 
@@ -119,12 +120,11 @@ public abstract class DaoBaseImpl<T> extends HibernateDaoSupport implements DaoB
     @Override
     @Transactional(readOnly = true)
     public long getCountAll() {
-        Session session = this.getHibernateTemplate().getSessionFactory().getCurrentSession();
-        Number totalSize = ( Number ) session.createCriteria( this.elementClass )
-                .setProjection( Projections.rowCount() ).uniqueResult();
-        return totalSize.longValue();
+        Session session = this.getHibernateTemplate().getSessionFactory().getCurrentSession();               
+        Number totalSize = (Number) session.createCriteria( this.elementClass ).setProjection(Projections.rowCount()).uniqueResult();
+        return totalSize.longValue();        
     }
-
+    
     /*
      * (non-Javadoc)
      * 

@@ -15,11 +15,6 @@
 
 package ubc.pavlab.aspiredb.server.dao;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
@@ -29,6 +24,11 @@ import org.springframework.stereotype.Repository;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * TODO document me

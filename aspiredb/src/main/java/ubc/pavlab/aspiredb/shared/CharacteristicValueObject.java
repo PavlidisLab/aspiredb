@@ -20,8 +20,11 @@ package ubc.pavlab.aspiredb.shared;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
+import java.io.Serializable;
+
 /**
- * author: anton date: 11/04/13
+ * author: anton
+ * date: 11/04/13
  */
 @DataTransferObject(javascript = "CharacteristicValueObject")
 public class CharacteristicValueObject implements Displayable {
@@ -30,7 +33,7 @@ public class CharacteristicValueObject implements Displayable {
     private String key;
     private String value;
 
-    public CharacteristicValueObject( Long id, String key, String value ) {
+    public CharacteristicValueObject(Long id, String key, String value) {
         this.id = id;
         this.key = key;
         this.value = value;
@@ -43,7 +46,7 @@ public class CharacteristicValueObject implements Displayable {
         return id;
     }
 
-    public void setId( Long id ) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -51,7 +54,7 @@ public class CharacteristicValueObject implements Displayable {
         return key;
     }
 
-    public void setKey( String key ) {
+    public void setKey(String key) {
         this.key = key;
     }
 
@@ -59,13 +62,13 @@ public class CharacteristicValueObject implements Displayable {
         return value;
     }
 
-    public void setValue( String value ) {
+    public void setValue(String value) {
         this.value = value;
     }
 
     @Override
     public String toString() {
-        return key + "=" + value;
+        return key+"="+value;
     }
 
     @Override

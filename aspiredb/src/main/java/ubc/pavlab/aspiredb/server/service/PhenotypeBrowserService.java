@@ -14,11 +14,11 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import java.util.Collection;
-import java.util.List;
-
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * TODO Document Me
@@ -28,8 +28,8 @@ import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
  */
 
 public interface PhenotypeBrowserService {
-
-    public List<PhenotypeSummary> getPhenotypesBySubjectIds( Collection<Long> subjectIds, Collection<Long> projectIds )
-            throws NeurocartaServiceException;
+    
+    public List<PhenotypeSummary> getPhenotypesBySubjectIds( Collection<Long> subjectIds,
+            Collection<Long> projectIds ) throws NeurocartaServiceException;
 
 }

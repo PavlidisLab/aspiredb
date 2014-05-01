@@ -18,18 +18,18 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
-import java.util.List;
-
 import org.springframework.security.access.annotation.Secured;
-
 import ubc.pavlab.aspiredb.server.model.Query;
 
+import java.util.List;
+
 /**
- * author: anton date: 17/04/13
+ * author: anton
+ * date: 17/04/13
  */
 public interface QueryDao extends SecurableDaoBase<Query> {
 
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
-    public List<Query> findByName( String queryName );
+    @Secured({"GROUP_USER","AFTER_ACL_COLLECTION_READ"})
+    public List<Query> findByName(String queryName);
 
 }

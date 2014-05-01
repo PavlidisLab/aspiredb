@@ -23,11 +23,11 @@ public class LoginController {
     }
 
     @RequestMapping("/keep_alive.html")
-    public void loadUser( HttpServletRequest request, HttpServletResponse response ) throws IOException {
+    public void loadUser( HttpServletRequest request, HttpServletResponse response ) throws IOException{
 
         String jsonText = null;
-
-        if ( !SecurityServiceImpl.isUserLoggedIn() ) {
+        
+        if ( !SecurityServiceImpl.isUserLoggedIn() ) {            
             jsonText = "{success:false}";
 
         } else {
@@ -35,7 +35,7 @@ public class LoginController {
         }
 
         JSONUtil jsonUtil = new JSONUtil( request, response );
-
+        
         jsonUtil.writeToResponse( jsonText );
 
     }

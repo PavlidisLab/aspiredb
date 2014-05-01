@@ -24,18 +24,18 @@ import org.directwebremoting.annotations.DataTransferObject;
  */
 @DataTransferObject
 public class ProjectValueObject implements Serializable {
-
+    
     /**
      * 
      */
     private static final long serialVersionUID = 2176326059505424010L;
 
     private Long id;
-
+    
     private String name;
-
+    
     private String description;
-
+    
     private Boolean special;
 
     public ProjectValueObject() {
@@ -47,7 +47,7 @@ public class ProjectValueObject implements Serializable {
 
     public Long getId() {
         return id;
-    }
+    }    
 
     public String getName() {
         return name;
@@ -73,4 +73,5 @@ public class ProjectValueObject implements Serializable {
         this.special = special;
     }
 
+    
 }

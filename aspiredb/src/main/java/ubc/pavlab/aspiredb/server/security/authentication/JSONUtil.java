@@ -18,12 +18,11 @@
  */
 package ubc.pavlab.aspiredb.server.security.authentication;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * A utility class to do 'JSON-like' things, such as writing out JSON objects to the response {@link java.io.Writer}.

@@ -26,109 +26,110 @@ import org.directwebremoting.annotations.DataTransferObject;
  */
 @DataTransferObject(javascript = "GeneValueObject")
 public class GeneValueObject implements Displayable, Serializable {
-    private static final long serialVersionUID = -7411514301896256147L;
+	private static final long serialVersionUID = -7411514301896256147L;
 
-    private String key;
-    private String symbol;
-    private String name;
-    private String taxon;
-    private String ensemblId;
-    private String linkToGemma;
-    private String geneBioType;
-    private GenomicRange genomicRange;
+	private String key;
+	private String symbol;
+	private String name;
+	private String taxon;
+	private String ensemblId;
+	private String linkToGemma;
+	private String geneBioType;
+	private GenomicRange genomicRange;
 
-    public GeneValueObject() {
-    }
+	public GeneValueObject() {
+	}
 
-    public String getSymbol() {
-        return symbol;
-    }
+	public String getSymbol() {
+		return symbol;
+	}
 
-    public void setSymbol( String symbol ) {
-        this.symbol = symbol;
-    }
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName( String name ) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public String getGeneBioType() {
-        return geneBioType;
-    }
+	public String getGeneBioType() {
+		return geneBioType;
+	}
 
-    public void setGeneBioType( String geneBioType ) {
-        this.geneBioType = geneBioType;
-    }
+	public void setGeneBioType(String geneBioType) {
+		this.geneBioType = geneBioType;
+	}
 
-    public GeneValueObject( String ensemblId, String symbol, String geneName, String gene_biotype, String taxon ) {
-        this.ensemblId = ensemblId;
-        this.symbol = symbol;
-        this.name = geneName;
-        this.geneBioType = gene_biotype;
-        this.taxon = taxon;
-        this.key = symbol + ":" + taxon;
-    }
+	public GeneValueObject(String ensemblId, String symbol, String geneName,
+			String gene_biotype, String taxon) {
+		this.ensemblId = ensemblId;
+		this.symbol = symbol;
+		this.name = geneName;
+		this.geneBioType = gene_biotype;
+		this.taxon = taxon;
+		this.key = symbol + ":" + taxon;
+	}
 
-    public String getKey() {
-        return key;
-    }
+	public String getKey() {
+		return key;
+	}
 
-    public void setKey( String key ) {
-        this.key = key;
-    }
+	public void setKey(String key) {
+		this.key = key;
+	}
 
-    public String getEnsemblId() {
-        return ensemblId;
-    }
+	public String getEnsemblId() {
+		return ensemblId;
+	}
 
-    public void setEnsemblId( String ensemblId ) {
-        this.ensemblId = ensemblId;
-    }
+	public void setEnsemblId(String ensemblId) {
+		this.ensemblId = ensemblId;
+	}
 
-    public String getLinkToGemma() {
-        return linkToGemma;
-    }
+	public String getLinkToGemma() {
+		return linkToGemma;
+	}
 
-    public void setLinkToGemma( String linkToGemma ) {
-        this.linkToGemma = linkToGemma;
-    }
+	public void setLinkToGemma(String linkToGemma) {
+		this.linkToGemma = linkToGemma;
+	}
 
-    public String getTaxon() {
-        return taxon;
-    }
+	public String getTaxon() {
+		return taxon;
+	}
 
-    public void setTaxon( String taxon ) {
-        this.taxon = taxon;
-    }
+	public void setTaxon(String taxon) {
+		this.taxon = taxon;
+	}
 
-    public GenomicRange getGenomicRange() {
-        return this.genomicRange;
-    }
+	public GenomicRange getGenomicRange() {
+		return this.genomicRange;
+	}
 
-    public void setGenomicRange( GenomicRange genomicRange ) {
-        this.genomicRange = genomicRange;
-    }
+	public void setGenomicRange(GenomicRange genomicRange) {
+		this.genomicRange = genomicRange;
+	}
 
-    @Override
-    public String getLabel() {
-        return symbol.equals( "" ) ? ensemblId : symbol;
-    }
+	@Override
+	public String getLabel() {
+		return symbol.equals("") ? ensemblId : symbol;
+	}
 
-    @Override
-    public String getHtmlLabel() {
-        return "<b>" + getLabel() + "</b>: " + name;
-    }
+	@Override
+	public String getHtmlLabel() {
+		return "<b>" + getLabel() + "</b>: " + name;
+	}
 
-    @Override
-    public String getTooltip() {
-        String ret = getLabel() + ": " + name;
-        if ( this.genomicRange != null ) {
-            ret += " - " + this.genomicRange.toString();
-        }
-        return ret;
-    }
+	@Override
+	public String getTooltip() {
+		String ret = getLabel() + ": " + name;
+		if (this.genomicRange != null) {
+			ret += " - " + this.genomicRange.toString();
+		}
+		return ret;
+	}
 }

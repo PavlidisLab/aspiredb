@@ -19,25 +19,25 @@
 package ubc.pavlab.aspiredb.shared.query.restriction;
 
 /**
- * author: anton date: 29/04/13
+ * author: anton
+ * date: 29/04/13
  */
 public class LabelRestriction implements RestrictionExpression {
-    private static final long serialVersionUID = 7963405073376269138L;
+	private static final long serialVersionUID = 7963405073376269138L;
 
-    private String labelName;
+	private String labelName;
 
-    public LabelRestriction() {
+	public LabelRestriction() {}
+
+    public LabelRestriction(String labelName) {
+    	this.labelName = labelName;
     }
-
-    public LabelRestriction( String labelName ) {
-        this.labelName = labelName;
-    }
-
+    
     public String getLabelName() {
         return labelName;
     }
 
-    public void setLabelName( String labelName ) {
+    public void setLabelName(String labelName) {
         this.labelName = labelName;
     }
 }

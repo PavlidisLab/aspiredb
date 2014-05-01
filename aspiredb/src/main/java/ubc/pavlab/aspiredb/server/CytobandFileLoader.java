@@ -21,7 +21,8 @@ package ubc.pavlab.aspiredb.server;
 import java.util.Map;
 
 /**
- * author: anton date: 19/02/13
+ * author: anton
+ * date: 19/02/13
  */
 public interface CytobandFileLoader {
 

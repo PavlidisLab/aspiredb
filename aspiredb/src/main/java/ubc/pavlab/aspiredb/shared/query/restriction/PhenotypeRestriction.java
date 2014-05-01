@@ -69,20 +69,20 @@ public class PhenotypeRestriction implements RestrictionExpression {
     }
 
     public boolean isAbsent() {
-
-        if ( this.value == null ) {
+        
+        if (this.value == null){
             return false;
         }
-
+        
         return this.value.equals( PhenotypeUtil.VALUE_ABSENT ); // FIXME! We should probably have special phenotype type
                                                                 // for absent/present.
     }
 
     public boolean isPresent() {
-        if ( this.value == null ) {
+        if (this.value == null){
             return false;
         }
-
+        
         return this.value.equals( PhenotypeUtil.VALUE_PRESENT ); // FIXME!
     }
 }

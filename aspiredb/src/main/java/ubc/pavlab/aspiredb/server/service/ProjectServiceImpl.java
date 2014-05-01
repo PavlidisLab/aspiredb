@@ -41,8 +41,8 @@ import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
 
 @Service
-@RemoteProxy(name = "ProjectService")
-public class ProjectServiceImpl implements ProjectService {
+@RemoteProxy(name="ProjectService")
+public class ProjectServiceImpl implements ProjectService{
 
     private static Logger log = LoggerFactory.getLogger( ProjectService.class );
 
@@ -58,8 +58,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     PhenotypeUploadService phenotypeUploadService;
 
-    @RemoteMethod
-    public List<ProjectValueObject> getProjects() {
+    @RemoteMethod 
+    public List<ProjectValueObject> getProjects(){
+        
 
         Collection<Project> projects = projectDao.loadAll();
         List<ProjectValueObject> vos = new ArrayList<ProjectValueObject>();
@@ -70,58 +71,60 @@ public class ProjectServiceImpl implements ProjectService {
 
         return vos;
     }
+    
+    @RemoteMethod 
+    public List<ProjectValueObject> getOverlapProjects(Collection<Long> ids){        
 
-    @RemoteMethod
-    public List<ProjectValueObject> getOverlapProjects( Collection<Long> ids ) {
-
-        Collection<Project> projects = projectDao.getOverlapProjects( ids );
+        Collection<Project> projects = projectDao.getOverlapProjects(ids);
         List<ProjectValueObject> vos = new ArrayList<ProjectValueObject>();
 
         for ( Project p : projects ) {
-            vos.add( Project.convertToValueObject( p ) );
+                vos.add( Project.convertToValueObject( p ) );           
         }
 
         return vos;
     }
-
-    // Hard code these special project's access for clarity
+    
+    //Hard code these special project's access for clarity
     @RemoteMethod
-    public ProjectValueObject getDgvProject() {
-
+    public ProjectValueObject getDgvProject( ){
+        
         ProjectValueObject pvo = new ProjectValueObject();
-
+        
         Collection<Project> projects = projectDao.getSpecialOverlapProjects();
-
+        
         for ( Project p : projects ) {
-
-            if ( p.getName().equals( "DGV" ) ) {
-                return Project.convertToValueObject( p );
-            }
-
+            
+                if (p.getName().equals( "DGV" )){
+                    return Project.convertToValueObject( p );
+                }
+                        
         }
 
-        return pvo;
-
+       
+        return pvo;       
+        
+        
     }
-
-    // Hard code these special project's access for clarity
+    
+   //Hard code these special project's access for clarity
     @RemoteMethod
-    public ProjectValueObject getDecipherProject() {
-
+    public ProjectValueObject getDecipherProject( ){
+        
         ProjectValueObject pvo = new ProjectValueObject();
-
+        
         Collection<Project> projects = projectDao.getSpecialOverlapProjects();
-
+        
         for ( Project p : projects ) {
-
-            if ( p.getName().equals( "DECIPHER" ) ) {
-                return Project.convertToValueObject( p );
-            }
-
+            
+                if (p.getName().equals( "DECIPHER" )){
+                    return Project.convertToValueObject( p );
+                }
+                        
         }
-
+       
         return pvo;
-
+        
     }
 
     /*
@@ -140,17 +143,20 @@ public class ProjectServiceImpl implements ProjectService {
     @RemoteMethod
     public Integer numVariants( Collection<Long> projectIds ) {
 
+
         Collection<Long> projectCollection = new ArrayList<Long>();
         projectCollection.add( projectIds.iterator().next() );
 
         return this.projectDao.getVariantCountForProjects( projectCollection );
     }
 
+    
     // TODO change return type to some object that can contain more relevant information, handle other exceptions
-    public String processUploadedFile( String projectName, String filename, VariantType v ) {
+    public String processUploadedFile( String projectName, String filename, VariantType v )  {
 
         log.info( " In processUploadedFile projectName:" + projectName + " filename:" + filename + " varianttype:"
                 + v.name() );
+
 
         try {
             Class.forName( "org.relique.jdbc.csv.CsvDriver" );
@@ -206,10 +212,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
+   
     // TODO change return type to some object that can contain more relevant information, handle other exceptions
-    public String processUploadedPhenotypeFile( String projectName, String filename ) {
+    public String processUploadedPhenotypeFile( String projectName, String filename )  {
 
         log.info( " In processUploadedPhenotypeFile projectName:" + projectName + " filename:" + filename );
+
 
         try {
             Class.forName( "org.relique.jdbc.csv.CsvDriver" );
@@ -262,7 +270,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    public String deleteProject( String projectName ) {
+    public String deleteProject( String projectName )  {
 
         log.info( " In deleteProject projectName:" + projectName );
 
@@ -288,6 +296,7 @@ public class ProjectServiceImpl implements ProjectService {
             throws NotLoggedInException {
         log.info( " In alterGroupPermissions projectName:" + projectName + " group name: " + groupName + " grant:"
                 + grant );
+
 
         if ( projectName == null || groupName == null ) {
             log.error( "null projectName or groupName options" );

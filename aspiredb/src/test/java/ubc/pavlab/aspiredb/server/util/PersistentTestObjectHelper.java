@@ -23,6 +23,7 @@ import java.util.List;
 
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Indel;
+import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
@@ -52,28 +53,28 @@ public interface PersistentTestObjectHelper {
     public CNV createDetachedTestCNVObject();
 
     public Subject createPersistentTestSubjectObjectWithCNV( String patientId );
-
+    
     public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypes( String patientId );
-
+    
     public Phenotype createPersistentTestPhenotypeObject( String name, String uri, String valueType, String value );
-
-    public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypesForEnrichmentTest( String patientId,
-            String phenName, String phenUri, String phenValue );
+    
+    public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypesForEnrichmentTest( String patientId, String phenName, String phenUri, String phenValue );
 
     public Subject createPersistentTestIndividualObject( String patientId );
 
     public Subject createDetachedIndividualObject( String patientId );
 
     public Project createPersistentProject( Project p );
-
-    public Subject addSubjectToProject( Subject s, Project p );
-
-    public List<Subject> getSubjectsForProject( Project p );
-
-    public Collection<LabelValueObject> getLabelsForSubject( Long subjectId );
-
-    public Collection<LabelValueObject> getLabelsForVariant( Long variantId );
-
-    public void deleteProject( String projectName );
-
+    
+    public Subject addSubjectToProject(Subject s, Project p);
+    
+    public List<Subject> getSubjectsForProject(Project p);
+    
+    public Collection<LabelValueObject> getLabelsForSubject(Long subjectId);
+    
+    public Collection<LabelValueObject> getLabelsForVariant(Long variantId);
+    
+    public void deleteProject(String projectName);
+    
+    
 }

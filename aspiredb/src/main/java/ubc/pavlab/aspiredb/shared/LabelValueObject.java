@@ -23,11 +23,12 @@ import java.io.Serializable;
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
- * author: anton date: 11/04/13
+ * author: anton
+ * date: 11/04/13
  */
 @DataTransferObject(javascript = "LabelValueObject")
 public class LabelValueObject implements Displayable, Serializable {
-
+    
     private static final long serialVersionUID = 5912945308104924604L;
 
     private String name;
@@ -38,30 +39,29 @@ public class LabelValueObject implements Displayable, Serializable {
     public LabelValueObject() {
     }
 
-    public LabelValueObject( String name ) {
+    public LabelValueObject(String name) {
         this.name = name;
         this.colour = "E6E6FA"; // TODO: define default
     }
-
-    public LabelValueObject( String name, String colour ) {
+    public LabelValueObject(String name, String colour) {
         this.name = name;
         this.colour = colour;
     }
 
-    public LabelValueObject( Long id, String name ) {
+    public LabelValueObject(Long id, String name) {
         this.id = id;
         this.name = name;
         this.colour = "E6E6FA"; // TODO: define default
     }
 
-    public LabelValueObject( Long id, String name, String colour ) {
+    public LabelValueObject(Long id, String name, String colour) {
         this.id = id;
         this.name = name;
         this.colour = colour;
         this.isShown = false;
     }
-
-    public LabelValueObject( Long id, String name, String colour, Boolean isShown ) {
+    
+    public LabelValueObject(Long id, String name, String colour, Boolean isShown) {
         this.id = id;
         this.name = name;
         this.colour = colour;
@@ -76,7 +76,7 @@ public class LabelValueObject implements Displayable, Serializable {
         return id;
     }
 
-    public void setId( Long id ) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -87,7 +87,7 @@ public class LabelValueObject implements Displayable, Serializable {
     public Boolean getIsShown() {
         return isShown;
     }
-
+    
     public void setName( String name ) {
         this.name = name;
     }
@@ -99,9 +99,9 @@ public class LabelValueObject implements Displayable, Serializable {
     public void setIsShown( Boolean isShown ) {
         this.isShown = isShown;
     }
-
+    
     public String toString() {
-        return this.getName();
+    	return this.getName();
     }
 
     @Override

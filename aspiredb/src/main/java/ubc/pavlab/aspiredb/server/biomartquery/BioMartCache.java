@@ -14,10 +14,10 @@
  */
 package ubc.pavlab.aspiredb.server.biomartquery;
 
+import ubc.pavlab.aspiredb.shared.GeneValueObject;
+
 import java.util.Collection;
 import java.util.List;
-
-import ubc.pavlab.aspiredb.shared.GeneValueObject;
 
 /**
  * BioMart cache
@@ -26,22 +26,22 @@ import ubc.pavlab.aspiredb.shared.GeneValueObject;
  * @version $Id: BioMartCache.java,v 1.3 2013/06/11 22:30:47 anton Exp $
  */
 public interface BioMartCache {
-    public boolean hasExpired();
+	public boolean hasExpired();
+	
+	public void putAll(Collection<GeneValueObject> genes);
 
-    public void putAll( Collection<GeneValueObject> genes );
+	public Collection<GeneValueObject> findGenes(String queryString);
 
-    public Collection<GeneValueObject> findGenes( String queryString );
+	/**
+	 * Get a list of genes using the given gene symbols or ensembl ids. The order of the returned list of genes is preserved. 
+	 * If a gene symbol or ensembl id is not valid, the returned gene will be null.
+	 * 
+	 * @param geneStrings gene symbols or ensembl ids
+	 * @return a list of GeneValueObjects
+	 */
+	public List<GeneValueObject> getGenes(List<String> geneStrings);
 
-    /**
-     * Get a list of genes using the given gene symbols or ensembl ids. The order of the returned list of genes is
-     * preserved. If a gene symbol or ensembl id is not valid, the returned gene will be null.
-     * 
-     * @param geneStrings gene symbols or ensembl ids
-     * @return a list of GeneValueObjects
-     */
-    public List<GeneValueObject> getGenes( List<String> geneStrings );
+	public Collection<GeneValueObject> fetchGenesByLocation(String chromosomeName, Long start, Long end);
 
-    public Collection<GeneValueObject> fetchGenesByLocation( String chromosomeName, Long start, Long end );
-
-    public Collection<GeneValueObject> fetchGenesByGeneSymbols( Collection<String> geneSymbols );
+	public Collection<GeneValueObject> fetchGenesByGeneSymbols(Collection<String> geneSymbols);
 }

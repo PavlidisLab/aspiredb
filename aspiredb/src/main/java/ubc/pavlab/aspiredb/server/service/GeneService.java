@@ -18,31 +18,32 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 /**
- * author: anton date: 01/05/13
+ * author: anton
+ * date: 01/05/13
  */
 public interface GeneService {
+    
+    public List<GeneValueObject> getGenesInsideVariants(Collection<Long> variantIds)
+            throws NotLoggedInException, BioMartServiceException;
 
-    public List<GeneValueObject> getGenesInsideVariants( Collection<Long> variantIds ) throws NotLoggedInException,
-            BioMartServiceException;
-
-    public Collection<GeneValueObject> findGenesWithNeurocartaPhenotype( String phenotypeValueUri )
+    public Collection<GeneValueObject> findGenesWithNeurocartaPhenotype(String phenotypeValueUri)
             throws NotLoggedInException, ExternalDependencyException;
-
-    public Map<String, GeneValueObject> findGenesAndURIsWithNeurocartaPhenotype( String phenotypeValueUri )
+    
+    public Map<String, GeneValueObject> findGenesAndURIsWithNeurocartaPhenotype(String phenotypeValueUri)
             throws NotLoggedInException, ExternalDependencyException;
-
-    public Long saveUserGeneSet( String geneName, List<GeneValueObject> genes );
-
-    public boolean isGeneSetName( String name );
-
+    
+    public Long saveUserGeneSet(String geneName,List<GeneValueObject> genes);
+    
+    public boolean isGeneSetName(String name);
+    
 }

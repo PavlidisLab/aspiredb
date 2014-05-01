@@ -15,13 +15,12 @@
 
 package ubc.pavlab.aspiredb.server.project;
 
-import java.util.List;
-
 import org.springframework.security.access.annotation.Secured;
-
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
+
+import java.util.List;
 
 /**
  * @author cmcdonald
@@ -36,34 +35,31 @@ public interface ProjectManager {
 
     @Secured("GROUP_ADMIN")
     public void deleteProject( String projectName ) throws Exception;
-
+    
     @Secured({ "GROUP_ADMIN" })
-    public void addSubjectPhenotypesToProject( String projectName, boolean createproject,
-            List<PhenotypeValueObject> voList ) throws Exception;
-
+    public void addSubjectPhenotypesToProject( String projectName, boolean createproject, List<PhenotypeValueObject> voList ) throws Exception;
+    
     @Secured({ "GROUP_ADMIN" })
-    public void addSubjectPhenotypesToSpecialProject( String projectName, boolean deleteProject,
-            List<PhenotypeValueObject> voList ) throws Exception;
-
+    public void addSubjectPhenotypesToSpecialProject( String projectName, boolean deleteProject, List<PhenotypeValueObject> voList ) throws Exception;
+    
     @Secured({ "GROUP_ADMIN" })
-    public void addSubjectVariantsToProject( String projectName, boolean createproject, List<VariantValueObject> voList )
-            throws Exception;
-
+    public void addSubjectVariantsToProject( String projectName, boolean createproject, List<VariantValueObject>  voList) throws Exception;
+    
     @Secured({ "GROUP_ADMIN" })
-    public void addSubjectVariantsToSpecialProject( String projectName, boolean deleteProject,
-            List<VariantValueObject> voList, boolean existingProject ) throws Exception;
-
+    public void addSubjectVariantsToSpecialProject( String projectName, boolean deleteProject, List<VariantValueObject>  voList, boolean existingProject) throws Exception;
+    
     @Secured({ "GROUP_ADMIN" })
-    public void addSubjectVariantsToProjectForceCreate( String projectName, List<VariantValueObject> voList )
-            throws Exception;
-
-    @Secured({ "GROUP_ADMIN" })
-    public List<String> getVariantUploadWarnings( String projectName, List<VariantValueObject> valueObjects );
-
-    @Secured({ "GROUP_ADMIN" })
-    public String createUserAndAssignToGroup( String userName, String password, String groupName );
-
-    @Secured({ "GROUP_ADMIN" })
-    public void populateProjectToProjectOverlap( String projectName, String specialProjectName ) throws Exception;
+    public void addSubjectVariantsToProjectForceCreate( String projectName, List<VariantValueObject>  voList) throws Exception;
+    
+    @Secured({"GROUP_ADMIN"})
+    public List<String> getVariantUploadWarnings(String projectName, List<VariantValueObject> valueObjects);
+    
+    @Secured({"GROUP_ADMIN"})
+    public String createUserAndAssignToGroup(String userName, String password, String groupName);
+    
+    @Secured({"GROUP_ADMIN"})
+    public void populateProjectToProjectOverlap(String projectName, String specialProjectName) throws Exception;
+    
+    
 
 }

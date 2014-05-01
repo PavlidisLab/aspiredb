@@ -14,10 +14,6 @@
  */
 package ubc.pavlab.aspiredb.cli;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.log4j.ConsoleAppender;
@@ -29,9 +25,12 @@ import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * cli for creating users
@@ -46,13 +45,13 @@ public class GroupManagerCLI extends AbstractCLI {
     ShaPasswordEncoder passwordEncoder = new ShaPasswordEncoder();
 
     private boolean createUser = false;
-
+    
     private boolean deleteUser = false;
-
+    
     private boolean changePassword = false;
 
     private boolean createGroup = false;
-
+    
     private boolean deleteGroup = false;
 
     private boolean assignUserToGroup = false;
@@ -80,7 +79,7 @@ public class GroupManagerCLI extends AbstractCLI {
         applicationContext = SpringContextUtil.getApplicationContext( false );
 
         userManager = ( UserManager ) applicationContext.getBean( "userManager" );
-
+        
         GroupManagerCLI p = new GroupManagerCLI();
         try {
             Exception ex = p.doWork( args );
@@ -121,10 +120,8 @@ public class GroupManagerCLI extends AbstractCLI {
                 "Use this option to delete an existing group, option -groupname required when using this option" );
         addOption( "assign", false,
                 "Using this option will assign a user to a group, options -groupname and -aspireuser required" );
-
-        addOption(
-                "changepassword",
-                false,
+        
+        addOption( "changepassword", false,
                 "Using this option will change an existing user's password, options -aspireuser and -aspireuserpassword required when using this option." );
     }
 
@@ -156,7 +153,7 @@ public class GroupManagerCLI extends AbstractCLI {
 
             }
 
-        } else if ( deleteUser ) {
+        }else if ( deleteUser ) {
 
             if ( aspireUserName == null ) {
                 log.error( "missing -aspireuser or -aspireuserpassword options" );
@@ -165,9 +162,9 @@ public class GroupManagerCLI extends AbstractCLI {
 
             try {
 
-                userManager.loadUserByUsername( aspireUserName );
-                userManager.deleteByUserName( aspireUserName );
-
+                userManager.loadUserByUsername( aspireUserName );                
+                userManager.deleteByUserName(aspireUserName);
+               
             } catch ( UsernameNotFoundException e ) {
 
                 log.error( "User name doesn't exist" );
@@ -185,13 +182,13 @@ public class GroupManagerCLI extends AbstractCLI {
             try {
                 String encodedPassword = passwordEncoder.encodePassword( aspireUserPassword, aspireUserName );
                 userManager.changePasswordForUser( aspireUserName, encodedPassword );
-
+                                
             } catch ( UsernameNotFoundException e ) {
                 log.error( "user does not exist" );
                 bail( AbstractCLI.ErrorCode.INVALID_OPTION );
             }
 
-        } else if ( createGroup ) {
+        }else if ( createGroup ) {
 
             if ( groupName == null ) {
                 log.error( "missing  -groupname option" );
@@ -208,7 +205,7 @@ public class GroupManagerCLI extends AbstractCLI {
 
             userManager.createGroup( groupName, authos );
 
-        } else if ( deleteGroup ) {
+        }else if ( deleteGroup ) {
 
             if ( groupName == null ) {
                 log.error( "missing  -groupname option" );

@@ -14,30 +14,18 @@
  */
 package ubc.pavlab.aspiredb.server.fileupload;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import ubc.pavlab.aspiredb.cli.InvalidDataException;
 import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.server.util.ConfigUtils;
-import ubc.pavlab.aspiredb.shared.CNVValueObject;
-import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
-import ubc.pavlab.aspiredb.shared.GenomicRange;
-import ubc.pavlab.aspiredb.shared.IndelValueObject;
-import ubc.pavlab.aspiredb.shared.InversionValueObject;
-import ubc.pavlab.aspiredb.shared.SNVValueObject;
-import ubc.pavlab.aspiredb.shared.VariantType;
-import ubc.pavlab.aspiredb.shared.VariantValueObject;
+import ubc.pavlab.aspiredb.shared.*;
+
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.*;
 
 public class VariantUploadService {
 
@@ -125,9 +113,9 @@ public class VariantUploadService {
                 errorMessages.add( "Invalid data format on line number: " + lineNumber + " error message:"
                         + e.getMessage() );
             } catch ( Exception e ) {
-
-                // should just be ignored data
-                // errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
+                
+                //should just be ignored data
+                //errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
             }
         }
 
@@ -259,8 +247,8 @@ public class VariantUploadService {
         // Sanja says to exclude these
         if ( variantsubtype.equals( "Complex" ) || variantsubtype.equals( "Inversion" )
                 || variantsubtype.equals( "Insertion" ) ) {
-
-            log.info( "ignored variant subtype" );
+            
+            log.info(  "ignored variant subtype");
             throw new Exception( "ignored variant subtype" );
         }
 
@@ -273,27 +261,29 @@ public class VariantUploadService {
         cnv.setGenomicRange( getGenomicRangeFromResultSet( results ) );
         cnv.setCnvLength( cnv.getGenomicRange().getBaseEnd() - cnv.getGenomicRange().getBaseStart() );
 
-        if ( variantsubtype.equals( "Gain" ) || variantsubtype.equals( "Duplication" ) ) {
+        if ( variantsubtype.equals( "Gain" )  || variantsubtype.equals("Duplication")) {
             cnv.setType( CnvType.GAIN.name() );
-        } else if ( variantsubtype.equals( "Loss" ) || variantsubtype.equals( "Deletion" ) ) {
-            cnv.setType( CnvType.LOSS.name() );
+        } else if ( variantsubtype.equals( "Loss" ) || variantsubtype.equals("Deletion") ) {
+            cnv.setType( CnvType.LOSS.name());
         } else if ( variantsubtype.equals( "Gain+Loss" ) ) {
             cnv.setType( CnvType.GAINLOSS.name() );
-        } else if ( variantsubtype.equals( "CNV" ) ) {
+        }else if ( variantsubtype.equals( "CNV" ) ) {
             cnv.setType( CnvType.UNKNOWN.name() );
-        } else {
-
-            log.info( "unrecognized variant subtype: " + variantsubtype );
+        }else{
+            
+            log.info("unrecognized variant subtype: "+variantsubtype);
             throw new Exception( "unrecognized variant subtype" );
         }
 
-        // Just add pubmedid for now
+        
+        //Just add pubmedid for now
         Map<String, CharacteristicValueObject> characteristics = new HashMap<String, CharacteristicValueObject>();
 
         CharacteristicValueObject charVO = new CharacteristicValueObject();
         charVO.setKey( "pubmedid" );
         charVO.setValue( results.getString( "pubmedid" ) );
         characteristics.put( charVO.getKey(), charVO );
+
 
         cnv.setCharacteristics( characteristics );
 

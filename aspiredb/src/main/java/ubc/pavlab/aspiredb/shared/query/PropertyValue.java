@@ -18,14 +18,15 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
-import java.io.Serializable;
-
 import org.directwebremoting.annotations.DataTransferObject;
-
 import ubc.pavlab.aspiredb.shared.Displayable;
 
+
+import java.io.Serializable;
+
 /**
- * author: anton date: 13/05/13
+ * author: anton
+ * date: 13/05/13
  */
 @DataTransferObject
 public class PropertyValue<T extends Displayable> implements Serializable {
@@ -34,10 +35,9 @@ public class PropertyValue<T extends Displayable> implements Serializable {
     private T value;
     private String displayValue;
 
-    public PropertyValue() {
-    }
+    public PropertyValue() {}
 
-    public PropertyValue( T value ) {
+    public PropertyValue(T value) {
         this.value = value;
         this.displayValue = value.getHtmlLabel();
     }
@@ -46,19 +46,19 @@ public class PropertyValue<T extends Displayable> implements Serializable {
         return displayValue;
     }
 
-    public void setDisplayValue( String displayValue ) {
+    public void setDisplayValue(String displayValue) {
         this.displayValue = displayValue;
     }
 
     public String toString() {
-        return value.toString();
+        return  value.toString();
     }
 
     public T getValue() {
         return this.value;
     }
 
-    public void setValue( T value ) {
+    public void setValue(T value) {
         this.value = value;
     }
 }

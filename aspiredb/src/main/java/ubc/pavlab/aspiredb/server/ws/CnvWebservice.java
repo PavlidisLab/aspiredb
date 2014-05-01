@@ -14,12 +14,11 @@
  */
 package ubc.pavlab.aspiredb.server.ws;
 
-import javax.ws.rs.Path;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
+
+import javax.ws.rs.Path;
 
 /**
  * TODO Document Me
@@ -43,40 +42,41 @@ public class CnvWebservice {
      * @param servletResponse
      * @return
      */
-    // @GET
-    // @Path("/showCnv/chr/{chromosome}/start/{start}/end/{end}")
-    // @Produces(MediaType.TEXT_PLAIN)
-    // public String showCnv( @PathParam("chromosome") String chromosome, @PathParam("start") int start,
-    // @PathParam("end") int end, @Context HttpServletResponse servletResponse ) {
-    //
-    // // Get CNVs from db.
-    // Collection<Variant> cnvs = variantDao.findByGenomicLocation( new GenomicRange( chromosome, start, end ) );
-    //
-    // if ( cnvs.isEmpty() ) {
-    // // FIXME what do we do here?
-    // throw new IllegalArgumentException( "No variants in the region described" );
-    // }
-    //
-    // // Make and return file.
-    // return CnvToBed.create( cnvs, chromosome, start, end );
-    // }
+//    @GET
+//    @Path("/showCnv/chr/{chromosome}/start/{start}/end/{end}")
+//    @Produces(MediaType.TEXT_PLAIN)
+//    public String showCnv( @PathParam("chromosome") String chromosome, @PathParam("start") int start,
+//            @PathParam("end") int end, @Context HttpServletResponse servletResponse ) {
+//
+//        // Get CNVs from db.
+//        Collection<Variant> cnvs = variantDao.findByGenomicLocation( new GenomicRange( chromosome, start, end ) );
+//
+//        if ( cnvs.isEmpty() ) {
+//            // FIXME what do we do here?
+//            throw new IllegalArgumentException( "No variants in the region described" );
+//        }
+//
+//        // Make and return file.
+//        return CnvToBed.create( cnvs, chromosome, start, end );
+//    }
+    
+//    @GET
+//    @Path("/showAllCnv/chr/{chromosome}/start/{start}/end/{end}")
+//    @Produces(MediaType.TEXT_PLAIN)
+//    public String showAllCnv( @PathParam("chromosome") String chromosome, @PathParam("start") int start,
+//            @PathParam("end") int end, @Context HttpServletResponse servletResponse ) {
+//
+//        // Get CNVs from db.
+//        Collection<Variant> cnvs = variantDao.getAllOnChromosome( chromosome );
+//
+//        if ( cnvs.isEmpty() ) {
+//            // FIXME what do we do here?
+//            throw new IllegalArgumentException( "No variants in the region described" );
+//        }
+//
+//        // Make and return file.
+//        return CnvToBed.create( cnvs, chromosome, start, end );
+//    }
 
-    // @GET
-    // @Path("/showAllCnv/chr/{chromosome}/start/{start}/end/{end}")
-    // @Produces(MediaType.TEXT_PLAIN)
-    // public String showAllCnv( @PathParam("chromosome") String chromosome, @PathParam("start") int start,
-    // @PathParam("end") int end, @Context HttpServletResponse servletResponse ) {
-    //
-    // // Get CNVs from db.
-    // Collection<Variant> cnvs = variantDao.getAllOnChromosome( chromosome );
-    //
-    // if ( cnvs.isEmpty() ) {
-    // // FIXME what do we do here?
-    // throw new IllegalArgumentException( "No variants in the region described" );
-    // }
-    //
-    // // Make and return file.
-    // return CnvToBed.create( cnvs, chromosome, start, end );
-    // }
 
 }

@@ -21,9 +21,11 @@ package ubc.pavlab.aspiredb.shared.suggestions;
 import java.io.Serializable;
 
 /**
- * author: anton date: 06/05/13
+ * author: anton
+ * date: 06/05/13
  */
 public class VariantCharacteristicSuggestion implements Serializable {
     private static final long serialVersionUID = 731028908700157435L;
+
 
 }

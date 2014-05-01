@@ -15,18 +15,17 @@
 
 package ubc.pavlab.aspiredb.server.util;
 
-import java.util.Arrays;
-
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Statistics;
 import net.sf.ehcache.config.CacheConfiguration;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
 
 /**
  * Get statistics about and manage caches.
@@ -96,7 +95,7 @@ public class CacheMonitorImpl implements CacheMonitor {
         Arrays.sort( cacheNames );
 
         buf.append( cacheNames.length + " caches; only non-empty caches listed below." );
-
+        
         int count = 0;
         for ( String rawCacheName : cacheNames ) {
             Cache cache = cacheManager.getCache( rawCacheName );
@@ -111,7 +110,7 @@ public class CacheMonitorImpl implements CacheMonitor {
             // a little shorter...
             String cacheName = rawCacheName;
 
-            buf.append( "\n" + cacheName );
+            buf.append("\n"+ cacheName );
             long hits = statistics.getCacheHits();
             long misses = statistics.getCacheMisses();
             long inMemoryHits = statistics.getInMemoryHits();
@@ -120,20 +119,23 @@ public class CacheMonitorImpl implements CacheMonitor {
             long onDiskHits = statistics.getOnDiskHits();
             long evictions = statistics.getEvictionCount();
 
-            buf.append( hits + "\t" );
-            buf.append( misses + "\t" );
-            buf.append( objectCount + "\t" );
-            buf.append( inMemoryHits + "\t" );
-            buf.append( inMemoryMisses + "\t" );
-            buf.append( onDiskHits + "\t" );
-            buf.append( evictions + "\t" );
+            buf.append(  hits+"\t"  );
+            buf.append(  misses+"\t"  );
+            buf.append( objectCount+"\t");
+            buf.append( inMemoryHits+"\t"  );
+            buf.append( inMemoryMisses+"\t" );
+            buf.append( onDiskHits+"\t" );
+            buf.append( evictions+"\t");
 
             CacheConfiguration cacheConfiguration = cache.getCacheConfiguration();
             boolean eternal = cacheConfiguration.isEternal();
-        }
+        }  
         return buf.toString();
 
     }
+
+    
+  
 
     private void setStatisticsEnabled( boolean b ) {
         String[] cacheNames = cacheManager.getCacheNames();

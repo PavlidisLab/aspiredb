@@ -14,24 +14,16 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.OneToMany;
-
 import ubc.pavlab.aspiredb.shared.CNVValueObject;
 import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
+
+import javax.persistence.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @version $Id: CNV.java,v 1.24 2013/06/21 18:35:45 cmcdonald Exp $
@@ -46,7 +38,7 @@ public class CNV extends Variant {
 
     @Column(name = "COPY_NUMBER")
     private Integer copyNumber;
-
+    
     @Column(name = "CNV_LENGTH")
     private Integer cnvLength;
 
@@ -66,7 +58,7 @@ public class CNV extends Variant {
         vo.setGenomicRange( new GenomicRange( cnv.getLocation().getChromosome(), cnv.getLocation().getStart(), cnv
                 .getLocation().getEnd() ) );
         vo.setCnvLength( cnv.getCnvLength() );
-
+        
         return vo;
     }
 

@@ -14,30 +14,16 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
 import org.springframework.security.access.annotation.Secured;
-
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
+
+import javax.persistence.*;
+
+import java.io.Serializable;
+import java.util.*;
 
 @Entity
 @Table(name = "SUBJECT")
@@ -53,6 +39,8 @@ public class Subject implements Serializable, Securable {
     @Column(name = "PATIENT_ID")
     private String patientId;
 
+    
+    
     @ManyToMany
     @JoinTable(name = "SUBJECT_PROJECTS", joinColumns = { @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "PROJECT_ID", referencedColumnName = "ID") })
     private List<Project> projects = new ArrayList<Project>();

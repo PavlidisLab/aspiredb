@@ -18,22 +18,13 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
 import ubc.pavlab.aspiredb.server.ValueObjectConvertible;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Entity
 @Table(name = "LABEL")
@@ -52,7 +43,7 @@ public class Label implements Securable, ValueObjectConvertible<LabelValueObject
 
     @Column(name = "IS_SHOWN")
     private Boolean isShown;
-
+    
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "QUERY_FK")
     private Query query;
@@ -65,7 +56,7 @@ public class Label implements Securable, ValueObjectConvertible<LabelValueObject
         this.colour = colour;
         this.isShown = true;
     }
-
+    
     public Label( String name, String colour, Boolean isShown ) {
         this.name = name;
         this.colour = colour;
@@ -93,7 +84,7 @@ public class Label implements Securable, ValueObjectConvertible<LabelValueObject
         return colour;
     }
 
-    public void setColour( String colour ) {
+    public void setColour(String colour) {
         this.colour = colour;
     }
 
@@ -108,11 +99,11 @@ public class Label implements Securable, ValueObjectConvertible<LabelValueObject
     public Boolean isShown() {
         return isShown;
     }
-
+    
     public void setIsShown( Boolean isShown ) {
         this.isShown = isShown;
     }
-
+    
     @Override
     public boolean equals( Object o ) {
         if ( this == o ) return true;

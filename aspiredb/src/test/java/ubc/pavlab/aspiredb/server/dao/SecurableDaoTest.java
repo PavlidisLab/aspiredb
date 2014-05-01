@@ -186,7 +186,12 @@ public class SecurableDaoTest extends BaseSpringContextTest {
         } catch ( AccessDeniedException e ) {
 
         }
-
+        
+        
+        
+        
     }
+
+    
 
 }

@@ -14,31 +14,31 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
-import java.util.Collection;
-
 import org.directwebremoting.annotations.DataTransferObject;
+
+import java.util.Collection;
 
 @DataTransferObject(javascript = "ProjectFilterConfig")
 public class ProjectFilterConfig extends AspireDbFilterConfig {
-
-    /**
+	
+	/**
 	 * 
 	 */
-    private static final long serialVersionUID = -8603007193329791775L;
-    private Collection<Long> projectIds;
+	private static final long serialVersionUID = -8603007193329791775L;
+	private Collection<Long> projectIds;
+			
+	public ProjectFilterConfig() {
+	}
 
-    public ProjectFilterConfig() {
-    }
+	public ProjectFilterConfig(Collection<Long> activeProjects) {
+		this.projectIds = activeProjects;
+	}
 
-    public ProjectFilterConfig( Collection<Long> activeProjects ) {
-        this.projectIds = activeProjects;
-    }
-
-    public Collection<Long> getProjectIds() {
-        return projectIds;
-    }
-
-    public void setProjectIds( Collection<Long> projectIds ) {
-        this.projectIds = projectIds;
-    }
+	public Collection<Long> getProjectIds() {
+		return projectIds;
+	}
+	
+	public void setProjectIds ( Collection<Long> projectIds ) {
+		this.projectIds = projectIds;
+	}
 }

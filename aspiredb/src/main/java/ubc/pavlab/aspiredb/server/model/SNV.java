@@ -14,18 +14,17 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
 import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.SNVValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @version $Id: SNV.java,v 1.6 2013/06/11 22:55:59 anton Exp $

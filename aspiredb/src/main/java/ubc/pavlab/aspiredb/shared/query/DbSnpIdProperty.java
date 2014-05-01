@@ -21,11 +21,12 @@ package ubc.pavlab.aspiredb.shared.query;
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
- * author: anton date: 10/05/13
+ * author: anton
+ * date: 10/05/13
  */
 @DataTransferObject(javascript = "DbSnpIdProperty")
 public class DbSnpIdProperty extends TextProperty {
     public DbSnpIdProperty() {
-        super( "DB SNP ID", "dbSNPID" );
+        super("DB SNP ID", "dbSNPID");
     }
 }

@@ -16,6 +16,7 @@ package ubc.pavlab.aspiredb.server.dao;
 
 import java.util.Collection;
 
+
 /**
  * TODO Document Me
  * 
@@ -34,9 +35,9 @@ public interface DaoBase<T> {
     public T load( Long id );
 
     public Collection<? extends T> loadAll();
-
+    
     public long getCountAll();
-
+            
     public void remove( Collection<? extends T> entities );
 
     public void remove( Long id );

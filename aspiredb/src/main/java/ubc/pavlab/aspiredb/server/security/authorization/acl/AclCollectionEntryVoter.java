@@ -15,12 +15,6 @@
 
 package ubc.pavlab.aspiredb.server.security.authorization.acl;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,16 +25,16 @@ import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.vote.AbstractAclVoter;
 import org.springframework.security.acls.domain.ObjectIdentityRetrievalStrategyImpl;
 import org.springframework.security.acls.domain.SidRetrievalStrategyImpl;
-import org.springframework.security.acls.model.Acl;
+import org.springframework.security.acls.model.*;
 import org.springframework.security.acls.model.AclService;
-import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.acls.model.ObjectIdentity;
-import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.acls.model.Sid;
-import org.springframework.security.acls.model.SidRetrievalStrategy;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Customized voter that looks at collections to see if permissions are present for objects contained in the collection;
@@ -60,6 +54,7 @@ import org.springframework.util.StringUtils;
  * processDomainObjectClass type.
  * 
  * @author paul
+ * 
  */
 public class AclCollectionEntryVoter extends AbstractAclVoter {
 
@@ -146,7 +141,6 @@ public class AclCollectionEntryVoter extends AbstractAclVoter {
 
     /*
      * Most of this is modified from the superclass vote method code.
-     * 
      * @see org.springframework.security.acls.AclEntryVoter#vote(org.springframework.security.core.Authentication,
      * java.lang.Object, java.util.Collection)
      */
@@ -219,7 +213,8 @@ public class AclCollectionEntryVoter extends AbstractAclVoter {
                 try {
                     if ( !acl.isGranted( requirePermission, sids, false ) ) {
                         if ( logger.isDebugEnabled() ) {
-                            logger.debug( "Voting to deny access - ACLs returned, but insufficient permissions for this principal" );
+                            logger
+                                    .debug( "Voting to deny access - ACLs returned, but insufficient permissions for this principal" );
                         }
 
                         return ACCESS_DENIED;

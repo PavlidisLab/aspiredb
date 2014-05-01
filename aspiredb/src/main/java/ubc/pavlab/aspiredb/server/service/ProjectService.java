@@ -28,29 +28,27 @@ import ubc.pavlab.aspiredb.shared.VariantType;
  * @version $Id: ProjectService.java,v 1.4 2013/06/11 22:30:38 anton Exp $
  */
 
-public interface ProjectService {
-
-    public List<ProjectValueObject> getProjects() throws NotLoggedInException;
-
-    public List<ProjectValueObject> getOverlapProjects( Collection<Long> projectIds );
-
+public interface ProjectService  {        
+    
+    public List<ProjectValueObject> getProjects( ) throws NotLoggedInException;
+    
+    public List<ProjectValueObject> getOverlapProjects(Collection<Long> projectIds );
+    
     public ProjectValueObject getDgvProject();
-
+    
     public ProjectValueObject getDecipherProject();
-
-    public Integer numSubjects( Collection<Long> projectIds ) throws NotLoggedInException;
-
-    public Integer numVariants( Collection<Long> projectIds ) throws NotLoggedInException;
-
-    public String processUploadedFile( String projectName, String filename, VariantType v ) throws NotLoggedInException;
-
-    public String processUploadedPhenotypeFile( String projectName, String filename ) throws NotLoggedInException;
-
-    public String deleteProject( String projectName ) throws NotLoggedInException;
-
-    public String alterGroupPermissions( String projectName, String groupName, Boolean grant )
-            throws NotLoggedInException;
-
-    public String createUserAndAssignToGroup( String userName, String password, String groupName )
-            throws NotLoggedInException;
+    
+    public Integer numSubjects( Collection<Long> projectIds) throws NotLoggedInException;
+    
+    public Integer numVariants( Collection<Long> projectIds) throws NotLoggedInException;    
+    
+    public String processUploadedFile(String projectName, String filename, VariantType v) throws NotLoggedInException;
+    
+    public String processUploadedPhenotypeFile(String projectName, String filename) throws NotLoggedInException;
+    
+    public String deleteProject(String projectName) throws NotLoggedInException;
+    
+    public String alterGroupPermissions(String projectName, String groupName, Boolean grant) throws NotLoggedInException;
+    
+    public String createUserAndAssignToGroup(String userName, String password, String groupName) throws NotLoggedInException;
 }

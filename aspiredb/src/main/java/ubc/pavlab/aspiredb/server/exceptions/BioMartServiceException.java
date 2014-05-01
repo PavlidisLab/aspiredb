@@ -23,12 +23,11 @@ package ubc.pavlab.aspiredb.server.exceptions;
  */
 public class BioMartServiceException extends ExternalDependencyException {
 
-    private static final long serialVersionUID = 3910408548661626074L;
+	private static final long serialVersionUID = 3910408548661626074L;
+	
+	public BioMartServiceException() {}
 
-    public BioMartServiceException() {
-    }
-
-    public BioMartServiceException( String message ) {
-        super( message );
-    }
+	public BioMartServiceException(String message) {
+		super(message);
+	}
 }

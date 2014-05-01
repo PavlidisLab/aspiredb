@@ -14,21 +14,17 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateAccessor;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.stereotype.Repository;
-
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
+
+import java.util.*;
+
 
 //copied and modified from Gemma, some stuff should change
 
@@ -189,17 +185,17 @@ public class UserDaoImpl extends DaoBaseImpl<User> implements UserDao {
         }
         return result;
     }
-
+    
     @Override
     public Collection<GroupAuthority> loadGroupAuthorities( User u ) {
         return this.getHibernateTemplate().findByNamedParam(
                 "select gr.authorities from UserGroup gr inner join gr.groupMembers m where m = :user ", "user", u );
     }
-
+    
     @Override
     public Collection<UserGroup> loadGroups( User user ) {
         return this.getHibernateTemplate().findByNamedParam(
                 "select gr from UserGroup gr inner join gr.groupMembers m where m = :user ", "user", user );
     }
-
+    
 }

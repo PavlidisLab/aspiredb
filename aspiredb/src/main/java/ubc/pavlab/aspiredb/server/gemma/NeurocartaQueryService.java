@@ -14,14 +14,14 @@
  */
 package ubc.pavlab.aspiredb.server.gemma;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Neurocarta query service
@@ -31,17 +31,18 @@ import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
  */
 public interface NeurocartaQueryService {
 
-    public boolean isNeurocartaPhenotype( String phenotypeUri ) throws NeurocartaServiceException;
+	public boolean isNeurocartaPhenotype( String phenotypeUri ) throws NeurocartaServiceException;
+	
+	public Collection<NeurocartaPhenotypeValueObject> findPhenotypes( String queryString )
+            throws NeurocartaServiceException;
+	
+	public Map< String,GeneValueObject> findPhenotypeGenes( String queryString )
+            throws NeurocartaServiceException, BioMartServiceException;
 
-    public Collection<NeurocartaPhenotypeValueObject> findPhenotypes( String queryString )
+	public List<NeurocartaPhenotypeValueObject> getPhenotypes( List<String> names )
             throws NeurocartaServiceException;
 
-    public Map<String, GeneValueObject> findPhenotypeGenes( String queryString ) throws NeurocartaServiceException,
-            BioMartServiceException;
-
-    public List<NeurocartaPhenotypeValueObject> getPhenotypes( List<String> names ) throws NeurocartaServiceException;
-
-    public Collection<GeneValueObject> fetchGenesAssociatedWithPhenotype( String phenotypeUri )
+	public Collection<GeneValueObject> fetchGenesAssociatedWithPhenotype( String phenotypeUri )
             throws NeurocartaServiceException, BioMartServiceException;
 
 }

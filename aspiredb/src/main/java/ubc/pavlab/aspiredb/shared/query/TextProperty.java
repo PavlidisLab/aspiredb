@@ -18,13 +18,14 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 /**
- * author: anton date: 07/05/13
+ * author: anton
+ * date: 07/05/13
  */
 @DataTransferObject(javascript = "TextProperty")
 public class TextProperty extends Property<TextDataType> {
@@ -32,21 +33,22 @@ public class TextProperty extends Property<TextDataType> {
 
     public TextProperty() {
         this.dataType = new TextDataType();
-        this.operators = Arrays.asList( Operator.IS_IN_SET, Operator.IS_NOT_IN_SET );
+        this.operators = Arrays.asList(Operator.IS_IN_SET, Operator.IS_NOT_IN_SET);
         this.supportsSuggestions = true;
     }
 
-    public TextProperty( String displayName, String name ) {
+    public TextProperty (String displayName, String name) {
         this();
         this.displayName = displayName;
         this.name = name;
     }
 
-    public TextProperty( String displayName, String name, Collection<String> allowedValues ) {
+    public TextProperty (String displayName, String name, Collection<String> allowedValues) {
         this();
         this.displayName = displayName;
         this.name = name;
         this.dataType.addAllowedValues( allowedValues );
     }
+
 
 }

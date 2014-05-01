@@ -15,65 +15,66 @@
 package ubc.pavlab.aspiredb.shared;
 
 import org.directwebremoting.annotations.DataTransferObject;
-
 import ubc.pavlab.aspiredb.shared.query.DbSnpIdProperty;
 import ubc.pavlab.aspiredb.shared.query.ObservedBaseProperty;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.ReferenceBaseProperty;
 
 /**
+ * 
+ * 
  * @version $Id: SNVValueObject.java,v 1.4 2013/07/04 17:26:00 anton Exp $
  */
 @DataTransferObject(javascript = "SNVValueObject")
 public class SNVValueObject extends VariantValueObject {
 
-    /**
+	/**
 	 * 
 	 */
-    private static final long serialVersionUID = -4244741255893027344L;
+	private static final long serialVersionUID = -4244741255893027344L;
 
-    private String referenceBase;
-
+	private String referenceBase;
+	
     private String observedBase;
-
+    
     private String dbSNPID;
 
     public SNVValueObject() {
     }
 
-    public String getReferenceBase() {
-        return referenceBase;
-    }
+	public String getReferenceBase() {
+		return referenceBase;
+	}
 
-    public void setReferenceBase( String referenceBase ) {
-        this.referenceBase = referenceBase;
-    }
+	public void setReferenceBase(String referenceBase) {
+		this.referenceBase = referenceBase;
+	}
 
-    public String getObservedBase() {
-        return observedBase;
-    }
+	public String getObservedBase() {
+		return observedBase;
+	}
 
-    public void setObservedBase( String observedBase ) {
-        this.observedBase = observedBase;
-    }
+	public void setObservedBase(String observedBase) {
+		this.observedBase = observedBase;
+	}
 
-    public String getDbSNPID() {
-        return dbSNPID;
-    }
+	public String getDbSNPID() {
+		return dbSNPID;
+	}
 
-    public void setDbSNPID( String dbSNPID ) {
-        this.dbSNPID = dbSNPID;
-    }
+	public void setDbSNPID(String dbSNPID) {
+		this.dbSNPID = dbSNPID;
+	}
 
     @Override
-    public String getPropertyStringValue( Property property ) {
-        if ( property instanceof DbSnpIdProperty ) {
+    public String getPropertyStringValue(Property property) {
+        if (property instanceof DbSnpIdProperty) {
             return this.getDbSNPID();
-        } else if ( property instanceof ObservedBaseProperty ) {
+        } else if (property instanceof ObservedBaseProperty) {
             return this.getObservedBase();
-        } else if ( property instanceof ReferenceBaseProperty ) {
+        } else if (property instanceof ReferenceBaseProperty) {
             return this.getReferenceBase();
         }
-        return super.getPropertyStringValue( property );
+        return super.getPropertyStringValue(property);
     }
 }

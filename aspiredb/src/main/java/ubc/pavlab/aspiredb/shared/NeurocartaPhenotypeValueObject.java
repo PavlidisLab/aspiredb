@@ -14,9 +14,9 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
-import java.util.Collection;
-
 import org.directwebremoting.annotations.DataTransferObject;
+
+import java.util.Collection;
 
 /**
  * Neurocarta phenotype value object
@@ -27,43 +27,42 @@ import org.directwebremoting.annotations.DataTransferObject;
 @DataTransferObject(javascript = "NeurocartaPhenotypeValueObject")
 public class NeurocartaPhenotypeValueObject extends PhenotypeValueObject implements Displayable {
 
-    private static final long serialVersionUID = -7292996170070245025L;
+	private static final long serialVersionUID = -7292996170070245025L;
 
     private Collection<GeneValueObject> genes;
 
     private int geneCount;
+	
+	public NeurocartaPhenotypeValueObject() {};
 
-    public NeurocartaPhenotypeValueObject() {
-    };
+	public int getGeneCount() {
+		return this.geneCount;
+	}
 
-    public int getGeneCount() {
-        return this.geneCount;
-    }
-
-    public void setGeneCount( int geneCount ) {
-        this.geneCount = geneCount;
-    }
+	public void setGeneCount(int geneCount) {
+		this.geneCount = geneCount;
+	}
 
     public Collection<GeneValueObject> getGenes() {
         return genes;
     }
 
-    public void setGenes( Collection<GeneValueObject> genes ) {
+    public void setGenes(Collection<GeneValueObject> genes) {
         this.genes = genes;
     }
 
-    @Override
-    public String getLabel() {
-        return this.getName();
-    }
+	@Override
+	public String getLabel() {
+		return this.getName();
+	}
 
-    @Override
-    public String getHtmlLabel() {
-        return this.getName();
-    }
+	@Override
+	public String getHtmlLabel() {
+		return this.getName();
+	}
 
-    @Override
-    public String getTooltip() {
-        return this.getName() + " - " + this.geneCount + " genes";
-    }
+	@Override
+	public String getTooltip() {
+		return this.getName() + " - " + this.geneCount + " genes";
+	}
 }

@@ -18,16 +18,10 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import static junit.framework.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
-
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
@@ -36,8 +30,14 @@ import ubc.pavlab.aspiredb.server.model.GenomicLocation;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static junit.framework.Assert.assertEquals;
+
 /**
- * author: anton date: 22/05/13
+ * author: anton
+ * date: 22/05/13
  */
 public class GeneServiceTest extends BaseSpringContextTest {
 
@@ -49,31 +49,38 @@ public class GeneServiceTest extends BaseSpringContextTest {
     public void setup() throws Exception {
         Variant variant = new CNV();
         GenomicLocation location = new GenomicLocation();
-        location.setChromosome( "Y" );
-        location.setStart( 1 );
-        location.setEnd( 100 );
-        variant.setLocation( location );
+        location.setChromosome("Y");
+        location.setStart(1);
+        location.setEnd(100);
+        variant.setLocation(location);
 
-        variantDaoMock = EasyMock.createMock( VariantDao.class );
-        EasyMock.expect( variantDaoMock.load( 2L ) ).andReturn( variant );
-        EasyMock.replay( variantDaoMock );
+        variantDaoMock = EasyMock.createMock(VariantDao.class);
+        EasyMock.expect(variantDaoMock.load(2L))
+                .andReturn(variant);
+        EasyMock.replay(variantDaoMock);
 
-        bioMartQueryServiceMock = EasyMock.createMock( BioMartQueryService.class );
-        EasyMock.expect( bioMartQueryServiceMock.fetchGenesByLocation( "Y", 1L, 100L ) ).andReturn(
-                Arrays.asList( new GeneValueObject( "1", "HAIRCH", "Hairy chest gene.", "", "human" ) ) );
-        EasyMock.replay( bioMartQueryServiceMock );
+        bioMartQueryServiceMock = EasyMock.createMock(BioMartQueryService.class);
+        EasyMock.expect(bioMartQueryServiceMock.fetchGenesByLocation("Y",1L,100L))
+                .andReturn(Arrays.asList(
+                        new GeneValueObject("1","HAIRCH","Hairy chest gene.","","human")));
+        EasyMock.replay(bioMartQueryServiceMock);
 
-        ReflectionTestUtils.setField( geneService, "variantDao", variantDaoMock, VariantDao.class );
-        ReflectionTestUtils.setField( geneService, "bioMartQueryService", bioMartQueryServiceMock,
-                BioMartQueryService.class );
+        ReflectionTestUtils.setField(geneService,
+                "variantDao",
+                variantDaoMock,
+                VariantDao.class);
+        ReflectionTestUtils.setField(geneService,
+                "bioMartQueryService",
+                bioMartQueryServiceMock,
+                BioMartQueryService.class);
     }
 
     @Test
     public void testGetGenesInsideVariants() throws Exception {
-        List<GeneValueObject> genes = geneService.getGenesInsideVariants( Arrays.asList( 2L ) );
+        List<GeneValueObject> genes = geneService.getGenesInsideVariants( Arrays.asList(2L) );
 
-        assertEquals( genes.size(), 1 );
-        assertEquals( genes.iterator().next().getSymbol(), "HAIRCH" );
+        assertEquals(genes.size(), 1);
+        assertEquals(genes.iterator().next().getSymbol(),"HAIRCH");
     }
 
     @Test

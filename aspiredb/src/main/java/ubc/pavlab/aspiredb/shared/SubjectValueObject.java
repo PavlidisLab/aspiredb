@@ -14,12 +14,12 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.directwebremoting.annotations.DataTransferObject;
 
 /**
  * @author ?
@@ -34,20 +34,21 @@ public class SubjectValueObject implements Serializable {
     private String patientId;
     private Map<String, PhenotypeValueObject> phenotypes;
     private Collection<LabelValueObject> labels;
-    private Integer numOfPhenotypes = 0;
+    private Integer numOfPhenotypes=0;
+    
 
     public Collection<LabelValueObject> getLabels() {
         return labels;
     }
 
-    public void setLabels( Collection<LabelValueObject> labels ) {
+    public void setLabels(Collection<LabelValueObject> labels) {
         this.labels = labels;
     }
 
     private Integer variants = 0;
 
     public SubjectValueObject() {
-        this.phenotypes = new HashMap<String, PhenotypeValueObject>();
+    	this.phenotypes = new HashMap<String, PhenotypeValueObject>();
     }
 
     public void setId( Long id ) {
@@ -67,7 +68,7 @@ public class SubjectValueObject implements Serializable {
     }
 
     public String getGender() {
-        return getPhenotypeValue( "Gender" );
+        return getPhenotypeValue("Gender");
     }
 
     public void setPhenotypes( Map<String, PhenotypeValueObject> phenotypes ) {
@@ -75,15 +76,14 @@ public class SubjectValueObject implements Serializable {
     }
 
     public PhenotypeValueObject getPhenotype( String name ) {
-        return this.phenotypes.get( name );
+    	return this.phenotypes.get(name);
     }
-
-    public String getPhenotypeValue( String name ) {
-        PhenotypeValueObject p = this.phenotypes.get( name );
-        if ( p == null ) return null;
-        return p.getDbValue();
+    public String getPhenotypeValue( String name ) {    	
+    	PhenotypeValueObject p = this.phenotypes.get(name);
+    	if ( p == null ) return null;
+    	return p.getDbValue();
     }
-
+    
     public Map<String, PhenotypeValueObject> getPhenotypes() {
         return phenotypes;
     }
@@ -101,26 +101,30 @@ public class SubjectValueObject implements Serializable {
         return phenotypes.toString();
     }
 
-    /**
-     * public Integer getNumPhenotypes() { return phenotypes.size(); }
-     */
-
+    /**public Integer getNumPhenotypes() {
+        return phenotypes.size();
+    }*/
+    
     @Override
-    public boolean equals( Object o ) {
-        return ( ( SubjectValueObject ) o ).getId().equals( this.getId() );
+    public boolean equals (Object o) {
+    	return ((SubjectValueObject) o).getId().equals( this.getId() );
     }
 
     @Override
     public int hashCode() {
-        return this.getId().hashCode();
+    	return this.getId().hashCode();
     }
 
-    public void setNumOfPhenotypes( Integer size ) {
+    
+
+    public void setNumOfPhenotypes(Integer size) {
         this.numOfPhenotypes = size;
     }
-
+    
     public Integer getNumOfPhenotypes() {
         return numOfPhenotypes;
     }
 
+ 
+    
 }

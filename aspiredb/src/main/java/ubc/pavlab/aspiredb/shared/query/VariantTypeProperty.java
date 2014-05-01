@@ -28,6 +28,6 @@ import org.directwebremoting.annotations.DataTransferObject;
 @DataTransferObject(javascript = "VariantTypeProperty")
 public class VariantTypeProperty extends TextProperty {
     public VariantTypeProperty() {
-        super( "Variant Type", "type", Arrays.asList( "CNV", "SNV", "indel", "Inversion", "Translocation" ) );
+        super("Variant Type", "type", Arrays.asList("CNV","SNV","indel","Inversion","Translocation"));
     }
 }

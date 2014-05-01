@@ -14,11 +14,12 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
-import java.util.Collection;
-
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
+
+import java.util.Collection;
+
 
 /**
  * TODO Document Me
@@ -55,8 +56,10 @@ public interface UserDao extends DaoBase<User> {
      */
     public User findByUserName( java.lang.String userName );
 
+    
+    
     public Collection<GroupAuthority> loadGroupAuthorities( User u );
-
+    
     public Collection<UserGroup> loadGroups( User user );
 
 }

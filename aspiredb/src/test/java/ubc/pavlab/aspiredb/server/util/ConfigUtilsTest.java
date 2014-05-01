@@ -32,6 +32,8 @@ import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.SubjectFilterConfig;
 
 /**
+ * 
+ * 
  * @author ptan
  * @version $Id$
  */
@@ -47,9 +49,9 @@ public class ConfigUtilsTest {
     @Test
     public void testHasSubjectConfig() {
         Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
-        assertFalse( ConfigUtils.hasSubjectConfig( filters ) );
+        assertFalse(ConfigUtils.hasSubjectConfig(filters));
         filters.add( new SubjectFilterConfig() );
-        assertTrue( ConfigUtils.hasSubjectConfig( filters ) );
+        assertTrue(ConfigUtils.hasSubjectConfig(filters));
     }
 
 }

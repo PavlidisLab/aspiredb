@@ -44,7 +44,9 @@ import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
+import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeEnrichmentValueObject;
+import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.TextValue;
 import ubc.pavlab.aspiredb.shared.query.PhenotypeProperty;
@@ -73,11 +75,11 @@ public class PhenotypeServiceImpl implements PhenotypeService {
     OntologyService ontologyService;
     @Autowired
     ProjectDao projectDao;
-
+    
     @Autowired
-    private NeurocartaCache neurocartaCache;
+	private NeurocartaCache neurocartaCache;
     @Autowired
-    private NeurocartaQueryService neurocartaQueryService;
+	private NeurocartaQueryService neurocartaQueryService;
 
     public boolean setNameUriValueType( Phenotype phenotype, String key ) {
         if ( isUri( key ) ) {
@@ -135,7 +137,7 @@ public class PhenotypeServiceImpl implements PhenotypeService {
             if ( value != null && value.trim().equalsIgnoreCase( "Y" ) ) {
                 return PhenotypeUtil.VALUE_PRESENT;
             }
-            return PhenotypeUtil.VALUE_ABSENT;
+                return PhenotypeUtil.VALUE_ABSENT;
 
         }
 
@@ -175,35 +177,36 @@ public class PhenotypeServiceImpl implements PhenotypeService {
 
         return valueObjectsMap;
     }
-
+    
     @Override
     @RemoteMethod
     @Transactional
-    // TODO: Test
-    public Map<String, Collection<GeneValueObject>> populateDescendantPhenotypes( String phenotypeUri )
-            throws NeurocartaServiceException, BioMartServiceException {
-
-        Map<String, Collection<GeneValueObject>> valueObjectsMap = new HashMap<String, Collection<GeneValueObject>>();
-        // List<GeneValueObject> gvos = (List<GeneValueObject>) this.neurocartaQueryService.getPhenotypes(names)
-        // .fetchGenesAssociatedWithPhenotype(phenotypeUri);
-
-        HumanPhenotypeOntologyService hpoService = ontologyService.getHumanPhenotypeOntologyService();
-        OntologyTerm ontologyTerm = hpoService.getTerm( phenotypeUri );
+    //TODO: Test 
+    public Map<String, Collection<GeneValueObject>> populateDescendantPhenotypes (String phenotypeUri) throws NeurocartaServiceException, BioMartServiceException{
+    	
+    	Map<String, Collection<GeneValueObject>> valueObjectsMap = new HashMap<String, Collection<GeneValueObject>>();
+    	//List<GeneValueObject> gvos = (List<GeneValueObject>) this.neurocartaQueryService.getPhenotypes(names) .fetchGenesAssociatedWithPhenotype(phenotypeUri);
+    	
+    	HumanPhenotypeOntologyService hpoService = ontologyService.getHumanPhenotypeOntologyService();
+        OntologyTerm ontologyTerm = hpoService.getTerm(
+                phenotypeUri );
 
         if ( ontologyTerm == null ) { // Not an ontology term.
             return null;
         }
-
-        Collection<OntologyTerm> descendantsTerms = ontologyTerm.getChildren( false );
-
-        for ( OntologyTerm childTerm : descendantsTerms ) {
-            String uri = PhenotypeUtil.HUMAN_PHENOTYPE_URI_PREFIX + childTerm.getLocalName();
-            Collection<GeneValueObject> gvos = neurocartaQueryService.fetchGenesAssociatedWithPhenotype( uri );
-            valueObjectsMap.put( childTerm.getTerm(), gvos );
+        
+        Collection<OntologyTerm> descendantsTerms = ontologyTerm.getChildren( false);       
+             
+    	
+    	for ( OntologyTerm childTerm : descendantsTerms ) {
+    		String uri = PhenotypeUtil.HUMAN_PHENOTYPE_URI_PREFIX+ childTerm.getLocalName();
+    		Collection<GeneValueObject> gvos = neurocartaQueryService.fetchGenesAssociatedWithPhenotype(uri);
+    		valueObjectsMap.put(childTerm.getTerm(), gvos);
         }
-
-        return valueObjectsMap;
-
+ 	    	
+		return valueObjectsMap;
+    	
+    	
     }
 
     @Override
@@ -385,6 +388,8 @@ public class PhenotypeServiceImpl implements PhenotypeService {
             }
         }
     }
+    
+    
 
     @Override
     @RemoteMethod

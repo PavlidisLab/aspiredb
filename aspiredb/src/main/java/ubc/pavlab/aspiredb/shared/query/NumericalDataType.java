@@ -21,12 +21,12 @@ package ubc.pavlab.aspiredb.shared.query;
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
- * author: anton date: 07/05/13
+ * author: anton
+ * date: 07/05/13
  */
 @DataTransferObject(javascript = "NumericalDataType")
 public class NumericalDataType extends DataType {
     private static final long serialVersionUID = 1L;
 
-    public NumericalDataType() {
-    }
+    public NumericalDataType() {}
 }

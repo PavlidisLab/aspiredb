@@ -14,13 +14,6 @@
  */
 package ubc.pavlab.aspiredb.cli;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.log4j.ConsoleAppender;
@@ -28,17 +21,26 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.springframework.beans.factory.BeanFactory;
-
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadServiceResult;
+import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
+import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Quick and dirty copy of DecipherVariantUploadCLI plus batching I should probably just genericize this one and factor
- * out the Decipher one
  * 
+ * Quick and dirty copy of DecipherVariantUploadCLI plus batching
+ * I should probably just genericize  this one and factor out the Decipher one
+ *  
  * @version $Id:
  */
 public class DGVVariantUploadCLI extends AbstractCLI {
@@ -50,16 +52,18 @@ public class DGVVariantUploadCLI extends AbstractCLI {
 
     private String filename = "";
     private String projectName = "";
-
+    
+    
     private int batchSize = 5000;
+   
 
     private boolean deleteProject = true;
 
     private boolean dryRun = false;
 
     private static BeanFactory applicationContext;
-
-    public String getLogger() {
+    
+    public String getLogger(){
         return "ubc.pavlab.aspiredb.cli.DGVVariantUploadCLI";
     }
 
@@ -89,7 +93,7 @@ public class DGVVariantUploadCLI extends AbstractCLI {
             }
             System.exit( 0 );
         } catch ( Exception e ) {
-            System.out.println( e.toString() );
+            System.out.println(e.toString());
             throw new RuntimeException( e );
         }
     }
@@ -102,19 +106,21 @@ public class DGVVariantUploadCLI extends AbstractCLI {
 
         Option f = OptionBuilder.isRequired().hasArg().withArgName( "File name" ).withDescription( "The file to parse" )
                 .withLongOpt( "filename" ).create( 'f' );
-
-        // DGV will reside in a 'Special project' and are all CNVs
+        
+        //DGV will reside in a 'Special project' and are all CNVs
         /*
-         * Option variantType = OptionBuilder.isRequired().hasArg().withArgName( "Variant Type" ) .withDescription(
-         * "The type of variant in this file, one of: CNV, Indel, SNV, Inversion" ) .create( "variant" );
-         */
+        Option variantType = OptionBuilder.isRequired().hasArg().withArgName( "Variant Type" )
+                .withDescription( "The type of variant in this file, one of: CNV, Indel, SNV, Inversion" )
+                .create( "variant" );
+*/
         Option project = OptionBuilder
                 .isRequired()
                 .hasArg()
                 .withArgName( "Project name" )
                 .withDescription(
                         "The project where this data will reside. Project will be deleted if existingproject option is not specified,"
-                                + "Acceptable values = 'DGV" ).create( "project" );
+                                + "Acceptable values = 'DGV" )
+                .create( "project" );
 
         addOption( "existingproject", false, "You must use this option if you are adding to an existing project" );
 
@@ -122,11 +128,11 @@ public class DGVVariantUploadCLI extends AbstractCLI {
 
         addOption( d );
         addOption( f );
-
+        
         addOption( project );
 
     }
-
+    
     @Override
     protected void processOptions() {
         if ( this.hasOption( 'd' ) ) {
@@ -169,52 +175,56 @@ public class DGVVariantUploadCLI extends AbstractCLI {
 
             Statement stmt = conn.createStatement();
             ResultSet results = stmt.executeQuery( "SELECT * FROM " + filename );
-
-            System.out.println( "getting value objects" );
-            VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromDGVResultSet( results );
-
+   
+            System.out.println("getting value objects");
+            VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromDGVResultSet( results);
+            
+           
             results.close();
             stmt.close();
             conn.close();
 
             if ( result.getErrorMessages().isEmpty() && !dryRun ) {
-
-                System.out.println( "inserting " + result.getVariantsToAdd().size() + " value objects into database" );
-
+                
+                System.out.println("inserting "+result.getVariantsToAdd().size()+" value objects into database");
+                
+                
                 ArrayList<VariantValueObject> variantsToAdd = result.getVariantsToAdd();
-
+                
                 int batchCount = 0;
-
-                for ( int i = 0; i < variantsToAdd.size(); i = i + batchSize ) {
-
+                
+                for (int i = 0; i < variantsToAdd.size(); i=i+batchSize){
+                    
                     int start = i;
-                    int end = i + batchSize;
-
-                    if ( end >= variantsToAdd.size() ) {
+                    int end = i+batchSize;
+                    
+                    if (end >= variantsToAdd.size()){
                         end = variantsToAdd.size();
-                    }
-
-                    List<VariantValueObject> batched = variantsToAdd.subList( start, end );
-
+                    }                    
+                    
+                    
+                    List<VariantValueObject> batched = variantsToAdd.subList(start, end );
+                    
                     batchCount++;
-
-                    System.out.println( "batch: " + batchCount + ",  adding: variantsToAdd.sublist(" + start + ","
-                            + end + "), " + batched.size() + " variants" );
-
-                    projectManager.addSubjectVariantsToSpecialProject( projectName, deleteProject, batched,
-                            batchCount > 1 );
-                    System.out.println( "Finished adding batch: " + batchCount );
-
+                    
+                    System.out.println("batch: "+batchCount+",  adding: variantsToAdd.sublist("+start+","+end+"), "+batched.size()+" variants");
+                    
+                    projectManager.addSubjectVariantsToSpecialProject( projectName, deleteProject, batched, batchCount>1 );
+                    System.out.println("Finished adding batch: "+batchCount);
+                    
                 }
-
-            } else if ( result.getErrorMessages().isEmpty() ) {
+                
+                
+                
+               
+            } else if ( result.getErrorMessages().isEmpty()  ) {
                 System.out.println( "No errors are detected in your data file" );
 
             } else {
                 for ( String errorMessage : result.getErrorMessages() ) {
                     System.out.println( errorMessage );
                 }
-
+                
             }
 
         } catch ( Exception e ) {
@@ -223,10 +233,14 @@ public class DGVVariantUploadCLI extends AbstractCLI {
 
         return null;
     }
+    
+
+   
 
     @Override
     public String getShortDesc() {
         return "Upload a variant data file and create / assign it to a project";
     }
+
 
 }

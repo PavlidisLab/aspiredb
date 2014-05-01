@@ -18,18 +18,18 @@
  */
 package ubc.pavlab.aspiredb.server;
 
-import static junit.framework.Assert.assertEquals;
-
-import java.util.Map;
-
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ubc.pavlab.aspiredb.server.service.ChromosomeService;
 import ubc.pavlab.aspiredb.shared.ChromosomeValueObject;
 
+import java.util.Map;
+
+import static junit.framework.Assert.assertEquals;
+
 /**
- * author: anton date: 22/05/13
+ * author: anton
+ * date: 22/05/13
  */
 public class ChromosomeServiceTest extends BaseSpringContextTest {
 
@@ -38,9 +38,9 @@ public class ChromosomeServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testGetChromosomes() throws Exception {
-        Map<String, ChromosomeValueObject> chromosomes = chromosomeService.getChromosomes();
+        Map<String,ChromosomeValueObject> chromosomes = chromosomeService.getChromosomes();
 
-        assertEquals( chromosomes.keySet().size(), 24 );
-        // TODO: Add more assertions.
+        assertEquals(chromosomes.keySet().size(), 24);
+        //TODO: Add more assertions.
     }
 }

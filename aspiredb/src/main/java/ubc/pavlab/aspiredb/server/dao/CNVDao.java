@@ -24,7 +24,8 @@ import ubc.pavlab.aspiredb.server.model.CNV;
  */
 public interface CNVDao extends VariantDaoBase<CNV>, RemotePaging<CNV> {
     /*
-     * TODO add CNV specific methods
-     */
+    TODO add CNV specific methods
+    
+    */
 
 }

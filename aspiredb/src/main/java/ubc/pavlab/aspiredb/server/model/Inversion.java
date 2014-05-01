@@ -34,7 +34,7 @@ public class Inversion extends Variant {
 
     public Inversion() {
     }
-
+    
     @Override
     public VariantValueObject toValueObject() {
         VariantValueObject vo = new VariantValueObject();

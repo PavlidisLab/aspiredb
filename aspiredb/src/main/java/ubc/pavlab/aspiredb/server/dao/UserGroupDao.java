@@ -15,10 +15,10 @@
 
 package ubc.pavlab.aspiredb.server.dao;
 
-import java.util.Collection;
-
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
+
+import java.util.Collection;
 
 /**
  * TODO Document Me

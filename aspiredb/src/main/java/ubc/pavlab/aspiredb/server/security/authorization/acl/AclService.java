@@ -13,6 +13,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
+ 
 package ubc.pavlab.aspiredb.server.security.authorization.acl;
 
 import org.springframework.security.acls.model.MutableAclService;
@@ -20,6 +21,7 @@ import org.springframework.security.acls.model.Sid;
 
 /**
  * @author paul
+ * 
  */
 public interface AclService extends MutableAclService {
 

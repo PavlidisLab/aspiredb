@@ -1,18 +1,16 @@
 package ubc.pavlab.aspiredb.shared;
 
-import java.util.Set;
-
+import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
 import org.directwebremoting.annotations.DataTransferObject;
-
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 
-import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
+import java.util.Set;
 
 @DataTransferObject(javascript = "AspireDbPagingLoadConfig")
 public interface AspireDbPagingLoadConfig extends PagingLoadConfig {
+	
+	  Set<AspireDbFilterConfig> getFilters();
 
-    Set<AspireDbFilterConfig> getFilters();
-
-    void setFilters( Set<AspireDbFilterConfig> filters );
+	  void setFilters(Set<AspireDbFilterConfig> filters);
 
 }

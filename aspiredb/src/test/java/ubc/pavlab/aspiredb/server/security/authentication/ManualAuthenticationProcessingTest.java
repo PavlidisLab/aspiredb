@@ -28,6 +28,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 
+
+
+
+
 /**
  * @author pavlidis
  * @version $Id: ManualAuthenticationProcessingTest.java,v 1.2 2012/10/09 18:29:54 cmcdonald Exp $
@@ -56,11 +60,11 @@ public class ManualAuthenticationProcessingTest extends BaseSpringContextTest {
         try {
             userManager.loadUserByUsername( username );
         } catch ( UsernameNotFoundException e ) {
-
+            
             String encodedPassword = passwordEncoder.encodePassword( pwd, username );
             UserDetailsImpl u = new UserDetailsImpl( encodedPassword, username, true, null, null, null, new Date() );
-
-            userManager.createUser( u );
+            
+            userManager.createUser( u ); 
         }
     }
 

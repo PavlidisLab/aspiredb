@@ -14,11 +14,6 @@
  */
 package ubc.pavlab.aspiredb.cli;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
-
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.log4j.ConsoleAppender;
@@ -26,12 +21,18 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.springframework.beans.factory.BeanFactory;
-
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadServiceResult;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
+import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.List;
 
 /**
  * First pass phenotype data uploader, missing a bunch of requirements
@@ -46,7 +47,7 @@ public class DecipherPhenotypeUploadCLI extends AbstractCLI {
     private static ProjectManager projectManager;
 
     private static OntologyService os;
-
+    
     private static PhenotypeUploadService phenotypeUploadService;
 
     private String directory = "";
@@ -57,8 +58,8 @@ public class DecipherPhenotypeUploadCLI extends AbstractCLI {
     private boolean deleteProject = true;
 
     private static BeanFactory applicationContext;
-
-    public String getLogger() {
+    
+    public String getLogger(){
         return "ubc.pavlab.aspiredb.cli.DecipherPhenotypeUploadCLI";
     }
 
@@ -147,29 +148,30 @@ public class DecipherPhenotypeUploadCLI extends AbstractCLI {
             Statement stmt = conn.createStatement();
             ResultSet results = stmt.executeQuery( "SELECT * FROM " + filename );
 
-            PhenotypeUploadServiceResult phenResult = phenotypeUploadService
-                    .getPhenotypeValueObjectsFromDecipherResultSet( results );
+            
 
+            PhenotypeUploadServiceResult phenResult = phenotypeUploadService.getPhenotypeValueObjectsFromDecipherResultSet( results );
+            
+            
             // clean up
             results.close();
             stmt.close();
             conn.close();
-
-            projectManager.addSubjectPhenotypesToSpecialProject( projectName, deleteProject,
-                    phenResult.getPhenotypesToAdd() );
+            
+            projectManager.addSubjectPhenotypesToSpecialProject( projectName, deleteProject, phenResult.getPhenotypesToAdd() );
 
             if ( !phenResult.getErrorMessages().isEmpty() ) {
                 for ( String errorMessage : phenResult.getErrorMessages() ) {
                     System.out.println( errorMessage );
                 }
-
-                System.out.println( "Unmatched phenotypes" );
-                for ( String unmatched : phenResult.getUnmatched() ) {
-
-                    System.out.println( unmatched );
-
+                
+                System.out.println("Unmatched phenotypes");
+                for (String unmatched: phenResult.getUnmatched()){
+                    
+                    System.out.println(unmatched);
+                    
                 }
-
+                
             }
 
         } catch ( Exception e ) {

@@ -15,11 +15,11 @@
 
 package ubc.pavlab.aspiredb.server.dao;
 
-import java.util.Collection;
-
 import org.springframework.security.access.annotation.Secured;
-
 import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.model.Subject;
+
+import java.util.Collection;
 
 /**
  * TODO Document Me
@@ -28,23 +28,28 @@ import ubc.pavlab.aspiredb.server.model.Project;
  * @version $Id: ProjectDao.java,v 1.13 2013/06/11 22:30:43 anton Exp $
  */
 public interface ProjectDao extends SecurableDaoBase<Project> {
-
-    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
-    public Project findByProjectName( String projectName );
-
-    @Secured({ "GROUP_USER" })
-    public Integer getVariantCountForProjects( Collection<Long> projectIds );
-
-    @Secured({ "GROUP_USER" })
-    public Integer getSubjectCountForProjects( Collection<Long> projectIds );
-
-    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
-    public Collection<Project> getOverlapProjects( Collection<Long> projectIds );
-
-    @Secured({ "GROUP_USER" })
+    
+    @Secured({"GROUP_USER" ,"AFTER_ACL_READ"})
+    public Project findByProjectName( String projectName);    
+   
+    @Secured({"GROUP_USER"})
+    public Integer getVariantCountForProjects(Collection<Long> projectIds);
+    
+    @Secured({"GROUP_USER"})
+    public Integer getSubjectCountForProjects(Collection<Long> projectIds);
+    
+    @Secured({"GROUP_USER","AFTER_ACL_READ"})
+    public Collection<Project> getOverlapProjects(Collection<Long> projectIds);
+    
+    @Secured({"GROUP_USER"})
     public Collection<Project> getSpecialOverlapProjects();
-
-    @Secured({ "GROUP_USER" })
-    public String getOverlapProjectVariantSupportCharacteristicKey( Long projectId );
+    
+    @Secured({"GROUP_USER"})
+    public String getOverlapProjectVariantSupportCharacteristicKey(Long projectId);
+    
+    
+    
+    
+    
 
 }

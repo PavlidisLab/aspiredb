@@ -15,7 +15,6 @@
 package ubc.pavlab.aspiredb.shared;
 
 import org.directwebremoting.annotations.DataTransferObject;
-
 import ubc.pavlab.aspiredb.shared.query.CNVTypeProperty;
 import ubc.pavlab.aspiredb.shared.query.CnvLengthProperty;
 import ubc.pavlab.aspiredb.shared.query.CopyNumberProperty;
@@ -29,32 +28,31 @@ import ubc.pavlab.aspiredb.shared.query.Property;
 @DataTransferObject(javascript = "CNVValueObject")
 public class CNVValueObject extends VariantValueObject {
 
-    private static final long serialVersionUID = 9123410174130882307L;
+	private static final long serialVersionUID = 9123410174130882307L;
 
-    private Integer copyNumber;
-
-    private Integer cnvLength;
-
-    protected String type;
-
+	private Integer copyNumber;
+	
+	private Integer cnvLength;
+    
+	protected String type;
     public String getType() {
-        return type;
-    }
+		return type;
+	}
 
-    public void setType( String type ) {
-        this.type = type;
-    }
+	public void setType(String type) {
+		this.type = type;
+	}
 
     public CNVValueObject() {
     }
 
-    public Integer getCopyNumber() {
-        return copyNumber;
-    }
+	public Integer getCopyNumber() {
+		return copyNumber;
+	}
 
-    public void setCopyNumber( Integer copyNumber ) {
-        this.copyNumber = copyNumber;
-    }
+	public void setCopyNumber(Integer copyNumber) {
+		this.copyNumber = copyNumber;
+	}
 
     public Integer getCnvLength() {
         return cnvLength;
@@ -64,26 +62,22 @@ public class CNVValueObject extends VariantValueObject {
         this.cnvLength = cnvLength;
     }
 
-    public String getPropertyStringValue( Property property ) {
-        if ( property instanceof CopyNumberProperty ) {
-            if ( copyNumber == null )
-                return null;
-            else
-                return copyNumber.toString();
-        } else if ( property instanceof CNVTypeProperty ) {
+    public String getPropertyStringValue(Property property) {
+        if (property instanceof CopyNumberProperty) {
+            if (copyNumber == null) return null;
+            else return copyNumber.toString();
+        } else if (property instanceof CNVTypeProperty) {
             return this.getType();
-        } else if ( property instanceof CnvLengthProperty ) {
-            if ( cnvLength == null )
-                return null;
-            else
-                return cnvLength.toString();
+        } else if (property instanceof CnvLengthProperty) {
+            if (cnvLength == null) return null;
+            else return cnvLength.toString();
         }
 
-        return super.getPropertyStringValue( property );
+        return super.getPropertyStringValue(property);
     }
 
     @Override
     public String toString() {
-        return patientId + ": Type: " + type;
+        return patientId + ": Type: " + type ;
     }
 }

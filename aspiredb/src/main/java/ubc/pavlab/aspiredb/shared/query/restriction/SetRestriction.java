@@ -18,17 +18,17 @@
  */
 package ubc.pavlab.aspiredb.shared.query.restriction;
 
+import org.directwebremoting.annotations.DataTransferObject;
+import ubc.pavlab.aspiredb.shared.query.Operator;
+import ubc.pavlab.aspiredb.shared.query.Property;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
-import ubc.pavlab.aspiredb.shared.query.Operator;
-import ubc.pavlab.aspiredb.shared.query.Property;
-
 /**
- * author: anton date: 26/04/13
+ * author: anton
+ * date: 26/04/13
  */
 @DataTransferObject(javascript = "SetRestriction")
 public class SetRestriction implements RestrictionExpression {
@@ -39,27 +39,27 @@ public class SetRestriction implements RestrictionExpression {
     public SetRestriction() {
     }
 
-    public SetRestriction( Property property, Operator operator, Set<? extends Serializable> values ) {
+    public SetRestriction(Property property, Operator operator, Set<? extends Serializable> values) {
         this.property = property;
         this.operator = operator;
-        this.values.addAll( values );
+        this.values.addAll(values);
     }
 
-    public SetRestriction( Property property, Operator operator, Serializable value ) {
+    public SetRestriction(Property property, Operator operator, Serializable value) {
         this.property = property;
         this.operator = operator;
-        this.values.add( value );
+        this.values.add(value);
     }
 
-    public void setProperty( Property property ) {
+    public void setProperty(Property property) {
         this.property = property;
     }
 
-    public void setOperator( Operator operator ) {
+    public void setOperator(Operator operator) {
         this.operator = operator;
     }
 
-    public void setValues( Set<Object> values ) {
+    public void setValues(Set<Object> values) {
         this.values = values;
     }
 

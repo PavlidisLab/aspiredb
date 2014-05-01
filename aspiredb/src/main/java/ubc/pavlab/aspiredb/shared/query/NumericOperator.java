@@ -18,18 +18,24 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
- * author: anton date: 07/05/13
+ * author: anton
+ * date: 07/05/13
  */
 public enum NumericOperator {
-    GREATER(">"), LESS("<"), EQUAL("="), NOT_EQUAL("!=");
+    GREATER(">"),
+    LESS("<"),
+    EQUAL("="),
+    NOT_EQUAL("!=");
 
     private String displayLabel;
 
     NumericOperator() {
     }
 
-    NumericOperator( String displayLabel ) {
+    NumericOperator(String displayLabel) {
         this.displayLabel = displayLabel;
     }
 

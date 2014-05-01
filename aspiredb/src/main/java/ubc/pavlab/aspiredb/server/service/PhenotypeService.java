@@ -14,10 +14,6 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
@@ -28,23 +24,25 @@ import ubc.pavlab.aspiredb.shared.query.PhenotypeProperty;
 import ubc.pavlab.aspiredb.shared.query.PropertyValue;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 public interface PhenotypeService {
 
-    public Map<String, PhenotypeValueObject> getPhenotypes( Long subjectId ) throws NotLoggedInException,
-            NotLoggedInException;
-
-    public Map<String, Collection<GeneValueObject>> populateDescendantPhenotypes( String phenotypeUri )
-            throws NeurocartaServiceException, BioMartServiceException;
+    public Map<String, PhenotypeValueObject> getPhenotypes(Long subjectId) throws NotLoggedInException, NotLoggedInException;   
+   
+    public Map<String, Collection<GeneValueObject>> populateDescendantPhenotypes (String phenotypeUri ) throws NeurocartaServiceException, BioMartServiceException;
 
     // NOT IMPLEMENTED YET
-    public Collection<PhenotypeProperty> suggestPhenotypes( SuggestionContext suggestionContext )
+    public Collection<PhenotypeProperty> suggestPhenotypes(SuggestionContext suggestionContext)
             throws NotLoggedInException;
 
     // NOT IMPLEMENTED YET
-    public Collection<PropertyValue> suggestPhenotypeValues( PhenotypeProperty property,
-            SuggestionContext suggestionContext ) throws NotLoggedInException;
+    public Collection<PropertyValue> suggestPhenotypeValues(PhenotypeProperty property,
+                                                            SuggestionContext suggestionContext) throws NotLoggedInException;
 
-    public List<PhenotypeEnrichmentValueObject> getPhenotypeEnrichmentValueObjects( Collection<Long> activeProjects,
-            Collection<Long> subjectIds ) throws NotLoggedInException;
+    public List<PhenotypeEnrichmentValueObject> getPhenotypeEnrichmentValueObjects(Collection<Long> activeProjects,
+                                                                                   Collection<Long> subjectIds) throws NotLoggedInException;
 
 }

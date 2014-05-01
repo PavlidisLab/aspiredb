@@ -14,11 +14,11 @@
  */
 package ubc.pavlab.aspiredb.server.ws;
 
-import java.util.Collection;
-
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.server.model.Variant;
+
+import java.util.Collection;
 
 /**
  * @author Michelle Ly
@@ -39,7 +39,7 @@ public class CnvToBed {
     private static final String RED = "255,0,0";
     private static final String BLUE = "0,0,255";
     private static final String BLACK = "0,0,0";
-
+       
     public static String create( Collection<Variant> variants, String chr, int start, int end, String appUrl ) {
         StringBuilder buffer = new StringBuilder();
 
@@ -48,31 +48,39 @@ public class CnvToBed {
 
         String trackDesc = "ASPIREdb variants";
         String trackVisibility = "visibility=pack";
-
+        
         // FIXME home.jsp does not currently support any parameters
-        buffer.append( "track name=\"" + trackDesc + "\" type=bedDetail description=\"" + trackDesc + "\""
-                + trackVisibility + " itemRgb=On " + "url=\"" + appUrl + "home.jsp?variantId=$$\"\n" );
-        for ( Variant variant : variants ) {
+        buffer.append( "track name=\"" + trackDesc + "\" type=bedDetail description=\"" + trackDesc + "\"" + trackVisibility + " itemRgb=On "
+        		+ "url=\"" + appUrl +"home.jsp?variantId=$$\"\n" );
+        for (Variant variant : variants) {
             String varDesc = variant.getDescription() == null ? "" : variant.getDescription();
-            buffer.append( "chr" + variant.getLocation().getChromosome() + "\t" + variant.getLocation().getStart()
-                    + "\t" + variant.getLocation().getEnd() + "\t" + variant.getSubject().getPatientId() + "\t"
+            buffer.append( "chr" + variant.getLocation().getChromosome() + "\t" 
+            					 + variant.getLocation().getStart() + "\t"
+            					 + variant.getLocation().getEnd() + "\t" 
+            					 + variant.getSubject().getPatientId() + "\t"
                     // filler, because we need to get to the 9th spot
-                    + "0\t" + ".\t" + variant.getLocation().getStart() + "\t" + variant.getLocation().getEnd() + "\t"
-                    + findColour( variant ) + "\t" + variant.getId() + "\t" + varDesc + "\n" );
+            					 + "0\t" 
+            					 + ".\t" 
+                    			 + variant.getLocation().getStart() + "\t" 
+                    			 + variant.getLocation().getEnd() + "\t"
+            					 + findColour( variant ) + "\t"
+            					 + variant.getId() + "\t"                    			 
+                    			 + varDesc
+                    			 + "\n");                    			 
         }
-
+	
         return buffer.toString();
     }
 
     private static String findColour( Variant variant ) {
-        if ( variant.getClass() == CNV.class ) {
-            CNV cnv = ( CNV ) variant;
-            if ( cnv.getType().equals( CnvType.LOSS ) )
-                return RED;
-            else
-                return BLUE;
-        }
-        return BLACK;
+    	if (variant.getClass() == CNV.class) {
+    		CNV cnv = (CNV) variant;
+    		if ( cnv.getType().equals( CnvType.LOSS ) )
+    			return RED;
+    		else
+    			return BLUE;
+    	}
+    	return BLACK;
     }
 
 }

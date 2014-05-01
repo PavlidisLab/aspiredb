@@ -14,10 +14,10 @@
  */
 package ubc.pavlab.aspiredb.server.fileupload;
 
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 public class VariantUploadServiceResult {
 

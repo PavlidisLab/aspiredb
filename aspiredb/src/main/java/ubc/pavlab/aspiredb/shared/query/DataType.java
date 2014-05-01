@@ -18,12 +18,14 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
-import java.io.Serializable;
-
 import org.directwebremoting.annotations.DataTransferObject;
 
+import java.io.Serializable;
+import java.util.Collection;
+
 /**
- * author: anton date: 07/05/13
+ * author: anton
+ * date: 07/05/13
  */
 @DataTransferObject(javascript = "DataType")
 public class DataType implements Serializable {

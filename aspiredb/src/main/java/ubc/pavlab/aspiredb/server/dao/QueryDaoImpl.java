@@ -18,34 +18,35 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
-import java.util.List;
-
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
 import ubc.pavlab.aspiredb.server.model.Query;
 
+import java.util.List;
+
 /**
- * author: anton date: 17/04/13
+ * author: anton
+ * date: 17/04/13
  */
 @Repository
 public class QueryDaoImpl extends SecurableDaoBaseImpl<Query> implements QueryDao {
 
     @Autowired
-    public QueryDaoImpl( SessionFactory sessionFactory ) {
-        super( Query.class );
+    public QueryDaoImpl(SessionFactory sessionFactory) {
+        super(Query.class);
         super.setSessionFactory( sessionFactory );
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Query> findByName( String queryName ) {
-        Criteria criteria = currentSession().createCriteria( Query.class );
-        criteria.add( Restrictions.eq( "name", queryName ) );
+    public List<Query> findByName(String queryName) {
+        Criteria criteria = currentSession().createCriteria(Query.class);
+        criteria.add(Restrictions.eq("name", queryName));
         return criteria.list();
     }
 }

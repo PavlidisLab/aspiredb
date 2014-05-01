@@ -17,7 +17,11 @@ package ubc.pavlab.aspiredb.server.util;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 
 /**
+ * 
+ * 
+ * 
  * @author mly
+ *
  */
 public class UCSCBrowserUtils {
 
@@ -28,16 +32,18 @@ public class UCSCBrowserUtils {
     public static String makeShowGenomicRangeURL( GenomicRange range ) {
         GenomicRange paddedRange = addPadding( range );
 
-        return UCSC_URL + "org=human&db=" + DB_VERSION + "&position=chr" + range.getChromosome() + ":"
+        return
+                UCSC_URL + "org=human&db=" + DB_VERSION 
+                + "&position=chr" + range.getChromosome() + ":"
                 + paddedRange.getBaseStart() + "-" + paddedRange.getBaseEnd();
     }
-
+    
     public static GenomicRange addPadding( GenomicRange range ) {
         int padding = 5000;
-        int newStart = Math.max( 0, range.getBaseStart() - padding );
+        int newStart = Math.max( 0, range.getBaseStart() - padding ); 
         int newEnd = range.getBaseEnd() + padding;
-
-        return new GenomicRange( range.getChromosome(), newStart, newEnd );
+        
+        return new GenomicRange( range.getChromosome(), newStart, newEnd );        
     }
 
 }

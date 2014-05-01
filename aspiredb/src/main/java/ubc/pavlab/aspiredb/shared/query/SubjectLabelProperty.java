@@ -21,11 +21,12 @@ package ubc.pavlab.aspiredb.shared.query;
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
- * author: anton date: 10/05/13
+ * author: anton
+ * date: 10/05/13
  */
 @DataTransferObject(javascript = "SubjectLabelProperty")
 public class SubjectLabelProperty extends LabelProperty {
     public SubjectLabelProperty() {
-        super( "Subject Label", "subject_label.id" );
+        super("Subject Label", "subject_label.id");
     }
 }

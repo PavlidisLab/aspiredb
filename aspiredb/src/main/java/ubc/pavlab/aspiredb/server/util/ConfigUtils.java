@@ -46,7 +46,7 @@ import ubc.pavlab.aspiredb.shared.query.SubjectFilterConfig;
 public class ConfigUtils {
 
     public static final String CONFIG_NAME = "appConfig";
-
+    
     /**
      * Name of the resource that is used to configure aspiredb internally.
      */
@@ -58,8 +58,9 @@ public class ConfigUtils {
      * Name of the resource containing defaults that the user can override (classpath)
      */
     private static final String DEFAULT_CONFIGURATION = "default.properties";
-
+    
     private static Log log = LogFactory.getLog( ConfigUtils.class.getName() );
+    
 
     /**
      * The name of the file users can use to configure aspiredb.
@@ -127,7 +128,7 @@ public class ConfigUtils {
         }
 
     }
-
+    
     public static String getAppVersion() {
         return getString( "aspiredb.version" );
     }
@@ -136,6 +137,7 @@ public class ConfigUtils {
         return getString( "aspiredb.admin.email" );
     }
 
+   
     /**
      * @return the configured base url (e.g., http://www.chibi.ubc.ca/aspiredb/). It will always end in a slash.
      */
@@ -146,10 +148,10 @@ public class ConfigUtils {
         }
         return url;
     }
-
+    
     public static String getGemmaBaseUrl() {
         String url = getString( "gemma.base.url", "http://chibi.ubc.ca/Gemma" );
-
+       
         return url;
     }
 
@@ -420,7 +422,7 @@ public class ConfigUtils {
      */
     public static Iterator<?> getKeys( String key ) {
         return config.getKeys( key );
-    }
+    }    
 
     /**
      * @param key
@@ -591,6 +593,7 @@ public class ConfigUtils {
         }
     }
 
+   
     /**
      * Set an environment/application variable programatically.
      * 
@@ -600,6 +603,7 @@ public class ConfigUtils {
     public static void setProperty( String key, Object value ) {
         config.setProperty( key, value );
     }
+
 
     /**
      * Returns true if filters has an instance of {@link SubjectFilterConfig}

@@ -14,39 +14,19 @@
  */
 package ubc.pavlab.aspiredb.cli;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.cli.AlreadySelectedException;
-import org.apache.commons.cli.BasicParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.MissingArgumentException;
-import org.apache.commons.cli.MissingOptionException;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.OptionGroup;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.commons.cli.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
+import org.apache.log4j.*;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import ubc.pavlab.aspiredb.server.security.authentication.ManualAuthenticationService;
 import ubc.pavlab.aspiredb.server.util.ConfigUtils;
+
+import java.io.File;
+import java.util.*;
 
 /**
  * Base Command Line Interface. Provides some default functionality.
@@ -119,12 +99,14 @@ public abstract class AbstractCLI {
     protected Collection<Object> successObjects = Collections.synchronizedSet( new HashSet<Object>() );
     protected Option passwordOpt;
     protected Option usernameOpt;
+    
+    
 
     public AbstractCLI() {
         this.buildStandardOptions();
         this.buildOptions();
-        this.addUserNameAndPasswordOptions();
-
+        this.addUserNameAndPasswordOptions();        
+        
     }
 
     public abstract String getShortDesc();
@@ -361,7 +343,7 @@ public abstract class AbstractCLI {
             } catch ( NumberFormatException e ) {
                 throw new RuntimeException( "Logging level must be an integer" );
             }
-        } else {
+        }else{
             configureLogging( getLogger(), this.verbosity );
         }
 
@@ -369,9 +351,11 @@ public abstract class AbstractCLI {
             this.mDate = this.getOptionValue( "mdate" );
         }
 
-    }
+        
 
-    protected String getLogger() {
+    }
+    
+    protected String getLogger(){
         return "set your own logger";
     }
 
@@ -720,9 +704,9 @@ public abstract class AbstractCLI {
             log.error( buf );
         }
     }
-
+    
     /** check username and password. */
-    void authenticate( BeanFactory ctx ) {
+    void authenticate(BeanFactory ctx) {
 
         /*
          * Allow security settings (authorization etc) in a given context to be passed into spawned threads
@@ -755,9 +739,11 @@ public abstract class AbstractCLI {
             }
         } else {
             log.info( "Logging in as anonymous guest with limited privileges" );
-            // manAuthentication.authenticateAnonymously();
+            //manAuthentication.authenticateAnonymously();
         }
 
     }
+    
+    
 
 }

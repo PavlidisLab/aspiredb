@@ -15,15 +15,12 @@
 
 package ubc.pavlab.aspiredb.server.security.authentication;
 
-import java.util.Collection;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.stereotype.Service;
-
 import ubc.pavlab.aspiredb.server.dao.UserDao;
 import ubc.pavlab.aspiredb.server.dao.UserGroupDao;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority;
@@ -33,7 +30,12 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.security.SecurityService;
 import ubc.pavlab.aspiredb.server.security.authorization.acl.AclService;
 
+import java.util.Collection;
+
+
+
 /**
+ * 
  * @author pavlidis
  * @version $Id: UserServiceImpl.java,v 1.4 2013/06/11 22:30:52 anton Exp $
  */
@@ -87,10 +89,10 @@ public class UserServiceImpl implements UserService {
 
         this.userDao.remove( user );
     }
-
-    @Override
+    
+    @Override    
     public void deleteByUserName( String userName ) {
-        User user = findByUserName( userName );
+        User user = findByUserName(userName);
         for ( UserGroup group : this.userDao.loadGroups( user ) ) {
             group.getGroupMembers().remove( user );
             this.userGroupDao.update( group );
@@ -252,7 +254,7 @@ public class UserServiceImpl implements UserService {
         this.userDao.update( user );
 
     }
-
+    
     @Override
     public void adminUpdate( final User user ) {
 

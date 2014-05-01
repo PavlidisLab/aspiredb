@@ -37,7 +37,7 @@ import ubc.pavlab.aspiredb.shared.GenomicRange;
  *
  */
 @Service("ucscConnector")
-@RemoteProxy(name = "UCSCConnector")
+@RemoteProxy(name="UCSCConnector")
 public class UCSCConnectorImpl implements UCSCConnector {
 
     @Autowired
@@ -46,13 +46,17 @@ public class UCSCConnectorImpl implements UCSCConnector {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public String constructCustomTracksFile( GenomicRange range, Collection<Long> activeProjectIds ) {
-        // throwGwtExceptionIfNotLoggedIn();
+    public String constructCustomTracksFile( GenomicRange range, Collection<Long> activeProjectIds ){
+        //throwGwtExceptionIfNotLoggedIn();
 
-        Collection<Variant> variants = variantDao.findByGenomicLocation( new GenomicRange( range.getChromosome() ),
-                activeProjectIds );
+        Collection<Variant> variants = variantDao.findByGenomicLocation(
+                new GenomicRange( range.getChromosome() ), activeProjectIds );
 
-        return CnvToBed.create( variants, range.getChromosome(), range.getBaseStart(), range.getBaseEnd(),
-                ConfigUtils.getBaseUrl() );
+        return CnvToBed.create(
+                variants,
+                range.getChromosome(),
+                range.getBaseStart(),
+                range.getBaseEnd(),
+                ConfigUtils.getBaseUrl());
     }
 }

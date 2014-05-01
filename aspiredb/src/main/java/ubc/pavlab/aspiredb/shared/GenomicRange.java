@@ -14,32 +14,32 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
-import java.io.Serializable;
-
 import org.directwebremoting.annotations.DataTransferObject;
 
+import java.io.Serializable;
+
 /**
+ *
  * @author anton
  */
 @DataTransferObject(javascript = "GenomicRange")
 public class GenomicRange implements Displayable, Serializable, Comparable<GenomicRange> {
-    private static final long serialVersionUID = 6917870790522866428L;
-
-    private String chromosome;
+	private static final long serialVersionUID = 6917870790522866428L;
+    
+	private String chromosome;
     private int baseStart;
     private int baseEnd;
     private String bandStart;
     private String bandEnd;
-
+    
     private String bandString;
-
-    public GenomicRange() {
-    }
-
+    
+    public GenomicRange(){}
+    
     public GenomicRange( String chromosome, String bandStart, String bandEnd ) {
-        this.chromosome = chromosome;
-        this.bandStart = bandStart;
-        this.bandEnd = bandEnd;
+    	this.chromosome = chromosome;
+    	this.bandStart = bandStart;
+    	this.bandEnd =  bandEnd;
     }
 
     public GenomicRange( String chromosome ) {
@@ -48,13 +48,13 @@ public class GenomicRange implements Displayable, Serializable, Comparable<Genom
 
     public GenomicRange( String chromosome, int start, int end ) {
         this.chromosome = chromosome;
-        this.baseStart = Math.min( start, end );
-        this.baseEnd = Math.max( start, end );
+        this.baseStart = Math.min(start, end);
+        this.baseEnd = Math.max(start, end);
     }
 
-    public boolean isWithin( GenomicRange other ) {
-        if ( chromosome.equals( other.getChromosome() ) ) {
-            if ( baseStart >= other.getBaseStart() && baseEnd <= other.getBaseEnd() ) {
+    public boolean isWithin(GenomicRange other) {
+        if (chromosome.equals(other.getChromosome())) {
+            if (baseStart >= other.getBaseStart() && baseEnd <= other.getBaseEnd()) {
                 return true;
             }
         }
@@ -62,85 +62,85 @@ public class GenomicRange implements Displayable, Serializable, Comparable<Genom
     }
 
     public String getBandString() {
-        return this.bandString;
+    	return this.bandString;
     }
-
-    public void initBandCoordinates() {
-        this.bandString = this.toCytobandString();
-    }
+    
+	public void initBandCoordinates() {
+		this.bandString = this.toCytobandString();
+	}
 
     public String getChromosome() {
-        return chromosome;
-    }
+		return chromosome;
+	}
 
-    public void setChromosome( String chromosome ) {
-        this.chromosome = chromosome;
-    }
+	public void setChromosome(String chromosome) {
+		this.chromosome = chromosome;
+	}
 
-    public int getBaseStart() {
-        return baseStart;
-    }
+	public int getBaseStart() {
+		return baseStart;
+	}
 
-    public void setBaseStart( int baseStart ) {
-        this.baseStart = baseStart;
-    }
+	public void setBaseStart(int baseStart) {
+		this.baseStart = baseStart;
+	}
 
-    public int getBaseEnd() {
-        return baseEnd;
-    }
+	public int getBaseEnd() {
+		return baseEnd;
+	}
 
-    public void setBaseEnd( int baseEnd ) {
-        this.baseEnd = baseEnd;
-    }
+	public void setBaseEnd(int baseEnd) {
+		this.baseEnd = baseEnd;
+	}
 
-    public String getBandStart() {
-        return bandStart;
-    }
+	public String getBandStart() {
+		return bandStart;
+	}
 
-    public void setBandStart( String bandStart ) {
-        this.bandStart = bandStart;
-    }
+	public void setBandStart(String bandStart) {
+		this.bandStart = bandStart;
+	}
 
-    public String getBandEnd() {
-        return bandEnd;
-    }
+	public String getBandEnd() {
+		return bandEnd;
+	}
 
-    public void setBandEnd( String bandEnd ) {
-        this.bandEnd = bandEnd;
-    }
+	public void setBandEnd(String bandEnd) {
+		this.bandEnd = bandEnd;
+	}
 
-    public String toBaseString() {
+	public String toBaseString () {
         String string = "";
-        if ( chromosome != null ) {
+        if (chromosome != null) {
             string += chromosome;
-            if ( baseStart != 0 ) {
+            if (baseStart != 0) {
                 string += ":" + baseStart;
-                if ( baseEnd != 0 ) {
+                if (baseEnd != 0) {
                     string += "-" + baseEnd;
                 }
             }
         }
-        return string;
+		return string;
     }
 
-    public String toCytobandString() {
+	public String toCytobandString () {
         String string = "";
-        if ( chromosome != null ) {
+        if (chromosome != null) {
             string += chromosome;
             if ( bandStart.equals( bandEnd ) ) {
                 string += bandStart;
             } else {
                 string += bandStart;
-                if ( bandEnd != null ) {
+                if (bandEnd != null) {
                     string += "-" + bandEnd;
                 }
             }
         }
         return string;
-    }
+	}
 
     public String toString() {
-        if ( this.bandStart != null ) {
+        if (this.bandStart != null) {
             return toCytobandString();
         } else {
             return toBaseString();
@@ -148,23 +148,21 @@ public class GenomicRange implements Displayable, Serializable, Comparable<Genom
     }
 
     @Override
-    public int compareTo( GenomicRange genomicRange ) {
-        int myChromosomeIndex = getChromosomeIndex( this.chromosome );
-        int otherChromosomeIndex = getChromosomeIndex( genomicRange.getChromosome() );
-        if ( myChromosomeIndex == otherChromosomeIndex ) {
+    public int compareTo(GenomicRange genomicRange) {
+        int myChromosomeIndex = getChromosomeIndex(this.chromosome);
+        int otherChromosomeIndex = getChromosomeIndex(genomicRange.getChromosome());
+        if (myChromosomeIndex == otherChromosomeIndex) {
             return this.baseStart - genomicRange.getBaseStart();
         } else {
             return myChromosomeIndex - otherChromosomeIndex;
         }
     }
 
-    private int getChromosomeIndex( String chr ) {
-        if ( chr.equals( "X" ) ) {
-            return 22;
-        } else if ( chr.equals( "Y" ) ) {
-            return 23;
-        } else {
-            return Integer.parseInt( chr );
+    private int getChromosomeIndex(String chr) {
+        if (chr.equals("X")) {return  22;}
+        else if (chr.equals("Y")) {return 23;}
+        else {
+            return Integer.parseInt(chr);
         }
     }
 

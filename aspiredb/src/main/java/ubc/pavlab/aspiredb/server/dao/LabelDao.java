@@ -18,16 +18,16 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.springframework.security.access.annotation.Secured;
-
 import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
- * author: anton date: 25/04/13
+ * author: anton
+ * date: 25/04/13
  */
 public interface LabelDao extends SecurableDaoBase<Label> {
 
@@ -36,19 +36,19 @@ public interface LabelDao extends SecurableDaoBase<Label> {
 
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     Collection<Label> getSubjectLabels();
-
+    
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
-    Collection<Label> getSubjectLabelsBySubjectId( Long id );
-
+    Collection<Label> getSubjectLabelsBySubjectId(Long id);
+    
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
-    Collection<Label> getVariantLabelsByVariantId( Long id );
-
+    Collection<Label> getVariantLabelsByVariantId(Long id);
+    
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     Collection<Label> getSubjectLabelsByProjectId( Long projectId );
 
     @Deprecated
-    List<Label> getLabelsMatching( String partialName );
+    List<Label> getLabelsMatching(String partialName);
 
     @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
-    Label findOrCreate( LabelValueObject labelVO );
+    Label findOrCreate(LabelValueObject labelVO);
 }

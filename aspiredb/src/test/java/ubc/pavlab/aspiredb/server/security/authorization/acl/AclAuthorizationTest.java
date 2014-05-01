@@ -15,6 +15,7 @@
 
 package ubc.pavlab.aspiredb.server.security.authorization.acl;
 
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -39,51 +40,61 @@ import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
+
+
 /**
+ * 
  * @version $Id: AclAuthorizationTest.java,v 1.9 2013/06/11 23:01:33 cmcdonald Exp $
  */
 public class AclAuthorizationTest extends BaseSpringContextTest {
-
+    
     @Autowired
     private UserManager userManager;
 
     @Autowired
     private SecurityService securityService;
-
+    
     @Autowired
     private SubjectDao subjectDao;
-
+    
     @Autowired
-    private CNVDao cnvDao;
-
+    private CNVDao cnvDao;   
+    
+    
     @Autowired
     private PersistentTestObjectHelper testObjectHelper;
+    
 
     String ownerUsername = RandomStringUtils.randomAlphabetic( 6 );
-
+    
     String aDifferentUsername = RandomStringUtils.randomAlphabetic( 5 );
-
+    
     String patientId = RandomStringUtils.randomAlphabetic( 4 );
-
+    
+    
+    
+    
     @Before
-    public void setup() throws Exception {
-
+    public void setup() throws Exception {   
+        
         try {
             userManager.loadUserByUsername( ownerUsername );
         } catch ( UsernameNotFoundException e ) {
             userManager.createUser( new UserDetailsImpl( "jimmy", ownerUsername, true, null, RandomStringUtils
-                    .randomAlphabetic( 10 ) + "@gmail.com", "key", new Date() ) );
+                    .randomAlphabetic( 10 )
+                    + "@gmail.com", "key", new Date() ) );
         }
-
+        
         super.runAsUser( this.ownerUsername );
-
+        
         testObjectHelper.createPersistentTestSubjectObjectWithCNV( patientId );
-
+        
         try {
             userManager.loadUserByUsername( aDifferentUsername );
         } catch ( UsernameNotFoundException e ) {
             userManager.createUser( new UserDetailsImpl( "foo", aDifferentUsername, true, null, RandomStringUtils
-                    .randomAlphabetic( 10 ) + "@gmail.com", "key", new Date() ) );
+                    .randomAlphabetic( 10 )
+                    + "@gmail.com", "key", new Date() ) );
         }
 
     }
@@ -95,7 +106,9 @@ public class AclAuthorizationTest extends BaseSpringContextTest {
      */
     @Test
     public void testGetIndividual() throws Exception {
-
+        
+        
+        
         super.runAsUser( this.aDifferentUsername );
         try {
             Subject ind2 = subjectDao.findByPatientId( patientId );
@@ -105,37 +118,43 @@ public class AclAuthorizationTest extends BaseSpringContextTest {
 
         }
 
+        
         super.runAsUser( this.ownerUsername );
-
+        
         Subject ind = subjectDao.findByPatientId( patientId );
-
-        assertTrue( "User should own the individual", securityService.isOwnedByCurrentUser( ind ) );
-
+        
+        assertTrue("User should own the individual" , securityService.isOwnedByCurrentUser( ind ));
+        
         super.runAsUser( this.aDifferentUsername );
-
-        assertFalse( "User shouldn't own the individual", securityService.isOwnedByCurrentUser( ind ) );
-
+        
+        assertFalse("User shouldn't own the individual" , securityService.isOwnedByCurrentUser( ind ));
+        
+        
     }
 
+    
     @Test
     public void testUserOwnsIndividualAndIndividualCNVs() throws Exception {
-
+        
+        
         super.runAsUser( this.ownerUsername );
-
+                
         CNV cnv = cnvDao.findBySubjectPatientId( patientId ).iterator().next();
-
-        assertTrue( "User should own the individual's cnvs", securityService.isOwnedByCurrentUser( cnv ) );
-
+        
+        assertTrue("User should own the individual's cnvs" , securityService.isOwnedByCurrentUser(cnv ));
+        
         super.runAsUser( this.aDifferentUsername );
-
-        assertFalse( "User shouldn't own the individual's cnvs", securityService.isOwnedByCurrentUser( cnv ) );
-
+        
+        assertFalse("User shouldn't own the individual's cnvs" , securityService.isOwnedByCurrentUser(cnv ));
+        
+        
     }
-
+    
     @Test
     public void testIndividualSecured() throws Exception {
-
+        
         super.runAsUser( this.aDifferentUsername );
+        
 
         try {
             subjectDao.findByPatientId( patientId );
@@ -143,29 +162,34 @@ public class AclAuthorizationTest extends BaseSpringContextTest {
         } catch ( AccessDeniedException e ) {
 
         }
-
+        
     }
-
+    
     @Test
-    public void testEditCNV() {
-
+    public void testEditCNV(){
+        
         super.runAsUser( this.ownerUsername );
-
+        
         Collection<CNV> ownedCNVs = cnvDao.findBySubjectPatientId( patientId );
-
+        
         CNV cnv = ownedCNVs.iterator().next();
-
+        
         super.runAsUser( this.aDifferentUsername );
-
+         
         cnv.setCopyNumber( 234 );
-
-        try {
-
+        
+        try{
+            
+            
             cnvDao.update( cnv );
             fail( "Should have gotten an access denied exception, acl was: " );
-        } catch ( AccessDeniedException e ) {
+        }
+        catch ( AccessDeniedException e ) {
+            
 
         }
     }
-
+    
+   
+    
 }
