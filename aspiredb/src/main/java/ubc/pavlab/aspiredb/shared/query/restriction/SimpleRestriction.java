@@ -23,15 +23,12 @@ import org.directwebremoting.annotations.DataTransferObject;
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.Property;
 
-
-
 /**
- * author: anton
- * date: 07/05/13
+ * author: anton date: 07/05/13
  */
 @DataTransferObject(javascript = "SimpleRestriction")
 public class SimpleRestriction implements RestrictionExpression {
-    
+
     /**
      * 
      */
@@ -43,7 +40,7 @@ public class SimpleRestriction implements RestrictionExpression {
     public SimpleRestriction() {
     }
 
-    public SimpleRestriction(Property property, Operator operator, Object value) {
+    public SimpleRestriction( Property property, Operator operator, Object value ) {
         this.property = property;
         this.operator = operator;
         this.value = value;
@@ -61,15 +58,15 @@ public class SimpleRestriction implements RestrictionExpression {
         return operator;
     }
 
-    public void setProperty(Property property) {
+    public void setProperty( Property property ) {
         this.property = property;
     }
 
-    public void setOperator(Operator operator) {
+    public void setOperator( Operator operator ) {
         this.operator = operator;
     }
 
-    public void setValue(Object value) {
+    public void setValue( Object value ) {
         this.value = value;
     }
 }

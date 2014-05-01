@@ -15,7 +15,8 @@
 
 package ubc.pavlab.aspiredb.server.project;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -26,12 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.RandomStringUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantOverlapDao;
@@ -49,7 +46,7 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
 
-public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest {
+public class Project2SpecialProjectOverlapTest {// extends BaseSpringContextTest {
 
     @Autowired
     private ProjectManager projectManager;
@@ -65,10 +62,10 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
 
     @Autowired
     VariantDao variantDao;
-    
+
     @Autowired
     SubjectDao subjectDao;
-    
+
     @Autowired
     PersistentTestObjectHelper helper;
 
@@ -76,9 +73,9 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
     final String projectName = RandomStringUtils.randomAlphabetic( 7 );
 
     final String userVariantId = RandomStringUtils.randomAlphabetic( 5 );
-    
+
     final String userVariantId2 = RandomStringUtils.randomAlphabetic( 5 );
-    
+
     final String userVariantIdToTestOverlapPercentage = RandomStringUtils.randomAlphabetic( 5 );
 
     final String overlapVariantId1 = RandomStringUtils.randomAlphabetic( 5 );
@@ -90,20 +87,16 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
     final String patientIdWithOverlap = RandomStringUtils.randomAlphabetic( 5 );
     final String projectNameWithOverlap = "DGV";
 
-   
-
-   
-   //@Test
+    // @Test
     public void testPopulateSpecialProjectOverlap() {
 
-       // super.runAsAdmin();
-        
-        
+        // super.runAsAdmin();
+
         ArrayList<VariantValueObject> cnvList = new ArrayList<VariantValueObject>();
         cnvList.add( getCNV( "X", 3, 234, userVariantId, patientId ) );
-        
-        cnvList.add( getCNV( "X", 1, 5, userVariantId2, patientId ) );        
-        
+
+        cnvList.add( getCNV( "X", 1, 5, userVariantId2, patientId ) );
+
         cnvList.add( getCNV( "2", 123, 235, RandomStringUtils.randomAlphabetic( 5 ), patientId ) );
         cnvList.add( getCNV( "3", 12, 236, RandomStringUtils.randomAlphabetic( 5 ), patientId ) );
 
@@ -130,8 +123,8 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
 
         // will overlap by 2
         cnvListWithOverlap.add( getCNV( "X", 5, 7, overlapVariantId4, patientIdWithOverlap ) );
-        
-        //will overlap by 134, we will use this one to test the percentage overlap
+
+        // will overlap by 134, we will use this one to test the percentage overlap
         cnvListWithOverlap.add( getCNV( "X", 100, 900, overlapVariantId5, patientIdWithOverlap ) );
 
         cnvListWithOverlap.add( getCNV( "X", 900, 1600, null, patientIdWithOverlap ) );
@@ -139,9 +132,9 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
         cnvListWithOverlap.add( getCNV( "Y", 3, 234, null, patientIdWithOverlap ) );
 
         try {
-            
+
             helper.deleteProject( "DGV" );
-            
+
             projectManager.addSubjectVariantsToSpecialProject( projectNameWithOverlap, true, cnvListWithOverlap, false );
 
         } catch ( Exception e ) {
@@ -150,30 +143,24 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
 
         }
 
-        
-
         Collection<Project> overlapProjects = projectDao.getSpecialOverlapProjects();
         Collection<Long> overlapProjectIds = new ArrayList<Long>();
-        
-        for (Project p: overlapProjects){
-            
-            overlapProjectIds.add( p.getId() );            
-            
+
+        for ( Project p : overlapProjects ) {
+
+            overlapProjectIds.add( p.getId() );
+
         }
-        
-                
+
         try {
-            
+
             projectManager.populateProjectToProjectOverlap( projectName, projectNameWithOverlap );
-       
 
         } catch ( Exception e ) {
 
             fail( "projectManager.populateSpecialProjectOverlap threw an exception:" + e.toString() );
 
         }
-        
-       
 
         Project projectToPopulate = projectDao.findByProjectName( projectName );
 
@@ -195,9 +182,8 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
 
         }
 
-        assertEquals(4, projToPopulateVvos.getItems().size() );
+        assertEquals( 4, projToPopulateVvos.getItems().size() );
 
-        
         List<VariantValueObject> vvos = projToPopulateVvos.getItems();
 
         VariantValueObject vvo = new VariantValueObject();
@@ -215,8 +201,8 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
 
         specialProjectList.add( specialProject.getId() );
 
-        Collection<Variant2SpecialVariantOverlap> infos = variant2SpecialVariantOverlapDao.loadByVariantId( vvo.getId(),
-                specialProjectList );
+        Collection<Variant2SpecialVariantOverlap> infos = variant2SpecialVariantOverlapDao.loadByVariantId(
+                vvo.getId(), specialProjectList );
 
         Variant v = variantDao.load( vvo.getId() );
 
@@ -239,37 +225,32 @@ public class Project2SpecialProjectOverlapTest{// extends BaseSpringContextTest 
             } else if ( specialVariant.getUserVariantId().equals( overlapVariantId1 ) ) {// check the accuracy of the
                                                                                          // overlap length
 
-                assertEquals(231, vInfo.getOverlap().intValue());
+                assertEquals( 231, vInfo.getOverlap().intValue() );
                 assertEquals( vInfo.getOverlapProjectId(), specialProject.getId() );
-                
-                
 
             } else if ( specialVariant.getUserVariantId().equals( overlapVariantId2 ) ) {
 
-                assertEquals(229, vInfo.getOverlap().intValue());
+                assertEquals( 229, vInfo.getOverlap().intValue() );
                 assertEquals( vInfo.getOverlapProjectId(), specialProject.getId() );
 
             } else if ( specialVariant.getUserVariantId().equals( overlapVariantId3 ) ) {
-                assertEquals(2, vInfo.getOverlap().intValue());
+                assertEquals( 2, vInfo.getOverlap().intValue() );
                 assertEquals( vInfo.getOverlapProjectId(), specialProject.getId() );
             } else if ( specialVariant.getUserVariantId().equals( overlapVariantId4 ) ) {
-                assertEquals(2, vInfo.getOverlap().intValue());
+                assertEquals( 2, vInfo.getOverlap().intValue() );
                 assertEquals( vInfo.getOverlapProjectId(), specialProject.getId() );
             } else if ( specialVariant.getUserVariantId().equals( overlapVariantId5 ) ) {
-                assertEquals(58,vInfo.getOverlapPercentage().intValue());
-                
-                assertEquals(17,vInfo.getOverlappedOverlapPercentage().intValue());
+                assertEquals( 58, vInfo.getOverlapPercentage().intValue() );
+
+                assertEquals( 17, vInfo.getOverlappedOverlapPercentage().intValue() );
             }
 
         }
-        
-        helper.deleteProject(projectName);
-        helper.deleteProject(projectNameWithOverlap);
-        
+
+        helper.deleteProject( projectName );
+        helper.deleteProject( projectNameWithOverlap );
 
     }
-
-    
 
     private boolean doesOverlap( Variant variant, Variant specialVariant ) {
 

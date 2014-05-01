@@ -18,13 +18,12 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 import java.io.Serializable;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
- * author: anton
- * date: 11/06/13
+ * author: anton date: 11/06/13
  */
 @DataTransferObject(javascript = "TextValue")
 public class TextValue implements Displayable, Serializable {
@@ -34,7 +33,7 @@ public class TextValue implements Displayable, Serializable {
     public TextValue() {
     }
 
-    public TextValue(String value) {
+    public TextValue( String value ) {
         this.value = value;
     }
 
@@ -46,7 +45,7 @@ public class TextValue implements Displayable, Serializable {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue( String value ) {
         this.value = value;
     }
 

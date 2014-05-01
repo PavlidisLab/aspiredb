@@ -57,19 +57,19 @@ public class PhenotypeDaoImpl extends SecurableDaoBaseImpl<Phenotype> implements
 
         return phenotypes;
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Integer findPhenotypeCountBySubjectId( Long id ) {
 
-        Criteria criteria = currentSession().createCriteria( Phenotype.class )
-                .createAlias( "subject", "subject" ).add( Restrictions.eq( "subject.id", id ) );
-                criteria.setProjection( Projections.distinct( Projections.id() ) );
-                List<Long> ids = criteria.list();
-                
+        Criteria criteria = currentSession().createCriteria( Phenotype.class ).createAlias( "subject", "subject" )
+                .add( Restrictions.eq( "subject.id", id ) );
+        criteria.setProjection( Projections.distinct( Projections.id() ) );
+        List<Long> ids = criteria.list();
+
         return ids.size();
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Collection<Phenotype> findPresentByProjectIdsAndUri( Collection<Long> ids, String uri ) {

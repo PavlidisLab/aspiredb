@@ -15,6 +15,8 @@
 
 package ubc.pavlab.aspiredb.server.security.authentication;
 
+import java.io.IOException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -33,16 +35,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 /**
  * Process authentication requests that come from outside a web context. This is used for command line interfaces, for
- * example.
- * 
- * modified from Gemma
+ * example. modified from Gemma
  * 
  * @author keshav
- * 
  */
 @Component
 public class ManualAuthenticationServiceImpl implements ApplicationContextAware, InitializingBean,
@@ -72,7 +69,6 @@ public class ManualAuthenticationServiceImpl implements ApplicationContextAware,
 
     }
 
-    
     @Override
     public Authentication attemptAuthentication( String username, String password ) throws AuthenticationException {
 
@@ -89,8 +85,6 @@ public class ManualAuthenticationServiceImpl implements ApplicationContextAware,
         return this.authenticationManager.authenticate( authRequest );
     }
 
-    
-    
     @Override
     public boolean validateRequest( String username, String password ) {
 
@@ -141,7 +135,6 @@ public class ManualAuthenticationServiceImpl implements ApplicationContextAware,
 
     }
 
-    
     @Override
     public void setApplicationContext( ApplicationContext applicationContext ) throws BeansException {
         this.context = applicationContext;

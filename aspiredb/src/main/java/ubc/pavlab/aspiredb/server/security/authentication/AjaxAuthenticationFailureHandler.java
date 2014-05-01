@@ -18,15 +18,16 @@
  */
 package ubc.pavlab.aspiredb.server.security.authentication;
 
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.DefaultRedirectStrategy;
-import org.springframework.security.web.RedirectStrategy;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.RedirectStrategy;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
 /**
  * Strategy used to handle a failed user authentication if it is a ajax style login (ajaxLoginTrue parameter = true)
@@ -39,7 +40,7 @@ public class AjaxAuthenticationFailureHandler extends SimpleUrlAuthenticationFai
 
     @Override
     public void onAuthenticationFailure( HttpServletRequest request, HttpServletResponse response,
-                                         AuthenticationException exception ) throws ServletException, IOException {
+            AuthenticationException exception ) throws ServletException, IOException {
 
         String ajaxLoginTrue = request.getParameter( "ajaxLoginTrue" );
 

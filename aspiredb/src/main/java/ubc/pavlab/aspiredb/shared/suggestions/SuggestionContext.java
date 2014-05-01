@@ -18,14 +18,13 @@
  */
 package ubc.pavlab.aspiredb.shared.suggestions;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 import java.io.Serializable;
 import java.util.Collection;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
- * author: anton
- * date: 02/05/13
+ * author: anton date: 02/05/13
  */
 @DataTransferObject(javascript = "SuggestionContext")
 public class SuggestionContext implements Serializable {
@@ -38,7 +37,7 @@ public class SuggestionContext implements Serializable {
         return valuePrefix;
     }
 
-    public void setValuePrefix(String valuePrefix) {
+    public void setValuePrefix( String valuePrefix ) {
         this.valuePrefix = valuePrefix;
     }
 
@@ -46,7 +45,7 @@ public class SuggestionContext implements Serializable {
         return activeProjectIds;
     }
 
-    public void setActiveProjectIds(Collection<Long> activeProjectIds) {
+    public void setActiveProjectIds( Collection<Long> activeProjectIds ) {
         this.activeProjectIds = activeProjectIds;
     }
 

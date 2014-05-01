@@ -53,6 +53,7 @@ import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
 import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
+import ubic.basecode.util.BatchIterator;
 
 /**
  * @author anton
@@ -116,6 +117,26 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
         query.setParameter( "patientId", patientId );
 
         return ( Subject ) query.uniqueResult();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ubc.pavlab.aspiredb.server.dao.SubjectDao#findByPatientIds(java.util.Collection)
+     */
+    @Override
+    @Deprecated
+    @Transactional(readOnly = true)
+    public Collection<Subject> findByPatientIds( Collection<String> patientIds ) {
+        Set<Subject> result = new HashSet<Subject>();
+        BatchIterator<String> it = BatchIterator.batches( patientIds, 200 );
+        Query query = this.getSessionFactory().getCurrentSession()
+                .createQuery( "from Subject as subject where subject.patientId in (:patientIds)" );
+        for ( ; it.hasNext(); ) {
+            query.setParameterList( "patientIds", it.next() );
+            result.addAll( query.list() );
+        }
+        return result;
     }
 
     @Override
@@ -206,13 +227,11 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
     private List<Long> findIds( AspireDbFilterConfig filter ) throws BioMartServiceException,
             NeurocartaServiceException {
 
-        
-        if (filter instanceof ProjectOverlapFilterConfig){
-            
-            List<Long> variantIds = variantDao.getProjectOverlapVariantIds( (ProjectOverlapFilterConfig)filter );
-            
-            Collection<Subject> subjects= this.loadByVariantIds( variantIds );
-            
+        if ( filter instanceof ProjectOverlapFilterConfig ) {
+
+            List<Long> variantIds = variantDao.getProjectOverlapVariantIds( ( ProjectOverlapFilterConfig ) filter );
+
+            Collection<Subject> subjects = this.loadByVariantIds( variantIds );
 
             ArrayList<Long> subjectIds = new ArrayList<Long>();
 

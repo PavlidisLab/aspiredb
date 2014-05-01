@@ -14,6 +14,11 @@
  */
 package ubc.pavlab.aspiredb.cli;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.log4j.ConsoleAppender;
@@ -21,18 +26,12 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.springframework.beans.factory.BeanFactory;
+
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadServiceResult;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
-import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.List;
 
 /**
  * First pass phenotype data uploader, missing a bunch of requirements
@@ -47,7 +46,7 @@ public class PhenotypeUploadCLI extends AbstractCLI {
     private static ProjectManager projectManager;
 
     private static OntologyService os;
-    
+
     private static PhenotypeUploadService phenotypeUploadService;
 
     private String directory = "";
@@ -152,24 +151,24 @@ public class PhenotypeUploadCLI extends AbstractCLI {
                 }
             }
 
-            PhenotypeUploadServiceResult phenResult = phenotypeUploadService.getPhenotypeValueObjectsFromResultSet( results );
-            
-            
+            PhenotypeUploadServiceResult phenResult = phenotypeUploadService
+                    .getPhenotypeValueObjectsFromResultSet( results );
+
             // clean up
             results.close();
             stmt.close();
             conn.close();
-            
+
             projectManager.addSubjectPhenotypesToProject( projectName, createProject, phenResult.getPhenotypesToAdd() );
 
             if ( !phenResult.getErrorMessages().isEmpty() ) {
                 for ( String errorMessage : phenResult.getErrorMessages() ) {
                     System.out.println( errorMessage );
                 }
-                
+
             } else {
                 System.out.println( "no errors" );
-                
+
             }
 
         } catch ( Exception e ) {

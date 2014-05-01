@@ -145,7 +145,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
     public void tearDownPhenotypes() throws Exception {
         // run save query as administrator in filter window
         super.runAsAdmin();
-        
+
         for ( Subject s : project.getSubjects() ) {
             try {
 

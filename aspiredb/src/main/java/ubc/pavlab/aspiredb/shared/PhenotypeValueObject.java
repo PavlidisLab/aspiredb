@@ -14,15 +14,14 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * @author ?
- * 
  */
 @DataTransferObject(javascript = "PhenotypeValueObject")
 public class PhenotypeValueObject implements Comparable<PhenotypeValueObject>, Serializable {
@@ -46,21 +45,21 @@ public class PhenotypeValueObject implements Comparable<PhenotypeValueObject>, S
     public PhenotypeValueObject() {
     }
 
-    public PhenotypeValueObject(PhenotypeValueObject phenotype, String uri, String name, String inferredValue) {
+    public PhenotypeValueObject( PhenotypeValueObject phenotype, String uri, String name, String inferredValue ) {
         this.subjectId = phenotype.getSubjectId();
         this.inferredValue = inferredValue;
         this.name = name;
         this.uri = uri;
     }
 
-    public PhenotypeValueObject(Long subjectId, String uri, String name, String inferredValue) {
+    public PhenotypeValueObject( Long subjectId, String uri, String name, String inferredValue ) {
         this.subjectId = subjectId;
         this.inferredValue = inferredValue;
         this.name = name;
         this.uri = uri;
     }
 
-    public PhenotypeValueObject(Long subjectId, String uri, String name) {
+    public PhenotypeValueObject( Long subjectId, String uri, String name ) {
         this.subjectId = subjectId;
         this.name = name;
         this.uri = uri;
@@ -74,11 +73,11 @@ public class PhenotypeValueObject implements Comparable<PhenotypeValueObject>, S
         return isOntologyTerm;
     }
 
-    public void setOntologyTerm(boolean ontologyTerm) {
+    public void setOntologyTerm( boolean ontologyTerm ) {
         isOntologyTerm = ontologyTerm;
     }
 
-    public void setDescendantPhenotypes(Map<String, PhenotypeValueObject> descendantPhenotypes) {
+    public void setDescendantPhenotypes( Map<String, PhenotypeValueObject> descendantPhenotypes ) {
         this.descendantPhenotypes = descendantPhenotypes;
     }
 
@@ -86,7 +85,7 @@ public class PhenotypeValueObject implements Comparable<PhenotypeValueObject>, S
         return inferredValue;
     }
 
-    public void setInferredValue(String inferredValue) {
+    public void setInferredValue( String inferredValue ) {
         this.inferredValue = inferredValue;
     }
 
@@ -102,7 +101,7 @@ public class PhenotypeValueObject implements Comparable<PhenotypeValueObject>, S
         return subjectId;
     }
 
-    public void setSubjectId(Long subjectId) {
+    public void setSubjectId( Long subjectId ) {
         this.subjectId = subjectId;
     }
 
@@ -118,7 +117,7 @@ public class PhenotypeValueObject implements Comparable<PhenotypeValueObject>, S
         return dbValue;
     }
 
-    public void setDbValue(String dbValue) {
+    public void setDbValue( String dbValue ) {
         this.dbValue = dbValue;
     }
 
@@ -139,34 +138,34 @@ public class PhenotypeValueObject implements Comparable<PhenotypeValueObject>, S
     }
 
     @Override
-    public boolean equals (Object o) {
-    	return (o != null && ((PhenotypeValueObject) o).getName().equals(this.getName()));
+    public boolean equals( Object o ) {
+        return ( o != null && ( ( PhenotypeValueObject ) o ).getName().equals( this.getName() ) );
     }
 
     public String getExternalSubjectId() {
         return externalSubjectId;
     }
 
-    public void setExternalSubjectId(String externalSubjectId) {
+    public void setExternalSubjectId( String externalSubjectId ) {
         this.externalSubjectId = externalSubjectId;
     }
 
     @Override
     public int hashCode() {
-    	return this.getName().hashCode();
+        return this.getName().hashCode();
     }
 
-	@Override
-	public int compareTo(PhenotypeValueObject o) {
-		return this.getName().compareTo(o.getName());
-	}
-
-    public void addChild(PhenotypeValueObject child) {
-        this.getDescendantPhenotypes().put(child.getName(), child);
+    @Override
+    public int compareTo( PhenotypeValueObject o ) {
+        return this.getName().compareTo( o.getName() );
     }
 
-    public void addChildIfAbsent(PhenotypeValueObject child) {
-        if (!this.getDescendantPhenotypes().containsKey(child.getName())) {
+    public void addChild( PhenotypeValueObject child ) {
+        this.getDescendantPhenotypes().put( child.getName(), child );
+    }
+
+    public void addChildIfAbsent( PhenotypeValueObject child ) {
+        if ( !this.getDescendantPhenotypes().containsKey( child.getName() ) ) {
             addChild( child );
         }
     }

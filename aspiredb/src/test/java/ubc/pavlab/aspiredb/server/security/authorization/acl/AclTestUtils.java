@@ -43,8 +43,6 @@ public class AclTestUtils {
     @Autowired
     private AclService aclService;
 
-    
-
     /**
      * Make sure object f has no ACLs
      * 

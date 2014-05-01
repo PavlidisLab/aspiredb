@@ -21,15 +21,14 @@ package ubc.pavlab.aspiredb.shared.suggestions;
 import java.io.Serializable;
 
 /**
- * author: anton
- * date: 06/05/13
+ * author: anton date: 06/05/13
  */
 public class LabelSuggestion implements Serializable {
     private static final long serialVersionUID = -7649973303615959652L;
 
     private String name;
 
-    public LabelSuggestion(String name) {
+    public LabelSuggestion( String name ) {
         this.name = name;
     }
 
@@ -40,7 +39,7 @@ public class LabelSuggestion implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName( String name ) {
         this.name = name;
     }
 }

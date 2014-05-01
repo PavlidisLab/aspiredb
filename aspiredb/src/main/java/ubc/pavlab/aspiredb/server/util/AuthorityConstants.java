@@ -21,7 +21,6 @@ import org.springframework.security.access.vote.AuthenticatedVoter;
  * Defines constants used in GrantedAuthories. An authority is basically a marker of a level of access; in Gemma this
  * corresponds to the authority on a 'group' of users (UserGroup). There are currently three special groups:
  * Administrators, Users, and Agents. Anonymous is another
- * 
  */
 public class AuthorityConstants {
 

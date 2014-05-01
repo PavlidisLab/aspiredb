@@ -14,44 +14,33 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
-import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
-import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
-import ubc.pavlab.aspiredb.server.model.UserGeneSet;
-import ubc.pavlab.aspiredb.shared.BoundedList;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
-
-import com.sencha.gxt.data.shared.loader.PagingLoadResult;
 
 /**
  * @author Gaya
- * 
  */
 public interface UserGeneSetService {
 
     public List<GeneValueObject> loadUserGeneSet( String name );
 
     public Collection<String> getSavedUserGeneSetNames();
-    
-    public void addGenes(String geneName,String geneSymbol) throws BioMartServiceException;
+
+    public void addGenes( String geneName, String geneSymbol ) throws BioMartServiceException;
 
     public void deleteUserGeneSet( String name );
-    
-    public void deleteGene(String geneSetName,String geneSymbol) throws BioMartServiceException;
-        
-    public Long saveUserGeneSet(String geneName,List<GeneValueObject> genes) throws BioMartServiceException;
-    
-    public boolean isGeneSetName(String name);
-    
-    public boolean isGeneInGeneSet(String genSetName,String geneSymbol);
-    
-    public List<GeneValueObject> getGenes(String geneSymbol)throws BioMartServiceException;
 
-  
+    public void deleteGene( String geneSetName, String geneSymbol ) throws BioMartServiceException;
+
+    public Long saveUserGeneSet( String geneName, List<GeneValueObject> genes ) throws BioMartServiceException;
+
+    public boolean isGeneSetName( String name );
+
+    public boolean isGeneInGeneSet( String genSetName, String geneSymbol );
+
+    public List<GeneValueObject> getGenes( String geneSymbol ) throws BioMartServiceException;
+
 }

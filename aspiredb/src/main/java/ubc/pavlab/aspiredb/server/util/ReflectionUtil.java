@@ -21,8 +21,6 @@ import java.lang.reflect.Method;
 
 /**
  * Various methods useful for manipulating objects using Reflection.
- * 
- *
  */
 public class ReflectionUtil {
 

@@ -18,13 +18,12 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 import java.util.Arrays;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
- * author: anton
- * date: 07/05/13
+ * author: anton date: 07/05/13
  */
 @DataTransferObject(javascript = "NumericProperty")
 public class NumericProperty extends Property<NumericalDataType> {
@@ -36,12 +35,11 @@ public class NumericProperty extends Property<NumericalDataType> {
 
     public NumericProperty() {
         this.dataType = new NumericalDataType();
-        this.operators = Arrays.asList(
-                Operator.NUMERIC_EQUAL,Operator.NUMERIC_GREATER,
-                Operator.NUMERIC_LESS, Operator.NUMERIC_NOT_EQUAL);
+        this.operators = Arrays.asList( Operator.NUMERIC_EQUAL, Operator.NUMERIC_GREATER, Operator.NUMERIC_LESS,
+                Operator.NUMERIC_NOT_EQUAL );
     }
 
-    public NumericProperty(String displayName, String name) {
+    public NumericProperty( String displayName, String name ) {
         this();
         this.displayName = displayName;
         this.name = name;

@@ -18,16 +18,12 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import org.directwebremoting.annotations.RemoteMethod;
-import org.directwebremoting.annotations.RemoteProxy;
-import org.springframework.stereotype.Service;
-import ubc.pavlab.aspiredb.shared.ChromosomeValueObject;
-
 import java.util.Map;
 
+import ubc.pavlab.aspiredb.shared.ChromosomeValueObject;
+
 /**
- * author: anton
- * date: 19/02/13
+ * author: anton date: 19/02/13
  */
 public interface ChromosomeService {
     public Map<String, ChromosomeValueObject> getChromosomes();

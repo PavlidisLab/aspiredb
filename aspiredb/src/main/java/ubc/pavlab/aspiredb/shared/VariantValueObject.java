@@ -14,31 +14,33 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
-import ubc.pavlab.aspiredb.shared.query.*;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
+import ubc.pavlab.aspiredb.shared.query.CharacteristicProperty;
+import ubc.pavlab.aspiredb.shared.query.Property;
+import ubc.pavlab.aspiredb.shared.query.VariantTypeProperty;
+
 @DataTransferObject(javascript = "VariantValueObject")
 public class VariantValueObject implements Serializable {
 
-	private static final long serialVersionUID = -5007872164222760764L;
+    private static final long serialVersionUID = -5007872164222760764L;
 
-	protected Long id;
-	protected String variantType;
+    protected Long id;
+    protected String variantType;
 
     protected Long subjectId;
-    protected String details="";
+    protected String details = "";
     protected SubjectValueObject subject;
-	
-	protected String patientId;
-	protected Map<String, CharacteristicValueObject> characteristics;
 
-    public void setLabels(Collection<LabelValueObject> labels) {
+    protected String patientId;
+    protected Map<String, CharacteristicValueObject> characteristics;
+
+    public void setLabels( Collection<LabelValueObject> labels ) {
         this.labels = labels;
     }
 
@@ -50,35 +52,35 @@ public class VariantValueObject implements Serializable {
 
     protected GenomicRange genomicRange;
 
-	protected String userVariantId;
-	protected String description;
-	protected String externalId;
-		
-	public VariantValueObject() {
-		super();
-	}
+    protected String userVariantId;
+    protected String description;
+    protected String externalId;
+
+    public VariantValueObject() {
+        super();
+    }
 
     public String getDetails() {
         return details;
     }
 
-    public void setDetails(String details) {
+    public void setDetails( String details ) {
         this.details = details;
     }
 
     public Long getSubjectId() {
         return subjectId;
     }
-    
+
     public SubjectValueObject getSubject() {
         return subject;
     }
-    
-    public void setSubject(SubjectValueObject subject) {
-        this.subject=subject;
+
+    public void setSubject( SubjectValueObject subject ) {
+        this.subject = subject;
     }
 
-    public void setSubjectId(Long subjectId) {
+    public void setSubjectId( Long subjectId ) {
         this.subjectId = subjectId;
     }
 
@@ -86,30 +88,30 @@ public class VariantValueObject implements Serializable {
         return variantType;
     }
 
-    public void setVariantType(String variantType) {
+    public void setVariantType( String variantType ) {
         this.variantType = variantType;
     }
 
-	public String getGenomeCoordinates() {
-		return this.genomicRange.toBaseString();
-	}
+    public String getGenomeCoordinates() {
+        return this.genomicRange.toBaseString();
+    }
 
-    public Map<String,CharacteristicValueObject> getCharacteristics() {
+    public Map<String, CharacteristicValueObject> getCharacteristics() {
         return characteristics;
     }
 
-    public void setCharacteristics(Map<String,CharacteristicValueObject> characteristics) {
+    public void setCharacteristics( Map<String, CharacteristicValueObject> characteristics ) {
         this.characteristics = characteristics;
     }
 
-	public GenomicRange getGenomicRange() {
-		return genomicRange;
-	}
+    public GenomicRange getGenomicRange() {
+        return genomicRange;
+    }
 
-	public void setGenomicRange(GenomicRange genomicRange) {
-		this.genomicRange = genomicRange;
-	}
-	
+    public void setGenomicRange( GenomicRange genomicRange ) {
+        this.genomicRange = genomicRange;
+    }
+
     public Long getId() {
         return id;
     }
@@ -150,13 +152,13 @@ public class VariantValueObject implements Serializable {
         this.externalId = externalId;
     }
 
-    public String getPropertyStringValue(Property property) {
-        if (property instanceof VariantTypeProperty) {
+    public String getPropertyStringValue( Property property ) {
+        if ( property instanceof VariantTypeProperty ) {
             return this.variantType;
-        }
-        else if (property instanceof CharacteristicProperty) {
-            final CharacteristicValueObject characteristicValueObject = this.getCharacteristics().get(property.getName());
-            if (characteristicValueObject == null) return null;
+        } else if ( property instanceof CharacteristicProperty ) {
+            final CharacteristicValueObject characteristicValueObject = this.getCharacteristics().get(
+                    property.getName() );
+            if ( characteristicValueObject == null ) return null;
             return characteristicValueObject.getValue();
         }
         return null;

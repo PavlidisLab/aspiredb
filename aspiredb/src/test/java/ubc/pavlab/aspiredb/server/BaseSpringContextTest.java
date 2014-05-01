@@ -56,8 +56,8 @@ import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 @ContextConfiguration(locations = { "classpath:/test-data-source.xml", "classpath:/application-context.xml",
         "classpath:/applicationContext-security.xml" })
 public abstract class BaseSpringContextTest extends AbstractJUnit4SpringContextTests implements InitializingBean {
-    
-    @Autowired 
+
+    @Autowired
     protected HibernateTransactionManager transactionManager;
 
     protected HibernateDaoSupport hibernateSupport = new HibernateDaoSupport() {
@@ -98,16 +98,14 @@ public abstract class BaseSpringContextTest extends AbstractJUnit4SpringContextT
         private TransactionStatus txStatus;
 
         protected void beginTransaction() {
-            txStatus = transactionManager.getTransaction(new DefaultTransactionDefinition());
+            txStatus = transactionManager.getTransaction( new DefaultTransactionDefinition() );
         }
 
         protected void commitTransaction() {
             transactionManager.commit( txStatus );
         }
 
-
     }
-
 
     /**
      * Run as a regular user.
@@ -125,7 +123,7 @@ public abstract class BaseSpringContextTest extends AbstractJUnit4SpringContextT
     protected final void runAsAdmin() {
         authenticationTestingUtil.grantAdminAuthority( this.applicationContext );
     }
-    
+
     protected final void runAsAnon() {
         authenticationTestingUtil.grantAnonAuthority( this.applicationContext );
     }
@@ -137,7 +135,6 @@ public abstract class BaseSpringContextTest extends AbstractJUnit4SpringContextT
     public void setDataSource( DataSource dataSource ) {
         this.simpleJdbcTemplate = new SimpleJdbcTemplate( dataSource );
     }
-   
 
     /**
      * Convenience shortcut for RandomStringUtils.randomAlphabetic( 10 ) (or something similar to that)
@@ -222,7 +219,7 @@ final class AuthenticationTestingUtil {
 
         putTokenInContext( token );
     }
-    
+
     protected void grantAnonAuthority( ApplicationContext ctx ) {
         ProviderManager providerManager = ( ProviderManager ) ctx.getBean( "authenticationManager" );
         providerManager.getProviders().add( new TestingAuthenticationProvider() );

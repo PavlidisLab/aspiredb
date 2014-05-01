@@ -18,13 +18,12 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 import java.util.Arrays;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
- * author: anton
- * date: 24/05/13
+ * author: anton date: 24/05/13
  */
 @DataTransferObject(javascript = "GeneProperty")
 public class GeneProperty extends Property<GenomicRangeDataType> {
@@ -34,7 +33,7 @@ public class GeneProperty extends Property<GenomicRangeDataType> {
         this.dataType = new GenomicRangeDataType();
         this.displayName = "Gene";
         this.exampleValues = "Gene symbols or description - Examples: <b>AHSA2</b>, <b>BNIP3P1</b>, <b>shock</b>";
-        this.operators = Arrays.asList(Operator.IS_IN_SET, Operator.IS_NOT_IN_SET);
+        this.operators = Arrays.asList( Operator.IS_IN_SET, Operator.IS_NOT_IN_SET );
         this.supportsSuggestions = true;
     }
 }

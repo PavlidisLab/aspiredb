@@ -22,8 +22,8 @@ import org.springframework.security.core.AuthenticationException;
 
 /**
  * modified from Gemma
- * @author paul
  * 
+ * @author paul
  */
 public interface ManualAuthenticationService {
 

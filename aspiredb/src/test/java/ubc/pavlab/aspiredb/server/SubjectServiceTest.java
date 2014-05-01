@@ -47,7 +47,10 @@ import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.StringMatrix;
 import ubc.pavlab.aspiredb.shared.TextValue;
 import ubc.pavlab.aspiredb.shared.VariantType;
-import ubc.pavlab.aspiredb.shared.query.*;
+import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.CNVTypeProperty;
+import ubc.pavlab.aspiredb.shared.query.Operator;
+import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.restriction.Conjunction;
 import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 import ubc.pavlab.aspiredb.shared.query.restriction.VariantTypeRestriction;
@@ -72,8 +75,8 @@ public class SubjectServiceTest extends BaseSpringContextTest {
 
     @Before
     public void init() {
-        testSubjectId = RandomStringUtils.randomAlphanumeric(5);
-        testSubject = testObjectHelper.createPersistentTestSubjectObjectWithCNV(testSubjectId);
+        testSubjectId = RandomStringUtils.randomAlphanumeric( 5 );
+        testSubject = testObjectHelper.createPersistentTestSubjectObjectWithCNV( testSubjectId );
         testVariant = testSubject.getVariants().iterator().next();
         testSubject = testObjectHelper.createPersistentTestSubjectObjectWithHPOntologyPhenotypes( testSubjectId );
     }
@@ -81,48 +84,48 @@ public class SubjectServiceTest extends BaseSpringContextTest {
     @Test
     public void findSubjectWithVariantFilter() throws NeurocartaServiceException, BioMartServiceException {
         Conjunction restriction = new Conjunction();
-        restriction.add(new VariantTypeRestriction(VariantType.CNV));
-        restriction.add(new SimpleRestriction(new CNVTypeProperty(), Operator.TEXT_EQUAL, new TextValue("LOSS")));
+        restriction.add( new VariantTypeRestriction( VariantType.CNV ) );
+        restriction.add( new SimpleRestriction( new CNVTypeProperty(), Operator.TEXT_EQUAL, new TextValue( "LOSS" ) ) );
 
         VariantFilterConfig filter = new VariantFilterConfig();
-        filter.setRestriction(restriction);
+        filter.setRestriction( restriction );
         Set<AspireDbFilterConfig> set = new HashSet<AspireDbFilterConfig>();
-        set.add(filter);
+        set.add( filter );
 
-        Page<? extends Subject> subjects = subjectDao.loadPage(0, 100, "", "", set);
-        assertTrue(subjects.size() > 0);
+        Page<? extends Subject> subjects = subjectDao.loadPage( 0, 100, "", "", set );
+        assertTrue( subjects.size() > 0 );
     }
 
     @Test
     public void testGetPhenotypeBySubjectIds() {
         Collection<Long> ids = new ArrayList<Long>();
-        ids.add(testSubject.getId());
-        
-        try{
+        ids.add( testSubject.getId() );
+
+        try {
             StringMatrix<String, String> matrix = subjectService.getPhenotypeBySubjectIds( ids, false );
-            assertTrue(matrix.getRowNames().iterator().next().equals( testSubject.getPatientId() ));
-            assertEquals(testSubject.getPhenotypes().size(), matrix.getColumnNames().size());
-            assertEquals(testSubject.getPhenotypes().iterator().next().getValue(), matrix.get( 0, 0 ));
-        }catch(Exception e){
+            assertTrue( matrix.getRowNames().iterator().next().equals( testSubject.getPatientId() ) );
+            assertEquals( testSubject.getPhenotypes().size(), matrix.getColumnNames().size() );
+            assertEquals( testSubject.getPhenotypes().iterator().next().getValue(), matrix.get( 0, 0 ) );
+        } catch ( Exception e ) {
             e.printStackTrace();
             assertTrue( false );
         }
     }
-    
+
     @Test
     public void addSubjectLabel() {
         Collection<Long> ids = new ArrayList<Long>();
-        ids.add(testSubject.getId());
+        ids.add( testSubject.getId() );
 
         String name = RandomStringUtils.randomAlphabetic( 4 );
-        
-        try{
-            subjectService.addLabel(ids, new LabelValueObject(name));
-        }catch(Exception e){
-            
+
+        try {
+            subjectService.addLabel( ids, new LabelValueObject( name ) );
+        } catch ( Exception e ) {
+
         }
 
-        Collection<Label> labels = labelDao.getLabelsMatching(name);
-        assertTrue(labels.size() > 0);
+        Collection<Label> labels = labelDao.getLabelsMatching( name );
+        assertTrue( labels.size() > 0 );
     }
 }

@@ -15,15 +15,15 @@
 
 package ubc.pavlab.aspiredb.server.security.authentication;
 
+import java.util.Collection;
+
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserExistsException;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
-
-import java.util.Collection;
-
 
 /**
  * @version $Id: UserService.java,v 1.4 2013/06/11 22:30:51 anton Exp $
@@ -35,14 +35,14 @@ public interface UserService {
      * @param group
      * @param authority
      */
-    @Secured( { "GROUP_USER", "ACL_SECURABLE_EDIT" })
+    @Secured({ "GROUP_USER", "ACL_SECURABLE_EDIT" })
     public void addGroupAuthority( UserGroup group, String authority );
 
     /**
      * @param user
      * @param group
      */
-    @Secured( { "GROUP_USER", "ACL_SECURABLE_EDIT" /* this applies to the first arg only! - should use an expression */})
+    @Secured({ "GROUP_USER", "ACL_SECURABLE_EDIT" /* this applies to the first arg only! - should use an expression */})
     public void addUserToGroup( UserGroup group, User user );
 
     /**
@@ -50,14 +50,14 @@ public interface UserService {
      * @return
      * @throws UserExistsException
      */
-    @Secured( { "GROUP_ADMIN" })
+    @Secured({ "GROUP_ADMIN" })
     public User create( User user ) throws UserExistsException;
 
     /**
      * @param group
      * @return
      */
-    @Secured( { "GROUP_USER" })
+    @Secured({ "GROUP_USER" })
     public UserGroup create( UserGroup group );
 
     /**
@@ -65,15 +65,15 @@ public interface UserService {
      * 
      * @param user
      */
-    @Secured( { "GROUP_ADMIN" })
+    @Secured({ "GROUP_ADMIN" })
     public void delete( User user );
-    
+
     /**
      * Remove a user from the persistent store.
      * 
      * @param user
      */
-    @Secured( { "GROUP_ADMIN" })
+    @Secured({ "GROUP_ADMIN" })
     public void deleteByUserName( String userName );
 
     /**
@@ -81,13 +81,13 @@ public interface UserService {
      * 
      * @param group
      */
-    @Secured( { "GROUP_USER", "ACL_SECURABLE_EDIT" })
+    @Secured({ "GROUP_USER", "ACL_SECURABLE_EDIT" })
     public void delete( UserGroup group );
 
     /**
      * 
      */
-    @Secured( { "GROUP_USER", "AFTER_ACL_READ" })
+    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
     public User findByEmail( java.lang.String email );
 
     /**
@@ -102,7 +102,7 @@ public interface UserService {
      * @param oldName
      * @return
      */
-    @Secured( { "GROUP_USER", "AFTER_ACL_READ" })
+    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
     public UserGroup findGroupByName( String name );
 
     @Secured("GROUP_USER")
@@ -112,26 +112,26 @@ public interface UserService {
      * @param usernName
      * @return
      */
-    @Secured( { "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<UserGroup> findGroupsForUser( User user );
 
     /**
      * A list of groups available (will be security-filtered)...might need to allow anonymous.
      */
-    @Secured( { "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<UserGroup> listAvailableGroups();
 
     /**
      * @param id
      * @return
      */
-    @Secured( { "GROUP_USER", "AFTER_ACL_READ" })
+    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
     public User load( java.lang.Long id );
 
     /**
      * Retrieves a list of users
      */
-    @Secured( { "GROUP_ADMIN" })
+    @Secured({ "GROUP_ADMIN" })
     public Collection<User> loadAll();
 
     /**
@@ -146,7 +146,7 @@ public interface UserService {
      * @param group
      * @param authority
      */
-    @Secured( { "GROUP_ADMIN" })
+    @Secured({ "GROUP_ADMIN" })
     public void removeGroupAuthority( UserGroup group, String authority );
 
     /**
@@ -159,16 +159,16 @@ public interface UserService {
     /**
      * @param user
      */
-    @Secured( { "GROUP_USER", "ACL_SECURABLE_EDIT" })
+    @Secured({ "GROUP_USER", "ACL_SECURABLE_EDIT" })
     public void update( User user );
-    
-    @Secured( { "GROUP_ADMIN" })
+
+    @Secured({ "GROUP_ADMIN" })
     public void adminUpdate( User user );
 
     /**
      * @param group
      */
-    @Secured( { "GROUP_USER", "ACL_SECURABLE_EDIT" })
+    @Secured({ "GROUP_USER", "ACL_SECURABLE_EDIT" })
     public void update( UserGroup group );
 
 }

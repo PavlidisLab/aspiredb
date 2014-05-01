@@ -16,7 +16,6 @@ package ubc.pavlab.aspiredb.server.model;
 
 import java.io.Serializable;
 
-
 /**
  * TODO Document Me. This might need to be changed to VariantType and include CNVs, SNVs etc.
  * 

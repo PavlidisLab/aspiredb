@@ -72,8 +72,6 @@ import ubc.pavlab.aspiredb.shared.query.GenomicRangeDataType;
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
-import ubc.pavlab.aspiredb.shared.query.restriction.Conjunction;
-import ubc.pavlab.aspiredb.shared.query.restriction.Disjunction;
 import ubc.pavlab.aspiredb.shared.query.restriction.SetRestriction;
 
 /**
@@ -183,12 +181,11 @@ public class ProjectManagerImpl implements ProjectManager {
     public void addSubjectVariantsToSpecialProject( String projectName, boolean deleteProject,
             List<VariantValueObject> voList, boolean existingProject ) throws Exception {
 
-        Project proj= null;
-        
-        if (!existingProject){        
-            proj = createSpecialProject( projectName, deleteProject );        
-        }        
-        else{
+        Project proj = null;
+
+        if ( !existingProject ) {
+            proj = createSpecialProject( projectName, deleteProject );
+        } else {
             proj = projectDao.findByProjectName( projectName );
         }
 
@@ -240,8 +237,8 @@ public class ProjectManagerImpl implements ProjectManager {
             }
 
             counter++;
-            
-            if (counter%500==0){
+
+            if ( counter % 500 == 0 ) {
                 log.info( "Added " + counter + " variant" );
             }
         }
@@ -710,16 +707,16 @@ public class ProjectManagerImpl implements ProjectManager {
                     // set the percentage overlap of the OverlapSpecialVariantId-variant, I realize that these method
                     // and variable names kind of suck
                     overlapInfo.setOverlappedOverlapPercentage( Math.round( vvoOverlappedPercentageOverlap ) );
-                    
+
                     overlapInfo.setVariantId( vvo.getId() );
                     overlapInfo.setOverlapSpecialVariantId( vvoOverlapped.getId() );
                     overlapInfo.setOverlapProjectId( specialProject.getId() );
                     overlapInfo.setProjectId( projectToPopulate.getId() );
 
                     variant2SpecialVariantOverlapDao.create( overlapInfo );
-                    
+
                 } else {
-                    log.info( "No Overlap" );                    
+                    log.info( "No Overlap" );
                 }
 
             }

@@ -18,40 +18,41 @@
  */
 package ubc.pavlab.aspiredb.server;
 
-import org.directwebremoting.annotations.RemoteMethod;
-import org.directwebremoting.annotations.RemoteProxy;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import ubc.pavlab.aspiredb.server.service.ChromosomeService;
-import ubc.pavlab.aspiredb.shared.ChromosomeValueObject;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import org.directwebremoting.annotations.RemoteMethod;
+import org.directwebremoting.annotations.RemoteProxy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import ubc.pavlab.aspiredb.server.service.ChromosomeService;
+import ubc.pavlab.aspiredb.shared.ChromosomeValueObject;
+
 /**
- * author: anton
- * date: 19/02/13
+ * author: anton date: 19/02/13
  */
-@RemoteProxy(name="ChromosomeService")
+@RemoteProxy(name = "ChromosomeService")
 @Service("chromosomeService")
 public class ChromosomeServiceImpl implements ChromosomeService {
 
-    @Autowired private GenomeCoordinateConverter genomeCoordinateConverter;
+    @Autowired
+    private GenomeCoordinateConverter genomeCoordinateConverter;
 
     @RemoteMethod
     @Override
     public Map<String, ChromosomeValueObject> getChromosomes() {
-        Map<String,Chromosome> chromosomes = genomeCoordinateConverter.getChromosomes();
-        Map<String,ChromosomeValueObject> chromosomeVOs = new HashMap<String, ChromosomeValueObject>();
-        for (Chromosome chromosome : chromosomes.values() ) {
+        Map<String, Chromosome> chromosomes = genomeCoordinateConverter.getChromosomes();
+        Map<String, ChromosomeValueObject> chromosomeVOs = new HashMap<String, ChromosomeValueObject>();
+        for ( Chromosome chromosome : chromosomes.values() ) {
             ChromosomeValueObject chromosomeValueObject = convert( chromosome );
-            chromosomeVOs.put(chromosomeValueObject.getName(), chromosomeValueObject);
+            chromosomeVOs.put( chromosomeValueObject.getName(), chromosomeValueObject );
         }
         return chromosomeVOs;
     }
 
-    private ChromosomeValueObject convert(Chromosome chromosome) {
-        return new ChromosomeValueObject( chromosome.getName(), chromosome.getBands(), chromosome.getSize(), chromosome.getCentromereLocation() );
+    private ChromosomeValueObject convert( Chromosome chromosome ) {
+        return new ChromosomeValueObject( chromosome.getName(), chromosome.getBands(), chromosome.getSize(),
+                chromosome.getCentromereLocation() );
     }
 }

@@ -19,41 +19,37 @@ import java.util.Collection;
 import org.directwebremoting.annotations.DataTransferObject;
 
 import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
-import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
-import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 
 @DataTransferObject(javascript = "ProjectOverlapFilterConfig")
 public class ProjectOverlapFilterConfig extends CompoundRestrictionFilterConfig {
-	
-	
-	
-	/**
+
+    /**
      * 
      */
     private static final long serialVersionUID = 6091780632280417499L;
-    //the 'active projects'
-	private Collection<Long> projectIds;
-	//the projects that you want to search for overlap
-	private Collection<Long> overlapProjectIds;
-	
-	public Boolean invert;
-	
-	private PhenotypeRestriction phenotypeRestriction;
-					
-	public ProjectOverlapFilterConfig() {
-	}
+    // the 'active projects'
+    private Collection<Long> projectIds;
+    // the projects that you want to search for overlap
+    private Collection<Long> overlapProjectIds;
 
-	public ProjectOverlapFilterConfig(Collection<Long> specialProjects) {
-		this.projectIds = specialProjects;
-	}
+    public Boolean invert;
 
-	public Collection<Long> getProjectIds() {
-		return projectIds;
-	}
-	
-	public void setProjectIds ( Collection<Long> projectIds ) {
-		this.projectIds = projectIds;
-	}
+    private PhenotypeRestriction phenotypeRestriction;
+
+    public ProjectOverlapFilterConfig() {
+    }
+
+    public ProjectOverlapFilterConfig( Collection<Long> specialProjects ) {
+        this.projectIds = specialProjects;
+    }
+
+    public Collection<Long> getProjectIds() {
+        return projectIds;
+    }
+
+    public void setProjectIds( Collection<Long> projectIds ) {
+        this.projectIds = projectIds;
+    }
 
     public Collection<Long> getOverlapProjectIds() {
         return overlapProjectIds;
@@ -61,7 +57,7 @@ public class ProjectOverlapFilterConfig extends CompoundRestrictionFilterConfig 
 
     public void setOverlapProjectIds( Collection<Long> overlapProjectIds ) {
         this.overlapProjectIds = overlapProjectIds;
-    }   
+    }
 
     public PhenotypeRestriction getPhenotypeRestriction() {
         return phenotypeRestriction;
@@ -79,6 +75,4 @@ public class ProjectOverlapFilterConfig extends CompoundRestrictionFilterConfig 
         this.invert = invert;
     }
 
-    
-    
 }

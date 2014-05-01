@@ -19,7 +19,6 @@
 package ubc.pavlab.aspiredb.server.dao;
 
 import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -48,8 +47,7 @@ import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
 
 /**
- * author: anton
- * date: 21/05/13
+ * author: anton date: 21/05/13
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 public class VariantDaoTest extends BaseSpringContextTest {
@@ -78,13 +76,13 @@ public class VariantDaoTest extends BaseSpringContextTest {
         new InlineTransaction() {
             @Override
             public void instructions() {
-                subject = testObjectHelper.createPersistentTestIndividualObject("testPatientId");
+                subject = testObjectHelper.createPersistentTestIndividualObject( "testPatientId" );
                 cnv = testObjectHelper.createPersistentTestCNVObject();
                 cnv.setSubject( subject );
-                label = labelDao.findOrCreate(new LabelValueObject("CNV_TEST_LABEL"));
-                
-                   variantService.addLabel(cnv.getId(), new LabelValueObject(label.getId(), "CNV_TEST_LABEL"));
-                
+                label = labelDao.findOrCreate( new LabelValueObject( "CNV_TEST_LABEL" ) );
+
+                variantService.addLabel( cnv.getId(), new LabelValueObject( label.getId(), "CNV_TEST_LABEL" ) );
+
             }
         }.execute();
     }
@@ -94,9 +92,9 @@ public class VariantDaoTest extends BaseSpringContextTest {
         new InlineTransaction() {
             @Override
             public void instructions() {
-                variantDao.remove(cnv);
-                subjectDao.remove(subject);
-                labelDao.remove(label);
+                variantDao.remove( cnv );
+                subjectDao.remove( subject );
+                labelDao.remove( label );
             }
         }.execute();
     }
@@ -108,18 +106,18 @@ public class VariantDaoTest extends BaseSpringContextTest {
 
     @Test
     public void testSuggestValuesForEntityProperty() throws Exception {
-//        final Property cnvTypeProperty = new CNVTypeProperty();
-//        final SuggestionContext suggestionContext = new SuggestionContext();
-//        suggestionContext.setValuePrefix("LOS");
-//
-//        new InlineTransaction() {
-//            @Override
-//            public void instructions() {
-//                Collection<String> values = variantDao.suggestValuesForEntityProperty(cnvTypeProperty, suggestionContext);
-//                assertEquals(values.size(), 1);
-//                assertEquals(values.iterator().next(), "LOSS");
-//            }
-//        }.execute();
+        // final Property cnvTypeProperty = new CNVTypeProperty();
+        // final SuggestionContext suggestionContext = new SuggestionContext();
+        // suggestionContext.setValuePrefix("LOS");
+        //
+        // new InlineTransaction() {
+        // @Override
+        // public void instructions() {
+        // Collection<String> values = variantDao.suggestValuesForEntityProperty(cnvTypeProperty, suggestionContext);
+        // assertEquals(values.size(), 1);
+        // assertEquals(values.iterator().next(), "LOSS");
+        // }
+        // }.execute();
     }
 
     @Test
@@ -130,34 +128,35 @@ public class VariantDaoTest extends BaseSpringContextTest {
     @Test
     public void testLoad() throws Exception {
         final Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
-        filters.add(new VariantFilterConfig( QueryTestUtils.makeTestVariantRestrictionExpression(label.getId())) );
+        filters.add( new VariantFilterConfig( QueryTestUtils.makeTestVariantRestrictionExpression( label.getId() ) ) );
         new InlineTransaction() {
             @Override
             public void instructions() {
                 Collection<? extends Variant> variants = null;
                 try {
-                    variants = variantDao.load(filters);
-                } catch (BioMartServiceException e) {
-                } catch (NeurocartaServiceException e) {
+                    variants = variantDao.load( filters );
+                } catch ( BioMartServiceException e ) {
+                } catch ( NeurocartaServiceException e ) {
                 }
 
-                assertTrue(variants.size() == 1);
+                assertTrue( variants.size() == 1 );
             }
         }.execute();
 
         filters.clear();
-        filters.add(new VariantFilterConfig( QueryTestUtils.makeTestVariantRestrictionExpressionWithSets(label.getId())) );
+        filters.add( new VariantFilterConfig( QueryTestUtils.makeTestVariantRestrictionExpressionWithSets( label
+                .getId() ) ) );
         new InlineTransaction() {
             @Override
             public void instructions() {
                 Collection<? extends Variant> variants = null;
                 try {
-                    variants = variantDao.load(filters);
-                } catch (BioMartServiceException e) {
-                } catch (NeurocartaServiceException e) {
+                    variants = variantDao.load( filters );
+                } catch ( BioMartServiceException e ) {
+                } catch ( NeurocartaServiceException e ) {
                 }
 
-                assertTrue(variants.size() == 1);
+                assertTrue( variants.size() == 1 );
             }
         }.execute();
     }

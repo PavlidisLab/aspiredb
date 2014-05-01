@@ -21,19 +21,17 @@ import org.springframework.security.acls.domain.AuditLogger;
 import org.springframework.security.acls.model.AccessControlEntry;
 import org.springframework.security.acls.model.AuditableAccessControlEntry;
 
-
 /**
  * Wire into the {@link org.springframework.security.acls.jdbc.LookupStrategy} to enable logging of object access.
  * modified from Gemma
+ * 
  * @author paul
- * 
- * 
  */
 public class AclAuditLogger implements AuditLogger {
 
     private static Log log = LogFactory.getLog( AclAuditLogger.class );
 
-    //private static boolean needToLog = ConfigUtils.getBoolean( "gemma.acl.audit" );
+    // private static boolean needToLog = ConfigUtils.getBoolean( "gemma.acl.audit" );
     private static boolean needToLog = true;
 
     @Override

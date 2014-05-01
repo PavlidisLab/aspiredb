@@ -18,21 +18,21 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
+import java.util.List;
+
 import org.springframework.security.access.annotation.Secured;
 
-import ubc.pavlab.aspiredb.server.model.Query;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
-
-import java.util.List;
 
 /**
  * User gene Set interface to access the User Gene Set model
- * @author: Gaya Charath 
+ * 
+ * @author: Gaya Charath
  * @since: 11/03/14
  */
 public interface UserGeneSetDao extends SecurableDaoBase<UserGeneSet> {
 
-    @Secured({"GROUP_USER","AFTER_ACL_COLLECTION_READ"})
-    public List<UserGeneSet> findByName(String geneSetName);
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    public List<UserGeneSet> findByName( String geneSetName );
 
 }

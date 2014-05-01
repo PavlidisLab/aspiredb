@@ -15,10 +15,14 @@
 
 package ubc.pavlab.aspiredb.server.ontology;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Component;
+
 import ubic.basecode.ontology.model.OntologyIndividual;
 import ubic.basecode.ontology.model.OntologyResource;
 import ubic.basecode.ontology.model.OntologyTerm;
@@ -26,9 +30,6 @@ import ubic.basecode.ontology.providers.AbstractOntologyService;
 import ubic.basecode.ontology.providers.DiseaseOntologyService;
 import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
 import ubic.basecode.ontology.search.OntologySearch;
-
-import java.util.Collection;
-import java.util.HashSet;
 
 /**
  * Has a static method for finding out which ontologies are loaded into the system and a general purpose find method

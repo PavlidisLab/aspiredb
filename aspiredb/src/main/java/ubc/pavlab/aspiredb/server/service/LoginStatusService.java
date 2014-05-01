@@ -14,7 +14,6 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-
 /**
  * TODO Document Me
  * 
@@ -24,8 +23,8 @@ package ubc.pavlab.aspiredb.server.service;
 public interface LoginStatusService {
 
     public Boolean isLoggedIn();
-    
+
     public Boolean isUserAdministrator();
-    
+
     public String getCurrentUsername();
 }

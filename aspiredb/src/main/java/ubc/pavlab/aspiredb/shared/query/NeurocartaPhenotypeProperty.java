@@ -18,13 +18,12 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 import java.util.Arrays;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
- * author: anton
- * date: 24/05/13
+ * author: anton date: 24/05/13
  */
 @DataTransferObject(javascript = "NeurocartaPhenotypeProperty")
 public class NeurocartaPhenotypeProperty extends Property<GenomicRangeDataType> {
@@ -34,7 +33,7 @@ public class NeurocartaPhenotypeProperty extends Property<GenomicRangeDataType> 
         this.dataType = new GenomicRangeDataType();
         this.displayName = "Phenocarta Phenotype";
         this.exampleValues = "Examples: <b>autism spectrum disorder</b>, <b>colon cancer</b>";
-        this.operators = Arrays.asList(Operator.IS_IN_SET, Operator.IS_NOT_IN_SET);
+        this.operators = Arrays.asList( Operator.IS_IN_SET, Operator.IS_NOT_IN_SET );
         this.supportsSuggestions = true;
     }
 }

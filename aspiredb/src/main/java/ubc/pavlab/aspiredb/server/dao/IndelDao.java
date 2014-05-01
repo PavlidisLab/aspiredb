@@ -24,8 +24,7 @@ import ubc.pavlab.aspiredb.server.model.Indel;
  */
 public interface IndelDao extends VariantDaoBase<Indel>, RemotePaging<Indel> {
     /*
-    TODO add Indel specific methods
-    
-    */
+     * TODO add Indel specific methods
+     */
 
 }

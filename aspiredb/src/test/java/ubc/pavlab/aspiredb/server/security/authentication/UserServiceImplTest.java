@@ -31,8 +31,6 @@ import ubc.pavlab.aspiredb.server.dao.UserGroupDao;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 
-
-
 /**
  * @author pavlidis
  * @version $Id: UserServiceImplTest.java,v 1.1 2012/09/10 20:33:28 cmcdonald Exp $
@@ -54,7 +52,7 @@ public class UserServiceImplTest {
         UserGroupDao userGroupDaoMock = createMock( UserGroupDao.class );
         userService.userGroupDao = userGroupDaoMock;
         testUser.setEmail( "foo@bar" );
-        testUser.setFirstName( "Foo" );        
+        testUser.setFirstName( "Foo" );
         testUser.setLastName( "Bar" );
         testUser.setUserName( "foobar" );
         testUser.setPassword( "aija" );

@@ -19,8 +19,7 @@
 package ubc.pavlab.aspiredb.server.exceptions;
 
 /**
- * author: anton
- * date: 02/05/13
+ * author: anton date: 02/05/13
  */
 public class ExternalDependencyException extends Exception {
 
@@ -29,7 +28,7 @@ public class ExternalDependencyException extends Exception {
     ExternalDependencyException() {
     }
 
-    ExternalDependencyException (String message) {
-        super(message);
+    ExternalDependencyException( String message ) {
+        super( message );
     }
 }

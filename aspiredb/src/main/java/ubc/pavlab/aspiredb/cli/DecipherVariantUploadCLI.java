@@ -14,6 +14,11 @@
  */
 package ubc.pavlab.aspiredb.cli;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.log4j.ConsoleAppender;
@@ -21,26 +26,16 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.springframework.beans.factory.BeanFactory;
+
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadServiceResult;
-import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
-import ubc.pavlab.aspiredb.shared.VariantType;
-import ubc.pavlab.aspiredb.shared.VariantValueObject;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
+ * modified VariantUploadCLI hack for unfortunately formatted file(since modified) that we got from DECIPHER not
+ * intended to be used for anything other than that file
  * 
- * modified VariantUploadCLI hack for unfortunately formatted file(since modified) that we got from DECIPHER
- * not intended to be used for anything other than that file
- *  
  * @version $Id: DecipherVariantUploadCLI.java
  */
 public class DecipherVariantUploadCLI extends AbstractCLI {
@@ -52,15 +47,14 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
 
     private String filename = "";
     private String projectName = "";
-   
 
     private boolean deleteProject = true;
 
     private boolean dryRun = false;
 
     private static BeanFactory applicationContext;
-    
-    public String getLogger(){
+
+    public String getLogger() {
         return "ubc.pavlab.aspiredb.cli.DecipherVariantUploadCLI";
     }
 
@@ -102,21 +96,19 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
 
         Option f = OptionBuilder.isRequired().hasArg().withArgName( "File name" ).withDescription( "The file to parse" )
                 .withLongOpt( "filename" ).create( 'f' );
-        
-        //Decipher will reside in a 'Special project' and are all CNVs
+
+        // Decipher will reside in a 'Special project' and are all CNVs
         /*
-        Option variantType = OptionBuilder.isRequired().hasArg().withArgName( "Variant Type" )
-                .withDescription( "The type of variant in this file, one of: CNV, Indel, SNV, Inversion" )
-                .create( "variant" );
-*/
+         * Option variantType = OptionBuilder.isRequired().hasArg().withArgName( "Variant Type" ) .withDescription(
+         * "The type of variant in this file, one of: CNV, Indel, SNV, Inversion" ) .create( "variant" );
+         */
         Option project = OptionBuilder
                 .isRequired()
                 .hasArg()
                 .withArgName( "Project name" )
                 .withDescription(
                         "The project where this data will reside. Project will be deleted if existingproject option is not specified,"
-                                + "Acceptable values = 'DECIPHER" )
-                .create( "project" );
+                                + "Acceptable values = 'DECIPHER" ).create( "project" );
 
         addOption( "existingproject", false, "You must use this option if you are adding to an existing project" );
 
@@ -124,11 +116,11 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
 
         addOption( d );
         addOption( f );
-        
+
         addOption( project );
 
     }
-    
+
     @Override
     protected void processOptions() {
         if ( this.hasOption( 'd' ) ) {
@@ -171,31 +163,32 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
 
             Statement stmt = conn.createStatement();
             ResultSet results = stmt.executeQuery( "SELECT * FROM " + filename );
-   
-            System.out.println("getting value objects");
-            VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromDecipherResultSet( results);
-            
-           
+
+            System.out.println( "getting value objects" );
+            VariantUploadServiceResult result = VariantUploadService
+                    .makeVariantValueObjectsFromDecipherResultSet( results );
+
             results.close();
             stmt.close();
             conn.close();
 
             if ( result.getErrorMessages().isEmpty() && !dryRun ) {
-                
-                System.out.println("inserting "+result.getVariantsToAdd().size()+" value objects into database");
-                
-                //should probably batch this up to speed it up a bit
-                
-                projectManager.addSubjectVariantsToSpecialProject( projectName, deleteProject, result.getVariantsToAdd(), false );
-               
-            } else if ( result.getErrorMessages().isEmpty()  ) {
+
+                System.out.println( "inserting " + result.getVariantsToAdd().size() + " value objects into database" );
+
+                // should probably batch this up to speed it up a bit
+
+                projectManager.addSubjectVariantsToSpecialProject( projectName, deleteProject,
+                        result.getVariantsToAdd(), false );
+
+            } else if ( result.getErrorMessages().isEmpty() ) {
                 System.out.println( "No errors are detected in your data file" );
 
             } else {
                 for ( String errorMessage : result.getErrorMessages() ) {
                     System.out.println( errorMessage );
                 }
-                
+
             }
 
         } catch ( Exception e ) {
@@ -204,14 +197,10 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
 
         return null;
     }
-    
-
-   
 
     @Override
     public String getShortDesc() {
         return "Upload a variant data file and create / assign it to a project";
     }
-
 
 }

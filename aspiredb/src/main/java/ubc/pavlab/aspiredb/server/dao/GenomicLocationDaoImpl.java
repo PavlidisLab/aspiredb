@@ -17,6 +17,7 @@ package ubc.pavlab.aspiredb.server.dao;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 import ubc.pavlab.aspiredb.server.model.GenomicLocation;
 
 /**

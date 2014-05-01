@@ -20,24 +20,20 @@ import org.directwebremoting.annotations.DataTransferObject;
 
 /**
  * TODO Document Me
- * 
- 
  * @version $Id: PhenotypeEnrichmentValueObject.java,v 1.2 2013/07/09 21:43:18 cmcdonald Exp $
  */
 
 @DataTransferObject
-public class PhenotypeEnrichmentValueObject implements Serializable{
+public class PhenotypeEnrichmentValueObject implements Serializable {
 
-    
     /**
-     * first pass at value object for phenotype enrichment, will change once the enrichment functionality becomes more clear
-     * a couple of these fields are probably unnecessary
-     * 
+     * first pass at value object for phenotype enrichment, will change once the enrichment functionality becomes more
+     * clear a couple of these fields are probably unnecessary
      */
     private static final long serialVersionUID = 1802977811089034726L;
-    
+
     private Long id;
-  
+
     private String uri;
     private String name;
     private Integer total;
@@ -61,14 +57,14 @@ public class PhenotypeEnrichmentValueObject implements Serializable{
         this.id = id;
     }
 
-	public String getUri() {
+    public String getUri() {
         return uri;
     }
 
     public void setUri( String uri ) {
         this.uri = uri;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -84,11 +80,11 @@ public class PhenotypeEnrichmentValueObject implements Serializable{
     public void setInGroupTotal( Integer inGroupTotal ) {
         this.inGroupTotal = inGroupTotal;
     }
- 
 
     public Integer getOutGroupTotal() {
         return outGroupTotal;
     }
+
     public String getInGroupTotalString() {
         return inGroupTotalString;
     }
@@ -124,17 +120,22 @@ public class PhenotypeEnrichmentValueObject implements Serializable{
     public void setOutGroupTotal( Integer outGroupTotal ) {
         this.outGroupTotal = outGroupTotal;
     }
+
     public Double getPValue() {
         return pValue;
     }
+
     public void setPValue( Double pValue ) {
         this.pValue = pValue;
-    } public Double getPValueCorrected() {
+    }
+
+    public Double getPValueCorrected() {
         return pValueCorrected;
-    }public void setPValueCorrected( Double pValueCorrected ) {
+    }
+
+    public void setPValueCorrected( Double pValueCorrected ) {
         this.pValueCorrected = pValueCorrected;
     }
-    
 
     public Integer getTotal() {
         return total;
@@ -144,5 +145,4 @@ public class PhenotypeEnrichmentValueObject implements Serializable{
         this.total = total;
     }
 
-    
 }

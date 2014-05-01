@@ -35,8 +35,6 @@ import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 
-
-
 /**
  * Test that we can log users in
  * 
@@ -52,7 +50,6 @@ public class PrincipalTest extends BaseSpringContextTest {
     @Autowired
     UserManager userManager;
 
-    
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -68,11 +65,10 @@ public class PrincipalTest extends BaseSpringContextTest {
         try {
             userManager.loadUserByUsername( username );
         } catch ( UsernameNotFoundException e ) {
-            
-            
+
             String encodedPassword = passwordEncoder.encodePassword( pwd, username );
-            UserDetailsImpl u = new UserDetailsImpl( encodedPassword, username, true, null, null, null, new Date() );           
-            
+            UserDetailsImpl u = new UserDetailsImpl( encodedPassword, username, true, null, null, null, new Date() );
+
             userManager.createUser( u );
         }
     }

@@ -18,13 +18,12 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 import java.util.Arrays;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
- * author: anton
- * date: 23/05/13
+ * author: anton date: 23/05/13
  */
 @DataTransferObject(javascript = "GenomicLocationProperty")
 public class GenomicLocationProperty extends Property<GenomicRangeDataType> {

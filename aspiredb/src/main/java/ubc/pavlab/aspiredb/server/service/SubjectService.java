@@ -18,22 +18,19 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
-import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
-import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
-import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
+import ubc.pavlab.aspiredb.shared.StringMatrix;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.PropertyValue;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
-import ubc.pavlab.aspiredb.shared.StringMatrix;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 /**
  * TODO Document Me
@@ -43,23 +40,25 @@ import java.util.Map;
  */
 public interface SubjectService {
 
-    public SubjectValueObject getSubject (Long projectId, Long subjectId );
-    public Collection<SubjectValueObject> getSubjects(Long projectId, List<Long> subjectId );
+    public SubjectValueObject getSubject( Long projectId, Long subjectId );
+
+    public Collection<SubjectValueObject> getSubjects( Long projectId, List<Long> subjectId );
 
     public Collection<Property> suggestProperties();
 
-    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext);
+    public Collection<PropertyValue> suggestValues( Property property, SuggestionContext suggestionContext );
 
     public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
-            throws  ExternalDependencyException;
-        
-    public Map<String,PhenotypeSummaryValueObject> getPhenotypeSummaryValueObjects( List<Long> subjectIds, Collection<Long> projectIds ) throws NeurocartaServiceException;
+            throws ExternalDependencyException;
+
+    public Map<String, PhenotypeSummaryValueObject> getPhenotypeSummaryValueObjects( List<Long> subjectIds,
+            Collection<Long> projectIds ) throws NeurocartaServiceException;
 
     public String getPhenotypeTextDownloadBySubjectIds( List<Long> subjectIds );
 
     /**
-     * Rownames are Subject.patientId (e.g. 03_01)
-     * Colnames are PhenotypeValueUri:Name (e.g. HP_0001000:Abnormality of skin pigmentation)
+     * Rownames are Subject.patientId (e.g. 03_01) Colnames are PhenotypeValueUri:Name (e.g. HP_0001000:Abnormality of
+     * skin pigmentation)
      * 
      * @param subjectIds
      * @param removeEmpty should Subjects with no phenotypes be excluded?
@@ -67,11 +66,11 @@ public interface SubjectService {
      */
     public StringMatrix<String, String> getPhenotypeBySubjectIds( Collection<Long> subjectIds, boolean removeEmpty );
 
-    public LabelValueObject addLabel(Collection<Long> subjectIds, LabelValueObject label) ;
+    public LabelValueObject addLabel( Collection<Long> subjectIds, LabelValueObject label );
 
-    public void removeLabel(Collection<Long> subjectIds, LabelValueObject label);
+    public void removeLabel( Collection<Long> subjectIds, LabelValueObject label );
 
-    public void removeLabel(Long subjectId, LabelValueObject label);
+    public void removeLabel( Long subjectId, LabelValueObject label );
 
-    public List<LabelValueObject> suggestLabels(SuggestionContext suggestionContext);
+    public List<LabelValueObject> suggestLabels( SuggestionContext suggestionContext );
 }

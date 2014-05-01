@@ -38,7 +38,6 @@ import ubc.pavlab.aspiredb.shared.query.restriction.Disjunction;
 import ubc.pavlab.aspiredb.shared.query.restriction.Junction;
 import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
 import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
-import ubic.basecode.ontology.model.OntologyIndividual;
 import ubic.basecode.ontology.model.OntologyResource;
 import ubic.basecode.ontology.model.OntologyTerm;
 import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;

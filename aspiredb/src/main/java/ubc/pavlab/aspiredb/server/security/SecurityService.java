@@ -15,17 +15,17 @@
 
 package ubc.pavlab.aspiredb.server.security;
 
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.acls.model.Sid;
-import org.springframework.transaction.annotation.Transactional;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
-import ubc.pavlab.aspiredb.server.util.AuthorityConstants;
-
 import java.util.Collection;
 import java.util.Map;
 
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.AuthorizationServiceException;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.acls.model.Sid;
+import org.springframework.transaction.annotation.Transactional;
 
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
+import ubc.pavlab.aspiredb.server.util.AuthorityConstants;
 
 /**
  * @author paul
@@ -207,13 +207,14 @@ public interface SecurityService {
 
     /**
      * @param s
-     * @return true if the owner is the same as the current authenticated user. Special case: if the owner is an administrator, and the uc
+     * @return true if the owner is the same as the current authenticated user. Special case: if the owner is an
+     *         administrator, and the uc
      */
     public abstract boolean isOwnedByCurrentUser( Securable s );
-    
+
     /**
-     * Convenience method to determine the visibility of an object.
-     * Even though in aspiredb all data should be private, leaving this in for testing purposes
+     * Convenience method to determine the visibility of an object. Even though in aspiredb all data should be private,
+     * leaving this in for testing purposes
      * 
      * @param s
      * @return true if anonymous users can view (READ) the object, false otherwise. If the object doesn't have an ACL,
@@ -223,13 +224,13 @@ public interface SecurityService {
     public abstract boolean isPrivate( Securable s );
 
     /**
-     * Convenience method to determine the visibility of an object.
-     * Even though in aspiredb all data should be private, leaving this in for testing purposes
+     * Convenience method to determine the visibility of an object. Even though in aspiredb all data should be private,
+     * leaving this in for testing purposes
+     * 
      * @param s
      * @return the negation of isPrivate().
      */
     public abstract boolean isPublic( Securable s );
-
 
     @Secured("ACL_SECURABLE_READ")
     public abstract boolean isReadableByGroup( Securable s, String groupName );

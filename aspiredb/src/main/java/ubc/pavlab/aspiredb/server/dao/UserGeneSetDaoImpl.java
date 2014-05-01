@@ -18,21 +18,20 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
+import java.util.List;
+
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import ubc.pavlab.aspiredb.server.model.Query;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
-
-import java.util.List;
 
 /**
  * User Gene Set Dao Implementation to access the User gene Set model
+ * 
  * @author: Gaya Charath
  * @since: 11/03/14
  */
@@ -40,16 +39,16 @@ import java.util.List;
 public class UserGeneSetDaoImpl extends SecurableDaoBaseImpl<UserGeneSet> implements UserGeneSetDao {
 
     @Autowired
-    public UserGeneSetDaoImpl(SessionFactory sessionFactory) {
-        super(UserGeneSet.class);
+    public UserGeneSetDaoImpl( SessionFactory sessionFactory ) {
+        super( UserGeneSet.class );
         super.setSessionFactory( sessionFactory );
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserGeneSet> findByName(String geneSetName) {
-        Criteria criteria = currentSession().createCriteria(UserGeneSet.class);
-        criteria.add(Restrictions.eq("name", geneSetName));
+    public List<UserGeneSet> findByName( String geneSetName ) {
+        Criteria criteria = currentSession().createCriteria( UserGeneSet.class );
+        criteria.add( Restrictions.eq( "name", geneSetName ) );
         return criteria.list();
     }
 }

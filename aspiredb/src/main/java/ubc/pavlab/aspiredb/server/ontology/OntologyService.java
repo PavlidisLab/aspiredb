@@ -15,14 +15,15 @@
 
 package ubc.pavlab.aspiredb.server.ontology;
 
+import java.util.Collection;
+
 import org.springframework.beans.factory.InitializingBean;
+
 import ubic.basecode.ontology.model.OntologyIndividual;
 import ubic.basecode.ontology.model.OntologyResource;
 import ubic.basecode.ontology.model.OntologyTerm;
 import ubic.basecode.ontology.providers.DiseaseOntologyService;
 import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
-
-import java.util.Collection;
 
 /**
  * @author paul
@@ -41,7 +42,6 @@ public interface OntologyService extends InitializingBean {
     public HumanPhenotypeOntologyService getHumanPhenotypeOntologyService();
 
     /**
-     *
      * @param givenSearch
      * @return
      */
@@ -55,7 +55,7 @@ public interface OntologyService extends InitializingBean {
      * @return returns a collection of ontologyTerm's
      */
     public Collection<OntologyTerm> findTerms( String search );
-    
+
     /**
      * @return the OntologyResource for the specified URI
      */

@@ -18,10 +18,9 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 import java.util.Arrays;
 
+import org.directwebremoting.annotations.DataTransferObject;
 
 @DataTransferObject(javascript = "ProjectOverlapNumericProperty")
 public class ProjectOverlapNumericProperty extends Property<NumericalDataType> {
@@ -33,11 +32,10 @@ public class ProjectOverlapNumericProperty extends Property<NumericalDataType> {
 
     public ProjectOverlapNumericProperty() {
         this.dataType = new NumericalDataType();
-        this.operators = Arrays.asList(
-                Operator.NUMERIC_LESS_OR_EQUAL,Operator.NUMERIC_GREATER_OR_EQUAL);
+        this.operators = Arrays.asList( Operator.NUMERIC_LESS_OR_EQUAL, Operator.NUMERIC_GREATER_OR_EQUAL );
     }
 
-    public ProjectOverlapNumericProperty(String displayName, String name) {
+    public ProjectOverlapNumericProperty( String displayName, String name ) {
         this();
         this.displayName = displayName;
         this.name = name;

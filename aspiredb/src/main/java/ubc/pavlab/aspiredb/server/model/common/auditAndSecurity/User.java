@@ -14,7 +14,11 @@
  */
 package ubc.pavlab.aspiredb.server.model.common.auditAndSecurity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * A user of the software system, who is authenticated. *

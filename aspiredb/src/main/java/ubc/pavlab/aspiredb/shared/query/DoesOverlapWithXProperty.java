@@ -20,12 +20,10 @@ package ubc.pavlab.aspiredb.shared.query;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
-
 @DataTransferObject(javascript = "DoesOverlapWithXProperty")
 public class DoesOverlapWithXProperty extends ProjectOverlapNumericProperty {
-    
-   
+
     public DoesOverlapWithXProperty() {
-        super("# of supporting variants", "doesoverlap");
+        super( "# of supporting variants", "doesoverlap" );
     }
 }

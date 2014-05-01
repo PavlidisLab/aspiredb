@@ -20,17 +20,15 @@ package ubc.pavlab.aspiredb.shared.query;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
-
 @DataTransferObject(javascript = "OverlapBasesProperty")
 public class OverlapBasesProperty extends ProjectOverlapNumericProperty {
-    
-   
+
     /**
      * 
      */
     private static final long serialVersionUID = -5424398761247895783L;
 
     public OverlapBasesProperty() {
-        super("base overlap", "basesoverlap");
+        super( "base overlap", "basesoverlap" );
     }
 }

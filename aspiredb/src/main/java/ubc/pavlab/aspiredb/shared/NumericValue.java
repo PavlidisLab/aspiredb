@@ -23,8 +23,7 @@ import java.io.Serializable;
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
- * author: anton
- * date: 11/06/13
+ * author: anton date: 11/06/13
  */
 @DataTransferObject(javascript = "NumericValue")
 public class NumericValue implements Serializable {
@@ -37,7 +36,7 @@ public class NumericValue implements Serializable {
     public NumericValue() {
     }
 
-    public NumericValue(Integer value) {
+    public NumericValue( Integer value ) {
         this.value = value;
     }
 
@@ -45,12 +44,12 @@ public class NumericValue implements Serializable {
         return value;
     }
 
-    public void setValue(Integer value) {
+    public void setValue( Integer value ) {
         this.value = value;
     }
 
     @Override
     public String toString() {
-        return String.valueOf(value);
+        return String.valueOf( value );
     }
 }

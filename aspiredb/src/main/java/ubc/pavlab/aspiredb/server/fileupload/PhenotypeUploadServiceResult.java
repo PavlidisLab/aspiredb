@@ -14,23 +14,22 @@
  */
 package ubc.pavlab.aspiredb.server.fileupload;
 
-import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
-import ubc.pavlab.aspiredb.shared.VariantValueObject;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
+
 public class PhenotypeUploadServiceResult {
 
-    public PhenotypeUploadServiceResult( ArrayList<PhenotypeValueObject> phenotypes, List<String> errors, HashSet<String> unmatchedStrings ) {
+    public PhenotypeUploadServiceResult( ArrayList<PhenotypeValueObject> phenotypes, List<String> errors,
+            HashSet<String> unmatchedStrings ) {
 
         phenotypesToAdd = phenotypes;
         errorMessages = errors;
         unmatched = unmatchedStrings;
 
     }
-    
 
     HashSet<String> unmatched = new HashSet<String>();
 

@@ -18,22 +18,18 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 /**
- * author: anton
- * date: 24/05/13
+ * author: anton date: 24/05/13
  */
 public enum SetOperator {
-    IS_IN("is in"),
-    IS_NOT_IN("is not in");
+    IS_IN("is in"), IS_NOT_IN("is not in");
 
     private String displayLabel;
 
     SetOperator() {
     }
 
-    SetOperator(String displayLabel) {
+    SetOperator( String displayLabel ) {
         this.displayLabel = displayLabel;
     }
 

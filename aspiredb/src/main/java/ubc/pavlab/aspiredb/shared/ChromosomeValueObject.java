@@ -18,25 +18,24 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 import java.io.Serializable;
 import java.util.Map;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
- * author: anton
- * date: 19/02/13
+ * author: anton date: 19/02/13
  */
 @DataTransferObject
 public class ChromosomeValueObject implements Serializable {
 
     private String name;
-    private Map<String,ChromosomeBand> bands;
+    private Map<String, ChromosomeBand> bands;
 
     private int baseSize;
     private int centromereLocation;
 
-    public ChromosomeValueObject(String name, Map<String, ChromosomeBand> bands, int baseSize, int centromereLocation) {
+    public ChromosomeValueObject( String name, Map<String, ChromosomeBand> bands, int baseSize, int centromereLocation ) {
         this.name = name;
         this.bands = bands;
         this.baseSize = baseSize;
@@ -50,7 +49,7 @@ public class ChromosomeValueObject implements Serializable {
         return name;
     }
 
-    public Map<String,ChromosomeBand> getBands() {
+    public Map<String, ChromosomeBand> getBands() {
         return bands;
     }
 
@@ -62,10 +61,10 @@ public class ChromosomeValueObject implements Serializable {
         return centromereLocation;
     }
 
-    //TODO: performance can be improved
-    public String getBandName(int startBase) {
-        for (ChromosomeBand band : bands.values()) {
-            if (band.getStart() < startBase && band.getEnd() > startBase) {
+    // TODO: performance can be improved
+    public String getBandName( int startBase ) {
+        for ( ChromosomeBand band : bands.values() ) {
+            if ( band.getStart() < startBase && band.getEnd() > startBase ) {
                 return band.getName();
             }
         }

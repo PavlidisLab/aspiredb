@@ -15,14 +15,14 @@
 
 package ubc.pavlab.aspiredb.server.security.authentication;
 
+import java.util.Collection;
+
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.GroupManager;
 import org.springframework.security.provisioning.UserDetailsManager;
+
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
-
-import java.util.Collection;
-
 
 /**
  * @author paul
@@ -38,7 +38,7 @@ public interface UserManager extends UserDetailsManager, GroupManager {
      * @return the confirmation token they will need to use.
      */
     public String changePasswordForUser( String email, String username, String newPassword );
-    
+
     public void changePasswordForUser( String username, String newPassword );
 
     /**
@@ -142,9 +142,7 @@ public interface UserManager extends UserDetailsManager, GroupManager {
      * @return true if okay, false otherwise
      */
     public boolean validateSignupToken( String username, String key );
-    
-    public void deleteByUserName(String username);
-    
-    
+
+    public void deleteByUserName( String username );
 
 }

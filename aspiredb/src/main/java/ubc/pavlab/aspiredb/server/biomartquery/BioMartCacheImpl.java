@@ -14,16 +14,19 @@
  */
 package ubc.pavlab.aspiredb.server.biomartquery;
 
-import net.sf.ehcache.search.Attribute;
-import net.sf.ehcache.search.expression.Criteria;
-import org.springframework.stereotype.Component;
-import ubc.pavlab.aspiredb.server.util.SearchableEhcache;
-import ubc.pavlab.aspiredb.shared.GeneValueObject;
-
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import javax.annotation.PostConstruct;
+
+import net.sf.ehcache.search.Attribute;
+import net.sf.ehcache.search.expression.Criteria;
+
+import org.springframework.stereotype.Component;
+
+import ubc.pavlab.aspiredb.server.util.SearchableEhcache;
+import ubc.pavlab.aspiredb.shared.GeneValueObject;
 
 /**
  * BioMart cache imlementation
@@ -33,7 +36,7 @@ import java.util.List;
  */
 @Component
 public class BioMartCacheImpl extends SearchableEhcache<GeneValueObject> implements BioMartCache {
-	// These constants are used in ehcache.xml. If they are changed, ehcache.xml must be modified. 
+    // These constants are used in ehcache.xml. If they are changed, ehcache.xml must be modified.
     private static final String CACHE_NAME = "BioMartCache";
     private static final String GENE_ENSEMBL_ID_SEARCH_ATTRIBUTE_NAME = "ensemblId";
     private static final String GENE_NAME_SEARCH_ATTRIBUTE_NAME = "name";
@@ -43,85 +46,82 @@ public class BioMartCacheImpl extends SearchableEhcache<GeneValueObject> impleme
     private static final String END_SEARCH_ATTRIBUTE_NAME = "genomicRangeEnd";
 
     private Attribute<Object> geneEnsemblIdAttribute;
-	private Attribute<Object> geneNameAttribute;
-	private Attribute<Object> geneSymbolAttribute;
-	private Attribute<Object> chromosomeAttribute;
-	private Attribute<Object> startAttribute;
-	private Attribute<Object> endAttribute;
+    private Attribute<Object> geneNameAttribute;
+    private Attribute<Object> geneSymbolAttribute;
+    private Attribute<Object> chromosomeAttribute;
+    private Attribute<Object> startAttribute;
+    private Attribute<Object> endAttribute;
 
-	@SuppressWarnings("unused")
-	@PostConstruct
-	private void initialize() {
-		geneEnsemblIdAttribute = getSearchAttribute(GENE_ENSEMBL_ID_SEARCH_ATTRIBUTE_NAME);
-		geneNameAttribute = getSearchAttribute(GENE_NAME_SEARCH_ATTRIBUTE_NAME);
-		geneSymbolAttribute = getSearchAttribute(GENE_SYMBOL_SEARCH_ATTRIBUTE_NAME);
-		chromosomeAttribute = getSearchAttribute(CHROMOSOME_SEARCH_ATTRIBUTE_NAME);
-		startAttribute = getSearchAttribute(START_SEARCH_ATTRIBUTE_NAME);
-		endAttribute = getSearchAttribute(END_SEARCH_ATTRIBUTE_NAME);
-	}
+    @SuppressWarnings("unused")
+    @PostConstruct
+    private void initialize() {
+        geneEnsemblIdAttribute = getSearchAttribute( GENE_ENSEMBL_ID_SEARCH_ATTRIBUTE_NAME );
+        geneNameAttribute = getSearchAttribute( GENE_NAME_SEARCH_ATTRIBUTE_NAME );
+        geneSymbolAttribute = getSearchAttribute( GENE_SYMBOL_SEARCH_ATTRIBUTE_NAME );
+        chromosomeAttribute = getSearchAttribute( CHROMOSOME_SEARCH_ATTRIBUTE_NAME );
+        startAttribute = getSearchAttribute( START_SEARCH_ATTRIBUTE_NAME );
+        endAttribute = getSearchAttribute( END_SEARCH_ATTRIBUTE_NAME );
+    }
 
-	@Override
-	public Object getKey(GeneValueObject gene) {
-		return gene.getEnsemblId();
-	}
+    @Override
+    public Object getKey( GeneValueObject gene ) {
+        return gene.getEnsemblId();
+    }
 
-	@Override
-	public String getCacheName() {
-		return CACHE_NAME;
-	}
-	
-	@Override
-	public Collection<GeneValueObject> findGenes(String queryString) {
-		String regexQueryString = "*" + queryString + "*";
-	
-		Criteria nameCriteria = geneNameAttribute.ilike(regexQueryString);
-		Criteria symbolCriteria = geneSymbolAttribute.ilike(regexQueryString);
-		
-		return fetchByCriteria(nameCriteria.or(symbolCriteria));
-	}
+    @Override
+    public String getCacheName() {
+        return CACHE_NAME;
+    }
 
-	@Override
-	public List<GeneValueObject> getGenes(List<String> geneStrings) {
-		List<GeneValueObject> genes = new ArrayList<GeneValueObject>(geneStrings.size());
-		
-		for (String geneString: geneStrings) {
-			Criteria symbolCriteria = geneSymbolAttribute.ilike(geneString);
-			Criteria ensemblIdCriteria = geneEnsemblIdAttribute.ilike(geneString);
-			Collection<GeneValueObject> fetchedGenes = fetchByCriteria(symbolCriteria.or(ensemblIdCriteria));
-			if (fetchedGenes.size() > 0) {
-				// Only use the first gene.
-				genes.add(fetchedGenes.iterator().next());
-			} else {
-				genes.add(null);
-			}
-		}
-		
-		return genes;
-	}
+    @Override
+    public Collection<GeneValueObject> findGenes( String queryString ) {
+        String regexQueryString = "*" + queryString + "*";
 
-	@Override
-	public Collection<GeneValueObject> fetchGenesByLocation( String chromosomeName, Long start, Long end ) {
-		Criteria chromosomeCriteria = chromosomeAttribute.eq(chromosomeName);
-        Criteria insideVariant = startAttribute.between(start.intValue(), end.intValue())
-                .or(endAttribute.between(start.intValue(), end.intValue()));
-        Criteria overlapsStart = startAttribute.le(start.intValue()).and(endAttribute.ge(start.intValue()));
-        Criteria overlapsEnd = startAttribute.le(end.intValue()).and(endAttribute.ge(end.intValue()));
+        Criteria nameCriteria = geneNameAttribute.ilike( regexQueryString );
+        Criteria symbolCriteria = geneSymbolAttribute.ilike( regexQueryString );
 
-        Criteria hasName = geneSymbolAttribute.ne("");
+        return fetchByCriteria( nameCriteria.or( symbolCriteria ) );
+    }
 
-        final Collection<GeneValueObject> geneValueObjects = fetchByCriteria(hasName.and(
-                                                                chromosomeCriteria
-                                                                    .and( insideVariant
-                                                                        .or( overlapsStart )
-                                                                        .or( overlapsEnd ))));
+    @Override
+    public List<GeneValueObject> getGenes( List<String> geneStrings ) {
+        List<GeneValueObject> genes = new ArrayList<GeneValueObject>( geneStrings.size() );
+
+        for ( String geneString : geneStrings ) {
+            Criteria symbolCriteria = geneSymbolAttribute.ilike( geneString );
+            Criteria ensemblIdCriteria = geneEnsemblIdAttribute.ilike( geneString );
+            Collection<GeneValueObject> fetchedGenes = fetchByCriteria( symbolCriteria.or( ensemblIdCriteria ) );
+            if ( fetchedGenes.size() > 0 ) {
+                // Only use the first gene.
+                genes.add( fetchedGenes.iterator().next() );
+            } else {
+                genes.add( null );
+            }
+        }
+
+        return genes;
+    }
+
+    @Override
+    public Collection<GeneValueObject> fetchGenesByLocation( String chromosomeName, Long start, Long end ) {
+        Criteria chromosomeCriteria = chromosomeAttribute.eq( chromosomeName );
+        Criteria insideVariant = startAttribute.between( start.intValue(), end.intValue() ).or(
+                endAttribute.between( start.intValue(), end.intValue() ) );
+        Criteria overlapsStart = startAttribute.le( start.intValue() ).and( endAttribute.ge( start.intValue() ) );
+        Criteria overlapsEnd = startAttribute.le( end.intValue() ).and( endAttribute.ge( end.intValue() ) );
+
+        Criteria hasName = geneSymbolAttribute.ne( "" );
+
+        final Collection<GeneValueObject> geneValueObjects = fetchByCriteria( hasName.and( chromosomeCriteria
+                .and( insideVariant.or( overlapsStart ).or( overlapsEnd ) ) ) );
 
         return geneValueObjects;
     }
 
-	@Override
-	public Collection<GeneValueObject> fetchGenesByGeneSymbols(Collection<String> geneSymbols) {
-    	Criteria symbolCriteria = geneSymbolAttribute.in(geneSymbols);
+    @Override
+    public Collection<GeneValueObject> fetchGenesByGeneSymbols( Collection<String> geneSymbols ) {
+        Criteria symbolCriteria = geneSymbolAttribute.in( geneSymbols );
 
-    	return fetchByCriteria(symbolCriteria);
-	}
+        return fetchByCriteria( symbolCriteria );
+    }
 }

@@ -18,13 +18,12 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 import java.io.Serializable;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
- * author: anton
- * date: 19/02/13
+ * author: anton date: 19/02/13
  */
 @DataTransferObject
 public class ChromosomeBand implements Serializable {
@@ -33,9 +32,10 @@ public class ChromosomeBand implements Serializable {
     private String name;
     private String staining;
 
-    public ChromosomeBand(){};
+    public ChromosomeBand() {
+    };
 
-    public ChromosomeBand(int start, int end, String name, String staining) {
+    public ChromosomeBand( int start, int end, String name, String staining ) {
         this.start = start;
         this.end = end;
         this.name = name;

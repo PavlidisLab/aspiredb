@@ -15,15 +15,14 @@
 
 package ubc.pavlab.aspiredb.server.security.authentication;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
-
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 
 /**
  * Implementation for Spring Security.
@@ -94,6 +93,7 @@ public class UserDetailsImpl implements UserDetails {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.springframework.security.userdetails.UserDetails#getAuthorities()
      */
     @Override
@@ -110,6 +110,7 @@ public class UserDetailsImpl implements UserDetails {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.springframework.security.userdetails.UserDetails#getPassword()
      */
     @Override
@@ -133,6 +134,7 @@ public class UserDetailsImpl implements UserDetails {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.springframework.security.userdetails.UserDetails#getUsername()
      */
     @Override
@@ -142,6 +144,7 @@ public class UserDetailsImpl implements UserDetails {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.springframework.security.userdetails.UserDetails#isAccountNonExpired()
      */
     @Override
@@ -151,6 +154,7 @@ public class UserDetailsImpl implements UserDetails {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.springframework.security.userdetails.UserDetails#isAccountNonLocked()
      */
     @Override
@@ -160,6 +164,7 @@ public class UserDetailsImpl implements UserDetails {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.springframework.security.userdetails.UserDetails#isCredentialsNonExpired()
      */
     @Override
@@ -169,6 +174,7 @@ public class UserDetailsImpl implements UserDetails {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.springframework.security.userdetails.UserDetails#isEnabled()
      */
     @Override

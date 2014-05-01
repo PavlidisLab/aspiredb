@@ -20,19 +20,15 @@
 package ubc.pavlab.aspiredb.server.util;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -41,18 +37,13 @@ import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
-import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.shared.query.PhenotypeFilterConfig;
-import ubc.pavlab.aspiredb.shared.query.restriction.Disjunction;
 import ubc.pavlab.aspiredb.shared.query.restriction.Junction;
 import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
 import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
-import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
 
 /**
- * 
- * 
  * @author ptan
  * @version $Id$
  */
@@ -66,7 +57,7 @@ public class PhenotypeUtilTest extends BaseSpringContextTest {
 
     @Autowired
     private SubjectDao subjectDao;
-    
+
     @Autowired
     private PhenotypeDao phenotypeDao;
 
@@ -76,7 +67,7 @@ public class PhenotypeUtilTest extends BaseSpringContextTest {
     private Collection<Phenotype> phenolist = new HashSet<Phenotype>();
 
     private static Log log = LogFactory.getLog( PhenotypeUtilTest.class.getName() );
- 
+
     @Before
     public void setup() {
         phenolist.add( persistentTestObjectHelper.createPersistentTestPhenotypeObject( "Abnormality of the head",
@@ -112,9 +103,9 @@ public class PhenotypeUtilTest extends BaseSpringContextTest {
         assertEquals( false, result );
     }
 
-    private void expandRestrictions(RestrictionExpression re, Collection<PhenotypeRestriction> phenotypeRestrictions ) {
+    private void expandRestrictions( RestrictionExpression re, Collection<PhenotypeRestriction> phenotypeRestrictions ) {
         if ( re instanceof PhenotypeRestriction ) {
-            phenotypeRestrictions.add((PhenotypeRestriction)re);
+            phenotypeRestrictions.add( ( PhenotypeRestriction ) re );
             return;
         } else if ( re instanceof Junction ) {
             for ( RestrictionExpression re2 : ( ( Junction ) re ).getRestrictions() ) {
@@ -124,28 +115,28 @@ public class PhenotypeUtilTest extends BaseSpringContextTest {
             return;
         }
     }
-    
+
     @Test
     public void testExpandOntologyTermsWithNullUri() throws InterruptedException {
         PhenotypeRestriction phenotype = new PhenotypeRestriction( "Abnormality of the head", "1" );
         PhenotypeFilterConfig config = new PhenotypeFilterConfig();
         config.setRestriction( phenotype );
-        
+
         PhenotypeFilterConfig result = phenotypeUtil.expandOntologyTerms( config, null );
         RestrictionExpression restriction = result.getRestriction();
         boolean foundFace = false;
 
         Collection<PhenotypeRestriction> phenotypeRestrictions = new HashSet<PhenotypeRestriction>();
-        expandRestrictions(restriction, phenotypeRestrictions);
-        
-        assertTrue(phenotypeRestrictions.size() > 1);
-        for (PhenotypeRestriction pr : phenotypeRestrictions) {
+        expandRestrictions( restriction, phenotypeRestrictions );
+
+        assertTrue( phenotypeRestrictions.size() > 1 );
+        for ( PhenotypeRestriction pr : phenotypeRestrictions ) {
             if ( pr.getName().equals( "Abnormality of the face" ) ) {
                 foundFace = true;
                 break;
             }
         }
-        
+
         assertTrue( foundFace );
     }
 }

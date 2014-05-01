@@ -20,10 +20,8 @@ package ubc.pavlab.aspiredb.shared.query;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
-
 @DataTransferObject(javascript = "OverlapPercentageOtherVariantProperty")
 public class OverlapPercentageOtherVariantProperty extends ProjectOverlapNumericProperty {
-
 
     /**
      * 
@@ -31,6 +29,6 @@ public class OverlapPercentageOtherVariantProperty extends ProjectOverlapNumeric
     private static final long serialVersionUID = -5925104689068916983L;
 
     public OverlapPercentageOtherVariantProperty() {
-        super("% overlap with other project variant", "percentageoverlapothervariants");
+        super( "% overlap with other project variant", "percentageoverlapothervariants" );
     }
 }

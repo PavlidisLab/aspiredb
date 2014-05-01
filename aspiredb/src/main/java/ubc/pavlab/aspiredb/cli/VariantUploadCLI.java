@@ -14,6 +14,11 @@
  */
 package ubc.pavlab.aspiredb.cli;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.log4j.ConsoleAppender;
@@ -21,6 +26,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.springframework.beans.factory.BeanFactory;
+
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadServiceResult;
@@ -28,13 +34,7 @@ import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
 import ubc.pavlab.aspiredb.shared.VariantType;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
-
 /**
- *  
  * @version $Id: VariantUploadCLI.java,v 1.12 2013/07/19 17:03:49 ptan Exp $
  */
 public class VariantUploadCLI extends AbstractCLI {
@@ -117,7 +117,7 @@ public class VariantUploadCLI extends AbstractCLI {
         addOption( project );
 
     }
-    
+
     @Override
     protected void processOptions() {
         if ( this.hasOption( 'd' ) ) {
@@ -179,24 +179,24 @@ public class VariantUploadCLI extends AbstractCLI {
                     bail( ErrorCode.FATAL_ERROR );
                 }
             }
-            
-            VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, variantType );
-            
-           
+
+            VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromResultSet( results,
+                    variantType );
+
             results.close();
             stmt.close();
             conn.close();
 
             if ( result.getErrorMessages().isEmpty() && !dryRun ) {
                 projectManager.addSubjectVariantsToProject( projectName, createProject, result.getVariantsToAdd() );
-            } else if ( result.getErrorMessages().isEmpty()  ) {
+            } else if ( result.getErrorMessages().isEmpty() ) {
                 System.out.println( "No errors are detected in your data file" );
 
             } else {
                 for ( String errorMessage : result.getErrorMessages() ) {
                     System.out.println( errorMessage );
                 }
-                
+
             }
 
         } catch ( Exception e ) {
@@ -205,14 +205,10 @@ public class VariantUploadCLI extends AbstractCLI {
 
         return null;
     }
-    
-
-   
 
     @Override
     public String getShortDesc() {
         return "Upload a variant data file and create / assign it to a project";
     }
-
 
 }

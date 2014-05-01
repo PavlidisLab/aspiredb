@@ -46,7 +46,7 @@ public class SNVDaoTest extends BaseSpringContextTest {
 
     @Autowired
     private SNVDao snvDao;
-    
+
     @Autowired
     PersistentTestObjectHelper testObjectHelper;
 
@@ -55,8 +55,6 @@ public class SNVDaoTest extends BaseSpringContextTest {
 
     @Autowired
     private ProjectDao projectDao;
-
-    
 
     String authorizedUsername = RandomStringUtils.randomAlphabetic( 6 );
 
@@ -134,9 +132,5 @@ public class SNVDaoTest extends BaseSpringContextTest {
         assertEquals( updatedSNV.getObservedBase(), "newObservedBase" );
 
     }
-
-    
-
-    
 
 }

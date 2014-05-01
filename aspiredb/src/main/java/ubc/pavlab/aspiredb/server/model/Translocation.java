@@ -18,14 +18,19 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.Enumerated;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
-
-import javax.persistence.*;
 
 /**
  * @version $Id: Translocation.java,v 1.4 2013/06/11 22:30:37 anton Exp $
@@ -61,7 +66,7 @@ public class Translocation extends Variant {
     public void setTargetLocation( GenomicLocation targetLocation ) {
         this.targetLocation = targetLocation;
     }
-    
+
     @Override
     public VariantValueObject toValueObject() {
         VariantValueObject vo = new VariantValueObject();

@@ -221,18 +221,18 @@ Ext.define('ASPIREdb.view.VariantGridCreator', {
 			itemId : 'variantGrid',
 			columns : columnConfig,
 			columnHeaders : columnHeaders,
+			//multiSelect : true,
+			
 			listeners: {
-				cellclick: function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
-													
-					this.selModel.select(record.index, false, false);
-					
-				
+				selectionchange:function (variantGrid, selected, eOpts ){
+					//this.selModel.select(record.index, false, false);
+					//var test=selected;
+				//this.selModel.selected =selected;
 				}
+			
 			},
-			selModel : Ext.create('Ext.selection.CellModel', {
+			selModel : Ext.create('Ext.selection.RowModel', {
 				mode : 'MULTI',	
-				
-				
 			}),
 			stripeRows : true,
 			height : 180,

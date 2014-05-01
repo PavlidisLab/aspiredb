@@ -14,19 +14,20 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 
-import java.util.Collection;
-import java.util.HashSet;
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 
 //this isn't abstract because the security interceptor wasn't working quite right when this class was abstract
 //for example calling the remove method didn't remove the appropriate acls
 public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSupport implements SecurableDaoBase<T> {
-    
+
     // Generic class
     private Class<T> elementClass;
 
@@ -113,18 +114,18 @@ public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSuppo
     @Override
     @Transactional(readOnly = true)
     public Collection<T> loadAll() {
-        return (Collection<T>)this.getHibernateTemplate().loadAll( elementClass );
+        return ( Collection<T> ) this.getHibernateTemplate().loadAll( elementClass );
     }
 
- 
     @Override
     @Transactional(readOnly = true)
     public long getCountAll() {
-        Session session = this.getHibernateTemplate().getSessionFactory().getCurrentSession();               
-        Number totalSize = (Number) session.createCriteria( this.elementClass ).setProjection(Projections.rowCount()).uniqueResult();
-        return totalSize.longValue();        
+        Session session = this.getHibernateTemplate().getSessionFactory().getCurrentSession();
+        Number totalSize = ( Number ) session.createCriteria( this.elementClass )
+                .setProjection( Projections.rowCount() ).uniqueResult();
+        return totalSize.longValue();
     }
-    
+
     /*
      * (non-Javadoc)
      * 

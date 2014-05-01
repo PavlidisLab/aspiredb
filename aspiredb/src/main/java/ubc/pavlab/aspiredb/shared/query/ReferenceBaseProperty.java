@@ -21,12 +21,11 @@ package ubc.pavlab.aspiredb.shared.query;
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
- * author: anton
- * date: 10/05/13
+ * author: anton date: 10/05/13
  */
 @DataTransferObject(javascript = "ReferenceBaseProperty")
 public class ReferenceBaseProperty extends TextProperty {
     public ReferenceBaseProperty() {
-        super("Reference Base", "referenceBase");
+        super( "Reference Base", "referenceBase" );
     }
 }

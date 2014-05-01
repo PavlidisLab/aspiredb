@@ -18,13 +18,12 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 import java.util.Arrays;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
- * author: anton
- * date: 07/05/13
+ * author: anton date: 07/05/13
  */
 @DataTransferObject(javascript = "CharacteristicProperty")
 public class CharacteristicProperty extends Property<DataType> {
@@ -32,12 +31,12 @@ public class CharacteristicProperty extends Property<DataType> {
     private static final long serialVersionUID = 1L;
 
     public CharacteristicProperty() {
-        this.operators =  Arrays.asList(Operator.IS_IN_SET, Operator.IS_NOT_IN_SET);
+        this.operators = Arrays.asList( Operator.IS_IN_SET, Operator.IS_NOT_IN_SET );
         this.supportsSuggestions = true;
         this.isCharacteristic = true;
     }
 
-    public CharacteristicProperty(String name) {
+    public CharacteristicProperty( String name ) {
         this();
         this.name = name;
         this.displayName = name;
@@ -45,7 +44,7 @@ public class CharacteristicProperty extends Property<DataType> {
         this.isCharacteristic = true;
     }
 
-    public CharacteristicProperty(String name, DataType dataType) {
+    public CharacteristicProperty( String name, DataType dataType ) {
         this();
         this.name = name;
         this.displayName = name;

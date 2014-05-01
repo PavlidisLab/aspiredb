@@ -18,11 +18,10 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+
+import org.directwebremoting.annotations.DataTransferObject;
 
 /**
  * @author anton
@@ -34,9 +33,9 @@ public class BoundedList<T> {
     private boolean moreResultsAvailable = false;
     private int totalSize;
 
-    public BoundedList(List<T> items) {
-        this.items.addAll(items.subList(0, Math.min(MAX_SIZE, items.size())));
-        if (items.size() > MAX_SIZE) {
+    public BoundedList( List<T> items ) {
+        this.items.addAll( items.subList( 0, Math.min( MAX_SIZE, items.size() ) ) );
+        if ( items.size() > MAX_SIZE ) {
             moreResultsAvailable = true;
         }
         this.totalSize = items.size();

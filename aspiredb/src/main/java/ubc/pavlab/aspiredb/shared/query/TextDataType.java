@@ -18,33 +18,32 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
-import org.directwebremoting.annotations.DataTransferObject;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
- * author: anton
- * date: 07/05/13
+ * author: anton date: 07/05/13
  */
 @DataTransferObject(javascript = "TextDataType")
-public class TextDataType extends DataType  {
+public class TextDataType extends DataType {
     private static final long serialVersionUID = -6610724309760895447L;
 
     protected Collection<String> allowedValues = new ArrayList<String>();
 
-    public TextDataType() {}
+    public TextDataType() {
+    }
 
     public Collection<String> getAllowedValues() {
         return allowedValues;
     }
 
-    public void setAllowedValues(Collection<String> allowedValues) {
+    public void setAllowedValues( Collection<String> allowedValues ) {
         this.allowedValues = allowedValues;
     }
 
-    public void addAllowedValues(Collection<String> allowedValues) {
+    public void addAllowedValues( Collection<String> allowedValues ) {
         this.allowedValues.addAll( allowedValues );
     }
 }

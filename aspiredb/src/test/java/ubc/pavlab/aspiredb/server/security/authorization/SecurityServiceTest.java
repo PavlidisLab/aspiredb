@@ -47,8 +47,6 @@ import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
-
-
 /**
  * Tests the SecurityService: testing the permissions.
  * 
@@ -56,8 +54,6 @@ import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
  * @version $Id: SecurityServiceTest.java,v 1.4 2013/03/01 21:46:23 cmcdonald Exp $
  */
 public class SecurityServiceTest extends BaseSpringContextTest {
-
-    
 
     @Autowired
     private SecurityService securityService;
@@ -69,23 +65,22 @@ public class SecurityServiceTest extends BaseSpringContextTest {
     private UserManager userManager;
 
     private ObjectIdentityRetrievalStrategy objectIdentityRetrievalStrategy = new ObjectIdentityRetrievalStrategyImpl();
-    
+
     @Autowired
     private PersistentTestObjectHelper testObjectHelper;
-    
+
     @Autowired
     private SubjectDao individualDao;
 
     String patientId = RandomStringUtils.randomAlphabetic( 4 );
-    
+
     Subject individual;
-    
+
     @Before
     public void setup() {
 
         // admin
-        individual = testObjectHelper.createPersistentTestSubjectObjectWithCNV(patientId);
-        
+        individual = testObjectHelper.createPersistentTestSubjectObjectWithCNV( patientId );
 
     }
 
@@ -110,8 +105,8 @@ public class SecurityServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testSetOwner() {
-        Subject ind = testObjectHelper.createPersistentTestSubjectObjectWithCNV(RandomStringUtils.randomAlphabetic( 4 ));
-        
+        Subject ind = testObjectHelper
+                .createPersistentTestSubjectObjectWithCNV( RandomStringUtils.randomAlphabetic( 4 ) );
 
         String username = "first_" + randomName();
         makeUser( username );
@@ -124,7 +119,6 @@ public class SecurityServiceTest extends BaseSpringContextTest {
 
     }
 
-    
     private void makeUser( String username ) {
         try {
             this.userManager.loadUserByUsername( username );
@@ -138,8 +132,8 @@ public class SecurityServiceTest extends BaseSpringContextTest {
     public void testMakeIndividualReadWrite() throws Exception {
 
         String indPatientId = RandomStringUtils.randomAlphabetic( 4 );
-        Subject ind = testObjectHelper.createPersistentTestSubjectObjectWithCNV(indPatientId);
-        assertTrue("This should be private because all data should be private",this.securityService.isPrivate( ind ));
+        Subject ind = testObjectHelper.createPersistentTestSubjectObjectWithCNV( indPatientId );
+        assertTrue( "This should be private because all data should be private", this.securityService.isPrivate( ind ) );
 
         String username = "first_" + randomName();
         String usertwo = "second_" + randomName();
@@ -197,8 +191,6 @@ public class SecurityServiceTest extends BaseSpringContextTest {
 
     }
 
-    
-
     private MutableAcl getAcl( Securable s ) {
         ObjectIdentity oi = this.objectIdentityRetrievalStrategy.getObjectIdentity( s );
 
@@ -217,8 +209,9 @@ public class SecurityServiceTest extends BaseSpringContextTest {
     @Test
     public void testDuplicateAcesNotAddedOnIndividual() throws Exception {
         // make private experiment
-        Subject ind = testObjectHelper.createPersistentTestSubjectObjectWithCNV(RandomStringUtils.randomAlphabetic( 4 ));
-        assertTrue("This should be private because all data should be private",this.securityService.isPrivate( ind ));
+        Subject ind = testObjectHelper
+                .createPersistentTestSubjectObjectWithCNV( RandomStringUtils.randomAlphabetic( 4 ) );
+        assertTrue( "This should be private because all data should be private", this.securityService.isPrivate( ind ) );
         // add user and add the user to the group
         String username = "bananabread" + randomName();
         String groupName = "bakedgoods" + randomName();
@@ -259,8 +252,8 @@ public class SecurityServiceTest extends BaseSpringContextTest {
     @Test
     public void testSetPrincipalSID() {
         String username = "first_" + randomName();
-        Subject ind = testObjectHelper.createPersistentTestSubjectObjectWithCNV(RandomStringUtils.randomAlphabetic( 4 ));
-        
+        Subject ind = testObjectHelper
+                .createPersistentTestSubjectObjectWithCNV( RandomStringUtils.randomAlphabetic( 4 ) );
 
         try {
             this.securityService.setOwner( ind, username );

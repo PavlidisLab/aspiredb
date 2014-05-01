@@ -21,7 +21,7 @@ package ubc.pavlab.aspiredb.shared.query.restriction;
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
- *  Represents RestrictionExpressions joined by OR.
+ * Represents RestrictionExpressions joined by OR.
  */
 @DataTransferObject(javascript = "Disjunction")
 public class Disjunction extends Junction {

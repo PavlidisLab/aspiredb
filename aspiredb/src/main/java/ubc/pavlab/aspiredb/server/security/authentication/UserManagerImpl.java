@@ -15,6 +15,13 @@
 
 package ubc.pavlab.aspiredb.server.security.authentication;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
@@ -38,13 +45,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.core.userdetails.cache.NullUserCache;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserExistsException;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.util.AuthorityConstants;
 
-import java.util.*;
 /**
  * Implementation for Spring Security, plus some other handy methods.
  * 
@@ -199,25 +206,24 @@ public class UserManagerImpl implements UserManager {
 
         return u.getSignupToken();
     }
-    
+
     @Override
     @Secured("GROUP_ADMIN")
     @Transactional
-    public void changePasswordForUser(String username, String newPassword )
-            throws AuthenticationException {        
+    public void changePasswordForUser( String username, String newPassword ) throws AuthenticationException {
 
         User u = userService.findByUserName( username );
 
         if ( u == null ) {
             throw new UsernameNotFoundException( "No user found with that username." );
         }
-        
+
         logger.debug( "Changing password for user '" + username + "'" );
 
         u.setPassword( newPassword );
-        
+
         userService.adminUpdate( u );
-        
+
     }
 
     /*
@@ -234,7 +240,7 @@ public class UserManagerImpl implements UserManager {
         for ( GrantedAuthority ga : authorities ) {
             GroupAuthority groupAuthority = new GroupAuthority();
             groupAuthority.setAuthority( ga.getAuthority() );
-            g.getAuthorities().add(groupAuthority);
+            g.getAuthorities().add( groupAuthority );
         }
 
         userService.create( g );
@@ -317,8 +323,8 @@ public class UserManagerImpl implements UserManager {
         userService.delete( user );
         userCache.removeUserFromCache( username );
     }
-    
-    @Override    
+
+    @Override
     public void deleteByUserName( String username ) {
 
         userService.deleteByUserName( username );
@@ -800,8 +806,7 @@ public class UserManagerImpl implements UserManager {
      * org.springframework.security.provisioning.JdbcUserDetailsManager#updateUser(org.springframework.security.core
      * .userdetails.UserDetails)
      */
-    protected Authentication createNewAuthentication( Authentication currentAuth,
-             String newPassword ) {
+    protected Authentication createNewAuthentication( Authentication currentAuth, String newPassword ) {
         UserDetails user = loadUserByUsername( currentAuth.getName() );
 
         UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken( user,

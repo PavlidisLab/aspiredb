@@ -18,27 +18,49 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
-import org.hibernate.criterion.*;
+import java.util.Set;
+
+import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Junction;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
+
 import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
-import ubc.pavlab.aspiredb.shared.*;
-import ubc.pavlab.aspiredb.shared.query.*;
+import ubc.pavlab.aspiredb.shared.GeneValueObject;
+import ubc.pavlab.aspiredb.shared.GenomicRange;
+import ubc.pavlab.aspiredb.shared.LabelValueObject;
+import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
+import ubc.pavlab.aspiredb.shared.NumericValue;
+import ubc.pavlab.aspiredb.shared.TextValue;
+import ubc.pavlab.aspiredb.shared.query.CNVTypeProperty;
+import ubc.pavlab.aspiredb.shared.query.CharacteristicProperty;
+import ubc.pavlab.aspiredb.shared.query.ExternalSubjectIdProperty;
+import ubc.pavlab.aspiredb.shared.query.GeneProperty;
+import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
+import ubc.pavlab.aspiredb.shared.query.LabelProperty;
+import ubc.pavlab.aspiredb.shared.query.NeurocartaPhenotypeProperty;
+import ubc.pavlab.aspiredb.shared.query.NumericProperty;
+import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.Property;
+import ubc.pavlab.aspiredb.shared.query.SubjectLabelProperty;
+import ubc.pavlab.aspiredb.shared.query.TextProperty;
+import ubc.pavlab.aspiredb.shared.query.VariantLabelProperty;
 import ubc.pavlab.aspiredb.shared.query.restriction.Conjunction;
 import ubc.pavlab.aspiredb.shared.query.restriction.Disjunction;
-import ubc.pavlab.aspiredb.shared.query.restriction.*;
-
-import java.io.Serializable;
-import java.util.Set;
+import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
+import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
+import ubc.pavlab.aspiredb.shared.query.restriction.SetRestriction;
+import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
+import ubc.pavlab.aspiredb.shared.query.restriction.VariantTypeRestriction;
 
 /**
- * Constructs Hibernate Criterion based on various subclasses of RestrictionExpression.
- *
- * RestrictionExpression tree is traversed pre-order.
- * Conjunction, Disjunction are non-leaf nodes.
- * SimpleRestriction, SetRestriction are leaf nodes.
+ * Constructs Hibernate Criterion based on various subclasses of RestrictionExpression. RestrictionExpression tree is
+ * traversed pre-order. Conjunction, Disjunction are non-leaf nodes. SimpleRestriction, SetRestriction are leaf nodes.
  * 
  * @author anton
  * @version $Id: CriteriaBuilder.java,v 1.23 2013/07/02 18:20:22 anton Exp $
@@ -50,13 +72,12 @@ public class CriteriaBuilder {
 
         protected Class clazz;
 
-        private EntityType(Class clazz) {
+        private EntityType( Class clazz ) {
             this.clazz = clazz;
         }
     }
 
     /**
-     *
      * @param restrictionExpression
      * @param target specifies what query should return (subjects or variants)
      * @return
@@ -95,94 +116,82 @@ public class CriteriaBuilder {
         return criteriaConjunction;
     }
 
-    private static Criterion processRestrictionExpression(SetRestriction setRestriction, EntityType target) {
+    private static Criterion processRestrictionExpression( SetRestriction setRestriction, EntityType target ) {
         Property property = setRestriction.getProperty();
         Operator operator = setRestriction.getOperator();
         Set<Object> values = setRestriction.getValues();
 
-        DetachedCriteria subquery = DetachedCriteria.forClass(target.clazz);
+        DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
 
         Junction criteriaDisjunction = Restrictions.disjunction();
 
         if ( property instanceof CharacteristicProperty ) {
-            for (Object value: values) {
-                criteriaDisjunction.add( createCharacteristicCriterion (
-                                ( CharacteristicProperty ) property,
-                                Operator.TEXT_EQUAL,
-                                ( TextValue ) value,
-                                target ));
+            for ( Object value : values ) {
+                criteriaDisjunction.add( createCharacteristicCriterion( ( CharacteristicProperty ) property,
+                        Operator.TEXT_EQUAL, ( TextValue ) value, target ) );
             }
         } else if ( property instanceof LabelProperty ) {
-            for (Object value: values) {
-                criteriaDisjunction.add( createLabelCriterion(
-                        ( LabelProperty ) property,
-                        Operator.TEXT_EQUAL,
-                        ( LabelValueObject ) value, target ));
+            for ( Object value : values ) {
+                criteriaDisjunction.add( createLabelCriterion( ( LabelProperty ) property, Operator.TEXT_EQUAL,
+                        ( LabelValueObject ) value, target ) );
             }
         } else if ( property instanceof CNVTypeProperty ) {
             EntityType propertyOf = EntityType.VARIANT;
-            for (Object value: values) {
-                criteriaDisjunction.add( createCNVTypeCriterion(
-                        Operator.TEXT_EQUAL,
-                        fullEntityPropertyName(target, propertyOf, property),
-                        ( TextValue ) value ));
+            for ( Object value : values ) {
+                criteriaDisjunction.add( createCNVTypeCriterion( Operator.TEXT_EQUAL,
+                        fullEntityPropertyName( target, propertyOf, property ), ( TextValue ) value ) );
             }
         } else if ( property instanceof ExternalSubjectIdProperty ) {
             EntityType propertyOf = EntityType.SUBJECT;
-            for (Object value: values) {
-                criteriaDisjunction.add( createTextCriterion(
-                        Operator.TEXT_EQUAL,
-                        fullEntityPropertyName(target, propertyOf, property),
-                        ( ( TextValue ) value ).getValue() ));
+            for ( Object value : values ) {
+                criteriaDisjunction.add( createTextCriterion( Operator.TEXT_EQUAL,
+                        fullEntityPropertyName( target, propertyOf, property ), ( ( TextValue ) value ).getValue() ) );
             }
         } else if ( property instanceof TextProperty ) {
             EntityType propertyOf = EntityType.VARIANT;
-            for (Object value: values) {
-                criteriaDisjunction.add( createTextCriterion(
-                        Operator.TEXT_EQUAL,
-                        fullEntityPropertyName(target, propertyOf, property),
-                        ( ( TextValue ) value ).getValue() ));
+            for ( Object value : values ) {
+                criteriaDisjunction.add( createTextCriterion( Operator.TEXT_EQUAL,
+                        fullEntityPropertyName( target, propertyOf, property ), ( ( TextValue ) value ).getValue() ) );
             }
         } else if ( property instanceof GenomicLocationProperty ) {
-            for (Object value: values) {
-                criteriaDisjunction.add( overlapsGenomicRegionCriterion( (GenomicRange) value ) );
+            for ( Object value : values ) {
+                criteriaDisjunction.add( overlapsGenomicRegionCriterion( ( GenomicRange ) value ) );
             }
         } else if ( property instanceof GeneProperty ) {
-            for (Object value: values) {
+            for ( Object value : values ) {
                 GeneValueObject gene = ( GeneValueObject ) value;
                 criteriaDisjunction.add( overlapsGenomicRegionCriterion( gene.getGenomicRange() ) );
             }
         } else if ( property instanceof NeurocartaPhenotypeProperty ) {
-            for (Object value : values) {
+            for ( Object value : values ) {
                 NeurocartaPhenotypeValueObject neurocartaPhenotype = ( NeurocartaPhenotypeValueObject ) value;
                 for ( GeneValueObject gene : neurocartaPhenotype.getGenes() ) {
-                    criteriaDisjunction.add( overlapsGenomicRegionCriterion(gene.getGenomicRange()) );
+                    criteriaDisjunction.add( overlapsGenomicRegionCriterion( gene.getGenomicRange() ) );
                 }
             }
         } else {
-            throw new IllegalArgumentException("Not supported!");
+            throw new IllegalArgumentException( "Not supported!" );
         }
 
-        subquery.add(criteriaDisjunction);
-        subquery.setProjection(Projections.distinct(Projections.id()));
+        subquery.add( criteriaDisjunction );
+        subquery.setProjection( Projections.distinct( Projections.id() ) );
 
-        switch (operator) {
+        switch ( operator ) {
             case IS_IN_SET:
                 return Subqueries.propertyIn( "id", subquery );
             case IS_NOT_IN_SET:
-                return Subqueries.propertyNotIn("id", subquery);
+                return Subqueries.propertyNotIn( "id", subquery );
             default:
-                throw new IllegalArgumentException("Operator not supported.");
+                throw new IllegalArgumentException( "Operator not supported." );
         }
     }
 
     private static Criterion processRestrictionExpression( PhenotypeRestriction restriction, EntityType target ) {
         DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
 
-        addPhenotypeAlias(subquery, target);
+        addPhenotypeAlias( subquery, target );
 
-        subquery.add( Restrictions.conjunction()
-                .add( Restrictions.eq( "phenotype.name", restriction.getName() ) )
+        subquery.add( Restrictions.conjunction().add( Restrictions.eq( "phenotype.name", restriction.getName() ) )
                 .add( Restrictions.eq( "phenotype.value", restriction.getValue() ) ) );
 
         subquery.setProjection( Projections.distinct( Projections.id() ) );
@@ -190,7 +199,7 @@ public class CriteriaBuilder {
         return Subqueries.propertyIn( "id", subquery );
     }
 
-    private static void addPhenotypeAlias(DetachedCriteria subquery, EntityType target) {
+    private static void addPhenotypeAlias( DetachedCriteria subquery, EntityType target ) {
         if ( target == EntityType.SUBJECT ) {
             subquery.createAlias( "phenotypes", "phenotype" );
         } else {
@@ -207,24 +216,22 @@ public class CriteriaBuilder {
             return createCharacteristicCriterion( ( CharacteristicProperty ) property, operator, ( TextValue ) value,
                     target );
         } else if ( property instanceof LabelProperty ) {
-            return createLabelCriterion( ( LabelProperty ) property, operator,
-                    ( LabelValueObject ) value, target );
+            return createLabelCriterion( ( LabelProperty ) property, operator, ( LabelValueObject ) value, target );
         } else if ( property instanceof CNVTypeProperty ) {
             EntityType propertyOf = EntityType.VARIANT;
-            return createCNVTypeCriterion( operator,
-                    fullEntityPropertyName(target, propertyOf, property), ( TextValue ) value );
+            return createCNVTypeCriterion( operator, fullEntityPropertyName( target, propertyOf, property ),
+                    ( TextValue ) value );
         } else if ( property instanceof ExternalSubjectIdProperty ) {
             EntityType propertyOf = EntityType.SUBJECT;
-            return createTextCriterion( operator,
-                    fullEntityPropertyName(target, propertyOf, property), ( ( TextValue ) value ).getValue() );
+            return createTextCriterion( operator, fullEntityPropertyName( target, propertyOf, property ),
+                    ( ( TextValue ) value ).getValue() );
         } else if ( property instanceof NumericProperty ) {
             EntityType propertyOf = EntityType.VARIANT;
-            return createNumericalCriterion( operator, propertyPrefix( target, propertyOf )
-                    + property.getName(), ( NumericValue ) value );
+            return createNumericalCriterion( operator, propertyPrefix( target, propertyOf ) + property.getName(),
+                    ( NumericValue ) value );
         } else if ( property instanceof TextProperty ) {
             EntityType propertyOf = EntityType.VARIANT;
-            return createTextCriterion( operator,
-                    fullEntityPropertyName(target, propertyOf, property),
+            return createTextCriterion( operator, fullEntityPropertyName( target, propertyOf, property ),
                     ( ( TextValue ) value ).getValue() );
         } else if ( property instanceof GenomicLocationProperty ) {
             return createGenomicRangeCriterion( operator, ( GenomicRange ) value, target );
@@ -235,8 +242,7 @@ public class CriteriaBuilder {
             NeurocartaPhenotypeValueObject neurocartaPhenotype = ( NeurocartaPhenotypeValueObject ) value;
             Junction criteriaDisjunction = Restrictions.disjunction();
             for ( GeneValueObject gene : neurocartaPhenotype.getGenes() ) {
-                criteriaDisjunction.add( createGenomicRangeCriterion( operator,
-                        gene.getGenomicRange(), target ) );
+                criteriaDisjunction.add( createGenomicRangeCriterion( operator, gene.getGenomicRange(), target ) );
             }
             return criteriaDisjunction;
         } else {
@@ -252,8 +258,7 @@ public class CriteriaBuilder {
         }
     }
 
-
-    private static Criterion overlapsGenomicRegionCriterion(GenomicRange range) {
+    private static Criterion overlapsGenomicRegionCriterion( GenomicRange range ) {
         Junction variantInsideRegion = Restrictions.conjunction()
                 .add( Restrictions.eq( "location.chromosome", range.getChromosome() ) )
                 .add( Restrictions.ge( "location.start", range.getBaseStart() ) )
@@ -283,17 +288,17 @@ public class CriteriaBuilder {
         subquery.add( overlapsGenomicRegionCriterion( range ) );
 
         subquery.setProjection( Projections.distinct( Projections.id() ) );
-        switch (operator) {
+        switch ( operator ) {
             case IS_IN_SET:
                 return Subqueries.propertyIn( "id", subquery );
             case IS_NOT_IN_SET:
-                return Subqueries.propertyNotIn("id", subquery);
+                return Subqueries.propertyNotIn( "id", subquery );
             default:
-                throw new IllegalArgumentException("Operator not supported.");
+                throw new IllegalArgumentException( "Operator not supported." );
         }
     }
 
-    private static void addLocationAlias(DetachedCriteria subquery, EntityType target) {
+    private static void addLocationAlias( DetachedCriteria subquery, EntityType target ) {
         if ( target == EntityType.SUBJECT ) {
             subquery.createAlias( "variants", "variant" );
             subquery.createAlias( "variant.location", "location" );
@@ -305,11 +310,11 @@ public class CriteriaBuilder {
         return createTextCriterion( operator, property, enumValue );
     }
 
-    private static Criterion createLabelCriterion( LabelProperty property, Operator operator,
-            LabelValueObject value, EntityType target ) {
+    private static Criterion createLabelCriterion( LabelProperty property, Operator operator, LabelValueObject value,
+            EntityType target ) {
         DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
-        
-        addLabelAlias(subquery, target);
+
+        addLabelAlias( subquery, target );
 
         if ( property instanceof VariantLabelProperty ) {
             subquery.add( Restrictions.eq( "variant_label.id", value.getId() ) );
@@ -328,7 +333,7 @@ public class CriteriaBuilder {
         throw new IllegalArgumentException();
     }
 
-    private static void addLabelAlias(DetachedCriteria subquery, EntityType target) {
+    private static void addLabelAlias( DetachedCriteria subquery, EntityType target ) {
         if ( target == EntityType.SUBJECT ) {
             subquery.createAlias( "variants", "variant", CriteriaSpecification.LEFT_JOIN )
                     .createAlias( "variant.labels", "variant_label", CriteriaSpecification.LEFT_JOIN )
@@ -341,19 +346,18 @@ public class CriteriaBuilder {
     }
 
     /**
-     * 
      * @param subquery (side effects)
      * @param target
      */
-    private static void addCharacteristicAlias(DetachedCriteria subquery, EntityType target) {
+    private static void addCharacteristicAlias( DetachedCriteria subquery, EntityType target ) {
         if ( target == EntityType.SUBJECT ) {
-            subquery.createAlias("variants", "variant")
-                    .createAlias("variant.characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN);
+            subquery.createAlias( "variants", "variant" ).createAlias( "variant.characteristics", "characteristic",
+                    CriteriaSpecification.LEFT_JOIN );
         } else {
-            subquery.createAlias("characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN);
+            subquery.createAlias( "characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN );
         }
     }
-    
+
     private static Criterion createCharacteristicCriterion( CharacteristicProperty property, Operator operator,
             TextValue value, EntityType target ) {
         DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
@@ -363,19 +367,17 @@ public class CriteriaBuilder {
         Junction conjunction = Restrictions.conjunction().add(
                 Restrictions.eq( "characteristic.key", property.getName() ) );
 
-        switch(operator) {
+        switch ( operator ) {
             case TEXT_EQUAL:
             case TEXT_NOT_EQUAL:
-                conjunction
-                        .add( createTextCriterion( operator, "characteristic.value", value.toString() ) );
+                conjunction.add( createTextCriterion( operator, "characteristic.value", value.toString() ) );
                 break;
             case NUMERIC_EQUAL:
             case NUMERIC_GREATER:
             case NUMERIC_LESS:
             case NUMERIC_NOT_EQUAL:
                 NumericValue numValue = new NumericValue( Integer.valueOf( value.getValue() ) );
-                conjunction
-                        .add( createNumericalCriterion( operator, "characteristic.value", numValue ) );
+                conjunction.add( createNumericalCriterion( operator, "characteristic.value", numValue ) );
                 break;
             default:
                 throw new IllegalArgumentException( "Operator type not supported." );
@@ -388,7 +390,6 @@ public class CriteriaBuilder {
     }
 
     /**
-     *
      * @param operator
      * @param property
      * @param value
@@ -416,8 +417,6 @@ public class CriteriaBuilder {
     }
 
     /**
-     *
-     *
      * @param operator EQUALS or NOT_EQUALS
      * @param property property
      * @param value text value
@@ -446,15 +445,15 @@ public class CriteriaBuilder {
      * @param property Property
      * @return full entity property name
      */
-    private static String fullEntityPropertyName(EntityType filterTarget, EntityType propertyOf, Property property) {
+    private static String fullEntityPropertyName( EntityType filterTarget, EntityType propertyOf, Property property ) {
         return propertyPrefix( filterTarget, propertyOf ) + property.getName();
     }
-    
+
     /**
      * Get prefix to be used to fully name entity property based on.
      *
      * @param filterTarget entity type criteria query will return
-     * @param propertyOf entity type that the property is member of 
+     * @param propertyOf entity type that the property is member of
      * @return either 'variant.' or 'subject.'
      */
     private static String propertyPrefix( EntityType filterTarget, EntityType propertyOf ) {

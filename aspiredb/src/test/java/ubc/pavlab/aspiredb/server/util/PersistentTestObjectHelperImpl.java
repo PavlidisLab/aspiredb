@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,8 +48,6 @@ import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
-import ubc.pavlab.aspiredb.server.project.ProjectManager;
-import ubc.pavlab.aspiredb.server.service.LabelService;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 /**
@@ -65,7 +62,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     @Autowired
     IndelDao indelDao;
-    
+
     @Autowired
     LabelDao labelDao;
 
@@ -86,7 +83,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     @Autowired
     ProjectDao projectDao;
-    
+
     @Autowired
     Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
 
@@ -95,14 +92,12 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     @Autowired
     PhenotypeUtil phenotypeUtil;
-    
+
     @Autowired
     VariantDao variantDao;
-    
-   
+
     public PersistentTestObjectHelperImpl() {
     }
-
 
     public SNV createDetachedTestSNVObject() {
 
@@ -192,18 +187,18 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
         return cnv;
     }
-    
-    public Phenotype createDetachedPhenotypeObject(String name, String uri, String valueType, String value){
-        
+
+    public Phenotype createDetachedPhenotypeObject( String name, String uri, String valueType, String value ) {
+
         Phenotype p = new Phenotype();
-        
+
         p.setName( name );
-        p.setValueType(valueType );
+        p.setValueType( valueType );
         p.setUri( uri );
         p.setValue( value );
-        
+
         return p;
-        
+
     }
 
     @Transactional
@@ -259,11 +254,11 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
         return subjectDao.create( individual );
     }
-    
+
     @Transactional
     public Phenotype createPersistentTestPhenotypeObject( String name, String uri, String valueType, String value ) {
 
-        Phenotype p = createDetachedPhenotypeObject( name,uri, valueType, value );
+        Phenotype p = createDetachedPhenotypeObject( name, uri, valueType, value );
 
         return phenotypeDao.create( p );
     }
@@ -272,101 +267,103 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     public Subject createPersistentTestSubjectObjectWithCNV( String patientId ) {
 
         Subject individual = createPersistentTestIndividualObject( patientId );
-        
+
         individual.addVariant( createPersistentTestCNVObject() );
 
         return individual;
     }
-    
+
     @Transactional
-    public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypes( String patientId ){
-        
+    public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypes( String patientId ) {
+
         Subject subject = createPersistentTestIndividualObject( patientId );
-        
-        subject.addPhenotype( createPersistentTestPhenotypeObject("Abnormality of abnormalities", "uri1","HPONTOLOGY","somevalue") );
-        subject.addPhenotype( createPersistentTestPhenotypeObject("Abnormality of the mind", "uri2","HPONTOLOGY","somevalue") );
-        subject.addPhenotype( createPersistentTestPhenotypeObject("Abnormality of society", "uri3","HPONTOLOGY","somevalue") );
-        subject.addPhenotype( createPersistentTestPhenotypeObject("CustomPhenotype", "uri4","CUSTOM","somevalue") );
-        
+
+        subject.addPhenotype( createPersistentTestPhenotypeObject( "Abnormality of abnormalities", "uri1",
+                "HPONTOLOGY", "somevalue" ) );
+        subject.addPhenotype( createPersistentTestPhenotypeObject( "Abnormality of the mind", "uri2", "HPONTOLOGY",
+                "somevalue" ) );
+        subject.addPhenotype( createPersistentTestPhenotypeObject( "Abnormality of society", "uri3", "HPONTOLOGY",
+                "somevalue" ) );
+        subject.addPhenotype( createPersistentTestPhenotypeObject( "CustomPhenotype", "uri4", "CUSTOM", "somevalue" ) );
 
         return subject;
-        
+
     }
-    
+
     @Transactional
-    public Subject addSubjectToProject(Subject s, Project p){        
-               
+    public Subject addSubjectToProject( Subject s, Project p ) {
+
         s.getProjects().add( p );
-        
+
         subjectDao.update( s );
-        
-        
+
         return s;
-        
+
     }
-    
+
     @Transactional
-    public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypesForEnrichmentTest( String patientId, String phenName, String phenUri, String phenValue ){
-        
+    public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypesForEnrichmentTest( String patientId,
+            String phenName, String phenUri, String phenValue ) {
+
         Subject subject = createPersistentTestIndividualObject( patientId );
-        
-        subject.addPhenotype( createPersistentTestPhenotypeObject(phenName, phenUri,"HPONTOLOGY",phenValue) );
+
+        subject.addPhenotype( createPersistentTestPhenotypeObject( phenName, phenUri, "HPONTOLOGY", phenValue ) );
 
         return subject;
-        
+
     }
 
     @Transactional
     public Project createPersistentProject( Project p ) {
         return projectDao.create( p );
     }
+
     @Transactional
-    public List<Subject> getSubjectsForProject(Project p){
+    public List<Subject> getSubjectsForProject( Project p ) {
         return p.getSubjects();
     }
+
     @Transactional
-    public Collection<LabelValueObject> getLabelsForSubject(Long subjectId){
-               
-        return Label.toValueObjects( labelDao.getSubjectLabelsBySubjectId(subjectId) );
+    public Collection<LabelValueObject> getLabelsForSubject( Long subjectId ) {
+
+        return Label.toValueObjects( labelDao.getSubjectLabelsBySubjectId( subjectId ) );
     }
-    
+
     @Transactional
-    public Collection<LabelValueObject> getLabelsForVariant(Long variantId){
-               
-        return Label.toValueObjects( labelDao.getVariantLabelsByVariantId(variantId) );
+    public Collection<LabelValueObject> getLabelsForVariant( Long variantId ) {
+
+        return Label.toValueObjects( labelDao.getVariantLabelsByVariantId( variantId ) );
     }
-    
+
     @Transactional
-    public void deleteProject(String projectName){
-       
-        
+    public void deleteProject( String projectName ) {
+
         Project project = projectDao.findByProjectName( projectName );
-        
-        if (project == null){
-            
+
+        if ( project == null ) {
+
             return;
-            
+
         }
-        
+
         variant2SpecialVariantOverlapDao.deleteByOverlapProjectId( project.getId() );
         for ( Subject s : project.getSubjects() ) {
             try {
-                
-                for (Phenotype p : s.getPhenotypes() ) {
+
+                for ( Phenotype p : s.getPhenotypes() ) {
                     phenotypeDao.remove( p );
                 }
-                
-                for (Variant v: s.getVariants()){
+
+                for ( Variant v : s.getVariants() ) {
                     variantDao.remove( v );
                 }
                 subjectDao.remove( s );
-                
+
             } catch ( Exception e ) {
                 e.printStackTrace();
             }
         }
         projectDao.remove( project );
     }
-    
-    
+
 }

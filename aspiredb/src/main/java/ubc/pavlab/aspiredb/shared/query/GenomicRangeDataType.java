@@ -20,12 +20,8 @@ package ubc.pavlab.aspiredb.shared.query;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 /**
- * author: anton
- * date: 23/05/13
+ * author: anton date: 23/05/13
  */
 @DataTransferObject(javascript = "GenomicRangeDataType")
 public class GenomicRangeDataType extends DataType {

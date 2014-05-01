@@ -15,18 +15,17 @@
 
 package ubc.pavlab.aspiredb.server.security.authorization.acl;
 
+import javax.sql.DataSource;
+
 import org.springframework.security.acls.jdbc.JdbcMutableAclService;
 import org.springframework.security.acls.jdbc.LookupStrategy;
 import org.springframework.security.acls.model.AclCache;
 import org.springframework.security.acls.model.Sid;
 
-import javax.sql.DataSource;
-
 /**
  * Subclass to support some additional functionality we need that JdbcMutableAclService does not implement.
  * 
  * @author paul
- * 
  */
 public class AclServiceImpl extends JdbcMutableAclService implements AclService {
 
@@ -55,17 +54,17 @@ public class AclServiceImpl extends JdbcMutableAclService implements AclService 
         Long sidId = super.createOrRetrieveSidPrimaryKey( sid, false );
 
         // note: this version failed to delete all relevant acl_entry rows
-        //String deleteAces = "delete e from acl_entry e inner join acl_sid s on s.id=e.sid where s.sid = ?";
-        
+        // String deleteAces = "delete e from acl_entry e inner join acl_sid s on s.id=e.sid where s.sid = ?";
+
         String deleteAces = "delete from acl_entry where sid = ?";
         int rowsAff = jdbcTemplate.update( deleteAces, new Object[] { sidId } );
-        
-        log.debug( "Deleted "+rowsAff+" entries from the acl_entry table." );
+
+        log.debug( "Deleted " + rowsAff + " entries from the acl_entry table." );
 
         String deleteSid = "delete from acl_sid where id = ?";
         rowsAff = jdbcTemplate.update( deleteSid, new Object[] { sidId } );
-        
-        log.debug( "Deleted "+rowsAff+" entries from the acl_sid table." );
+
+        log.debug( "Deleted " + rowsAff + " entries from the acl_sid table." );
 
     }
 

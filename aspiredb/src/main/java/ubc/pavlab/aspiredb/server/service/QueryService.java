@@ -77,8 +77,8 @@ public interface QueryService {
     public Collection<String> getSavedQueryNames();
 
     public void deleteQuery( String name );
-    
-    public boolean isQueryName(String name);
+
+    public boolean isQueryName( String name );
 
     public int getSubjectCount( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException,
             ExternalDependencyException;

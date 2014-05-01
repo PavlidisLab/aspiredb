@@ -17,6 +17,7 @@ package ubc.pavlab.aspiredb.server.service;
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.stereotype.Service;
+
 import ubc.pavlab.aspiredb.server.security.SecurityServiceImpl;
 
 /**
@@ -26,23 +27,23 @@ import ubc.pavlab.aspiredb.server.security.SecurityServiceImpl;
  * @version $Id: LoginStatusServiceImpl.java,v 1.8 2013/07/16 23:05:06 ptan Exp $
  */
 @Service("loginStatusService")
-@RemoteProxy(name="LoginStatusService")
+@RemoteProxy(name = "LoginStatusService")
 public class LoginStatusServiceImpl implements LoginStatusService {
-    
+
     @Override
     public Boolean isLoggedIn() {
 
         return SecurityServiceImpl.isUserLoggedIn();
     }
-    
+
     @Override
-    public Boolean isUserAdministrator(){
+    public Boolean isUserAdministrator() {
         return SecurityServiceImpl.isUserAdmin();
     }
 
-   @Override
-   @RemoteMethod
-   public String getCurrentUsername() {
-       return SecurityServiceImpl.getCurrentUsername();
-   }
+    @Override
+    @RemoteMethod
+    public String getCurrentUsername() {
+        return SecurityServiceImpl.getCurrentUsername();
+    }
 }

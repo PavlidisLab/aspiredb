@@ -15,6 +15,7 @@
 package ubc.pavlab.aspiredb.shared.query;
 
 import org.directwebremoting.annotations.DataTransferObject;
+
 import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
 
 /**
@@ -22,18 +23,18 @@ import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
  */
 @DataTransferObject(javascript = "CompoundRestrictionFilterConfig")
 public abstract class CompoundRestrictionFilterConfig extends AspireDbFilterConfig {
-	private static final long serialVersionUID = -4256615467308247969L;
+    private static final long serialVersionUID = -4256615467308247969L;
 
     private RestrictionExpression restriction1;
-    
+
     private RestrictionExpression restriction2;
-    
+
     private RestrictionExpression restriction3;
 
     protected CompoundRestrictionFilterConfig() {
     }
 
-    protected CompoundRestrictionFilterConfig(RestrictionExpression restriction1, RestrictionExpression restriction2) {
+    protected CompoundRestrictionFilterConfig( RestrictionExpression restriction1, RestrictionExpression restriction2 ) {
         this.setRestriction1( restriction1 );
         this.setRestriction2( restriction2 );
     }
@@ -61,5 +62,5 @@ public abstract class CompoundRestrictionFilterConfig extends AspireDbFilterConf
     public void setRestriction3( RestrictionExpression restriction3 ) {
         this.restriction3 = restriction3;
     }
-   
+
 }

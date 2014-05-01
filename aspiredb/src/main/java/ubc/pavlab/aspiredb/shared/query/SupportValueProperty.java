@@ -20,12 +20,10 @@ package ubc.pavlab.aspiredb.shared.query;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
-
 @DataTransferObject(javascript = "SupportValueProperty")
 public class SupportValueProperty extends ProjectOverlapNumericProperty {
-    
-   
+
     public SupportValueProperty() {
-        super("# of supporting studies", "supportvalue");
+        super( "# of supporting studies", "supportvalue" );
     }
 }

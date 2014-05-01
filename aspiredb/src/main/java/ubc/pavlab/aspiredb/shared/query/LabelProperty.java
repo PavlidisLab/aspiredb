@@ -21,10 +21,7 @@ package ubc.pavlab.aspiredb.shared.query;
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
- * author: anton
- * date: 08/05/13
- *
- * Class is concrete because I couldn't get DWR to see it when it is abstract.
+ * author: anton date: 08/05/13 Class is concrete because I couldn't get DWR to see it when it is abstract.
  */
 @DataTransferObject(javascript = "LabelProperty")
 public class LabelProperty extends TextProperty {
@@ -32,12 +29,12 @@ public class LabelProperty extends TextProperty {
     protected LabelProperty() {
     }
 
-    public LabelProperty(String displayName, String name) {
-        super(displayName, name);
+    public LabelProperty( String displayName, String name ) {
+        super( displayName, name );
     }
 
-    public LabelProperty(String displayName, String name, String color) {
-        super(displayName, name);
+    public LabelProperty( String displayName, String name, String color ) {
+        super( displayName, name );
     }
 
 }

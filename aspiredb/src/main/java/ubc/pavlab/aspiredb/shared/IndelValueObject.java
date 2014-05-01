@@ -15,41 +15,40 @@
 package ubc.pavlab.aspiredb.shared;
 
 import org.directwebremoting.annotations.DataTransferObject;
+
 import ubc.pavlab.aspiredb.shared.query.IndelLengthProperty;
 import ubc.pavlab.aspiredb.shared.query.Property;
 
 /**
- * 
- * 
  * @version $Id: IndelValueObject.java,v 1.2 2013/07/04 17:26:00 anton Exp $
  */
 @DataTransferObject(javascript = "IndelValueObject")
 public class IndelValueObject extends VariantValueObject {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 6947488320581484129L;
-	
-	private int length;
+    private static final long serialVersionUID = 6947488320581484129L;
+
+    private int length;
 
     public IndelValueObject() {
-    	
+
     }
 
-	public int getLength() {
-		return length;
-	}
+    public int getLength() {
+        return length;
+    }
 
-	public void setLength(int length) {
-		this.length = length;
-	}
+    public void setLength( int length ) {
+        this.length = length;
+    }
 
     @Override
-    public String getPropertyStringValue(Property property) {
-        if (property instanceof IndelLengthProperty) {
-            return String.valueOf(this.getLength());
+    public String getPropertyStringValue( Property property ) {
+        if ( property instanceof IndelLengthProperty ) {
+            return String.valueOf( this.getLength() );
         }
-        return super.getPropertyStringValue(property);
+        return super.getPropertyStringValue( property );
     }
 }

@@ -18,6 +18,13 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,106 +39,97 @@ import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
 import ubc.pavlab.aspiredb.server.model.GenomicLocation;
-import ubc.pavlab.aspiredb.server.model.Query;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
-import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
- * author: anton
- * date: 01/05/13
+ * author: anton date: 01/05/13
  */
 @Service("geneService")
-@RemoteProxy(name="GeneService")
+@RemoteProxy(name = "GeneService")
 public class GeneServiceImpl implements GeneService {
 
-    @Autowired private VariantDao variantDao;
-    @Autowired private UserGeneSetDao userGeneSetDao;
-    @Autowired private BioMartQueryService bioMartQueryService;
-    @Autowired private NeurocartaQueryService neurocartaQueryService;
-    
+    @Autowired
+    private VariantDao variantDao;
+    @Autowired
+    private UserGeneSetDao userGeneSetDao;
+    @Autowired
+    private BioMartQueryService bioMartQueryService;
+    @Autowired
+    private NeurocartaQueryService neurocartaQueryService;
+
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
-    public List<GeneValueObject> getGenesInsideVariants(Collection<Long> ids)
-            throws NotLoggedInException, BioMartServiceException {
-        
+    public List<GeneValueObject> getGenesInsideVariants( Collection<Long> ids ) throws NotLoggedInException,
+            BioMartServiceException {
+
         // Used to remove duplicates
-        HashMap<String,GeneValueObject> genes = new HashMap<String, GeneValueObject>();
-        for (Long id: ids) {
+        HashMap<String, GeneValueObject> genes = new HashMap<String, GeneValueObject>();
+        for ( Long id : ids ) {
             Variant variant = variantDao.load( id );
             GenomicLocation location = variant.getLocation();
             Collection<GeneValueObject> genesInsideRange = this.bioMartQueryService.fetchGenesByLocation(
-                    String.valueOf(location.getChromosome()),
-                    (long) location.getStart(), (long) location.getEnd());
-            for (GeneValueObject geneValueObject : genesInsideRange) {
-                genes.put(geneValueObject.getEnsemblId(), geneValueObject);
+                    String.valueOf( location.getChromosome() ), ( long ) location.getStart(),
+                    ( long ) location.getEnd() );
+            for ( GeneValueObject geneValueObject : genesInsideRange ) {
+                genes.put( geneValueObject.getEnsemblId(), geneValueObject );
             }
         }
-        List<GeneValueObject> results = new ArrayList<GeneValueObject>(genes.values());
+        List<GeneValueObject> results = new ArrayList<GeneValueObject>( genes.values() );
         return results;
     }
 
     @Override
     @RemoteMethod
-    public Collection<GeneValueObject> findGenesWithNeurocartaPhenotype(String phenotypeValueUri)
+    public Collection<GeneValueObject> findGenesWithNeurocartaPhenotype( String phenotypeValueUri )
             throws NotLoggedInException, ExternalDependencyException {
-        
-        return this.neurocartaQueryService.fetchGenesAssociatedWithPhenotype(phenotypeValueUri);
+
+        return this.neurocartaQueryService.fetchGenesAssociatedWithPhenotype( phenotypeValueUri );
     }
-    
+
     @Override
     @RemoteMethod
-    public Map< String,GeneValueObject> findGenesAndURIsWithNeurocartaPhenotype(String phenotypeValueUri)
+    public Map<String, GeneValueObject> findGenesAndURIsWithNeurocartaPhenotype( String phenotypeValueUri )
             throws NotLoggedInException, ExternalDependencyException {
-        
-        return this.neurocartaQueryService.findPhenotypeGenes(phenotypeValueUri);
+
+        return this.neurocartaQueryService.findPhenotypeGenes( phenotypeValueUri );
     }
 
-
-@Override
-@Transactional
-@RemoteMethod
-public Long saveUserGeneSet(String geneSetName,List<GeneValueObject> genes) {
-    final List<UserGeneSet> geneSet = userGeneSetDao.findByName(geneSetName);
-    UserGeneSet savedUserGeneSet=null;
-    if ( geneSet.isEmpty() ) {
-    	UserGeneSet userGeneSet = new UserGeneSet(geneSetName, ( Serializable ) genes);
-    	savedUserGeneSet = userGeneSetDao.create( userGeneSet );
-    } else if ( geneSet.size() == 1 ) {
-    	UserGeneSet userGeneSet = geneSet.iterator().next();
-    	userGeneSet.setObject( ( Serializable ) genes );
-        userGeneSetDao.update( userGeneSet );
-        savedUserGeneSet = userGeneSet;
-    } else {
-        throw new IllegalStateException( "Found more than one saved gene sets with same name belonging to one user." );
+    @Override
+    @Transactional
+    @RemoteMethod
+    public Long saveUserGeneSet( String geneSetName, List<GeneValueObject> genes ) {
+        final List<UserGeneSet> geneSet = userGeneSetDao.findByName( geneSetName );
+        UserGeneSet savedUserGeneSet = null;
+        if ( geneSet.isEmpty() ) {
+            UserGeneSet userGeneSet = new UserGeneSet( geneSetName, ( Serializable ) genes );
+            savedUserGeneSet = userGeneSetDao.create( userGeneSet );
+        } else if ( geneSet.size() == 1 ) {
+            UserGeneSet userGeneSet = geneSet.iterator().next();
+            userGeneSet.setObject( ( Serializable ) genes );
+            userGeneSetDao.update( userGeneSet );
+            savedUserGeneSet = userGeneSet;
+        } else {
+            throw new IllegalStateException(
+                    "Found more than one saved gene sets with same name belonging to one user." );
+        }
+        return savedUserGeneSet.getId();
     }
-    return savedUserGeneSet.getId();
-}
 
-@Override
-@RemoteMethod
-public boolean isGeneSetName(String name) {
+    @Override
+    @RemoteMethod
+    public boolean isGeneSetName( String name ) {
 
-	List<UserGeneSet> geneSet = userGeneSetDao.findByName( name );
-    
-    if (geneSet.size() >0){
+        List<UserGeneSet> geneSet = userGeneSetDao.findByName( name );
+
+        if ( geneSet.size() > 0 ) {
             return true;
         }
-    
-    
-    return false;              
-         
-}
 
+        return false;
+
+    }
 
 }

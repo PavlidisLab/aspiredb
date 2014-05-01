@@ -79,5 +79,4 @@ public class Query implements Securable {
         this.object = object;
     }
 
-    
 }

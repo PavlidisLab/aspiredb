@@ -14,9 +14,11 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import java.util.Collection;
+import java.util.List;
+
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
-import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
@@ -26,64 +28,55 @@ import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.PropertyValue;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
-import java.util.Collection;
-import java.util.List;
-
-/**
- 
- * @author azoubare
+/** @author azoubare
  * @version $Id: VariantService.java,v 1.19 2013/06/13 19:57:16 anton Exp $
  */
 public interface VariantService {
 
-    public VariantValueObject getVariant(Long variantId);
-    
-    public List<VariantValueObject> getSubjectVariants(String patientId);
-    public List<VariantValueObject> getSubjectsVariants(List<String> patientIds);
-    
-    public Integer getTotalNoOfVariantsBySubjectId(String patientId);
-            
+    public VariantValueObject getVariant( Long variantId );
+
+    public List<VariantValueObject> getSubjectVariants( String patientId );
+
+    public List<VariantValueObject> getSubjectsVariants( List<String> patientIds );
+
+    public Integer getTotalNoOfVariantsBySubjectId( String patientId );
+
     public Collection<Property> suggestVariantLocationProperties();
-    
-    public Collection<PropertyValue> suggestVariantLocationValues(Property property, SuggestionContext suggestionContext)
-            throws BioMartServiceException, NeurocartaServiceException, BioMartServiceException, NeurocartaServiceException;
 
-    public Collection<Property> suggestEntityPropertiesByStringName(String variantType);
-    
-    public Collection<Property> suggestPropertiesForVariantType(VariantType variantType);
-    
+    public Collection<PropertyValue> suggestVariantLocationValues( Property property,
+            SuggestionContext suggestionContext ) throws BioMartServiceException, NeurocartaServiceException,
+            BioMartServiceException, NeurocartaServiceException;
+
+    public Collection<Property> suggestEntityPropertiesByStringName( String variantType );
+
+    public Collection<Property> suggestPropertiesForVariantType( VariantType variantType );
+
     public Collection<Property> suggestPropertiesForProjectOverlap();
-    
+
     public Collection<Property> suggestPropertiesForNumberOfVariantsInProjectOverlap();
-    
+
     public Collection<Property> suggestPropertiesForSupportOfVariantsInProjectOverlap();
-    
+
     public Collection<Property> suggestProperties();
-            
-    public Collection<PropertyValue> suggestValues(Property property, SuggestionContext suggestionContext)
-            throws  BioMartServiceException, NeurocartaServiceException;
-    
-    public Collection<GeneProperty> suggestGeneValues(SuggestionContext suggestionContext) throws BioMartServiceException, NeurocartaServiceException ;
+
+    public Collection<PropertyValue> suggestValues( Property property, SuggestionContext suggestionContext )
+            throws BioMartServiceException, NeurocartaServiceException;
+
+    public Collection<GeneProperty> suggestGeneValues( SuggestionContext suggestionContext )
+            throws BioMartServiceException, NeurocartaServiceException;
 
     @Deprecated
-    public Collection<String> suggestCharacteristicPropertyValues(CharacteristicProperty property);
-           
+    public Collection<String> suggestCharacteristicPropertyValues( CharacteristicProperty property );
 
     @Deprecated
-    public List<LabelValueObject> suggestLabels(SuggestionContext suggestionContext);
-           
+    public List<LabelValueObject> suggestLabels( SuggestionContext suggestionContext );
 
-    public LabelValueObject addLabel(Long variantId, LabelValueObject label);
-            
+    public LabelValueObject addLabel( Long variantId, LabelValueObject label );
 
-    public LabelValueObject addLabel(Collection<Long> variantIds, LabelValueObject label);
-           
+    public LabelValueObject addLabel( Collection<Long> variantIds, LabelValueObject label );
 
-    public void removeLabel(Long variantId, LabelValueObject label);
-            
+    public void removeLabel( Long variantId, LabelValueObject label );
 
-    public void removeLabel(Collection<Long> variantIds, LabelValueObject label);
-            
-
+    public void removeLabel( Collection<Long> variantIds, LabelValueObject label );
 
 }
