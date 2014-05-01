@@ -73,10 +73,11 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
          var vo = vos[i];
 
          var linkToGemma = "";
+         var phenName = "";
 
          if ( vo.geneBioType == "protein_coding" ) {
             linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl( vo.symbol );
-            var row = [ vo.symbol, vo.geneBioType, vo.name, linkToGemma ];
+            var row = [ vo.symbol, vo.geneBioType, vo.name, phenName, linkToGemma ];
             data.push( row );
          }
 

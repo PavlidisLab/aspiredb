@@ -58,6 +58,13 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
                  flex : 1
               },
               {
+                 header : 'Phenotype Name',
+                 dataIndex : 'pheneName',
+                 hidden : true,
+                 disabled : true,
+                 flex : 1
+              },
+              {
                  header : 'View in Gemma',
                  dataIndex : 'linkToGemma',
                  flex : 1,
