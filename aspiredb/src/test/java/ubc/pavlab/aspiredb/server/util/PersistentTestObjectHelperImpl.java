@@ -99,7 +99,6 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     public PersistentTestObjectHelperImpl() {
     }
 
-    @Override
     public SNV createDetachedTestSNVObject() {
 
         GenomicLocation genomicLocation = new GenomicLocation();
@@ -121,14 +120,12 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         return snv;
     }
 
-    @Override
     @Transactional
     public SNV createPersistentTestSNVObject() {
 
         return snvDao.create( createDetachedTestSNVObject() );
     }
 
-    @Override
     public Indel createDetachedTestIndelObject() {
 
         GenomicLocation genomicLocation = new GenomicLocation();
@@ -148,14 +145,12 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         return indel;
     }
 
-    @Override
     @Transactional
     public Indel createPersistentTestIndelObject() {
 
         return indelDao.create( createDetachedTestIndelObject() );
     }
 
-    @Override
     public CNV createDetachedTestCNVObject() {
 
         GenomicLocation genomicLocation = new GenomicLocation();
@@ -206,7 +201,6 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     }
 
-    @Override
     @Transactional
     public CNV createPersistentTestCNVObject() {
         return cnvDao.create( createDetachedTestCNVObject() );
@@ -244,7 +238,6 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         return cnv;
     }
 
-    @Override
     public Subject createDetachedIndividualObject( String patientId ) {
 
         Subject individual = new Subject();
@@ -254,7 +247,6 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         return individual;
     }
 
-    @Override
     @Transactional
     public Subject createPersistentTestIndividualObject( String patientId ) {
 
@@ -263,7 +255,6 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         return subjectDao.create( individual );
     }
 
-    @Override
     @Transactional
     public Phenotype createPersistentTestPhenotypeObject( String name, String uri, String valueType, String value ) {
 
@@ -272,7 +263,6 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         return phenotypeDao.create( p );
     }
 
-    @Override
     @Transactional
     public Subject createPersistentTestSubjectObjectWithCNV( String patientId ) {
 
@@ -283,7 +273,6 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         return individual;
     }
 
-    @Override
     @Transactional
     public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypes( String patientId ) {
 
@@ -301,7 +290,6 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     }
 
-    @Override
     @Transactional
     public Subject addSubjectToProject( Subject s, Project p ) {
 
@@ -313,7 +301,6 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     }
 
-    @Override
     @Transactional
     public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypesForEnrichmentTest( String patientId,
             String phenName, String phenUri, String phenValue ) {
@@ -326,33 +313,28 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     }
 
-    @Override
     @Transactional
     public Project createPersistentProject( Project p ) {
         return projectDao.create( p );
     }
 
-    @Override
     @Transactional
     public List<Subject> getSubjectsForProject( Project p ) {
         return p.getSubjects();
     }
 
-    @Override
     @Transactional
     public Collection<LabelValueObject> getLabelsForSubject( Long subjectId ) {
 
         return Label.toValueObjects( labelDao.getSubjectLabelsBySubjectId( subjectId ) );
     }
 
-    @Override
     @Transactional
     public Collection<LabelValueObject> getLabelsForVariant( Long variantId ) {
 
         return Label.toValueObjects( labelDao.getVariantLabelsByVariantId( variantId ) );
     }
 
-    @Override
     @Transactional
     public void deleteProject( String projectName ) {
 

@@ -266,7 +266,8 @@ public class ProjectManagerTest extends BaseSpringContextTest {
             }
         } );
 
-        new TransactionTemplate( transactionManager );
+        // make sure aDifferentUserName doesn't have access to stuff in project
+        TransactionTemplate tt2 = new TransactionTemplate( transactionManager );
         tt.execute( new TransactionCallbackWithoutResult() {
             @Override
             public void doInTransactionWithoutResult( TransactionStatus status ) {
@@ -319,7 +320,8 @@ public class ProjectManagerTest extends BaseSpringContextTest {
         // authorizedUsername is in groupName
         projectManager.alterGroupWritePermissions( projectId, groupName, false );
 
-        new TransactionTemplate( transactionManager );
+        // make sure authorizedUsername does not have read access to all the stuff in a project after security change
+        TransactionTemplate tt3 = new TransactionTemplate( transactionManager );
         tt.execute( new TransactionCallbackWithoutResult() {
             @Override
             public void doInTransactionWithoutResult( TransactionStatus status ) {

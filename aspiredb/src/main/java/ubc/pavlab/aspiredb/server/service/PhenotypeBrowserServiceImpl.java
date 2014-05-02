@@ -38,6 +38,8 @@ import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
+import ubic.basecode.ontology.model.OntologyTerm;
+import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
 
 /**
  * TODO Document Me
@@ -60,7 +62,6 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService {
     @Autowired
     private NeurocartaQueryService neurocartaQueryService;
 
-    @Override
     public List<PhenotypeSummary> getPhenotypesBySubjectIds( Collection<Long> subjectIds, Collection<Long> projectIds )
             throws NeurocartaServiceException {
 
@@ -196,6 +197,67 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService {
         }
         subjects.add( subjectId );
         subjectsWithUnknown.remove( subjectId );
+    }
+
+    // FIXME: temporarily disabled
+    private PhenotypeSummary fillInferredPhenotypeSummaries( PhenotypeSummary phenotypeSummary,
+            Map<String, PhenotypeSummary> phenotypeToSummaryMap ) throws NeurocartaServiceException {
+
+        HumanPhenotypeOntologyService hpoService = ontologyService.getHumanPhenotypeOntologyService();
+        OntologyTerm ontologyTerm = hpoService.getTerm( PhenotypeUtil.HUMAN_PHENOTYPE_URI_PREFIX
+                + phenotypeSummary.getUri() );
+
+        if ( ontologyTerm == null ) { // Not an ontology term.
+            return phenotypeSummary;
+        }
+
+        // Shown when phenotype grid row is expanded.
+        Collection<PhenotypeSummary> descendantSummaries = phenotypeSummary.getDescendantOntologyTermSummaries();
+        Collection<OntologyTerm> descendantsTerms = ontologyTerm.getChildren( false );
+        // if ( descendantsTerms.isEmpty() ) { // Is leaf term.
+        // return phenotypeSummary;
+        // }
+        // // TODO: what about inference of absence?
+
+        // Add to map if phenotype is present in db.
+        for ( OntologyTerm childTerm : descendantsTerms ) {
+            if ( phenotypeToSummaryMap.keySet().contains( childTerm.getLabel() ) ) {
+                descendantSummaries.add( phenotypeToSummaryMap.get( childTerm.getLabel() ) );
+            }
+
+            phenotypeSummary.setNeurocartaPhenotype( isNeurocartaPhenotype( phenotypeSummary.getUri() )
+                    || isNeurocartaPhenotype( childTerm.getUri() ) );
+        }
+
+        // Initialize subject sets.
+        if ( phenotypeSummary.getInferredValueToSubjectSet().get( "1" ) == null ) {
+            phenotypeSummary.getInferredValueToSubjectSet().put( "1", new HashSet<Long>() );
+        }
+        if ( phenotypeSummary.getInferredValueToSubjectSet().get( "0" ) == null ) {
+            phenotypeSummary.getInferredValueToSubjectSet().put( "0", new HashSet<Long>() );
+        }
+
+        Set<Long> presentSubjectSet = phenotypeSummary.getInferredValueToSubjectSet().get( "1" );
+        Set<Long> absentSubjectSet = phenotypeSummary.getInferredValueToSubjectSet().get( "0" );
+
+        for ( PhenotypeSummary childSummary : descendantSummaries ) {
+            // Propagate 'Present' (1) values to ancestor.
+            Set<Long> childPresentSubjectSet = childSummary.getInferredValueToSubjectSet().get( "1" );
+            if ( childPresentSubjectSet != null ) {
+                presentSubjectSet.addAll( childPresentSubjectSet );
+            }
+
+            // Propagate 'Absent' (0) values to descendants.
+            if ( childSummary.getInferredValueToSubjectSet().get( "0" ) == null ) {
+                childSummary.getInferredValueToSubjectSet().put( "0", new HashSet<Long>() );
+            }
+            Set<Long> childAbsentSubjectSet = childSummary.getInferredValueToSubjectSet().get( "0" );
+            if ( absentSubjectSet != null ) {
+                childAbsentSubjectSet.addAll( absentSubjectSet );
+            }
+        }
+
+        return phenotypeSummary;
     }
 
     private Collection<Phenotype> loadPhenotypesBySubjectIds( Collection<Long> subjectIds ) {

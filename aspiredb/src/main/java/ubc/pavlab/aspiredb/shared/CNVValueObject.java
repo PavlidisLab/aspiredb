@@ -64,22 +64,19 @@ public class CNVValueObject extends VariantValueObject {
         this.cnvLength = cnvLength;
     }
 
-    @Override
     public String getPropertyStringValue( Property property ) {
         if ( property instanceof CopyNumberProperty ) {
-            if ( copyNumber == null ) {
+            if ( copyNumber == null )
                 return null;
-            } else {
+            else
                 return copyNumber.toString();
-            }
         } else if ( property instanceof CNVTypeProperty ) {
             return this.getType();
         } else if ( property instanceof CnvLengthProperty ) {
-            if ( cnvLength == null ) {
+            if ( cnvLength == null )
                 return null;
-            } else {
+            else
                 return cnvLength.toString();
-            }
         }
 
         return super.getPropertyStringValue( property );

@@ -97,6 +97,7 @@ public class CacheMonitorImpl implements CacheMonitor {
 
         buf.append( cacheNames.length + " caches; only non-empty caches listed below." );
 
+        int count = 0;
         for ( String rawCacheName : cacheNames ) {
             Cache cache = cacheManager.getCache( rawCacheName );
             Statistics statistics = cache.getStatistics();
@@ -128,7 +129,7 @@ public class CacheMonitorImpl implements CacheMonitor {
             buf.append( evictions + "\t" );
 
             CacheConfiguration cacheConfiguration = cache.getCacheConfiguration();
-            cacheConfiguration.isEternal();
+            boolean eternal = cacheConfiguration.isEternal();
         }
         return buf.toString();
 

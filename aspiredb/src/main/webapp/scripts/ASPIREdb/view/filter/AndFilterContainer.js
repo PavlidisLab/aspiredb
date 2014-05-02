@@ -1,209 +1,210 @@
-Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.filter.OrFilterContainer' ] );
+Ext.require([ 'Ext.layout.container.*', 'ASPIREdb.view.filter.OrFilterContainer' ]);
+
+Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
+	extend : 'Ext.Container',
+	alias : 'widget.filter_and',
+	layout : {
+		type : 'vbox'
+	},
+	config : {
+		propertyStore : null,
+		suggestValuesRemoteFunction : null,
+		filterItemType : null
+	},
+	items : [ {
+		xtype : 'container',
+		itemId : 'filterContainer',
+		layout : {
+			type : 'vbox',
+			defaultMargins : {
+				top : 5,
+				right : 5,
+				left : 5,
+				bottom : 5
+			}
+		},
+		getRestrictionExpression : function() {
+			var conjunction = new Conjunction();
+			conjunction.restrictions = [];
+			this.items.each(function(item, index, length) {
+
+				var itemRestriction = item.getRestrictionExpression();
 
-Ext.define( 'ASPIREdb.view.filter.AndFilterContainer', {
-   extend : 'Ext.Container',
-   alias : 'widget.filter_and',
-   layout : {
-      type : 'vbox'
-   },
-   config : {
-      propertyStore : null,
-      suggestValuesRemoteFunction : null,
-      filterItemType : null
-   },
-   items : [ {
-      xtype : 'container',
-      itemId : 'filterContainer',
-      layout : {
-         type : 'vbox',
-         defaultMargins : {
-            top : 5,
-            right : 5,
-            left : 5,
-            bottom : 5
-         }
-      },
-      getRestrictionExpression : function() {
-         var conjunction = new Conjunction();
-         conjunction.restrictions = [];
-         this.items.each( function(item, index, length) {
+				if (FilterUtil.isSimpleRestriction(itemRestriction)) {
 
-            var itemRestriction = item.getRestrictionExpression();
+					if (FilterUtil.validateSimpleRestriction(itemRestriction)) {
 
-            if ( FilterUtil.isSimpleRestriction( itemRestriction ) ) {
+						conjunction.restrictions.push(itemRestriction);
+					}
 
-               if ( FilterUtil.validateSimpleRestriction( itemRestriction ) ) {
+				} else if (itemRestriction instanceof Disjunction) {
 
-                  conjunction.restrictions.push( itemRestriction );
-               }
+					var nonEmptyDisjunction = new Disjunction();
+					
+					var nonEmptyRestrictionsArray = [];
 
-            } else if ( itemRestriction instanceof Disjunction ) {
+					if (itemRestriction.restrictions) {
 
-               var nonEmptyDisjunction = new Disjunction();
+						for ( var i = 0; i < itemRestriction.restrictions.length; i++) {
+							
+							var disjunctedRestriction = itemRestriction.restrictions[i];
+							
+							if (FilterUtil.isSimpleRestriction(disjunctedRestriction)) {
 
-               var nonEmptyRestrictionsArray = [];
+								if (FilterUtil.validateSimpleRestriction(disjunctedRestriction)) {
+
+									nonEmptyRestrictionsArray.push(disjunctedRestriction);
+								}
+
+							}							
+
+						}
+
+					}
+
+					else {
+						//to help flush out any bugs
+						alert("multi nested disjunction andfilterconatiner");
+
+					}
+					
+					if (nonEmptyRestrictionsArray.length>0){
+						
+						nonEmptyDisjunction.restrictions = nonEmptyRestrictionsArray;
+						
+						conjunction.restrictions.push(nonEmptyDisjunction);
+						
+					}
+
+				}
+				else{
+					//to help flush out any bugs
+					alert("Unsupported Restriction andfiltercontainer");
+					
+				}
+			});
+			return conjunction;
+		}
+	}, {
+		xtype : 'button',
+		itemId : 'addButton',
+		text : 'AND'
+	} ],
 
-               if ( itemRestriction.restrictions ) {
+	getRestrictionExpression : function() {
+		var filterContainer = this.getComponent('filterContainer');
+		return filterContainer.getRestrictionExpression();
+	},
 
-                  for (var i = 0; i < itemRestriction.restrictions.length; i++) {
+	setRestrictionExpression : function(restriction) {
+		var filterContainer = this.getComponent('filterContainer');
 
-                     var disjunctedRestriction = itemRestriction.restrictions[i];
+		var addMultiItemToContainer = this.getAddMultiItemToContainerFunction(filterContainer);
 
-                     if ( FilterUtil.isSimpleRestriction( disjunctedRestriction ) ) {
+		var getNewItem = this.getNewItemFunction();
 
-                        if ( FilterUtil.validateSimpleRestriction( disjunctedRestriction ) ) {
+		var filterItemType = this.getFilterItemType();
 
-                           nonEmptyRestrictionsArray.push( disjunctedRestriction );
-                        }
+		if (filterItemType == 'ASPIREdb.view.filter.PhenotypeFilter') {
 
-                     }
+			filterContainer.removeAll();
+			for ( var i = 0; i < restriction.restrictions.length; i++) {
 
-                  }
+				addMultiItemToContainer(restriction.restrictions[i], null, getNewItem);
+				
 
-               }
+			}
+		} else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer' || filterItemType == 'ASPIREdb.view.filter.OrPhenotypeFilterContainer' || filterItemType == 'ASPIREdb.view.filter.PropertyFilter'|| filterItemType == 'ASPIREdb.view.filter.ProjectOverlapPropertyFilter') {
+			filterContainer.removeAll();
 
-               else {
-                  // to help flush out any bugs
-                  alert( "multi nested disjunction andfilterconatiner" );
+			if (restriction.restrictions) {
 
-               }
+				FilterUtil.traverseRidiculousObjectQueryGraphAndDoSomething(restriction.restrictions, restriction, addMultiItemToContainer, getNewItem);
 
-               if ( nonEmptyRestrictionsArray.length > 0 ) {
+			} else {
 
-                  nonEmptyDisjunction.restrictions = nonEmptyRestrictionsArray;
+				var item = this.getNewItem();
 
-                  conjunction.restrictions.push( nonEmptyDisjunction );
+				item.setSimpleRestrictionExpression(restriction);
 
-               }
+				filterContainer.add(item);
 
-            } else {
-               // to help flush out any bugs
-               alert( "Unsupported Restriction andfiltercontainer" );
+			}
 
-            }
-         } );
-         return conjunction;
-      }
-   }, {
-      xtype : 'button',
-      itemId : 'addButton',
-      text : 'AND'
-   } ],
+		}
 
-   getRestrictionExpression : function() {
-      var filterContainer = this.getComponent( 'filterContainer' );
-      return filterContainer.getRestrictionExpression();
-   },
+	},
 
-   setRestrictionExpression : function(restriction) {
-      var filterContainer = this.getComponent( 'filterContainer' );
+	getAddMultiItemToContainerFunction : function(filterContainer) {
 
-      var addMultiItemToContainer = this.getAddMultiItemToContainerFunction( filterContainer );
+				
+		var addMultiItemToContainer = function(restriction, outerRestriction, getNewItem) {
+			
+			
+			if (!(restriction instanceof VariantTypeRestriction)){
+				
+				if (outerRestriction instanceof Disjunction){
+					
+					var item = getNewItem();
+					
+					item.setRestrictionExpression(outerRestriction);
 
-      var getNewItem = this.getNewItemFunction();
+					filterContainer.add(item);
+					
+					
+				}else{
+				
+					var item = getNewItem();
+				
+					item.setRestrictionExpression(restriction);
 
-      var filterItemType = this.getFilterItemType();
+					filterContainer.add(item);
+				
+				}
+				
+			}
 
-      if ( filterItemType == 'ASPIREdb.view.filter.PhenotypeFilter' ) {
+		};
 
-         filterContainer.removeAll();
-         for (var i = 0; i < restriction.restrictions.length; i++) {
+		return addMultiItemToContainer;
 
-            addMultiItemToContainer( restriction.restrictions[i], null, getNewItem );
+	},
 
-         }
-      } else if ( filterItemType == 'ASPIREdb.view.filter.OrFilterContainer'
-         || filterItemType == 'ASPIREdb.view.filter.OrPhenotypeFilterContainer'
-         || filterItemType == 'ASPIREdb.view.filter.PropertyFilter'
-         || filterItemType == 'ASPIREdb.view.filter.ProjectOverlapPropertyFilter' ) {
-         filterContainer.removeAll();
+	getNewItemFunction : function() {
 
-         if ( restriction.restrictions ) {
+		var filterTypeItem = this.getFilterItemType();
+		var propertyStore = this.getPropertyStore();
+		var suggestValuesRemoteFunction = this.getSuggestValuesRemoteFunction();
 
-            FilterUtil.traverseRidiculousObjectQueryGraphAndDoSomething( restriction.restrictions, restriction,
-               addMultiItemToContainer, getNewItem );
+		var getNewItem = function() {
 
-         } else {
+			return Ext.create(filterTypeItem, {
+				propertyStore : propertyStore,
+				suggestValuesRemoteFunction : suggestValuesRemoteFunction
+			});
 
-            var item = this.getNewItem();
+		};
 
-            item.setSimpleRestrictionExpression( restriction );
+		return getNewItem;
+	},
 
-            filterContainer.add( item );
+	initComponent : function() {
+		this.callParent();
 
-         }
+		var me = this;
+		var filterContainer = this.getComponent("filterContainer");
 
-      }
+		var getNewItem = this.getNewItemFunction();
 
-   },
+		var item = getNewItem();
+		// Add first item.
+		filterContainer.insert(0, item);
 
-   getAddMultiItemToContainerFunction : function(filterContainer) {
+		// Attach button listener
+		me.getComponent("addButton").on('click', function(button, event) {
+			filterContainer.add(getNewItem());
+			filterContainer.doLayout();
+		});
+	}
 
-      var addMultiItemToContainer = function(restriction, outerRestriction, getNewItem) {
-
-         if ( !(restriction instanceof VariantTypeRestriction) ) {
-
-            if ( outerRestriction instanceof Disjunction ) {
-
-               var item = getNewItem();
-
-               item.setRestrictionExpression( outerRestriction );
-
-               filterContainer.add( item );
-
-            } else {
-
-               var item = getNewItem();
-
-               item.setRestrictionExpression( restriction );
-
-               filterContainer.add( item );
-
-            }
-
-         }
-
-      };
-
-      return addMultiItemToContainer;
-
-   },
-
-   getNewItemFunction : function() {
-
-      var filterTypeItem = this.getFilterItemType();
-      var propertyStore = this.getPropertyStore();
-      var suggestValuesRemoteFunction = this.getSuggestValuesRemoteFunction();
-
-      var getNewItem = function() {
-
-         return Ext.create( filterTypeItem, {
-            propertyStore : propertyStore,
-            suggestValuesRemoteFunction : suggestValuesRemoteFunction
-         } );
-
-      };
-
-      return getNewItem;
-   },
-
-   initComponent : function() {
-      this.callParent();
-
-      var me = this;
-      var filterContainer = this.getComponent( "filterContainer" );
-
-      var getNewItem = this.getNewItemFunction();
-
-      var item = getNewItem();
-      // Add first item.
-      filterContainer.insert( 0, item );
-
-      // Attach button listener
-      me.getComponent( "addButton" ).on( 'click', function(button, event) {
-         filterContainer.add( getNewItem() );
-         filterContainer.doLayout();
-      } );
-   }
-
-} );
+});

@@ -143,9 +143,7 @@ public class PhenotypeServiceImpl implements PhenotypeService {
     }
 
     public static boolean isUri( String uriOrName ) {
-        if ( uriOrName == null ) {
-            return false;
-        }
+        if ( uriOrName == null ) return false;
 
         return uriOrName.trim().startsWith( "HP_" );
     }
@@ -271,8 +269,121 @@ public class PhenotypeServiceImpl implements PhenotypeService {
         return propertyValues;
     }
 
+    /**
+     * Expand map by adding rows for descendants/ancestors of terms currently in the map(from db).
+     * 
+     * @param phenotypeMap
+     */
+    private Map<String, PhenotypeValueObject> addDescendantsAndAncestors( Map<String, PhenotypeValueObject> phenotypeMap ) {
+        // Pre-condition:
+        // db phenotypes are loaded into phenotypeMap
+        HumanPhenotypeOntologyService hpoService = ontologyService.getHumanPhenotypeOntologyService();
+
+        Map<String, PhenotypeValueObject> inferredPhenotypeMap = new HashMap<String, PhenotypeValueObject>();
+
+        for ( PhenotypeValueObject phenotype : phenotypeMap.values() ) {
+            // Create full ontology tree branch (up and down from current term)
+            Long subjectId = phenotype.getSubjectId();
+
+            OntologyTerm ontologyTerm = hpoService.getTerm( PhenotypeUtil.HUMAN_PHENOTYPE_URI_PREFIX
+                    + phenotype.getUri() );
+
+            if ( ontologyTerm == null ) continue;
+
+            Collection<OntologyTerm> descendantsTerms = ontologyTerm.getChildren( false );
+
+            // Add descendants (some are present in db some are not) to each phenotype object.
+            for ( OntologyTerm descendantTerm : descendantsTerms ) {
+                PhenotypeValueObject childPhenotype = phenotypeMap.get( descendantTerm.getLabel() );
+                if ( childPhenotype == null ) {
+                    childPhenotype = inferredPhenotypeMap.get( descendantTerm.getLabel() );
+                    if ( childPhenotype == null ) {
+                        childPhenotype = createPhenotypeValueObject( subjectId, descendantTerm );
+                        inferredPhenotypeMap.put( childPhenotype.getName(), childPhenotype );
+                    }
+                }
+            }
+
+            // Ancestors
+            Collection<OntologyTerm> ancestorTerms = ontologyTerm.getParents( false );
+            for ( OntologyTerm ancestorTerm : ancestorTerms ) {
+                PhenotypeValueObject ancestorPhenotype = phenotypeMap.get( ancestorTerm.getLabel() );
+                if ( ancestorPhenotype == null ) {
+                    ancestorPhenotype = inferredPhenotypeMap.get( ancestorTerm.getLabel() );
+                    if ( ancestorPhenotype == null ) {
+                        ancestorPhenotype = createPhenotypeValueObject( subjectId, ancestorTerm );
+                        inferredPhenotypeMap.put( ancestorTerm.getLabel(), ancestorPhenotype );
+                    }
+                }
+            }
+        }
+
+        // Add inferred terms not stored in database.
+        inferredPhenotypeMap.putAll( phenotypeMap );
+        phenotypeMap = inferredPhenotypeMap;
+
+        for ( PhenotypeValueObject phenotype : phenotypeMap.values() ) {
+            // Create full ontology tree branch (up and down from current term)
+
+            OntologyTerm ontologyTerm = hpoService.getTerm( PhenotypeUtil.HUMAN_PHENOTYPE_URI_PREFIX
+                    + phenotype.getUri() );
+
+            if ( ontologyTerm == null ) {
+                ontologyTerm = hpoService.getTerm( phenotype.getUri() );
+                if ( ontologyTerm == null ) {
+                    continue;
+                }
+            }
+
+            Collection<OntologyTerm> descendantsTerms = ontologyTerm.getChildren( false );
+
+            // Add descendants (some are present in db some are not) to each phenotype object.
+            for ( OntologyTerm descendantTerm : descendantsTerms ) {
+                PhenotypeValueObject childPhenotype = phenotypeMap.get( descendantTerm.getLabel() );
+                if ( childPhenotype != null ) {
+                    phenotype.addChildIfAbsent( childPhenotype );
+                }
+            }
+
+            // Ancestors
+            Collection<OntologyTerm> ancestorTerms = ontologyTerm.getParents( false );
+            for ( OntologyTerm ancestorTerm : ancestorTerms ) {
+                PhenotypeValueObject ancestorPhenotype = phenotypeMap.get( ancestorTerm.getLabel() );
+                if ( ancestorPhenotype != null ) {
+                    ancestorPhenotype.addChildIfAbsent( phenotype );
+                }
+            }
+        }
+        return phenotypeMap;
+    }
+
     private PhenotypeValueObject createPhenotypeValueObject( Long subjectId, OntologyTerm ontologyTerm ) {
         return new PhenotypeValueObject( subjectId, ontologyTerm.getUri(), ontologyTerm.getLabel(), "Unknown" );
+    }
+
+    /**
+     * Propagate absent/present values to ancestors/descendants.
+     * 
+     * @param phenotypeMap
+     */
+    private void propagateAbsentPresentValues( Map<String, PhenotypeValueObject> phenotypeMap ) {
+        for ( PhenotypeValueObject phenotype : phenotypeMap.values() ) {
+            for ( PhenotypeValueObject child : phenotype.getDescendantPhenotypes().values() ) {
+                // Propagate 'Present' (1) values to ancestor.
+                if ( child.getDbValue() != null && phenotype.getDbValue() == null ) {
+                    if ( child.getDbValue().equals( PhenotypeUtil.VALUE_PRESENT ) ) {
+                        phenotype.setInferredValue( PhenotypeUtil.VALUE_PRESENT );
+                        continue;
+                    }
+                }
+                // Propagate 'Absent' (0) values to descendants.
+                if ( phenotype.getDbValue() != null && child.getDbValue() == null ) {
+                    if ( phenotype.getDbValue().equals( PhenotypeUtil.VALUE_ABSENT ) ) {
+                        child.setInferredValue( PhenotypeUtil.VALUE_ABSENT );
+                    }
+                }
+            }
+        }
     }
 
     @Override

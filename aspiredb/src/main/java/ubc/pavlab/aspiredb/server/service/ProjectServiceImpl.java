@@ -58,7 +58,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     PhenotypeUploadService phenotypeUploadService;
 
-    @Override
     @RemoteMethod
     public List<ProjectValueObject> getProjects() {
 
@@ -72,7 +71,6 @@ public class ProjectServiceImpl implements ProjectService {
         return vos;
     }
 
-    @Override
     @RemoteMethod
     public List<ProjectValueObject> getOverlapProjects( Collection<Long> ids ) {
 
@@ -87,7 +85,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     // Hard code these special project's access for clarity
-    @Override
     @RemoteMethod
     public ProjectValueObject getDgvProject() {
 
@@ -108,7 +105,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     // Hard code these special project's access for clarity
-    @Override
     @RemoteMethod
     public ProjectValueObject getDecipherProject() {
 
@@ -141,7 +137,6 @@ public class ProjectServiceImpl implements ProjectService {
     /*
      * TODO eventually we want this to work with a collection of projectIds
      */
-    @Override
     @RemoteMethod
     public Integer numVariants( Collection<Long> projectIds ) {
 
@@ -152,7 +147,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     // TODO change return type to some object that can contain more relevant information, handle other exceptions
-    @Override
     public String processUploadedFile( String projectName, String filename, VariantType v ) {
 
         log.info( " In processUploadedFile projectName:" + projectName + " filename:" + filename + " varianttype:"
@@ -213,7 +207,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     // TODO change return type to some object that can contain more relevant information, handle other exceptions
-    @Override
     public String processUploadedPhenotypeFile( String projectName, String filename ) {
 
         log.info( " In processUploadedPhenotypeFile projectName:" + projectName + " filename:" + filename );
@@ -269,7 +262,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    @Override
     public String deleteProject( String projectName ) {
 
         log.info( " In deleteProject projectName:" + projectName );
@@ -292,7 +284,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    @Override
     public String alterGroupPermissions( String projectName, String groupName, Boolean grant )
             throws NotLoggedInException {
         log.info( " In alterGroupPermissions projectName:" + projectName + " group name: " + groupName + " grant:"
@@ -321,7 +312,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    @Override
     public String createUserAndAssignToGroup( String userName, String password, String groupName )
             throws NotLoggedInException {
 

@@ -141,7 +141,6 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
         return this.neurocartaCache.findPhenotypes( queryString );
     }
 
-    @Override
     @SuppressWarnings("rawtypes")
     public Map<String, GeneValueObject> findPhenotypeGenes( String phenotypeUri ) throws NeurocartaServiceException,
             BioMartServiceException {
@@ -163,7 +162,7 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
             JSONArray jsonArray = new JSONArray( new JSONTokener( result ) );
 
             geneSymbols = new HashSet<String>( jsonArray.length() );
-            new ArrayList<String>();
+            ArrayList<String> uris = new ArrayList<String>();
 
             for ( int i = 0; i < jsonArray.length(); i++ ) {
                 JSONObject json = jsonArray.getJSONObject( i );

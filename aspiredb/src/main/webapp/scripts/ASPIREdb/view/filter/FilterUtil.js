@@ -17,64 +17,60 @@
  *
  */
 
-var FilterUtil = {
+var FilterUtil = {		
+		
 
-   // Simple means not Disjunction or Conjunction
-   validateSimpleRestriction : function(restriction) {
+		//Simple means not Disjunction or Conjunction
+		validateSimpleRestriction: function(restriction){
+			
+			if (restriction instanceof PhenotypeRestriction && restriction.name && restriction.value){
+				
+				return true;
+				
+			}else if (restriction instanceof SetRestriction && restriction.operator && restriction.property && restriction.values && restriction.values.length>0){
+			
+				return true;
+			
+			}
+			else if (restriction instanceof SimpleRestriction && restriction.operator && restriction.property && restriction.value && restriction.value.value !==''){
+				
+				return true;
+			}
+			
+			return false;
+			
+		},
+		
+		isSimpleRestriction : function(restriction){
+			
+			if (restriction instanceof PhenotypeRestriction || restriction instanceof SetRestriction ||restriction instanceof SimpleRestriction){
+				return true;
+			}
+			
+			return false;
+			
+		},
+		
+		traverseRidiculousObjectQueryGraphAndDoSomething: function(restrictions, parentRestriction, somethingToDoFunction, somethingElseToDoFunction){
+			
+			for ( var i = 0; i < restrictions.length; i++) {				
+				
+				var rest1 = restrictions[i];
 
-      if ( restriction instanceof PhenotypeRestriction && restriction.name && restriction.value ) {
+				if (rest1.restrictions) {
+					
+					this.traverseRidiculousObjectQueryGraphAndDoSomething(rest1.restrictions, rest1, somethingToDoFunction, somethingElseToDoFunction);
 
-         return true;
+				} else{	
+					
+					somethingToDoFunction(rest1, parentRestriction, somethingElseToDoFunction);				
+					
+					//Disjunction Junction, what's your Function?
+					if (parentRestriction instanceof Disjunction) return;
+				}
 
-      } else if ( restriction instanceof SetRestriction && restriction.operator && restriction.property
-         && restriction.values && restriction.values.length > 0 ) {
-
-         return true;
-
-      } else if ( restriction instanceof SimpleRestriction && restriction.operator && restriction.property
-         && restriction.value && restriction.value.value !== '' ) {
-
-         return true;
-      }
-
-      return false;
-
-   },
-
-   isSimpleRestriction : function(restriction) {
-
-      if ( restriction instanceof PhenotypeRestriction || restriction instanceof SetRestriction
-         || restriction instanceof SimpleRestriction ) {
-         return true;
-      }
-
-      return false;
-
-   },
-
-   traverseRidiculousObjectQueryGraphAndDoSomething : function(restrictions, parentRestriction, somethingToDoFunction,
-      somethingElseToDoFunction) {
-
-      for (var i = 0; i < restrictions.length; i++) {
-
-         var rest1 = restrictions[i];
-
-         if ( rest1.restrictions ) {
-
-            this.traverseRidiculousObjectQueryGraphAndDoSomething( rest1.restrictions, rest1, somethingToDoFunction,
-               somethingElseToDoFunction );
-
-         } else {
-
-            somethingToDoFunction( rest1, parentRestriction, somethingElseToDoFunction );
-
-            // Disjunction Junction, what's your Function?
-            if ( parentRestriction instanceof Disjunction )
-               return;
-         }
-
-      }
-
-   }
-
+			}
+			
+		}
+		
 };

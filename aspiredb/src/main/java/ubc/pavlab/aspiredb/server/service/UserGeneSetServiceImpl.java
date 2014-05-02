@@ -158,9 +158,8 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
 
         if ( genesets.size() > 0 ) {
             geneValueObjects = ( List<GeneValueObject> ) genesets.iterator().next().getObject();
-        } else {
+        } else
             geneValueObjects = null;
-        }
 
         // should only be one for one user
         return geneValueObjects;
@@ -191,9 +190,8 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
 
         if ( geneSet.size() > 0 ) {
             existingGeneValueObjects = ( List<GeneValueObject> ) geneSet.iterator().next().getObject();
-        } else {
+        } else
             existingGeneValueObjects = null;
-        }
 
         // storing the existing genes to the gene set
         for ( GeneValueObject existingGeneValueObject : existingGeneValueObjects ) {
@@ -207,13 +205,15 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         // specified. so we need to do this workaround to obtain the complete gene value object
         List<GeneValueObject> geneValueObjects = bioMartQueryService.getGenes( geneSymbols );
 
+        UserGeneSet savedUserGeneSet = null;
         if ( geneSet.isEmpty() ) {
             UserGeneSet userGeneSet = new UserGeneSet( geneSetName, ( Serializable ) geneValueObjects );
-            userGeneSetDao.create( userGeneSet );
+            savedUserGeneSet = userGeneSetDao.create( userGeneSet );
         } else if ( geneSet.size() == 1 ) {
             UserGeneSet userGeneSet = geneSet.iterator().next();
             userGeneSet.setObject( ( Serializable ) geneValueObjects );
             userGeneSetDao.update( userGeneSet );
+            savedUserGeneSet = userGeneSet;
         } else {
             throw new IllegalStateException(
                     "Found more than one saved gene sets with same name belonging to one user." );
@@ -236,9 +236,8 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
 
         if ( geneSet.size() > 0 ) {
             existingGeneValueObjects = ( List<GeneValueObject> ) geneSet.iterator().next().getObject();
-        } else {
+        } else
             existingGeneValueObjects = null;
-        }
 
         List<GeneValueObject> newGeneValueObjects = new ArrayList<>();
 
@@ -246,13 +245,12 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         for ( GeneValueObject gvo : existingGeneValueObjects ) {
             if ( gvo.getSymbol().contentEquals( geneSymbol ) ) {
                 // do nothing
-            } else {
+            } else
                 newGeneValueObjects.add( gvo );
-            }
         }
 
         if ( geneSet.isEmpty() ) {
-            new UserGeneSet( geneSetName, ( Serializable ) newGeneValueObjects );
+            UserGeneSet userGeneSet = new UserGeneSet( geneSetName, ( Serializable ) newGeneValueObjects );
         } else if ( geneSet.size() == 1 ) {
             UserGeneSet userGeneSet = geneSet.iterator().next();
             userGeneSet.setObject( ( Serializable ) newGeneValueObjects );

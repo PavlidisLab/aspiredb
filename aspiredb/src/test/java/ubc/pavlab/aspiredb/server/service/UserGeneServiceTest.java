@@ -18,6 +18,7 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import java.util.Collection;
 import java.util.Date;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -30,6 +31,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
+import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
@@ -50,6 +52,9 @@ public class UserGeneServiceTest extends BaseSpringContextTest {
 
     @Autowired
     UserManager userManager;
+
+    private Project project;
+    private Collection<Long> activeProjectIds;
 
     private static Log log = LogFactory.getLog( UserGeneServiceTest.class.getName() );
     String username = "jimmy";

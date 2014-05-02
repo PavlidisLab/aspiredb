@@ -16,30 +16,31 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'Ext.data.ArrayStore', ] );
+Ext.require([ 'Ext.data.ArrayStore', ]);
 
-Ext.define( 'ASPIREdb.store.LabelStore', {
-   extend : 'Ext.data.ArrayStore',
-   alias : 'store.labelStore',
-   autoSync : true,
+Ext.define('ASPIREdb.store.LabelStore', {
+	extend : 'Ext.data.ArrayStore',
+	alias : 'store.labelStore',
+	autoSync : true,
 
-   fields : [ {
-      name : 'labelId',
-      type : 'int'
-   }, {
-      name : 'labelName',
-      type : 'string'
-   }, {
-      name : 'labelColour',
-      type : 'string'
-   }, {
-      name : 'show',
-      type : 'boolean'
-   }, {
-      name : 'remove',
-      type : 'boolean'
-   } ],
+	fields : [ {
+		name : 'labelId',
+		type : 'int'
+	},{
+		name : 'labelName',
+		type : 'string'
+	}, 
+	{
+		name : 'labelColour',
+		type : 'string'
+	},{
+		name : 'show',
+		type : 'boolean'
+	}, {
+        name : 'remove',
+        type : 'boolean'
+    }  ],
 
-   storeId : 'labelStore'
+	storeId : 'labelStore'
 
-} );
+});

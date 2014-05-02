@@ -210,10 +210,10 @@ public class AclAdvice {
             /*
              * Let agent read anything
              */
-
             if ( log.isDebugEnabled() ) {
                 log.debug( "Making readable by GROUP_AGENT: " + oi );
             }
+
             grant( acl, BasePermission.READ, new GrantedAuthoritySid( new GrantedAuthorityImpl(
                     AuthorityConstants.AGENT_GROUP_AUTHORITY ) ) );
 

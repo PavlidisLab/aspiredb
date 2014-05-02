@@ -37,6 +37,7 @@ import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantOverlapDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.shared.BoundedList;
@@ -49,6 +50,7 @@ import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.DoesOverlapWithXProperty;
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.OverlapBasesProperty;
+import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.ProjectOverlapFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 
@@ -712,6 +714,38 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
         }
 
         assertEquals( 2, result.getItems().size() );
+
+    }
+
+    private boolean doesOverlap( Variant variant, Variant specialVariant ) {
+
+        if ( !variant.getLocation().getChromosome().equals( specialVariant.getLocation().getChromosome() ) ) {
+            return false;
+        }
+
+        int start = Math.max( variant.getLocation().getStart(), specialVariant.getLocation().getStart() );
+        int end = Math.min( variant.getLocation().getEnd(), specialVariant.getLocation().getEnd() );
+
+        // genius
+        if ( start < end ) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    private ProjectFilterConfig getProjectFilterConfigById( Project p ) {
+
+        ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();
+
+        ArrayList<Long> projectIds = new ArrayList<Long>();
+
+        projectIds.add( p.getId() );
+
+        projectFilterConfig.setProjectIds( projectIds );
+
+        return projectFilterConfig;
 
     }
 

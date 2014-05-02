@@ -80,9 +80,7 @@ public class SubjectValueObject implements Serializable {
 
     public String getPhenotypeValue( String name ) {
         PhenotypeValueObject p = this.phenotypes.get( name );
-        if ( p == null ) {
-            return null;
-        }
+        if ( p == null ) return null;
         return p.getDbValue();
     }
 
