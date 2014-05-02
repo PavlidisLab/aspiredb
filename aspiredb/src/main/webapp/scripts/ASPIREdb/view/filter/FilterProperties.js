@@ -1,9 +1,8 @@
 
+Ext.define( 'ASPIREdb.common.FilterProperties', {
+   singleton : true,
 
-Ext.define('ASPIREdb.common.FilterProperties', {
-    singleton: true,
-
-    subjectProperties: null,
-    phenotypeProperties: null,
-    variantProperties: null
-});
+   subjectProperties : null,
+   phenotypeProperties : null,
+   variantProperties : null
+} );

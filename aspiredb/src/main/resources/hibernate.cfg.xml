@@ -2,41 +2,40 @@
 <!DOCTYPE hibernate-configuration PUBLIC
 		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
 		"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
-		
-<hibernate-configuration>
-    <session-factory>
 
-        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-	    
-	    <!-- We shouldn't use other options (validate is ok).
-	    We should be manually updating database schema on production. It's too risky to
-	    let hbm2ddl to handle schema updates. -->
-        <property name="hbm2ddl.auto">Validate</property> 
-	    	 
-	 	<!-- Add new entity classes here so that hibernate tools see it. -->
-	 	<mapping class="ubc.pavlab.aspiredb.server.model.Variant" />
-	 	<mapping class="ubc.pavlab.aspiredb.server.model.SNV" />
-        <mapping class="ubc.pavlab.aspiredb.server.model.CNV" />
-        <mapping class="ubc.pavlab.aspiredb.server.model.Inversion" />
-        <mapping class="ubc.pavlab.aspiredb.server.model.Indel" />
-        <mapping class="ubc.pavlab.aspiredb.server.model.Translocation" />
-        <mapping class="ubc.pavlab.aspiredb.server.model.Gene" />
-     	<mapping class="ubc.pavlab.aspiredb.server.model.GeneGroup" />
-     	<mapping class="ubc.pavlab.aspiredb.server.model.UserGeneSet" />
-   		<mapping class="ubc.pavlab.aspiredb.server.model.GenomicLocation" />
-    	<mapping class="ubc.pavlab.aspiredb.server.model.Subject" />      	
-       	<mapping class="ubc.pavlab.aspiredb.server.model.Phenotype" />
-      	<mapping class="ubc.pavlab.aspiredb.server.model.CnvType" />      	
-      	<mapping class="ubc.pavlab.aspiredb.server.model.Characteristic" />
-        <mapping class="ubc.pavlab.aspiredb.server.model.Label" />
-        <mapping class="ubc.pavlab.aspiredb.server.model.Query" />
-        <mapping class="ubc.pavlab.aspiredb.server.model.TranslocationType" />
-      	<mapping class="ubc.pavlab.aspiredb.server.model.Project" />
-      	<mapping class="ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User" />
-      	<mapping class="ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup" />
-      	<mapping class="ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority" />
-      	<mapping class="ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap" />
-      	
-    </session-factory>
+<hibernate-configuration>
+	<session-factory>
+
+		<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+
+
+		<!-- We shouldn't use other options (validate is ok). We should be manually updating database schema on production. It's 
+			too risky to let hbm2ddl to handle schema updates. -->
+		<property name="hbm2ddl.auto">Validate</property>
+
+		<!-- Add new entity classes here so that hibernate tools see it. -->
+		<mapping class="ubc.pavlab.aspiredb.server.model.Variant" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.SNV" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.CNV" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.Inversion" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.Indel" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.Translocation" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.Gene" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.GeneGroup" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.UserGeneSet" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.GenomicLocation" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.Subject" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.Phenotype" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.CnvType" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.Characteristic" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.Label" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.Query" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.TranslocationType" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.Project" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority" />
+		<mapping class="ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap" />
+
+	</session-factory>
 </hibernate-configuration>

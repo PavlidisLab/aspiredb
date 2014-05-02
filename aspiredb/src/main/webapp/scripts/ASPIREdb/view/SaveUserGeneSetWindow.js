@@ -20,124 +20,117 @@
  * @author gayacharath
  * @widget saveUserGeneSetWindow
  */
-Ext.require([ 'Ext.Window' ]);
+Ext.require( [ 'Ext.Window' ] );
 
-Ext.define('ASPIREdb.view.SaveUserGeneSetWindow', {
-	extend : 'Ext.Window',
-	alias : 'widget.saveUserGeneSetWindow',
-	singleton : true,
-	title : 'Save User Gene Set',
-	closable : true,
-	closeAction : 'hide',
-	width : 400,
-	height : 200,
-	layout : 'fit',
-	bodyStyle : 'padding: 5px;',
-	border: false,
+Ext.define( 'ASPIREdb.view.SaveUserGeneSetWindow', {
+   extend : 'Ext.Window',
+   alias : 'widget.saveUserGeneSetWindow',
+   singleton : true,
+   title : 'Save User Gene Set',
+   closable : true,
+   closeAction : 'hide',
+   width : 400,
+   height : 200,
+   layout : 'fit',
+   bodyStyle : 'padding: 5px;',
+   border : false,
 
-	geneSetValueobjects : [],
+   geneSetValueobjects : [],
 
-	items : [ {
+   items : [ {
 
-		bodyPadding : 5,
-		width : 350,
+      bodyPadding : 5,
+      width : 350,
 
-		layout : 'anchor',
-		defaults : {
-			anchor : '100%'
-		},
+      layout : 'anchor',
+      defaults : {
+         anchor : '100%'
+      },
 
-		defaultType : 'textfield',
-		items : [ {
-			fieldLabel : 'Gene Set Name',
-			name : 'last',
-			allowBlank : false,
-			itemId : 'geneSetName'
-		} ],
+      defaultType : 'textfield',
+      items : [ {
+         fieldLabel : 'Gene Set Name',
+         name : 'last',
+         allowBlank : false,
+         itemId : 'geneSetName'
+      } ],
 
-		buttons : [ {
-			xtype : 'button',
-			itemId : 'saveButton',
-			text : 'OK'
-		} ]
+      buttons : [ {
+         xtype : 'button',
+         itemId : 'saveButton',
+         text : 'OK'
+      } ]
 
-	} ],
+   } ],
 
-	initComponent : function() {
-		this.callParent();
+   initComponent : function() {
+      this.callParent();
 
-		var ref = this;
+      var ref = this;
 
-		this.down('#saveButton').on('click', ref.saveButtonHandler, ref);
-	},
+      this.down( '#saveButton' ).on( 'click', ref.saveButtonHandler, ref );
+   },
 
-	initAndShow : function(genes) {
-		
-		this.geneSetValueobjects = genes;
-		this.show();
+   initAndShow : function(genes) {
 
-	},
+      this.geneSetValueobjects = genes;
+      this.show();
 
-	saveButtonHandler : function() {
-		var ref=this;
-		var geneSetName = this.down('#geneSetName').getValue();
-			
-		//check whether the query name exist in the database
-		UserGeneSetService.isGeneSetName(geneSetName,{
-			callback : function(gvoSta) {
-				if (gvoSta){
-					
-					Ext.Msg.show({
-						title:'Save gene set overwrite',
-						msg:'Gene set name already exist. Do you want to overwrite it?',
-						buttons:Ext.Msg.YESNOCANCEL,
-						icon:Ext.Msg.QUESTION,
-						fn:function(btn){
-							if(btn=='cancel'){
-				            //do something
-							}
-							if(btn=='yes'){
-				        	
-								GeneService.saveUserGeneSet(geneSetName, ref.geneSetValueobjects, {
-									callback : function(gvoId) {
+   },
 
-										ASPIREdb.view.SaveUserGeneSetWindow.down('#geneSetName').setValue('');
-										ASPIREdb.view.SaveUserGeneSetWindow.close();
-										ASPIREdb.EVENT_BUS.fireEvent('new_geneSet_saved');
+   saveButtonHandler : function() {
+      var ref = this;
+      var geneSetName = this.down( '#geneSetName' ).getValue();
 
-									}
-								});
-								ref.down('#geneSetName').clearValue();
-								
-								
-								
-								
-				    		
-							}
-							
-						}
-						
-					});	 
-						
-				
-				}
-				else {
-					UserGeneSetService.saveUserGeneSet(geneSetName, ref.geneSetValueobjects, {
-						callback : function(gvoId) {
-														
-							ASPIREdb.view.SaveUserGeneSetWindow.down('#geneSetName').setValue('');
-							ASPIREdb.view.SaveUserGeneSetWindow.close();
-							ASPIREdb.EVENT_BUS.fireEvent('new_geneSet_saved', geneSetName);
-							//ASPIREdb.view.DeleteQueryWindow.updateDeleteQueryCombo();
-							
+      // check whether the query name exist in the database
+      UserGeneSetService.isGeneSetName( geneSetName, {
+         callback : function(gvoSta) {
+            if ( gvoSta ) {
 
-						}
-					});
-				}
-			}
-		
-		});
-		
-	}
+               Ext.Msg.show( {
+                  title : 'Save gene set overwrite',
+                  msg : 'Gene set name already exist. Do you want to overwrite it?',
+                  buttons : Ext.Msg.YESNOCANCEL,
+                  icon : Ext.Msg.QUESTION,
+                  fn : function(btn) {
+                     if ( btn == 'cancel' ) {
+                        // do something
+                     }
+                     if ( btn == 'yes' ) {
 
-});
+                        GeneService.saveUserGeneSet( geneSetName, ref.geneSetValueobjects, {
+                           callback : function(gvoId) {
+
+                              ASPIREdb.view.SaveUserGeneSetWindow.down( '#geneSetName' ).setValue( '' );
+                              ASPIREdb.view.SaveUserGeneSetWindow.close();
+                              ASPIREdb.EVENT_BUS.fireEvent( 'new_geneSet_saved' );
+
+                           }
+                        } );
+                        ref.down( '#geneSetName' ).clearValue();
+
+                     }
+
+                  }
+
+               } );
+
+            } else {
+               UserGeneSetService.saveUserGeneSet( geneSetName, ref.geneSetValueobjects, {
+                  callback : function(gvoId) {
+
+                     ASPIREdb.view.SaveUserGeneSetWindow.down( '#geneSetName' ).setValue( '' );
+                     ASPIREdb.view.SaveUserGeneSetWindow.close();
+                     ASPIREdb.EVENT_BUS.fireEvent( 'new_geneSet_saved', geneSetName );
+                     // ASPIREdb.view.DeleteQueryWindow.updateDeleteQueryCombo();
+
+                  }
+               } );
+            }
+         }
+
+      } );
+
+   }
+
+} );

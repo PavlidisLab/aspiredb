@@ -404,6 +404,7 @@ Ext.define('ASPIREdb.view.LabelControlWindow',
 				    removeLabels : function(labels) {
 						var me = this;
 
+<<<<<<< HEAD
                         if ( labels != null && labels.length > 0 ) {
 						    if ( me.isSubjectLabel ) {
 						        me.removeSubjectLabels(labels);
@@ -414,6 +415,29 @@ Ext.define('ASPIREdb.view.LabelControlWindow',
                             me.destroy();
                         }
 					},
+=======
+                                },
+                             /**
+                               * editor ://colorPicker, { xtype:colorPicker, allowBlank: false, displayField
+                               * :'labelColour', }, width : 100, listeners :{ click : function(e){ console.log('color
+                               * picker X '+e.getX()+'and Y '+e.getY()); this.XValue = e.getX(); this.YValue =e.getY(); } }
+                               */
+                             }, {
+                                header : 'Show',
+                                dataIndex : 'show',
+                                xtype : 'checkcolumn',
+                                id : 'labelShowColumn',
+                                width : 50,
+                                sortable : false
+                             }, {
+                                header : '',
+                                xtype : 'actioncolumn',
+                                id : 'labelActionColumn',
+                                handler : function(view, rowIndex, colIndex, item, e) {
+                                   var action = 'removeLabel';
+                                   this.fireEvent( 'itemclick', this, action, view, rowIndex, colIndex, item, e );
+                                },
+>>>>>>> refs/remotes/origin/master
 
 					/**
 					 * Show label?

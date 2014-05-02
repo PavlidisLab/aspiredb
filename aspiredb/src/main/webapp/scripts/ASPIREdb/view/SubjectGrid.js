@@ -99,10 +99,23 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 				flex : 1
 			}],
 
+<<<<<<< HEAD
 	/**
 	 * Create tool bar and buttons on top of subject grid
 	 */
 	initComponent : function() {
+=======
+      // the current filters used
+      filterConfigs : [],
+
+      // subject select all status holder
+      selectAllStatus : 'No'
+   },
+   constructor : function(cfg) {
+      this.initConfig( cfg );
+      this.callParent( arguments );
+   },
+>>>>>>> refs/remotes/origin/master
 
 		this.callParent();
 
@@ -421,6 +434,7 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
                     selectedIds : selectedSubjectIds
 				});
 
+<<<<<<< HEAD
 		labelControlWindow.show();
 	},
 	
@@ -436,6 +450,19 @@ Ext.define('ASPIREdb.view.SubjectGrid', {
 		//	this.selectAllStatus ='Yes';
 		//}
 		
+=======
+   /**
+    * When all the subjects are sselected this is executed
+    */
+   selectAllHandler : function() {
+      // if (this.selectAllStatus=='No'){
+      this.cancelBubble = true;
+      // boolean true to suppressEvent
+      this.getSelectionModel().selectAll( true );
+      this.selectionChangeHandler();
+      // this.selectAllStatus ='Yes';
+      // }
+>>>>>>> refs/remotes/origin/master
 
 	}
 

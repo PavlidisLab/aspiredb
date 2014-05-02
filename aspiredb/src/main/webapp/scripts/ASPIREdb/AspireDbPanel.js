@@ -273,6 +273,7 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 
 				window.location.href = 'j_spring_security_logout';
 
+<<<<<<< HEAD
 			}
 		}, {
 			xtype : 'container',
@@ -293,3 +294,232 @@ Ext.define('ASPIREdb.AspireDbPanel', {
 		xtype : 'ASPIREdb_mainpanel'
 	} ]
 });
+=======
+      ASPIREdb.view.DashboardWindow.on( 'beforeclose', function(event) {
+         aspireDbPanel.disableToolbarButtonsForDashboard( false );
+      } );
+
+      // TODO: finish me
+      ASPIREdb.EVENT_BUS.on( 'logout', function(event) {
+         /*
+          * loginForm.setVisible( true ); logoutForm.setVisible( false );
+          * 
+          * toolPanel.setVisible( false ); mainPanel.setVisible( false ); dashboard.hide();
+          */
+      } );
+
+      ASPIREdb.EVENT_BUS.fireEvent( 'login' );
+
+      LoginStatusService.getCurrentUsername( {
+         callback : function(username) {
+            aspireDbPanel.down( '#message' ).setText( 'You are logged in as ' + username );
+         }
+      } );
+
+      ASPIREdb.EVENT_BUS.on( 'project_select', function(event) {
+
+         // todo :Add select the project to title bar
+         var projecttitle = ASPIREdb.ActiveProjectSettings.getActiveProjectName();
+         aspireDbPanel.down( '#projectTitle' ).setText( 'Active Project:  ' + projecttitle );
+      } );
+
+      ASPIREdb.EVENT_BUS.on( 'filter_submit', function(filterConfigs) {
+         var isFilter = false;
+         for (var i = 0; i < filterConfigs.length; i++) {
+            if ( !(filterConfigs[i] instanceof ProjectFilterConfig) ) {
+               isFilter = true;
+            }
+
+         }
+         /**
+          * if (isFilter){ aspireDbPanel.down('#filterActivated').setText('Filter Activated');
+          * aspireDbPanel.down('#filterButton').setBorder(4); aspireDbPanel.down('#filterButton').setTooltip("Filter
+          * Activated"); } else { aspireDbPanel.down('#filterActivated').setText('');
+          * aspireDbPanel.down('#filterButton').setBorder(1); aspireDbPanel.down('#filterButton').setTooltip("Filter Not
+          * Activated"); }
+          */
+      } );
+
+   },
+
+   /**
+    * Disable the filter button and clear filter button before closing the dashboard window
+    * 
+    * @param: 'yes' or 'no'
+    */
+   disableToolbarButtonsForDashboard : function(yes) {
+
+      if ( yes ) {
+         this.down( '#filterButton' ).disable();
+         this.down( '#clearFilterButton' ).disable();
+      } else {
+         this.down( '#filterButton' ).enable();
+         this.down( '#clearFilterButton' ).enable();
+      }
+   },
+
+   parseUrlParametersAndRedirect : function() {
+      var parsedParams = Ext.Object.fromQueryString( location.search );
+      var variantId = parsedParams.variantId;
+      if ( variantId !== null && !variantId.isEmpty() ) {
+         // Grab genomic range
+         VariantService.getVariant( Long.parseLong( variantId ), function callback(vo) {
+            var filterConfig = new VariantFilterConfig();
+            var genomicRangeRestriction = new SimpleRestriction();
+            genomicRangeRestriction.propery = new GenomicLocationProperty();
+            genomicRangeRestriction.operator = 'IS_IN';
+            genomicRangeRestriction.value = vo.genomicRange;
+            filterConfig.restriction( genomicRangeRestriction );
+
+            console.log( "filter_submit event from aspiredbpanel parseurlparameters and redirect" );
+            ASPIREdb.EVENT_BUS.fireEvent( 'filter_submit', filterConfig );
+            // mainPanel.resizeMe();
+         } );
+      }
+   },
+
+   items : [ {
+      region : 'north',
+      itemId : 'topToolbar',
+      height : 50,
+      xtype : 'container',
+      layout : 'hbox',
+      items : [ {
+         xtype : 'component',
+         margin : '5 5 5 5',
+         height : 30,
+         width : 126,
+         autoEl : {
+            tag : 'img',
+            src : 'scripts/ASPIREdb/resources/images/aspiredb-logo-smaller.png'
+         }
+      }, {
+         xtype : 'button',
+         text : 'Filter...',
+         itemId : 'filterButton',
+         height : 30,
+         margin : '5 5 5 5',
+         handler : function() {
+            ASPIREdb.view.filter.FilterWindow.show();
+         }
+      }, {
+         xtype : 'button',
+         text : 'Clear filter',
+         itemId : 'clearFilterButton',
+         height : 30,
+         margin : '5 5 5 5',
+         handler : function() {
+            var filterConfigs = [];
+            var activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+            var projectFilter = new ProjectFilterConfig;
+            projectFilter.projectIds = activeProjectIds;
+            filterConfigs.push( projectFilter );
+
+            console.log( "filter_submit event from Aspiredbpanel clearfilterbutton" );
+            ASPIREdb.EVENT_BUS.fireEvent( 'filter_submit', filterConfigs );
+         }
+      }, {
+         xtype : 'button',
+         text : 'Dashboard',
+         itemId : 'dashboardButton',
+         height : 30,
+         margin : '5 5 5 5',
+         handler : function() {
+            this.up( '#aspireDbPanel' ).disableToolbarButtonsForDashboard( true );
+            ASPIREdb.view.DashboardWindow.show();
+         }
+      }, {
+         xtype : 'button',
+         text : 'Gene Manager',
+         itemId : 'geneManagerButton',
+         height : 30,
+         margin : '5 5 5 5',
+         handler : function() {
+            ASPIREdb.view.GeneManagerWindow.initGridAndShow();
+
+         }
+      }, {
+         xtype : 'button',
+         text : 'Subject Label Manager',
+         itemId : 'subjectLabelManagerButton',
+         height : 30,
+         margin : '5 5 5 5',
+         handler : function() {
+            var labelControlWindow = Ext.create( 'ASPIREdb.view.LabelControlWindow', {
+               isSubjectLabel : true,
+            } );
+            labelControlWindow.show();
+         }
+      }, {
+         xtype : 'button',
+         text : 'Variant Label Manager',
+         itemId : 'variantLabelManagerButton',
+         height : 30,
+         margin : '5 5 5 5',
+         handler : function() {
+            var labelControlWindow = Ext.create( 'ASPIREdb.view.LabelControlWindow', {
+               isSubjectLabel : false,
+            } );
+            labelControlWindow.show();
+         }
+      }, {
+         xtype : 'button',
+         text : 'Help',
+         itemId : 'helpButton',
+         margin : '5 5 5 5',
+         height : 30,
+         handler : function() {
+            window.open( "http://aspiredb.sites.olt.ubc.ca/", "_blank", "" );
+         }
+      }, {
+         xtype : 'label',
+         itemId : 'projectTitle',
+         style : 'vertical-align : middle; padding-top : 10px',
+         height : 30,
+         margin : '5 5 5 5',
+         flex : 1
+      }, {
+         xtype : 'label',
+         itemId : 'filterActivated',
+         style : 'vertical-align : middle; padding-top : 10px; float:auto',
+         height : 30,
+         margin : '5 5 5 5',
+         flex : 1
+      }, {
+         xtype : 'label',
+         itemId : 'message',
+         style : 'text-align: right; vertical-align : middle; padding-top : 10px',
+         height : 30,
+         margin : '5 5 5 5',
+         flex : 1
+      }, {
+         xtype : 'button',
+         text : 'Logout',
+         itemId : 'logoutButton',
+         height : 30,
+         margin : '5 5 5 5',
+         handler : function() {
+
+            window.location.href = 'j_spring_security_logout';
+
+         }
+      }, {
+         xtype : 'container',
+         itemId : 'logoutForm',
+         hidden : true,
+         layout : 'hbox',
+         items : [ {
+            xtype : 'button',
+            text : 'Admin Tools',
+            height : 30,
+            margin : '5 5 5 5',
+            itemId : 'adminToolsButton',
+            hidden : true
+         } ]
+      } ]
+   }, {
+      region : 'center',
+      xtype : 'ASPIREdb_mainpanel'
+   } ]
+} );
+>>>>>>> refs/remotes/origin/master
