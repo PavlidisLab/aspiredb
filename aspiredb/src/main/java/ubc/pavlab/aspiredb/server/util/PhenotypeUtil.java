@@ -257,33 +257,6 @@ public class PhenotypeUtil {
         return expandedRestrictions;
     }
 
-    private Set<PhenotypeRestriction> createRestrictionsUsingAncestors( String value, OntologyTerm term,
-            Set<PhenotypeRestriction> expandedRestrictions, Collection<String> remainingTerms ) {
-
-        Collection<OntologyTerm> ancestorTerms = term.getParents( false );
-
-        String s = "";
-        for ( OntologyTerm ancestorTerm : ancestorTerms ) {
-            s += ancestorTerm.getLabel() + ", ";
-            PhenotypeRestriction phenotypeRestriction = new PhenotypeRestriction( ancestorTerm.getLabel(), value,
-                    ancestorTerm.getUri() );
-
-            HashSet<String> termList = new HashSet<String>();
-            termList.add( ancestorTerm.getLabel() );
-
-            if ( remainingTerms.contains( ancestorTerm.getLabel() ) ) {
-                expandedRestrictions.add( phenotypeRestriction );
-                remainingTerms.remove( ancestorTerm.getLabel() );
-                // log.info( "Phenotype \"" + ancestorTerm.getLabel() + " found in database." );
-            } else {
-                // log.info("Phenotype \"" + ancestorTerm.getLabel() + " not found in database.");
-            }
-
-        }
-
-        return expandedRestrictions;
-    }
-
     private RestrictionExpression expandNodesUsingOntologyInference( RestrictionExpression node,
             Collection<Long> activeProjectIds ) {
         if ( node instanceof PhenotypeRestriction ) {

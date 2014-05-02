@@ -139,6 +139,7 @@ public class GenomicRange implements Displayable, Serializable, Comparable<Genom
         return string;
     }
 
+    @Override
     public String toString() {
         if ( this.bandStart != null ) {
             return toCytobandString();

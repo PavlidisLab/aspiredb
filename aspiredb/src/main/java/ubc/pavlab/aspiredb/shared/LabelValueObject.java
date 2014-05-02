@@ -100,6 +100,7 @@ public class LabelValueObject implements Displayable, Serializable {
         this.isShown = isShown;
     }
 
+    @Override
     public String toString() {
         return this.getName();
     }

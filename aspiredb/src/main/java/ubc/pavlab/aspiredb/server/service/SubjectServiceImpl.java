@@ -84,7 +84,9 @@ public class SubjectServiceImpl implements SubjectService {
     public SubjectValueObject getSubject( Long projectId, Long subjectId ) {
         // throwGwtExceptionIfNotLoggedIn();
         Subject subject = subjectDao.load( subjectId );
-        if ( subject == null ) return null;
+        if ( subject == null ) {
+            return null;
+        }
 
         SubjectValueObject vo = subject.convertToValueObject();
         Integer numVariants = cnvDao.findBySubjectPatientId( subject.getPatientId() ).size();
@@ -105,7 +107,9 @@ public class SubjectServiceImpl implements SubjectService {
     public Collection<SubjectValueObject> getSubjects( Long projectId, List<Long> subjectIds ) {
         // throwGwtExceptionIfNotLoggedIn();
         Collection<Subject> subjects = subjectDao.load( subjectIds );
-        if ( subjects.isEmpty() ) return null;
+        if ( subjects.isEmpty() ) {
+            return null;
+        }
 
         List<SubjectValueObject> vos = new ArrayList<>();
 
@@ -163,7 +167,7 @@ public class SubjectServiceImpl implements SubjectService {
     public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
             throws NeurocartaServiceException {
 
-        Collection<Subject> subjects = subjectDao.load( subjectIds );
+        subjectDao.load( subjectIds );
 
         StopWatch timer = new StopWatch();
         timer.start();
@@ -193,8 +197,6 @@ public class SubjectServiceImpl implements SubjectService {
             int unknown = 0;
             int present = 0;
             int denominator = 0;
-            int absent = 0;
-
             for ( String key : keyArray ) {
 
                 Integer size = sum.getDbValueToSubjectSet().get( key ).size();
@@ -209,7 +211,6 @@ public class SubjectServiceImpl implements SubjectService {
                                 + "</span>";
                     } else if ( key.equals( "0" ) ) {
                         phenoSummaryMap.put( "Absent", size );
-                        absent = size;
                         denominator = denominator + size;
                         displaySummary = displaySummary + " Absent(" + size + ')';
                         displaySummary = "<span " + "style='color: " + colors[1] + "'" + ">" + displaySummary
@@ -269,7 +270,7 @@ public class SubjectServiceImpl implements SubjectService {
     public Map<String, PhenotypeSummaryValueObject> getPhenotypeSummaryValueObjects( List<Long> subjectIds,
             Collection<Long> projectIds ) throws NeurocartaServiceException {
 
-        Collection<Subject> subjects = subjectDao.load( subjectIds );
+        subjectDao.load( subjectIds );
 
         StopWatch timer = new StopWatch();
         timer.start();
@@ -282,7 +283,7 @@ public class SubjectServiceImpl implements SubjectService {
 
         // List<PhenotypeSummaryValueObject> valueObjects = new ArrayList<PhenotypeSummaryValueObject>();
         Map<String, PhenotypeSummaryValueObject> summaryValueObjectsMap = new HashMap<String, PhenotypeSummaryValueObject>();
-        HashMap<String, Integer> allPhenoSummaryMap = new HashMap<String, Integer>();
+        new HashMap<String, Integer>();
 
         // convert PhenotypeSummaries to lighter PhenotypeValueObjects
 
@@ -301,8 +302,6 @@ public class SubjectServiceImpl implements SubjectService {
             int unknown = 0;
             int present = 0;
             int denominator = 0;
-            int absent = 0;
-
             for ( String key : keyArray ) {
 
                 Integer size = sum.getDbValueToSubjectSet().get( key ).size();
@@ -317,7 +316,6 @@ public class SubjectServiceImpl implements SubjectService {
                                 + "</span>";
                     } else if ( key.equals( "0" ) ) {
                         phenoSummaryMap.put( "Absent", size );
-                        absent = size;
                         denominator = denominator + size;
                         displaySummary = displaySummary + " Absent(" + size + ')';
                         displaySummary = "<span " + "style='color: " + colors[1] + "'" + ">" + displaySummary
@@ -472,10 +470,11 @@ public class SubjectServiceImpl implements SubjectService {
     @Transactional
     public List<LabelValueObject> suggestLabels( SuggestionContext suggestionContext ) {
         Collection<Label> labels;
-        if ( suggestionContext == null || suggestionContext.getActiveProjectIds().size() == 0 )
+        if ( suggestionContext == null || suggestionContext.getActiveProjectIds().size() == 0 ) {
             labels = labelDao.getSubjectLabels();
-        else
+        } else {
             labels = labelDao.getSubjectLabelsByProjectId( suggestionContext.getActiveProjectIds().iterator().next() );
+        }
         List<LabelValueObject> vos = new ArrayList<LabelValueObject>();
         for ( Label label : labels ) {
             vos.add( label.toValueObject() );

@@ -34,7 +34,9 @@ public class ReflectionUtil {
     public static String constructDaoName( Object obj ) {
         String baseDaoName = getBaseForImpl( obj ) + DAO_SUFFIX;
 
-        if ( baseDaoName.length() == DAO_SUFFIX.length() ) return null;
+        if ( baseDaoName.length() == DAO_SUFFIX.length() ) {
+            return null;
+        }
 
         baseDaoName = baseDaoName.substring( baseDaoName.lastIndexOf( '.' ) + 1 );
         return baseDaoName.substring( 0, 1 ).toLowerCase() + baseDaoName.substring( 1 );

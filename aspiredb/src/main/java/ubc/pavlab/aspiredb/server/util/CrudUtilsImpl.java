@@ -67,7 +67,9 @@ public class CrudUtilsImpl implements InitializingBean, CrudUtils {
      * @return
      */
     public static boolean isTransient( Object entity ) {
-        if ( entity == null ) return true;
+        if ( entity == null ) {
+            return true;
+        }
         try {
             return org.apache.commons.beanutils.BeanUtils.getSimpleProperty( entity, "id" ) == null;
         } catch ( Exception e ) {
@@ -96,7 +98,9 @@ public class CrudUtilsImpl implements InitializingBean, CrudUtils {
      * @return
      */
     public static boolean methodIsCrud( Method m ) {
-        if ( log.isTraceEnabled() ) log.trace( "Testing " + m.getName() );
+        if ( log.isTraceEnabled() ) {
+            log.trace( "Testing " + m.getName() );
+        }
         return crudMethods.contains( m.getName() );
     }
 

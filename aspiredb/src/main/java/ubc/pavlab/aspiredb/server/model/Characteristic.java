@@ -53,6 +53,7 @@ public class Characteristic implements SecuredNotChild {
         this.value = v;
     }
 
+    @Override
     public Long getId() {
         return id;
     }

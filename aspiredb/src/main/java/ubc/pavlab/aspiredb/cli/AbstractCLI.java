@@ -354,7 +354,9 @@ public abstract class AbstractCLI {
         if ( commandLine.hasOption( "logger" ) ) {
             String value = getOptionValue( "logger" );
             String[] vals = value.split( "=" );
-            if ( vals.length != 2 ) throw new RuntimeException( "Logging value must in format [logger]=[value]" );
+            if ( vals.length != 2 ) {
+                throw new RuntimeException( "Logging value must in format [logger]=[value]" );
+            }
             try {
                 log.info( "Setting logging for " + vals[0] + " to " + vals[1] );
                 configureLogging( vals[0], Integer.parseInt( vals[1] ) );

@@ -187,7 +187,9 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
             variantIds.retainAll( ids );
 
             // if size is 0 -> stop
-            if ( variantIds.isEmpty() ) break;
+            if ( variantIds.isEmpty() ) {
+                break;
+            }
         }
         return variantIds;
     }

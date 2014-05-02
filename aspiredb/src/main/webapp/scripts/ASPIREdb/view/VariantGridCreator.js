@@ -3,18 +3,15 @@
  * 
  * Copyright (c) 2013 University of British Columbia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ * 
  */
 
 Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel',
@@ -84,7 +81,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
          var store = Ext.create( 'Ext.data.ArrayStore', {
             fields : fieldData,
             data : storeData,
-            groupField : 'patientId',
+            groupField : 'patientId'
 
          } );
 
@@ -229,27 +226,34 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             columns : columnConfig,
             columnHeaders : columnHeaders,
             // multiSelect : true,
-            listeners : {
-               cellclick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
 
-                  this.selModel.select( record.index, false, false );
+            // listeners : {
+            // cellclick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+            //
+            // this.selModel.select( record.index, false, false );
+            // }
+            // },
 
-               }
-            },
-            selModel : Ext.create( 'Ext.selection.CellModel', {
-               mode : 'MULTI',
+            // selModel : Ext.create( 'Ext.selection.CellModel', {
+            selModel : Ext.create( 'Ext.selection.RowModel', {
+               preventFocus : true,
+               mode : 'MULTI'
 
             } ),
+
             stripeRows : true,
             height : 180,
             width : 500,
             title : 'Table View',
-            requires : [ 'Ext.grid.feature.Grouping' ],
-            features : [ Ext.create( 'Ext.grid.feature.Grouping', {
-               groupHeaderTpl : '{name} ({rows.length} Item{[values.rows.length > 1 ? "s" : ""]})',
-               startCollapsed : true,
 
-            } ) ],
+            // known Extjs bug. Disabling for now until fixed. See Bug 4063
+            // requires : [ 'Ext.grid.feature.Grouping' ],
+            // features : [ Ext.create( 'Ext.grid.feature.Grouping', {
+            // groupHeaderTpl : '{name} ({rows.length} Item{[values.rows.length > 1 ? "s" : ""]})',
+            // startCollapsed : true,
+            //
+            // } ) ],
+
             visibleLabels : visibleLabels
 
          } );
@@ -289,9 +293,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
        * if (vvo.patientId == subjectId){
        * 
        * switch (vvo.variantType){ case "CNV": countCNV++; break; case "SNV": countSNV++; break; case "INDEL":
-       * countINDEL++; break; } }
-       *  }
-       *  },
+       * countINDEL++; break; } } } },
        */
       /**
        * @public

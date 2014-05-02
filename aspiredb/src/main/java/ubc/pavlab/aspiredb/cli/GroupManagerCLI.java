@@ -132,7 +132,9 @@ public class GroupManagerCLI extends AbstractCLI {
     protected Exception doWork( String[] args ) {
         Exception err = processCommandLine( "Project ", args );
         authenticate( applicationContext );
-        if ( err != null ) return err;
+        if ( err != null ) {
+            return err;
+        }
 
         if ( createUser ) {
 

@@ -37,7 +37,9 @@ public class AclAuditLogger implements AuditLogger {
     @Override
     public void logIfNeeded( boolean granted, AccessControlEntry ace ) {
 
-        if ( !needToLog ) return;
+        if ( !needToLog ) {
+            return;
+        }
 
         if ( ace instanceof AuditableAccessControlEntry ) {
             AuditableAccessControlEntry auditableAce = ( AuditableAccessControlEntry ) ace;

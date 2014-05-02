@@ -136,7 +136,9 @@ public class SecurityServiceImpl implements SecurityService {
     private static Authentication getAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if ( authentication == null ) throw new RuntimeException( "Null authentication object" );
+        if ( authentication == null ) {
+            throw new RuntimeException( "Null authentication object" );
+        }
 
         return authentication;
     }
@@ -187,7 +189,9 @@ public class SecurityServiceImpl implements SecurityService {
 
         Collection<Securable> privateOnes = this.choosePrivate( securables );
 
-        if ( privateOnes.isEmpty() ) return result;
+        if ( privateOnes.isEmpty() ) {
+            return result;
+        }
 
         String currentUsername = userManager.getCurrentUsername();
 
@@ -217,7 +221,9 @@ public class SecurityServiceImpl implements SecurityService {
 
         Map<ObjectIdentity, Securable> objectIdentities = getObjectIdentities( securables );
 
-        if ( objectIdentities.isEmpty() ) return result;
+        if ( objectIdentities.isEmpty() ) {
+            return result;
+        }
 
         /*
          * Take advantage of fast bulk loading of ACLs. Other methods sohuld adopt this if they turn out to be heavily
@@ -256,7 +262,9 @@ public class SecurityServiceImpl implements SecurityService {
         Map<Securable, Boolean> result = new HashMap<Securable, Boolean>();
         Map<ObjectIdentity, Securable> objectIdentities = getObjectIdentities( securables );
 
-        if ( objectIdentities.isEmpty() ) return result;
+        if ( objectIdentities.isEmpty() ) {
+            return result;
+        }
 
         /*
          * Take advantage of fast bulk loading of ACLs. Other methods should adopt this if they turn out to be heavily
@@ -284,7 +292,9 @@ public class SecurityServiceImpl implements SecurityService {
         Map<Securable, Boolean> result = new HashMap<Securable, Boolean>();
         Map<ObjectIdentity, Securable> objectIdentities = getObjectIdentities( securables );
 
-        if ( objectIdentities.isEmpty() ) return result;
+        if ( objectIdentities.isEmpty() ) {
+            return result;
+        }
 
         Map<ObjectIdentity, Acl> acls = aclService
                 .readAclsById( new Vector<ObjectIdentity>( objectIdentities.keySet() ) );
@@ -308,7 +318,9 @@ public class SecurityServiceImpl implements SecurityService {
         Map<Securable, Boolean> arePrivate = arePrivate( securables );
 
         for ( Securable s : securables ) {
-            if ( arePrivate.get( s ) ) result.add( s );
+            if ( arePrivate.get( s ) ) {
+                result.add( s );
+            }
         }
         return result;
     }
@@ -326,7 +338,9 @@ public class SecurityServiceImpl implements SecurityService {
         Map<Securable, Boolean> arePrivate = arePrivate( securables );
 
         for ( Securable s : securables ) {
-            if ( !arePrivate.get( s ) ) result.add( s );
+            if ( !arePrivate.get( s ) ) {
+                result.add( s );
+            }
         }
         return result;
     }
@@ -510,7 +524,9 @@ public class SecurityServiceImpl implements SecurityService {
 
         Map<Securable, Collection<String>> result = new HashMap<Securable, Collection<String>>();
 
-        if ( securables.isEmpty() ) return result;
+        if ( securables.isEmpty() ) {
+            return result;
+        }
 
         Collection<String> groupNames = getGroupsUserCanView();
 
@@ -599,7 +615,9 @@ public class SecurityServiceImpl implements SecurityService {
         Map<Securable, Sid> result = new HashMap<Securable, Sid>();
         Map<ObjectIdentity, Securable> objectIdentities = getObjectIdentities( securables );
 
-        if ( securables.isEmpty() ) return result;
+        if ( securables.isEmpty() ) {
+            return result;
+        }
 
         /*
          * Take advantage of fast bulk loading of ACLs. Other methods sohuld adopt this if they turn out to be heavily
@@ -611,10 +629,11 @@ public class SecurityServiceImpl implements SecurityService {
         for ( ObjectIdentity oi : acls.keySet() ) {
             Acl a = acls.get( oi );
             Sid owner = a.getOwner();
-            if ( owner == null )
+            if ( owner == null ) {
                 result.put( objectIdentities.get( oi ), null );
-            else
+            } else {
                 result.put( objectIdentities.get( oi ), owner );
+            }
         }
         return result;
     }
@@ -700,7 +719,9 @@ public class SecurityServiceImpl implements SecurityService {
             Acl acl = this.aclService.readAclById( oi );
 
             Sid owner = acl.getOwner();
-            if ( owner == null ) return false;
+            if ( owner == null ) {
+                return false;
+            }
 
             if ( owner instanceof PrincipalSid ) {
                 String ownerName = ( ( PrincipalSid ) owner ).getPrincipal();
@@ -1282,7 +1303,9 @@ public class SecurityServiceImpl implements SecurityService {
          */
         for ( AccessControlEntry ace : acl.getEntries() ) {
 
-            if ( !ace.getPermission().equals( BasePermission.READ ) ) continue;
+            if ( !ace.getPermission().equals( BasePermission.READ ) ) {
+                continue;
+            }
 
             Sid sid = ace.getSid();
             if ( sid instanceof GrantedAuthoritySid ) {
@@ -1315,7 +1338,9 @@ public class SecurityServiceImpl implements SecurityService {
     private boolean isShared( Acl acl ) {
         for ( AccessControlEntry ace : acl.getEntries() ) {
 
-            if ( !ace.getPermission().equals( BasePermission.READ ) ) continue;
+            if ( !ace.getPermission().equals( BasePermission.READ ) ) {
+                continue;
+            }
 
             Sid sid = ace.getSid();
             if ( sid instanceof GrantedAuthoritySid ) {

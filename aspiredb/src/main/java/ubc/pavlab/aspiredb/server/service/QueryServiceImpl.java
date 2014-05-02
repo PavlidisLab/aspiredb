@@ -406,7 +406,7 @@ public class QueryServiceImpl implements QueryService {
 
         Page<Subject> subjects = ( Page<Subject> ) subjectDao.loadPage( 0, 20000, sortField, sortDir, filters );
 
-        long totalLength = subjects.getTotalCount();
+        subjects.getTotalCount();
 
         List<SubjectValueObject> vos = new ArrayList<SubjectValueObject>();
         for ( Subject subject : subjects ) {
@@ -450,7 +450,7 @@ public class QueryServiceImpl implements QueryService {
         }
 
         Collection<Variant> variants = ( Collection<Variant> ) page;
-        int totalLength = page.getTotalCount();
+        page.getTotalCount();
 
         List<VariantValueObject> vos = convertToValueObjects( variants );
 
@@ -600,14 +600,6 @@ public class QueryServiceImpl implements QueryService {
                 addGenomicLocations( restrictionExpression );
             }
         }
-    }
-
-    private Map<String, OntologyTerm> toMap( Collection<OntologyTerm> terms ) {
-        Map<String, OntologyTerm> map = new HashMap<String, OntologyTerm>();
-        for ( OntologyTerm term : terms ) {
-            map.put( term.getLabel(), term );
-        }
-        return map;
     }
 
     /*

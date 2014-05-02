@@ -70,12 +70,9 @@ import ubc.pavlab.aspiredb.shared.query.TranslocationTypeProperty;
 import ubc.pavlab.aspiredb.shared.query.VariantLabelProperty;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
-import com.sencha.gxt.data.shared.SortInfo;
-import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
-
 /**
  * TODO Document Me
- *
+ * 
  * @author ??
  * @version $Id: VariantServiceImpl.java,v 1.39 2013/07/02 18:20:21 anton Exp $
  */
@@ -97,32 +94,6 @@ public class VariantServiceImpl implements VariantService {
     private NeurocartaQueryService neurocartaQueryService;
     @Autowired
     private ChromosomeService chromosomeService;
-
-    private String patientId;
-
-    private String getSortColumn( PagingLoadConfig config ) {
-        // default value
-        String property = "id";
-
-        if ( config.getSortInfo() != null && !config.getSortInfo().isEmpty() ) {
-            SortInfo sortInfo = config.getSortInfo().iterator().next();
-            property = sortInfo.getSortField();
-        }
-
-        // String columnName = propertyToColumnName.get( property );
-        return "id";
-    }
-
-    private String getSortDirection( PagingLoadConfig config ) {
-        // default value
-        String direction = "ASC";
-
-        if ( config.getSortInfo() != null && !config.getSortInfo().isEmpty() ) {
-            SortInfo sortInfo = config.getSortInfo().iterator().next();
-            direction = sortInfo.getSortDir().toString();
-        }
-        return direction;
-    }
 
     @Override
     @RemoteMethod

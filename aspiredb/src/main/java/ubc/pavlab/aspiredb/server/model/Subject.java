@@ -80,6 +80,7 @@ public class Subject implements Serializable, Securable {
         this.id = id;
     }
 
+    @Override
     public Long getId() {
         return id;
     }

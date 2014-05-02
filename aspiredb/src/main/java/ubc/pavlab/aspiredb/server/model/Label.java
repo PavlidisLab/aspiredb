@@ -115,13 +115,21 @@ public class Label implements Securable, ValueObjectConvertible<LabelValueObject
 
     @Override
     public boolean equals( Object o ) {
-        if ( this == o ) return true;
-        if ( !( o instanceof Label ) ) return false;
+        if ( this == o ) {
+            return true;
+        }
+        if ( !( o instanceof Label ) ) {
+            return false;
+        }
 
         Label label = ( Label ) o;
 
-        if ( id != null ? !id.equals( label.id ) : label.id != null ) return false;
-        if ( !name.equals( label.name ) ) return false;
+        if ( id != null ? !id.equals( label.id ) : label.id != null ) {
+            return false;
+        }
+        if ( !name.equals( label.name ) ) {
+            return false;
+        }
 
         return true;
     }

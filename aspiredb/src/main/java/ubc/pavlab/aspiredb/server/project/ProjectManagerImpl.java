@@ -114,6 +114,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
     ShaPasswordEncoder passwordEncoder = new ShaPasswordEncoder();
 
+    @Override
     @Transactional
     public Project createProject( String name ) throws Exception {
         if ( projectDao.findByProjectName( name ) != null ) {
@@ -161,6 +162,7 @@ public class ProjectManagerImpl implements ProjectManager {
      * @see ubc.pavlab.aspiredb.server.project.ProjectManager#addSubjectVariantsToProject(java.lang.String, boolean,
      * java.util.List) createProject parameter is included to make accidental overwriting via cli's more difficult
      */
+    @Override
     @Transactional
     public void addSubjectVariantsToProject( String projectName, boolean createProject, List<VariantValueObject> voList )
             throws Exception {
@@ -170,13 +172,16 @@ public class ProjectManagerImpl implements ProjectManager {
             proj = createProject( projectName );
         } else {
             proj = projectDao.findByProjectName( projectName );
-            if ( proj == null ) throw new Exception( "Project does not exist" );
+            if ( proj == null ) {
+                throw new Exception( "Project does not exist" );
+            }
         }
 
         createSubjectVariantsFromVariantValueObjects( proj, voList );
 
     }
 
+    @Override
     @Transactional
     public void addSubjectVariantsToSpecialProject( String projectName, boolean deleteProject,
             List<VariantValueObject> voList, boolean existingProject ) throws Exception {
@@ -198,6 +203,7 @@ public class ProjectManagerImpl implements ProjectManager {
      * @param voList
      * @throws Exception
      */
+    @Override
     @Transactional
     public void addSubjectVariantsToProjectForceCreate( String projectName, List<VariantValueObject> voList )
             throws Exception {
@@ -366,6 +372,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
     }
 
+    @Override
     @Transactional
     public void addSubjectPhenotypesToProject( String projectName, boolean createProject,
             List<PhenotypeValueObject> voList ) throws Exception {
@@ -379,13 +386,16 @@ public class ProjectManagerImpl implements ProjectManager {
 
         } else {
             proj = projectDao.findByProjectName( projectName );
-            if ( proj == null ) throw new Exception( "Project does not exist" );
+            if ( proj == null ) {
+                throw new Exception( "Project does not exist" );
+            }
         }
 
         createSubjectPhenotypesFromPhenotypeValueObjects( proj, voList );
 
     }
 
+    @Override
     @Transactional
     public void addSubjectPhenotypesToSpecialProject( String projectName, boolean deleteProject,
             List<PhenotypeValueObject> voList ) throws Exception {
@@ -499,6 +509,7 @@ public class ProjectManagerImpl implements ProjectManager {
         v.setExternalId( vvo.getExternalId() );
     }
 
+    @Override
     @Transactional
     public void alterGroupWritePermissions( String projectName, String groupName, boolean grant ) {
         log.info( ( grant ? "Granting" : "Removing" ) + " write permissions for group:" + groupName + " on project:"
@@ -567,6 +578,7 @@ public class ProjectManagerImpl implements ProjectManager {
         }
     }
 
+    @Override
     @Transactional
     public void deleteProject( String name ) throws Exception {
 

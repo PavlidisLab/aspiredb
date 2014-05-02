@@ -325,7 +325,9 @@ public class ConfigUtils {
      */
     public static String getDownloadPath() {
         String val = getString( "aspiredb.download.path" );
-        if ( val.endsWith( File.separator ) ) return val;
+        if ( val.endsWith( File.separator ) ) {
+            return val;
+        }
         return val + File.separatorChar;
     }
 

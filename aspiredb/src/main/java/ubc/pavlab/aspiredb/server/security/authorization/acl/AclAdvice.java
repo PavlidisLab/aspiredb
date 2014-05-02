@@ -93,7 +93,9 @@ public class AclAdvice {
         assert args != null;
         final Object persistentObject = getPersistentObject( retValue, methodName, args );
 
-        if ( persistentObject == null ) return;
+        if ( persistentObject == null ) {
+            return;
+        }
 
         final boolean isUpdate = CrudUtilsImpl.methodIsUpdate( methodName );
         final boolean isDelete = CrudUtilsImpl.methodIsDelete( methodName );
@@ -199,7 +201,9 @@ public class AclAdvice {
             /*
              * All objects must have administration permissions on them.
              */
-            if ( log.isDebugEnabled() ) log.debug( "Making administratable by GROUP_ADMIN: " + oi );
+            if ( log.isDebugEnabled() ) {
+                log.debug( "Making administratable by GROUP_ADMIN: " + oi );
+            }
             grant( acl, BasePermission.ADMINISTRATION, new GrantedAuthoritySid( new GrantedAuthorityImpl(
                     AuthorityConstants.ADMIN_GROUP_AUTHORITY ) ) );
 
@@ -207,7 +211,9 @@ public class AclAdvice {
              * Let agent read anything
              */
 
-            if ( log.isDebugEnabled() ) log.debug( "Making readable by GROUP_AGENT: " + oi );
+            if ( log.isDebugEnabled() ) {
+                log.debug( "Making readable by GROUP_AGENT: " + oi );
+            }
             grant( acl, BasePermission.READ, new GrantedAuthoritySid( new GrantedAuthorityImpl(
                     AuthorityConstants.AGENT_GROUP_AUTHORITY ) ) );
 
@@ -217,7 +223,9 @@ public class AclAdvice {
              */
             if ( !isAdmin && !isAnonymous ) {
 
-                if ( log.isDebugEnabled() ) log.debug( "Giving read/write permissions on " + oi + " to " + sid );
+                if ( log.isDebugEnabled() ) {
+                    log.debug( "Giving read/write permissions on " + oi + " to " + sid );
+                }
                 grant( acl, BasePermission.READ, sid );
 
                 /*
@@ -243,8 +251,9 @@ public class AclAdvice {
                 log.warn( "Somehow...a user created themselves: " + oi );
             } else {
 
-                if ( log.isDebugEnabled() )
+                if ( log.isDebugEnabled() ) {
                     log.debug( "New User: given read/write permissions on " + oi + " to " + sid );
+                }
 
                 if ( isRunningAsAdmin ) {
                     /*
@@ -267,7 +276,9 @@ public class AclAdvice {
         assert !acl.equals( parentAcl );
 
         if ( parentAcl != null && inheritFromParent ) {
-            if ( log.isTraceEnabled() ) log.trace( "Setting parent to: " + parentAcl + " <--- " + acl );
+            if ( log.isTraceEnabled() ) {
+                log.trace( "Setting parent to: " + parentAcl + " <--- " + acl );
+            }
             acl.setParent( parentAcl );
         }
 
@@ -339,7 +350,9 @@ public class AclAdvice {
             /*
              * Only deal with single-argument update methods.
              */
-            if ( args.length > 1 ) return null;
+            if ( args.length > 1 ) {
+                return null;
+            }
 
             assert args.length > 0;
             return args[0];
@@ -370,7 +383,9 @@ public class AclAdvice {
      */
     private boolean isEligibleForAcl( Object c ) {
 
-        if ( c == null ) return false;
+        if ( c == null ) {
+            return false;
+        }
 
         if ( Securable.class.isAssignableFrom( c.getClass() ) ) {
             return true;
@@ -436,7 +451,9 @@ public class AclAdvice {
             }
 
             if ( oktoClearACEs ) {
-                if ( log.isTraceEnabled() ) log.trace( "Erasing ACEs from child " + object );
+                if ( log.isTraceEnabled() ) {
+                    log.trace( "Erasing ACEs from child " + object );
+                }
 
                 while ( childAcl.getEntries().size() > 0 ) {
                     childAcl.deleteAce( 0 );
@@ -495,7 +512,9 @@ public class AclAdvice {
      * @param isDelete
      */
     private void process( final Object o, final String methodName, final boolean isUpdate, final boolean isDelete ) {
-        if ( log.isTraceEnabled() ) log.trace( "***********  Start ACL *************" );
+        if ( log.isTraceEnabled() ) {
+            log.trace( "***********  Start ACL *************" );
+        }
 
         Securable s = ( Securable ) o;
 
@@ -509,7 +528,9 @@ public class AclAdvice {
             startCreate( methodName, s );
         }
 
-        if ( log.isTraceEnabled() ) log.trace( "*========* End ACL *=========*" );
+        if ( log.isTraceEnabled() ) {
+            log.trace( "*========* End ACL *=========*" );
+        }
     }
 
     /**
@@ -560,7 +581,9 @@ public class AclAdvice {
                 throw ( new RuntimeException( e ) );
             }
 
-            if ( associatedObject == null ) continue;
+            if ( associatedObject == null ) {
+                continue;
+            }
 
             Class<?> propertyType = descriptor.getPropertyType();
 

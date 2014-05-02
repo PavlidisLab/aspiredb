@@ -33,7 +33,7 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
  * Strategy used to handle a successful user authentication if it is a ajax style login (ajaxLoginTrue parameter = true)
  * then no redirect happens and a some JSON is sent to the client if the request is not ajax-style then the default
  * redirection takes place
- *
+ * 
  * @author cmcdonald
  */
 public class AjaxAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {

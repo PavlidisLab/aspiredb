@@ -117,9 +117,13 @@ public class PhenotypeUploadCLI extends AbstractCLI {
     protected Exception doWork( String[] args ) {
         Exception err = processCommandLine( "Parse CVS", args );
         authenticate( applicationContext );
-        if ( err != null ) return err;
+        if ( err != null ) {
+            return err;
+        }
 
-        if ( directory == null || filename == null || columns == null ) return err;
+        if ( directory == null || filename == null || columns == null ) {
+            return err;
+        }
 
         try {
 

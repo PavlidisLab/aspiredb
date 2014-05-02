@@ -54,6 +54,7 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
 
     private static BeanFactory applicationContext;
 
+    @Override
     public String getLogger() {
         return "ubc.pavlab.aspiredb.cli.DecipherVariantUploadCLI";
     }
@@ -150,9 +151,13 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
     protected Exception doWork( String[] args ) {
         Exception err = processCommandLine( "Upload Variant file", args );
         authenticate( applicationContext );
-        if ( err != null ) return err;
+        if ( err != null ) {
+            return err;
+        }
 
-        if ( directory == null || filename == null ) return err;
+        if ( directory == null || filename == null ) {
+            return err;
+        }
 
         try {
             Class.forName( "org.relique.jdbc.csv.CsvDriver" );

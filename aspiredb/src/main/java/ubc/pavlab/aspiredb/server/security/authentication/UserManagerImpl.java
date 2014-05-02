@@ -728,7 +728,9 @@ public class UserManagerImpl implements UserManager {
     public void updateUser( UserDetails user ) {
         String username = user.getUsername();
         User u = userService.findByUserName( username );
-        if ( u == null ) throw new IllegalArgumentException( "No user could be loaded with name=" + user );
+        if ( u == null ) {
+            throw new IllegalArgumentException( "No user could be loaded with name=" + user );
+        }
 
         u.setPassword( user.getPassword() );
         u.setEnabled( user.isEnabled() );

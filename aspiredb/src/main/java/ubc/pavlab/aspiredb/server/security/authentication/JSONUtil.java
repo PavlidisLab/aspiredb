@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
  * A utility class to do 'JSON-like' things, such as writing out JSON objects to the response {@link java.io.Writer}.
  * <p>
  * This is in core because it is used by the AjaxAuthenticationFailureHandler - it could be moved.
- *
+ * 
  * @author keshav
  * @version $Id: JSONUtil.java,v 1.2 2013/07/24 00:42:14 paul Exp $
  */
@@ -48,7 +48,7 @@ public class JSONUtil {
 
     /**
      * Writes the text, which is in JSON format, to the {@link HttpServletResponse}.
-     *
+     * 
      * @param jsonText
      */
     public void writeToResponse( String jsonText ) throws IOException {

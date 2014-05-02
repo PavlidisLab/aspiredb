@@ -61,7 +61,9 @@ public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSuppo
     @Transactional
     public Collection<T> create( Collection<T> entities ) {
         nullCheck( entities );
-        if ( entities.isEmpty() ) return entities;
+        if ( entities.isEmpty() ) {
+            return entities;
+        }
         this.getHibernateTemplate().saveOrUpdateAll( entities );
         return entities;
     }
@@ -87,7 +89,9 @@ public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSuppo
     @Override
     @Transactional(readOnly = true)
     public Collection<T> load( Collection<Long> ids ) {
-        if ( ids.isEmpty() ) return new HashSet<T>();
+        if ( ids.isEmpty() ) {
+            return new HashSet<T>();
+        }
         Collection<T> results = this.getHibernateTemplate().findByNamedParam(
                 "from   " + elementClass.getSimpleName() + " where id in (:ids)", "ids", ids );
         return results;
@@ -114,7 +118,7 @@ public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSuppo
     @Override
     @Transactional(readOnly = true)
     public Collection<T> loadAll() {
-        return ( Collection<T> ) this.getHibernateTemplate().loadAll( elementClass );
+        return this.getHibernateTemplate().loadAll( elementClass );
     }
 
     @Override
@@ -135,7 +139,9 @@ public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSuppo
     @Transactional
     public void remove( Collection<T> entities ) {
         nullCheck( entities );
-        if ( entities.isEmpty() ) return;
+        if ( entities.isEmpty() ) {
+            return;
+        }
         this.getHibernateTemplate().deleteAll( entities );
     }
 
@@ -180,7 +186,9 @@ public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSuppo
      * @param entity
      */
     private void nullCheck( Object entity ) {
-        if ( entity == null ) throw new IllegalArgumentException( "Argument cannot be null" );
+        if ( entity == null ) {
+            throw new IllegalArgumentException( "Argument cannot be null" );
+        }
     }
 
     protected Session currentSession() {

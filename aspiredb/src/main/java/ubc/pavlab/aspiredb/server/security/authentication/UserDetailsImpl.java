@@ -70,7 +70,9 @@ public class UserDetailsImpl implements UserDetails {
         this.userName = userName;
         this.enabled = enabled;
 
-        if ( grantedAuthorities != null ) this.grantedAuthorities = grantedAuthorities;
+        if ( grantedAuthorities != null ) {
+            this.grantedAuthorities = grantedAuthorities;
+        }
         this.email = email;
 
         this.signupToken = signupConfirmationKey;

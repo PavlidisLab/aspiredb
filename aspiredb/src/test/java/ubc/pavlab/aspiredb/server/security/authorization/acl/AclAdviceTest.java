@@ -30,7 +30,6 @@ import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Subject;
-import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
 /**
@@ -69,7 +68,7 @@ public class AclAdviceTest extends BaseSpringContextTest {
 
         aclTestUtils.checkHasAcl( cnv );
 
-        variantDao.remove( ( Variant ) cnv );
+        variantDao.remove( cnv );
 
         aclTestUtils.checkDeletedAcl( cnv );
 

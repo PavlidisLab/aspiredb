@@ -86,6 +86,7 @@ public abstract class Variant implements SecuredNotChild, ValueObjectConvertible
     @Column(name = "EXTERNALID")
     private String externalId;
 
+    @Override
     public Long getId() {
         return id;
     }

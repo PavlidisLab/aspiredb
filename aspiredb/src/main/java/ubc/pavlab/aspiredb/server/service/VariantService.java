@@ -28,7 +28,8 @@ import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.PropertyValue;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
-/** @author azoubare
+/**
+ * @author azoubare
  * @version $Id: VariantService.java,v 1.19 2013/06/13 19:57:16 anton Exp $
  */
 public interface VariantService {

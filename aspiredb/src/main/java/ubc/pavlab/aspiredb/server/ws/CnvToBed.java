@@ -67,10 +67,11 @@ public class CnvToBed {
     private static String findColour( Variant variant ) {
         if ( variant.getClass() == CNV.class ) {
             CNV cnv = ( CNV ) variant;
-            if ( cnv.getType().equals( CnvType.LOSS ) )
+            if ( cnv.getType().equals( CnvType.LOSS ) ) {
                 return RED;
-            else
+            } else {
                 return BLUE;
+            }
         }
         return BLACK;
     }

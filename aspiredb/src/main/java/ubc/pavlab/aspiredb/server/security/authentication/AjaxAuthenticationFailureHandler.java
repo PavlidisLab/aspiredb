@@ -33,7 +33,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
  * Strategy used to handle a failed user authentication if it is a ajax style login (ajaxLoginTrue parameter = true)
  * then no redirect happens and a some JSON is sent to the client if the request is not ajax style then the default
  * redirection takes place
- *
+ * 
  * @author cmcdonald
  */
 public class AjaxAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {

@@ -84,6 +84,7 @@ public class PhenotypeDaoImpl extends SecurableDaoBaseImpl<Phenotype> implements
         return criteria.list();
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Collection<Phenotype> loadAllByProjectIds( Collection<Long> projectIds ) {
         Session session = currentSession();
@@ -193,7 +194,9 @@ public class PhenotypeDaoImpl extends SecurableDaoBaseImpl<Phenotype> implements
 
     @Override
     public Collection<Phenotype> loadBySubjectIds( Collection<Long> subjectIds ) {
-        if ( subjectIds.isEmpty() ) return new HashSet<Phenotype>();
+        if ( subjectIds.isEmpty() ) {
+            return new HashSet<Phenotype>();
+        }
 
         Session session = currentSession();
 

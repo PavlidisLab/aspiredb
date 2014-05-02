@@ -75,7 +75,9 @@ public class OntologyServiceImpl implements OntologyService {
 
         for ( AbstractOntologyService ontology : ontologyServices ) {
             Collection<OntologyIndividual> found = ontology.findIndividuals( query );
-            if ( found != null ) results.addAll( found );
+            if ( found != null ) {
+                results.addAll( found );
+            }
         }
 
         return results;
@@ -95,7 +97,9 @@ public class OntologyServiceImpl implements OntologyService {
         for ( AbstractOntologyService ontology : ontologyServices ) {
             if ( ontology.isOntologyLoaded() ) {
                 Collection<OntologyTerm> found = ontology.findTerm( query );
-                if ( found != null ) results.addAll( found );
+                if ( found != null ) {
+                    results.addAll( found );
+                }
             }
         }
 
@@ -116,7 +120,9 @@ public class OntologyServiceImpl implements OntologyService {
     public OntologyResource getResource( String uri ) {
         for ( AbstractOntologyService ontology : ontologyServices ) {
             OntologyResource resource = ontology.getResource( uri );
-            if ( resource != null ) return resource;
+            if ( resource != null ) {
+                return resource;
+            }
         }
         return null;
     }
@@ -125,7 +131,9 @@ public class OntologyServiceImpl implements OntologyService {
     public OntologyTerm getTerm( String uri ) {
         for ( AbstractOntologyService ontology : ontologyServices ) {
             OntologyTerm term = ontology.getTerm( uri );
-            if ( term != null ) return term;
+            if ( term != null ) {
+                return term;
+            }
         }
         return null;
     }
@@ -133,7 +141,9 @@ public class OntologyServiceImpl implements OntologyService {
     @Override
     public boolean isObsolete( String uri ) {
         OntologyTerm t = this.getTerm( uri );
-        if ( t != null && t.isTermObsolete() ) return true;
+        if ( t != null && t.isTermObsolete() ) {
+            return true;
+        }
         return false;
     }
 

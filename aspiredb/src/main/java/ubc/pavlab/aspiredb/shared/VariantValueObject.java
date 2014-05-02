@@ -158,7 +158,9 @@ public class VariantValueObject implements Serializable {
         } else if ( property instanceof CharacteristicProperty ) {
             final CharacteristicValueObject characteristicValueObject = this.getCharacteristics().get(
                     property.getName() );
-            if ( characteristicValueObject == null ) return null;
+            if ( characteristicValueObject == null ) {
+                return null;
+            }
             return characteristicValueObject.getValue();
         }
         return null;

@@ -57,7 +57,9 @@ public abstract class DaoBaseImpl<T> extends HibernateDaoSupport implements DaoB
     @Transactional
     public Collection<? extends T> create( Collection<? extends T> entities ) {
         nullCheck( entities );
-        if ( entities.isEmpty() ) return entities;
+        if ( entities.isEmpty() ) {
+            return entities;
+        }
         this.getHibernateTemplate().saveOrUpdateAll( entities );
         return entities;
     }
@@ -83,7 +85,9 @@ public abstract class DaoBaseImpl<T> extends HibernateDaoSupport implements DaoB
     @Override
     @Transactional(readOnly = true)
     public Collection<T> load( Collection<Long> ids ) {
-        if ( ids.isEmpty() ) return new HashSet<T>();
+        if ( ids.isEmpty() ) {
+            return new HashSet<T>();
+        }
         return this.getHibernateTemplate().findByNamedParam(
                 "from   " + elementClass.getSimpleName() + " where id in (:ids)", "ids", ids );
     }
@@ -134,7 +138,9 @@ public abstract class DaoBaseImpl<T> extends HibernateDaoSupport implements DaoB
     @Transactional
     public void remove( Collection<? extends T> entities ) {
         nullCheck( entities );
-        if ( entities.isEmpty() ) return;
+        if ( entities.isEmpty() ) {
+            return;
+        }
         this.getHibernateTemplate().deleteAll( entities );
     }
 
@@ -191,7 +197,9 @@ public abstract class DaoBaseImpl<T> extends HibernateDaoSupport implements DaoB
      * @param entity
      */
     private void nullCheck( Object entity ) {
-        if ( entity == null ) throw new IllegalArgumentException( "Argument cannot be null" );
+        if ( entity == null ) {
+            throw new IllegalArgumentException( "Argument cannot be null" );
+        }
     }
 
 }

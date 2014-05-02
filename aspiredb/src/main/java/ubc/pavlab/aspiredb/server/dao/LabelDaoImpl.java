@@ -66,6 +66,7 @@ public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDa
         return load( ids );
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Collection<Label> getSubjectLabelsByProjectId( Long projectId ) {
 
@@ -82,6 +83,7 @@ public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDa
         return load( ids );
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Collection<Label> getVariantLabelsByVariantId( Long id ) {
 
@@ -98,6 +100,7 @@ public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDa
         return load( ids );
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Collection<Label> getSubjectLabelsBySubjectId( Long id ) {
 

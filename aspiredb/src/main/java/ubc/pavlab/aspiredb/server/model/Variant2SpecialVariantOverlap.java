@@ -50,16 +50,30 @@ public class Variant2SpecialVariantOverlap implements Serializable {
 
     @Override
     public boolean equals( Object obj ) {
-        if ( this == obj ) return true;
-        if ( obj == null ) return false;
-        if ( getClass() != obj.getClass() ) return false;
+        if ( this == obj ) {
+            return true;
+        }
+        if ( obj == null ) {
+            return false;
+        }
+        if ( getClass() != obj.getClass() ) {
+            return false;
+        }
         Variant2SpecialVariantOverlap other = ( Variant2SpecialVariantOverlap ) obj;
         if ( overlapSpecialVariantId == null ) {
-            if ( other.overlapSpecialVariantId != null ) return false;
-        } else if ( !overlapSpecialVariantId.equals( other.overlapSpecialVariantId ) ) return false;
+            if ( other.overlapSpecialVariantId != null ) {
+                return false;
+            }
+        } else if ( !overlapSpecialVariantId.equals( other.overlapSpecialVariantId ) ) {
+            return false;
+        }
         if ( variantId == null ) {
-            if ( other.variantId != null ) return false;
-        } else if ( !variantId.equals( other.variantId ) ) return false;
+            if ( other.variantId != null ) {
+                return false;
+            }
+        } else if ( !variantId.equals( other.variantId ) ) {
+            return false;
+        }
         return true;
     }
 

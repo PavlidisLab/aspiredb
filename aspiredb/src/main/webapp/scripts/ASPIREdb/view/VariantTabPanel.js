@@ -3,18 +3,15 @@
  * 
  * Copyright (c) 2013 University of British Columbia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ * 
  */
 
 Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel',
@@ -52,7 +49,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       loadedVariants : [],
       property : new VariantTypeProperty(),
       // the current filters used
-      filterConfigs : [],
+      filterConfigs : []
    },
 
    constructor : function(cfg) {
@@ -166,7 +163,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          } ],
          data : data,
          autoLoad : true,
-         autoSync : true,
+         autoSync : true
       } );
 
       this.colourVariantByCombo = Ext.create( 'Ext.form.ComboBox', {
@@ -177,7 +174,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          valueField : 'id',
          queryMode : 'local',
          editable : false,
-         forceSelection : true,
+         forceSelection : true
       } );
 
       this.colourVariantByCombo.on( 'select', this.colourVariantByHandler, this );
@@ -307,11 +304,11 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                      items : [ {
                         text : 'Make label',
                         handler : ref.makeLabelHandler,
-                        scope : ref,
+                        scope : ref
                      }, {
                         text : 'Label settings',
                         handler : ref.labelSettingsHandler,
-                        scope : ref,
+                        scope : ref
                      } ]
                   } );
 
@@ -501,19 +498,33 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       // when variant table view is selected
       if ( grid.isVisible() ) {
 
+         // TODO
+         // http://docs.sencha.com/extjs/4.1.3/#!/api/Ext.data.Store-method-filter
+
          // collapse all the grids first - to open only the
          // selected one
-         grid.features[0].collapseAll();
+         if ( grid.features != null ) {
+            grid.features[0].collapseAll();
 
-         // expand only the selected subjects
-         SubjectService.getSubjects( projectIds[0], subjectIds, {
-            callback : function(selectedSubjectValueObjects) {
-               for (var i = 0; i < selectedSubjectValueObjects.length; i++) {
-                  var selectedSubjectValueObjects = selectedSubjectValueObjects[i];
-                  grid.features[0].expand( selectedSubjectValueObjects.patientId, true );
+            // expand only the selected subjects
+            SubjectService.getSubjects( projectIds[0], subjectIds, {
+               callback : function(selectedSubjectValueObjects) {
+                  for (var i = 0; i < selectedSubjectValueObjects.length; i++) {
+                     var selectedSubjectValueObjects = selectedSubjectValueObjects[i];
+                     grid.features[0].expand( selectedSubjectValueObjects.patientId, true );
+                  }
                }
-            }
-         } );
+            } );
+
+         } else {
+
+            /*
+             * // expand only the selected subjects SubjectService.getSubjects( projectIds[0], subjectIds, { callback :
+             * function(selectedSubjectValueObjects) { for (var i = 0; i < selectedSubjectValueObjects.length; i++) {
+             * var selectedSubjectValueObjects = selectedSubjectValueObjects[i]; grid. grid.features[0].expand(
+             * selectedSubjectValueObjects.patientId, true ); } } } );
+             */
+         }
 
       }
       // When Ideogram view selected
@@ -795,7 +806,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
                }
             } );
-         },
+         }
       } );
 
       var labelWindow = new ASPIREdb.view.CreateLabelWindowVariant();

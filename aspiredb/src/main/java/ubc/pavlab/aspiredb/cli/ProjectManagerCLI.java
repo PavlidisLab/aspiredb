@@ -114,7 +114,9 @@ public class ProjectManagerCLI extends AbstractCLI {
     protected Exception doWork( String[] args ) {
         Exception err = processCommandLine( "Project ", args );
         authenticate( applicationContext );
-        if ( err != null ) return err;
+        if ( err != null ) {
+            return err;
+        }
 
         if ( ( grant == true || restrict == true ) && delete == true ) {
             log.error( "can't have -grant/-restrict and -delete options together" );

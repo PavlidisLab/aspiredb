@@ -99,8 +99,6 @@ public class LabelServiceTest extends BaseSpringContextTest {
     private String HP_MOUTH = "Abnormality of the mouth";
     private String HP_NERVOUS = "Abnormality of the nervous system";
 
-    private Collection<Long> activeProjectIds;
-
     private Long subjectId;
 
     private static Log log = LogFactory.getLog( QueryServiceTest.class.getName() );
@@ -204,8 +202,6 @@ public class LabelServiceTest extends BaseSpringContextTest {
         plist.add( project );
         Collection<Long> projectIds = new ArrayList<Long>();
         projectIds.add( project.getId() );
-        activeProjectIds = projectIds;
-
         Phenotype phenoHead = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_HEAD, "HP_0000234",
                 "HPONTOLOGY", headPhenoValue );
         Phenotype phenoFace = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_FACE, "HP_0000271",

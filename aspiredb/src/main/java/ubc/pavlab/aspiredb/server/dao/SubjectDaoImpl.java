@@ -74,6 +74,7 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
         super.setSessionFactory( sessionFactory );
     }
 
+    @Override
     public Collection<Subject> loadByVariantIds( List<Long> variantIds ) {
 
         Collection<Variant> variants = variantDao.load( variantIds );
@@ -219,7 +220,9 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
             subjectIds.retainAll( ids );
 
             // Stop if nothing is left to filter.
-            if ( subjectIds.isEmpty() ) break;
+            if ( subjectIds.isEmpty() ) {
+                break;
+            }
         }
         return subjectIds;
     }
@@ -283,6 +286,7 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
         }
     }
 
+    @Override
     public Collection<Subject> findByPhenotype( PhenotypeFilterConfig filterConfig ) {
 
         Session session = this.getSessionFactory().getCurrentSession();

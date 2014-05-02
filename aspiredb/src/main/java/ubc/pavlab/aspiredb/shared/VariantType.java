@@ -27,10 +27,14 @@ public enum VariantType {
 
     public static VariantType findByName( String name ) {
 
-        if ( name == null ) return null;
+        if ( name == null ) {
+            return null;
+        }
 
         for ( VariantType type : VariantType.values() ) {
-            if ( name.toLowerCase().equals( type.name().toLowerCase() ) ) return type;
+            if ( name.toLowerCase().equals( type.name().toLowerCase() ) ) {
+                return type;
+            }
         }
 
         return null;

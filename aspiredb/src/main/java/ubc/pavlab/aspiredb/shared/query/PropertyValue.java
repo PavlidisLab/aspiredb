@@ -50,6 +50,7 @@ public class PropertyValue<T extends Displayable> implements Serializable {
         this.displayValue = displayValue;
     }
 
+    @Override
     public String toString() {
         return value.toString();
     }

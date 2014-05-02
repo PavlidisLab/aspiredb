@@ -439,7 +439,7 @@ public class CriteriaBuilder {
 
     /**
      * Construct full entity property name to be used in criteria query.
-     *
+     * 
      * @param filterTarget entity type criteria query will return
      * @param propertyOf entity type that the property is member of
      * @param property Property
@@ -451,7 +451,7 @@ public class CriteriaBuilder {
 
     /**
      * Get prefix to be used to fully name entity property based on.
-     *
+     * 
      * @param filterTarget entity type criteria query will return
      * @param propertyOf entity type that the property is member of
      * @return either 'variant.' or 'subject.'
