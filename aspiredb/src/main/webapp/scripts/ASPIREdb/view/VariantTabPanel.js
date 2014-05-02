@@ -489,6 +489,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       ideogram.drawColouredVariants( this.loadedVariants, false );
       ideogram.showColourLegend();
    },
+
    /**
     * When subjects are selected in the subject grid highlist the variants of selected subjects in ideogram and in table
     * view
@@ -505,18 +506,52 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             // collapse all the grids first - to open only the
             // selected one
             grid.features[0].collapseAll();
-   
+
             // expand only the selected subjects
             SubjectService.getSubjects( projectIds[0], subjectIds, {
                callback : function(selectedSubjectValueObjects) {
                   for (var i = 0; i < selectedSubjectValueObjects.length; i++) {
-                     var selectedSubjectValueObjects = selectedSubjectValueObjects[i];
-                     grid.features[0].expand( selectedSubjectValueObjects.patientId, true );
+                     var subject = selectedSubjectValueObjects[i];
+                     grid.features[0].expand( subject.patientId, true );
                   }
                }
             } );
          } else {
-            // TODO FIXME Select Variants that match the selected Subject Patient IDs
+
+            // collapsable plugin disabled so no groups to expand / collapse
+            // so just select the variants for the selected subjectIds
+            // and scroll to view it
+
+            SubjectService.getSubjects( projectIds[0], subjectIds, {
+               callback : function(selectedSubjectValueObjects) {
+
+                  var selectedRecords = [];
+
+                  for (var i = 0; i < selectedSubjectValueObjects.length; i++) {
+                     var subject = selectedSubjectValueObjects[i];
+
+                     grid.store.each( function(rec) {
+                        if ( rec.get( 'patientId' ) == subject.patientId ) {
+                           selectedRecords.push( rec );
+                        }
+                     } );
+                  }
+
+                  grid.selModel.select( selectedRecords );
+
+                  if ( selectedRecords.length > 0 ) {
+                     grid.getView().focusRow( grid.store.indexOfId( selectedRecords[0].data.id ) );
+                     // use just to make sure selected record is at the top
+                     grid.getView().scrollBy( {
+                        x : 0,
+                        y : 1000
+                     } );
+                     grid.getView().focusRow( grid.store.indexOfId( selectedRecords[0].data.id ) );
+                  }
+
+               }
+            } );
+
          }
 
       }
