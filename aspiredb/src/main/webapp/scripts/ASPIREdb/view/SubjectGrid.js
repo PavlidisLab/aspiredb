@@ -157,6 +157,13 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
          scope : this
       } );
 
+      this.deselectAllButton = Ext.create( 'Ext.Button', {
+         itemId : 'deselectAll',
+         text : 'Clear All',
+         handler : this.deselectAllHandler,
+         scope : this
+      } );
+
       this.saveButton = Ext.create( 'Ext.Button', {
          itemId : 'saveButton',
          text : '',
@@ -171,6 +178,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
       this.toolbar.add( this.labelsButton );
       this.toolbar.add( this.selectAllButton );
+      this.toolbar.add( this.deselectAllButton );
       this.toolbar.add( Ext.create( 'Ext.toolbar.Fill' ) );
       this.toolbar.add( this.saveButton );
       this.addDocked( this.toolbar );
@@ -464,6 +472,12 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       // this.selectAllStatus ='Yes';
       // }
 
+   },
+
+   deselectAllHandler : function() {
+      this.cancelBubble = true;
+      this.getSelectionModel().deselectAll();
+      this.selectionChangeHandler();
    }
 
 } );

@@ -117,6 +117,14 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          scope : this
       } );
 
+      this.deselectAllButton = Ext.create( 'Ext.Button', {
+         itemId : 'deselectAll',
+         text : 'Clear All',
+         disabled : false,
+         handler : this.deselectAllHandler,
+         scope : this
+      } );
+      
       this.saveButton = Ext.create( 'Ext.Button', {
          id : 'saveButton',
          text : '',
@@ -338,6 +346,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                toolbar.add( ref.actionsButton );
                toolbar.add( ref.labelsButton );
                toolbar.add( ref.selectAllButton );
+               toolbar.add( ref.deselectAllButton );
                toolbar.add( ref.saveButton );
                toolbar.add( ref.exportButton );
                toolbar.add( ref.zoomInButton );
@@ -597,6 +606,12 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       this.selectionChangeHandler( this.getComponent( 'variantGrid' ).getSelectionModel(), this.getComponent(
          'variantGrid' ).getSelectionModel().getSelection() );
 
+   },
+
+   deselectAllHandler : function() {
+      this.getComponent( 'variantGrid' ).getSelectionModel().deselectAll();
+      this.selectionChangeHandler( this.getComponent( 'variantGrid' ).getSelectionModel(), this.getComponent(
+         'variantGrid' ).getSelectionModel().getSelection() );
    },
 
    ideogramSelectionChangeHandler : function(model, records) {
