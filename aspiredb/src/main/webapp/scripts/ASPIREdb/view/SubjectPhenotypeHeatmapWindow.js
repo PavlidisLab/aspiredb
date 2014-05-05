@@ -20,6 +20,9 @@
 Ext.require( [ 'Ext.Window', 'Matrix2Viz' ] );
 
 Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
+   /**
+    * @memberOf ASPIREdb.view.SubjectPhenotypeHeatmapWindow
+    */
    extend : 'Ext.Window',
    alias : 'widget.subjectPhenotypeHeatmapWindow',
    singleton : true,

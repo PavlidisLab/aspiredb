@@ -24,6 +24,9 @@ Ext.require( [ 'ASPIREdb.store.SubjectStore', 'ASPIREdb.view.CreateLabelWindow',
  * 
  */
 Ext.define( 'ASPIREdb.view.SubjectGrid', {
+   /**
+    * @memberOf ASPIREdb.view.SubjectGrid
+    */
    extend : 'Ext.grid.Panel',
    alias : 'widget.subjectGrid',
    title : 'Subject',

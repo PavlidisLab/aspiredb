@@ -20,6 +20,9 @@ Ext.require([ 'Ext.Window', 'Ext.picker.Color', 'Ext.data.ArrayStore',
 		'Ext.form.ComboBox', 'Ext.button.Button' ]);
 
 Ext.define('ASPIREdb.view.CreateLabelWindow', {
+   /**
+    * @memberOf ASPIREdb.view.CreateLabelWindow
+    */
 	extend : 'Ext.Window',
 	alias : 'widget.createLabelWindow',
 	title : 'Make label',

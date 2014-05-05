@@ -26,6 +26,9 @@ Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowMode
  * Variant Tab Panel contains both Ideogram view and Variant table view
  */
 Ext.define( 'ASPIREdb.view.VariantTabPanel', {
+   /**
+    * @memberOf ASPIREdb.view.VariantTabPanel
+    */
    extend : 'Ext.tab.Panel',
    alias : 'widget.variantTabPanel',
    title : 'Variant',
@@ -124,7 +127,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          handler : this.deselectAllHandler,
          scope : this
       } );
-      
+
       this.saveButton = Ext.create( 'Ext.Button', {
          id : 'saveButton',
          text : '',

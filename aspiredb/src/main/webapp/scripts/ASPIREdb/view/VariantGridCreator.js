@@ -22,6 +22,9 @@ Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowMode
 // TODO js documentation
 Ext.define( 'ASPIREdb.view.VariantGridCreator',
    {
+      /**
+       * @memberOf ASPIREdb.view.VariantGridCreator
+       */
       extend : 'Ext.util.Observable',
       singleton : true,
 
