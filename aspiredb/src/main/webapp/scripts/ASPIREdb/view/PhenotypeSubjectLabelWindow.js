@@ -11,6 +11,12 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
    height : 450,
    layout : 'fit',
    bodyStyle : 'padding: 5px;',
+   config : {
+      selectedSubjectIds : [],
+      selSubjects : [],
+      visibleLabels : [],
+      gridPanelName : '',
+   },
 
    /**
     * items : [ { itemId : 'phenotypeSubjectLabelGrid', xtype : 'phenotypeSubjectLabelGrid', } ],
@@ -81,7 +87,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
                   var phenSummary2 = selPhenotypes[j].data.selectedPhenotype;
                   var phenotypeName = phenSummary1.name + " vs " + phenSummary2.name;
                   var columnNames = [ phenSummary1.name, phenSummary2.name, 'Label' ];
-                  
+
                   var colData = [];
                   var rowNames = [];
                   var data = [];
@@ -128,7 +134,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
                               }
                            }
                         }
-                       
+
                      }
                   }
                   this.createGridPanel( data, columnNames, phenotypeName );
@@ -140,9 +146,9 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
             for (var i = 0; i < selPhenotypes.length; i++) {
                var data = [];
                var rowData = [];
-               var phenotypeName ='';
-               var columnNames =[];
-               
+               var phenotypeName = '';
+               var columnNames = [];
+
                var phenSummary1 = selPhenotypes[i].data.selectedPhenotype;
 
                for ( var rowlabelName in phenSummary1.phenoSummaryMap) {
@@ -158,19 +164,18 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
                   }
 
                }
-               
+
                for (var j = i + 1; j < selPhenotypes.length; j++) {
 
                   var phenSummary2 = selPhenotypes[j].data.selectedPhenotype;
-                  
-                  
-                  if (data.length>0){
-                     phenotypeName = phenotypeName+" vs "+phenSummary2.name;
-                     columnNames.push(phenSummary2.name);
-                     
+
+                  if ( data.length > 0 ) {
+                     phenotypeName = phenotypeName + " vs " + phenSummary2.name;
+                     columnNames.push( phenSummary2.name );
+
                      var colData = [];
-                   //  var rowNames = [];
-                     var newData =[];
+                     // var rowNames = [];
+                     var newData = [];
 
                      for ( var columnlabelName in phenSummary2.phenoSummaryMap) {
                         var subjects = [];
@@ -188,68 +193,64 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
 
                      // find the resultant row
                      for ( var dataRow in data) {
-                           var rowData =data[dataRow];
-                           var subjectindex=rowData.length -1;
-                           var rowSubjects = rowData[subjectindex];
-                           if (rowSubjects!=null){
+                        var rowData = data[dataRow];
+                        var subjectindex = rowData.length - 1;
+                        var rowSubjects = rowData[subjectindex];
+                        if ( rowSubjects != null ) {
                            // if ( rowNames.indexOf( rowSubjects[0] == -1 ) ) {
-                              //   console.log( 'row data :  ' + dataRow + ' value is  : ' + rowSubjects[0] );
+                           // console.log( 'row data : ' + dataRow + ' value is : ' + rowSubjects[0] );
 
-                               //  rowNames.push( rowSubjects[0] );
+                           // rowNames.push( rowSubjects[0] );
 
-                                 for ( var colName in colData) {
-                                    if ( colName != 'transpose' ) {
-                                       var row = [];
-                                       var resultSubjects = [];
-                                       console.log( 'column names : ' + colName );
-                                       var colSubjects = colData[colName];
-                                       for (var l=0;l< rowData.length-1;l++){
-                                          row.push( rowData[l] );
-                                       }
-                                       row.push( colSubjects[0] );
-                                       for (var k = 0; k < rowSubjects.length; k++) {
-                                          if ( colSubjects[1].indexOf( rowSubjects[k] ) != -1 ) {
-                                             resultSubjects.push( rowSubjects[k] );
-                                          }
-                                       }
-                                       row.push( resultSubjects );
-                                       newData.push( row );
-                                       
+                           for ( var colName in colData) {
+                              if ( colName != 'transpose' ) {
+                                 var row = [];
+                                 var resultSubjects = [];
+                                 console.log( 'column names : ' + colName );
+                                 var colSubjects = colData[colName];
+                                 for (var l = 0; l < rowData.length - 1; l++) {
+                                    row.push( rowData[l] );
+                                 }
+                                 row.push( colSubjects[0] );
+                                 for (var k = 0; k < rowSubjects.length; k++) {
+                                    if ( colSubjects[1].indexOf( rowSubjects[k] ) != -1 ) {
+                                       resultSubjects.push( rowSubjects[k] );
                                     }
                                  }
-                                // data =newData; 
-                              //}
-                           }
-                           else{
-                              //empty subjects
-                              for ( var colName in colData) {
-                                 if ( colName != 'transpose' ) {
-                                    var row = [];
-                                    var resultSubjects = [];
-                                    console.log( 'column names : ' + colName );
-                                    var colSubjects = colData[colName];
-                                    for (var l=0;l< rowData.length-1;l++){
-                                       row.push( rowData[l] );
-                                    }
-                                    row.push( colSubjects[0] );
-                                    
-                                    row.push( resultSubjects );
-                                    newData.push( row );
-                                    
-                                 }
+                                 row.push( resultSubjects );
+                                 newData.push( row );
+
                               }
                            }
-                           
-                          
+                           // data =newData;
+                           // }
+                        } else {
+                           // empty subjects
+                           for ( var colName in colData) {
+                              if ( colName != 'transpose' ) {
+                                 var row = [];
+                                 var resultSubjects = [];
+                                 console.log( 'column names : ' + colName );
+                                 var colSubjects = colData[colName];
+                                 for (var l = 0; l < rowData.length - 1; l++) {
+                                    row.push( rowData[l] );
+                                 }
+                                 row.push( colSubjects[0] );
+
+                                 row.push( resultSubjects );
+                                 newData.push( row );
+
+                              }
+                           }
+                        }
 
                      }
-                     data =newData;
-                      
-                  }
-                  else{
+                     data = newData;
+
+                  } else {
                      phenotypeName = phenSummary1.name + " vs " + phenSummary2.name;
                      columnNames = [ phenSummary1.name, phenSummary2.name ];
-                     
+
                      var colData = [];
                      var rowNames = [];
 
@@ -295,14 +296,13 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
                                  }
                               }
                            }
-                           
+
                         }
                      }
                   }
-                  
-                  
+
                }
-               columnNames.push('Label');
+               columnNames.push( 'Label' );
                this.createGridPanel( data, columnNames, phenotypeName );
             }
 
@@ -319,8 +319,8 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
              * for ( var rowlabelName in phenSummary.phenoSummaryMap) { var subjects = []; if ( rowlabelName !=
              * "Unknown" ) { if ( rowlabelName == "Present" || rowlabelName == "Y" ) subjects = phenSummary.subjects[1];
              * else if ( rowlabelName == "Absent" || rowlabelName == "N" ) subjects = phenSummary.subjects[0]; else
-             * subjects = phenSummary.subjects[rowlabelName]; pheneData.push( [ rowlabelName, subjects ] ); }
-             *  } phenSummaries.push(pheneData); }
+             * subjects = phenSummary.subjects[rowlabelName]; pheneData.push( [ rowlabelName, subjects ] ); } }
+             * phenSummaries.push(pheneData); }
              * 
              * for (var i = 0; i < phenSummaries.length; i++) { for (var k = i+1; k < phenSummaries.length; k++) { var
              * rowNames=[]; var data=[]; // find the resultant row for ( var rowName in phenSummaries[i]) { if ( rowName !=
@@ -335,10 +335,8 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
              * []; console.log( 'column names : ' + colName ); var colSubjects = phenSummaries[k][colName]; //row.push(
              * rowSubjects[0] ); //row.push( colSubjects[0] ); for (var k = 0; k < rowSubjects[1].length; k++) { if (
              * colSubjects[1].indexOf( rowSubjects[1][k] ) != -1 ) { resultSubjects.push( rowSubjects[1][k] ); } }
-             * row.push( resultSubjects ); data.push( row ); } } }
-             *  } }
-             *  }
-             *  } this.createGridPanel( data, columnNames, phenotypeName );
+             * row.push( resultSubjects ); data.push( row ); } } } } } } } this.createGridPanel( data, columnNames,
+             * phenotypeName );
              */
 
          }
@@ -351,6 +349,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
    createGridPanel : function(data, columnNames, phenotypeName) {
 
       var ref = this;
+      ref.gridPanelName = phenotypeName;
       var fields = [];
 
       if ( columnNames.length > 0 ) {
@@ -379,20 +378,40 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
                   dataIndex : columnNames[i],
                   flex : 1,
                   renderer : function(value) {
-                     /**
-                      * var labels =[]; var projectIds= ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
-                      * SubjectService.getSubjects(projectIds[0],value, { callback :
-                      * function(selectedSubjectValueObjects) { for (var k=0;k<selectedSubjectValueObjects.length;k++){
-                      * if (selectedSubjectValueObjects[k].labels[0].isShown){
-                      * labels.push(selectedSubjectValueObjects[k].labels[0]); } } } }); console.log('label colour
-                      * :'+labels[0].colour); if (labels.length >0){ var fontcolor = (parseInt( labels[0].colour, 16 ) >
-                      * 0xffffff / 2) ? 'black' : 'white'; ret += "<font color=" + fontcolor + "><span
-                      * style='background-color: " + labels[0].colour + "'>&nbsp&nbsp" + value.length + "&nbsp</span></font>&nbsp&nbsp&nbsp";
-                      * console.log('font color :'+fontcolor); } else ret =value.length;
-                      * 
-                      * return ret; //value.length;
-                      */
-                     return value.length;
+                    
+                    var returnValue = value.length;
+                    if (returnValue!=0) {
+                        var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+
+                        SubjectService.getSubjects( projectIds[0], value, {
+                           callback : function(selectedSubjectValueObjects) {
+                              for (var k = 0; k < selectedSubjectValueObjects.length; k++) {
+                                 
+                                 if ( selectedSubjectValueObjects[k].labels != undefined ) {
+
+                                    label = selectedSubjectValueObjects[k].labels[0];
+                                    if (label && returnValue==value.length){
+                                    var fontcolor = (parseInt( label.colour, 16 ) > 0xffffff / 2) ? 'black' : 'white';
+                                    
+                                    returnValue = "<font color=" + fontcolor + "><span style='background-color: " + label.colour
+                                       + "'>&nbsp&nbsp" + returnValue + "&nbsp</span></font>&nbsp&nbsp&nbsp";
+                                       console.log('ret *********'+returnValue);
+                                       
+                                    }
+                           
+                                 }
+                              }
+                              
+                              console.log('ret *********??????'+returnValue);
+                           }
+                        
+                        } );
+                       
+                        //console.log('ret *********??????'+returnValue);
+                 
+                    }
+                    return returnValue;
+                    
                   }
                } );
             } else {
@@ -415,14 +434,39 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
          store : suggestContigencyTableStore,
          columns : columns,
          autoRender : true,
+         //multiSelect : false,
          width : 850,
          // columnLines : true,
          listeners : {
             cellclick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
-               ref.makeLabelHandler( record.raw[cellIndex] );
+              // ref.selectedSubjectIds = [];
+               var subjectIdLength = record.raw.length;
+               ref.selectedSubjectIds = record.raw[subjectIdLength - 1];
 
+               // Stop the browser getting the event
+               e.preventDefault();
+
+               var contextMenu = new Ext.menu.Menu( {
+                  //id : 'labelContextmenu',
+                  items : [ {
+                     text : 'Make label',
+                     handler : ref.makeLabelHandler,
+                     scope : this,
+                  }, {
+                     text : 'Edit label',
+                     itemId : 'editLabel',
+                     handler : ref.editLabelHandler,
+                     disabled : true,
+                     scope : this,
+                  } ]
+               } );
+
+               contextMenu.showAt( e.getX(), e.getY() );
             }
+
+         // }
          },
+
          selModel : Ext.create( 'Ext.selection.RowModel', {
             mode : 'MULTI',
             listeners : {
@@ -447,9 +491,11 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
     * @param :
     *           event
     */
-   makeLabelHandler : function(subjectIds) {
+   makeLabelHandler : function() {
 
       var me = this;
+
+      var subjectIds = me.selectedSubjectIds;
       var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
       SubjectService.getSubjects( projectIds[0], subjectIds, {
          callback : function(selectedSubjectValueObjects) {
@@ -476,7 +522,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
                   if ( btn === 'yes' ) {
                      me.addLabelHandler( vo, subjectIds );
                      this.hide();
-                     // ASPIREdb.EVENT_BUS.fireEvent('subject_label_created');
+
                   }
 
                }, this );
@@ -484,7 +530,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
             } else {
                me.addLabelHandler( vo, subjectIds );
                this.hide();
-               // ASPIREdb.EVENT_BUS.fireEvent('subject_label_created');
+
             }
 
          }
@@ -492,6 +538,78 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
 
       var labelWindow = new ASPIREdb.view.CreateLabelWindowSubject();
       labelWindow.show();
+      var grid = ASPIREdb.view.PhenotypeSubjectLabelWindow.getComponent( me.gridPanelName );
+      console.log( 'grid  :' + grid );
+      
+   },
+
+   editLabelHandler : function() {
+
+      var me = this;
+
+      var subjectIds = me.selectedSubjectIds;
+      var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+      SubjectService.getSubjects( projectIds[0], subjectIds, {
+         callback : function(selectedSubjectValueObjects) {
+            me.selSubjects = selectedSubjectValueObjects;
+         }
+      } );
+
+      Ext.define( 'ASPIREdb.view.CreateLabelWindowSubject', {
+         isSubjectLabel : true,
+         extend : 'ASPIREdb.view.CreateLabelWindow',
+         title : 'Edit Label',
+         items : [ {
+            xtype : 'text',
+            itemId : 'labelName',
+            value : me.selSubjects[0].labels[0].name,
+            flex : 2,
+         }, {
+            xtype : 'colorpicker',
+            itemId : 'colorPicker',
+            value : me.selSubjects[0].labels[0].colour, // default
+            flex : 2,
+         } ],
+
+         // override
+         onOkButtonClick : function() {
+
+            var labelCombo = this.down( "#labelCombo" );
+            var vo = this.getLabel();
+            if ( vo == null ) {
+               return;
+            }
+            var labelIndex = labelCombo.getStore().findExact( 'display', vo.name );
+            if ( labelIndex != -1 ) {
+               // activate confirmation window
+               Ext.MessageBox.confirm( 'Label already exist', 'Label already exist. Add into it ?', function(btn) {
+                  if ( btn === 'yes' ) {
+                     me.addLabelHandler( vo, subjectIds );
+                     this.hide();
+      
+                  }
+
+               }, this );
+
+            } else {
+               me.addLabelHandler( vo, subjectIds );
+               this.hide();
+       
+            }
+
+         }
+      } );
+
+      var labelWindow = new ASPIREdb.view.CreateLabelWindowSubject();
+      labelWindow.show();
+
+      // me.down('#editLabel').setVisible(true);
+      var grid = ASPIREdb.view.PhenotypeSubjectLabelWindow.getComponent( me.gridPanelName );
+      var test = grid.getComponent( '#labelContextmenu' );
+      var selection = grid.getSelectionModel().getSelection()[0];
+      if ( selection ) {
+         var store = grid.store;
+      }
 
    },
 
@@ -529,7 +647,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
    },
 
    /**
-    * Reusing the code in subject grid Load subject labels created by the user
+    * Reusing the code in subject grid to Load subject labels created by the user
     * 
     * @return visibleLabels
     */
