@@ -12,10 +12,9 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
    layout : 'fit',
    bodyStyle : 'padding: 5px;',
 
-   items : [ {
-      itemId : 'phenotypeSubjectLabelGrid',
-      xtype : 'phenotypeSubjectLabelGrid',
-   } ],
+   /**
+    * items : [ { itemId : 'phenotypeSubjectLabelGrid', xtype : 'phenotypeSubjectLabelGrid', } ],
+    */
 
    initComponent : function() {
 
@@ -23,135 +22,533 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
 
    },
 
+   /**
+    * initGridAndShow : function(psvos, selPhenotypes) {
+    * 
+    * var ref = this;
+    * 
+    * var grid = ref.getComponent( 'phenotypeSubjectLabelGrid' ); grid.populateGrid( psvos, selPhenotypes ); ref.show(); },
+    */
+
    initGridAndShow : function(psvos, selPhenotypes) {
+      if ( selPhenotypes.length > 3 ) {
+         Ext.Msg.alert( 'User is allowed to select maximum 3 phenotypes to view thw table. Reselect' );
+      } else {
+         // if only one phenotype is selected
+         if ( selPhenotypes.length == 1 ) {
+            var data = [];
 
-      var ref = this;
+            var phenSummary = selPhenotypes[0].data.selectedPhenotype;
+            var phenotypeName = phenSummary.name;
+            var columnNames = [ phenotypeName, 'Label' ];
 
-      var grid = ref.getComponent( 'phenotypeSubjectLabelGrid' );
-      grid.populateGrid( psvos, selPhenotypes );
-      ref.show();
-      // //grid.updatePhenotypeSummaryMatrix();
-   },
+            for ( var labelName in phenSummary.phenoSummaryMap) {
+               var subjects = [];
+               if ( labelName != "Unknown" ) {
+                  if ( labelName == "Present" || labelName == "Y" )
+                     subjects = phenSummary.subjects[1];
+                  else if ( labelName == "Absent" || labelName == "N" )
+                     subjects = phenSummary.subjects[0];
+                  else
+                     subjects = phenSummary.subjects[labelName];
+                  // rowName, cell Value
+                  var row = [ labelName, subjects ];
+                  data.push( row );
+               }
+            }
+            this.createGridPanel( data, columnNames, phenotypeName );
 
-   populateGrid : function(psvos) {
+         } else if ( selPhenotypes.length == 2 ) {
+            for (var i = 0; i < selPhenotypes.length; i++) {
+               var rowData = [];
+               var phenSummary1 = selPhenotypes[i].data.selectedPhenotype;
 
-      var data = [];
+               for ( var rowlabelName in phenSummary1.phenoSummaryMap) {
+                  var subjects = [];
+                  if ( rowlabelName != "Unknown" ) {
+                     if ( rowlabelName == "Present" || rowlabelName == "Y" )
+                        subjects = phenSummary1.subjects[1];
+                     else if ( rowlabelName == "Absent" || rowlabelName == "N" )
+                        subjects = phenSummary1.subjects[0];
+                     else
+                        subjects = phenSummary1.subjects[rowlabelName];
+                     rowData.push( [ rowlabelName, subjects ] );
+                  }
 
-      for (var i = 0; i < ref.phenotypeSummaryValueObjects.length; i++) {
-         var phenSummary = ref.phenotypeSummaryValueObjects[i];
-         var phenoSummaryValueObject = voMap[phenSummary.name];
-         // we are attaching a new property to phenSummary here, calling it phenoSummaryMapSelectedSubjects
+               }
+               for (var j = i + 1; j < selPhenotypes.length; j++) {
 
-         if ( phenoSummaryValueObject ) {
-            phenSummary.phenoSummaryMapSelectedSubjects = phenoSummaryValueObject.phenoSummaryMap;
-            phenSummary.displaySummarySelectedSubjects = phenoSummaryValueObject.displaySummary;
-         } else {// if phenoSummaryValueObject is null or undefined
-            console.log( "null or undefined phenoSummaryValueObject: " + phenSummary.name );
+                  var phenSummary2 = selPhenotypes[j].data.selectedPhenotype;
+                  var phenotypeName = phenSummary1.name + " vs " + phenSummary2.name;
+                  var columnNames = [ phenSummary1.name, phenSummary2.name, 'Label' ];
+                  
+                  var colData = [];
+                  var rowNames = [];
+                  var data = [];
+
+                  for ( var columnlabelName in phenSummary2.phenoSummaryMap) {
+                     var subjects = [];
+                     if ( columnlabelName != "Unknown" ) {
+                        if ( columnlabelName == "Present" || columnlabelName == "Y" )
+                           subjects = phenSummary2.subjects[1];
+                        else if ( columnlabelName == "Absent" || columnlabelName == "N" )
+                           subjects = phenSummary2.subjects[0];
+                        else
+                           subjects = phenSummary2.subjects[columnlabelName];
+                        colData.push( [ columnlabelName, subjects ] );
+
+                     }
+                  }
+
+                  // find the resultant row
+                  for ( var rowName in rowData) {
+                     if ( rowName != 'transpose' ) {
+
+                        var rowSubjects = rowData[rowName];
+                        if ( rowNames.indexOf( rowSubjects[0] == -1 ) ) {
+                           console.log( 'row data :  ' + rowName + ' value is  : ' + rowSubjects[0] );
+
+                           rowNames.push( rowSubjects[0] );
+
+                           for ( var colName in colData) {
+                              if ( colName != 'transpose' ) {
+                                 var row = [];
+                                 var resultSubjects = [];
+                                 console.log( 'column names : ' + colName );
+                                 var colSubjects = colData[colName];
+                                 row.push( rowSubjects[0] );
+                                 row.push( colSubjects[0] );
+                                 for (var k = 0; k < rowSubjects[1].length; k++) {
+                                    if ( colSubjects[1].indexOf( rowSubjects[1][k] ) != -1 ) {
+                                       resultSubjects.push( rowSubjects[1][k] );
+                                    }
+                                 }
+                                 row.push( resultSubjects );
+                                 data.push( row );
+                              }
+                           }
+                        }
+                       
+                     }
+                  }
+                  this.createGridPanel( data, columnNames, phenotypeName );
+               }
+            }
+
+         } else if ( selPhenotypes.length == 3 ) {
+
+            for (var i = 0; i < selPhenotypes.length; i++) {
+               var data = [];
+               var rowData = [];
+               var phenotypeName ='';
+               var columnNames =[];
+               
+               var phenSummary1 = selPhenotypes[i].data.selectedPhenotype;
+
+               for ( var rowlabelName in phenSummary1.phenoSummaryMap) {
+                  var subjects = [];
+                  if ( rowlabelName != "Unknown" ) {
+                     if ( rowlabelName == "Present" || rowlabelName == "Y" )
+                        subjects = phenSummary1.subjects[1];
+                     else if ( rowlabelName == "Absent" || rowlabelName == "N" )
+                        subjects = phenSummary1.subjects[0];
+                     else
+                        subjects = phenSummary1.subjects[rowlabelName];
+                     rowData.push( [ rowlabelName, subjects ] );
+                  }
+
+               }
+               
+               for (var j = i + 1; j < selPhenotypes.length; j++) {
+
+                  var phenSummary2 = selPhenotypes[j].data.selectedPhenotype;
+                  
+                  
+                  if (data.length>0){
+                     phenotypeName = phenotypeName+" vs "+phenSummary2.name;
+                     columnNames.push(phenSummary2.name);
+                     
+                     var colData = [];
+                   //  var rowNames = [];
+                     var newData =[];
+
+                     for ( var columnlabelName in phenSummary2.phenoSummaryMap) {
+                        var subjects = [];
+                        if ( columnlabelName != "Unknown" ) {
+                           if ( columnlabelName == "Present" || columnlabelName == "Y" )
+                              subjects = phenSummary2.subjects[1];
+                           else if ( columnlabelName == "Absent" || columnlabelName == "N" )
+                              subjects = phenSummary2.subjects[0];
+                           else
+                              subjects = phenSummary2.subjects[columnlabelName];
+                           colData.push( [ columnlabelName, subjects ] );
+
+                        }
+                     }
+
+                     // find the resultant row
+                     for ( var dataRow in data) {
+                           var rowData =data[dataRow];
+                           var subjectindex=rowData.length -1;
+                           var rowSubjects = rowData[subjectindex];
+                           if (rowSubjects!=null){
+                           // if ( rowNames.indexOf( rowSubjects[0] == -1 ) ) {
+                              //   console.log( 'row data :  ' + dataRow + ' value is  : ' + rowSubjects[0] );
+
+                               //  rowNames.push( rowSubjects[0] );
+
+                                 for ( var colName in colData) {
+                                    if ( colName != 'transpose' ) {
+                                       var row = [];
+                                       var resultSubjects = [];
+                                       console.log( 'column names : ' + colName );
+                                       var colSubjects = colData[colName];
+                                       for (var l=0;l< rowData.length-1;l++){
+                                          row.push( rowData[l] );
+                                       }
+                                       row.push( colSubjects[0] );
+                                       for (var k = 0; k < rowSubjects.length; k++) {
+                                          if ( colSubjects[1].indexOf( rowSubjects[k] ) != -1 ) {
+                                             resultSubjects.push( rowSubjects[k] );
+                                          }
+                                       }
+                                       row.push( resultSubjects );
+                                       newData.push( row );
+                                       
+                                    }
+                                 }
+                                // data =newData; 
+                              //}
+                           }
+                           else{
+                              //empty subjects
+                              for ( var colName in colData) {
+                                 if ( colName != 'transpose' ) {
+                                    var row = [];
+                                    var resultSubjects = [];
+                                    console.log( 'column names : ' + colName );
+                                    var colSubjects = colData[colName];
+                                    for (var l=0;l< rowData.length-1;l++){
+                                       row.push( rowData[l] );
+                                    }
+                                    row.push( colSubjects[0] );
+                                    
+                                    row.push( resultSubjects );
+                                    newData.push( row );
+                                    
+                                 }
+                              }
+                           }
+                           
+                          
+
+                     }
+                     data =newData;
+                      
+                  }
+                  else{
+                     phenotypeName = phenSummary1.name + " vs " + phenSummary2.name;
+                     columnNames = [ phenSummary1.name, phenSummary2.name ];
+                     
+                     var colData = [];
+                     var rowNames = [];
+
+                     for ( var columnlabelName in phenSummary2.phenoSummaryMap) {
+                        var subjects = [];
+                        if ( columnlabelName != "Unknown" ) {
+                           if ( columnlabelName == "Present" || columnlabelName == "Y" )
+                              subjects = phenSummary2.subjects[1];
+                           else if ( columnlabelName == "Absent" || columnlabelName == "N" )
+                              subjects = phenSummary2.subjects[0];
+                           else
+                              subjects = phenSummary2.subjects[columnlabelName];
+                           colData.push( [ columnlabelName, subjects ] );
+
+                        }
+                     }
+
+                     // find the resultant row
+                     for ( var rowName in rowData) {
+                        if ( rowName != 'transpose' ) {
+
+                           var rowSubjects = rowData[rowName];
+                           if ( rowNames.indexOf( rowSubjects[0] == -1 ) ) {
+                              console.log( 'row data :  ' + rowName + ' value is  : ' + rowSubjects[0] );
+
+                              rowNames.push( rowSubjects[0] );
+
+                              for ( var colName in colData) {
+                                 if ( colName != 'transpose' ) {
+                                    var row = [];
+                                    var resultSubjects = [];
+                                    console.log( 'column names : ' + colName );
+                                    var colSubjects = colData[colName];
+                                    row.push( rowSubjects[0] );
+                                    row.push( colSubjects[0] );
+                                    for (var k = 0; k < rowSubjects[1].length; k++) {
+                                       if ( colSubjects[1].indexOf( rowSubjects[1][k] ) != -1 ) {
+                                          resultSubjects.push( rowSubjects[1][k] );
+                                       }
+                                    }
+                                    row.push( resultSubjects );
+                                    data.push( row );
+                                 }
+                              }
+                           }
+                           
+                        }
+                     }
+                  }
+                  
+                  
+               }
+               columnNames.push('Label');
+               this.createGridPanel( data, columnNames, phenotypeName );
+            }
+
+            /**
+             * // multiple cases var phenSummaries = []; var phenotypeName = ''; var columnNames = []; for (var i = 0; i <
+             * selPhenotypes.length; i++) { var phenSummary = selPhenotypes[i].data.selectedPhenotype;
+             * 
+             * phenotypeName = phenotypeName+ phenSummary.name;
+             * 
+             * console.log( 'grid panel names: ' + phenotypeName ); var pheneData = [];
+             * 
+             * columnNames.push( phenSummary.name );
+             * 
+             * for ( var rowlabelName in phenSummary.phenoSummaryMap) { var subjects = []; if ( rowlabelName !=
+             * "Unknown" ) { if ( rowlabelName == "Present" || rowlabelName == "Y" ) subjects = phenSummary.subjects[1];
+             * else if ( rowlabelName == "Absent" || rowlabelName == "N" ) subjects = phenSummary.subjects[0]; else
+             * subjects = phenSummary.subjects[rowlabelName]; pheneData.push( [ rowlabelName, subjects ] ); }
+             *  } phenSummaries.push(pheneData); }
+             * 
+             * for (var i = 0; i < phenSummaries.length; i++) { for (var k = i+1; k < phenSummaries.length; k++) { var
+             * rowNames=[]; var data=[]; // find the resultant row for ( var rowName in phenSummaries[i]) { if ( rowName !=
+             * 'transpose' ) {
+             * 
+             * var rowSubjects = phenSummaries[i][rowName]; if ( rowNames.indexOf( rowSubjects[0] == -1 ) ) {
+             * console.log( 'row data : ' + rowName + ' value is : ' + rowSubjects[0] );
+             * 
+             * rowNames.push( rowSubjects[0] );
+             * 
+             * for ( var colName in phenSummaries[k]) { if ( colName != 'transpose' ) { var row = []; var resultSubjects =
+             * []; console.log( 'column names : ' + colName ); var colSubjects = phenSummaries[k][colName]; //row.push(
+             * rowSubjects[0] ); //row.push( colSubjects[0] ); for (var k = 0; k < rowSubjects[1].length; k++) { if (
+             * colSubjects[1].indexOf( rowSubjects[1][k] ) != -1 ) { resultSubjects.push( rowSubjects[1][k] ); } }
+             * row.push( resultSubjects ); data.push( row ); } } }
+             *  } }
+             *  }
+             *  } this.createGridPanel( data, columnNames, phenotypeName );
+             */
+
          }
 
+         this.show();
       }
-      ref.getView().refresh( true );
-
-      var grid = ASPIREdb.view.PhenotypeSubjectLabelWindow.getComponent( 'phenotypeSubjectLabelGrid' );
-
-      var data = [];
-      for (var i = 0; i < psvos.length; i++) {
-         var phenSummary = psvos[i];
-
-         var row = [ phenSummary, phenSummary, phenSummary, phenSummary ];
-         data.push( row );
-
-      }
-
-      grid.store.loadData( data );
-      grid.setLoading( false );
-
-      grid.enableToolbar( gvos, uri );
 
    },
 
-/**
- *  // Show the gene manager window
- * 
- * initGridAndShow : function(){
- * 
- * var ref = this; ref.show(); var panel = ref.down('#phenotypeSubjectLabelGrid');
- * 
- * 
- * /**grid.setLoading(true);
- * 
- * UserGeneSetService.getSavedUserGeneSetNames( { callback : function(geneSetNames) {
- * ASPIREdb.view.GeneManagerWindow.populateGeneSetGrid(geneSetNames); } });
- * 
- *  }, initComponent : function() { this.callParent(); },
- * 
- * draw : function() {
- *  // sample_data.js var dataMatrix = { dimensions: {numberOfRows: data.data.length, numberOfColumns:
- * data.data[0].length}, getDataAt: function (rowIndex, columnIndex) { return data.data[rowIndex][columnIndex]; } };
- * 
- * var convertedData = this.convertData(data.data, columns);
- * 
- * var order = h2m.ClusterHelper.produceClusteredOrder(convertedData);
- * 
- * M2V = {}; M2V.Util = {}; M2V.Util.dataType = {};
- * 
- * M2V.Util.dataType.renderNA = function (ctx, size) { };
- * 
- * M2V.Util.dataType.renderGenderCell = function (ctx, gender, row, column, size) { var color; if (gender === "m") {
- * color = "rgb(72,209,204)"; } else if (gender === "f") { color = "rgb(255,105,180)";
- *  } else M2V.Util.dataType.renderNA(ctx, size); ctx.fillStyle = color; ctx.fillRect(1, 1, size.width - 2, size.height -
- * 2); };
- * 
- * M2V.Util.dataType.renderAbsentPresentCell = function (ctx, value, row, column, size) { if (value === 0) {
- * ctx.fillStyle = "black"; ctx.fillRect(size.width / 4, size.height / 4, size.width / 2, size.height / 2); } else if
- * (value === 1) { ctx.strokeStyle = "black"; ctx.strokeRect(size.width / 4, size.height / 4, size.width / 2,
- * size.height / 2); } else M2V.Util.dataType.renderNA(ctx, size); };
- * 
- * //TODO: provide centering helper function var renderDefaults = { text: function (ctx, box, text) { ctx.translate(0,
- * box.height / 2 + 4); //fontSize ctx.fillText(text, 0, 0); }, label: function (ctx, box, text) { ctx.translate(0,
- * box.height / 2 + 4); //fontSize ctx.fillText(text, 0, 0); }, group: function (ctx, box, value) { ctx.translate(0,
- * box.height / 2 + 4); //fontSize ctx.fillText(value, 0, 0); }, type: function (ctx, box, value) { ctx.translate(0,
- * box.height / 2 + 4); //fontSize ctx.fillText(value, 0, 0); }, metaNumber: function (ctx, box, value) { ctx.fillStyle =
- * 'rgb(0,100,0)'; ctx.fillRect(0, 1, box.width * value, box.height - 2); } };
- * 
- * 
- * 
- * var matrix = Ext.create('Matrix2Viz', { //renderTo: "matrix_div", //renderTo: document.body, //renderTo:
- * this.down('#matrix_div').getEl(), renderTo: this.el, width: 900, height: 700,
- * 
- * data: dataMatrix, labelFormat: { row: [ {name: 'label', size: 90}, {name: 'group', size: 50} ], column: [ {name:
- * 'label', size: 100}, {name: 'metaNumber', size: 10}, {name: 'type', size: 50} ] }, renderers: { cell: { 'gender': {
- * render: M2V.Util.dataType.renderGenderCell }, 'binary': { render: M2V.Util.dataType.renderAbsentPresentCell },
- * 'numeric': { render: function(ctx, data, row, column, size) { var red = Math.round(255 * (data / (column.range.high -
- * column.range.low))); ctx.fillStyle = "rgb(" + red + ",0,0)"; ctx.fillRect(1, 1, size.width - 2, size.height - 2); } } },
- * rowMetadata: { 'label': { render: renderDefaults.text }, 'group': { render: renderDefaults.text } }, columnMetadata: {
- * 'label': { render: renderDefaults.text }, 'metaNumber': { render: renderDefaults.metaNumber }, 'type': { render:
- * renderDefaults.text } } },
- * 
- * rows: rows, //sample_data.js rowOrder: order.rowOrder,
- * 
- * columns: columns, //sample_data.js columnOrder: order.columnOrder,
- * 
- * clustering: order,
- * 
- * cellSize: { width: 20, height: 10 },
- * 
- * controlPanel: 'DefaultControlPanel',
- *  // TODO: add row/column options for both displayOptions: { showRowDendrogram: true, showColumnDendrogram: true,
- * showRowLabels: true, showColumnLabels: true } });
- * 
- * this.add(matrix);
- * 
- * matrix.draw();
- *  },
- * 
- * bin : function(numberOfBins, value, range) { return Math.floor(value / ((range.high - range.low) / numberOfBins)); },
- * 
- * convertData : function (data, columns) { var converted = []; for (var i = 0; i < data.length; i++) { var row =
- * data[i]; var convertedRow = []; for (var j = 0; j < row.length; j++) { var value = row[j]; var convertedValue =
- * value; if (columns[j].type === 'gender') { if (value === 'm') { convertedValue = 1; } else { convertedValue = 0; } }
- * else if (columns[j].type === 'numeric') { convertedValue = this.bin(3, value, columns[j].range); }
- * convertedRow.push(convertedValue); } converted.push(convertedRow); } return converted; }
- */
+   createGridPanel : function(data, columnNames, phenotypeName) {
+
+      var ref = this;
+      var fields = [];
+
+      if ( columnNames.length > 0 ) {
+         for (var i = 0; i < columnNames.length; i++) {
+            fields.push( columnNames[i] );
+         }
+      }
+      // create store
+      var suggestContigencyTableStore = Ext.create( 'Ext.data.ArrayStore', {
+         fields : fields,
+         data : data,
+         autoLoad : true,
+         autoSync : true,
+         storeId : phenotypeName,
+
+      } );
+
+      // columns
+      var columns = [];
+
+      if ( columnNames.length > 1 ) {
+         for (var i = 0; i < columnNames.length; i++) {
+            if ( columnNames[i] == 'Label' ) {
+               columns.push( {
+                  header : columnNames[i],
+                  dataIndex : columnNames[i],
+                  flex : 1,
+                  renderer : function(value) {
+                     /**
+                      * var labels =[]; var projectIds= ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+                      * SubjectService.getSubjects(projectIds[0],value, { callback :
+                      * function(selectedSubjectValueObjects) { for (var k=0;k<selectedSubjectValueObjects.length;k++){
+                      * if (selectedSubjectValueObjects[k].labels[0].isShown){
+                      * labels.push(selectedSubjectValueObjects[k].labels[0]); } } } }); console.log('label colour
+                      * :'+labels[0].colour); if (labels.length >0){ var fontcolor = (parseInt( labels[0].colour, 16 ) >
+                      * 0xffffff / 2) ? 'black' : 'white'; ret += "<font color=" + fontcolor + "><span
+                      * style='background-color: " + labels[0].colour + "'>&nbsp&nbsp" + value.length + "&nbsp</span></font>&nbsp&nbsp&nbsp";
+                      * console.log('font color :'+fontcolor); } else ret =value.length;
+                      * 
+                      * return ret; //value.length;
+                      */
+                     return value.length;
+                  }
+               } );
+            } else {
+               columns.push( {
+                  header : columnNames[i],
+                  dataIndex : columnNames[i],
+                  flex : 1,
+
+               } );
+            }
+
+         }
+      }
+      // create grid
+      var grid = Ext.create( 'Ext.grid.Panel', {
+         // title : phenotypeName,
+         id : phenotypeName,
+         closable : false,
+         border : true,
+         store : suggestContigencyTableStore,
+         columns : columns,
+         autoRender : true,
+         width : 850,
+         // columnLines : true,
+         listeners : {
+            cellclick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+               ref.makeLabelHandler( record.raw[cellIndex] );
+
+            }
+         },
+         selModel : Ext.create( 'Ext.selection.RowModel', {
+            mode : 'MULTI',
+            listeners : {
+               click : {
+                  element : 'el', // bind to the underlying el property on the panel
+                  fn : function() {
+                     console.log( 'click el' );
+
+                  }
+               },
+            }
+         } ),
+
+      } );
+
+      ref.add( grid );
+      ref.show();
+   },
+   /**
+    * Reusing the code in subject grid Assigns a Label
+    * 
+    * @param :
+    *           event
+    */
+   makeLabelHandler : function(subjectIds) {
+
+      var me = this;
+      var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+      SubjectService.getSubjects( projectIds[0], subjectIds, {
+         callback : function(selectedSubjectValueObjects) {
+            me.selSubjects = selectedSubjectValueObjects;
+         }
+      } );
+
+      Ext.define( 'ASPIREdb.view.CreateLabelWindowSubject', {
+         isSubjectLabel : true,
+         extend : 'ASPIREdb.view.CreateLabelWindow',
+
+         // override
+         onOkButtonClick : function() {
+
+            var labelCombo = this.down( "#labelCombo" );
+            var vo = this.getLabel();
+            if ( vo == null ) {
+               return;
+            }
+            var labelIndex = labelCombo.getStore().findExact( 'display', vo.name );
+            if ( labelIndex != -1 ) {
+               // activate confirmation window
+               Ext.MessageBox.confirm( 'Label already exist', 'Label already exist. Add into it ?', function(btn) {
+                  if ( btn === 'yes' ) {
+                     me.addLabelHandler( vo, subjectIds );
+                     this.hide();
+                     // ASPIREdb.EVENT_BUS.fireEvent('subject_label_created');
+                  }
+
+               }, this );
+
+            } else {
+               me.addLabelHandler( vo, subjectIds );
+               this.hide();
+               // ASPIREdb.EVENT_BUS.fireEvent('subject_label_created');
+            }
+
+         }
+      } );
+
+      var labelWindow = new ASPIREdb.view.CreateLabelWindowSubject();
+      labelWindow.show();
+
+   },
+
+   /**
+    * Reusing the code in subject grid Add the label to the store
+    * 
+    * @param: label value object, selected subject Ids
+    */
+   addLabelHandler : function(vo, selSubjectIds) {
+
+      var me = this;
+
+      // store in database
+      SubjectService.addLabel( selSubjectIds, vo, {
+         callback : function(addedLabel) {
+
+            addedLabel.isShown = true;
+            LabelService.updateLabel( addedLabel );
+
+            var existingLab = me.visibleLabels[addedLabel.id];
+            if ( existingLab == undefined ) {
+               me.visibleLabels[addedLabel.id] = addedLabel;
+            } else {
+               existingLab.isShown = true;
+            }
+            for (var i = 0; i < me.selSubjects.length; i++) {
+               me.selSubjects[i].labels.push( addedLabel );
+            }
+
+            ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' );
+
+         }
+      } );
+
+   },
+
+   /**
+    * Reusing the code in subject grid Load subject labels created by the user
+    * 
+    * @return visibleLabels
+    */
+   createVisibleLabels : function() {
+      var visibleLabels = [];
+      var suggestionContext = new SuggestionContext();
+      suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+
+      // load all labels created by this user
+      SubjectService.suggestLabels( suggestionContext, {
+         callback : function(labels) {
+            for ( var idx in labels) {
+               var label = labels[idx];
+               visibleLabels[label.id] = label;
+            }
+         }
+      } );
+
+      return visibleLabels;
+   },
 
 } );
