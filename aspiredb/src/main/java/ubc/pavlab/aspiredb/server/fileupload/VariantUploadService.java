@@ -422,12 +422,12 @@ public class VariantUploadService {
             if ( vvo == null ) {
                 continue;
             }
-            if ( ! ( vvo instanceof SNVValueObject ) ) {
-                log.warn("SNVValueObject expected.");
+            if ( !( vvo instanceof SNVValueObject ) ) {
+                log.warn( "SNVValueObject expected." );
                 continue;
             }
-            SNVValueObject vo = (SNVValueObject)vvo;
-            
+            SNVValueObject vo = ( SNVValueObject ) vvo;
+
             GenomicRange coord = vo.getGenomicRange();
             if ( coord == null ) {
                 continue;
@@ -439,13 +439,13 @@ public class VariantUploadService {
             Collection<SNVValueObject> volist;
             if ( map.get( coord.getChromosome() ) == null ) {
                 volist = new ArrayList<>();
-                
+
                 HashMap<Integer, Collection<SNVValueObject>> newMap = new HashMap<Integer, Collection<SNVValueObject>>();
                 newMap.put( coord.getBaseStart(), volist );
                 map.put( coord.getChromosome(), newMap );
             } else {
                 volist = map.get( coord.getChromosome() ).get( coord.getBaseStart() );
-                if (volist == null) {
+                if ( volist == null ) {
                     volist = new ArrayList<>();
                 }
             }
@@ -454,7 +454,7 @@ public class VariantUploadService {
         }
 
         // TODO FIXME
-        
+
         // search the database of functional predictions using our map of variants
         try {
             Class.forName( "org.relique.jdbc.csv.CsvDriver" );
@@ -488,7 +488,7 @@ public class VariantUploadService {
                         continue;
                     }
                     for ( SNVValueObject snvResultVo : resultVoList ) {
-                        
+
                         Map<String, CharacteristicValueObject> characteristics = snvResultVo.getCharacteristics();
                         if ( characteristics == null ) {
                             continue;
@@ -496,9 +496,11 @@ public class VariantUploadService {
 
                         String refBaseVo = snvResultVo.getReferenceBase();
                         String obsBaseVo = snvResultVo.getObservedBase();
-                        if ( ( refBaseVo != null ) && ( obsBaseVo != null ) ) {
-                            if ( ( refBaseVo == results.getString( "ref" ) )
-                                    && ( obsBaseVo == results.getString( "alt" ) ) ) {
+                        String resultRef = results.getString( "ref" );
+                        String resultAlt = results.getString( "alt" );
+                        if ( ( refBaseVo != null ) && ( obsBaseVo != null ) && ( resultRef != null )
+                                && ( resultAlt != null ) ) {
+                            if ( ( refBaseVo.equals( resultRef ) ) && ( obsBaseVo.equals( resultAlt ) ) ) {
                                 found++;
                                 CharacteristicValueObject dbPredVo = new CharacteristicValueObject();
                                 dbPredVo.setKey( dbPredColname );
@@ -510,8 +512,10 @@ public class VariantUploadService {
 
                 }
 
-                log.info( "Scanned " + line + " variants in " + dbPrefix + ".chr" + chrs[i] + ". Found " + found
-                        + " / " + vos.size() + " variants." );
+                if ( found > 0 ) {
+                    log.info( "Scanned " + line + " variants in " + dbPrefix + ".chr" + chrs[i] + ". Found " + found
+                            + " / " + vos.size() + " variants." );
+                }
 
                 results.close();
 
