@@ -14,11 +14,20 @@
  */
 package ubc.pavlab.aspiredb.server.fileupload;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +74,11 @@ public class VariantUploadService {
             } catch ( Exception e ) {
                 errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
             }
+        }
+
+        // FIXME
+        if ( variantType.equals( VariantType.SNV ) ) {
+            computeVariantFunctionPrediction( variantsToAdd );
         }
 
         VariantUploadServiceResult serviceResult = new VariantUploadServiceResult( variantsToAdd, errorMessages );
@@ -341,6 +355,177 @@ public class VariantUploadService {
 
         return snv;
 
+    }
+
+    // TODO FIXME Bug 3958 - Gene variant prioritization
+    // puts the function prediction into dbPredColname CharacteristicValueObject
+    // http://dbnsfp.houstonbioinformatics.org/dbNSFPzip/dbNSFP2.4.readme.txt
+
+    /*
+     * 50 LR_pred: Prediction of our LR based ensemble prediction score,"T(olerated)" or "D(amaging)". The score cutoff
+     * between "D" and "T" is 0.5. The rankscore cutoff between "D" and "T" is 0.82268.
+     */
+    private static void computeVariantFunctionPrediction( ArrayList<VariantValueObject> vos ) {
+        final String[] chrs = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16",
+                "17", "18", "19", "20", "21", "22", "X", "Y" };
+        String propnamePath = "aspiredb.cli.variant.functionalprediction.dbDirectory";
+        String propnamePredictionColumn = "aspiredb.cli.variant.functionalprediction.predictionColumn";
+        String propnameRefBase = "aspiredb.cli.variant.snv.referencebase";
+        String propnameObsBase = "aspiredb.cli.variant.snv.observedbase";
+        String aspireRefBaseColumn = ConfigUtils.getString( propnameRefBase );
+        String aspireObsBaseColumn = ConfigUtils.getString( propnameObsBase );
+        String dbDirectory = ConfigUtils.getString( propnamePath );
+        String dbPredColname = ConfigUtils.getString( propnamePredictionColumn );
+        if ( dbDirectory == null || dbDirectory.length() == 0 ) {
+            log.warn( "Property " + propnamePath + " not set. Functional prediction will not be computed." );
+            return;
+        }
+        if ( dbPredColname == null || dbPredColname.length() == 0 ) {
+            dbPredColname = "LR_pred";
+            log.info( "Property " + propnamePredictionColumn + " not set. Defaulting to " + dbPredColname );
+        }
+        if ( aspireRefBaseColumn == null || aspireRefBaseColumn.length() == 0 ) {
+            aspireRefBaseColumn = "ref_base";
+            log.info( "Property " + propnameRefBase + " not set. Defaulting to " + aspireRefBaseColumn );
+        }
+        if ( aspireObsBaseColumn == null || aspireObsBaseColumn.length() == 0 ) {
+            aspireObsBaseColumn = "obs_base";
+            log.info( "Property " + propnameObsBase + " not set. Defaulting to " + aspireObsBaseColumn );
+        }
+        final String dbPrefix = "dbNSFP2.4_variant";
+
+        // check to see if the files are there
+        for ( int i = 0; i < chrs.length; i++ ) {
+            String path = dbDirectory + "/" + dbPrefix + ".chr" + chrs[i];
+            try (BufferedReader br = new BufferedReader( new FileReader( path ) )) {
+                String line = br.readLine();
+                if ( !line.contains( dbPredColname ) ) {
+                    log.warn( "File '" + path + "' does not contain column '" + dbPredColname + "'" );
+                }
+            } catch ( FileNotFoundException e ) {
+                // TODO Auto-generated catch block
+                log.error( e );
+                // TODO REMOVE ME
+                throw new Error( e );
+            } catch ( IOException e ) {
+                // TODO Auto-generated catch block
+                log.error( e );
+                throw new Error( e );
+            }
+        }
+
+        // map.get('chr').get('position') = VariantValueObject
+        HashMap<String, HashMap<Integer, Collection<SNVValueObject>>> map = new HashMap<>();
+
+        // store variant positions in memory
+        for ( VariantValueObject vvo : vos ) {
+            if ( vvo == null ) {
+                continue;
+            }
+            if ( ! ( vvo instanceof SNVValueObject ) ) {
+                log.warn("SNVValueObject expected.");
+                continue;
+            }
+            SNVValueObject vo = (SNVValueObject)vvo;
+            
+            GenomicRange coord = vo.getGenomicRange();
+            if ( coord == null ) {
+                continue;
+            }
+            if ( Math.abs( coord.getBaseEnd() - coord.getBaseStart() ) > 1 ) {
+                log.warn( "Variant " + vo.getGenomeCoordinates() + " is not an SNV" );
+                continue;
+            }
+            Collection<SNVValueObject> volist;
+            if ( map.get( coord.getChromosome() ) == null ) {
+                volist = new ArrayList<>();
+                
+                HashMap<Integer, Collection<SNVValueObject>> newMap = new HashMap<Integer, Collection<SNVValueObject>>();
+                newMap.put( coord.getBaseStart(), volist );
+                map.put( coord.getChromosome(), newMap );
+            } else {
+                volist = map.get( coord.getChromosome() ).get( coord.getBaseStart() );
+                if (volist == null) {
+                    volist = new ArrayList<>();
+                }
+            }
+            volist.add( vo );
+
+        }
+
+        // TODO FIXME
+        
+        // search the database of functional predictions using our map of variants
+        try {
+            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
+
+            for ( int i = 0; i < chrs.length; i++ ) {
+                // create a connection
+                // arg[0] is the directory in which the .csv files are held
+                Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + dbDirectory + "?" + "separator="
+                        + URLEncoder.encode( "\t", "UTF-8" ) + "&" + "fileExtension=" + ".chr" + chrs[i] );
+
+                Statement stmt = conn.createStatement();
+
+                // String colnames = "[#chr],pos(1-coor),ref,alt," + dbPredColname;
+                String colnames = "*";
+                ResultSet results = stmt.executeQuery( "SELECT " + colnames + " FROM " + dbPrefix );
+
+                HashMap<Integer, Collection<SNVValueObject>> chrMap = map.get( chrs[i] );
+                if ( chrMap == null ) {
+                    continue;
+                }
+
+                int found = 0;
+                int line = 0;
+                while ( results.next() ) {
+                    line++;
+
+                    String dbPos = results.getString( "pos(1-coor)" );
+
+                    Collection<SNVValueObject> resultVoList = chrMap.get( Integer.parseInt( dbPos ) );
+                    if ( resultVoList == null ) {
+                        continue;
+                    }
+                    for ( SNVValueObject snvResultVo : resultVoList ) {
+                        
+                        Map<String, CharacteristicValueObject> characteristics = snvResultVo.getCharacteristics();
+                        if ( characteristics == null ) {
+                            continue;
+                        }
+
+                        String refBaseVo = snvResultVo.getReferenceBase();
+                        String obsBaseVo = snvResultVo.getObservedBase();
+                        if ( ( refBaseVo != null ) && ( obsBaseVo != null ) ) {
+                            if ( ( refBaseVo == results.getString( "ref" ) )
+                                    && ( obsBaseVo == results.getString( "alt" ) ) ) {
+                                found++;
+                                CharacteristicValueObject dbPredVo = new CharacteristicValueObject();
+                                dbPredVo.setKey( dbPredColname );
+                                dbPredVo.setValue( results.getString( dbPredColname ) );
+                                characteristics.put( dbPredColname, dbPredVo );
+                            }
+                        }
+                    }
+
+                }
+
+                log.info( "Scanned " + line + " variants in " + dbPrefix + ".chr" + chrs[i] + ". Found " + found
+                        + " / " + vos.size() + " variants." );
+
+                results.close();
+
+                stmt.close();
+                conn.close();
+            }
+
+        } catch ( Exception e ) {
+            // TODO Auto-generated catch block
+            log.error( "Error occured while trying to compute variant functional prediction.", e );
+
+            // TODO Remove ME
+            throw new Error( "Error occured while trying to compute variant functional prediction", e );
+        }
     }
 
     public static IndelValueObject makeIndelFromResultSet( ResultSet results ) throws Exception {
