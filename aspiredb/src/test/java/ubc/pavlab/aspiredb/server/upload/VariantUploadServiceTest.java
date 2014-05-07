@@ -19,10 +19,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
@@ -237,6 +241,51 @@ public class VariantUploadServiceTest extends BaseSpringContextTest {
             fail();
         }
 
+    }
+
+    @Test
+    public void testPredictSNVFunction() {
+        try {
+            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
+
+            // query variants
+            Connection qconn = DriverManager.getConnection( "jdbc:relique:csv:src/test/resources/data" );
+            Statement qstmt = qconn.createStatement();
+            ResultSet qresults = qstmt.executeQuery( "SELECT * FROM testsnp" );
+            VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromResultSet( qresults,
+                    VariantType.SNV );
+            qresults.close();
+            qstmt.close();
+            qconn.close();
+            ArrayList<VariantValueObject> vos = result.getVariantsToAdd();
+            assertEquals( vos.size(), 3 );
+            HashMap<String, HashMap<Integer, Collection<SNVValueObject>>> chrMap = VariantUploadService
+                    .constructQuerySNVMap( vos );
+            assertEquals( chrMap.keySet().size(), 3 );
+
+            // db / target variants
+            final String chr = "1";
+            Connection dbconn = DriverManager.getConnection( "jdbc:relique:csv:src/test/resources/data" + "?"
+                    + "separator=" + URLEncoder.encode( "\t", "UTF-8" ) + "&" + "fileExtension=" + ".chr" + chr );
+            Statement dbstmt = dbconn.createStatement();
+            ResultSet dbResults = dbstmt.executeQuery( "SELECT * FROM testdbNSFP2.4_variant" );
+            // snv1,1,1,2,C,T
+
+            String dbPredColname = "LR_pred";
+
+            Collection<SNVValueObject> matched = VariantUploadService.predictSNVFunction( chrMap.get( chr ), dbResults,
+                    dbPredColname );
+
+            dbResults.close();
+            dbstmt.close();
+            dbconn.close();
+
+            assertEquals( matched.size(), 1 );
+            assertEquals( matched.iterator().next().getCharacteristics().get( dbPredColname ).getValue(), "D" );
+
+        } catch ( Exception e ) {
+            fail();
+        }
     }
 
 }
