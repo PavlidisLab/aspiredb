@@ -51,6 +51,7 @@ public class VariantUploadCLI extends AbstractCLI {
     private boolean createProject = false;
 
     private boolean dryRun = false;
+    private boolean predictSNVfunction = true;
 
     private static BeanFactory applicationContext;
 
@@ -110,6 +111,8 @@ public class VariantUploadCLI extends AbstractCLI {
 
         addOption( "dryrun", false, "Use this option to validate your data before uploading" );
 
+        addOption( "predictSNVfunction", true, "Use this option to predict SNV function. Variant Type must be SNV." );
+
         addOption( d );
         addOption( f );
         addOption( variantType );
@@ -135,6 +138,10 @@ public class VariantUploadCLI extends AbstractCLI {
 
             variantType = VariantType.findByName( variant );
 
+        }
+
+        if ( this.hasOption( "predictSNVfunction" ) && variantType.equals( VariantType.SNV ) ) {
+            predictSNVfunction = true;
         }
 
         if ( this.hasOption( "project" ) ) {
@@ -190,6 +197,10 @@ public class VariantUploadCLI extends AbstractCLI {
             results.close();
             stmt.close();
             conn.close();
+
+            if ( predictSNVfunction ) {
+                VariantUploadService.predictDbNsfpSNVFunction( result.getVariantsToAdd() );
+            }
 
             if ( result.getErrorMessages().isEmpty() && !dryRun ) {
                 projectManager.addSubjectVariantsToProject( projectName, createProject, result.getVariantsToAdd() );

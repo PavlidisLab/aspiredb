@@ -15,10 +15,8 @@
 package ubc.pavlab.aspiredb.server.fileupload;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -75,11 +73,6 @@ public class VariantUploadService {
             } catch ( Exception e ) {
                 errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
             }
-        }
-
-        // FIXME
-        if ( variantType.equals( VariantType.SNV ) ) {
-            predictDbNsfpSNVFunction( variantsToAdd );
         }
 
         VariantUploadServiceResult serviceResult = new VariantUploadServiceResult( variantsToAdd, errorMessages );
@@ -478,7 +471,7 @@ public class VariantUploadService {
                 volist = new ArrayList<>();
                 map.get( coord.getChromosome() ).put( coord.getBaseStart(), volist );
             }
-            log.info( "Adding " + vo.getPatientId() + " at " + vo.getGenomeCoordinates() );
+
             volist.add( vo );
         }
 
@@ -495,8 +488,11 @@ public class VariantUploadService {
      * @link http://dbnsfp.houstonbioinformatics.org/dbNSFPzip/dbNSFP2.4.readme.txt
      * @param vos
      * @return totalVariantsPredicted
+     * @throws ClassNotFoundException
+     * @throws IOException
      */
-    private static Collection<SNVValueObject> predictDbNsfpSNVFunction( ArrayList<VariantValueObject> vos ) {
+    public static Collection<SNVValueObject> predictDbNsfpSNVFunction( ArrayList<VariantValueObject> vos )
+            throws ClassNotFoundException, IOException {
         final String[] chrs = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16",
                 "17", "18", "19", "20", "21", "22", "X", "Y" };
         final String propnamePath = "aspiredb.cli.variant.functionalprediction.dbDirectory";
@@ -536,12 +532,6 @@ public class VariantUploadService {
                 if ( !line.contains( dbPredColname ) ) {
                     log.warn( "File '" + path + "' does not contain column '" + dbPredColname + "'" );
                 }
-            } catch ( FileNotFoundException e ) {
-                log.error( e );
-                return matched;
-            } catch ( IOException e ) {
-                log.error( e );
-                return matched;
             }
         }
 
@@ -549,24 +539,12 @@ public class VariantUploadService {
         HashMap<String, HashMap<Integer, Collection<SNVValueObject>>> map = constructQuerySNVMap( vos );
 
         // search the database of functional predictions using our map of variants
-        try {
-            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-        } catch ( ClassNotFoundException e ) {
-            log.error( e );
-            return matched;
-        }
+        Class.forName( "org.relique.jdbc.csv.CsvDriver" );
 
-        String delimiter = "\t";
-        try {
-            delimiter = URLEncoder.encode( "\t", "UTF-8" );
-        } catch ( UnsupportedEncodingException e ) {
-            log.error( e );
-            return matched;
-        }
+        String delimiter = URLEncoder.encode( "\t", "UTF-8" );
 
-        try {
-            // for ( int i = 0; i < chrs.length; i++ ) {
-            for ( String chr : map.keySet() ) {
+        for ( String chr : map.keySet() ) {
+            try {
                 // create a connection
                 // arg[0] is the directory in which the .csv files are held
                 Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + dbDirectory + "?" + "separator="
@@ -591,13 +569,14 @@ public class VariantUploadService {
                         log.info( "Matched " + matchedPerChr.size() + " / " + vos.size() + " query variants in "
                                 + dbPrefix + ".chr" + chr );
                     }
+                } finally {
+                    stmt.close();
+                    conn.close();
                 }
-                stmt.close();
-                conn.close();
+            } catch ( SQLException e ) {
+                log.error( "Error occured while trying to compute variant functional prediction.", e );
+                continue;
             }
-
-        } catch ( SQLException e ) {
-            log.error( "Error occured while trying to compute variant functional prediction.", e );
         }
 
         return matched;
