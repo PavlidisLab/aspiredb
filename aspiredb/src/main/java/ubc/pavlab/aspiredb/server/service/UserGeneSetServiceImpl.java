@@ -31,6 +31,7 @@ import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
 import ubc.pavlab.aspiredb.server.dao.UserGeneSetDao;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
+import ubc.pavlab.aspiredb.shared.GeneSetValueObject;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 
 /**
@@ -164,6 +165,18 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         // should only be one for one user
         return geneValueObjects;
 
+    }
+    @Override
+    @RemoteMethod
+    public List<GeneSetValueObject> suggestUserGeneSet( String query ){
+        List<GeneSetValueObject> geneSetValueObjects = new ArrayList<>();
+        List<UserGeneSet> genesets = userGeneSetDao.suggestGeneSetNames( query);
+        for ( UserGeneSet geneset : genesets ) {
+            GeneSetValueObject gvo=new GeneSetValueObject();
+            gvo.setName( geneset.getName() );
+            geneSetValueObjects.add( gvo );
+        }
+        return geneSetValueObjects;
     }
 
     @Override
