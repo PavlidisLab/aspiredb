@@ -111,7 +111,8 @@ public class VariantUploadCLI extends AbstractCLI {
 
         addOption( "dryrun", false, "Use this option to validate your data before uploading" );
 
-        addOption( "predictSNVfunction", true, "Use this option to predict SNV function. Variant Type must be SNV." );
+        addOption( "predictSNVfunction", true,
+                "Set argument to true (default) to predict SNV function and false otherwise. Variant Type must be SNV." );
 
         addOption( d );
         addOption( f );
@@ -141,7 +142,7 @@ public class VariantUploadCLI extends AbstractCLI {
         }
 
         if ( this.hasOption( "predictSNVfunction" ) && variantType.equals( VariantType.SNV ) ) {
-            predictSNVfunction = true;
+            predictSNVfunction = Boolean.parseBoolean( this.getOptionValue( "predictSNVfunction" ) );
         }
 
         if ( this.hasOption( "project" ) ) {

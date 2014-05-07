@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -367,10 +368,16 @@ public class VariantUploadService {
 
         Collection<SNVValueObject> matched = new ArrayList<>();
         int posFound = 0;
+        int line = 0;
 
         if ( chrMap == null ) {
             return matched;
         }
+
+        String dbChr = "";
+
+        StopWatch timer = new StopWatch();
+        timer.start();
 
         while ( true ) {
 
@@ -379,6 +386,11 @@ public class VariantUploadService {
                     break;
                 }
 
+                line++;
+                if ( ( line % 1e5 ) == 0 ) {
+                    log.debug( "Read " + line + " lines ..." );
+                }
+                dbChr = dbResults.getString( "#chr" );
                 String dbPos = dbResults.getString( "pos(1-coor)" );
                 String resultRef = dbResults.getString( "ref" );
                 String resultAlt = dbResults.getString( "alt" );
@@ -403,6 +415,10 @@ public class VariantUploadService {
                     String refBaseVo = snvResultVo.getReferenceBase();
                     String obsBaseVo = snvResultVo.getObservedBase();
 
+                    if ( !snvResultVo.getGenomicRange().getChromosome().equals( dbChr ) ) {
+                        log.warn( "Chromosomes do not match!" );
+                        return matched;
+                    }
                     Map<String, CharacteristicValueObject> characteristics = snvResultVo.getCharacteristics();
                     if ( characteristics == null ) {
                         continue;
@@ -429,6 +445,9 @@ public class VariantUploadService {
                 continue;
             }
         }
+
+        log.info( "Read " + line + " variants in chr" + dbChr + " which took " + timer.getTime() + " ms. "
+                + matched.size() + " variants matched the query." );
 
         return matched;
     }
@@ -501,6 +520,8 @@ public class VariantUploadService {
         final String propnameObsBase = "aspiredb.cli.variant.snv.observedbase";
         final String dbPrefix = "dbNSFP2.4_variant";
         Collection<SNVValueObject> matched = new ArrayList<>();
+        StopWatch timer = new StopWatch();
+        timer.start();
 
         // get db source paths from properties file
         String aspireRefBaseColumn = ConfigUtils.getString( propnameRefBase );
@@ -547,15 +568,17 @@ public class VariantUploadService {
             try {
                 // create a connection
                 // arg[0] is the directory in which the .csv files are held
-                Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + dbDirectory + "?" + "separator="
-                        + delimiter + "&" + "fileExtension=" + ".chr" + chr );
-
+                String connStr = "jdbc:relique:csv:" + dbDirectory + "?" + "separator=" + delimiter + "&"
+                        + "fileExtension=" + ".chr" + chr;
+                Connection conn = DriverManager.getConnection( connStr );
                 Statement stmt = conn.createStatement();
 
                 // String colnames = "#chr,pos(1-coor),ref,alt," + dbPredColname;
                 String colnames = "*";
                 String query = "SELECT " + colnames + " FROM " + dbPrefix + " WHERE " + " NOT (" + dbPredColname
                         + " IS NULL) AND " + dbPredColname + " != '.' ";
+
+                log.debug( "Target database=[" + connStr + "] query=[" + query + "]" );
 
                 try (ResultSet dbResults = stmt.executeQuery( query )) {
                     HashMap<Integer, Collection<SNVValueObject>> chrMap = map.get( chr );
@@ -564,11 +587,9 @@ public class VariantUploadService {
                     }
 
                     Collection<SNVValueObject> matchedPerChr = predictSNVFunction( chrMap, dbResults, dbPredColname );
-                    if ( matchedPerChr.size() > 0 ) {
-                        matched.addAll( matchedPerChr );
-                        log.info( "Matched " + matchedPerChr.size() + " / " + vos.size() + " query variants in "
-                                + dbPrefix + ".chr" + chr );
-                    }
+
+                    matched.addAll( matchedPerChr );
+
                 } finally {
                     stmt.close();
                     conn.close();
@@ -578,6 +599,9 @@ public class VariantUploadService {
                 continue;
             }
         }
+
+        log.info( "Total of " + matched.size() + " function predictions were made which took " + timer.getTime()
+                + " ms." );
 
         return matched;
     }
