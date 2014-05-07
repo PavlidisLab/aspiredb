@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
+import ubc.pavlab.aspiredb.shared.GeneSetValueObject;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 
 /**
@@ -32,6 +33,7 @@ public interface UserGeneSetService {
     public void addGenes( String geneName, String geneSymbol ) throws BioMartServiceException;
 
     public void deleteUserGeneSet( String name );
+    
 
     public void deleteGene( String geneSetName, String geneSymbol ) throws BioMartServiceException;
 
@@ -42,5 +44,7 @@ public interface UserGeneSetService {
     public boolean isGeneInGeneSet( String genSetName, String geneSymbol );
 
     public List<GeneValueObject> getGenes( String geneSymbol ) throws BioMartServiceException;
+
+    List<GeneSetValueObject> suggestUserGeneSet( String query );
 
 }
