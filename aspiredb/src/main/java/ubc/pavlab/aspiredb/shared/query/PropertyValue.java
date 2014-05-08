@@ -22,6 +22,7 @@ import java.io.Serializable;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
+import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.shared.Displayable;
 
 /**
@@ -34,8 +35,10 @@ public class PropertyValue<T extends Displayable> implements Serializable {
     private T value;
     private String displayValue;
 
-    public PropertyValue() {
-    }
+   /** public PropertyValue(UserGeneSet geneset) {
+        this.value = ( T ) geneset;
+        this.displayValue = value.getHtmlLabel();
+    }*/
 
     public PropertyValue( T value ) {
         this.value = value;

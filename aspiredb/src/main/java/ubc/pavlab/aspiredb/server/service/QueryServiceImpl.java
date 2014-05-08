@@ -51,6 +51,7 @@ import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.util.ConfigUtils;
 import ubc.pavlab.aspiredb.shared.BoundedList;
+import ubc.pavlab.aspiredb.shared.GeneSetValueObject;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
@@ -59,6 +60,7 @@ import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.GeneProperty;
+import ubc.pavlab.aspiredb.shared.query.GeneSetProperty;
 import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
 import ubc.pavlab.aspiredb.shared.query.NeurocartaPhenotypeProperty;
 import ubc.pavlab.aspiredb.shared.query.PhenotypeFilterConfig;
@@ -481,6 +483,7 @@ public class QueryServiceImpl implements QueryService {
         return savedQuery.getId();
     }
 
+    @SuppressWarnings("unchecked")
     private void addGenomicLocations( RestrictionExpression restrictionExpression ) throws ExternalDependencyException {
 
         if ( restrictionExpression.getClass() == SetRestriction.class ) {
@@ -506,6 +509,26 @@ public class QueryServiceImpl implements QueryService {
                     }
                 }
             }
+            else if ( restriction.getProperty() instanceof GeneSetProperty ) {
+                Collection<Object> values = restriction.getValues();
+                for ( Object value : values ) {
+                    GeneValueObject vo = ( GeneValueObject ) value;
+                    if ( vo.getGenomicRange() == null ) {
+                        throw new IllegalStateException( "Genomic range wasn't set in GeneValueObject." );
+                    }
+                    /**
+                    GeneSetValueObject vo = ( GeneSetValueObject ) value;
+                    List<GeneValueObject> gvos = new ArrayList<GeneValueObject>();
+                    gvos =( List<GeneValueObject> ) vo.getObject();
+                    for (GeneValueObject gvo:gvos){
+                        if ( gvo.getGenomicRange() == null ) {
+                            throw new IllegalStateException( "Genomic range wasn't set in GeneValueObject." );
+                        }
+                    }  */                
+                 
+                }
+            }
+        
         } else if ( restrictionExpression instanceof Junction ) {
             for ( RestrictionExpression restriction : ( ( Junction ) restrictionExpression ).getRestrictions() ) {
                 addGenomicLocations( restriction );

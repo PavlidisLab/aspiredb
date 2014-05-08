@@ -14,6 +14,7 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -413,6 +414,7 @@ public class VariantServiceImpl implements VariantService {
                 GeneSetValueObject gvo =new GeneSetValueObject();
                 gvo.setId( geneset.getId() );
                 gvo.setName( geneset.getName() );
+                gvo.setObject( ( Serializable )geneset.getObject() );
                 values.add( new PropertyValue<GeneSetValueObject>( gvo) );           
         }
     }else if ( property instanceof GenomicLocationProperty ) {
