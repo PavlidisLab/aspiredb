@@ -30,17 +30,17 @@ import org.springframework.transaction.annotation.Transactional;
 import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
 import ubc.pavlab.aspiredb.server.dao.CharacteristicDao;
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
-//import ubc.pavlab.aspiredb.server.dao.UserGeneSetDao;
+import ubc.pavlab.aspiredb.server.dao.UserGeneSetDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
 import ubc.pavlab.aspiredb.server.model.Label;
-//import ubc.pavlab.aspiredb.server.model.UserGeneSet;
+import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.ChromosomeBand;
 import ubc.pavlab.aspiredb.shared.ChromosomeValueObject;
-//import ubc.pavlab.aspiredb.shared.GeneSetValueObject;
+import ubc.pavlab.aspiredb.shared.GeneSetValueObject;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
@@ -55,7 +55,7 @@ import ubc.pavlab.aspiredb.shared.query.CopyNumberProperty;
 import ubc.pavlab.aspiredb.shared.query.DbSnpIdProperty;
 import ubc.pavlab.aspiredb.shared.query.DoesOverlapWithXProperty;
 import ubc.pavlab.aspiredb.shared.query.GeneProperty;
-//import ubc.pavlab.aspiredb.shared.query.GeneSetProperty;
+import ubc.pavlab.aspiredb.shared.query.GeneSetProperty;
 import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
 import ubc.pavlab.aspiredb.shared.query.IndelLengthProperty;
 import ubc.pavlab.aspiredb.shared.query.LabelProperty;
@@ -93,8 +93,8 @@ public class VariantServiceImpl implements VariantService {
     private VariantDao variantDao;
     @Autowired
     private LabelDao labelDao;
-   // @Autowired
-   // private UserGeneSetDao userGeneSetDao;
+    @Autowired
+    private UserGeneSetDao userGeneSetDao;
     @Autowired
     private CharacteristicDao characteristicDao;
     @Autowired
@@ -296,7 +296,7 @@ public class VariantServiceImpl implements VariantService {
                     values.add( new PropertyValue<GeneValueObject>( gene ) );
                 }
             }
-        }/** else if ( property instanceof GeneSetProperty ) {
+        } else if ( property instanceof GeneSetProperty ) {
             Collection<UserGeneSet> geneSets = this.userGeneSetDao.suggestGeneSetNames( suggestionContext.getValuePrefix() );
           for ( UserGeneSet geneset : geneSets ) {
               GeneSetValueObject gvo =new GeneSetValueObject();
@@ -305,7 +305,7 @@ public class VariantServiceImpl implements VariantService {
               gvo.setObject( geneset.getObject() );
               values.add( new PropertyValue<GeneSetValueObject>( gvo) );           
       }
-  }*/else if ( property instanceof NeurocartaPhenotypeProperty ) {
+  }else if ( property instanceof NeurocartaPhenotypeProperty ) {
             String query = suggestionContext.getValuePrefix();
             if ( query.length() >= 3 ) {
                 final Collection<NeurocartaPhenotypeValueObject> phenotypes = neurocartaQueryService
@@ -390,7 +390,7 @@ public class VariantServiceImpl implements VariantService {
 
         properties.add( new GenomicLocationProperty() );
         properties.add( new GeneProperty() );
-       // properties.add( new GeneSetProperty() );
+        properties.add( new GeneSetProperty() );
         properties.add( new NeurocartaPhenotypeProperty() );
 
         return properties;

@@ -50,14 +50,13 @@ Ext.define( 'ASPIREdb.view.filter.OrFilterContainer', {
             disjunction.restrictions = [];
             this.items.each( function(item, index, length) {
                disjunction.restrictions.push( item.getRestrictionExpression() );
-               /**
+               
                if (disjunction.restrictions[index].property.displayName =='GeneSet'){
                   disjunction.restrictions[index].property =new GeneProperty();
-                  //disjunction.restrictions[index].property.displayName ='Gene';
-                 // disjunction.restrictions[index].property.nam='Gene';
+                  disjunction.restrictions[index].property.displayName ='Gene';
                   disjunction.restrictions[index].values = disjunction.restrictions[index].values[index].object;
                   
-               }*/
+               }
             } );
             
             return disjunction;

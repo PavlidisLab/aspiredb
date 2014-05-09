@@ -16,11 +16,8 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
       selSubjects : [],
       visibleLabels : [],
       gridPanelName : '',
+      selectedRecord:[],
    },
-
-   /**
-    * items : [ { itemId : 'phenotypeSubjectLabelGrid', xtype : 'phenotypeSubjectLabelGrid', } ],
-    */
 
    initComponent : function() {
 
@@ -28,14 +25,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
 
    },
 
-   /**
-    * initGridAndShow : function(psvos, selPhenotypes) {
-    * 
-    * var ref = this;
-    * 
-    * var grid = ref.getComponent( 'phenotypeSubjectLabelGrid' ); grid.populateGrid( psvos, selPhenotypes ); ref.show(); },
-    */
-
+ 
    initGridAndShow : function(psvos, selPhenotypes) {
       if ( selPhenotypes.length > 3 ) {
          Ext.Msg.alert( 'User is allowed to select maximum 3 phenotypes to view thw table. Reselect' );
@@ -306,38 +296,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
                this.createGridPanel( data, columnNames, phenotypeName );
             }
 
-            /**
-             * // multiple cases var phenSummaries = []; var phenotypeName = ''; var columnNames = []; for (var i = 0; i <
-             * selPhenotypes.length; i++) { var phenSummary = selPhenotypes[i].data.selectedPhenotype;
-             * 
-             * phenotypeName = phenotypeName+ phenSummary.name;
-             * 
-             * console.log( 'grid panel names: ' + phenotypeName ); var pheneData = [];
-             * 
-             * columnNames.push( phenSummary.name );
-             * 
-             * for ( var rowlabelName in phenSummary.phenoSummaryMap) { var subjects = []; if ( rowlabelName !=
-             * "Unknown" ) { if ( rowlabelName == "Present" || rowlabelName == "Y" ) subjects = phenSummary.subjects[1];
-             * else if ( rowlabelName == "Absent" || rowlabelName == "N" ) subjects = phenSummary.subjects[0]; else
-             * subjects = phenSummary.subjects[rowlabelName]; pheneData.push( [ rowlabelName, subjects ] ); } }
-             * phenSummaries.push(pheneData); }
-             * 
-             * for (var i = 0; i < phenSummaries.length; i++) { for (var k = i+1; k < phenSummaries.length; k++) { var
-             * rowNames=[]; var data=[]; // find the resultant row for ( var rowName in phenSummaries[i]) { if ( rowName !=
-             * 'transpose' ) {
-             * 
-             * var rowSubjects = phenSummaries[i][rowName]; if ( rowNames.indexOf( rowSubjects[0] == -1 ) ) {
-             * console.log( 'row data : ' + rowName + ' value is : ' + rowSubjects[0] );
-             * 
-             * rowNames.push( rowSubjects[0] );
-             * 
-             * for ( var colName in phenSummaries[k]) { if ( colName != 'transpose' ) { var row = []; var resultSubjects =
-             * []; console.log( 'column names : ' + colName ); var colSubjects = phenSummaries[k][colName]; //row.push(
-             * rowSubjects[0] ); //row.push( colSubjects[0] ); for (var k = 0; k < rowSubjects[1].length; k++) { if (
-             * colSubjects[1].indexOf( rowSubjects[1][k] ) != -1 ) { resultSubjects.push( rowSubjects[1][k] ); } }
-             * row.push( resultSubjects ); data.push( row ); } } } } } } } this.createGridPanel( data, columnNames,
-             * phenotypeName );
-             */
+       
 
          }
 
@@ -402,12 +361,12 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
                                  }
                               }
                               
-                              console.log('ret *********??????'+returnValue);
+                              //console.log('ret *********??????'+returnValue);
                            }
                         
                         } );
                        
-                        //console.log('ret *********??????'+returnValue);
+                       console.log('ret *********??????'+returnValue);
                  
                     }
                     return returnValue;
@@ -427,7 +386,6 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
       }
       // create grid
       var grid = Ext.create( 'Ext.grid.Panel', {
-         // title : phenotypeName,
          id : phenotypeName,
          closable : false,
          border : true,
@@ -436,18 +394,18 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
          autoRender : true,
          //multiSelect : false,
          width : 850,
-         // columnLines : true,
-         listeners : {
+               listeners : {
             cellclick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
-              // ref.selectedSubjectIds = [];
+       
                var subjectIdLength = record.raw.length;
                ref.selectedSubjectIds = record.raw[subjectIdLength - 1];
+               ref.selectedRecord =record;
 
                // Stop the browser getting the event
                e.preventDefault();
 
                var contextMenu = new Ext.menu.Menu( {
-                  //id : 'labelContextmenu',
+  
                   items : [ {
                      text : 'Make label',
                      handler : ref.makeLabelHandler,
@@ -538,6 +496,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
 
       var labelWindow = new ASPIREdb.view.CreateLabelWindowSubject();
       labelWindow.show();
+      ASPIREdb.EVENT_BUS.fireEvent('phenotype_label_created', me.selectedRecord);
       var grid = ASPIREdb.view.PhenotypeSubjectLabelWindow.getComponent( me.gridPanelName );
       console.log( 'grid  :' + grid );
       
@@ -603,7 +562,6 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
       var labelWindow = new ASPIREdb.view.CreateLabelWindowSubject();
       labelWindow.show();
 
-      // me.down('#editLabel').setVisible(true);
       var grid = ASPIREdb.view.PhenotypeSubjectLabelWindow.getComponent( me.gridPanelName );
       var test = grid.getComponent( '#labelContextmenu' );
       var selection = grid.getSelectionModel().getSelection()[0];
