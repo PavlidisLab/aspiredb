@@ -58,6 +58,12 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       filterConfigs : [],
    },
 
+   bbar : [ {
+      xtype : 'label',
+      itemId : 'statusbar',
+      html : ''
+   } ], // bbar
+
    constructor : function(cfg) {
       this.initConfig( cfg );
       this.callParent( arguments );
@@ -293,10 +299,12 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
                ProjectService.numVariants( filterConfigs[0].projectIds, {
                   callback : function(NoOfVariants) {
-                     if ( NoOfVariants > vvos.length ) {
-                        ref.setTitle( "Variant :" + vvos.length + " of " + NoOfVariants + " filtered" );
-                     } else if ( NoOfVariants == vvos.length )
-                        ref.setTitle( "Variant" );
+                     /*
+                      * if ( NoOfVariants > vvos.length ) { ref.setTitle( "Variant :" + vvos.length + " of " +
+                      * NoOfVariants + " filtered" ); } else if ( NoOfVariants == vvos.length ) ref.setTitle( "Variant" );
+                      */
+                     ref.down( '#statusbar' ).update(
+                        ref.loadedVariants.length + " / " + NoOfVariants + " variants loaded" );
                   }
                } );
 

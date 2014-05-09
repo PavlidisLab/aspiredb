@@ -122,6 +122,12 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
                  flex : 1
               } ],
 
+   bbar : [ {
+      xtype : 'label',
+      itemId : 'statusbar',
+      html : ''
+   } ], // bbar
+
    /**
     * Create tool bar and buttons on top of subject grid
     */
@@ -177,6 +183,14 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       this.toolbar = Ext.create( 'Ext.toolbar.Toolbar', {
          itemId : 'subjectGridToolbar',
          dock : 'top'
+      } );
+
+      Ext.apply( this, {
+         bbar : new Ext.Toolbar( {
+            itemId : 'statusBar',
+            text : '',
+            scope : this,
+         } )
       } );
 
       this.toolbar.add( this.labelsButton );
@@ -253,12 +267,15 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
             console.log( me.valueObjects.length + " subjects being processed into value objects" );
             // find the number of subjects
             // filtered
+
             ProjectService.numSubjects( filterConfigs[0].projectIds, {
                callback : function(NoOfSubjects) {
-                  if ( NoOfSubjects > me.valueObjects.length ) {
-                     me.setTitle( "Subject :" + me.valueObjects.length + " of " + NoOfSubjects + " filtered" );
-                  } else if ( NoOfSubjects == me.valueObjects.length )
-                     me.setTitle( "Subject" );
+                  /*
+                   * if ( NoOfSubjects > me.valueObjects.length ) { me.setTitle( "Subject :" + me.valueObjects.length + "
+                   * of " + NoOfSubjects + " filtered" ); } else if ( NoOfSubjects == me.valueObjects.length )
+                   * me.setTitle( "Subject" );
+                   */
+                  me.down( '#statusbar' ).update( me.valueObjects.length + " / " + NoOfSubjects + " subjects loaded" );
                }
             } );
 
