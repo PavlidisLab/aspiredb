@@ -19,6 +19,12 @@
 Ext.require( [ 'Ext.Window', 'ASPIREdb.store.LabelStore', 'Ext.grid.column.Action', 'Ext.ux.CheckColumn',
               'Ext.form.field.*', 'Ext.picker.Color' ] );
 
+var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
+   //clicksToMoveEditor: 1,
+  clicksToEdit: 2,
+    autoCancel: false
+});
+
 var contextMenu = new Ext.menu.Menu( {
    itemId : 'contextMenu',
    displayField : 'labelColour',
@@ -130,7 +136,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                                    allowBlank : false,
 
                                 }
-                             }, {
+                             }, /**{
                                 header : 'Color',
                                 dataIndex : 'labelColour',
                                 width : 100,
@@ -139,7 +145,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                                    allowBlank : false,
                                 },
 
-                             }, {
+                             },*/ {
                                 header : 'Show',
                                 dataIndex : 'show',
                                 xtype : 'checkcolumn',
@@ -162,22 +168,17 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
 
                                 } ]
                              } ],
-                  plugins : [ Ext.create( 'Ext.grid.plugin.CellEditing', {
-                     clicksToEdit : 2,
-                     ptype : 'cellEditing',
-                     autoCancel : false,
-
-                  } ) ],
+                  plugins : [ rowEditing],
 
                   listeners : {
-                     cellclick : function(e, rowIndex,cellIndex, record) {
+                     itemclick : function(e, rowIndex,cellIndex, record) {
                      console.log('X value '+e.getX()+ 'Y value :'+e.getY());
-                        colorPicker.showAt( e.getX(), e.getY() );
+                        /**colorPicker.showAt( e.getX(), e.getY() );
                         ASPIREdb.EVENT_BUS.on( 'label_color_chnaged', function(selColor){
                            item.data.labelColour =selColor;
                            item.store.data.items[rowIndex].data =selColor;
                            item.store.getView().refresh();
-                        } );
+                        } );*/
                       //  var labelId =this.store.data.items[rowIndex].data.labelId;
                       //  var selectedColor =colorPicker.getValue();
 

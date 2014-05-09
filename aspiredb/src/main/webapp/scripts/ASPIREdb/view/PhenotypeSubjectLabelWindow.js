@@ -409,13 +409,13 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
                   items : [ {
                      text : 'Make label',
                      handler : ref.makeLabelHandler,
-                     scope : this,
+                     scope : ref,
                   }, {
                      text : 'Edit label',
                      itemId : 'editLabel',
                      handler : ref.editLabelHandler,
                      disabled : true,
-                     scope : this,
+                     scope : ref,
                   } ]
                } );
 
