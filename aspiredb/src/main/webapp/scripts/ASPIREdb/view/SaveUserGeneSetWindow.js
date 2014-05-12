@@ -109,6 +109,39 @@ Ext.define( 'ASPIREdb.view.SaveUserGeneSetWindow', {
                         } );
                         ref.down( '#geneSetName' ).clearValue();
 
+                     } else if ( btn == 'no' ) {
+                        // if the user wish to add to the existing geneset
+                        Ext.Msg.show( {
+                           title : 'Add to gene set',
+                           msg : 'Do you want to add to geneset then?',
+                           buttons : Ext.Msg.YESNOCANCEL,
+                           icon : Ext.Msg.QUESTION,
+                           fn : function(btn) {
+                              if ( btn == 'cancel' ) {
+                                 // do something
+                              }
+                              if ( btn == 'yes' ) {
+                                 var geneSymbols = [];
+                                 for (var i = 0; i < ref.geneSetValueobjects.length; i++)
+                                    geneSymbols.push( ref.geneSetValueobjects[i].symbol );
+                                 UserGeneSetService.addGenesToGeneSet( geneSetName, geneSymbols, {
+                                    callback : function() {
+                                       ASPIREdb.view.SaveUserGeneSetWindow.down( '#geneSetName' ).setValue( '' );
+                                       ASPIREdb.view.SaveUserGeneSetWindow.close();
+                                       ASPIREdb.EVENT_BUS.fireEvent( 'new_geneSet_saved' );
+
+                                    }
+                                 } );
+
+                                 
+
+                              }
+
+                           }
+
+                        } );
+                        ref.down( '#geneSetName' ).clearValue();
+
                      }
 
                   }

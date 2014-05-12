@@ -47,4 +47,6 @@ public interface UserGeneSetService {
 
     List<GeneSetValueObject> suggestUserGeneSet( String query );
 
+    void addGenesToGeneSet( String geneSetName, List<String> geneSymbol ) throws BioMartServiceException;
+
 }
