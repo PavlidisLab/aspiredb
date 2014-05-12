@@ -36,7 +36,7 @@ Ext.define( 'ASPIREdb.view.ideogram.ColourLegend', {
          window.collapse();
          winWidth = window.getWidth();
          window.setWidth( 150 );
-         window.alignTo( Ext.getBody(), 'br-br' );
+         window.alignTo( Ext.getBody(), 'b-b' );
          this.hide();
          this.previousSibling().show();
          isMinimized = true;
