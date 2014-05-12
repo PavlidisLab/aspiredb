@@ -109,7 +109,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                              {
                                 header : 'Label',
                                 dataIndex : 'labelId',
-                                // width : 100,
+                                width : 100,
                                 flex : 1,
                                 renderer : function(labelId) {
 
@@ -131,6 +131,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                                 header : 'Name',
                                 dataIndex : 'labelName',
                                 width : 100,
+                                flex : 1,
                                 editor : {
                                    xtype : 'textfield',
                                    allowBlank : false,
