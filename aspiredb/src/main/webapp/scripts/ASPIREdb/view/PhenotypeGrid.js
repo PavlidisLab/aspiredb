@@ -360,7 +360,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid',
        */
       subjectSelectHandler : function(subjectIds) {// todo
 
-         if ( !subjectIds ) {
+         if ( !subjectIds || subjectIds.length == 0 ) {
             var col = this.columns[this.SELECTED_VALUES_COL_IDX];
 
             col.setText( "" );

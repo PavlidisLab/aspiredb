@@ -339,7 +339,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
       if ( this.selSubjects.length == 0 ) {
          this.down( '#makeLabel' ).disable();
-         return;
+         // return;
       } else {
          this.down( '#makeLabel' ).enable();
       }
@@ -352,8 +352,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
          }
          ASPIREdb.EVENT_BUS.fireEvent( 'subject_selected', ids );
       } else {
-         ASPIREdb.EVENT_BUS.fireEvent( 'subject_selected', null );
-
+         ASPIREdb.EVENT_BUS.fireEvent( 'subject_selected', this.store.collect( 'id' ), true );
       }
    },
 
@@ -496,8 +495,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
    deselectAllHandler : function() {
       this.cancelBubble = true;
-      this.getSelectionModel().deselectAll();
-      this.selectionChangeHandler();
+      this.getSelectionModel().deselectAll(); // calls selectionChangeHandler
    }
 
 } );

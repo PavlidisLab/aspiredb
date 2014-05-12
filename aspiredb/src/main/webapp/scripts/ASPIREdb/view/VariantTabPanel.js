@@ -514,13 +514,18 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
     * When subjects are selected in the subject grid highlist the variants of selected subjects in ideogram and in table
     * view
     */
-   subjectSelectionHandler : function(subjectIds) {
+   subjectSelectionHandler : function(subjectIds, unselectRows) {
       var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
       this.selectedSubjects = subjectIds;
       var grid = this.down( '#variantGrid' );
 
       // when variant table view is selected
       if ( grid.isVisible() ) {
+
+         if ( unselectRows ) {
+            grid.getSelectionModel().deselectAll();
+            return;
+         }
 
          if ( grid.features != null && grid.features.length > 0 ) {
             // collapse all the grids first - to open only the
@@ -544,6 +549,10 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
             SubjectService.getSubjects( projectIds[0], subjectIds, {
                callback : function(selectedSubjectValueObjects) {
+
+                  if ( selectedSubjectValueObjects == null ) {
+                     return;
+                  }
 
                   var selectedRecords = [];
 
@@ -587,6 +596,10 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          SubjectService.getSubjects( projectIds[0], subjectIds, {
             callback : function(subjectValueObjects) {
 
+               if ( subjectValueObjects == null ) {
+                  return;
+               }
+
                var subjectIDS = [];
                var patientIDS = [];
                for (var i = 0; i < subjectValueObjects.length; i++) {
@@ -620,9 +633,9 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    },
 
    deselectAllHandler : function() {
+      this.subjectSelectionHandler( this.loadedSubjects, true );
+
       this.getComponent( 'variantGrid' ).getSelectionModel().deselectAll();
-      this.selectionChangeHandler( this.getComponent( 'variantGrid' ).getSelectionModel(), this.getComponent(
-         'variantGrid' ).getSelectionModel().getSelection() );
    },
 
    ideogramSelectionChangeHandler : function(model, records) {
