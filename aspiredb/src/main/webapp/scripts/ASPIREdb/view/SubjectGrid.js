@@ -474,7 +474,8 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       var labelControlWindow = Ext.create( 'ASPIREdb.view.LabelControlWindow', {
          visibleLabels : me.visibleLabels,
          isSubjectLabel : true,
-         selectedIds : selectedSubjectIds
+         selectedIds : selectedSubjectIds,
+         title : "Subject Label Settings"
       } );
 
       labelControlWindow.show();

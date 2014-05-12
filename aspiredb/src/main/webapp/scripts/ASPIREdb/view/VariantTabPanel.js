@@ -882,7 +882,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       var labelControlWindow = Ext.create( 'ASPIREdb.view.LabelControlWindow', {
          visibleLabels : me.down( '#variantGrid' ).visibleLabels,
          isSubjectLabel : false,
-         selectedIds : selectedVariantIds
+         selectedIds : selectedVariantIds,
+         title: 'Variant Label Settings'
       } );
 
       labelControlWindow.show();
