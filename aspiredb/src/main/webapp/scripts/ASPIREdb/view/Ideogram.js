@@ -540,7 +540,10 @@ Ext.define('ASPIREdb.view.Ideogram', {
 		if (repeat){
 			//do not update the ledgend
 		}
-		else this.colourLegend.update(displayText); 
+		else {
+		   this.colourLegend.setTitle('Ideogram legend : '+this.displayedProperty.displayName);
+		   this.colourLegend.update(displayText);
+		   }
 			//this.colourLegend.update(valuetoColourArray,this.displayedProperty); 
 		console.log('colour legend '+valuetoColourArray);
 		

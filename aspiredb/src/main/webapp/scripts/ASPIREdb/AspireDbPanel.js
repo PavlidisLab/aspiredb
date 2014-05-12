@@ -224,7 +224,7 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
             ASPIREdb.view.GeneManagerWindow.initGridAndShow();
 
          }
-      }, {
+      },/** {
          xtype : 'button',
          text : 'Subject Label Manager',
          itemId : 'subjectLabelManagerButton',
@@ -248,7 +248,8 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
             } );
             labelControlWindow.show();
          }
-      }, {
+      }*/
+      ,{
          xtype : 'button',
          text : 'Help',
          itemId : 'helpButton',

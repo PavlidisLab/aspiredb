@@ -40,10 +40,14 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
             for ( var labelName in phenSummary.phenoSummaryMap) {
                var subjects = [];
                if ( labelName != "Unknown" ) {
-                  if ( labelName == "Present" || labelName == "Y" )
+                  if ( labelName == "Present"  )
                      subjects = phenSummary.subjects[1];
-                  else if ( labelName == "Absent" || labelName == "N" )
+                  else if ( labelName == "Absent"  )
                      subjects = phenSummary.subjects[0];
+                  else if ( labelName == "Y" )
+                     subjects = phenSummary.subjects['Y'];
+                  else if ( labelName == "N" )
+                     subjects = phenSummary.subjects['N'];
                   else
                      subjects = phenSummary.subjects[labelName];
                   // rowName, cell Value
@@ -71,10 +75,14 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
                for ( var rowlabelName in phenSummary.phenoSummaryMap) {
                   var subjects = [];
                   if ( rowlabelName != "Unknown" ) {
-                     if ( rowlabelName == "Present" || rowlabelName == "Y" )
+                     if ( rowlabelName == "Present"  )
                         subjects = phenSummary.subjects[1];
-                     else if ( rowlabelName == "Absent" || rowlabelName == "N" )
+                     else if ( rowlabelName == "Absent"  )
                         subjects = phenSummary.subjects[0];
+                     else if ( rowlabelName == "Y" )
+                        subjects = phenSummary.subjects['Y'];
+                     else if ( rowlabelName == "N" )
+                        subjects = phenSummary.subjects['N'];
                      else
                         subjects = phenSummary.subjects[rowlabelName];
                      pheneData.push( [ rowlabelName, subjects ] );
@@ -282,7 +290,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
     * @param :
     *           event
     */
-   makeLabelHandler : function(record) {
+   makeLabelHandler : function() {
 
       var me = this;
 
@@ -330,8 +338,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
       var labelWindow = new ASPIREdb.view.CreateLabelWindowSubject();
       labelWindow.show();
       ASPIREdb.EVENT_BUS.fireEvent( 'phenotype_label_created', me.selectedRecord );
-      var grid = ASPIREdb.view.PhenotypeSubjectLabelWindow.getComponent( me.gridPanelName );
-      console.log( 'grid  :' + grid );
+     
       
 
    },
