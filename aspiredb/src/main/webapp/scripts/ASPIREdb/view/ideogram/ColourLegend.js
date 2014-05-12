@@ -1,8 +1,8 @@
 Ext.define( 'ASPIREdb.view.ideogram.ColourLegend', {
    extend : 'Ext.window.Window',
    alias : 'widget.colourlegend',
-   width : 200,
-   height : 200,
+   width : 150,
+   height : 150,
    autoScroll : true,
    title : 'Ideogram',
    closable : false,
@@ -36,7 +36,7 @@ Ext.define( 'ASPIREdb.view.ideogram.ColourLegend', {
          window.collapse();
          winWidth = window.getWidth();
          window.setWidth( 150 );
-         window.alignTo( Ext.getBody(), 'bl-bl' );
+         window.alignTo( Ext.getBody(), 'br-br' );
          this.hide();
          this.previousSibling().show();
          isMinimized = true;

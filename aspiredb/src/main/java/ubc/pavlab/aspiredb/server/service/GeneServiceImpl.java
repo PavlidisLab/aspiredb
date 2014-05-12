@@ -93,8 +93,10 @@ public class GeneServiceImpl implements GeneService {
     @RemoteMethod
     public Map<String, GeneValueObject> findGenesAndURIsWithNeurocartaPhenotype( String phenotypeValueUri )
             throws NotLoggedInException, ExternalDependencyException {
-
-        return this.neurocartaQueryService.findPhenotypeGenes( phenotypeValueUri );
+        Map<String, GeneValueObject> genes =new HashMap<String, GeneValueObject>();
+                genes =this.neurocartaQueryService.findPhenotypeGenes( phenotypeValueUri );
+        
+        return genes;
     }
 
     @Override

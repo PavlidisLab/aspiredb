@@ -68,7 +68,7 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         List<String> geneSymbols = new ArrayList<>();
         List<GeneValueObject> geneValueObjects = new ArrayList<GeneValueObject>();
 
-        if ( genes.size()==0 ) { 
+        if ( genes.get(0).getSymbol()==null ) { 
             // null gene value objects
         } else {
             // storing the gene symbols
