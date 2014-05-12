@@ -4,7 +4,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
    extend : 'Ext.Window',
    alias : 'widget.phenotypesubjectlabelwindow',
    singleton : true,
-   title : 'Subject Labels',
+   title : 'Contingency Table',
    closable : true,
    closeAction : 'hide',
    width : 900,
@@ -16,7 +16,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
       selSubjects : [],
       visibleLabels : [],
       gridPanelName : '',
-      selectedRecord:[],
+      selectedRecord : [],
    },
 
    initComponent : function() {
@@ -25,10 +25,9 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
 
    },
 
- 
    initGridAndShow : function(psvos, selPhenotypes) {
       if ( selPhenotypes.length > 3 ) {
-         Ext.Msg.alert( 'User is allowed to select maximum 3 phenotypes to view thw table. Reselect' );
+         Ext.Msg.alert( 'Warning','User is allowed to select maximum 3 phenotypes to view thw table. Reselect' );
       } else {
          // if only one phenotype is selected
          if ( selPhenotypes.length == 1 ) {
@@ -36,7 +35,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
 
             var phenSummary = selPhenotypes[0].data.selectedPhenotype;
             var phenotypeName = phenSummary.name;
-            var columnNames = [ phenotypeName, 'Label' ];
+            var columnNames = [ phenotypeName, 'Subject Count' ];
 
             for ( var labelName in phenSummary.phenoSummaryMap) {
                var subjects = [];
@@ -54,260 +53,92 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
             }
             this.createGridPanel( data, columnNames, phenotypeName );
 
-         } else if ( selPhenotypes.length == 2 ) {
+         } else{
+            // multiple cases
+            var selectedPhenotypeData = [];
+            var phenotypeName = '';
+            var columnNames = [];
             for (var i = 0; i < selPhenotypes.length; i++) {
-               var rowData = [];
-               var phenSummary1 = selPhenotypes[i].data.selectedPhenotype;
+               var phenSummary = selPhenotypes[i].data.selectedPhenotype;
 
-               for ( var rowlabelName in phenSummary1.phenoSummaryMap) {
+               phenotypeName = phenotypeName + phenSummary.name;
+
+               console.log( 'grid panel names: ' + phenotypeName );
+               var pheneData = [];
+
+               columnNames.push( phenSummary.name );
+
+               for ( var rowlabelName in phenSummary.phenoSummaryMap) {
                   var subjects = [];
                   if ( rowlabelName != "Unknown" ) {
                      if ( rowlabelName == "Present" || rowlabelName == "Y" )
-                        subjects = phenSummary1.subjects[1];
+                        subjects = phenSummary.subjects[1];
                      else if ( rowlabelName == "Absent" || rowlabelName == "N" )
-                        subjects = phenSummary1.subjects[0];
+                        subjects = phenSummary.subjects[0];
                      else
-                        subjects = phenSummary1.subjects[rowlabelName];
-                     rowData.push( [ rowlabelName, subjects ] );
+                        subjects = phenSummary.subjects[rowlabelName];
+                     pheneData.push( [ rowlabelName, subjects ] );
                   }
-
                }
-               for (var j = i + 1; j < selPhenotypes.length; j++) {
-
-                  var phenSummary2 = selPhenotypes[j].data.selectedPhenotype;
-                  var phenotypeName = phenSummary1.name + " vs " + phenSummary2.name;
-                  var columnNames = [ phenSummary1.name, phenSummary2.name, 'Label' ];
-
-                  var colData = [];
-                  var rowNames = [];
-                  var data = [];
-
-                  for ( var columnlabelName in phenSummary2.phenoSummaryMap) {
-                     var subjects = [];
-                     if ( columnlabelName != "Unknown" ) {
-                        if ( columnlabelName == "Present" || columnlabelName == "Y" )
-                           subjects = phenSummary2.subjects[1];
-                        else if ( columnlabelName == "Absent" || columnlabelName == "N" )
-                           subjects = phenSummary2.subjects[0];
-                        else
-                           subjects = phenSummary2.subjects[columnlabelName];
-                        colData.push( [ columnlabelName, subjects ] );
-
-                     }
-                  }
-
-                  // find the resultant row
-                  for ( var rowName in rowData) {
-                     if ( rowName != 'transpose' ) {
-
-                        var rowSubjects = rowData[rowName];
-                        if ( rowNames.indexOf( rowSubjects[0] == -1 ) ) {
-                           console.log( 'row data :  ' + rowName + ' value is  : ' + rowSubjects[0] );
-
-                           rowNames.push( rowSubjects[0] );
-
-                           for ( var colName in colData) {
-                              if ( colName != 'transpose' ) {
-                                 var row = [];
-                                 var resultSubjects = [];
-                                 console.log( 'column names : ' + colName );
-                                 var colSubjects = colData[colName];
-                                 row.push( rowSubjects[0] );
-                                 row.push( colSubjects[0] );
-                                 for (var k = 0; k < rowSubjects[1].length; k++) {
-                                    if ( colSubjects[1].indexOf( rowSubjects[1][k] ) != -1 ) {
-                                       resultSubjects.push( rowSubjects[1][k] );
-                                    }
-                                 }
-                                 row.push( resultSubjects );
-                                 data.push( row );
-                              }
-                           }
-                        }
-
-                     }
-                  }
-                  this.createGridPanel( data, columnNames, phenotypeName );
-               }
+               selectedPhenotypeData.push( pheneData );
             }
+            
+            var resultantData= selectedPhenotypeData[0];
+            for (var i = 1; i < selectedPhenotypeData.length; i++) {
+               var newResultantRow = [];
+               for (var j = 0; j < resultantData.length; j++) {
+                   for (var m = 0; m < selectedPhenotypeData[i].length; m++) {
+                     var columnValues = resultantData[j];
+                     var newResultantColumn = [];
+                     //push the phenotype values for the grid column
+                     for (var k = 0; k < columnValues.length - 1; k++){
+                        if ( columnValues[k] != 'transpose' ) {
+                           newResultantColumn.push( columnValues[k] );
+                        }
+                     }
+                    // newResultantColumn.push( selectedPhenotypeData[i][0][m] );
+                     var secondColumnValues = selectedPhenotypeData[i][m];
+                     for (var n = 0; n < secondColumnValues.length - 1; n++){
+                        if ( secondColumnValues[k] != 'transpose' ) {
+                           newResultantColumn.push( secondColumnValues[n] );
+                        }
+                     }
+                        
+                     //finding the common subject ids for selected 2 phenotypes 
+                     var firstColumnSubjects = columnValues[columnValues.length - 1];
+                     var secondColumnSubjects = secondColumnValues[secondColumnValues.length - 1];
+                     var resultSubjects = [];
+                     for (var k = 0; k < firstColumnSubjects.length; k++) {
+                        if ( secondColumnSubjects.indexOf( firstColumnSubjects[k] ) != -1 ) {
+                           resultSubjects.push( firstColumnSubjects[k] );
+                        }
+                     }
 
-         } else if ( selPhenotypes.length == 3 ) {
-
-            for (var i = 0; i < selPhenotypes.length; i++) {
-               var data = [];
-               var rowData = [];
-               var phenotypeName = '';
-               var columnNames = [];
-
-               var phenSummary1 = selPhenotypes[i].data.selectedPhenotype;
-
-               for ( var rowlabelName in phenSummary1.phenoSummaryMap) {
-                  var subjects = [];
-                  if ( rowlabelName != "Unknown" ) {
-                     if ( rowlabelName == "Present" || rowlabelName == "Y" )
-                        subjects = phenSummary1.subjects[1];
-                     else if ( rowlabelName == "Absent" || rowlabelName == "N" )
-                        subjects = phenSummary1.subjects[0];
-                     else
-                        subjects = phenSummary1.subjects[rowlabelName];
-                     rowData.push( [ rowlabelName, subjects ] );
+                     newResultantColumn.push( resultSubjects );
+                     newResultantRow.push( newResultantColumn );
+                   
+                     
                   }
-
+                  
                }
-
-               for (var j = i + 1; j < selPhenotypes.length; j++) {
-
-                  var phenSummary2 = selPhenotypes[j].data.selectedPhenotype;
-
-                  if ( data.length > 0 ) {
-                     phenotypeName = phenotypeName + " vs " + phenSummary2.name;
-                     columnNames.push( phenSummary2.name );
-
-                     var colData = [];
-                     // var rowNames = [];
-                     var newData = [];
-
-                     for ( var columnlabelName in phenSummary2.phenoSummaryMap) {
-                        var subjects = [];
-                        if ( columnlabelName != "Unknown" ) {
-                           if ( columnlabelName == "Present" || columnlabelName == "Y" )
-                              subjects = phenSummary2.subjects[1];
-                           else if ( columnlabelName == "Absent" || columnlabelName == "N" )
-                              subjects = phenSummary2.subjects[0];
-                           else
-                              subjects = phenSummary2.subjects[columnlabelName];
-                           colData.push( [ columnlabelName, subjects ] );
-
-                        }
-                     }
-
-                     // find the resultant row
-                     for ( var dataRow in data) {
-                        var rowData = data[dataRow];
-                        var subjectindex = rowData.length - 1;
-                        var rowSubjects = rowData[subjectindex];
-                        if ( rowSubjects != null ) {
-                           // if ( rowNames.indexOf( rowSubjects[0] == -1 ) ) {
-                           // console.log( 'row data : ' + dataRow + ' value is : ' + rowSubjects[0] );
-
-                           // rowNames.push( rowSubjects[0] );
-
-                           for ( var colName in colData) {
-                              if ( colName != 'transpose' ) {
-                                 var row = [];
-                                 var resultSubjects = [];
-                                 console.log( 'column names : ' + colName );
-                                 var colSubjects = colData[colName];
-                                 for (var l = 0; l < rowData.length - 1; l++) {
-                                    row.push( rowData[l] );
-                                 }
-                                 row.push( colSubjects[0] );
-                                 for (var k = 0; k < rowSubjects.length; k++) {
-                                    if ( colSubjects[1].indexOf( rowSubjects[k] ) != -1 ) {
-                                       resultSubjects.push( rowSubjects[k] );
-                                    }
-                                 }
-                                 row.push( resultSubjects );
-                                 newData.push( row );
-
-                              }
-                           }
-                           // data =newData;
-                           // }
-                        } else {
-                           // empty subjects
-                           for ( var colName in colData) {
-                              if ( colName != 'transpose' ) {
-                                 var row = [];
-                                 var resultSubjects = [];
-                                 console.log( 'column names : ' + colName );
-                                 var colSubjects = colData[colName];
-                                 for (var l = 0; l < rowData.length - 1; l++) {
-                                    row.push( rowData[l] );
-                                 }
-                                 row.push( colSubjects[0] );
-
-                                 row.push( resultSubjects );
-                                 newData.push( row );
-
-                              }
-                           }
-                        }
-
-                     }
-                     data = newData;
-
-                  } else {
-                     phenotypeName = phenSummary1.name + " vs " + phenSummary2.name;
-                     columnNames = [ phenSummary1.name, phenSummary2.name ];
-
-                     var colData = [];
-                     var rowNames = [];
-
-                     for ( var columnlabelName in phenSummary2.phenoSummaryMap) {
-                        var subjects = [];
-                        if ( columnlabelName != "Unknown" ) {
-                           if ( columnlabelName == "Present" || columnlabelName == "Y" )
-                              subjects = phenSummary2.subjects[1];
-                           else if ( columnlabelName == "Absent" || columnlabelName == "N" )
-                              subjects = phenSummary2.subjects[0];
-                           else
-                              subjects = phenSummary2.subjects[columnlabelName];
-                           colData.push( [ columnlabelName, subjects ] );
-
-                        }
-                     }
-
-                     // find the resultant row
-                     for ( var rowName in rowData) {
-                        if ( rowName != 'transpose' ) {
-
-                           var rowSubjects = rowData[rowName];
-                           if ( rowNames.indexOf( rowSubjects[0] == -1 ) ) {
-                              console.log( 'row data :  ' + rowName + ' value is  : ' + rowSubjects[0] );
-
-                              rowNames.push( rowSubjects[0] );
-
-                              for ( var colName in colData) {
-                                 if ( colName != 'transpose' ) {
-                                    var row = [];
-                                    var resultSubjects = [];
-                                    console.log( 'column names : ' + colName );
-                                    var colSubjects = colData[colName];
-                                    row.push( rowSubjects[0] );
-                                    row.push( colSubjects[0] );
-                                    for (var k = 0; k < rowSubjects[1].length; k++) {
-                                       if ( colSubjects[1].indexOf( rowSubjects[1][k] ) != -1 ) {
-                                          resultSubjects.push( rowSubjects[1][k] );
-                                       }
-                                    }
-                                    row.push( resultSubjects );
-                                    data.push( row );
-                                 }
-                              }
-                           }
-
-                        }
-                     }
-                  }
-
-               }
-               columnNames.push( 'Label' );
-               this.createGridPanel( data, columnNames, phenotypeName );
+             //recursive resultant data
+               resultantData=newResultantRow;
+        
             }
+            columnNames.push( 'Subject Count' );
+            this.createGridPanel( resultantData, columnNames, phenotypeName );
 
-       
-
-         }
+         } 
 
          this.show();
       }
 
    },
-
+   
    createGridPanel : function(data, columnNames, phenotypeName) {
 
       var ref = this;
+      ref.removeAll();
       ref.gridPanelName = phenotypeName;
       var fields = [];
 
@@ -331,46 +162,48 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
 
       if ( columnNames.length > 1 ) {
          for (var i = 0; i < columnNames.length; i++) {
-            if ( columnNames[i] == 'Label' ) {
+            if ( columnNames[i] == 'Subject Count' ) {
                columns.push( {
                   header : columnNames[i],
                   dataIndex : columnNames[i],
                   flex : 1,
                   renderer : function(value) {
-                    
-                    var returnValue = value.length;
-                    if (returnValue!=0) {
+
+                     var returnValue = value.length;
+                     if ( returnValue != 0 ) {
                         var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
 
                         SubjectService.getSubjects( projectIds[0], value, {
                            callback : function(selectedSubjectValueObjects) {
                               for (var k = 0; k < selectedSubjectValueObjects.length; k++) {
-                                 
+
                                  if ( selectedSubjectValueObjects[k].labels != undefined ) {
 
                                     label = selectedSubjectValueObjects[k].labels[0];
-                                    if (label && returnValue==value.length){
-                                    var fontcolor = (parseInt( label.colour, 16 ) > 0xffffff / 2) ? 'black' : 'white';
-                                    
-                                    returnValue = "<font color=" + fontcolor + "><span style='background-color: " + label.colour
-                                       + "'>&nbsp&nbsp" + returnValue + "&nbsp</span></font>&nbsp&nbsp&nbsp";
-                                       console.log('ret *********'+returnValue);
-                                       
+                                    if ( label && returnValue == value.length ) {
+                                       var fontcolor = (parseInt( label.colour, 16 ) > 0xffffff / 2) ? 'black'
+                                          : 'white';
+
+                                       returnValue = "<font color=" + fontcolor + "><span style='background-color: "
+                                          + label.colour + "'>&nbsp&nbsp" + returnValue
+                                          + "&nbsp</span></font>&nbsp&nbsp&nbsp";
+                                       console.log( 'ret *********' + returnValue );
+
                                     }
-                           
+
                                  }
                               }
-                              
-                              //console.log('ret *********??????'+returnValue);
+
+                              // console.log('ret *********??????'+returnValue);
                            }
-                        
+
                         } );
-                       
-                       console.log('ret *********??????'+returnValue);
-                 
-                    }
-                    return returnValue;
-                    
+
+                        console.log( 'ret *********??????' + returnValue );
+
+                     }
+                     return returnValue;
+
                   }
                } );
             } else {
@@ -392,23 +225,23 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
          store : suggestContigencyTableStore,
          columns : columns,
          autoRender : true,
-         //multiSelect : false,
+         // multiSelect : false,
          width : 850,
-               listeners : {
+         listeners : {
             cellclick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
-       
+
                var subjectIdLength = record.raw.length;
                ref.selectedSubjectIds = record.raw[subjectIdLength - 1];
-               ref.selectedRecord =record;
+               ref.selectedRecord = record;
 
                // Stop the browser getting the event
                e.preventDefault();
 
                var contextMenu = new Ext.menu.Menu( {
-  
+
                   items : [ {
                      text : 'Make label',
-                     handler : ref.makeLabelHandler,
+                     handler : ref.makeLabelHandler(record),
                      scope : ref,
                   }, {
                      text : 'Edit label',
@@ -449,7 +282,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
     * @param :
     *           event
     */
-   makeLabelHandler : function() {
+   makeLabelHandler : function(record) {
 
       var me = this;
 
@@ -496,10 +329,11 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
 
       var labelWindow = new ASPIREdb.view.CreateLabelWindowSubject();
       labelWindow.show();
-      ASPIREdb.EVENT_BUS.fireEvent('phenotype_label_created', me.selectedRecord);
+      ASPIREdb.EVENT_BUS.fireEvent( 'phenotype_label_created', me.selectedRecord );
       var grid = ASPIREdb.view.PhenotypeSubjectLabelWindow.getComponent( me.gridPanelName );
       console.log( 'grid  :' + grid );
       
+
    },
 
    editLabelHandler : function() {
@@ -545,7 +379,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
                   if ( btn === 'yes' ) {
                      me.addLabelHandler( vo, subjectIds );
                      this.hide();
-      
+
                   }
 
                }, this );
@@ -553,7 +387,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
             } else {
                me.addLabelHandler( vo, subjectIds );
                this.hide();
-       
+
             }
 
          }

@@ -68,7 +68,7 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         List<String> geneSymbols = new ArrayList<>();
         List<GeneValueObject> geneValueObjects = new ArrayList<GeneValueObject>();
 
-        if ( genes.isEmpty() ) {// .get(0).getEnsemblId()==null){
+        if ( genes.isEmpty() || genes.get( 0 ).getEnsemblId() == null ) {
             // null gene value objects
         } else {
             // storing the gene symbols
@@ -166,13 +166,14 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         return geneValueObjects;
 
     }
+
     @Override
     @RemoteMethod
-    public List<GeneSetValueObject> suggestUserGeneSet( String query ){
+    public List<GeneSetValueObject> suggestUserGeneSet( String query ) {
         List<GeneSetValueObject> geneSetValueObjects = new ArrayList<>();
-        List<UserGeneSet> genesets = userGeneSetDao.suggestGeneSetNames( query);
+        List<UserGeneSet> genesets = userGeneSetDao.suggestGeneSetNames( query );
         for ( UserGeneSet geneset : genesets ) {
-            GeneSetValueObject gvo=new GeneSetValueObject();
+            GeneSetValueObject gvo = new GeneSetValueObject();
             gvo.setName( geneset.getName() );
             geneSetValueObjects.add( gvo );
         }
