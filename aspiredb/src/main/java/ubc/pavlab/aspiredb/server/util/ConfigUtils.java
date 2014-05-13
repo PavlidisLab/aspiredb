@@ -32,6 +32,8 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.SystemConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.directwebremoting.annotations.RemoteMethod;
+import org.directwebremoting.annotations.RemoteProxy;
 
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.SubjectFilterConfig;
@@ -43,6 +45,7 @@ import ubc.pavlab.aspiredb.shared.query.SubjectFilterConfig;
  * @author pavlidis
  * @version $Id: ConfigUtils.java,v 1.4 2013/07/23 23:19:33 ptan Exp $
  */
+@RemoteProxy
 public class ConfigUtils {
 
     public static final String CONFIG_NAME = "appConfig";
@@ -128,6 +131,7 @@ public class ConfigUtils {
 
     }
 
+    @RemoteMethod
     public static String getAppVersion() {
         return getString( "aspiredb.version" );
     }
