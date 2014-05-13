@@ -32,7 +32,7 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
    width : 925,
    height : 760,
    layout : 'fit',
-   bodyStyle : 'padding: 5px;',
+   bodyStyle : 'padding: 10px;',
    id : 'subjectPhenotypeHeatmapWindow',
 
    initComponent : function() {
