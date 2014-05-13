@@ -20,7 +20,7 @@
 Ext.require( [ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings',
               'ASPIREdb.view.PhenotypeEnrichmentWindow', 'Ext.grid.column.Column',
               'ASPIREdb.view.NeurocartaGeneWindow', 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow',
-'APIREdb.view.PhenotypeContigencyTableWindow', 'ASPIREdb.view.PhenotypeSubjectLabelWindow' ] ); 
+              'APIREdb.view.PhenotypesContigencyTableWindow' ] );
 
 // TODO js documentation
 Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
@@ -149,7 +149,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
                        } else if ( phenSummary.dbValue == this.DB_VAL_HPO_PRESENT ) {
                           style = colors[0];
                           displayVal = "Present";
-			} else if ( phenSummary.dbValue == "Unknown" ) {
+                       } else if ( phenSummary.dbValue == "Unknown" ) {
                           style = colors[2];
                           displayVal = "Unknown";
                        }
@@ -359,7 +359,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
     */
    subjectSelectHandler : function(subjectIds) {// todo
 
-      if ( !subjectIds ) {
+      if ( !subjectIds || subjectIds.length == 0 ) {
          var col = this.columns[this.SELECTED_VALUES_COL_IDX];
 
          col.setText( "" );
@@ -368,12 +368,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
          return;
       }
 
-<<<<<<< HEAD
       var activeProjectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
-=======
-         if ( !subjectIds || subjectIds.length == 0 ) {
-            var col = this.columns[this.SELECTED_VALUES_COL_IDX];
->>>>>>> 6b92a79579002811a45a705dbae6bc88813cbc24
 
       var ref = this;
       console.log( "on subject select handler in phenotype grid ..........." );
