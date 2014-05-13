@@ -13,6 +13,7 @@
 <script src="dwr/interface/UserGeneSetService.js"></script>
 <script src="dwr/interface/UCSCConnector.js"></script>
 <script src="dwr/dtoall.js"></script>
+<script src="dwr/interface/ConfigUtils.js"></script>
 
 <script src="scripts/lib/ext-all-debug-w-comments.js"></script>
 <!-- <script type="text/javascript" src="scripts/lib/ext-theme-neptune.js"></script>-->
