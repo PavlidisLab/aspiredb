@@ -29,8 +29,8 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
    title : 'Subject Phenotype Heatmap',
    closable : true,
    closeAction : 'hide',
-   width : 925,
-   height : 760,
+   width : 800,
+   height : 600,
    layout : 'fit',
    bodyStyle : 'padding: 10px;',
    id : 'subjectPhenotypeHeatmapWindow',
@@ -81,18 +81,20 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
       M2V.Util = {};
       M2V.Util.dataType = {};
 
-      M2V.Util.dataType.renderNA = function(ctx, size) {
-      };
+      // See PhenotypeGrid colors
 
-      M2V.Util.dataType.renderGenderCell = function(ctx, gender, row, column, size) {
+      M2V.Util.dataType.renderGenderCell = function(ctx, value, row, column, size) {
          var color;
-         if ( gender.toUpperCase() === "M" ) {
-            color = "rgb(72,209,204)";
-         } else if ( gender.toUpperCase() === "F" ) {
-            color = "rgb(255,105,180)";
+         value = value.toUpperCase();
+         if ( value === "M" || value === "Y" ) {
+            color = "rgb(44,127,184)"; // blue
+         } else if ( value === "F" || value === "N" ) {
+            color = "rgb(216,179,101)"; // yellow
 
-         } else
-            M2V.Util.dataType.renderNA( ctx, size );
+         } else {
+            color = "rgb(99,99,99)"; // grey
+         }
+
          ctx.fillStyle = color;
          ctx.fillRect( 1, 1, size.width - 2, size.height - 2 );
       };
@@ -101,12 +103,14 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
       M2V.Util.dataType.renderAbsentPresentCell = function(ctx, value, row, column, size) {
          // TODO write a legend
          var color;
+         value = value.toUpperCase();
          if ( value === 0 || value === "0" || value === "N" || value === "M" ) {
-            color = "rgb(200,200,200)"; // grey
+            color = "rgb(49,163,84)"; // green
          } else if ( value === 1 || value === "1" || value === "Y" || value === "F" ) {
-            color = "rgb(0,0,0)"; // black
-         } else
-            M2V.Util.dataType.renderNA( ctx, size );
+            color = "rgb(179,88,6)"; // brown
+         } else {
+            color = "rgb(99,99,99)"; // unknown
+         }
 
          ctx.fillStyle = color;
          ctx.fillRect( 1, 1, size.width - 2, size.height - 2 );
@@ -163,8 +167,7 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
          renderers : {
             cell : {
                'gender' : {
-                  // render: M2V.Util.dataType.renderGenderCell
-                  render : M2V.Util.dataType.renderAbsentPresentCell
+                  render : M2V.Util.dataType.renderGenderCell
                },
                'binary' : {
                   render : M2V.Util.dataType.renderAbsentPresentCell
