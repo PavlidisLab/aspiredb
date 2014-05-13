@@ -133,6 +133,7 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
 
             }
             columnNames.push( 'Subject Count' );
+            columnNames.push( '' );
             this.createGridPanel( resultantData, columnNames, phenotypeName );
 
          }
@@ -173,16 +174,31 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
                columns.push( {
                   header : columnNames[i],
                   dataIndex : columnNames[i],
-                  flex : 1,
+                  width : 100,
                   renderer : function(value) {
 
-                     /**
-                      * if ( value.length != 0 ) { return ref.findLabelColour(value);
-                      * 
-                      * }else return value.length;
-                      */
                      return value.length
                   }
+               } );
+            } else if ( columnNames[i] == '' ) {
+               columns.push( {
+                  header : 'Label',
+                  dataIndex : 'tag',
+                  width : 50,
+                  renderer : function() {
+
+                     var src = 'scripts/ASPIREdb/resources/images/icons/tag.png';
+                     var tooltip = "Click to add label";
+
+                     var ahrefurl = '<a href=#>';
+
+                     image = Ext.String.format( ahrefurl + "<img src='{0}' alt='{1}' > </a>", src, tooltip );
+
+                     var ret = image;
+                     return ret;
+
+                  }
+
                } );
             } else {
                columns.push( {
