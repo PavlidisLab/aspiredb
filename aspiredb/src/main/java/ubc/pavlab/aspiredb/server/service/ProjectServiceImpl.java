@@ -141,6 +141,7 @@ public class ProjectServiceImpl implements ProjectService {
     /*
      * TODO eventually we want this to work with a collection of projectIds
      */
+    @Override
     @RemoteMethod
     public Integer numVariants( Collection<Long> projectIds ) {
 
@@ -263,6 +264,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
+    @Override
     public String deleteProject( String projectName ) {
 
         log.info( " In deleteProject projectName:" + projectName );

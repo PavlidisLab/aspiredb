@@ -60,6 +60,7 @@ public class GeneSetValueObject implements Displayable, Serializable {
     }
 
    
+    @Override
     public String getLabel() {
         return name;
     }

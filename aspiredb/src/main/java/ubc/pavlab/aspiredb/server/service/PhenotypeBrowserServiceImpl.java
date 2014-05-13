@@ -62,6 +62,7 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService {
     @Autowired
     private NeurocartaQueryService neurocartaQueryService;
 
+    @Override
     public List<PhenotypeSummary> getPhenotypesBySubjectIds( Collection<Long> subjectIds, Collection<Long> projectIds )
             throws NeurocartaServiceException {
 

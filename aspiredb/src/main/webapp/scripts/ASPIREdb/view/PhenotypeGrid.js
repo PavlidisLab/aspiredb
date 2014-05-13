@@ -19,8 +19,7 @@
 
 Ext.require( [ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings',
               'ASPIREdb.view.PhenotypeEnrichmentWindow', 'Ext.grid.column.Column',
-              'ASPIREdb.view.NeurocartaGeneWindow', 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow',
-              'APIREdb.view.PhenotypesContigencyTableWindow' ] );
+              'ASPIREdb.view.NeurocartaGeneWindow', 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow','ASPIREdb.view.PhenotypesContigencyTableWindow' ] );
 
 // TODO js documentation
 Ext.define( 'ASPIREdb.view.PhenotypeGrid', {

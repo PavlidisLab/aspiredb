@@ -141,6 +141,7 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
         return this.neurocartaCache.findPhenotypes( queryString );
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public Map<String, GeneValueObject> findPhenotypeGenes( String phenotypeUri ) throws NeurocartaServiceException,
             BioMartServiceException {

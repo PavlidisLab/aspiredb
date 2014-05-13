@@ -1,4 +1,4 @@
-Ext.require( [ 'Ext.window.*', 'Ext.layout.container.Border', 'ASPIREdb.view.phenotypeSubjectLabelGrid' ] );
+Ext.require( [ 'Ext.window.*', 'Ext.layout.container.Border' ] );
 
 Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
    extend : 'Ext.Window',
