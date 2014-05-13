@@ -346,7 +346,7 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
                me.selSubjects[i].labels.push( addedLabel );
             }
 
-            ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' );
+            ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed',selSubjectIds );
 
          }
       } );
