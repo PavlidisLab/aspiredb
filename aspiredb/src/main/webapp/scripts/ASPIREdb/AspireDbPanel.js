@@ -26,6 +26,7 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
    itemId : 'aspireDbPanel',
    extend : 'Ext.container.Viewport',
    layout : 'border',
+
    config : {
       loginForm : null
    },
@@ -34,6 +35,17 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
       this.callParent();
 
       var aspireDbPanel = this;
+
+      ConfigUtils.getAppVersion( {
+         callback : function(version) {
+
+            if ( version == null ) {
+               version = "";
+            }
+            aspireDbPanel.getComponent( 'statusbar' ).update( "ASPIREdb " + version + " Copyright 2014" );
+
+         }
+      } );
 
       ASPIREdb.EVENT_BUS.on( 'login', function(event) {
 
@@ -224,32 +236,15 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
             ASPIREdb.view.GeneManagerWindow.initGridAndShow();
 
          }
-      },/** {
-         xtype : 'button',
-         text : 'Subject Label Manager',
-         itemId : 'subjectLabelManagerButton',
-         height : 30,
-         margin : '5 5 5 5',
-         handler : function() {
-            var labelControlWindow = Ext.create( 'ASPIREdb.view.LabelControlWindow', {
-               isSubjectLabel : true,
-            } );
-            labelControlWindow.show();
-         }
-      }, {
-         xtype : 'button',
-         text : 'Variant Label Manager',
-         itemId : 'variantLabelManagerButton',
-         height : 30,
-         margin : '5 5 5 5',
-         handler : function() {
-            var labelControlWindow = Ext.create( 'ASPIREdb.view.LabelControlWindow', {
-               isSubjectLabel : false,
-            } );
-            labelControlWindow.show();
-         }
-      }*/
-      ,{
+      }, /**
+          * { xtype : 'button', text : 'Subject Label Manager', itemId : 'subjectLabelManagerButton', height : 30,
+          * margin : '5 5 5 5', handler : function() { var labelControlWindow = Ext.create(
+          * 'ASPIREdb.view.LabelControlWindow', { isSubjectLabel : true, } ); labelControlWindow.show(); } }, { xtype :
+          * 'button', text : 'Variant Label Manager', itemId : 'variantLabelManagerButton', height : 30, margin : '5 5 5
+          * 5', handler : function() { var labelControlWindow = Ext.create( 'ASPIREdb.view.LabelControlWindow', {
+          * isSubjectLabel : false, } ); labelControlWindow.show(); } }
+          */
+      , {
          xtype : 'button',
          text : 'Help',
          itemId : 'helpButton',
@@ -307,5 +302,11 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
    }, {
       region : 'center',
       xtype : 'ASPIREdb_mainpanel'
+   }, {
+      xtype : 'label',
+      itemId : 'statusbar',
+      region : 'south',
+      html : 'ASPIREdb',
+      style : 'font-size : 70%; padding : 2px 2px 2px 2px'
    } ]
 } );

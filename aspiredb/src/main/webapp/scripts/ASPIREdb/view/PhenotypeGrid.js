@@ -19,7 +19,8 @@
 
 Ext.require( [ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings',
               'ASPIREdb.view.PhenotypeEnrichmentWindow', 'Ext.grid.column.Column',
-              'ASPIREdb.view.NeurocartaGeneWindow', 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow','ASPIREdb.view.PhenotypesContigencyTableWindow' ] );
+              'ASPIREdb.view.NeurocartaGeneWindow', 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow',
+              'ASPIREdb.view.PhenotypesContigencyTableWindow' ] );
 
 // TODO js documentation
 Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
@@ -273,6 +274,13 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
 
                var data = [];
                ref.phenotypeSummaryValueObjects = [];
+
+               if ( vos.length > 0 ) {
+                  ref.getDockedComponent( 'phenotypeGridToolbar' ).getComponent( 'heatmapButton' ).enable();
+               } else {
+                  ref.getDockedComponent( 'phenotypeGridToolbar' ).getComponent( 'heatmapButton' ).disable();
+               }
+
                for (var i = 0; i < vos.length; i++) {
                   var phenSummary = vos[i];
 
