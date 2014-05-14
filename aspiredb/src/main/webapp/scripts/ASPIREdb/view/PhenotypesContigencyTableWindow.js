@@ -327,6 +327,7 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
             for (var i = 0; i < me.selSubjects.length; i++) {
                me.selSubjects[i].labels.push( addedLabel );
             }
+            
             // update subject store
            for (var i=0;i<me.selSubjects.length;i++){
                var subjectLabels =ASPIREdb.view.SubjectGrid.prototype.getStore().getAt(ASPIREdb.view.SubjectGrid.prototype.getStore().find('patientId',me.selSubjects[i].patientId)).data.labelIds;
@@ -334,11 +335,11 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
                ASPIREdb.view.SubjectGrid.prototype.getStore().getAt(ASPIREdb.view.SubjectGrid.prototype.getStore().find('patientId',me.selSubjects[i].patientId)).data.labelIds = subjectLabels;
             
             }
-
-              ASPIREdb.view.SubjectGrid.getView().refresh();
-        
-            
-           
+           ASPIREdb.view.SubjectGrid.prototype.setVisibleLabels(me.visibleLabels);
+           console.log('passed visible labels to subject grid'+me.visibleLabels[0]);
+           //refresh the grid
+           ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed',selSubjectIds );
+          
         
          }
       } );

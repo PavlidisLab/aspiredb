@@ -448,7 +448,19 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
     */
    refreshGridView : function(selSubjectIds) {
       var me = this;
-      me.getView().refresh();
+   // update local store
+      
+      var projectIds=ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+      SubjectService.getSubjects( projectIds[0],selSubjectIds, {
+         callback : function(svos) {
+            me.selSubjects = svos;
+            
+            me.getView().refresh();
+         }
+            
+   });
+     
+      
 
    },
 
