@@ -82,10 +82,10 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             handler : this.makeLabelHandler,
             scope : this
          }, {
-            itemId : 'labelSettings',
-            text : 'Settings...',
+            itemId : 'labelManager',
+            text : 'Label Manager',
             disabled : false,
-            handler : this.labelSettingsHandler,
+            handler : this.labelManagerHandler,
             scope : this
          } ]
       } );
@@ -330,8 +330,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                         handler : ref.makeLabelHandler,
                         scope : ref,
                      }, {
-                        text : 'Label settings',
-                        handler : ref.labelSettingsHandler,
+                        text : 'Label Manager',
+                        handler : ref.labelManagerHandler,
                         scope : ref,
                      } ]
                   } );
@@ -896,9 +896,9 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    },
 
    /**
-    * Display LabelSettingsWindow
+    * Display labelManagerWindow
     */
-   labelSettingsHandler : function(event) {
+   labelManagerHandler : function(event) {
       var me = this;
 
       var currentlySelectedRecords = me.getVariantRecordSelection();
@@ -911,7 +911,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          visibleLabels : me.down( '#variantGrid' ).visibleLabels,
          isSubjectLabel : false,
          selectedIds : selectedVariantIds,
-         title : 'Variant Label Settings'
+         title : 'Variant Label Manager'
       } );
 
       labelControlWindow.show();
