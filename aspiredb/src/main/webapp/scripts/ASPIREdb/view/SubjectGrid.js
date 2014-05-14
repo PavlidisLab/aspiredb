@@ -336,7 +336,8 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
     */
    selectionChangeHandler : function() {
       this.selSubjects = this.getSelectionModel().getSelection();
-
+      this.selectAllStatus ='No';
+      
       if ( this.selSubjects.length == 0 ) {
          this.down( '#makeLabel' ).disable();
          // return;
@@ -448,10 +449,9 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
    /**
     * Refresh grid view by reloading data from database because it was updated
     */
-   refreshGridView : function() {
+   refreshGridView : function(selSubjectIds) {
       var me = this;
-      me.filterSubmitHandler( me.filterConfigs );
-      me.getView().refresh();
+       me.getView().refresh();
 
    },
 
@@ -484,19 +484,20 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
     * When all the subjects are sselected this is executed
     */
    selectAllHandler : function() {
-      // if (this.selectAllStatus=='No'){
+       if (this.selectAllStatus=='No'){
       this.cancelBubble = true;
       // boolean true to suppressEvent
       this.getSelectionModel().selectAll( true );
       this.selectionChangeHandler();
-      // this.selectAllStatus ='Yes';
-      // }
+       this.selectAllStatus ='Yes';
+       }
 
    },
 
    deselectAllHandler : function() {
       this.cancelBubble = true;
       this.getSelectionModel().deselectAll(); // calls selectionChangeHandler
+      this.selectAllStatus ='No';
    }
 
 } );

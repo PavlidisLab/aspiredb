@@ -24,6 +24,7 @@ import java.util.Map;
 
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
+import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
 import ubc.pavlab.aspiredb.shared.StringMatrix;
@@ -73,4 +74,6 @@ public interface SubjectService {
     public void removeLabel( Long subjectId, LabelValueObject label );
 
     public List<LabelValueObject> suggestLabels( SuggestionContext suggestionContext );
+
+    Collection<Label> getSubjectLabels( Collection<Long> subjectIds );
 }

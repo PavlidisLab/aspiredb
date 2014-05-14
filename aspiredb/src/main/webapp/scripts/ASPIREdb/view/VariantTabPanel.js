@@ -263,12 +263,14 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
             currentlySelectedRecords = this.getIdeogramVariantRecordSelection();
             this.selectAllButton.disable();
+            this.ideogramSubjectSelection( this.selectedSubjects );
             ideogram.showColourLegend();
 
          } else {
             // newCard is the grid
             currentlySelectedRecords = this.selectedVariants;
             this.selectAllButton.enable();
+            this.gridPanelSubjectSelection( this.selectedSubjects );
             ideogram.hideColourLegend();
 
          }
@@ -511,111 +513,122 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    },
 
    /**
-    * When subjects are selected in the subject grid highlist the variants of selected subjects in ideogram and in table
-    * view
+    * When subjects are selected in the subject grid highlight the variants of selected subjects in ideogram and in
+    * table view
     */
    subjectSelectionHandler : function(subjectIds, unselectRows) {
-      var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+
       this.selectedSubjects = subjectIds;
       var grid = this.down( '#variantGrid' );
 
       // when variant table view is selected
       if ( grid.isVisible() ) {
-
          if ( unselectRows ) {
             grid.getSelectionModel().deselectAll();
             return;
          }
 
-         if ( grid.features != null && grid.features.length > 0 ) {
-            // collapse all the grids first - to open only the
-            // selected one
-            grid.features[0].collapseAll();
-
-            // expand only the selected subjects
-            SubjectService.getSubjects( projectIds[0], subjectIds, {
-               callback : function(selectedSubjectValueObjects) {
-                  for (var i = 0; i < selectedSubjectValueObjects.length; i++) {
-                     var subject = selectedSubjectValueObjects[i];
-                     grid.features[0].expand( subject.patientId, true );
-                  }
-               }
-            } );
-         } else {
-
-            // collapsable plugin disabled so no groups to expand / collapse
-            // so just select the variants for the selected subjectIds
-            // and scroll to view it
-
-            SubjectService.getSubjects( projectIds[0], subjectIds, {
-               callback : function(selectedSubjectValueObjects) {
-
-                  if ( selectedSubjectValueObjects == null ) {
-                     return;
-                  }
-
-                  var selectedRecords = [];
-
-                  grid.store.sort( 'patientId' );
-
-                  for (var i = 0; i < selectedSubjectValueObjects.length; i++) {
-                     var subject = selectedSubjectValueObjects[i];
-
-                     grid.store.each( function(rec) {
-                        if ( rec.get( 'patientId' ) == subject.patientId ) {
-                           selectedRecords.push( rec );
-                        }
-                     } );
-                  }
-
-                  grid.selModel.select( selectedRecords );
-
-                  if ( selectedRecords.length > 0 ) {
-                     grid.getView().focusRow( grid.store.indexOfId( selectedRecords[0].data.id ) );
-                     // use just to make sure selected record is at the top
-                     grid.getView().scrollBy( {
-                        x : 0,
-                        y : 1000
-                     } );
-                     grid.getView().focusRow( grid.store.indexOfId( selectedRecords[0].data.id ) );
-                  }
-
-               }
-            } );
-
-         }
-
+         this.gridPanelSubjectSelection( subjectIds );
       }
       // When Ideogram view selected
       else {
          console.log( "when the variant ideogram is selected" );
+         this.ideogramSubjectSelection( subjectIds );
 
-         var ideogram = this.getComponent( 'ideogram' );
-         ideogram.drawChromosomes();
-         var ref = this;
-
-         // heighlight the selected subject in ideogram
-         SubjectService.getSubjects( projectIds[0], subjectIds, {
-            callback : function(subjectValueObjects) {
-
-               if ( subjectValueObjects == null ) {
-                  return;
-               }
-
-               var subjectIDS = [];
-               var patientIDS = [];
-               for (var i = 0; i < subjectValueObjects.length; i++) {
-                  subjectIDS.push( subjectValueObjects[i].id );
-                  patientIDS.push( subjectValueObjects[i].patientId );
-               }
-               ideogram.drawVariantsWithSubjectsHighlighted( subjectIDS, ref.loadedVariants );
-
-            }
-         } );
       }
       grid.getView().refresh();
    },
 
+   ideogramSubjectSelection : function(subjectIds) {
+
+      var ideogram = this.getComponent( 'ideogram' );
+      ideogram.drawChromosomes();
+      var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+      var ref = this;
+
+      // heighlight the selected subject in ideogram
+      SubjectService.getSubjects( projectIds[0], subjectIds, {
+         callback : function(subjectValueObjects) {
+
+            if ( subjectValueObjects == null ) {
+               return;
+            }
+
+            var subjectIDS = [];
+            var patientIDS = [];
+            for (var i = 0; i < subjectValueObjects.length; i++) {
+               subjectIDS.push( subjectValueObjects[i].id );
+               patientIDS.push( subjectValueObjects[i].patientId );
+            }
+            ideogram.drawVariantsWithSubjectsHighlighted( subjectIDS, ref.loadedVariants );
+
+         }
+      } );
+   },
+
+   gridPanelSubjectSelection : function(subjectIds) {
+
+      var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+
+      if ( grid.features != null && grid.features.length > 0 ) {
+         // collapse all the grids first - to open only the
+         // selected one
+         grid.features[0].collapseAll();
+
+         // expand only the selected subjects
+         SubjectService.getSubjects( projectIds[0], subjectIds, {
+            callback : function(selectedSubjectValueObjects) {
+               for (var i = 0; i < selectedSubjectValueObjects.length; i++) {
+                  var subject = selectedSubjectValueObjects[i];
+                  grid.features[0].expand( subject.patientId, true );
+               }
+            }
+         } );
+      } else {
+
+         // collapsable plugin disabled so no groups to expand / collapse
+         // so just select the variants for the selected subjectIds
+         // and scroll to view it
+
+         SubjectService.getSubjects( projectIds[0], subjectIds, {
+            callback : function(selectedSubjectValueObjects) {
+
+               if ( selectedSubjectValueObjects == null ) {
+                  return;
+               }
+
+               var selectedRecords = [];
+
+               grid.store.sort( 'patientId' );
+
+               for (var i = 0; i < selectedSubjectValueObjects.length; i++) {
+                  var subject = selectedSubjectValueObjects[i];
+
+                  grid.store.each( function(rec) {
+                     if ( rec.get( 'patientId' ) == subject.patientId ) {
+                        selectedRecords.push( rec );
+                     }
+                  } );
+               }
+
+               grid.selModel.select( selectedRecords );
+
+               if ( selectedRecords.length > 0 ) {
+                  grid.getView().focusRow( grid.store.indexOfId( selectedRecords[0].data.id ) );
+                  // use just to make sure selected record is at the top
+                  grid.getView().scrollBy( {
+                     x : 0,
+                     y : 1000
+                  } );
+                  grid.getView().focusRow( grid.store.indexOfId( selectedRecords[0].data.id ) );
+               }
+
+            }
+         } );
+
+      }
+
+   },
    selectionChangeHandler : function(model, records) {
       console.log( 'on grid selection change handler variant tab panel' );
       this.selectedVariants = records;

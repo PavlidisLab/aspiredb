@@ -483,6 +483,26 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
+    @Transactional
+    @RemoteMethod
+    public Collection<Label> getSubjectLabels( Collection<Long> subjectIds ) {
+        // Collection<Label labelEntity = labelDao.load( labelIds );
+        Collection<Label> labels = new ArrayList<Label>();
+        
+        for ( Long subjectId : subjectIds ) {
+            Collection<Label> subjectLabels =labelDao.getSubjectLabelsBySubjectId( subjectId );
+            if ( subjectLabels.isEmpty() ) {
+               
+            }else {
+                for (Label subjectLabel :subjectLabels){
+                    labels.add( subjectLabel );
+                }
+            }
+        }
+        return labels;
+    }
+
+    @Override
     @RemoteMethod
     @Transactional
     public StringMatrix<String, String> getPhenotypeBySubjectIds( Collection<Long> subjectIds, boolean removeEmpty ) {
