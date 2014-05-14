@@ -491,8 +491,8 @@ public class SubjectServiceImpl implements SubjectService {
         
         for ( Long subjectId : subjectIds ) {
             Collection<Label> subjectLabels =labelDao.getSubjectLabelsBySubjectId( subjectId );
-            if ( subjectLabels.isEmpty() ) {
-               
+            if ( subjectLabels==null ) {
+               //
             }else {
                 for (Label subjectLabel :subjectLabels){
                     labels.add( subjectLabel );
