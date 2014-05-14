@@ -72,7 +72,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
                handler : this.makeLabelHandler,
                scope : this,
             }, {
-               text: 'Label Settings',
+               text : 'Label Manager',
                handler : this.labelManagerHandler,
                scope : this,
             } ]
@@ -82,45 +82,41 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       }
    },
 
-   columns : [
-              {
-                 text : "Subject Id",
-                 dataIndex : 'patientId',
-                 flex : 1
-              },
-              {
-                 text : "Labels",
-                 dataIndex : 'labelIds',
-                 // This is very slow we need to rethink this
-                 renderer : function(value) {
+   columns : [ {
+      text : "Subject Id",
+      dataIndex : 'patientId',
+      flex : 1
+   }, {
+      text : "Labels",
+      dataIndex : 'labelIds',
+      // This is very slow we need to rethink this
+      renderer : function(value) {
 
-                    var ret = "";
-                    for (var i = 0; i < value.length; i++) {
-                       var label = this.visibleLabels[value[i]];
-                       if ( label == undefined ) {
-                          continue;
-                       }
-                       if ( label.isShown ) {
-                          var fontcolor = (parseInt( label.colour, 16 ) > 0xffffff / 2) ? 'black' : 'white';
-                          ret += "<font color=" + fontcolor + "><span style='background-color: " + label.colour
-                             + "'>&nbsp&nbsp" + label.name + "&nbsp</span></font>&nbsp&nbsp&nbsp";
-                       }
-                    }
-                    return ret;
-                 },
-                 flex : 1
-              }, {
-                 text : "# of variants",
-                 dataIndex : 'varientNos',
-                 renderer : function(value) {
-                    return value;
-                 },
-                 flex : 1
-              }, {
-                 text : "# of phenotypes",
-                 dataIndex : 'phenotypeNos',
-                 flex : 1
-              } ],
+         var ret = "";
+         for (var i = 0; i < value.length; i++) {
+            var label = this.visibleLabels[value[i]];
+            if ( label == undefined ) {
+               continue;
+            }
+            if ( label.isShown ) {
+               ret += label.htmlLabel;
+            }
+         }
+         return ret;
+      },
+      flex : 1
+   }, {
+      text : "# of variants",
+      dataIndex : 'varientNos',
+      renderer : function(value) {
+         return value;
+      },
+      flex : 1
+   }, {
+      text : "# of phenotypes",
+      dataIndex : 'phenotypeNos',
+      flex : 1
+   } ],
 
    bbar : [ {
       xtype : 'label',
@@ -336,8 +332,8 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
     */
    selectionChangeHandler : function() {
       this.selSubjects = this.getSelectionModel().getSelection();
-      this.selectAllStatus ='No';
-      
+      this.selectAllStatus = 'No';
+
       if ( this.selSubjects.length == 0 ) {
          this.down( '#makeLabel' ).disable();
          // return;
@@ -374,7 +370,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
       Ext.define( 'ASPIREdb.view.CreateLabelWindowSubject', {
          isSubjectLabel : true,
-         title :'Subject Label Manager',
+         title : 'Subject Label Manager',
          extend : 'ASPIREdb.view.CreateLabelWindow',
 
          // override
@@ -452,7 +448,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
     */
    refreshGridView : function(selSubjectIds) {
       var me = this;
-       me.getView().refresh();
+      me.getView().refresh();
 
    },
 
@@ -485,20 +481,20 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
     * When all the subjects are sselected this is executed
     */
    selectAllHandler : function() {
-       if (this.selectAllStatus=='No'){
-      this.cancelBubble = true;
-      // boolean true to suppressEvent
-      this.getSelectionModel().selectAll( true );
-      this.selectionChangeHandler();
-       this.selectAllStatus ='Yes';
-       }
+      if ( this.selectAllStatus == 'No' ) {
+         this.cancelBubble = true;
+         // boolean true to suppressEvent
+         this.getSelectionModel().selectAll( true );
+         this.selectionChangeHandler();
+         this.selectAllStatus = 'Yes';
+      }
 
    },
 
    deselectAllHandler : function() {
       this.cancelBubble = true;
       this.getSelectionModel().deselectAll(); // calls selectionChangeHandler
-      this.selectAllStatus ='No';
+      this.selectAllStatus = 'No';
    }
 
 } );

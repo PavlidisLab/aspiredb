@@ -112,11 +112,13 @@ public class LabelValueObject implements Displayable, Serializable {
 
     @Override
     public String getHtmlLabel() {
-        return "<span style='background-color: " + colour + "'>" + name + "</span>";
+        String fontcolor = ( Integer.parseInt( this.colour, 16 ) > 0xffffff / 2 ) ? "black" : "white";
+        return "<font color=" + fontcolor + "><span style='background-color: " + this.colour + "'>&nbsp&nbsp"
+                + this.name + "&nbsp</span></font>&nbsp&nbsp&nbsp";
     }
 
     @Override
     public String getTooltip() {
-        return "";
+        return name;
     }
 }

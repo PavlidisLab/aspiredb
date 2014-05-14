@@ -94,91 +94,84 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
          }
       },
 
-      items : [
-               {
-                  xtype : 'grid',
-                  flex : 1,
-                  region : 'center',
-                  itemId : 'labelSettingsGrid',
-                  store : Ext.create( 'ASPIREdb.store.LabelStore' ),
-                  columns : [
-                             {
-                                header : 'Label',
-                                dataIndex : 'labelId',
-                                width : 100,
-                                flex : 1,
-                                renderer : function(labelId, meta, rec, rowIndex, colIndex, store) {
+      items : [ {
+         xtype : 'grid',
+         flex : 1,
+         region : 'center',
+         itemId : 'labelSettingsGrid',
+         store : Ext.create( 'ASPIREdb.store.LabelStore' ),
+         columns : [ {
+            header : 'Label',
+            dataIndex : 'labelId',
+            width : 100,
+            flex : 1,
+            renderer : function(labelId, meta, rec, rowIndex, colIndex, store) {
 
-                                   var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
-                                   var ret = "";
-                                   var fontcolor = (parseInt( label.colour, 16 ) > 0xffffff / 2) ? 'black' : 'white';
-                                   ret += "<font color=" + fontcolor + "><span style='background-color: "
-                                      + label.colour + "'>&nbsp&nbsp" + label.name
-                                      + "&nbsp</span></font>&nbsp&nbsp&nbsp";
+               var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
+               var ret = label.htmlLabel;
+               return ret;
+            },
+            editor : {
+               xtype : 'numberfield',
+               allowBlank : false,
 
-                                   return ret;
-                                },
-                                editor : {
-                                   xtype : 'numberfield',
-                                   allowBlank : false,
+            }
+         }, {
+            header : 'Name',
+            dataIndex : 'labelName',
+            width : 100,
+            flex : 1,
+            renderer : function(val, meta, rec, rowIndex, colIndex, store) {
+               meta.tdAttr = 'data-qtip="Double-click to rename label"';
+               return val;
+            },
+            editor : {
+               xtype : 'textfield',
+               allowBlank : false,
 
-                                }
-                             }, {
-                                header : 'Name',
-                                dataIndex : 'labelName',
-                                width : 100,
-                                flex : 1,
-                                renderer : function(val, meta, rec, rowIndex, colIndex, store) {
-                                   meta.tdAttr = 'data-qtip="Double-click to rename label"';
-                                   return val;
-                                },
-                                editor : {
-                                   xtype : 'textfield',
-                                   allowBlank : false,
+            }
+         }, /**
+             * { header : 'Color', dataIndex : 'labelColour', width : 100, editor : { xtype : contextMenu, allowBlank :
+             * false, }, },
+             */
+         {
+            header : 'Show',
+            dataIndex : 'show',
+            xtype : 'checkcolumn',
+            id : 'labelShowColumn',
+            width : 50,
+            sortable : false
+         }, {
+            header : '',
+            xtype : 'actioncolumn',
+            id : 'labelActionColumn',
+            handler : function(view, rowIndex, colIndex, item, e) {
+               var action = 'removeLabel';
+               this.fireEvent( 'itemclick', this, action, view, rowIndex, colIndex, item, e );
+            },
 
-                                }
-                             }, /**
-                                  * { header : 'Color', dataIndex : 'labelColour', width : 100, editor : { xtype :
-                                  * contextMenu, allowBlank : false, }, },
-                                  */
-                             {
-                                header : 'Show',
-                                dataIndex : 'show',
-                                xtype : 'checkcolumn',
-                                id : 'labelShowColumn',
-                                width : 50,
-                                sortable : false
-                             }, {
-                                header : '',
-                                xtype : 'actioncolumn',
-                                id : 'labelActionColumn',
-                                handler : function(view, rowIndex, colIndex, item, e) {
-                                   var action = 'removeLabel';
-                                   this.fireEvent( 'itemclick', this, action, view, rowIndex, colIndex, item, e );
-                                },
+            width : 30,
+            items : [ {
+               icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
+               tooltip : 'Remove label',
 
-                                width : 30,
-                                items : [ {
-                                   icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
-                                   tooltip : 'Remove label',
+            } ]
+         } ],
+         plugins : [ rowEditing ],
 
-                                } ]
-                             } ],
-                  plugins : [ rowEditing ],
-
-                  listeners : {
-                     itemclick : function(e, rowIndex, cellIndex, record) {
-                        console.log( 'X value ' + e.getX() + 'Y value :' + e.getY() );
-                        /**
-                         * colorPicker.showAt( e.getX(), e.getY() ); ASPIREdb.EVENT_BUS.on( 'label_color_chnaged',
-                         * function(selColor){ item.data.labelColour =selColor; item.store.data.items[rowIndex].data
-                         * =selColor; item.store.getView().refresh(); } );
-                         */
-                        // var labelId =this.store.data.items[rowIndex].data.labelId;
-                        // var selectedColor =colorPicker.getValue();
-                     }
-                  }
-               },// end of grid
+         listeners : {
+            itemclick : function(e, rowIndex, cellIndex, record) {
+               console.log( 'X value ' + e.getX() + 'Y value :' + e.getY() );
+               /**
+                * colorPicker.showAt( e.getX(), e.getY() ); ASPIREdb.EVENT_BUS.on( 'label_color_chnaged',
+                * function(selColor){ item.data.labelColour =selColor; item.store.data.items[rowIndex].data =selColor;
+                * item.store.getView().refresh(); } );
+                */
+               // var labelId =this.store.data.items[rowIndex].data.labelId;
+               // var selectedColor =colorPicker.getValue();
+            }
+         }
+      },// end of grid
       ]
    } ],
 

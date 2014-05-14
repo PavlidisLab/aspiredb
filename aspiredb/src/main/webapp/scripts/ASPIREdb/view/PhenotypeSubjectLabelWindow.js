@@ -27,7 +27,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
 
    initGridAndShow : function(psvos, selPhenotypes) {
       if ( selPhenotypes.length > 3 ) {
-         Ext.Msg.alert( 'Warning','User is allowed to select maximum 3 phenotypes to view thw table. Reselect' );
+         Ext.Msg.alert( 'Warning', 'User is allowed to select maximum 3 phenotypes to view thw table. Reselect' );
       } else {
          // if only one phenotype is selected
          if ( selPhenotypes.length == 1 ) {
@@ -40,9 +40,9 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
             for ( var labelName in phenSummary.phenoSummaryMap) {
                var subjects = [];
                if ( labelName != "Unknown" ) {
-                  if ( labelName == "Present"  )
+                  if ( labelName == "Present" )
                      subjects = phenSummary.subjects[1];
-                  else if ( labelName == "Absent"  )
+                  else if ( labelName == "Absent" )
                      subjects = phenSummary.subjects[0];
                   else if ( labelName == "Y" )
                      subjects = phenSummary.subjects['Y'];
@@ -57,7 +57,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
             }
             this.createGridPanel( data, columnNames, phenotypeName );
 
-         } else{
+         } else {
             // multiple cases
             var selectedPhenotypeData = [];
             var phenotypeName = '';
@@ -75,9 +75,9 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
                for ( var rowlabelName in phenSummary.phenoSummaryMap) {
                   var subjects = [];
                   if ( rowlabelName != "Unknown" ) {
-                     if ( rowlabelName == "Present"  )
+                     if ( rowlabelName == "Present" )
                         subjects = phenSummary.subjects[1];
-                     else if ( rowlabelName == "Absent"  )
+                     else if ( rowlabelName == "Absent" )
                         subjects = phenSummary.subjects[0];
                      else if ( rowlabelName == "Y" )
                         subjects = phenSummary.subjects['Y'];
@@ -90,29 +90,29 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
                }
                selectedPhenotypeData.push( pheneData );
             }
-            
-            var resultantData= selectedPhenotypeData[0];
+
+            var resultantData = selectedPhenotypeData[0];
             for (var i = 1; i < selectedPhenotypeData.length; i++) {
                var newResultantRow = [];
                for (var j = 0; j < resultantData.length; j++) {
-                   for (var m = 0; m < selectedPhenotypeData[i].length; m++) {
+                  for (var m = 0; m < selectedPhenotypeData[i].length; m++) {
                      var columnValues = resultantData[j];
                      var newResultantColumn = [];
-                     //push the phenotype values for the grid column
-                     for (var k = 0; k < columnValues.length - 1; k++){
+                     // push the phenotype values for the grid column
+                     for (var k = 0; k < columnValues.length - 1; k++) {
                         if ( columnValues[k] != 'transpose' ) {
                            newResultantColumn.push( columnValues[k] );
                         }
                      }
-                    // newResultantColumn.push( selectedPhenotypeData[i][0][m] );
+                     // newResultantColumn.push( selectedPhenotypeData[i][0][m] );
                      var secondColumnValues = selectedPhenotypeData[i][m];
-                     for (var n = 0; n < secondColumnValues.length - 1; n++){
+                     for (var n = 0; n < secondColumnValues.length - 1; n++) {
                         if ( secondColumnValues[k] != 'transpose' ) {
                            newResultantColumn.push( secondColumnValues[n] );
                         }
                      }
-                        
-                     //finding the common subject ids for selected 2 phenotypes 
+
+                     // finding the common subject ids for selected 2 phenotypes
                      var firstColumnSubjects = columnValues[columnValues.length - 1];
                      var secondColumnSubjects = secondColumnValues[secondColumnValues.length - 1];
                      var resultSubjects = [];
@@ -124,25 +124,24 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
 
                      newResultantColumn.push( resultSubjects );
                      newResultantRow.push( newResultantColumn );
-                   
-                     
+
                   }
-                  
+
                }
-             //recursive resultant data
-               resultantData=newResultantRow;
-        
+               // recursive resultant data
+               resultantData = newResultantRow;
+
             }
             columnNames.push( 'Subject Count' );
             this.createGridPanel( resultantData, columnNames, phenotypeName );
 
-         } 
+         }
 
          this.show();
       }
 
    },
-   
+
    createGridPanel : function(data, columnNames, phenotypeName) {
 
       var ref = this;
@@ -189,12 +188,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
 
                                     label = selectedSubjectValueObjects[k].labels[0];
                                     if ( label && returnValue == value.length ) {
-                                       var fontcolor = (parseInt( label.colour, 16 ) > 0xffffff / 2) ? 'black'
-                                          : 'white';
-
-                                       returnValue = "<font color=" + fontcolor + "><span style='background-color: "
-                                          + label.colour + "'>&nbsp&nbsp" + returnValue
-                                          + "&nbsp</span></font>&nbsp&nbsp&nbsp";
+                                       returnValue = label.htmlLabel;
                                        console.log( 'ret *********' + returnValue );
 
                                     }
@@ -249,7 +243,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
 
                   items : [ {
                      text : 'Make label',
-                     handler : ref.makeLabelHandler(record),
+                     handler : ref.makeLabelHandler( record ),
                      scope : ref,
                   }, {
                      text : 'Edit label',
@@ -338,8 +332,6 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
       var labelWindow = new ASPIREdb.view.CreateLabelWindowSubject();
       labelWindow.show();
       ASPIREdb.EVENT_BUS.fireEvent( 'phenotype_label_created', me.selectedRecord );
-     
-      
 
    },
 
