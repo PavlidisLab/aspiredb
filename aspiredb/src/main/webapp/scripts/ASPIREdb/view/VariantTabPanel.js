@@ -556,6 +556,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
                   var selectedRecords = [];
 
+                  grid.store.sort( 'patientId' );
+
                   for (var i = 0; i < selectedSubjectValueObjects.length; i++) {
                      var subject = selectedSubjectValueObjects[i];
 
@@ -896,7 +898,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          visibleLabels : me.down( '#variantGrid' ).visibleLabels,
          isSubjectLabel : false,
          selectedIds : selectedVariantIds,
-         title: 'Variant Label Settings'
+         title : 'Variant Label Settings'
       } );
 
       labelControlWindow.show();
