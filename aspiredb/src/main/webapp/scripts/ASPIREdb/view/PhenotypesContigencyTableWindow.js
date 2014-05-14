@@ -184,33 +184,13 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
                      image = Ext.String.format( ahrefurl + "<i class='fa fa-tags'></i> </a>", src, tooltip );
                      //<img src='{0}' alt='{1}' >
 
-                     var ret = image+'&nbsp&nbsp'+value.length;
-                     if (value.length==0) ret ='&nbsp&nbsp'+value.length;
+                     var ret = value.length+'&nbsp&nbsp'+image;
+                     if (value.length==0) ret =value.length+'&nbsp&nbsp';
                      return ret;
                      //return value.length
                   }
                } );
-            } /**else if ( columnNames[i] == '' ) {
-               columns.push( {
-                  header : 'Label',
-                  dataIndex : 'tag',
-                  width : 50,
-                  renderer : function() {
-
-                     var src = 'scripts/ASPIREdb/resources/images/icons/tag.png';
-                     var tooltip = "Click to add label";
-
-                     var ahrefurl = '<a href=#>';
-
-                     image = Ext.String.format( ahrefurl + "<img src='{0}' alt='{1}' > </a>", src, tooltip );
-
-                     var ret = image;
-                     return ret;
-
-                  }
-
-               } );
-            } */else {
+            } else {
                columns.push( {
                   header : columnNames[i],
                   dataIndex : columnNames[i],
@@ -236,21 +216,9 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
 
                var subjectIdLength = record.raw.length;
                ref.selectedSubjectIds = record.raw[subjectIdLength - 1];
+               if (ref.selectedSubjectIds.length!=0)
+                     ref.makeLabelHandler();
 
-               // Stop the browser getting the event
-              // e.preventDefault();
-               ref.makeLabelHandler();
-
-             /**  var contextMenu = new Ext.menu.Menu( {
-
-                  items : [ {
-                     text : 'Make label',
-                     handler : ref.makeLabelHandler,
-                     scope : ref,
-                  } ]
-               } );
-
-               contextMenu.showAt( e.getX(), e.getY() );*/
             }
 
          // }
