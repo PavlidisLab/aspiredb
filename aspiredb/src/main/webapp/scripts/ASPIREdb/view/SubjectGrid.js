@@ -72,7 +72,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
                handler : this.makeLabelHandler,
                scope : this,
             }, {
-               text : 'Label settings',
+               text : 'Label Manager',
                handler : this.labelSettingsHandler,
                scope : this,
             } ]
@@ -146,7 +146,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
             scope : this
          }, {
             itemId : 'labelSettings',
-            text : 'Settings...',
+            text : 'Label Manager',
             disabled : false,
             handler : this.labelSettingsHandler,
             scope : this
@@ -374,6 +374,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
       Ext.define( 'ASPIREdb.view.CreateLabelWindowSubject', {
          isSubjectLabel : true,
+         title :'Subject Label Manager',
          extend : 'ASPIREdb.view.CreateLabelWindow',
 
          // override

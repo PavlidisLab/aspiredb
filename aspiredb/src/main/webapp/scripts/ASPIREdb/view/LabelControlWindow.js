@@ -56,7 +56,7 @@ var colorPicker = Ext.create( 'Ext.menu.ColorPicker', {
 Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    extend : 'Ext.Window',
    alias : 'widget.labelControlWindow',
-   title : 'Label settings',
+   title : 'Label Manager',
    id : 'labelControlWindow',
    frame : 'true',
    closable : true,

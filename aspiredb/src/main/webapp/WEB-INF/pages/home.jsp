@@ -30,6 +30,7 @@
 	href="scripts/lib/resources/css/ext-all-steelblue.css">
 <link rel="icon" type="image/x-icon"
 	href="scripts/ASPIREdb/resources/images/favicon.ico" />
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
 <script src="scripts/ASPIREdb/view/ideogram/IdeogramCursorLayer.js"></script>
 <script src="scripts/ASPIREdb/view/ideogram/ChromosomeLayer.js"></script>

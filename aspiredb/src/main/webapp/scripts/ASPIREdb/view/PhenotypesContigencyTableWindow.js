@@ -133,7 +133,7 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
 
             }
             columnNames.push( 'Subject Count' );
-            columnNames.push( '' );
+          //  columnNames.push( '' );
             this.createGridPanel( resultantData, columnNames, phenotypeName );
 
          }
@@ -176,11 +176,21 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
                   dataIndex : columnNames[i],
                   width : 100,
                   renderer : function(value) {
+                     var src = 'scripts/ASPIREdb/resources/images/icons/tag.png';
+                     var tooltip = "Click to add label";
 
-                     return value.length
+                     var ahrefurl = '<a onclick='+ref.makeLabelHandler+'href=#>';
+
+                     image = Ext.String.format( ahrefurl + "<i class='fa fa-tags'></i> </a>", src, tooltip );
+                     //<img src='{0}' alt='{1}' >
+
+                     var ret = image+'&nbsp&nbsp'+value.length;
+                     if (value.length==0) ret ='&nbsp&nbsp'+value.length;
+                     return ret;
+                     //return value.length
                   }
                } );
-            } else if ( columnNames[i] == '' ) {
+            } /**else if ( columnNames[i] == '' ) {
                columns.push( {
                   header : 'Label',
                   dataIndex : 'tag',
@@ -200,7 +210,7 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
                   }
 
                } );
-            } else {
+            } */else {
                columns.push( {
                   header : columnNames[i],
                   dataIndex : columnNames[i],
@@ -228,9 +238,10 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
                ref.selectedSubjectIds = record.raw[subjectIdLength - 1];
 
                // Stop the browser getting the event
-               e.preventDefault();
+              // e.preventDefault();
+               ref.makeLabelHandler();
 
-               var contextMenu = new Ext.menu.Menu( {
+             /**  var contextMenu = new Ext.menu.Menu( {
 
                   items : [ {
                      text : 'Make label',
@@ -239,7 +250,7 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
                   } ]
                } );
 
-               contextMenu.showAt( e.getX(), e.getY() );
+               contextMenu.showAt( e.getX(), e.getY() );*/
             }
 
          // }
