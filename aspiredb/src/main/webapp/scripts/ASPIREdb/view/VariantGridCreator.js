@@ -84,7 +84,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
          var store = Ext.create( 'Ext.data.ArrayStore', {
             fields : fieldData,
             data : storeData,
-            groupField : 'patientId'
+         // groupField : 'patientId'
 
          } );
 

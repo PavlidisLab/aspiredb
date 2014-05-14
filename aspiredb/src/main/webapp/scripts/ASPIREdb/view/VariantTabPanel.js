@@ -82,10 +82,10 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             handler : this.makeLabelHandler,
             scope : this
          }, {
-            itemId : 'labelSettings',
-            text : 'Settings...',
+            itemId : 'labelManager',
+            text : 'Label Manager',
             disabled : false,
-            handler : this.labelSettingsHandler,
+            handler : this.labelManagerHandler,
             scope : this
          } ]
       } );
@@ -330,8 +330,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                         handler : ref.makeLabelHandler,
                         scope : ref,
                      }, {
-                        text : 'Label settings',
-                        handler : ref.labelSettingsHandler,
+                        text : 'Label Manager',
+                        handler : ref.labelManagerHandler,
                         scope : ref,
                      } ]
                   } );
@@ -513,11 +513,11 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    },
 
    /**
-    * When subjects are selected in the subject grid highlight the variants of selected subjects in ideogram and in table
-    * view
+    * When subjects are selected in the subject grid highlight the variants of selected subjects in ideogram and in
+    * table view
     */
    subjectSelectionHandler : function(subjectIds, unselectRows) {
-     
+
       this.selectedSubjects = subjectIds;
       var grid = this.down( '#variantGrid' );
 
@@ -527,20 +527,20 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             grid.getSelectionModel().deselectAll();
             return;
          }
-       this.gridPanelSubjectSelection( subjectIds);
 
+         this.gridPanelSubjectSelection( subjectIds );
       }
       // When Ideogram view selected
       else {
          console.log( "when the variant ideogram is selected" );
          this.ideogramSubjectSelection( subjectIds );
-       
+
       }
       grid.getView().refresh();
    },
-   
-   ideogramSubjectSelection : function(subjectIds){
-      
+
+   ideogramSubjectSelection : function(subjectIds) {
+
       var ideogram = this.getComponent( 'ideogram' );
       ideogram.drawChromosomes();
       var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
@@ -566,11 +566,9 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       } );
    },
 
-   gridPanelSubjectSelection: function(subjectIds){
-      
+   gridPanelSubjectSelection : function(subjectIds) {
+
       var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
-      
-      
 
       if ( grid.features != null && grid.features.length > 0 ) {
          // collapse all the grids first - to open only the
@@ -601,6 +599,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
                var selectedRecords = [];
 
+               grid.store.sort( 'patientId' );
+
                for (var i = 0; i < selectedSubjectValueObjects.length; i++) {
                   var subject = selectedSubjectValueObjects[i];
 
@@ -628,7 +628,6 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       }
 
-   
    },
    selectionChangeHandler : function(model, records) {
       console.log( 'on grid selection change handler variant tab panel' );
@@ -898,9 +897,9 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    },
 
    /**
-    * Display LabelSettingsWindow
+    * Display labelManagerWindow
     */
-   labelSettingsHandler : function(event) {
+   labelManagerHandler : function(event) {
       var me = this;
 
       var currentlySelectedRecords = me.getVariantRecordSelection();
@@ -913,7 +912,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          visibleLabels : me.down( '#variantGrid' ).visibleLabels,
          isSubjectLabel : false,
          selectedIds : selectedVariantIds,
-         title: 'Variant Label Settings'
+         title : 'Variant Label Manager'
       } );
 
       labelControlWindow.show();

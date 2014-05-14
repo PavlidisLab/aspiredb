@@ -72,8 +72,8 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
                handler : this.makeLabelHandler,
                scope : this,
             }, {
-               text : 'Label Manager',
-               handler : this.labelSettingsHandler,
+               text: 'Label Settings',
+               handler : this.labelManagerHandler,
                scope : this,
             } ]
          } );
@@ -145,10 +145,10 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
             handler : this.makeLabelHandler,
             scope : this
          }, {
-            itemId : 'labelSettings',
+            itemId : 'labelManager',
             text : 'Label Manager',
             disabled : false,
-            handler : this.labelSettingsHandler,
+            handler : this.labelManagerHandler,
             scope : this
          } ]
       } );
@@ -457,12 +457,12 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
    },
 
    /**
-    * Display LabelSettingsWindow
+    * Display labelManagerWindow
     * 
     * @param :
     *           event
     */
-   labelSettingsHandler : function(event) {
+   labelManagerHandler : function(event) {
       var me = this;
 
       var selectedSubjectIds = [];
@@ -475,7 +475,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
          visibleLabels : me.visibleLabels,
          isSubjectLabel : true,
          selectedIds : selectedSubjectIds,
-         title : "Subject Label Settings"
+         title : "Subject Label Manager"
       } );
 
       labelControlWindow.show();
