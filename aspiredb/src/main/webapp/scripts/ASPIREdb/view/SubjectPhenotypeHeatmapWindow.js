@@ -44,10 +44,14 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
       var matrixColumnMetadata = [];
       var matrixRowMetadata = [];
 
+      // TODO determine values dynamically
+
       for (var i = 0; i < matrix.columnNames.length; i++) {
          var type;
          if ( matrix.columnNames[i] == "Gender" || matrix.columnNames[i] == "Family history" ) {
             type = 'gender';
+         } else if ( matrix.columnNames[i] == "Hairwhorls" ) {
+            type = 'count';
          } else {
             type = 'binary';
          }
@@ -82,17 +86,34 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
       M2V.Util.dataType = {};
 
       // See PhenotypeGrid colors
+      var colors = [ "#b35806", "#31a354", "#636363", "#d8b365", "#2c7fb8", "#addd8e", "#7570b3", "#a6bddb" ];
+      colorNAIndex = 2;
+
+      // a bit hard to match this with PhenotypeGrid because it depends on the
+      // db value order
+      M2V.Util.dataType.renderCountCell = function(ctx, value, row, column, size) {
+         var color;
+         var offset = 2;
+         var idx = parseInt( value ) + offset;
+         if ( idx < colors.length ) {
+            color = colors[idx];
+         } else {
+            color = colors[colorNAIndex];
+         }
+
+         ctx.fillStyle = color;
+         ctx.fillRect( 1, 1, size.width - 2, size.height - 2 );
+      };
 
       M2V.Util.dataType.renderGenderCell = function(ctx, value, row, column, size) {
          var color;
          value = value.toUpperCase();
          if ( value === "M" || value === "Y" ) {
-            color = "rgb(44,127,184)"; // blue
+            color = colors[4]; // blue
          } else if ( value === "F" || value === "N" ) {
-            color = "rgb(216,179,101)"; // yellow
-
+            color = colors[3]; // yellow
          } else {
-            color = "rgb(99,99,99)"; // grey
+            color = colors[2]; // grey
          }
 
          ctx.fillStyle = color;
@@ -105,11 +126,11 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
          var color;
          value = value.toUpperCase();
          if ( value === 0 || value === "0" || value === "N" || value === "M" ) {
-            color = "rgb(49,163,84)"; // green
+            color = colors[1]; // green
          } else if ( value === 1 || value === "1" || value === "Y" || value === "F" ) {
-            color = "rgb(179,88,6)"; // brown
+            color = colors[0]; // brown
          } else {
-            color = "rgb(99,99,99)"; // unknown
+            color = colors[2]; // unknown
          }
 
          ctx.fillStyle = color;
@@ -166,6 +187,9 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
          },
          renderers : {
             cell : {
+               'count' : {
+                  render : M2V.Util.dataType.renderCountCell
+               },
                'gender' : {
                   render : M2V.Util.dataType.renderGenderCell
                },
