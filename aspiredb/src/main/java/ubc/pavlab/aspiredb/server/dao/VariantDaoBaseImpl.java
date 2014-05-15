@@ -541,6 +541,14 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         // If this is a less than, we probably have to take into account the the variants with 0 overlap????
         Set<String> supportSet = new HashSet<String>();
 
+        // check and warn
+        if ( overlaps.iterator().hasNext() ) {
+            Long projectId = overlaps.iterator().next().getOverlapProjectId();
+            if ( projectDao.getOverlapProjectVariantSupportCharacteristicKey( projectId ) == null ) {
+                log.warn( "Support key is null for overlap project '" + projectDao.load( projectId ).getName() + "'" );
+            }
+        }
+
         // note all of these overlaps are associated with the same variantId
         for ( Variant2SpecialVariantOverlap overlap : overlaps ) {
 

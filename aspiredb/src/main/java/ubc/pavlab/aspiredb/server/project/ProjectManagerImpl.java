@@ -114,6 +114,8 @@ public class ProjectManagerImpl implements ProjectManager {
 
     ShaPasswordEncoder passwordEncoder = new ShaPasswordEncoder();
 
+    public static final String DGV_SUPPORT_CHARACTERISTIC_KEY = "pubmedid";
+
     @Override
     @Transactional
     public Project createProject( String name ) throws Exception {
@@ -152,6 +154,10 @@ public class ProjectManagerImpl implements ProjectManager {
         Project p = new Project();
         p.setName( name );
         p.setSpecialData( true );
+
+        if ( name.equals( "DGV" ) ) {
+            p.setVariantSupportCharacteristicKey( DGV_SUPPORT_CHARACTERISTIC_KEY );
+        }
 
         return projectDao.create( p );
     }
