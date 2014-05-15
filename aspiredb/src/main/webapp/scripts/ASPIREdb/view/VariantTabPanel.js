@@ -405,7 +405,12 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
     * When a Variant Label is removed for a selected Ids
     */
    variantLabelRemoved : function(variantIds, labelsToRemove) {
-      this.removeLabelsFromVariants( this.getVariantRecordSelection(), labelsToRemove );
+      if ( variantIds.length > 0 ) {
+         this.removeLabelsFromVariants( this.getVariantRecordSelection(), labelsToRemove );
+      } else {
+         var allVariants = this.getComponent( 'variantGrid' ).store.data.items;
+         this.removeLabelsFromVariants( allVariants, labelsToRemove );
+      }
       this.variantLabelUpdateHandler();
    },
 

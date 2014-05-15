@@ -470,10 +470,15 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
    /**
     * Label changed. Update labels in grid.
     */
-   labelRemovedHandler : function(selSubjectIds, modifiedLabels) {
+   labelRemovedHandler : function(selSubjectIds, labelsToRemove) {
       var me = this;
 
-      me.removeLabelsFromSubjects( me.selSubjects, modifiedLabels );
+      if ( selSubjectIds.length > 0 ) {
+         me.removeLabelsFromSubjects( me.selSubjects, labelsToRemove );
+      } else {
+         var allSubjects = this.store.data.items;
+         me.removeLabelsFromSubjects( allSubjects, labelsToRemove );
+      }
 
       ASPIREdb.EVENT_BUS.fireEvent( 'subjects_label_changed' );
 
