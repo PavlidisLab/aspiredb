@@ -70,7 +70,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    config : {
       visibleLabels : [],
       isSubjectLabel : false,
-      selectedIds : [],
+      selectedSubjectIds : [],
       XValue : 0,
       YValue : 0,
    },
@@ -216,29 +216,18 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
          // if (labelcolour)
       } );
 
-      // init visibleLabels
-      me.visibleLabels = [];
-      var loadData = [];
-
       if ( me.isSubjectLabel ) {
          me.service = SubjectService;
       } else {
          me.service = VariantService;
       }
 
-      var suggestionContext = new SuggestionContext();
-      suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
-
-      me.service.suggestLabels( suggestionContext, {
-         callback : function(vos) {
-            for (var i = 0; i < vos.length; i++) {
-               var label = vos[i];
-               me.visibleLabels[label.id] = label;
-               loadData.push( [ label.id, label.name, label.colour, label.isShown ] );
-            }
-            me.down( '#labelSettingsGrid' ).store.loadData( loadData );
-         }
+      var loadData = [];
+      me.visibleLabels.forEach( function(label, index, array) {
+         loadData.push( [ label.id, label.name, label.colour, label.isShown ] );
       } );
+      me.down( '#labelSettingsGrid' ).store.loadData( loadData );
+
    },
 
    labelColorHandler : function(selColor) {
@@ -254,28 +243,28 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
 
    removeSubjectLabels : function(labels, rowIndex) {
       var me = this;
-      if ( me.selectedIds.length == 0 ) {
+      if ( me.selectedSubjectIds.length == 0 ) {
          Ext.MessageBox.confirm( 'Delete', 'Remove label ' + 'for all subjects?', function(btn) {
             if ( btn === 'yes' ) {
                LabelService.deleteSubjectLabels( labels, {
                   callback : function() {
-                     ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed', me.selectedIds );
+                     ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_removed', me.selectedSubjectIds, labels );
                      me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
                   }
                } );
             }
          } );
       } else {
-         Ext.MessageBox.confirm( 'Delete', 'Remove ' + labels.length + ' label(s) ' + 'for ' + me.selectedIds.length
-            + ' subject(s)?', function(btn) {
-            if ( btn === 'yes' ) {
-               LabelService.removeLabelsFromSubjects( labels, me.selectedIds, {
-                  callback : function() {
-                     ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed', me.selectedIds );
-                  }
-               } );
-            }
-         } );
+         Ext.MessageBox.confirm( 'Delete', 'Remove ' + labels.length + ' label(s) ' + 'for selected subject(s)?',
+            function(btn) {
+               if ( btn === 'yes' ) {
+                  LabelService.removeLabelsFromSubjects( labels, me.selectedSubjectIds, {
+                     callback : function() {
+                        ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_removed', me.selectedSubjectIds, labels );
+                     }
+                  } );
+               }
+            } );
       }
    },
 
@@ -284,28 +273,28 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
     */
    removeVariantLabels : function(labels, rowIndex) {
       var me = this;
-      if ( me.selectedIds.length == 0 ) {
+      if ( me.selectedSubjectIds.length == 0 ) {
          Ext.MessageBox.confirm( 'Delete', 'Remove label ' + 'for all variants?', function(btn) {
             if ( btn === 'yes' ) {
                LabelService.deleteVariantLabels( labels, {
                   callback : function() {
-                     ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed', me.selectedIds );
+                     ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_removed', me.selectedSubjectIds, labels );
                      me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
                   }
                } );
             }
          } );
       } else {
-         Ext.MessageBox.confirm( 'Delete', 'Remove ' + labels.length + ' label(s) ' + 'for ' + me.selectedIds.length
-            + ' variant(s)?', function(btn) {
-            if ( btn === 'yes' ) {
-               LabelService.removeLabelsFromVariants( labels, me.selectedIds, {
-                  callback : function() {
-                     ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed', me.selectedIds );
-                  }
-               } );
-            }
-         } );
+         Ext.MessageBox.confirm( 'Delete', 'Remove ' + labels.length + ' label(s) ' + 'for selected variant(s)?',
+            function(btn) {
+               if ( btn === 'yes' ) {
+                  LabelService.removeLabelsFromVariants( labels, me.selectedSubjectIds, {
+                     callback : function() {
+                        ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_removed', me.selectedSubjectIds, labels );
+                     }
+                  } );
+               }
+            } );
       }
    },
 

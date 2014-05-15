@@ -208,9 +208,13 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       // when subject selected
       this.on( 'selectionchange', me.selectionChangeHandler, me );
 
-      // when subject label change
-      ASPIREdb.EVENT_BUS.on( 'subject_Label_changed', this.refreshGridView, this );
+      // when subject label is removed
+      ASPIREdb.EVENT_BUS.on( 'subject_label_removed', this.labelRemovedHandler, this );
 
+      // when subject label is shown
+      ASPIREdb.EVENT_BUS.on( 'subject_label_changed', function() {
+         me.getView().refresh()
+      }, this );
    },
 
    /**
@@ -444,24 +448,36 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
    },
 
    /**
-    * Refresh grid view by reloading data from database because it was updated
+    * Remove labels from subjects in local store.
     */
-   refreshGridView : function(selSubjectIds) {
-      var me = this;
-   // update local store
-      
-      var projectIds=ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
-      SubjectService.getSubjects( projectIds[0],selSubjectIds, {
-         callback : function(svos) {
-            me.selSubjects = svos;
-            
-            me.getView().refresh();
+   removeLabelsFromSubjects : function(subjects, labelsToRemove) {
+      for (var i = 0; i < subjects.length; i++) {
+         var labelIds = subjects[i].data.labelIds;
+         var labelsToRemoveIndex = [];
+         for (var j = 0; j < labelIds.length; j++) {
+            for (var k = 0; k < labelsToRemove.length; k++) {
+               if ( labelIds[j] == labelsToRemove[k].id ) {
+                  labelsToRemoveIndex.push( j );
+               }
+            }
          }
-            
-   });
-     
-      
+         for (var j = 0; j < labelsToRemoveIndex.length; j++) {
+            labelIds.pop( labelsToRemoveIndex[j] );
+         }
+      }
+   },
 
+   /**
+    * Label changed. Update labels in grid.
+    */
+   labelRemovedHandler : function(selSubjectIds, modifiedLabels) {
+      var me = this;
+
+      me.removeLabelsFromSubjects( me.selSubjects, modifiedLabels );
+
+      ASPIREdb.EVENT_BUS.fireEvent( 'subjects_label_changed' );
+
+      me.getView().refresh();
    },
 
    /**
@@ -482,7 +498,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       var labelControlWindow = Ext.create( 'ASPIREdb.view.LabelControlWindow', {
          visibleLabels : me.visibleLabels,
          isSubjectLabel : true,
-         selectedIds : selectedSubjectIds,
+         selectedSubjectIds : selectedSubjectIds,
          title : "Subject Label Manager"
       } );
 
