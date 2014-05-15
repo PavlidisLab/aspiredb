@@ -212,11 +212,17 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       // when variant label created
       ASPIREdb.EVENT_BUS.on( 'variant_label_created', this.variantLabelUpdateHandler, this );
 
+      // when variant label removed
+      ASPIREdb.EVENT_BUS.on( 'variant_label_removed', this.variantLabelRemoved, this );
+
       // when variant label changes
       ASPIREdb.EVENT_BUS.on( 'subject_label_changed', this.subjectLabelUpdateHandler, this );
 
       // when subject label created
       ASPIREdb.EVENT_BUS.on( 'subject_label_created', this.subjectLabelUpdateHandler, this );
+
+      // when variant label removed
+      ASPIREdb.EVENT_BUS.on( 'subject_label_removed', this.subjectLabelUpdateHandler, this );
 
       ASPIREdb.EVENT_BUS.on( 'property_changed', function(property) {
          ref.property = [];
@@ -376,6 +382,34 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    },
 
    /**
+    * Remove labels from variants in local store.
+    */
+   removeLabelsFromVariants : function(variants, labelsToRemove) {
+      for (var i = 0; i < variants.length; i++) {
+         var labelIds = variants[i].data.labelIds;
+         var labelsToRemoveIndex = [];
+         for (var j = 0; j < labelIds.length; j++) {
+            for (var k = 0; k < labelsToRemove.length; k++) {
+               if ( labelIds[j] == labelsToRemove[k].id ) {
+                  labelsToRemoveIndex.push( j );
+               }
+            }
+         }
+         for (var j = 0; j < labelsToRemoveIndex.length; j++) {
+            labelIds.pop( labelsToRemoveIndex[j] );
+         }
+      }
+   },
+
+   /**
+    * When a Variant Label is removed for a selected Ids
+    */
+   variantLabelRemoved : function(variantIds, labelsToRemove) {
+      this.removeLabelsFromVariants( this.getVariantRecordSelection(), labelsToRemove );
+      this.variantLabelUpdateHandler();
+   },
+
+   /**
     * Refresh grid view by reloading data from database because it was updated
     */
    variantLabelUpdateHandler : function() {
@@ -390,6 +424,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       property.name = 'Labels';
       property.displayName = 'Variant Labels';
       this.redrawIdeogram( property );
+
    },
 
    /**
@@ -816,7 +851,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       Ext.define( 'ASPIREdb.view.CreateLabelWindowVariant', {
          isSubjectLabel : false,
-         title:'Variant Label Manager',
+         title : 'Variant Label Manager',
          extend : 'ASPIREdb.view.CreateLabelWindow',
 
          // override
@@ -911,7 +946,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       var labelControlWindow = Ext.create( 'ASPIREdb.view.LabelControlWindow', {
          visibleLabels : me.down( '#variantGrid' ).visibleLabels,
          isSubjectLabel : false,
-         selectedIds : selectedVariantIds,
+         selectedOwnerIds : selectedVariantIds,
          title : 'Variant Label Manager'
       } );
 

@@ -78,7 +78,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
          }
 
-         var visibleLabels = this.createVisibleLabels();
+         var visibleLabels = this.createVisibleLabels( vvos );
          var storeData = this.constructVariantStoreData( vvos, characteristicNames, visibleLabels );
 
          var store = Ext.create( 'Ext.data.ArrayStore', {
@@ -262,23 +262,20 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
       },
 
       /**
+       * Extract labels from value object
        * 
        * @param visibleLabels
        */
-      createVisibleLabels : function(visibleLabels) {
+      createVisibleLabels : function(vvos) {
          var visibleLabels = [];
-         var suggestionContext = new SuggestionContext();
-         suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
 
-         // load all labels created by this user
-         VariantService.suggestLabels( suggestionContext, {
-            callback : function(labels) {
-               for ( var idx in labels) {
-                  var label = labels[idx];
-                  visibleLabels[label.id] = label;
-               }
+         for (var i = 0; i < vvos.length; i++) {
+            var labels = vvos[i].labels;
+            for (var j = 0; j < labels.length; j++) {
+               var label = labels[j];
+               visibleLabels[label.id] = label;
             }
-         } );
+         }
 
          return visibleLabels;
       },

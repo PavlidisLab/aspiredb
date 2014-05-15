@@ -70,7 +70,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    config : {
       visibleLabels : [],
       isSubjectLabel : false,
-      selectedSubjectIds : [],
+      selectedOwnerIds : [],
       XValue : 0,
       YValue : 0,
    },
@@ -243,12 +243,12 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
 
    removeSubjectLabels : function(labels, rowIndex) {
       var me = this;
-      if ( me.selectedSubjectIds.length == 0 ) {
+      if ( me.selectedOwnerIds.length == 0 ) {
          Ext.MessageBox.confirm( 'Delete', 'Remove label ' + 'for all subjects?', function(btn) {
             if ( btn === 'yes' ) {
                LabelService.deleteSubjectLabels( labels, {
                   callback : function() {
-                     ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_removed', me.selectedSubjectIds, labels );
+                     ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_removed', me.selectedOwnerIds, labels );
                      me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
                   }
                } );
@@ -258,9 +258,9 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
          Ext.MessageBox.confirm( 'Delete', 'Remove ' + labels.length + ' label(s) ' + 'for selected subject(s)?',
             function(btn) {
                if ( btn === 'yes' ) {
-                  LabelService.removeLabelsFromSubjects( labels, me.selectedSubjectIds, {
+                  LabelService.removeLabelsFromSubjects( labels, me.selectedOwnerIds, {
                      callback : function() {
-                        ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_removed', me.selectedSubjectIds, labels );
+                        ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_removed', me.selectedOwnerIds, labels );
                      }
                   } );
                }
@@ -273,12 +273,12 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
     */
    removeVariantLabels : function(labels, rowIndex) {
       var me = this;
-      if ( me.selectedSubjectIds.length == 0 ) {
+      if ( me.selectedOwnerIds.length == 0 ) {
          Ext.MessageBox.confirm( 'Delete', 'Remove label ' + 'for all variants?', function(btn) {
             if ( btn === 'yes' ) {
                LabelService.deleteVariantLabels( labels, {
                   callback : function() {
-                     ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_removed', me.selectedSubjectIds, labels );
+                     ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_removed', me.selectedOwnerIds, labels );
                      me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
                   }
                } );
@@ -288,9 +288,9 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
          Ext.MessageBox.confirm( 'Delete', 'Remove ' + labels.length + ' label(s) ' + 'for selected variant(s)?',
             function(btn) {
                if ( btn === 'yes' ) {
-                  LabelService.removeLabelsFromVariants( labels, me.selectedSubjectIds, {
+                  LabelService.removeLabelsFromVariants( labels, me.selectedOwnerIds, {
                      callback : function() {
-                        ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_removed', me.selectedSubjectIds, labels );
+                        ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_removed', me.selectedOwnerIds, labels );
                      }
                   } );
                }
