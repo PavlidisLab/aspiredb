@@ -46,6 +46,9 @@ public class UserGeneSet implements Securable {
 
     @Column(name = "NAME")
     private String name;
+    
+    @Column(name = "DESCRIPTION")
+    private String description;
 
     @Column(name = "OBJECT", columnDefinition = "MEDIUMBLOB")
     private Serializable object;
@@ -81,6 +84,14 @@ public class UserGeneSet implements Securable {
 
     public void setObject( Serializable object ) {
         this.object = object;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription( String description ) {
+        this.description = description;
     }
 
 }

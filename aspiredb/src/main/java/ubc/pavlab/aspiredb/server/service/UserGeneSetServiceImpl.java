@@ -111,6 +111,7 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
      * @return true or false
      */
     @Override
+    @Transactional
     @RemoteMethod
     public boolean isGeneSetName( String name ) {
 
@@ -129,6 +130,7 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
      * @return true or false
      */
     @Override
+    @Transactional
     @RemoteMethod
     public boolean isGeneInGeneSet( String genSetName, String geneSymbol ) {
 
@@ -148,9 +150,23 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         }
         return false;
     }
+    
+    @Override
+    @Transactional
+    @RemoteMethod
+    public GeneSetValueObject findUserGeneSet( String geneSetName ) {
+       GeneSetValueObject geneSetValueObject = new GeneSetValueObject();
+        List<UserGeneSet> genesets = userGeneSetDao.findByName( geneSetName );
+        geneSetValueObject.setId( genesets.get( 0 ).getId() );        
+        geneSetValueObject.setName( genesets.get( 0 ).getName() );
+        geneSetValueObject.setDescription( genesets.get( 0 ).getDescription() );
+        geneSetValueObject.setObject( genesets.get( 0 ).getObject() );
+        return geneSetValueObject;
+    }
 
     @SuppressWarnings("unchecked")
     @Override
+    @Transactional
     @RemoteMethod
     public List<GeneValueObject> loadUserGeneSet( String name ) {
         List<UserGeneSet> genesets = userGeneSetDao.findByName( name );
@@ -164,6 +180,25 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
 
         // should only be one for one user
         return geneValueObjects;
+
+    }
+    /**
+     * DWR - Updating the user selected gene listed in the phenotype and variant window
+     * 
+     * @param geneSetName
+     * @param Gene value objects holding only the symbol, name and type of a gene
+     * @return update gene set id
+     */
+    @Override
+    @Transactional
+    @RemoteMethod
+    public void updateUserGeneSet( GeneSetValueObject geneSetvalueObject ) {
+        List<UserGeneSet> geneSet = userGeneSetDao.findByName( geneSetvalueObject.getName() );
+        UserGeneSet geneSetEntity = userGeneSetDao.load( geneSet.get( 0 ).getId() );
+        geneSetEntity.setName( geneSetvalueObject.getName() );
+        geneSetEntity.setDescription( geneSetvalueObject.getDescription() );
+        userGeneSetDao.update( geneSetEntity );
+      
 
     }
 
@@ -190,6 +225,24 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
             geneSetNames.add( geneset.getName() );
         }
         return geneSetNames;
+
+    }
+    
+    @Override
+    @RemoteMethod
+    public List<GeneSetValueObject>  getSavedUserGeneSets() {
+        List<GeneSetValueObject> geneSetValueObjects = new ArrayList<>();
+        Collection<String> geneSetNames = new ArrayList<>();
+        Collection<UserGeneSet> genesets = userGeneSetDao.loadAll();
+        for ( UserGeneSet geneset : genesets ) {
+            GeneSetValueObject gvo = new GeneSetValueObject();
+            gvo.setName( geneset.getName() );
+            gvo.setId( geneset.getId() );
+            gvo.setObject( geneset.getObject() );
+            geneSetValueObjects.add( gvo );
+        }
+        return geneSetValueObjects;
+      
 
     }
 

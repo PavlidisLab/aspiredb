@@ -40,6 +40,9 @@ Ext.define('ASPIREdb.view.GeneManagerWindow', {
 		xtype : 'ASPIREdb_genemanagerpanel',
 	}],
 
+	 config :{
+	    genesetSize :[],
+	 },
 	
 	initComponent : function() {
 	
@@ -60,12 +63,29 @@ Ext.define('ASPIREdb.view.GeneManagerWindow', {
 		ref.show();
 		grid.setLoading(true);
 		
-		UserGeneSetService.getSavedUserGeneSetNames( {
-			callback : function(geneSetNames) {	
-				ASPIREdb.view.GeneManagerWindow.populateGeneSetGrid(geneSetNames);			
-			}
-		});
+		ref.genesetSize=[]
 		
+		/**UserGeneSetService.getSavedUserGeneSetNames( {
+			callback : function(geneSetNames) {	
+			   
+			   for (var i=0;i<geneSetNames.length;i++){
+			      UserGeneSetService.loadUserGeneSet( geneSetNames[i], {
+	               callback : function(gvos) {
+	                  
+	                 ref.genesetSize.push(gvos.length);
+	               }
+	            } );
+			   }
+			         }
+      });
+			 */
+		// ASPIREdb.view.GeneManagerWindow.populateGeneSetGrid(geneSetNames,ref.genesetSize);
+		UserGeneSetService.getSavedUserGeneSets( {
+         callback : function(gvos) { 
+            ASPIREdb.view.GeneManagerWindow.populateGeneSetGrid(gvos);
+         }
+		});
+	
 	
 	},
 	
@@ -74,15 +94,15 @@ Ext.define('ASPIREdb.view.GeneManagerWindow', {
 	/**
 	 * Populate and gene set names in the gene set grid
 	 */
-	populateGeneSetGrid : function(names) {
+	populateGeneSetGrid : function(gvos) {
 		
 		var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
 		var grid =panel.down ('#geneSetGrid');
 		
 			
 		var data = [];
-		for ( var i = 0; i < names.length; i++) {
-			var row = [ names[i],'',''];		
+		for ( var i = 0; i < gvos.length; i++) {
+			var row = [ gvos[i].name,'',gvos[i].object.length];		
 			data.push(row);					
 		}
 			

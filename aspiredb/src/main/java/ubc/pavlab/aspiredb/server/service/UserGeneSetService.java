@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
+import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.shared.GeneSetValueObject;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 
@@ -48,5 +49,11 @@ public interface UserGeneSetService {
     List<GeneSetValueObject> suggestUserGeneSet( String query );
 
     void addGenesToGeneSet( String geneSetName, List<String> geneSymbol ) throws BioMartServiceException;
+
+    public void updateUserGeneSet( GeneSetValueObject geneset ) ;
+
+    GeneSetValueObject findUserGeneSet( String geneSetName );
+
+    List<GeneSetValueObject> getSavedUserGeneSets();
 
 }

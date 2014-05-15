@@ -36,6 +36,7 @@ public class GeneSetValueObject implements Displayable, Serializable {
     
     
     private String name;
+    private String description;
     private Long id;
     private Serializable object;
 
@@ -109,5 +110,13 @@ public class GeneSetValueObject implements Displayable, Serializable {
 
     public void setObject( Serializable object ) {
         this.object = object;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription( String description ) {
+        this.description = description;
     }
 }

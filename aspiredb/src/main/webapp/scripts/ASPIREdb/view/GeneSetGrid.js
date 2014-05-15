@@ -64,15 +64,13 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
       flex : 1,
       editor : {
          // defaults to text field if no xtype is supplied
-         allowBlank : false
+         allowBlank : true
       }
    }, {
       header : 'size',
       dataIndex : 'geneSetSize',
       flex : 1,
-      editor : {
-         allowBlank : false,
-      }
+    
    } ],
 
    plugins : [ rowEditing ],
@@ -87,6 +85,34 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
       this.callParent();
       this.on( 'select', this.geneSetSelectHandler, this );
       ASPIREdb.EVENT_BUS.on( 'gene_added', this.geneAddedHandler, this );
+      this.on( 'edit', function(editor, e) {
+         var record = e.record;
+         var me=this;
+         UserGeneSetService.findUserGeneSet( me.selGeneSet[0].data.geneSetName, {
+            callback : function(gsvo) {
+               console.log('found gene set name '+gsvo);
+               gsvo.name = record.data.geneSetName;
+               gsvo.description = record.data.geneDescription;
+           /**    UserGeneSetService.updateUserGeneSet( gsvo, {
+                  callback : function() {
+                     me.getView().refresh();
+                     ASPIREdb.EVENT_BUS.fireEvent( 'geneset_updated' );
+
+                  },
+                  errorHandler : function(er, exception) {
+                     Ext.Msg.alert( "Update user gene set Error", er + "\n" + exception.stack );
+                     console.log( exception.stack );
+                  }
+               } );*/
+
+            },
+            errorHandler : function(er, exception) {
+               Ext.Msg.alert( "find user gene set Error", er + "\n" + exception.stack );
+               console.log( exception.stack );
+            }
+         } );
+
+      } );
 
    },
 
@@ -175,7 +201,7 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
                   var geneSetGrid = panel.down( '#geneSetGrid' );
                   // add gene set name to geneset grid
                   var data = [];
-                  var row = [ newGeneSetName, '', '' ];
+                  var row = [ newGeneSetName, '', 0 ];
                   data.push( row );
                   geneSetGrid.store.add( data );
                   geneSetGrid.getView().refresh( true );
