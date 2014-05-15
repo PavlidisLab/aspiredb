@@ -133,7 +133,7 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
 
             }
             columnNames.push( 'Subject Count' );
-          //  columnNames.push( '' );
+            // columnNames.push( '' );
             this.createGridPanel( resultantData, columnNames, phenotypeName );
 
          }
@@ -179,15 +179,16 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
                      var src = 'scripts/ASPIREdb/resources/images/icons/tag.png';
                      var tooltip = "Click to add label";
 
-                     var ahrefurl = '<a onclick='+ref.makeLabelHandler+'href=#>';
+                     var ahrefurl = '<a onclick=' + ref.makeLabelHandler + 'href=#>';
 
                      image = Ext.String.format( ahrefurl + "<i class='fa fa-tags'></i> </a>", src, tooltip );
-                     //<img src='{0}' alt='{1}' >
+                     // <img src='{0}' alt='{1}' >
 
-                     var ret = value.length+'&nbsp&nbsp'+image;
-                     if (value.length==0) ret =value.length+'&nbsp&nbsp';
+                     var ret = value.length + '&nbsp&nbsp' + image;
+                     if ( value.length == 0 )
+                        ret = value.length + '&nbsp&nbsp';
                      return ret;
-                     //return value.length
+                     // return value.length
                   }
                } );
             } else {
@@ -216,8 +217,8 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
 
                var subjectIdLength = record.raw.length;
                ref.selectedSubjectIds = record.raw[subjectIdLength - 1];
-               if (ref.selectedSubjectIds.length!=0)
-                     ref.makeLabelHandler();
+               if ( ref.selectedSubjectIds.length != 0 )
+                  ref.makeLabelHandler();
 
             }
 
@@ -314,8 +315,6 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
 
             addedLabel.isShown = true;
             LabelService.updateLabel( addedLabel );
-            
-            
 
             var existingLab = me.visibleLabels[addedLabel.id];
             if ( existingLab == undefined ) {
@@ -323,24 +322,14 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
             } else {
                existingLab.isShown = true;
             }
-          
+
             for (var i = 0; i < me.selSubjects.length; i++) {
                me.selSubjects[i].labels.push( addedLabel );
             }
-            
-            // update subject store
-           for (var i=0;i<me.selSubjects.length;i++){
-               var subjectLabels =ASPIREdb.view.SubjectGrid.prototype.getStore().getAt(ASPIREdb.view.SubjectGrid.prototype.getStore().find('patientId',me.selSubjects[i].patientId)).data.labelIds;
-               subjectLabels.push(addedLabel.id);
-               ASPIREdb.view.SubjectGrid.prototype.getStore().getAt(ASPIREdb.view.SubjectGrid.prototype.getStore().find('patientId',me.selSubjects[i].patientId)).data.labelIds = subjectLabels;
-            
-            }
-           ASPIREdb.view.SubjectGrid.prototype.setVisibleLabels(me.visibleLabels);
-           console.log('passed visible labels to subject grid'+me.visibleLabels[0]);
-           //refresh the grid
-           ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed',selSubjectIds );
-          
-        
+
+            // refresh the grid
+            ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_updated', selSubjectIds, addedLabel );
+
          }
       } );
 

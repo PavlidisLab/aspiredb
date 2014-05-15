@@ -228,7 +228,7 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          }
       }, {
          xtype : 'button',
-         text : 'Gene Manager',
+         text : 'Gene Set Manager',
          itemId : 'geneManagerButton',
          height : 30,
          margin : '5 5 5 5',

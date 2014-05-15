@@ -211,9 +211,14 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       // when subject label is removed
       ASPIREdb.EVENT_BUS.on( 'subject_label_removed', this.labelRemovedHandler, this );
 
+      // when subject label is removed
+      ASPIREdb.EVENT_BUS.on( 'subject_label_updated', this.labelUpdateHandler, this );
+
       // when subject label is shown
       ASPIREdb.EVENT_BUS.on( 'subject_label_changed', function() {
-         me.getView().refresh()
+
+         me.getView().refresh();
+
       }, this );
    },
 
@@ -465,6 +470,39 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
             labelIds.pop( labelsToRemoveIndex[j] );
          }
       }
+   },
+
+   /**
+    * Update Subject labels in local store.
+    */
+   updateSubjectsLabels : function(subjectIds, labelToUpdate) {
+      this.visibleLabels[labelToUpdate.id] = labelToUpdate;
+      for (var i = 0; i < subjectIds.length; i++) {
+
+         var selectedSubjectId = this.store.find( 'id', subjectIds[i] );
+         var selectionModel = this.getSelectionModel();
+         selectionModel.doSelect( this.store.data.items[selectedSubjectId] );
+         var record = this.getSelectionModel().getSelection();
+
+         var labelIds = record[0].get( 'labelIds' );
+         labelIds.push( labelToUpdate.id );
+
+      }
+   },
+
+   /**
+    * Label changed. Update subjects label in grid.
+    */
+   labelUpdateHandler : function(selSubjectIds, labelToUpdate) {
+      var me = this;
+
+      if ( selSubjectIds.length > 0 ) {
+         me.updateSubjectsLabels( selSubjectIds, labelToUpdate );
+      }
+
+      ASPIREdb.EVENT_BUS.fireEvent( 'subjects_label_changed' );
+
+      me.getView().refresh();
    },
 
    /**

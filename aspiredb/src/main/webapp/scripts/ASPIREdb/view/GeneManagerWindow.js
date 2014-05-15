@@ -25,7 +25,7 @@ Ext.define('ASPIREdb.view.GeneManagerWindow', {
 	extend : 'Ext.Window',
 	alias : 'widget.geneManagerWindow',
 	singleton : true,
-	title : 'Gene Manager',
+	title : 'Gene Set Manager',
 	closable : true,
 	closeAction : 'hide',
 	width : 1000,

@@ -70,7 +70,7 @@ Ext.define('ASPIREdb.view.GeneGrid', {
 	            	flex : 1,
 	            	editor: {
 		                // defaults to textfield if no xtype is supplied
-		                allowBlank: false
+		                allowBlank: true
 		            }
 	            }
 	],		
@@ -80,7 +80,7 @@ Ext.define('ASPIREdb.view.GeneGrid', {
         'selectionchange': function(view, records) {
             this.down('#removeGene').setDisabled(!records.length);
             this.selectedGene=this.getSelectionModel().getSelection();
-           // console.log('selected gene sumbol : '+this.selectedGene[0].data.symbol);
+        
         }
     },
 	
