@@ -287,9 +287,14 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
    },
    /**
-    * Filter the variants of the subject selected. Initially it loads all the variants associated with all the subjects
+    * Filter the variants of the subject selected. Initially it loads all the variants associated with all the subjects.
+    * 
+    * @param filterConfigs -
+    *           variant filters
+    * @param legendProperty -
+    *           which legend to display in the ideogram (e.g. Variant Label)
     */
-   filterSubmitHandler : function(filterConfigs) {
+   filterSubmitHandler : function(filterConfigs, legendProperty) {
 
       var ref = this;
 
@@ -372,6 +377,13 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                toolbar.add( ref.zoomOutButton );
                toolbar.add( ref.colourVariantByCombo );
 
+               // refresh the legend (e.g. Variant Labels) in ideogram
+               if ( legendProperty != null ) {
+                  ASPIREdb.EVENT_BUS.fireEvent( 'colorCoding_selected' );
+                  ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', legendProperty );
+                  ref.redrawIdeogram( legendProperty );
+               }
+
                ref.setLoading( false );
 
             }
@@ -418,17 +430,16 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
     * Refresh grid view by reloading data from database because it was updated
     */
    variantLabelUpdateHandler : function() {
-      var me = this;
-      me.filterSubmitHandler( me.filterConfigs );
 
-      // refresh the variant in grid
-      me.down( '#variantGrid' ).getView().refresh();
-
-      // refresh the variant labels in ideogram
       var property = new VariantLabelProperty();
       property.name = 'Labels';
       property.displayName = 'Variant Labels';
-      this.redrawIdeogram( property );
+
+      var me = this;
+      me.filterSubmitHandler( me.filterConfigs, property );
+
+      // refresh the variant in grid
+      me.down( '#variantGrid' ).getView().refresh();
 
    },
 
@@ -927,6 +938,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                      grid.getView().refresh();
                   }
 
+                  ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_created' );
                }
             } );
          },
