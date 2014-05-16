@@ -196,7 +196,8 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
          var record = e.record;
          var label = me.visibleLabels[record.data.labelId];
          label.name = record.data.labelName;
-         label.colour = record.data.labelColour;
+         label.htmlLabel ="<font color=black><span style='background-color:"+label.colour+"'>&nbsp&nbsp"+label.name+"&nbsp</span></font>&nbsp&nbsp&nbsp"
+         
          LabelService.updateLabel( label, {
             callback : function() {
                me.down( '#labelSettingsGrid' ).getView().refresh();
@@ -205,6 +206,9 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                } else {
                   ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' );
                }
+            },errorHandler : function(er, exception) {
+               Ext.Msg.alert( "Update Label Error", er + "\n" + exception.stack );
+               console.log( exception.stack );
             }
          } );
       } );

@@ -456,6 +456,9 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
     * Remove labels from subjects in local store.
     */
    removeLabelsFromSubjects : function(subjects, labelsToRemove) {
+   // removing to visible label to show in the subject grid
+    //  this.visibleLabels.pop(this.visibleLabels[labelsToRemove.id]);
+           
       for (var i = 0; i < subjects.length; i++) {
          var labelIds = subjects[i].data.labelIds;
          var labelsToRemoveIndex = [];
