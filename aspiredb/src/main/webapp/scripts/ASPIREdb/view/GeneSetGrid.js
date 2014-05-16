@@ -70,7 +70,7 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
       header : 'size',
       dataIndex : 'geneSetSize',
       flex : 1,
-    
+
    } ],
 
    plugins : [ rowEditing ],
@@ -83,27 +83,29 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
    initComponent : function() {
 
       this.callParent();
+
       this.on( 'select', this.geneSetSelectHandler, this );
+
       ASPIREdb.EVENT_BUS.on( 'gene_added', this.geneAddedHandler, this );
+
       this.on( 'edit', function(editor, e) {
          var record = e.record;
-         var me=this;
+         var me = this;
          UserGeneSetService.findUserGeneSet( me.selGeneSet[0].data.geneSetName, {
             callback : function(gsvo) {
-               console.log('found gene set name '+gsvo);
+               console.log( 'found gene set name ' + gsvo.name + '  decription' + gsvo.description );
                gsvo.name = record.data.geneSetName;
                gsvo.description = record.data.geneDescription;
-           /**    UserGeneSetService.updateUserGeneSet( gsvo, {
-                  callback : function() {
-                     me.getView().refresh();
-                     ASPIREdb.EVENT_BUS.fireEvent( 'geneset_updated' );
+               console.log( 'AFTER UPDATE - found gene set name ' + gsvo.name + '  decription' + ' to string '
+                  + gsvo.description + gsvo.id );
 
-                  },
-                  errorHandler : function(er, exception) {
-                     Ext.Msg.alert( "Update user gene set Error", er + "\n" + exception.stack );
-                     console.log( exception.stack );
-                  }
-               } );*/
+               // ///////////////////////////////
+               /**
+                * UserGeneSetService.updateUserGeneSet( gvo, { callback : function() { console.log('testing the update
+                * user gene set**********'); // me.getView().refresh(); ASPIREdb.EVENT_BUS.fireEvent( 'geneset_updated' );
+                *  }, errorHandler : function(er, exception) { Ext.Msg.alert( "Update user gene set Error", er + "\n" +
+                * exception.stack ); console.log( exception.stack ); } } );
+                */
 
             },
             errorHandler : function(er, exception) {
@@ -174,7 +176,8 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
          id : 'geneSetName',
          text : '',
          scope : this,
-         allowBlank : false,
+         allowBlank : true,
+         emptyText : 'Type gene Set Name',
 
       } );
 

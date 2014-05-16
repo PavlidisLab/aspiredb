@@ -68,7 +68,7 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         List<String> geneSymbols = new ArrayList<>();
         List<GeneValueObject> geneValueObjects = new ArrayList<GeneValueObject>();
 
-        if ( genes.get(0).getSymbol()==null ) { 
+        if ( genes.get( 0 ).getSymbol() == null ) {
             // null gene value objects
         } else {
             // storing the gene symbols
@@ -150,14 +150,14 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         }
         return false;
     }
-    
+
     @Override
     @Transactional
     @RemoteMethod
     public GeneSetValueObject findUserGeneSet( String geneSetName ) {
-       GeneSetValueObject geneSetValueObject = new GeneSetValueObject();
+        GeneSetValueObject geneSetValueObject = new GeneSetValueObject();
         List<UserGeneSet> genesets = userGeneSetDao.findByName( geneSetName );
-        geneSetValueObject.setId( genesets.get( 0 ).getId() );        
+        geneSetValueObject.setId( genesets.get( 0 ).getId() );
         geneSetValueObject.setName( genesets.get( 0 ).getName() );
         geneSetValueObject.setDescription( genesets.get( 0 ).getDescription() );
         geneSetValueObject.setObject( genesets.get( 0 ).getObject() );
@@ -182,6 +182,7 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         return geneValueObjects;
 
     }
+
     /**
      * DWR - Updating the user selected gene listed in the phenotype and variant window
      * 
@@ -198,7 +199,6 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         geneSetEntity.setName( geneSetvalueObject.getName() );
         geneSetEntity.setDescription( geneSetvalueObject.getDescription() );
         userGeneSetDao.update( geneSetEntity );
-      
 
     }
 
@@ -227,12 +227,12 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         return geneSetNames;
 
     }
-    
+
     @Override
     @RemoteMethod
-    public List<GeneSetValueObject>  getSavedUserGeneSets() {
+    public List<GeneSetValueObject> getSavedUserGeneSets() {
         List<GeneSetValueObject> geneSetValueObjects = new ArrayList<>();
-        Collection<String> geneSetNames = new ArrayList<>();
+
         Collection<UserGeneSet> genesets = userGeneSetDao.loadAll();
         for ( UserGeneSet geneset : genesets ) {
             GeneSetValueObject gvo = new GeneSetValueObject();
@@ -242,13 +242,12 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
             geneSetValueObjects.add( gvo );
         }
         return geneSetValueObjects;
-      
 
     }
 
     @Override
     @RemoteMethod
-    public void addGenes( String geneSetName, String geneSymbol ) throws BioMartServiceException {
+    public GeneValueObject addGenes( String geneSetName, String geneSymbol ) throws BioMartServiceException {
 
         final List<UserGeneSet> geneSet = userGeneSetDao.findByName( geneSetName );
 
@@ -292,6 +291,11 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         for ( UserGeneSet geneset : genesets ) {
             geneSetNames.add( geneset.getName() );
         }
+        // returning the added gene value object
+        List<String> returningGeneSymbols = new ArrayList<>();
+        returningGeneSymbols.add( geneSymbol );
+        List<GeneValueObject> returningGeneValueObjects = bioMartQueryService.getGenes( returningGeneSymbols );
+        return returningGeneValueObjects.get( 0 );
     }
 
     @Override
@@ -310,14 +314,15 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
 
         // storing the existing genes to the gene set
         for ( GeneValueObject existingGeneValueObject : existingGeneValueObjects ) {
-               geneSymbols.add( existingGeneValueObject.getSymbol() );
+            geneSymbols.add( existingGeneValueObject.getSymbol() );
         }
 
         // adding the gene to the gene set
         for ( String geneSymbol : geneSymbolList ) {
-            if (geneSymbols.contains( geneSymbol)){
-                
-            }else geneSymbols.add( geneSymbol );
+            if ( geneSymbols.contains( geneSymbol ) ) {
+
+            } else
+                geneSymbols.add( geneSymbol );
         }
 
         // getting the actual gene value objects. Gene value object will return null unless the gene value object id is
@@ -346,7 +351,6 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         }
     }
 
-    
     @Override
     @RemoteMethod
     public void deleteGene( String geneSetName, String geneSymbol ) throws BioMartServiceException {

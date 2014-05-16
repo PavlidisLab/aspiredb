@@ -476,14 +476,17 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
     * Update Subject labels in local store.
     */
    updateSubjectsLabels : function(subjectIds, labelToUpdate) {
+      // adding to visible label to show in the subject grid
       this.visibleLabels[labelToUpdate.id] = labelToUpdate;
-      for (var i = 0; i < subjectIds.length; i++) {
 
+      for (var i = 0; i < subjectIds.length; i++) {
+         // select selected subjects in subject grid
          var selectedSubjectId = this.store.find( 'id', subjectIds[i] );
          var selectionModel = this.getSelectionModel();
          selectionModel.doSelect( this.store.data.items[selectedSubjectId] );
          var record = this.getSelectionModel().getSelection();
 
+         // var record =this.store.data.items.get('id', subjectIds[i]);
          var labelIds = record[0].get( 'labelIds' );
          labelIds.push( labelToUpdate.id );
 
