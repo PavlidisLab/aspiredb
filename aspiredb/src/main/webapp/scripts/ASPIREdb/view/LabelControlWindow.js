@@ -160,14 +160,132 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
 
          listeners : {
             itemclick : function(e, rowIndex, cellIndex, record) {
-               console.log( 'X value ' + e.getX() + 'Y value :' + e.getY() );
-               /**
-                * colorPicker.showAt( e.getX(), e.getY() ); ASPIREdb.EVENT_BUS.on( 'label_color_chnaged',
-                * function(selColor){ item.data.labelColour =selColor; item.store.data.items[rowIndex].data =selColor;
-                * item.store.getView().refresh(); } );
-                */
-               // var labelId =this.store.data.items[rowIndex].data.labelId;
-               // var selectedColor =colorPicker.getValue();
+               //create edit label window
+              
+                  var ref = this;
+                  var row=e.store.data.items[record].data;
+                  var labelcolour = row.labelColour;
+                  var labename =row.labelName;
+                  var labelid =row.labelId;
+
+                     
+                  Ext.define( 'ASPIREdb.view.CreateLabelWindowEdit', {
+                     isSubjectLabel : true,
+                     extend : 'Ext.window.Window',
+                     title : 'Edit label',
+                     closable : true,
+                     closeAction : 'destroy',
+                     layout : 'border',
+                     bodyStyle : 'padding: 5px;',
+                     flex : 1,
+                                          
+                     layout : {
+                        type : 'hbox',
+                        defaultMargins : {
+                           top : 5,
+                           right : 5,
+                           left : 5,
+                           bottom : 5,
+                        },
+                     },
+          
+
+                     initComponent : function() {
+                        var me = this;
+
+                      me.items = [{
+                         xtype : 'textfield',
+                         id : 'labelName',
+                         text : '',
+                         value : labename,
+                         
+                      }, {
+                         xtype : 'colorpicker',
+                         itemId : 'colorPicker',
+                         value : labelcolour,
+                         flex : 2,
+                      }, {
+                         xtype : 'button',
+                         itemId : 'okButton',
+                         text : 'OK',
+                         flex : 1,
+                         handler : function() {
+                            me.onOkButtonClick();
+                         }
+                      }, {
+                         xtype : 'button',
+                         itemId : 'cancelButton',
+                         text : 'Cancel',
+                         flex : 1,
+                         handler : function() {
+                            me.hide();
+                         }
+                      }, ],
+                        this.callParent();
+
+                     },
+
+                        
+                  // override
+                     onOkButtonClick : function() {
+                        
+                        var vo = this.getLabel();
+                        if ( vo == null ) {
+                           return;
+                        }
+                        var label = ref.up( '#labelControlWindow' ).visibleLabels[labelid];
+                        label.name = vo.name;
+                        label.htmlLabel ="<font color=black><span style='background-color:"+vo.colour+"'>&nbsp&nbsp"+vo.name+"&nbsp</span></font>&nbsp&nbsp&nbsp";
+                        
+                        LabelService.updateLabel( label, {
+                           callback : function() {
+                              ref.getView().refresh();
+                              if (ref.up( '#labelControlWindow' ).isSubjectLabel ) {
+                                 ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' );
+                              } else {
+                                 ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' );
+                              }
+                           },errorHandler : function(er, exception) {
+                              Ext.Msg.alert( "Update Label Error", er + "\n" + exception.stack );
+                              console.log( exception.stack );
+                           }
+                        } );
+
+                        var labelEditWindow = new ASPIREdb.view.CreateLabelWindowEdit();
+                        labelEditWindow.hide();
+                          
+                        
+
+                     },
+
+                     getLabel : function() {
+                        var editedColorPicker = this.down("#colorPicker");
+                        var editedLabelName = this.down("#labelName");
+                 
+                        // vo will be a ValueObject if it already exists
+                        // otherwise, it's just a name of type string
+                        var vo = editedLabelName.getValue();
+                        if (vo == null || vo.length == "") {
+                           return null;
+                        }
+                        if (vo.id == undefined) {
+                           vo = new LabelValueObject();
+                           vo.name = editedLabelName.getValue();
+                           vo.colour = editedColorPicker.getValue();
+                        }
+                        vo.isShown = true;
+                        return vo;
+
+                     },
+                     
+                     
+                  });
+
+                  var labelEditWindow = new ASPIREdb.view.CreateLabelWindowEdit();
+                  labelEditWindow.show();
+
+               
+               
             }
          }
       },// end of grid
@@ -195,7 +313,8 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
          var record = e.record;
          var label = me.visibleLabels[record.data.labelId];
          label.name = record.data.labelName;
-         label.colour = record.data.labelColour;
+         label.htmlLabel ="<font color=black><span style='background-color:"+label.colour+"'>&nbsp&nbsp"+label.name+"&nbsp</span></font>&nbsp&nbsp&nbsp";
+         
          LabelService.updateLabel( label, {
             callback : function() {
                me.down( '#labelSettingsGrid' ).getView().refresh();
@@ -204,6 +323,9 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                } else {
                   ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' );
                }
+            },errorHandler : function(er, exception) {
+               Ext.Msg.alert( "Update Label Error", er + "\n" + exception.stack );
+               console.log( exception.stack );
             }
          } );
       } );
@@ -229,6 +351,8 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
       me.down( '#labelSettingsGrid' ).store.loadData( loadData );
 
    },
+   
+  
 
    labelColorHandler : function(selColor) {
 
