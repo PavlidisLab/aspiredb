@@ -39,7 +39,6 @@ var colorPicker = Ext.create( 'Ext.menu.ColorPicker', {
    displayField : 'labelColour',
    listeners : {
       select : function(picker, selColor) {
-         var tttt = picker;
          console.log( 'picker value ' + picker.value );
          console.log( 'picker  :' + picker + 'cell color  ' + selColor );
          alert( selColor );
@@ -68,7 +67,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    height : 400,
    renderTo : Ext.getBody(),
    config : {
-      visibleLabels : [],
+      visibleLabels : {},
       isSubjectLabel : false,
       selectedOwnerIds : [],
       XValue : 0,
@@ -223,9 +222,10 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
       }
 
       var loadData = [];
-      me.visibleLabels.forEach( function(label, index, array) {
+      for (labelId in me.visibleLabels) {
+         var label = me.visibleLabels[labelId];
          loadData.push( [ label.id, label.name, label.colour, label.isShown ] );
-      } );
+      }
       me.down( '#labelSettingsGrid' ).store.loadData( loadData );
 
    },

@@ -50,8 +50,6 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
          var dataIndexes = this.storeFields;
 
-         var visibleLabels = {};
-
          for (var i = 0; i < dataIndexes.length; i++) {
 
             if ( dataIndexes[i] == 'baseStart' || dataIndexes[i] == 'baseEnd' || dataIndexes[i] == 'indelLength' ) {
@@ -267,7 +265,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
        * @param visibleLabels
        */
       createVisibleLabels : function(vvos) {
-         var visibleLabels = [];
+         var visibleLabels = {};
 
          for (var i = 0; i < vvos.length; i++) {
             var labels = vvos[i].labels;
