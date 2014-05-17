@@ -379,7 +379,6 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
       Ext.define( 'ASPIREdb.view.CreateLabelWindowSubject', {
          isSubjectLabel : true,
-         title : 'Subject Label Manager',
          extend : 'ASPIREdb.view.CreateLabelWindow',
 
          // override
