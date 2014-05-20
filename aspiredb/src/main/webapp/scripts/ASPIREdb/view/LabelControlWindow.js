@@ -57,8 +57,8 @@ var colorPicker = Ext.create( 'Ext.menu.ColorPicker', {
    }
 } );
 
-/*
-* For removing and showing labels
+/**
+ * For removing and showing labels
  */
 Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    extend : 'Ext.Window',
@@ -289,7 +289,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
 
       me.down( '#labelShowColumn' ).on( 'checkchange', me.onLabelShowCheckChange, this );
 
-      me.down( '#labelActionColumn' ).on( 'cellclick', me.onLabelActionColumnClick, this );
+      me.down( '#labelActionColumn' ).on( 'itemclick', me.onLabelActionColumnClick, this );
 
       me.initGridAndShow();
 
