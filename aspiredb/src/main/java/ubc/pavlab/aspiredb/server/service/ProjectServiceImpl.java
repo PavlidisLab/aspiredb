@@ -39,6 +39,7 @@ import ubc.pavlab.aspiredb.server.project.ProjectManager;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 @Service
 @RemoteProxy(name = "ProjectService")
@@ -70,6 +71,22 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return vos;
+    }
+    
+    @Override
+    @RemoteMethod
+    public Long createUserProject(String projectName, String projectDescription) throws NotLoggedInException{
+        Project newProject =new Project();
+        newProject.setName( projectName );
+        newProject.setDescription( projectDescription );
+        newProject.setSpecialData( false );
+        projectDao.create( newProject );
+        
+        return newProject.getId();
+    }
+    
+    public void addSubjectVariantsToProject(String projectName, List<VariantValueObject> voList){
+        
     }
 
     @Override

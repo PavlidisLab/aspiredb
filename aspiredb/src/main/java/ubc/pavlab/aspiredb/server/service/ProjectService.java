@@ -31,7 +31,7 @@ import ubc.pavlab.aspiredb.shared.VariantType;
 public interface ProjectService {
 
     public List<ProjectValueObject> getProjects() throws NotLoggedInException;
-
+    
     public List<ProjectValueObject> getOverlapProjects( Collection<Long> projectIds );
 
     public ProjectValueObject getDgvProject();
@@ -53,4 +53,6 @@ public interface ProjectService {
 
     public String createUserAndAssignToGroup( String userName, String password, String groupName )
             throws NotLoggedInException;
+    
+    public Long createUserProject(String projectName, String projectDescription) throws NotLoggedInException;
 }

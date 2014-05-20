@@ -39,7 +39,8 @@ import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 /**
- * author: anton date: 10/06/13
+ * author: anton date: 10/06/13 
+ * 
  */
 @Component("labelService")
 @Service("labelService")
@@ -55,6 +56,9 @@ public class LabelServiceImpl implements LabelService {
     @Autowired
     private VariantDao variantDao;
 
+    /**
+     * update the label
+     */
     @Override
     @Transactional
     @RemoteMethod
@@ -66,7 +70,10 @@ public class LabelServiceImpl implements LabelService {
         labelDao.update( labelEntity );
        // updateSubjectLabel( label );
     }
-
+    
+    /**
+     * update subject label
+     */
     @Override
     @Transactional
     @RemoteMethod
