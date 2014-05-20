@@ -40,4 +40,7 @@ public interface LabelService {
     public void deleteSubjectLabels( Collection<LabelValueObject> labels );
 
     public void deleteVariantLabels( Collection<LabelValueObject> labels );
+
+    public void updateSubjectLabel( LabelValueObject label );
+
 }

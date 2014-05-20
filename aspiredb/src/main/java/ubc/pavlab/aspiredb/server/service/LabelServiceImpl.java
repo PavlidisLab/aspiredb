@@ -28,7 +28,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import antlr.collections.List;
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
+import ubc.pavlab.aspiredb.server.dao.SecurableDaoBase;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.Label;
@@ -62,6 +64,27 @@ public class LabelServiceImpl implements LabelService {
         labelEntity.setColour( label.getColour() );
         labelEntity.setIsShown( label.getIsShown() );
         labelDao.update( labelEntity );
+        updateSubjectLabel( label );
+    }
+
+    @Override
+    @Transactional
+    @RemoteMethod
+    public void updateSubjectLabel( LabelValueObject label ) {
+        Collection<Subject> subjects = subjectDao.findByLabel( label );
+
+        for ( Subject subject : subjects ) {
+            Collection<Label> subjectlabels = subject.getLabels();
+            for ( Label subjectlabel : subjectlabels ) {
+                if ( subjectlabel.getId().equals( label.getId() ) ) {
+                    subjectlabel.equals( label );
+                }
+            }
+
+            subject.setLabels( subjectlabels );
+            subjectDao.update( subject );
+        }
+
     }
 
     @Override
@@ -141,4 +164,5 @@ public class LabelServiceImpl implements LabelService {
         Label labelEntity = labelDao.load( label.getId() );
         labelDao.remove( labelEntity );
     }
+
 }
