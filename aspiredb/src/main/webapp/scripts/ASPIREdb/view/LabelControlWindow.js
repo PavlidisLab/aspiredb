@@ -19,13 +19,46 @@
 Ext.require( [ 'Ext.Window', 'ASPIREdb.store.LabelStore', 'Ext.grid.column.Action', 'Ext.ux.CheckColumn',
               'Ext.form.field.*', 'Ext.picker.Color' ] );
 
-/**
- * var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', { // clicksToMoveEditor: 1, clicksToEdit : 2, autoCancel :
- * false } );
- */
 
-/**
- * For removing and showing labels
+
+ var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', { 
+// clicksToMoveEditor: 1, 
+clicksToEdit : 2, autoCancel :
+ false } );
+
+
+var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
+   // clicksToMoveEditor: 1,
+   clicksToEdit : 2,
+   autoCancel : false
+} );
+
+var contextMenu = new Ext.menu.Menu( {
+   itemId : 'contextMenu',
+   displayField : 'labelColour',
+   items : [ {
+      text : colorPicker,
+      scope : this,
+
+   } ]
+} );
+
+var colorPicker = Ext.create( 'Ext.menu.ColorPicker', {
+   displayField : 'labelColour',
+   listeners : {
+      select : function(picker, selColor) {
+         console.log( 'picker value ' + picker.value );
+         console.log( 'picker  :' + picker + 'cell color  ' + selColor );
+         alert( selColor );
+         // set the store label value
+         ASPIREdb.EVENT_BUS.fireEvent( 'label_color_chnaged', selColor );
+
+      }
+   }
+} );
+
+/*
+* For removing and showing labels
  */
 Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    extend : 'Ext.Window',
@@ -42,7 +75,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    height : 400,
    renderTo : Ext.getBody(),
    config : {
-      visibleLabels : [],
+      visibleLabels : {},
       isSubjectLabel : false,
       selectedOwnerIds : [],
       XValue : 0,
@@ -288,9 +321,10 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
       }
 
       var loadData = [];
-      me.visibleLabels.forEach( function(label, index, array) {
+      for (labelId in me.visibleLabels) {
+         var label = me.visibleLabels[labelId];
          loadData.push( [ label.id, label.name, label.colour, label.isShown ] );
-      } );
+      }
       me.down( '#labelSettingsGrid' ).store.loadData( loadData );
 
    },

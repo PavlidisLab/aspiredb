@@ -90,7 +90,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       text : "Labels",
       dataIndex : 'labelIds',
       // This is very slow we need to rethink this
-      renderer : function(value) {
+      renderer : function(value, metaData, record, row, col, store, gridView) {
 
          var ret = "";
          for (var i = 0; i < value.length; i++) {
@@ -227,20 +227,16 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
     * 
     * @return visibleLabels
     */
-   createVisibleLabels : function() {
+   createVisibleLabels : function(vvos) {
       var visibleLabels = [];
-      var suggestionContext = new SuggestionContext();
-      suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
 
-      // load all labels created by this user
-      SubjectService.suggestLabels( suggestionContext, {
-         callback : function(labels) {
-            for ( var idx in labels) {
-               var label = labels[idx];
-               visibleLabels[label.id] = label;
-            }
+      for (var i = 0; i < vvos.length; i++) {
+         var labels = vvos[i].labels;
+         for (var j = 0; j < labels.length; j++) {
+            var label = labels[j];
+            visibleLabels[label.id] = label;
          }
-      } );
+      }
 
       return visibleLabels;
    },
@@ -258,14 +254,15 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       me.filterConfigs = filterConfigs;
       me.setLoading( true );
       me.getStore().removeAll();
-      // load existing subject labels
-      me.visibleLabels = me.createVisibleLabels();
 
       // DWR : get subjects match the subject filter
       // configuration
       QueryService.querySubjects( filterConfigs, {
          callback : function(pageLoad) {
             me.valueObjects = pageLoad.items;
+
+            // load existing subject labels
+            me.visibleLabels = me.createVisibleLabels( me.valueObjects );
 
             var data = [];
 
@@ -460,16 +457,11 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
            
       for (var i = 0; i < subjects.length; i++) {
          var labelIds = subjects[i].data.labelIds;
-         var labelsToRemoveIndex = [];
-         for (var j = 0; j < labelIds.length; j++) {
-            for (var k = 0; k < labelsToRemove.length; k++) {
-               if ( labelIds[j] == labelsToRemove[k].id ) {
-                  labelsToRemoveIndex.push( j );
-               }
+         for (var k = 0; k < labelsToRemove.length; k++) {
+            var idx = labelIds.indexOf( labelsToRemove[k].id );
+            if ( idx > -1 ) {
+               labelIds.splice( idx, 1 );
             }
-         }
-         for (var j = 0; j < labelsToRemoveIndex.length; j++) {
-            labelIds.pop( labelsToRemoveIndex[j] );
          }
       }
    },
@@ -488,7 +480,6 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
          selectionModel.doSelect( this.store.data.items[selectedSubjectId] );
          var record = this.getSelectionModel().getSelection();
 
-         // var record =this.store.data.items.get('id', subjectIds[i]);
          var labelIds = record[0].get( 'labelIds' );
          labelIds.push( labelToUpdate.id );
 
@@ -528,6 +519,18 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       me.getView().refresh();
    },
 
+   updateVisibleLabelsFromStore : function() {
+      var ret = {};
+      for (var i = 0; i < this.store.data.items.length; i++) {
+         var labelIds = this.store.data.items[i].data.labelIds;
+         for (var j = 0; j < labelIds.length; j++) {
+            var labelId = labelIds[j];
+            ret[labelId] = this.visibleLabels[labelId];
+         }
+      }
+      return ret;
+   },
+
    /**
     * Display labelManagerWindow
     * 
@@ -542,6 +545,11 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       for (var i = 0; i < this.selSubjects.length; i++) {
          selectedSubjectIds.push( this.selSubjects[i].data.id );
       }
+
+      // check visibleLabels and make sure it's up-to-date
+      // use store instead of value objects because value objects may
+      // already be stale
+      me.visibleLabels = me.updateVisibleLabelsFromStore();
 
       var labelControlWindow = Ext.create( 'ASPIREdb.view.LabelControlWindow', {
          visibleLabels : me.visibleLabels,

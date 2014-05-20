@@ -399,16 +399,11 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    removeLabelsFromVariants : function(variants, labelsToRemove) {
       for (var i = 0; i < variants.length; i++) {
          var labelIds = variants[i].data.labelIds;
-         var labelsToRemoveIndex = [];
-         for (var j = 0; j < labelIds.length; j++) {
-            for (var k = 0; k < labelsToRemove.length; k++) {
-               if ( labelIds[j] == labelsToRemove[k].id ) {
-                  labelsToRemoveIndex.push( j );
-               }
+         for (var k = 0; k < labelsToRemove.length; k++) {
+            var idx = labelIds.indexOf( labelsToRemove[k].id );
+            if ( idx > -1 ) {
+               labelIds.splice( idx, 1 );
             }
-         }
-         for (var j = 0; j < labelsToRemoveIndex.length; j++) {
-            labelIds.pop( labelsToRemoveIndex[j] );
          }
       }
    },
@@ -948,11 +943,26 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       labelWindow.show();
    },
 
+   updateVisibleLabelsFromStore : function() {
+      var ret = {};
+      var visibleLabels = this.down( '#variantGrid' ).visibleLabels;
+      var store = this.down( '#variantGrid' ).store;
+      for (var i = 0; i < store.data.items.length; i++) {
+         var labelIds = store.data.items[i].data.labelIds;
+         for (var j = 0; j < labelIds.length; j++) {
+            var labelId = labelIds[j];
+            ret[labelId] = visibleLabels[labelId];
+         }
+      }
+      return ret;
+   },
+
    /**
     * Display labelManagerWindow
     */
    labelManagerHandler : function(event) {
       var me = this;
+      var visibleLabels = me.down( '#variantGrid' ).visibleLabels;
 
       var currentlySelectedRecords = me.getVariantRecordSelection();
       var selectedVariantIds = [];
@@ -960,8 +970,10 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          selectedVariantIds.push( currentlySelectedRecords[i].get( 'id' ) );
       }
 
+      visibleLabels = me.updateVisibleLabelsFromStore();
+
       var labelControlWindow = Ext.create( 'ASPIREdb.view.LabelControlWindow', {
-         visibleLabels : me.down( '#variantGrid' ).visibleLabels,
+         visibleLabels : visibleLabels,
          isSubjectLabel : false,
          selectedOwnerIds : selectedVariantIds,
          title : 'Variant Label Manager'
