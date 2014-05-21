@@ -1,4 +1,3 @@
-
 Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
    extend : 'Ext.Container',
    alias : 'widget.filter_phenotype_property',
@@ -25,11 +24,11 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
          } ),
          listConfig : {
             loadingText : 'Searching...',
-            emptyText : 'No results found.'
+            emptyText : 'No results.'
          },
          listeners : {
             select : {
-               fn : function(obj, records) {
+               fn : function( obj, records ) {
                   var record = records[0];
                   var valueCombo = this.getComponent( 'valueCombo' );
                   valueCombo.clearValue();
@@ -56,7 +55,7 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
          } ),
          listeners : {
             select : {
-               fn : function(obj, records) {
+               fn : function( obj, records ) {
                   ASPIREdb.EVENT_BUS.fireEvent( 'query_update' );
                },
                scope : this,
@@ -64,7 +63,7 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
          },
          listConfig : {
             loadingText : 'Searching...',
-            emptyText : 'No results found.'
+            emptyText : 'No results.'
          }
       }, {
          xtype : 'button',
@@ -74,7 +73,7 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
 
       this.callParent();
 
-      this.getComponent( "removeButton" ).on( 'click', function(button, event) {
+      this.getComponent( "removeButton" ).on( 'click', function( button, event ) {
          // TODO: fix with custom events
          var item = button.ownerCt;
          var filterContainer = item.ownerCt;
@@ -99,7 +98,7 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
       return phenotypeRestriction;
    },
 
-   setRestrictionExpression : function(phenotypeRestriction) {
+   setRestrictionExpression : function( phenotypeRestriction ) {
       var nameCombo = this.getComponent( "nameCombo" );
       var valueCombo = this.getComponent( "valueCombo" );
       nameCombo.setValue( phenotypeRestriction.name );
