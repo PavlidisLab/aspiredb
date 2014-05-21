@@ -16,144 +16,172 @@
  * limitations under the License.
  *
  */
-Ext.require([ 'Ext.Window' ]);
+Ext.require( [ 'Ext.Window','ASPIREdb.view.UploadDataManagerWindow'] );
 
-Ext.define('ASPIREdb.view.DashboardWindow', {
-	extend : 'Ext.Window',
-	alias : 'widget.dashboardWindow',
-	singleton : true,
-	title : 'Dashboard',
-	closable : true,
-	closeAction : 'hide',
-	width : 400,
-	height : 250,
-	layout : {
-		type : 'vbox',
-		align : 'center'
-	},
-	bodyStyle : 'padding: 5px;',
-	border: false,
+Ext.define( 'ASPIREdb.view.DashboardWindow', {
+   extend : 'Ext.Window',
+   alias : 'widget.dashboardWindow',
+   singleton : true,
+   title : 'Dashboard',
+   closable : true,
+   closeAction : 'hide',
+   width : 400,
+   height : 250,
+   layout : {
+      type : 'vbox',
+      align : 'center'
+   },
+   bodyStyle : 'padding: 5px;',
+   border : false,
 
-	config : {
+   config : {
 
-		//active project ID values holder
-		activeProjectIds : [],
-		
-	},
-	
-	initComponent : function() {
+      // active project ID values holder
+      activeProjectIds : [],
 
-		this.callParent();
+   },
+   dockedItems : [ {
+      xtype : 'toolbar',
+      itemId : 'dashboardToolbar',
+      dock : 'top'
+   } ],
 
-		var ref = this;
-		var projectStore = Ext.create('Ext.data.Store', {
-			proxy : {
-				type : 'dwr',
-				dwrFunction : ProjectService.getProjects,
-				model : 'ASPIREdb.model.Project',
-				reader : {
-					type : 'json',
-					root : 'name'
-				}
-			}
-		});
+   initComponent : function() {
 
-		var projectComboBox = Ext.create('Ext.form.ComboBox', {
-			id : 'projectField',
-			name : 'unit',
-			fieldLabel : 'Project',
-			store : projectStore,
-			editable : false,
-			displayField : 'name',
-			allowBlank : false,
-			valueField : 'id',
-			forceSelection : true,
-			emptyText : "Choose project...",
-			msgTarget : 'qtip'
-		});
+      this.callParent();
+      this.enableToolbar();
+      var ref = this;
+      var projectStore = Ext.create( 'Ext.data.Store', {
+         proxy : {
+            type : 'dwr',
+            dwrFunction : ProjectService.getProjects,
+            model : 'ASPIREdb.model.Project',
+            reader : {
+               type : 'json',
+               root : 'name'
+            }
+         }
+      } );
 
-		this.add(projectComboBox);
+      var projectComboBox = Ext.create( 'Ext.form.ComboBox', {
+         id : 'projectField',
+         name : 'unit',
+         fieldLabel : 'Project',
+         store : projectStore,
+         editable : false,
+         displayField : 'name',
+         allowBlank : false,
+         valueField : 'id',
+         forceSelection : true,
+         emptyText : "Choose project...",
+         msgTarget : 'qtip'
+      } );
 
-		projectComboBox.on('select', function() {
+      this.add( projectComboBox );
 
-			ProjectService.numSubjects([ projectComboBox.getValue() ], {
-				callback : function(numSubjects) {
+      projectComboBox.on( 'select', function() {
 
-					ref.getComponent('numSubjects').setText('Number of Subjects: ' + numSubjects);
+         ProjectService.numSubjects( [ projectComboBox.getValue() ], {
+            callback : function(numSubjects) {
 
-				}
+               ref.getComponent( 'numSubjects' ).setText( 'Number of Subjects: ' + numSubjects );
 
-			});
+            }
 
-			ProjectService.numVariants([ projectComboBox.getValue() ], {
-				callback : function(numVariants) {
+         } );
 
-					ref.getComponent('numVariants').setText('Number of Variants:  ' + numVariants);
+         ProjectService.numVariants( [ projectComboBox.getValue() ], {
+            callback : function(numVariants) {
 
-				}
+               ref.getComponent( 'numVariants' ).setText( 'Number of Variants:  ' + numVariants );
 
-			});
-			
-			
+            }
 
-		});
+         } );
 
-		var okButton = Ext.create('Ext.Button', {
-			text : 'ok',
-			handler : function() {
-				//var selectedProjectId=0;
-				
-				if (!projectComboBox.getValue()) {
+      } );
 
-					projectComboBox.setActiveError('Please select project');
-					return;
-				}
-				else {
-					var selectedProjectId=projectComboBox.getValue();
-					//TODO : Now only one project is loaded at a time, but in future this might change
-					if (selectedProjectId!=ref.activeProjectIds[0]){
-				
-				
-						ASPIREdb.ActiveProjectSettings.setActiveProject([ {
-							id : projectComboBox.getValue(),
-							name : projectComboBox.getRawValue(),
-							description : ''
-						} ]);
+      var okButton = Ext.create( 'Ext.Button', {
+         text : 'ok',
+         handler : function() {
+            // var selectedProjectId=0;
 
-						var filterConfigs = [];			
-								
-						ref.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
-						var projectFilter = new ProjectFilterConfig;
-						projectFilter.projectIds = ref.activeProjectIds;
-						filterConfigs.push(projectFilter);
-						console.log("filter_submit event from DashBoard window");
-						ASPIREdb.EVENT_BUS.fireEvent('filter_submit', filterConfigs);
-				
-						console.log("query_update event from DashboardWindow");
-						ASPIREdb.EVENT_BUS.fireEvent('query_update');
-						ASPIREdb.EVENT_BUS.fireEvent('project_select');
-						
-				}
-					ref.close();
+            if ( !projectComboBox.getValue() ) {
 
-			}
-			}
-		});
+               projectComboBox.setActiveError( 'Please select project' );
+               return;
+            } else {
+               var selectedProjectId = projectComboBox.getValue();
+               // TODO : Now only one project is loaded at a time, but in future this might change
+               if ( selectedProjectId != ref.activeProjectIds[0] ) {
 
-		this.add({
-			xtype : 'label',
-			itemId : 'numSubjects',
-			text : 'Number of Subjects:',
-			margin : '20 20 5 20'
-		}, {
-			xtype : 'label',
-			itemId : 'numVariants',
-			text : 'Number of Variants:',
-			margin : '5 20 20 20'
-		});
+                  ASPIREdb.ActiveProjectSettings.setActiveProject( [ {
+                     id : projectComboBox.getValue(),
+                     name : projectComboBox.getRawValue(),
+                     description : ''
+                  } ] );
 
-		this.add(okButton);
+                  var filterConfigs = [];
 
-	}
+                  ref.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+                  var projectFilter = new ProjectFilterConfig;
+                  projectFilter.projectIds = ref.activeProjectIds;
+                  filterConfigs.push( projectFilter );
+                  console.log( "filter_submit event from DashBoard window" );
+                  ASPIREdb.EVENT_BUS.fireEvent( 'filter_submit', filterConfigs );
 
-});
+                  console.log( "query_update event from DashboardWindow" );
+                  ASPIREdb.EVENT_BUS.fireEvent( 'query_update' );
+                  ASPIREdb.EVENT_BUS.fireEvent( 'project_select' );
+
+               }
+               ref.close();
+
+            }
+         }
+      } );
+
+      this.add( {
+         xtype : 'label',
+         itemId : 'numSubjects',
+         text : 'Number of Subjects:',
+         margin : '20 20 5 20'
+      }, {
+         xtype : 'label',
+         itemId : 'numVariants',
+         text : 'Number of Variants:',
+         margin : '5 20 20 20'
+      } );
+
+      this.add( okButton );
+
+   },
+   /**
+    * Enable the tool bar in dash board
+    * 
+    */
+   enableToolbar : function() {
+
+      this.getDockedComponent( 'dashboardToolbar' ).removeAll();
+
+      this.getDockedComponent( 'dashboardToolbar' ).add( {
+         xtype : 'button',
+         id : 'createProject',
+         text : 'Upload Data Manager',
+         tooltip : 'Craete new Project',
+         icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
+         handler : function() {
+            ASPIREdb.view.UploadDataManagerWindow.initGridAndShow();
+            /**
+             * ProjectService.createUserProject( 'New Project', 'New Project Description', { callback :
+             * function(projectId) { var createdProject =projectId;
+             *  }, errorHandler : function(er, exception) { Ext.Msg.alert( "create project Error", er + "\n" +
+             * exception.stack ); console.log( exception.stack ); } } );
+             */
+
+         }
+      } );
+
+   }
+
+} );

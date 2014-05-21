@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'Ext.Window','ASPIREdb.UploadManagerPanel' ] );
+Ext.require( [ 'Ext.Window','ASPIREdb.view.UploadManagerPanel' ] );
 
 Ext.define( 'ASPIREdb.view.UploadDataManagerWindow', {
    extend : 'Ext.Window',
@@ -24,15 +24,11 @@ Ext.define( 'ASPIREdb.view.UploadDataManagerWindow', {
    singleton : true,
    title : 'Upload Data Manager',
    closable : true,
-  // closeAction : 'hide',
-   width : 400,
-   height : 250,
-   layout : {
-      type : 'vbox',
-      align : 'center'
-   },
+   closeAction : 'hide',
+   width : 800,
+   height : 500,
+   layout : 'fit',
    bodyStyle : 'padding: 5px;',
-   border : false,
 
    config : {
 
@@ -40,30 +36,27 @@ Ext.define( 'ASPIREdb.view.UploadDataManagerWindow', {
       activeProjectIds : [],
 
    },
-   items : [{
+   items : [ {
       region : 'center',
       itemId : 'uploadManagerPanel',
       xtype : 'uploadManagerPanel',
-   }],
+   } ],
 
    initComponent : function() {
 
       this.callParent();
-     
 
    },
    /**
-    * Show the gene manager window
-    */   
-   initGridAndShow : function(){
-      
+    * Show the upload manager panel
+    */
+   initGridAndShow : function() {
+
       var ref = this;
-      var panel = ASPIREdb.view.UploadDataManagerWindow.down('#uploadManagerPanel');
-      
+      var panel = ASPIREdb.view.UploadDataManagerWindow.down( '#uploadManagerPanel' );
+
       ref.show();
-     
-   
+
    },
-   
 
 } );
