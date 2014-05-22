@@ -20,6 +20,7 @@ import java.util.List;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 /**
  * TODO Document Me
@@ -55,4 +56,6 @@ public interface ProjectService {
             throws NotLoggedInException;
     
     public Long createUserProject(String projectName, String projectDescription) throws NotLoggedInException;
+
+    public Exception addSubjectVariantsToExistingProject( String directory,String filename, String projectName, VariantType variantType );
 }

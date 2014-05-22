@@ -54,6 +54,7 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
             title : 'Project',
             collapsible : true,
             autoWidth : true,
+            autoheight : true,
             defaultType : 'textfield',
             layout : 'anchor',
             defaults : {
@@ -62,25 +63,98 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
             items : [ {
                fieldLabel : 'Project Name',
                name : 'projectName',
+               id : 'projectName',
                value : '',
+               labelWidth : 150,
 
             }, {
                fieldLabel : 'Project Decription',
                name : 'projectDescription',
-
+               id : 'projectDescription',
+               value : '',
+               labelWidth : 150,
             } ]
          }, {
-            xtype : 'filefield',
-            id : 'variantFile',
-            width : 600,
-            emptyText : 'Select variant file to upload',
-            fieldLabel : 'Upload Variant List',
-            labelWidth : 150,
-            name : 'varintUploadFile-path',
-            buttonText : 'Select',
-       
-         } ]
-      }, {
+            xtype : 'fieldset',
+            title : 'Variants',
+            collapsible : true,
+            autoWidth : true,
+            autoheight : true,
+            defaultType : 'textfield',
+            layout : 'anchor',
+            defaults : {
+               anchor : '100%'
+            },
+            items : [ {
+               xtype : 'filefield',
+               id : 'variantFile',
+               width : 600,
+               emptyText : 'Select variant file to upload',
+               fieldLabel : 'Upload Variant List',
+               labelWidth : 150,
+               name : 'varintUploadFile-path',
+               buttonText : 'Select',
+
+            }, {
+               xtype : 'combobox',
+               fieldLabel : 'variant Type',
+               id : 'variantType',
+               editable : false,
+               displayField : 'variantType',
+               // allowBlank : false,
+               valueField : 'id',
+               store : Ext.create( 'Ext.data.Store', {
+                  fields : [ 'id', 'variantType' ],
+                  data : [ {
+                     id : 'cnv',
+                     variantType : 'CNV'
+                  }, {
+                     id : 'snv',
+                     variantType : 'SNV'
+                  }, {
+                     id : 'indel',
+                     variantType : 'INDEL'
+                  }, {
+                     id : 'inversion',
+                     variantType : 'INVERSION'
+                  }, {
+                     id : 'translocation',
+                     variantType : 'TRANSLOCATION'
+                  }, {
+                     id : 'decipher',
+                     variantType : 'DECIPHER'
+                  }, {
+                     id : 'dvg',
+                     variantType : 'DGV'
+                  }, ]
+               } ),
+               labelWidth : 150,
+
+            } ]
+         }, /**{
+            xtype : 'fieldset',
+            title : 'Phenotypes',
+            collapsible : true,
+            autoWidth : true,
+            autoheight : true,
+            defaultType : 'textfield',
+            layout : 'anchor',
+            defaults : {
+               anchor : '100%'
+            },
+            items : [ {
+               xtype : 'filefield',
+               id : 'phenotypeFile',
+               width : 600,
+               emptyText : 'Select phenotype file to upload',
+               fieldLabel : 'Upload Phenotype List',
+               labelWidth : 150,
+               name : 'phenotypeUploadFile-path',
+               buttonText : 'Select',
+
+            } ]
+         }*/]
+      },/** {
          title : 'Existing Project Upload',
          defaultType : 'textfield',
          width : 750,
@@ -105,44 +179,100 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                   }
                }
             } ),
-       //     typeAhead : true,
-         //   queryMode : 'local',
+            // typeAhead : true,
+            // queryMode : 'local',
             emptyText : 'Choose project...',
             forceSelection : true,
             msgTarget : 'qtip',
 
          } ]
-      } ]
+      }*/ ]
    },
 
-   buttons : [ {
-      text : 'Upload',
-      disabled : true,
-      formBind : true,
-      handler : function() {
-         this.up( 'form' ).getForm().submit( {
-            url : 'upload.action', //'xml-form-errors.xml',
-            submitEmptyText : false,
-            waitMsg : 'Uploading your file...',
-            success: function(fp, o) { 
-               Ext.Msg.alert('Success', 'Your file has been uploaded.');
-            }
-               /**
-                * handler: function() { var form = this.up('form').getForm(); if(form.isValid()){ form.submit({ url:
-                * 'upload.action', waitMsg: 'Uploading your file...', success: function(fp, o) { Ext.Msg.alert('Success',
-                * 'Your file has been uploaded.'); } }); } }
-                */
-         } );
-         /**
-          * ProjectService.createUserProject( 'New Project', 'New Project Description', { callback : function(projectId) {
-          * var createdProject =projectId; }, errorHandler : function(er, exception) { Ext.Msg.alert( "create project
-          * Error", er + "\n" + exception.stack ); console.log( exception.stack ); } } );
-          */
-      }
+   buttons : [
+              {
+                 text : 'Upload',
+                 // disabled : true,
+                  //formBind : true,
+                 handler : function() {
+                    var form = this.up( 'uploadManagerPanel' ).getForm();
+                     console.log('form project name: '+form);
+                    if ( form.isValid() ) {
+                       form.submit( {
+                          clientValidation: true,
+                          scope: this,
+                          params: {
+                             newStatus: 'delivered'
+                         },
+                          // method :'POST',
+                          // url : 'upload.action', // 'xml-form-errors.xml',
+                          // submitEmptyText : false,
+                          waitMsg : 'Uploading your file...',
+                          success : function(form,action) {
+                             Ext.Msg.alert( 'Success', 'Your file has been uploaded.' );
+                             // getting the form values
+                             var projectName = form.findField( 'projectName' ).getValue();
+                             var projectDescription = form.findField( 'projectDescription' ).getValue();
+                             var variantPath = form.findField( 'varintUploadFile-path' ).getValue();
+                             var variantDirectory = variantPath.substring( 0, variantPath.lastIndexOf( "\\" ) );
+                             var variantFilename = variantPath.substring( variantPath.lastIndexOf( "\\" ) + 1,
+                                variantPath.length );
+                             var variantType = new VariantType();
+                             variantType.setValue( form.findField( 'variantType' ).getValue() );
+                             var phenotypePath = form.findField( 'phenotypeUploadFile-path' ).getValue();
+                             var phenotypeDirectory = phenotypePath.substring( 0, phenotypePath.lastIndexOf( "\\" ) );
+                             var phenotypeFilename = phenotypePath.substring( phenotypePath.lastIndexOf( "\\" ) + 1,
+                                phenotypePath.length );
 
-   }, {
-      text : 'Cancel'
-   } ]
+                             // create project
+                             ProjectService.createUserProject( projectName, projectDescription, {
+                                callback : function(projectId) {
+                                   ProjectService.addSubjectVariantsToExistingProject( variantDirectory,
+                                      variantFilename, projectName, variantType, {
+                                         callback : function(errorMessage) {
+
+                                         },
+                                         errorHandler : function(er, exception) {
+                                            xt.Msg.alert( "create variant Error", er + "\n" + exception.stack );
+                                            console.log( exception.stack );
+                                         }
+                                      } );
+
+                                },
+                                errorHandler : function(er, exception) {
+                                   xt.Msg.alert( "create project Error", er + "\n" + exception.stack );
+                                   console.log( exception.stack );
+                                }
+                             } );
+
+                          },
+                          failure : function(form, action) {
+                             Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' );
+                          }
+                       /**
+                         * handler: function() { var form = this.up('form').getForm(); if(form.isValid()){ form.submit({
+                         * url: 'upload.action', waitMsg: 'Uploading your file...', success: function(fp, o) {
+                         * Ext.Msg.alert('Success', 'Your file has been uploaded.'); } }); } }
+                         */
+                       } );
+                    } else {
+                      // Ext.Msg.alert( "Error!", "Your form is invalid!" );
+                       fieldNames = [];                
+                       fields = form.getFields();
+                       for(var i=0; i <  fields.length; i++){
+                           field = fields[i];
+                           if (field == undefined)
+                            fieldNames.push(field.getName());
+                        }
+                       console.debug(fieldNames);
+                       Ext.MessageBox.alert('Invalid Fields', 'The following fields are invalid: ' + fieldNames.join(', '));
+                    }
+
+                 }
+
+              }, {
+                 text : 'Cancel'
+              } ]
 } );
 
 // fsf.render(document.body);
