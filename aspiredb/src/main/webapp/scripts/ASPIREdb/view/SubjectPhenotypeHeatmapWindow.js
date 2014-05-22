@@ -34,9 +34,43 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
    layout : 'fit',
    bodyStyle : 'padding: 10px;',
    id : 'subjectPhenotypeHeatmapWindow',
+   // TODO FIXME Bug 4419. Combine labels and dendrograms with the matrix image
+   /*tbar : new Ext.Toolbar( {
+      items : [ {
+         xtype : 'button',
+         itemId : 'exportButton',
+         text : '',
+         tooltip : 'Save heatmap as PNG',
+         icon : 'scripts/ASPIREdb/resources/images/icons/export.png'
+      } ]
+   } ),*/
 
    initComponent : function() {
+      var ref = this;
       this.callParent();
+
+      this.down( '#exportButton' ).on( 'click', function() {
+         ref.exportButtonHandler();
+      }, this );
+
+   },
+
+   /**
+    * TODO FIXME Bug 4419. Combine labels and dendrograms with the matrix image
+    */
+   exportButtonHandler : function() {
+      if ( this.heatmap == null ) {
+         return;
+      }
+
+      var canvas = this.heatmap.down( '#matrixCanvas' );
+      if ( canvas == null ) {
+         return;
+      }
+
+      var imgsrc = canvas.el.dom.toDataURL( 'image/png' );
+      var strDownloadMime = "image/octet-stream";
+      document.location.href = imgsrc.replace( "image/png", strDownloadMime );
    },
 
    draw : function(matrix) {
@@ -249,6 +283,8 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
             showColumnLabels : true
          }
       } );
+
+      this.heatmap = heatmap;
 
       var resizer = Ext.create( 'Ext.resizer.Resizer', {
          handles : 'all',
