@@ -49,9 +49,10 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
       var ref = this;
       this.callParent();
 
-      this.down( '#exportButton' ).on( 'click', function() {
-         ref.exportButtonHandler();
-      }, this );
+      // TODO FIXME Bug 4419. Combine labels and dendrograms with the matrix image
+      //this.down( '#exportButton' ).on( 'click', function() {
+      //   ref.exportButtonHandler();
+      //}, this );
 
    },
 
