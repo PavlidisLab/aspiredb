@@ -14,6 +14,10 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.Reader;
+import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.List;
 
@@ -57,5 +61,5 @@ public interface ProjectService {
     
     public Long createUserProject(String projectName, String projectDescription) throws NotLoggedInException;
 
-    public Exception addSubjectVariantsToExistingProject( String directory,String filename, String projectName, VariantType variantType );
+    public Exception addSubjectVariantsToExistingProject( String fileContent, String projectName, String variantType );
 }

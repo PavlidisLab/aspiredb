@@ -29,6 +29,9 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
    bodyStyle : 'padding:5px 5px 0',
    // width: 350,
    fileUpload : true,
+   config : {
+      variantSrc : null,
+   },
    fieldDefaults : {
       labelWidth : 75,
       msgTarget : 'side'
@@ -88,12 +91,28 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
             items : [ {
                xtype : 'filefield',
                id : 'variantFile',
+               name : 'file',
                width : 600,
+               allowBlanck : false,
                emptyText : 'Select variant file to upload',
                fieldLabel : 'Upload Variant List',
                labelWidth : 150,
-               name : 'varintUploadFile-path',
                buttonText : 'Select',
+               handler : function() {
+                  console.log( 'file upload handler ' );
+               },
+               listeners : {
+                  afterrender : function(el) {
+                     var element = el.fileInputEl;
+                     console.log( element );
+                     return element;
+                  },
+                  change : function(fld, value) {
+
+                     var newValue = value.replace( /C:\\fakepath\\/g, '' );
+                     fld.setRawValue( newValue );
+                  }
+               }
 
             }, {
                xtype : 'combobox',
@@ -131,7 +150,7 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                labelWidth : 150,
 
             } ]
-         }, /**{
+         }, {
             xtype : 'fieldset',
             title : 'Phenotypes',
             collapsible : true,
@@ -145,134 +164,103 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
             items : [ {
                xtype : 'filefield',
                id : 'phenotypeFile',
+               name : 'phenotypeFile',
                width : 600,
                emptyText : 'Select phenotype file to upload',
                fieldLabel : 'Upload Phenotype List',
                labelWidth : 150,
                name : 'phenotypeUploadFile-path',
                buttonText : 'Select',
-
             } ]
-         }*/]
-      },/** {
-         title : 'Existing Project Upload',
-         defaultType : 'textfield',
-         width : 750,
+         }
 
-         items : [ {
-            xtype : 'combobox',
-            fieldLabel : 'Project',
-            id : 'userProjectField',
-            name : 'unit',
-            editable : false,
-            displayField : 'name',
-            allowBlank : false,
-            valueField : 'id',
-            store : Ext.create( 'Ext.data.Store', {
-               proxy : {
-                  type : 'dwr',
-                  dwrFunction : ProjectService.getProjects,
-                  model : 'ASPIREdb.model.Project',
-                  reader : {
-                     type : 'json',
-                     root : 'name'
-                  }
-               }
-            } ),
-            // typeAhead : true,
-            // queryMode : 'local',
-            emptyText : 'Choose project...',
-            forceSelection : true,
-            msgTarget : 'qtip',
-
-         } ]
-      }*/ ]
+         ]
+      } ]
    },
 
-   buttons : [
-              {
-                 text : 'Upload',
-                 // disabled : true,
-                  //formBind : true,
-                 handler : function() {
-                    var form = this.up( 'uploadManagerPanel' ).getForm();
-                     console.log('form project name: '+form);
-                    if ( form.isValid() ) {
-                       form.submit( {
-                          clientValidation: true,
-                          scope: this,
-                          params: {
-                             newStatus: 'delivered'
-                         },
-                          // method :'POST',
-                          // url : 'upload.action', // 'xml-form-errors.xml',
-                          // submitEmptyText : false,
-                          waitMsg : 'Uploading your file...',
-                          success : function(form,action) {
-                             Ext.Msg.alert( 'Success', 'Your file has been uploaded.' );
-                             // getting the form values
-                             var projectName = form.findField( 'projectName' ).getValue();
-                             var projectDescription = form.findField( 'projectDescription' ).getValue();
-                             var variantPath = form.findField( 'varintUploadFile-path' ).getValue();
-                             var variantDirectory = variantPath.substring( 0, variantPath.lastIndexOf( "\\" ) );
-                             var variantFilename = variantPath.substring( variantPath.lastIndexOf( "\\" ) + 1,
-                                variantPath.length );
-                             var variantType = new VariantType();
-                             variantType.setValue( form.findField( 'variantType' ).getValue() );
-                             var phenotypePath = form.findField( 'phenotypeUploadFile-path' ).getValue();
-                             var phenotypeDirectory = phenotypePath.substring( 0, phenotypePath.lastIndexOf( "\\" ) );
-                             var phenotypeFilename = phenotypePath.substring( phenotypePath.lastIndexOf( "\\" ) + 1,
-                                phenotypePath.length );
+   buttons : [ {
+      text : 'Upload',
+      // disabled : true,
+      // formBind : true,
+      handler : function() {
+         var form = this.up( 'uploadManagerPanel' ).getForm();
+         var me = this;
+         if ( form.isValid() ) {
 
-                             // create project
-                             ProjectService.createUserProject( projectName, projectDescription, {
-                                callback : function(projectId) {
-                                   ProjectService.addSubjectVariantsToExistingProject( variantDirectory,
-                                      variantFilename, projectName, variantType, {
-                                         callback : function(errorMessage) {
+            // getting the form values
+            values = form.getFieldValues();
+            var projectName = values['projectName'];
+            var projectDescription = values['projectDescription'];
 
-                                         },
-                                         errorHandler : function(er, exception) {
-                                            xt.Msg.alert( "create variant Error", er + "\n" + exception.stack );
-                                            console.log( exception.stack );
-                                         }
-                                      } );
+            // create project
+            ProjectService.createUserProject( projectName, projectDescription, {
+               callback : function(projectId) {
+                  console.log( 'reading uplodaed files' + file );
 
-                                },
-                                errorHandler : function(er, exception) {
-                                   xt.Msg.alert( "create project Error", er + "\n" + exception.stack );
-                                   console.log( exception.stack );
-                                }
-                             } );
+               },
+               errorHandler : function(er, exception) {
+                  Ext.Msg.alert( "create project Error", er + "\n" + exception.stack );
+                  console.log( exception.stack );
+               }
+            } );
 
-                          },
-                          failure : function(form, action) {
-                             Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' );
-                          }
-                       /**
-                         * handler: function() { var form = this.up('form').getForm(); if(form.isValid()){ form.submit({
-                         * url: 'upload.action', waitMsg: 'Uploading your file...', success: function(fp, o) {
-                         * Ext.Msg.alert('Success', 'Your file has been uploaded.'); } }); } }
-                         */
-                       } );
-                    } else {
-                      // Ext.Msg.alert( "Error!", "Your form is invalid!" );
-                       fieldNames = [];                
-                       fields = form.getFields();
-                       for(var i=0; i <  fields.length; i++){
-                           field = fields[i];
-                           if (field == undefined)
-                            fieldNames.push(field.getName());
-                        }
-                       console.debug(fieldNames);
-                       Ext.MessageBox.alert('Invalid Fields', 'The following fields are invalid: ' + fieldNames.join(', '));
-                    }
+            form.submit( {
+               clientValidation : true,
+               scope : this,
+               params : {
+                  newStatus : 'delivered'
+               },
+               method : 'GET',
+               url : '/aspiredb/upload_action.html', // submitEmptyText : false,
 
-                 }
+               waitMsg : 'Uploading your file...',
+               success : function(form, action) {
+                  Ext.Msg.alert( 'Success', 'Your file has been uploaded.' );
+               },
+               failure : function(form, action) {
+                  Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' );
+               }
+            } );
 
-              }, {
-                 text : 'Cancel'
-              } ]
+            /**
+             * var variantPath = form.findField( 'variantFile' ).getValue(); var variantDirectory =
+             * variantPath.substring( 0, variantPath.lastIndexOf( "\\" ) ); var variantFilename = variantPath.substring(
+             * variantPath.lastIndexOf( "\\" ) + 1, variantPath.length ); var variantType =
+             * values['variantType-inputEl'].toUpperCase(); var file = Ext.getCmp( 'variantFile' ).getEl().down(
+             * 'input[type=file]' ).dom.files[0]; // variantType.setValue(values['variantType-inputEl']); //
+             * variantType.setValue( values['variantType-inputEl'] ); // var phenotypePath = form.findField(
+             * 'phenotypeUploadFile-path' ).getValue(); // var phenotypeDirectory = phenotypePath.substring( 0,
+             * phenotypePath.lastIndexOf( "\\" ) ); // var phenotypeFilename = phenotypePath.substring(
+             * phenotypePath.lastIndexOf( "\\" ) + 1, // phenotypePath.length );
+             * 
+             * var fReader = new FileReader(); // fReader.readAsDataURL( file ); fReader.readAsBinaryString( file );
+             * 
+             * fReader.onloadend = function(event) { var variantSrc = event.target.result; console.log( 'reader finish
+             * reading' + variantSrc );
+             *  // add variants to the project ProjectService.addSubjectVariantsToExistingProject( variantSrc,
+             * projectName, variantType, { callback : function(errorMessage) {
+             * 
+             * Ext.Msg.alert( 'Error', 'Add to variant DWR returns Error :' + errorMessage );
+             *  }, errorHandler : function(er, exception) { Ext.Msg.alert( "create variant Error", er + "\n" +
+             * exception.stack ); console.log( exception.stack ); } } ); }
+             */
+
+         } else {
+            // Ext.Msg.alert( "Error!", "Your form is invalid!" );
+            fieldNames = [];
+            fields = form.getFields();
+            for (var i = 0; i < fields.length; i++) {
+               field = fields[i];
+               if ( field == undefined )
+                  fieldNames.push( field.getName() );
+            }
+            console.debug( fieldNames );
+            Ext.MessageBox.alert( 'Invalid Fields', 'The following fields are invalid: ' + fieldNames.join( ', ' ) );
+         }
+
+      }
+
+   }, {
+      text : 'Cancel'
+   } ]
 } );
-
-// fsf.render(document.body);

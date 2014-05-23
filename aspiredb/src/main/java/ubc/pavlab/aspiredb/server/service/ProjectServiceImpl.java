@@ -14,6 +14,14 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -21,6 +29,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.io.StringWriter;
 
 import javax.ws.rs.core.Variant;
 
@@ -30,6 +39,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
+
+import com.google.gwt.http.client.URL;
 
 import ubc.pavlab.aspiredb.cli.AbstractCLI.ErrorCode;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
@@ -92,28 +106,50 @@ public class ProjectServiceImpl implements ProjectService {
     
     @Override
     @RemoteMethod
-    public Exception addSubjectVariantsToExistingProject(String directory, String filename, String projectName, VariantType variantType){
+    public Exception addSubjectVariantsToExistingProject(String fileContent, String projectName, String variantType){
+        
         try {
-            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-
-            // create a connection
-            // arg[0] is the directory in which the .csv files are held
-            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + directory );
-
-            Statement stmt = conn.createStatement();
-            ResultSet results = stmt.executeQuery( "SELECT * FROM " + filename );
+          
+          Reader readerString = new StringReader(fileContent);
+            CSVReader csvReader = new CSVReader(readerString);
+            List content = csvReader.readAll();
+            csvReader.close();
+          
             
+            String csv = "C:\\output2.csv";
+            CSVWriter writer = new CSVWriter(new FileWriter(csv));
+            
+            Object[] objectArray =content.toArray();
+            
+            for(int i = 0; i < objectArray.length; i++){
+                String [] passedCSVFile= objectArray[i].toString().split( "," );
+                writer.writeNext(passedCSVFile);
+            }
+          
+            writer.close();
+            
+    
+             Class.forName( "org.relique.jdbc.csv.CsvDriver" );
+          //   CSVParser parser = new CSVParser(in, CSVFormat.csv);
+          //   List<CSVRecord> list = parser.getRecords();
+
+             // create a connection
+             // arg[0] is the directory in which the .csv files are held
+             Connection conn = DriverManager.getConnection( "jdbc:relique:csv:"  );
+
+             Statement stmt = conn.createStatement();
+             ResultSet results = stmt.executeQuery( fileContent );
+
+       //  ResultSet results=null;
             //find project
             Project proj = projectDao.findByProjectName( projectName );
+            VariantType variantType2 = null;
+           // if (variantType.equalsIgnoreCase( "CNV" )){
+                VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromResultSet( results,
+                        variantType2.CNV );
+          //  }
             
-                      
-            VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromResultSet( results,
-                    variantType );
-
-            results.close();
-            stmt.close();
-            conn.close();
-
+        
             
             if ( result.getErrorMessages().isEmpty() ) {
                 projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
