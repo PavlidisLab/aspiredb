@@ -52,14 +52,32 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
          defaultType : 'textfield',
          width : 750,
 
-         items : [ /**
-                      * { xtype : 'fieldset', title : 'Project', collapsible : true, autoWidth : true, autoheight :
-                      * true, defaultType : 'textfield', layout : 'anchor', defaults : { anchor : '100%' }, items : [ {
-                      * fieldLabel : 'Project Name', name : 'projectName', id : 'projectName', value : '', labelWidth :
-                      * 150,
-                      *  }, { fieldLabel : 'Project Decription', name : 'projectDescription', id : 'projectDescription',
-                      * value : '', labelWidth : 150, } ] },
-                      */
+         items : [ {
+            xtype : 'fieldset',
+            title : 'Project',
+            collapsible : true,
+            autoWidth : true,
+            autoheight : true,
+            defaultType : 'textfield',
+            layout : 'anchor',
+            defaults : {
+               anchor : '100%'
+            },
+            items : [ {
+               fieldLabel : 'Project Name',
+               name : 'projectName',
+               id : 'projectName',
+               value : '',
+               labelWidth : 150,
+            }, {
+               fieldLabel : 'Project Decription',
+               name : 'projectDescription',
+               id : 'projectDescription',
+               value : '',
+               labelWidth : 150,
+            } ]
+         },
+
          {
             xtype : 'fieldset',
             title : 'Variants',
@@ -210,7 +228,7 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                           variantPath.length );
                        var variantType = values['variantType-inputEl'].toUpperCase();
                        var file = Ext.getCmp( 'variantFile' ).getEl().down( 'input[type=file]' ).dom.files[0]; // variantType.setValue(values['variantType-inputEl']);
-                                                                                                               // //
+                       // //
                        variantType.setValue( values['variantType-inputEl'] );
                        var phenotypePath = form.findField( 'phenotypeUploadFile-path' ).getValue();
                        var phenotypeDirectory = phenotypePath.substring( 0, phenotypePath.lastIndexOf( "\\" ) );
@@ -218,7 +236,7 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                           phenotypePath.length );
 
                        var fReader = new FileReader();
-                       // fReader.readAsDataURL( file ); 
+                       // fReader.readAsDataURL( file );
                        fReader.readAsBinaryString( file );
 
                        fReader.onloadend = function(event) {

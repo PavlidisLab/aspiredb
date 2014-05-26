@@ -859,11 +859,22 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    makeLabelHandler : function(event) {
 
       var me = this;
+      var labelTypeStore = Ext.create( 'Ext.data.Store', {
+         fields : [ 'abbr', 'name' ],
+         data : [ {
+            "abbr" : "VL",
+            "name" : "Variant Label"
+         }, {
+            "abbr" : "SL",
+            "name" : "Subject Label"
+         }, ]
+      } );
 
       Ext.define( 'ASPIREdb.view.CreateLabelWindowVariant', {
          isSubjectLabel : false,
          title : 'Variant Label Manager',
          extend : 'ASPIREdb.view.CreateLabelWindow',
+         
 
          // override
          onOkButtonClick : function() {
@@ -940,6 +951,18 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       } );
 
       var labelWindow = new ASPIREdb.view.CreateLabelWindowVariant();
+      labelWindow.add(
+         {
+            xtype : 'combo',
+            allowBlank : false,
+            store : labelTypeStore,
+            itemId : 'labelType',
+            queryMode : 'local',
+            displayField : 'name',
+            valueField : 'abbr',
+          //  renderTo: Ext.getBody(),
+            flex : 1,
+         });
       labelWindow.show();
    },
 
