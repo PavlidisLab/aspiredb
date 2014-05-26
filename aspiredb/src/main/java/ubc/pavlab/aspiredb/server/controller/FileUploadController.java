@@ -18,10 +18,10 @@ import ubc.pavlab.aspiredb.server.model.FileUploadBean;
  */
 @Controller
 @RemoteProxy
-@RequestMapping(value = "/upload_action")
+@RequestMapping(value = "/upload_action.html")
 public class FileUploadController {
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody
     String create( FileUploadBean uploadItem, BindingResult result ) {
 

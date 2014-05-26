@@ -195,7 +195,7 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
             // create project
             ProjectService.createUserProject( projectName, projectDescription, {
                callback : function(projectId) {
-                  console.log( 'reading uplodaed files' + file );
+                  console.log( 'reading uplodaed files' );
 
                },
                errorHandler : function(er, exception) {
@@ -210,7 +210,7 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                params : {
                   newStatus : 'delivered'
                },
-               method : 'GET',
+               method : 'POST',
                url : '/aspiredb/upload_action.html', // submitEmptyText : false,
 
                waitMsg : 'Uploading your file...',

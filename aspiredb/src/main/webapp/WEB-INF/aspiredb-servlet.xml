@@ -47,6 +47,7 @@
 			<props>
 				<prop key="/dwr/**/*">dwrController</prop>
 				<prop key="/home.html">homeController</prop>
+                <prop key="/upload_action.html">fileUploadController</prop>
 				<prop key="/login.html">loginController</prop>
 				<prop key="/keep_alive.html">loginController</prop>
 			</props>
