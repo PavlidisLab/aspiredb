@@ -1,5 +1,7 @@
 package ubc.pavlab.aspiredb.server.model;
  
+import java.io.InputStream;
+
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
  
 /**
@@ -11,7 +13,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
  */
 public class FileUploadBean {
  
-    private CommonsMultipartFile file;
+  private CommonsMultipartFile file;
  
     public CommonsMultipartFile getFile() {
         return file;
@@ -20,4 +22,6 @@ public class FileUploadBean {
     public void setFile(CommonsMultipartFile file) {
         this.file = file;
     }
+    
+       
 }

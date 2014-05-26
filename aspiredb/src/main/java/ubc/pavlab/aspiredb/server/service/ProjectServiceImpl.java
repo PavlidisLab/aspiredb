@@ -112,41 +112,28 @@ public class ProjectServiceImpl implements ProjectService {
           
           Reader readerString = new StringReader(fileContent);
             CSVReader csvReader = new CSVReader(readerString);
-            List content = csvReader.readAll();
+            List resultsList = csvReader.readAll();
             csvReader.close();
-          
+                              
             
-            String csv = "C:\\output2.csv";
+            String csv = "output2.csv";
             CSVWriter writer = new CSVWriter(new FileWriter(csv));
             
-            Object[] objectArray =content.toArray();
+            Object[] objectArray =resultsList.toArray();
             
             for(int i = 0; i < objectArray.length; i++){
                 String [] passedCSVFile= objectArray[i].toString().split( "," );
                 writer.writeNext(passedCSVFile);
             }
           
-            writer.close();
-            
-    
-             Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-          //   CSVParser parser = new CSVParser(in, CSVFormat.csv);
-          //   List<CSVRecord> list = parser.getRecords();
-
-             // create a connection
-             // arg[0] is the directory in which the .csv files are held
-             Connection conn = DriverManager.getConnection( "jdbc:relique:csv:"  );
-
-             Statement stmt = conn.createStatement();
-             ResultSet results = stmt.executeQuery( fileContent );
-
-       //  ResultSet results=null;
+            writer.close();            
+           
             //find project
             Project proj = projectDao.findByProjectName( projectName );
             VariantType variantType2 = null;
            // if (variantType.equalsIgnoreCase( "CNV" )){
-                VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromResultSet( results,
-                        variantType2.CNV );
+                VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromResultContent( objectArray,
+                        variantType );
           //  }
             
         
@@ -168,6 +155,8 @@ public class ProjectServiceImpl implements ProjectService {
         }
         return null;
     }
+    
+        
 
     @Override
     @RemoteMethod
