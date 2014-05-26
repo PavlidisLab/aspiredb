@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'Ext.form.*', 'Ext.layout.container.Column', 'Ext.tab.Panel', 'Ext.Ajax.*',
+Ext.require( [ 'Ext.form.*', 'Ext.layout.container.Column', 'Ext.tab.Panel',
 
 ] );
 /**
@@ -26,7 +26,7 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
    extend : 'Ext.form.Panel',
    alias : 'widget.uploadManagerPanel',
    frame : true,
-   // bodyStyle : 'padding:5px 5px 0',
+   bodyStyle : 'padding:5px 5px 0',
    bodyPadding : 5,
    padding : '50 50 50 50',
 
@@ -113,10 +113,10 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                width : 600,
                allowBlanck : false,
                emptyText : 'Select variant file to upload',
-               fieldLabel : 'File',
+               fieldLabel : 'Upload Variant List',
                labelWidth : 150,
                buttonText : 'Select',
-             /**  listeners : {
+               listeners : {
                   afterrender : function(el) {
                      var element = el.fileInputEl;
                      console.log( element );
@@ -129,7 +129,7 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                      }
 
                   }
-               }*/
+               }
 
             }, {
                xtype : 'combobox',
@@ -167,13 +167,13 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                labelWidth : 150,
 
             } ]
-         }, /**
-             * { xtype : 'fieldset', title : 'Phenotypes', collapsible : true, autoWidth : true, autoheight : true,
-             * defaultType : 'textfield', layout : 'anchor', defaults : { anchor : '100%' }, items : [ { xtype :
-             * 'filefield', id : 'phenotypeFile', name : 'phenotypeFile', width : 600, emptyText : 'Select phenotype
-             * file to upload', fieldLabel : 'Upload Phenotype List', labelWidth : 150, name :
-             * 'phenotypeUploadFile-path', buttonText : 'Select', } ] },
-             */
+         }, 
+              { xtype : 'fieldset', title : 'Phenotypes', collapsible : true, autoWidth : true, autoheight : true,
+              defaultType : 'textfield', layout : 'anchor', defaults : { anchor : '100%' }, items : [ { xtype :
+              'filefield', id : 'phenotypeFile', name : 'phenotypeFile', width : 600, emptyText : 'Select phenotype
+              file to upload', fieldLabel : 'Upload Phenotype List', labelWidth : 150, name :
+              'phenotypeUploadFile-path', buttonText : 'Select', } ] },
+             
          {
             xtype : 'label',
             itemId : 'message',
@@ -208,6 +208,7 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
             // create project
             ProjectService.createUserProject( projectName, projectDescription, {
                callback : function(projectId) {
+
                   console.log( 'reading uplodaed files' + file );
                  var fReader = new FileReader();
                  fReader.readAsBinaryString( file );
@@ -227,7 +228,8 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                         }
 
                      } );
-                  }
+}
+//github.com/ppavlidis/aspiredb.git
 
                },
                errorHandler : function(er, exception) {
@@ -236,6 +238,47 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                }
             } );
 
+            form.submit( {
+               clientValidation : true,
+               scope : this,
+               params : {
+                  newStatus : 'delivered'
+               },
+               method : 'POST',
+               url : '/aspiredb/upload_action.html', // submitEmptyText : false,
+
+               waitMsg : 'Uploading your file...',
+               success : function(form, action) {
+                  Ext.Msg.alert( 'Success', 'Your file has been uploaded.' );
+               },
+               failure : function(form, action) {
+                  Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' );
+               }
+            } );
+
+            /**
+             * var variantPath = form.findField( 'variantFile' ).getValue(); var variantDirectory =
+             * variantPath.substring( 0, variantPath.lastIndexOf( "\\" ) ); var variantFilename = variantPath.substring(
+             * variantPath.lastIndexOf( "\\" ) + 1, variantPath.length ); var variantType =
+             * values['variantType-inputEl'].toUpperCase(); var file = Ext.getCmp( 'variantFile' ).getEl().down(
+             * 'input[type=file]' ).dom.files[0]; // variantType.setValue(values['variantType-inputEl']); //
+             * variantType.setValue( values['variantType-inputEl'] ); // var phenotypePath = form.findField(
+             * 'phenotypeUploadFile-path' ).getValue(); // var phenotypeDirectory = phenotypePath.substring( 0,
+             * phenotypePath.lastIndexOf( "\\" ) ); // var phenotypeFilename = phenotypePath.substring(
+             * phenotypePath.lastIndexOf( "\\" ) + 1, // phenotypePath.length );
+             * 
+             * var fReader = new FileReader(); // fReader.readAsDataURL( file ); fReader.readAsBinaryString( file );
+             * 
+             * fReader.onloadend = function(event) { var variantSrc = event.target.result; console.log( 'reader finish
+             * reading' + variantSrc );
+             *  // add variants to the project ProjectService.addSubjectVariantsToExistingProject( variantSrc,
+             * projectName, variantType, { callback : function(errorMessage) {
+             * 
+             * Ext.Msg.alert( 'Error', 'Add to variant DWR returns Error :' + errorMessage );
+             *  }, errorHandler : function(er, exception) { Ext.Msg.alert( "create variant Error", er + "\n" +
+             * exception.stack ); console.log( exception.stack ); } } ); }
+             */
+>>>>>>> branch 'master' of https://github.com/ppavlidis/aspiredb.git
 
          } else {
             // Ext.Msg.alert( "Error!", "Your form is invalid!" );

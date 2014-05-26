@@ -21,7 +21,7 @@ import ubc.pavlab.aspiredb.server.model.FileUploadBean;
 @RequestMapping(value = "/upload_action.html")
 public class FileUploadController {
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody
     String create( FileUploadBean uploadItem, BindingResult result ) {
 
