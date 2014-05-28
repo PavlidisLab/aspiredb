@@ -33,9 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 import ubc.pavlab.aspiredb.server.dao.CNVDao;
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
+import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
@@ -43,6 +45,7 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.StringMatrix;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.TextValue;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.ExternalSubjectIdProperty;
 import ubc.pavlab.aspiredb.shared.query.LabelProperty;
 import ubc.pavlab.aspiredb.shared.query.Property;
@@ -67,10 +70,15 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Autowired
     private CNVDao cnvDao;
+
     @Autowired
     private PhenotypeBrowserService phenotypeBrowserService;
+
     @Autowired
     private LabelDao labelDao;
+
+    @Autowired
+    private VariantDao variantDao;
 
     /**
      * Get the Subject value Object of the given subject Id
@@ -93,6 +101,20 @@ public class SubjectServiceImpl implements SubjectService {
         vo.setVariants( numVariants != null ? numVariants : 0 );
 
         return vo;
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public List<Long> getVariantsSubjects( List<String> patientIds ) {
+        List<Long> subjectIds = new ArrayList<Long>();
+
+        for ( String patientId : patientIds ) {
+            Subject variantSubject = subjectDao.findByPatientId( patientId );
+            subjectIds.add( variantSubject.getId() );
+        }
+
+        return subjectIds;
     }
 
     /**
@@ -488,13 +510,13 @@ public class SubjectServiceImpl implements SubjectService {
     public Collection<Label> getSubjectLabels( Collection<Long> subjectIds ) {
         // Collection<Label labelEntity = labelDao.load( labelIds );
         Collection<Label> labels = new ArrayList<Label>();
-        
+
         for ( Long subjectId : subjectIds ) {
-            Collection<Label> subjectLabels =labelDao.getSubjectLabelsBySubjectId( subjectId );
-            if ( subjectLabels==null ) {
-               //
-            }else {
-                for (Label subjectLabel :subjectLabels){
+            Collection<Label> subjectLabels = labelDao.getSubjectLabelsBySubjectId( subjectId );
+            if ( subjectLabels == null ) {
+                //
+            } else {
+                for ( Label subjectLabel : subjectLabels ) {
                     labels.add( subjectLabel );
                 }
             }

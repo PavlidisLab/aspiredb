@@ -20,7 +20,7 @@
 Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel',
               'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings',
               'ASPIREdb.view.VariantGridCreator', 'ASPIREdb.IdeogramDownloadWindow', 'Ext.data.ArrayStore',
-              'Ext.form.ComboBox' ] );
+              'Ext.form.ComboBox', 'ASPIREdb.view.SubjectGrid' ] );
 
 /**
  * Variant Tab Panel contains both Ideogram view and Variant table view
@@ -870,11 +870,16 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          }, ]
       } );
 
-      Ext.define( 'ASPIREdb.view.CreateLabelWindowVariant', {
+      Ext.define( 'ASPIREdb.view.CreateLabelWindowVariantORSubject', {
          isSubjectLabel : false,
          title : 'Variant Label Manager',
+         id : 'labelWindowVariantORSubject',
          extend : 'ASPIREdb.view.CreateLabelWindow',
-         
+         dockedItems : [ {
+            xtype : 'toolbar',
+            itemId : 'labelWindowToolbar',
+            dock : 'top'
+         } ],
 
          // override
          onOkButtonClick : function() {
@@ -884,85 +889,169 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
             var idsToLabel = [];
 
-            idsToLabel = me.getSelectedVariantIds( me.getVariantRecordSelection() );
+            var labelWindow = this.dockedItems.items[0].up( '#labelWindowVariantORSubject' ).down( '#labelType' );
+            var lType = labelWindow.getValue();
 
-            // store in database
-            VariantService.addLabel( idsToLabel, vo, {
-               errorHandler : function(message) {
-                  alert( 'Error adding variant label. ' + message );
-               },
-               callback : function(addedLabel) {
+            if ( lType == 'VL' ) {
 
-                  var grid = me.down( '#variantGrid' );
+               idsToLabel = me.getSelectedVariantIds( me.getVariantRecordSelection() );
 
-                  addedLabel.isShown = true;
-                  LabelService.updateLabel( addedLabel );
+               // store in database
+               VariantService.addLabel( idsToLabel, vo, {
+                  errorHandler : function(message) {
+                     alert( 'Error adding variant label. ' + message );
+                  },
+                  callback : function(addedLabel) {
 
-                  var existingLab = grid.visibleLabels[addedLabel.id];
-                  if ( existingLab === undefined ) {
-                     grid.visibleLabels[addedLabel.id] = addedLabel;
-                  } else {
-                     existingLab.isShown = true;
+                     var grid = me.down( '#variantGrid' );
+
+                     addedLabel.isShown = true;
+                     LabelService.updateLabel( addedLabel );
+
+                     var existingLab = grid.visibleLabels[addedLabel.id];
+                     if ( existingLab === undefined ) {
+                        grid.visibleLabels[addedLabel.id] = addedLabel;
+                     } else {
+                        existingLab.isShown = true;
+                     }
+
+                     var currentlySelectedRecords = me.getVariantRecordSelection();
+
+                     // update
+                     // local
+                     // store
+                     for (var i = 0; i < currentlySelectedRecords.length; i++) {
+                        var labelIds = currentlySelectedRecords[i].get( 'labelIds' );
+                        labelIds.push( addedLabel.id );
+                     }
+
+                     if ( me.getActiveTab().itemId == 'ideogram' ) {
+                        // refreshing
+                        // grid
+                        // doesn't
+                        // work
+                        // if
+                        // it
+                        // is
+                        // not
+                        // the
+                        // active
+                        // tab
+                        // so
+                        // set
+                        // flag
+                        // to
+                        // refresh
+                        // on
+                        // grid
+                        // 'show'
+                        // event
+                        me.newIdeogramLabel = true;
+
+                     } else {
+                        // refresh
+                        // grid
+                        grid.getView().refresh();
+                     }
+
+                     ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_created' );
+                  }
+               } );
+            } else if ( lType == 'SL' ) {
+
+               var selectedPatientIds = me.getSelectedPatientIds( me.getVariantRecordSelection() );
+               var ref = this;
+
+               SubjectService.getVariantsSubjects( selectedPatientIds, {
+                  errorHandler : function(message) {
+                     alert( 'Error adding variant label. ' + message );
+                  },
+                  callback : function(subjectIds) {
+                     idsToLabel = subjectIds;
+                     // store in database
+                     SubjectService.addLabel( idsToLabel, ref.getLabel(), {
+                        errorHandler : function(message) {
+                           alert( 'Error adding variant label. ' + message );
+                        },
+                        callback : function(addedLabel) {
+
+                           addedLabel.isShown = true;
+                           LabelService.updateLabel( addedLabel );
+
+                           var currentlySelectedRecords = me.getVariantRecordSelection();
+
+                           // update
+                           // local
+                           // store
+                           for (var i = 0; i < currentlySelectedRecords.length; i++) {
+                              var labelIds = currentlySelectedRecords[i].get( 'labelIds' );
+                              labelIds.push( addedLabel.id );
+                           }
+
+                           if ( me.getActiveTab().itemId == 'ideogram' ) {
+                              // refreshing
+                              // grid
+                              // doesn't
+                              // work
+                              // if
+                              // it
+                              // is
+                              // not
+                              // the
+                              // active
+                              // tab
+                              // so
+                              // set
+                              // flag
+                              // to
+                              // refresh
+                              // on
+                              // grid
+                              // 'show'
+                              // event
+                              me.newIdeogramLabel = true;
+
+                           } else {
+                              // refresh
+                              // grid
+                              grid.getView().refresh();
+                           }
+
+                           ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_created' );
+                           ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_updated', idsToLabel, addedLabel );
+
+                        }
+                     } );
                   }
 
-                  var currentlySelectedRecords = me.getVariantRecordSelection();
+               } );
 
-                  // update
-                  // local
-                  // store
-                  for (var i = 0; i < currentlySelectedRecords.length; i++) {
-                     var labelIds = currentlySelectedRecords[i].get( 'labelIds' );
-                     labelIds.push( addedLabel.id );
-                  }
+            }
 
-                  if ( me.getActiveTab().itemId == 'ideogram' ) {
-                     // refreshing
-                     // grid
-                     // doesn't
-                     // work
-                     // if
-                     // it
-                     // is
-                     // not
-                     // the
-                     // active
-                     // tab
-                     // so
-                     // set
-                     // flag
-                     // to
-                     // refresh
-                     // on
-                     // grid
-                     // 'show'
-                     // event
-                     me.newIdeogramLabel = true;
-
-                  } else {
-                     // refresh
-                     // grid
-                     grid.getView().refresh();
-                  }
-
-                  ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_created' );
-               }
-            } );
          },
       } );
 
-      var labelWindow = new ASPIREdb.view.CreateLabelWindowVariant();
-      labelWindow.add(
-         {
-            xtype : 'combo',
-            allowBlank : false,
-            store : labelTypeStore,
-            itemId : 'labelType',
-            queryMode : 'local',
-            displayField : 'name',
-            valueField : 'abbr',
-          //  renderTo: Ext.getBody(),
-            flex : 1,
-         });
+      var labelWindow = new ASPIREdb.view.CreateLabelWindowVariantORSubject();
+      labelWindow.getDockedComponent( 'labelWindowToolbar' ).removeAll();
+      labelWindow.getDockedComponent( 'labelWindowToolbar' ).add( {
+         xtype : 'label',
+         text : 'Select Label Type',
+         margin : '5 5 5 5'
+      } );
+      labelWindow.getDockedComponent( 'labelWindowToolbar' ).add( '-' );
+
+      labelWindow.getDockedComponent( 'labelWindowToolbar' ).add( {
+         xtype : 'combo',
+         allowBlank : false,
+         store : labelTypeStore,
+         itemId : 'labelType',
+         queryMode : 'local',
+         displayField : 'name',
+         valueField : 'abbr',
+         // renderTo: Ext.getBody(),
+         // flex : 1,
+         width : 150,
+      } );
       labelWindow.show();
    },
 
@@ -1014,6 +1103,18 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       }
 
       return selectedVariantIds;
+   },
+
+   getSelectedPatientIds : function(selectedVariantRecords) {
+
+      var selectedPatientIds = [];
+      var me = this;
+
+      for (var i = 0; i < selectedVariantRecords.length; i++) {
+         selectedPatientIds.push( selectedVariantRecords[i].data.patientId );
+      }
+
+      return selectedPatientIds;
    },
 
    areOnSameChromosome : function(records) {

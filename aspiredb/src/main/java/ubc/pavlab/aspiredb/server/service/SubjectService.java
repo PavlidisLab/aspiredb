@@ -57,6 +57,8 @@ public interface SubjectService {
 
     public String getPhenotypeTextDownloadBySubjectIds( List<Long> subjectIds );
 
+    public List<Long> getVariantsSubjects( List<String> patientIds );
+
     /**
      * Rownames are Subject.patientId (e.g. 03_01) Colnames are PhenotypeValueUri:Name (e.g. HP_0001000:Abnormality of
      * skin pigmentation)
