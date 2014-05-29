@@ -61,5 +61,5 @@ public interface ProjectService {
     
     public Long createUserProject(String projectName, String projectDescription) throws NotLoggedInException;
 
-    public Exception addSubjectVariantsToExistingProject( String fileContent, String projectName, String variantType );
+    public String addSubjectVariantsToExistingProject( String fileContent, String projectName, String variantType );
 }

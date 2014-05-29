@@ -73,8 +73,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     UserManager userManager;
-    
-    
+
     @Autowired
     PhenotypeUploadService phenotypeUploadService;
 
@@ -91,72 +90,74 @@ public class ProjectServiceImpl implements ProjectService {
 
         return vos;
     }
-    
+
     @Override
     @RemoteMethod
-    public Long createUserProject(String projectName, String projectDescription) throws NotLoggedInException{
-        Project newProject =new Project();
+    public Long createUserProject( String projectName, String projectDescription ) throws NotLoggedInException {
+        Project newProject = new Project();
         newProject.setName( projectName );
         newProject.setDescription( projectDescription );
         newProject.setSpecialData( false );
         projectDao.create( newProject );
-        
+
         return newProject.getId();
     }
-    
+
     @Override
     @RemoteMethod
-    public Exception addSubjectVariantsToExistingProject(String fileContent, String projectName, String variantType){
-        
+    public String addSubjectVariantsToExistingProject( String fileContent, String projectName, String variantType ) {
+
+        String returnString = "";
+
         try {
-          
-          Reader readerString = new StringReader(fileContent);
-            CSVReader csvReader = new CSVReader(readerString);
-            List resultsList = csvReader.readAll();
-            csvReader.close();
-                              
-            
-            String csv = "output2.csv";
-            CSVWriter writer = new CSVWriter(new FileWriter(csv));
-            
-            Object[] objectArray =resultsList.toArray();
-            
-            for(int i = 0; i < objectArray.length; i++){
-                String [] passedCSVFile= objectArray[i].toString().split( "," );
-                writer.writeNext(passedCSVFile);
+
+            String csv = "uploadFile/output2.csv";
+            CSVWriter writer = new CSVWriter( new FileWriter( csv ) );
+
+            // Object[] objectArray = resultsList.toArray();
+            String[] Outresults = fileContent.split( "\n" );
+
+            for ( int i = 0; i < Outresults.length; i++ ) {
+                String[] passedCSVFile = Outresults[i].toString().split( "," );
+                writer.writeNext( passedCSVFile );
             }
-          
-            writer.close();            
-           
-            //find project
+
+            writer.close();
+
+            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
+
+            // create a connection
+            // arg[0] is the directory in which the .csv files are held
+            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
+
+            Statement stmt = conn.createStatement();
+            ResultSet results = stmt.executeQuery( "SELECt * from output2" );
+
+            // find project
             Project proj = projectDao.findByProjectName( projectName );
             VariantType variantType2 = null;
-           // if (variantType.equalsIgnoreCase( "CNV" )){
-                VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromResultContent( objectArray,
-                        variantType );
-          //  }
-            
-        
-            
+            // if (variantType.equalsIgnoreCase( "CNV" )){
+            VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromResultSet( results,
+                    variantType2.CNV );
+            // }
+
             if ( result.getErrorMessages().isEmpty() ) {
                 projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
             } else if ( result.getErrorMessages().isEmpty() ) {
-                System.out.println( "No errors are detected in your data file" );
+                returnString = "No errors are detected in your data file";
 
             } else {
                 for ( String errorMessage : result.getErrorMessages() ) {
-                    System.out.println( errorMessage );
+                    returnString = errorMessage;
                 }
 
             }
 
         } catch ( Exception e ) {
-            return e;
+            return e.toString();
         }
-        return null;
+        return returnString;
     }
-    
-        
 
     @Override
     @RemoteMethod

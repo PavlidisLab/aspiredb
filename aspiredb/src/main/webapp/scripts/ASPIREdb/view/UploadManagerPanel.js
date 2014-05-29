@@ -221,27 +221,19 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                          * been uploaded.' ); }, failure : function(form, action) { Ext.Msg.alert( 'Failed',
                          * action.result ? action.result.message : 'No response' ); } } );
                          */
-
-                       var variantPath = form.findField( 'variantFile' ).getValue();
-                       var variantDirectory = variantPath.substring( 0, variantPath.lastIndexOf( "\\" ) );
-                       var variantFilename = variantPath.substring( variantPath.lastIndexOf( "\\" ) + 1,
-                          variantPath.length );
+                       
                        var variantType = values['variantType-inputEl'].toUpperCase();
-                       var file = Ext.getCmp( 'variantFile' ).getEl().down( 'input[type=file]' ).dom.files[0]; // variantType.setValue(values['variantType-inputEl']);
-                       // //
-                       variantType.setValue( values['variantType-inputEl'] );
-                       var phenotypePath = form.findField( 'phenotypeUploadFile-path' ).getValue();
-                       var phenotypeDirectory = phenotypePath.substring( 0, phenotypePath.lastIndexOf( "\\" ) );
-                       var phenotypeFilename = phenotypePath.substring( phenotypePath.lastIndexOf( "\\" ) + 1,
-                          phenotypePath.length );
+                       var file = Ext.getCmp( 'variantFile' ).getEl().down( 'input[type=file]' ).dom.files[0]; 
+                       var phenotypeFile = Ext.getCmp( 'phenotypeFile' ).getEl().down( 'input[type=file]' ).dom.files[0];
+                       
 
                        var fReader = new FileReader();
-                       // fReader.readAsDataURL( file );
                        fReader.readAsBinaryString( file );
 
                        fReader.onloadend = function(event) {
                           var variantSrc = event.target.result;
-                          console.log( 'reader finish reading' + variantSrc );
+                         // console.log( 'reader finish reading' + variantSrc );
+                          
                           // add variants to the project
                           ProjectService.addSubjectVariantsToExistingProject( variantSrc, projectName, variantType, {
                              callback : function(errorMessage) {

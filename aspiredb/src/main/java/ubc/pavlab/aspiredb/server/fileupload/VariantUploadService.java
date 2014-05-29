@@ -204,7 +204,7 @@ public class VariantUploadService {
     public static VariantValueObject makeVariantValueObjectFromResultContent( Object result, String variantType )
             throws Exception {
 
-        if ( variantType.equals( VariantType.CNV ) ) {
+        if ( variantType.equals( "CNV" ) ) {
             return makeCNVFromResultSet( result );
         } /**else if ( variantType.equals( VariantType.SNV ) ) {
             return makeSNVFromResultSet( results );
@@ -259,8 +259,8 @@ public class VariantUploadService {
         String cnvType = ConfigUtils.getString( "aspiredb.cli.variant.cnv.type" );
 
         CNVValueObject cnv = new CNVValueObject();
-
-      /**  cnv.setPatientId( result.getString( CommonVariantColumn.SUBJECTID.key ) );
+        String[] row =result.toString().split( "," );
+        /**cnv.setPatientId( row.equals( CommonVariantColumn.SUBJECTID.key ) );
         cnv.setGenomicRange( getGenomicRangeFromResultSet( results ) );
         cnv.setCnvLength( cnv.getGenomicRange().getBaseEnd() - cnv.getGenomicRange().getBaseStart() );
 
