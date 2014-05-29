@@ -118,7 +118,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
     @Override
     @Transactional
-    public Project createProject( String name ) throws Exception {
+    public Project createProject( String name , String description) throws Exception {
         if ( projectDao.findByProjectName( name ) != null ) {
             throw new Exception( "project with that name already exists" );
 
@@ -126,6 +126,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
         Project p = new Project();
         p.setName( name );
+        p.setDescription( description );
 
         return projectDao.create( p );
     }
@@ -175,7 +176,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
         Project proj;
         if ( createProject ) {
-            proj = createProject( projectName );
+            proj = createProject( projectName ,"");
         } else {
             proj = projectDao.findByProjectName( projectName );
             if ( proj == null ) {
@@ -218,7 +219,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
         proj = projectDao.findByProjectName( projectName );
         if ( proj == null ) {
-            proj = createProject( projectName );
+            proj = createProject( projectName ,"" );
         }
 
         createSubjectVariantsFromVariantValueObjects( proj, voList );
@@ -388,7 +389,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
             proj = new Project();
             proj.setName( projectName );
-            proj = createProject( projectName );
+            proj = createProject( projectName ,"");
 
         } else {
             proj = projectDao.findByProjectName( projectName );

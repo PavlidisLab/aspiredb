@@ -53,6 +53,7 @@ import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadServiceResult;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadServiceResult;
 import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
@@ -70,6 +71,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     ProjectManager projectManager;
+
+    @Autowired
+    OntologyService os;
 
     @Autowired
     UserManager userManager;
@@ -93,25 +97,38 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @RemoteMethod
-    public Long createUserProject( String projectName, String projectDescription ) throws NotLoggedInException {
-        Project newProject = new Project();
-        newProject.setName( projectName );
-        newProject.setDescription( projectDescription );
-        newProject.setSpecialData( false );
-        projectDao.create( newProject );
+    public String createUserProject( String projectName, String projectDescription ) throws NotLoggedInException {
 
-        return newProject.getId();
+        log.info( " In createProject projectName:" + projectName );
+
+        try {
+            projectManager.createProject( projectName, projectDescription );
+        } catch ( Exception e ) {
+            log.error( e.getMessage() );
+            return e.getMessage();
+        }
+
+        return "Success";
+
     }
 
+    /**
+     * @author gaya
+     * @param fileContent
+     * @param projectName
+     * @param variantType
+     * @return Error String
+     */
     @Override
     @RemoteMethod
-    public String addSubjectVariantsToExistingProject( String fileContent, String projectName, String variantType ) {
+    public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName,
+            String variantType ) {
 
-        String returnString = "";
+        String returnString = "Success";
 
         try {
 
-            String csv = "uploadFile/output2.csv";
+            String csv = "uploadFile/variantFile.csv";
             CSVWriter writer = new CSVWriter( new FileWriter( csv ) );
 
             // Object[] objectArray = resultsList.toArray();
@@ -131,20 +148,36 @@ public class ProjectServiceImpl implements ProjectService {
             Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
 
             Statement stmt = conn.createStatement();
-            ResultSet results = stmt.executeQuery( "SELECt * from output2" );
+            ResultSet results = stmt.executeQuery( "SELECt * from variantFile" );
 
-            // find project
-            Project proj = projectDao.findByProjectName( projectName );
-            VariantType variantType2 = null;
-            // if (variantType.equalsIgnoreCase( "CNV" )){
-            VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromResultSet( results,
-                    variantType2.CNV );
-            // }
+            // check weather the project exist
+            if ( createProject ) {
+                if ( projectDao.findByProjectName( projectName ) != null ) {
+                    returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
+                }
+            }
+
+            VariantType VariantType = null;
+            VariantUploadServiceResult result = null;
+
+            if ( variantType.equalsIgnoreCase( "CNV" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.CNV );
+            } else if ( variantType.equalsIgnoreCase( "SNV" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.SNV );
+            } else if ( variantType.equalsIgnoreCase( "INDEL" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INDEL );
+            } else if ( variantType.equalsIgnoreCase( "INVERSION" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INVERSION );
+            } else if ( variantType.equalsIgnoreCase( "DECIPHER" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DECIPHER );
+            } else if ( variantType.equalsIgnoreCase( "DGV" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DGV );
+            }
 
             if ( result.getErrorMessages().isEmpty() ) {
                 projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
             } else if ( result.getErrorMessages().isEmpty() ) {
-                returnString = "No errors are detected in your data file";
+                returnString = "Success";
 
             } else {
                 for ( String errorMessage : result.getErrorMessages() ) {
@@ -156,6 +189,87 @@ public class ProjectServiceImpl implements ProjectService {
         } catch ( Exception e ) {
             return e.toString();
         }
+        return returnString;
+    }
+
+    /**
+     * @author gaya
+     * @param fileContent
+     * @param projectName
+     * @param variantType
+     * @return Error String
+     */
+    @Override
+    @RemoteMethod
+    public String addSubjectPhenotypeToExistingProject( String fileContent, boolean createProject, String projectName,
+            String variantType ) {
+
+        String returnString = "Success";
+
+        try {
+
+            os.getHumanPhenotypeOntologyService().startInitializationThread( true );
+            int c = 0;
+
+            while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
+                Thread.sleep( 10000 );
+                log.info( "Waiting for HumanPhenotypeOntology to load" );
+                if ( ++c > 10 ) {
+                    throw new Exception( "Ontology load timeout" );
+                }
+            }
+
+            String csv = "uploadFile/phenotypeFile.csv";
+            CSVWriter writer = new CSVWriter( new FileWriter( csv ) );
+
+            // Object[] objectArray = resultsList.toArray();
+            String[] Outresults = fileContent.split( "\n" );
+
+            for ( int i = 0; i < Outresults.length; i++ ) {
+                String[] passedCSVFile = Outresults[i].toString().split( "," );
+                writer.writeNext( passedCSVFile );
+            }
+
+            writer.close();
+
+            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
+
+            // create a connection
+            // arg[0] is the directory in which the .csv files are held
+            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
+
+            Statement stmt = conn.createStatement();
+            ResultSet results = stmt.executeQuery( "SELECT * FROM phenotypeFile" );
+
+            if ( createProject ) {
+                if ( projectDao.findByProjectName( projectName ) != null ) {
+                    returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
+                }
+            }
+
+            PhenotypeUploadServiceResult phenResult = phenotypeUploadService
+                    .getPhenotypeValueObjectsFromResultSet( results );
+
+            // clean up
+            results.close();
+            stmt.close();
+            conn.close();
+
+            projectManager.addSubjectPhenotypesToProject( projectName, createProject, phenResult.getPhenotypesToAdd() );
+
+            if ( !phenResult.getErrorMessages().isEmpty() ) {
+                for ( String errorMessage : phenResult.getErrorMessages() ) {
+                    returnString = errorMessage;
+                }
+
+            } else {
+                returnString = "Success";
+            }
+
+        } catch ( Exception e ) {
+            return e.toString();
+        }
+
         return returnString;
     }
 

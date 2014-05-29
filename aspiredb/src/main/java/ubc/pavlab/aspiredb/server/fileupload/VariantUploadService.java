@@ -81,39 +81,6 @@ public class VariantUploadService {
         return serviceResult;
 
     }
-    
-    public static VariantUploadServiceResult makeVariantValueObjectsFromResultContent( Object[] results,
-            String variantType ) throws Exception {
-
-        ArrayList<VariantValueObject> variantsToAdd = new ArrayList<VariantValueObject>();
-        int lineNumber = 1;
-        ArrayList<String> errorMessages = new ArrayList<String>();
-
-        // TODO maybe validate columns first, and bail if they are all not there
-       for (Object result : results) {
-            lineNumber++;
-            try {
-                variantsToAdd.add( makeVariantValueObjectFromResultContent( result, variantType ) );
-            } catch ( InvalidDataException e ) {
-                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
-            } catch ( NumberFormatException e ) {
-                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
-            } catch ( SQLException e ) {
-                errorMessages.add( "Invalid data format on line number: " + lineNumber + " error message:"
-                        + e.getMessage() );
-            } catch ( Exception e ) {
-                errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
-            }
-        }
-
-        VariantUploadServiceResult serviceResult = new VariantUploadServiceResult( variantsToAdd, errorMessages );
-
-        return serviceResult;
-
-    }
-    
-    
-  
 
     // Decipher gave us a weird file, this may only need to be done as a one off
     public static VariantUploadServiceResult makeVariantValueObjectsFromDecipherResultSet( ResultSet results )
@@ -200,28 +167,6 @@ public class VariantUploadService {
         }
 
     }
-    
-    public static VariantValueObject makeVariantValueObjectFromResultContent( Object result, String variantType )
-            throws Exception {
-
-        if ( variantType.equals( "CNV" ) ) {
-            return makeCNVFromResultSet( result );
-        } /**else if ( variantType.equals( VariantType.SNV ) ) {
-            return makeSNVFromResultSet( results );
-        } else if ( variantType.equals( VariantType.INDEL ) ) {
-            return makeIndelFromResultSet( results );
-        } else if ( variantType.equals( VariantType.INVERSION ) ) {
-            return makeInversionFromResultSet( results );
-        } else if ( variantType.equals( VariantType.DECIPHER ) ) {
-            return makeDecipherCNVFromResultSet( results );
-        } else if ( variantType.equals( VariantType.DGV ) ) {
-            return makeDGVCNVFromResultSet( results );
-        }*/ else {
-            log.error( "VariantType not supported" );
-            throw new InvalidDataException( "VariantType not supported" );
-        }
-
-    }
 
     public static CNVValueObject makeCNVFromResultSet( ResultSet results ) throws Exception {
 
@@ -253,39 +198,8 @@ public class VariantUploadService {
         return cnv;
 
     }
-    
-    public static CNVValueObject makeCNVFromResultSet(Object result ) throws Exception {
 
-        String cnvType = ConfigUtils.getString( "aspiredb.cli.variant.cnv.type" );
-
-        CNVValueObject cnv = new CNVValueObject();
-        String[] row =result.toString().split( "," );
-        /**cnv.setPatientId( row.equals( CommonVariantColumn.SUBJECTID.key ) );
-        cnv.setGenomicRange( getGenomicRangeFromResultSet( results ) );
-        cnv.setCnvLength( cnv.getGenomicRange().getBaseEnd() - cnv.getGenomicRange().getBaseStart() );
-
-        cnv.setType( result.getString( cnvType ) );
-
-        if ( !cnv.getType().toUpperCase().equals( CnvType.GAIN.name() )
-                && !cnv.getType().toUpperCase().equals( CnvType.LOSS.name() ) ) {
-            throw new InvalidDataException( "invalid " + cnvType + ":" + cnv.getType() );
-        }
-
-        populateOptionalVariantColumns( result, cnv );
-        populateOptionalCNVColumns( result, cnv );
-
-        ArrayList<String> reservedCNVColumns = getReservedVariantColumns();
-
-        reservedCNVColumns.add( cnvType );
-        reservedCNVColumns.addAll( OptionalCNVColumn.getOptionalCNVColumnNames() );
-
-        cnv.setCharacteristics( getCharacteristicsFromResultSet( result, reservedCNVColumns ) );*/
-
-        return cnv;
-
-    }
-    
-   
+  
     // Quick and dirty method to grab data from decipher's poorly formatted data file they gave us
     // no point in making this pretty because of the one off nature of the file
     public static CNVValueObject makeDecipherCNVFromResultSet( ResultSet results ) throws Exception {

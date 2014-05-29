@@ -154,6 +154,8 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
       } );
 
       this.add( okButton );
+      
+     ASPIREdb.EVENT_BUS.on( 'new_project_created', this.refreshDashboardHandler, this );
 
    },
    /**
@@ -161,27 +163,37 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
     * 
     */
    enableToolbar : function() {
-
+      var me=this;
       this.getDockedComponent( 'dashboardToolbar' ).removeAll();
-
-      this.getDockedComponent( 'dashboardToolbar' ).add( {
-         xtype : 'button',
-         id : 'createProject',
-         text : 'Upload Data Manager',
-         tooltip : 'Craete new Project',
-         icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
-         handler : function() {
-            ASPIREdb.view.UploadDataManagerWindow.initGridAndShow();
-            /**
-             * ProjectService.createUserProject( 'New Project', 'New Project Description', { callback :
-             * function(projectId) { var createdProject =projectId;
-             *  }, errorHandler : function(er, exception) { Ext.Msg.alert( "create project Error", er + "\n" +
-             * exception.stack ); console.log( exception.stack ); } } );
-             */
-
+      
+      LoginStatusService.isUserAdministrator({
+         callback : function(admin) {
+            if (admin){
+               me.getDockedComponent( 'dashboardToolbar' ).add( {
+                  xtype : 'button',
+                  id : 'createProject',
+                  text : 'Upload Data Manager',
+                  tooltip : 'Craete new Project',
+                  icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
+                  handler : function() {
+                     ASPIREdb.view.UploadDataManagerWindow.initGridAndShow();
+          
+                  }
+               } );
+            }
+               
          }
-      } );
+      });
+      
+      
 
+   },
+   /**
+    * Refresh the dash board
+    */
+   refreshDashboardHandler : function(){
+      this.getView().refresh( true );
+      
    }
 
 } );

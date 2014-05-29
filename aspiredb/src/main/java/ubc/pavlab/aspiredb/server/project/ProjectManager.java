@@ -32,7 +32,7 @@ public interface ProjectManager {
     public void alterGroupWritePermissions( String projectName, String groupName, boolean grant );
 
     @Secured("GROUP_ADMIN")
-    public Project createProject( String projectName ) throws Exception;
+    public Project createProject( String projectName , String description) throws Exception;
 
     @Secured("GROUP_ADMIN")
     public void deleteProject( String projectName ) throws Exception;

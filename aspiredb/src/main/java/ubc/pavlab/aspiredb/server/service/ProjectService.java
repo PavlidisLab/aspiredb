@@ -59,7 +59,9 @@ public interface ProjectService {
     public String createUserAndAssignToGroup( String userName, String password, String groupName )
             throws NotLoggedInException;
     
-    public Long createUserProject(String projectName, String projectDescription) throws NotLoggedInException;
+    public String createUserProject(String projectName, String projectDescription) throws NotLoggedInException;
 
-    public String addSubjectVariantsToExistingProject( String fileContent, String projectName, String variantType );
+    public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName, String variantType );
+    
+    public String addSubjectPhenotypeToExistingProject( String fileContent, boolean createProject, String projectName, String variantType );
 }

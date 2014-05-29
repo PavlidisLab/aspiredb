@@ -16,9 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'Ext.form.*', 'Ext.layout.container.Column', 'Ext.tab.Panel',
-
-] );
+Ext.require( [ 'Ext.form.*', 'Ext.layout.container.Column', 'Ext.tab.Panel', 'Ext.ProgressBar' ] );
 /**
  * Upload Panel
  */
@@ -177,6 +175,18 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                labelWidth : 150,
                name : 'phenotypeUploadFile-path',
                buttonText : 'Select',
+               listeners : {
+                  afterrender : function(el) {
+                     var element = el.fileInputEl;
+                     console.log( element );
+                     return element;
+                  },
+                  change : function(fld, value) {
+
+                     var newValue = value.replace( /C:\\fakepath\\/g, '' );
+                     fld.setRawValue( newValue );
+                  }
+               }
             } ]
          }
 
@@ -184,86 +194,179 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
       } ]
    },
 
-   buttons : [
-              {
-                 text : 'Upload',
-                 // disabled : true,
-                 // formBind : true,
-                 handler : function() {
-                    var form = this.up( 'uploadManagerPanel' ).getForm();
-                    var me = this;
-                    if ( form.isValid() ) {
+   buttons : [ {
+      text : 'Upload',
+      id : 'uploadFiles',
+      // disabled : true,
+      // formBind : true,
+      handler : function() {
+         var form = this.up( 'uploadManagerPanel' ).getForm();
+         var me = this;
+         
+         var Runner = function() {
+            var f = function(v, pbar, btn, count, cb) {
+               return function() {
+                  if ( v > count ) {
+                     btn.dom.disabled = false;
+                     cb();
+                  } else {
+                     if ( pbar.id == 'pbar4' ) {
+                        // give this one a different count style for fun
+                        var i = v / count;
+                        pbar.updateProgress( i, Math.round( 100 * i ) + '% completed...' );
+                     } else {
+                        pbar.updateProgress( v / count, 'Loading item ' + v + ' of ' + count + '...' );
+                     }
+                  }
+               };
+            };
+            return {
+               run : function(pbar, btn, count, cb) {
+                  btn.dom.disabled = true;
+                  var ms = 5000 / count;
+                  for (var i = 1; i < (count + 2); i++) {
+                     setTimeout( f( i, pbar, btn, count, cb ), i * ms );
+                  }
+               }
+            };
+         }();
+         
+         // Reset the disabled state on the buttons because firefox will retain the state
+         // between page refreshes
 
-                       // getting the form values
-                       values = form.getFieldValues();
-                       var projectName = values['projectName'];
-                       var projectDescription = values['projectDescription'];
+         var pbar4 = Ext.create( 'Ext.ProgressBar', {
+            text : 'Waiting on you...',
+            id : 'pbar4',
+            textEl : 'p4text',
+            cls : 'custom',
+            // renderTo:'p4',
+            //renderTo : this,
+         } );
 
-                       // create project
-                       ProjectService.createUserProject( projectName, projectDescription, {
-                          callback : function(projectId) {
-                             console.log( 'reading uplodaed files' );
+         pbar4.show();
+         
+         var btn4 = Ext.get('uploadFiles');
+         btn4.dom.disabled = false;
 
-                          },
-                          errorHandler : function(er, exception) {
-                             Ext.Msg.alert( "create project Error", er + "\n" + exception.stack );
-                             console.log( exception.stack );
-                          }
-                       } );
+         Runner.run( pbar4, btn4, 19, function() {
+            pbar4.updateText( 'All finished!' );
+         } );
+         
 
-                       /**
-                         * form.submit( {
-                         * 
-                         * method : 'POST', url : '/aspiredb/upload_action.html', // submitEmptyText : false,
-                         * 
-                         * waitMsg : 'Uploading your file...', headers: {'Content-Type':'multipart/form-data;
-                         * charset=UTF-8'}, success : function(form, action) { Ext.Msg.alert( 'Success', 'Your file has
-                         * been uploaded.' ); }, failure : function(form, action) { Ext.Msg.alert( 'Failed',
-                         * action.result ? action.result.message : 'No response' ); } } );
-                         */
-                       
-                       var variantType = values['variantType-inputEl'].toUpperCase();
-                       var file = Ext.getCmp( 'variantFile' ).getEl().down( 'input[type=file]' ).dom.files[0]; 
-                       var phenotypeFile = Ext.getCmp( 'phenotypeFile' ).getEl().down( 'input[type=file]' ).dom.files[0];
-                       
+         if ( form.isValid() ) {
 
-                       var fReader = new FileReader();
-                       fReader.readAsBinaryString( file );
+            // getting the form values
+            values = form.getFieldValues();
+            var projectName = values['projectName'];
+            var projectDescription = values['projectDescription'];
+            var variantType = values['variantType-inputEl'].toUpperCase();
+            var file = Ext.getCmp( 'variantFile' ).getEl().down( 'input[type=file]' ).dom.files[0];
+            var phenotypeFile = Ext.getCmp( 'phenotypeFile' ).getEl().down( 'input[type=file]' ).dom.files[0];
 
-                       fReader.onloadend = function(event) {
-                          var variantSrc = event.target.result;
-                         // console.log( 'reader finish reading' + variantSrc );
-                          
-                          // add variants to the project
-                          ProjectService.addSubjectVariantsToExistingProject( variantSrc, projectName, variantType, {
-                             callback : function(errorMessage) {
 
-                                Ext.Msg.alert( 'Error', 'Add to variant DWR returns Error :' + errorMessage );
-                             },
-                             errorHandler : function(er, exception) {
-                                Ext.Msg.alert( "create variant Error", er + "\n" + exception.stack );
-                                console.log( exception.stack );
-                             }
-                          } );
-                       }
+            // create project
+            ProjectService.createUserProject( projectName, projectDescription, {
+               callback : function(message) {
+                //  Ext.Msg.alert( "Server Reply","Create Project"+ message );
+                  if (message =="Success"){
+                     
+                  // Uploading variants to the created project
+                     var fReader = new FileReader();
+                     fReader.readAsBinaryString( file );
 
-                    } else {
-                       // Ext.Msg.alert( "Error!", "Your form is invalid!" );
-                       fieldNames = [];
-                       fields = form.getFields();
-                       for (var i = 0; i < fields.length; i++) {
-                          field = fields[i];
-                          if ( field == undefined )
-                             fieldNames.push( field.getName() );
-                       }
-                       console.debug( fieldNames );
-                       Ext.MessageBox.alert( 'Invalid Fields', 'The following fields are invalid: '
-                          + fieldNames.join( ', ' ) );
-                    }
+                     fReader.onloadend = function(event) {
+                        var variantSrc = event.target.result;
 
-                 }
+                        // add variants to the project
+                        ProjectService.addSubjectVariantsToExistingProject( variantSrc, false, projectName, variantType, {
+                           callback : function(errorMessage) {
+                              if (errorMessage == 'Success'){
+                                 Ext.Msg.alert( 'Success', 'You have successfully uploaded variant file');
+                              }
+                              else Ext.Msg.alert( 'Server Reply', 'Uploading Variants  :' + errorMessage );
+                           },
+                           errorHandler : function(er, exception) {
+                              Ext.Msg.alert( "Upload variants Error", er + "\n" + exception.stack );
+                              console.log( exception.stack );
+                           }
+                        } );
+                     };
+                     
+                     // Uploading phenoypes to the created project
+                     var fpReader = new FileReader();
+                     fpReader.readAsBinaryString( phenotypeFile );
 
-              }, {
-                 text : 'Cancel'
-              } ]
+                     fpReader.onloadend = function(event) {
+                        var variantSrc = event.target.result;
+
+                        // add variants to the project
+                        ProjectService.addSubjectPhenotypeToExistingProject( variantSrc, false, projectName, variantType, {
+                           callback : function(errorMessage) {
+                              if (errorMessage =="Success"){
+                                 Ext.Msg.alert( 'Success', 'You have successfully uploaded phenotype file');
+                              }else Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :' + errorMessage );
+                           },
+                           errorHandler : function(er, exception) {
+                              Ext.Msg.alert( "Upload phenotype Error", er + "\n" + exception.stack );
+                              console.log( exception.stack );
+                           }
+                        } );
+                     };
+                     
+                     
+                  }
+
+               },
+               errorHandler : function(er, exception) {
+                  Ext.Msg.alert( "create project Error", er + "\n" + exception.stack );
+                  console.log( exception.stack );
+               }
+            } );
+
+            /**
+             * form.submit( {
+             * 
+             * method : 'POST', url : '/aspiredb/upload_action.html', // submitEmptyText : false,
+             * 
+             * waitMsg : 'Uploading your file...', headers: {'Content-Type':'multipart/form-data; charset=UTF-8'},
+             * success : function(form, action) { Ext.Msg.alert( 'Success', 'Your file has been uploaded.' ); }, failure :
+             * function(form, action) { Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' ); } } );
+             */
+            ASPIREdb.EVENT_BUS.fireEvent( 'new_project_created');
+
+         } else {
+            // Ext.Msg.alert( "Error!", "Your form is invalid!" );
+            fieldNames = [];
+            fields = form.getFields();
+            for (var i = 0; i < fields.length; i++) {
+               field = fields[i];
+               if ( field == undefined )
+                  fieldNames.push( field.getName() );
+            }
+            console.debug( fieldNames );
+            Ext.MessageBox.alert( 'Invalid Fields', 'The following fields are invalid: ' + fieldNames.join( ', ' ) );
+         }
+
+      }
+
+   }, {
+      xtype : 'button',
+      text : 'Cancel',
+      itemId : 'cancelButton',
+      handler : function(){
+         ASPIREdb.view.UploadDataManagerWindow.hide();
+      },
+     // scope :this,
+   } ],
+
+   /**
+    * init
+    */
+   initComponent : function() {
+      this.callParent();
+
+   },
+
+ 
+
 } );

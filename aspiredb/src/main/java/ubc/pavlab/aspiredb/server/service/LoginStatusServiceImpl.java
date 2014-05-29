@@ -37,6 +37,7 @@ public class LoginStatusServiceImpl implements LoginStatusService {
     }
 
     @Override
+    @RemoteMethod
     public Boolean isUserAdministrator() {
         return SecurityServiceImpl.isUserAdmin();
     }
