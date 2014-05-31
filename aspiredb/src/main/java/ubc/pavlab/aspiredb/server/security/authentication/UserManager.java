@@ -73,6 +73,9 @@ public interface UserManager extends UserDetailsManager, GroupManager {
      * @return
      */
     public UserGroup findGroupByName( String name );
+    
+    
+   // public UserGroup createUserGroup( String groupName );
 
     /**
      * @param username

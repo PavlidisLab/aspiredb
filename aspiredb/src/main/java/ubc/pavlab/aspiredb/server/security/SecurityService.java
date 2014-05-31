@@ -301,6 +301,8 @@ public interface SecurityService {
      */
     @Secured("ACL_SECURABLE_EDIT")
     public abstract Collection<String> readableBy( Securable s );
+    
+  //  public boolean isUserAdmin( String userName );
 
     /**
      * @param userName

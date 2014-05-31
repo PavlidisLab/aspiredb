@@ -111,6 +111,21 @@ public class ProjectServiceImpl implements ProjectService {
         return "Success";
 
     }
+    
+   /** public ProjectValueObject findUserProject(String projectName) throws NotLoggedInException{
+        ProjectValueObject pvo=null;
+        log.info( " finding projectName:" + projectName );
+
+        try {
+            pvo.equals( projectManager.findProject( projectName ));
+        } catch ( Exception e ) {
+            log.error( e.getMessage() );
+           //return e.getMessage();
+        }
+
+        
+        return pvo;
+    }*/
 
     /**
      * @author gaya

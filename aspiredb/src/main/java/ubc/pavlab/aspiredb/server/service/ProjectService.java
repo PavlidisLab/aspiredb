@@ -60,6 +60,8 @@ public interface ProjectService {
             throws NotLoggedInException;
     
     public String createUserProject(String projectName, String projectDescription) throws NotLoggedInException;
+    
+   // public ProjectValueObject findUserProject(String projectName) throws NotLoggedInException;
 
     public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName, String variantType );
     

@@ -58,6 +58,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
@@ -172,6 +173,13 @@ public class SecurityServiceImpl implements SecurityService {
     public void addUserToGroup( String userName, String groupName ) {
         this.userManager.addUserToGroup( userName, groupName );
     }
+    
+   /** @Override
+    @Transactional
+    public boolean isUserAdmin( String userName ) {
+        return isUserAdmin();
+      
+    }*/
 
     /*
      * (non-Javadoc)

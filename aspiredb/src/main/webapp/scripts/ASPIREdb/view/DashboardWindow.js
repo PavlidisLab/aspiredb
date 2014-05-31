@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'Ext.Window','ASPIREdb.view.UploadDataManagerWindow'] );
+Ext.require( [ 'Ext.Window','ASPIREdb.view.UploadDataManagerWindow','ASPIREdb.view.ProjectManagerWindow'] );
 
 Ext.define( 'ASPIREdb.view.DashboardWindow', {
    extend : 'Ext.Window',
@@ -169,10 +169,11 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
       LoginStatusService.isUserAdministrator({
          callback : function(admin) {
             if (admin){
+               //add upload project button
                me.getDockedComponent( 'dashboardToolbar' ).add( {
                   xtype : 'button',
                   id : 'createProject',
-                  text : 'Upload Data Manager',
+                  text : 'Upload Project',
                   tooltip : 'Craete new Project',
                   icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
                   handler : function() {
@@ -180,10 +181,30 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
           
                   }
                } );
+               
+               me.getDockedComponent( 'dashboardToolbar' ).add( '-' );
+               
+               //add project manager button
+               me.getDockedComponent( 'dashboardToolbar' ).add( {
+                  xtype : 'button',
+                  id : 'manageProject',
+                  text : 'Manage Project',
+                  tooltip : 'Add users and upload variants or upload phenotypes',
+                  icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
+                  handler : function() {
+                     ASPIREdb.view.ProjectManagerWindow.initGridAndShow();
+          
+                  }
+               } );
+               
+               
+               
             }
                
          }
       });
+      
+      
       
       
 

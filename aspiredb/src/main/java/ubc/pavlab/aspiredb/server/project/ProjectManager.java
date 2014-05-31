@@ -15,11 +15,13 @@
 
 package ubc.pavlab.aspiredb.server.project;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.security.access.annotation.Secured;
 
 import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
@@ -33,6 +35,9 @@ public interface ProjectManager {
 
     @Secured("GROUP_ADMIN")
     public Project createProject( String projectName , String description) throws Exception;
+    
+  //  @Secured("GROUP_ADMIN")
+ //   public Project findProject( String projectName) throws Exception;
 
     @Secured("GROUP_ADMIN")
     public void deleteProject( String projectName ) throws Exception;
@@ -52,6 +57,9 @@ public interface ProjectManager {
     @Secured({ "GROUP_ADMIN" })
     public void addSubjectVariantsToSpecialProject( String projectName, boolean deleteProject,
             List<VariantValueObject> voList, boolean existingProject ) throws Exception;
+    
+   // @Secured({ "GROUP_ADMIN" })
+  //  public Collection<String> getUsersForProject(String projectName);
 
     @Secured({ "GROUP_ADMIN" })
     public void addSubjectVariantsToProjectForceCreate( String projectName, List<VariantValueObject> voList )

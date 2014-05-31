@@ -16,6 +16,7 @@
 package ubc.pavlab.aspiredb.server.project;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ubc.pavlab.aspiredb.cli.InvalidDataException;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
+import ubc.pavlab.aspiredb.server.dao.SecurableDaoBase;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantOverlapDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
@@ -52,6 +54,7 @@ import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.security.SecurityService;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
@@ -93,6 +96,8 @@ public class ProjectManagerImpl implements ProjectManager {
 
     @Autowired
     VariantDao variantDao;
+    
+    SecurityService securityservice;
 
     @Autowired
     Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
@@ -105,7 +110,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
     @Autowired
     SecurityService securityService;
-
+    
     @Autowired
     UserManager userManager;
 
@@ -130,6 +135,17 @@ public class ProjectManagerImpl implements ProjectManager {
 
         return projectDao.create( p );
     }
+    
+  /**  @Override
+    @Transactional
+    public Project findProject( String projectName) throws Exception{
+        Project project =projectDao.findByProjectName( projectName );
+     if (project!= null){
+         return project;
+     }
+     else return null;
+        
+    }*/
 
     @Transactional
     public Project createSpecialProject( String name, boolean deleteProject ) throws Exception {
@@ -533,6 +549,17 @@ public class ProjectManagerImpl implements ProjectManager {
         log.info( "FINISHED " + ( grant ? "Granting" : "Removing" ) + " write permissions for group:" + groupName
                 + " on project:" + projectName );
     }
+    
+    /**public Collection<String> getUsersForProject(String projectName){
+        
+        Project proj = projectDao.findByProjectName( projectName );
+        
+        
+        return securityservice.readableBy(proj );
+        
+       
+        
+    } */
 
     private void alterWritePermissionForGroup( Project project, String groupName, boolean grant ) {
 
@@ -584,6 +611,8 @@ public class ProjectManagerImpl implements ProjectManager {
 
         }
     }
+    
+   
 
     @Override
     @Transactional
@@ -616,6 +645,8 @@ public class ProjectManagerImpl implements ProjectManager {
         projectDao.remove( project );
 
     }
+    
+    
 
     @Override
     @Transactional
