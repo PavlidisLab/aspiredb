@@ -17,7 +17,7 @@
  *
  */
 Ext.require( [ 'ASPIREdb.MainPanel', 'ASPIREdb.EVENT_BUS', 'ASPIREdb.view.filter.FilterWindow',
-              'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.DashboardWindow', 'ASPIREdb.view.GeneManagerWindow' ] );
+              'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.DashboardWindow', 'ASPIREdb.view.GeneManagerWindow' ,'ASPIREdb.view.LabelManagerWindow'] );
 
 /**
  * Main Panel which trigger the Main Panel after user's successful login Events: - login - logout
@@ -234,6 +234,16 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          margin : '5 5 5 5',
          handler : function() {
             ASPIREdb.view.GeneManagerWindow.initGridAndShow();
+
+         }
+      }, {
+         xtype : 'button',
+         text : 'Label Manager',
+         itemId : 'labelManagerButton',
+         height : 30,
+         margin : '5 5 5 5',
+         handler : function() {
+            ASPIREdb.view.LabelManagerWindow.initGridAndShow();
 
          }
       }, /**
