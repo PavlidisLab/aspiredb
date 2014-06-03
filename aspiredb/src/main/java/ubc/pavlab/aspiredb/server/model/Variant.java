@@ -14,6 +14,8 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
+import gemma.gsec.model.SecuredNotChild;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -40,7 +42,6 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import ubc.pavlab.aspiredb.server.ValueObjectConvertible;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.SecuredNotChild;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 /**

@@ -14,6 +14,8 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
+import gemma.gsec.model.Securable;
+
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -21,8 +23,6 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
-
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 
 //this isn't abstract because the security interceptor wasn't working quite right when this class was abstract
 //for example calling the remove method didn't remove the appropriate acls

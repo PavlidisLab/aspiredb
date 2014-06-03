@@ -14,6 +14,8 @@
  */
 package ubc.pavlab.aspiredb.server.model.common.auditAndSecurity;
 
+import gemma.gsec.model.SecuredNotChild;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;

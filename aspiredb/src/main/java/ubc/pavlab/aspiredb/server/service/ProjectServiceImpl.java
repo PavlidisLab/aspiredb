@@ -14,14 +14,7 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -32,10 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.io.StringWriter;
-import java.lang.reflect.Array;
-
-import javax.ws.rs.core.Variant;
 
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
@@ -45,12 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
-
-import com.google.gwt.http.client.URL;
-
-import ubc.pavlab.aspiredb.cli.AbstractCLI.ErrorCode;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadService;
@@ -58,7 +41,6 @@ import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadServiceResult;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadServiceResult;
 import ubc.pavlab.aspiredb.server.model.Project;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
@@ -68,7 +50,7 @@ import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
-import ubc.pavlab.aspiredb.shared.VariantValueObject;
+import au.com.bytecode.opencsv.CSVWriter;
 
 @Service
 @RemoteProxy(name = "ProjectService")
@@ -115,8 +97,8 @@ public class ProjectServiceImpl implements ProjectService {
     @RemoteMethod
     public Collection<String> getProjectUserNames( String projectName ) {
         Collection<String> userObject = new ArrayList<String>();
-        
-        userObject =null;
+
+        userObject = null;
         Collection<String> userNames = new ArrayList<String>();
 
         Project proj = projectDao.findByProjectName( projectName );
@@ -129,26 +111,25 @@ public class ProjectServiceImpl implements ProjectService {
 
         return userObject;
     }
-    
+
     @Override
     @RemoteMethod
     public Collection<User> getProjectUsers( String projectName ) {
         Collection<User> userObject = new ArrayList<User>();
-        
-        Collection<String> userNames =new ArrayList<String>();
-                        
+
+        Collection<String> userNames = new ArrayList<String>();
+
         Project proj = projectDao.findByProjectName( projectName );
-        userNames= securityService.readableBy( proj );
-        
-        for (String userName : userNames){
+        userNames = securityService.readableBy( proj );
+
+        for ( String userName : userNames ) {
             User user = userManager.findByUserName( userName );
-            userObject.add( user);
+            userObject.add( user );
         }
-        
+
         return userObject;
     }
 
-    
     @Override
     @RemoteMethod
     public Collection<String> projectReadableBy( Project project ) {

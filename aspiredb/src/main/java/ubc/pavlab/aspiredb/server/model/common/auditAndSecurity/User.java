@@ -14,6 +14,8 @@
  */
 package ubc.pavlab.aspiredb.server.model.common.auditAndSecurity;
 
+import gemma.gsec.model.SecuredNotChild;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

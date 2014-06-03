@@ -14,12 +14,12 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
+import gemma.gsec.model.Securable;
+
 import java.util.Collection;
 
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
-
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 
 /**
  * TODO Document Me

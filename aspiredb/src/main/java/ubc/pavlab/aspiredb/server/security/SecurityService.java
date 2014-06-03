@@ -15,6 +15,8 @@
 
 package ubc.pavlab.aspiredb.server.security;
 
+import gemma.gsec.model.Securable;
+
 import java.util.Collection;
 import java.util.Map;
 
@@ -24,7 +26,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.transaction.annotation.Transactional;
 
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 import ubc.pavlab.aspiredb.server.util.AuthorityConstants;
 
 /**
@@ -301,8 +302,8 @@ public interface SecurityService {
      */
     @Secured("ACL_SECURABLE_EDIT")
     public abstract Collection<String> readableBy( Securable s );
-    
-  //  public boolean isUserAdmin( String userName );
+
+    // public boolean isUserAdmin( String userName );
 
     /**
      * @param userName
