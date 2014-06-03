@@ -79,6 +79,13 @@
         </dependency>
 
         <dependency>
+            <groupId>pavlab</groupId>
+            <artifactId>gemma-gsec</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        
+        <dependency>
             <groupId>dwr</groupId>
             <artifactId>dwr</artifactId>
             <version>3.0.RC2</version>

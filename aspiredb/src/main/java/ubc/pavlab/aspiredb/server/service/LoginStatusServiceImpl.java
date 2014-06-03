@@ -14,11 +14,11 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import gemma.gsec.util.SecurityUtil;
+
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.stereotype.Service;
-
-import ubc.pavlab.aspiredb.server.security.SecurityServiceImpl;
 
 /**
  * Simple service to find out if current user is logged in
@@ -32,19 +32,18 @@ public class LoginStatusServiceImpl implements LoginStatusService {
 
     @Override
     public Boolean isLoggedIn() {
-
-        return SecurityServiceImpl.isUserLoggedIn();
+        return SecurityUtil.isUserLoggedIn();
     }
 
     @Override
     @RemoteMethod
     public Boolean isUserAdministrator() {
-        return SecurityServiceImpl.isUserAdmin();
+        return SecurityUtil.isUserAdmin();
     }
 
     @Override
     @RemoteMethod
     public String getCurrentUsername() {
-        return SecurityServiceImpl.getCurrentUsername();
+        return SecurityUtil.getCurrentUsername();
     }
 }
