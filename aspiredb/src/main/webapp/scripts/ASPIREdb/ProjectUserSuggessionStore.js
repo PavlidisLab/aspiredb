@@ -29,7 +29,7 @@ Ext.define('ASPIREdb.ProjectUserSuggestionStore', {
 
     suggestionContext: null,
     property: null,
-    
+    /**
     constructor: function (config) {
         config.proxy = {
             type: 'dwr',
@@ -49,5 +49,5 @@ Ext.define('ASPIREdb.ProjectUserSuggestionStore', {
         this.suggestionContext.valuePrefix = options.params.query;
         this.proxy.dwrParams = [this.suggestionContext];
         this.callParent(options);
-    }
+    }*/
 });

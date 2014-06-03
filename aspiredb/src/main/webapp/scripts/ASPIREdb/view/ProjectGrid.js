@@ -17,8 +17,7 @@
  *
  */
 
-Ext.require( [ 'ASPIREdb.store.ProjectStore', 'Ext.grid.*', 'Ext.data.*',
-              'Ext.util.*', 'Ext.state.*', 'Ext.form.*' ] );
+Ext.require( [ 'ASPIREdb.store.ProjectStore', 'Ext.grid.*', 'Ext.data.*', 'Ext.util.*', 'Ext.state.*', 'Ext.form.*' ] );
 
 var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
    // clicksToMoveEditor: 1,
@@ -91,16 +90,15 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
       this.on( 'edit', function(editor, e) {
          var record = e.record;
          var me = this;
-         
+
          ProjectService.findUserProject( me.selProject[0].data.ProjectName, {
             callback : function(psvo) {
-             //  console.log( 'found project name ' + psvo.name + '  decription' + psvo.description );
+               // console.log( 'found project name ' + psvo.name + ' decription' + psvo.description );
                psvo.name = record.data.ProjectName;
                psvo.description = record.data.projectDescription;
-            //   console.log( 'AFTER UPDATE - found project name ' + psvo.name + '  decription' + ' to string '
-            //      + psvo.description + psvo.id );
+               // console.log( 'AFTER UPDATE - found project name ' + psvo.name + ' decription' + ' to string '
+               // + psvo.description + psvo.id );
 
-          
             },
             errorHandler : function(er, exception) {
                Ext.Msg.alert( "find user project Error", er + "\n" + exception.stack );
@@ -115,7 +113,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
    updateProjectGridHandler : function(ProjectName) {
       var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
       var projectGrid = panel.down( '#ProjectGrid' );
-      
+
       // TODO : refresh grid when loaded
       this.store.add( ProjectName );
       this.getView().refresh( true );
@@ -128,40 +126,69 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
    },
 
    ProjectSelectHandler : function(ref, record, index, eOpts) {
-      
+
       var me = this;
       this.selProject = this.getSelectionModel().getSelection();
       var ProjectName = this.selProject[0].data.ProjectName;
-      
-      var currentUser = UserService.getCurrentUser();
-      
-     //get user groups
-      UserService.findGroupsForUser( currentUser, {
-         callback : function(pvos) {
 
-          //  me.populateProjectGrid( pvos );
+    /**  ProjectService.getProjectUserNames( ProjectName, {
+         callback : function(userNames) {
+            console.log ('project users :'+users);
+            me.populateProjectGrid( userNames, ProjectName );
+         },
+         errorHandler : function(er, exception) {
+            Ext.Msg.alert( "Project Grid : get User Error", er + "\n" + exception.stack );
+            console.log( exception.stack );
          }
-      } );
+      } );*/
       ASPIREdb.EVENT_BUS.fireEvent( 'Project_selected', this.selProject );
 
    },
 
    // Populate projects in project grid
-   populateProjectGrid : function(pvos) {
+   populateProjectGrid : function(userNames, projectName) {
+      var test ="";
+      
+      ProjectService.getProjectUserGroups( projectName, {
+         callback : function(userGroupMap) {
+            console.log ('project user groups :'+userGroupMap);
+            
+            var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
+            var grid = panel.down( '#projectUserGrid' );
 
-      var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
-      var grid = panel.down( '#projectGrid' );
+            
+            if ( userGroupMap != null ) {
+               var data = [];
+               
+               for (var i = 0; i < userNames.length; i++) {
+                  var userName = userNames[i];
+                  var userGroupNames="";
+                  
+                  var usergroups = userGroupMap[userName];
+                  for (var i = 0; i < usergroups.length; i++) {
+                     userGroupNames=userGroupNames+usergroups[i];
+                  }
+                 
+                     var row = [ userName,'', userGroupNames ];
+                     data.push( row );
+               
+                  
+               }
+               
+               grid.store.loadData( data );
+               grid.setLoading( false );
+               grid.getView().refresh();
+            }
+         },
+         errorHandler : function(er, exception) {
+            Ext.Msg.alert( "Project Grid : get User Group Error", er + "\n" + exception.stack );
+            console.log( exception.stack );
+         }
 
-      var data = [];
-      for (var i = 0; i < pvos.length; i++) {
-         var pvo = pvos[i];
-         var row = [ pvo.symbol, '', pvo.name, '' ];
-         data.push( row );
-      }
+      } );
 
-      grid.store.loadData( data );
-      grid.setLoading( false );
-      grid.getView().refresh();
+
+     
 
    },
 
@@ -193,11 +220,12 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
          handler : function() {
 
             var newProjectName = ref.down( '#ProjectName' ).getValue();
-                    
+
             ProjectService.createUserProject( newProjectName, '', {
                callback : function(message) {
                   var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
                   var ProjectGrid = panel.down( '#ProjectGrid' );
+
                   // add project name to Project grid
                   var data = [];
                   var row = [ newProjectName, '', 0 ];
@@ -208,7 +236,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
 
                   var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
                   var grid = panel.down( '#projectGrid' );
-                  
+
                   grid.store.removeAll( true );
                   ref.down( '#ProjectName' ).setValue( '' );
                   console.log( 'returned project value object : ' + message );
@@ -231,7 +259,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
                callback : function(message) {
                   var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
                   var ProjectGrid = panel.down( '#ProjectGrid' );
-                  
+
                   var selection = ProjectGrid.getView().getSelectionModel().getSelection()[0];
                   if ( selection ) {
                      ProjectGrid.store.remove( selection );

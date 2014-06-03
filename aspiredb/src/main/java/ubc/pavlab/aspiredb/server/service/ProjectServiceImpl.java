@@ -28,8 +28,12 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.io.StringWriter;
+import java.lang.reflect.Array;
 
 import javax.ws.rs.core.Variant;
 
@@ -39,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
@@ -53,9 +58,14 @@ import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadServiceResult;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadServiceResult;
 import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
+import ubc.pavlab.aspiredb.server.security.SecurityService;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
+import ubc.pavlab.aspiredb.server.security.authentication.UserService;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
@@ -76,7 +86,13 @@ public class ProjectServiceImpl implements ProjectService {
     OntologyService os;
 
     @Autowired
+    SecurityService securityService;
+
+    @Autowired
     UserManager userManager;
+
+    @Autowired
+    UserService userService;
 
     @Autowired
     PhenotypeUploadService phenotypeUploadService;
@@ -97,6 +113,87 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @RemoteMethod
+    public Collection<String> getProjectUserNames( String projectName ) {
+        Collection<String> userObject = new ArrayList<String>();
+        
+        userObject =null;
+        Collection<String> userNames = new ArrayList<String>();
+
+        Project proj = projectDao.findByProjectName( projectName );
+        userNames = projectReadableBy( proj );
+
+        for ( String userName : userNames ) {
+            User user = userService.findByUserName( userName );
+            userObject.add( user.getFirstName() );
+        }
+
+        return userObject;
+    }
+    
+    @Override
+    @RemoteMethod
+    public Collection<User> getProjectUsers( String projectName ) {
+        Collection<User> userObject = new ArrayList<User>();
+        
+        Collection<String> userNames =new ArrayList<String>();
+                        
+        Project proj = projectDao.findByProjectName( projectName );
+        userNames= securityService.readableBy( proj );
+        
+        for (String userName : userNames){
+            User user = userManager.findByUserName( userName );
+            userObject.add( user);
+        }
+        
+        return userObject;
+    }
+
+    
+    @Override
+    @RemoteMethod
+    public Collection<String> projectReadableBy( Project project ) {
+        Collection<String> allUsers = userManager.findAllUsers();
+
+        Collection<String> result = new HashSet<String>();
+
+        for ( String u : allUsers ) {
+            if ( securityService.isViewableByUser( project, u ) ) {
+                result.add( u );
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    @RemoteMethod
+    public Map<String, Collection<UserGroup>> getProjectUserGroups( String projectName ) {
+        Map<String, Collection<UserGroup>> userGroupObject = new HashMap<String, Collection<UserGroup>>();
+
+        Collection<String> userNames = new ArrayList<String>();
+
+        Project proj = projectDao.findByProjectName( projectName );
+        userNames = securityService.readableBy( proj );
+
+        for ( String userName : userNames ) {
+
+            User user = userManager.findByUserName( userName );
+            Collection<UserGroup> usergroups = userService.findGroupsForUser( user );
+            userGroupObject.put( userName, usergroups );
+        }
+
+        return userGroupObject;
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public User getCurrentUserName() {
+        return userManager.getCurrentUser();
+    }
+
+    @Override
+    @RemoteMethod
     public String createUserProject( String projectName, String projectDescription ) throws NotLoggedInException {
 
         log.info( " In createProject projectName:" + projectName );
@@ -111,21 +208,12 @@ public class ProjectServiceImpl implements ProjectService {
         return "Success";
 
     }
-    
-   /** public ProjectValueObject findUserProject(String projectName) throws NotLoggedInException{
-        ProjectValueObject pvo=null;
-        log.info( " finding projectName:" + projectName );
 
-        try {
-            pvo.equals( projectManager.findProject( projectName ));
-        } catch ( Exception e ) {
-            log.error( e.getMessage() );
-           //return e.getMessage();
-        }
-
-        
-        return pvo;
-    }*/
+    /**
+     * public ProjectValueObject findUserProject(String projectName) throws NotLoggedInException{ ProjectValueObject
+     * pvo=null; log.info( " finding projectName:" + projectName ); try { pvo.equals( projectManager.findProject(
+     * projectName )); } catch ( Exception e ) { log.error( e.getMessage() ); //return e.getMessage(); } return pvo; }
+     */
 
     /**
      * @author gaya
@@ -308,17 +396,13 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectValueObject getDgvProject() {
 
         ProjectValueObject pvo = new ProjectValueObject();
-
         Collection<Project> projects = projectDao.getSpecialOverlapProjects();
 
         for ( Project p : projects ) {
-
             if ( p.getName().equals( "DGV" ) ) {
                 return Project.convertToValueObject( p );
             }
-
         }
-
         return pvo;
 
     }
@@ -329,17 +413,13 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectValueObject getDecipherProject() {
 
         ProjectValueObject pvo = new ProjectValueObject();
-
         Collection<Project> projects = projectDao.getSpecialOverlapProjects();
 
         for ( Project p : projects ) {
-
             if ( p.getName().equals( "DECIPHER" ) ) {
                 return Project.convertToValueObject( p );
             }
-
         }
-
         return pvo;
 
     }

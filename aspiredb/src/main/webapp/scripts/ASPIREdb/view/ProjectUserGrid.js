@@ -18,7 +18,7 @@
  */
 
 Ext.require( [ 'Ext.grid.*', 'ASPIREdb.store.ProjectStore', 'ASPIREdb.TextDataDownloadWindow', 'Ext.data.*',
-              'Ext.util.*', 'Ext.state.*', 'Ext.form.*', 'ASPIREdb.ProjectUserSuggestionStore',
+              'Ext.util.*', 'Ext.state.*', 'Ext.form.*', 'ASPIREdb.ProjectUserStore',
               'ASPIREdb.model.Project', 'ASPIREdb.model.PropertyValue' ] );
 
 var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
@@ -35,7 +35,7 @@ Ext.define( 'ASPIREdb.view.ProjectUserGrid', {
    emptyText : 'No projects found',
    id : 'ProjectUserGrid',
    border : true,
-   store : Ext.create( 'ASPIREdb.store.ProjectStore' ),
+   store : Ext.create( 'ASPIREdb.store.ProjectUserStore' ),
 
    config : {
       // collection of all the ProjectValueObject loaded
@@ -56,22 +56,22 @@ Ext.define( 'ASPIREdb.view.ProjectUserGrid', {
 
    columns : [ {
       header : 'User Name',
-      dataIndex : 'name',
+      dataIndex : 'userName',
       flex : 1,
       editor : {
          // defaults to textfield if no xtype is supplied
          allowBlank : true
       }
-   },/**{
+   },{
       header : 'User Password',
-      dataIndex : 'password',
+      dataIndex : 'userPassword',
       inputType:'password',
       flex : 1,
       editor : {
          // defaults to textfield if no xtype is supplied
          allowBlank : true
       }
-   },*/ {
+   }, {
       header : 'User Group',
       dataIndex : 'userGroup',
       flex : 1,

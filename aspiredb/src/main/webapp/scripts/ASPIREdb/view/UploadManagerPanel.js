@@ -231,6 +231,7 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
             };
          }();
          
+         //TODO: display progress bar
          // Reset the disabled state on the buttons because firefox will retain the state
          // between page refreshes
 
@@ -322,6 +323,7 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                   console.log( exception.stack );
                }
             } );
+            
 
             /**
              * form.submit( {

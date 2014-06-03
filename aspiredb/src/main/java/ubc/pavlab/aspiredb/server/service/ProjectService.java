@@ -20,8 +20,12 @@ import java.io.Reader;
 import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
+import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
@@ -42,6 +46,16 @@ public interface ProjectService {
     public ProjectValueObject getDgvProject();
 
     public ProjectValueObject getDecipherProject();
+    
+    public User getCurrentUserName();
+    
+    public Collection<String> getProjectUserNames(String projectName);
+    
+    public Collection<User> getProjectUsers( String projectName );
+    
+    public Collection<String> projectReadableBy( Project project );
+    
+    public Map<String,Collection<UserGroup>> getProjectUserGroups( String projectName );
 
     public Integer numSubjects( Collection<Long> projectIds ) throws NotLoggedInException;
 
