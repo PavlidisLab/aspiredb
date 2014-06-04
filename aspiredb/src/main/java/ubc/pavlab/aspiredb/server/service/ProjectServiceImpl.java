@@ -14,6 +14,8 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import gemma.gsec.SecurityService;
+
 import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -45,7 +47,6 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
-import ubc.pavlab.aspiredb.server.security.SecurityService;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
@@ -123,7 +124,7 @@ public class ProjectServiceImpl implements ProjectService {
         userNames = securityService.readableBy( proj );
 
         for ( String userName : userNames ) {
-            User user = userManager.findByUserName( userName );
+            User user = ( User ) userManager.findByUserName( userName );
             userObject.add( user );
         }
 
@@ -158,7 +159,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         for ( String userName : userNames ) {
 
-            User user = userManager.findByUserName( userName );
+            User user = ( User ) userManager.findByUserName( userName );
             Collection<UserGroup> usergroups = userService.findGroupsForUser( user );
             userGroupObject.put( userName, usergroups );
         }
@@ -170,7 +171,7 @@ public class ProjectServiceImpl implements ProjectService {
     @RemoteMethod
     @Transactional(readOnly = true)
     public User getCurrentUserName() {
-        return userManager.getCurrentUser();
+        return ( User ) userManager.getCurrentUser();
     }
 
     @Override

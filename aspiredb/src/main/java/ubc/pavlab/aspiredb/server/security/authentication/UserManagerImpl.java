@@ -46,7 +46,6 @@ import org.springframework.security.core.userdetails.cache.NullUserCache;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ubc.pavlab.aspiredb.cli.AbstractCLI;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserExistsException;
@@ -60,7 +59,7 @@ import ubc.pavlab.aspiredb.server.util.AuthorityConstants;
  * @version $Id: UserManagerImpl.java,v 1.6 2013/06/11 23:02:56 cmcdonald Exp $
  */
 @Service("userManager")
-public class UserManagerImpl implements UserManager {
+public class UserManagerImpl implements gemma.gsec.model.UserManager {
 
     /**
      * Name of the default user group (not to be confused with the group authority GROUP_USER).
@@ -104,7 +103,7 @@ public class UserManagerImpl implements UserManager {
     public void addGroupAuthority( String groupName, GrantedAuthority authority ) {
         UserGroup g = loadGroup( groupName );
 
-        for ( GroupAuthority ga : g.getAuthorities() ) {
+        for ( gemma.gsec.model.GroupAuthority ga : g.getAuthorities() ) {
             if ( ga.getAuthority().equals( authority.getAuthority() ) ) {
                 logger.warn( "Group already has authority" + authority.getAuthority() );
                 return;
@@ -208,9 +207,9 @@ public class UserManagerImpl implements UserManager {
         return u.getSignupToken();
     }
 
-    @Override
-    @Secured("GROUP_ADMIN")
-    @Transactional
+    // @Override
+    // @Secured("GROUP_ADMIN")
+    // @Transactional
     public void changePasswordForUser( String username, String newPassword ) throws AuthenticationException {
 
         User u = userService.findByUserName( username );
@@ -325,7 +324,7 @@ public class UserManagerImpl implements UserManager {
         userCache.removeUserFromCache( username );
     }
 
-    @Override
+    // @Override
     public void deleteByUserName( String username ) {
 
         userService.deleteByUserName( username );
@@ -407,7 +406,7 @@ public class UserManagerImpl implements UserManager {
         UserGroup group = loadGroup( groupToSearch );
 
         List<GrantedAuthority> result = new ArrayList<GrantedAuthority>();
-        for ( GroupAuthority ga : group.getAuthorities() ) {
+        for ( gemma.gsec.model.GroupAuthority ga : group.getAuthorities() ) {
             result.add( new GrantedAuthorityImpl( ga.getAuthority() ) );
         }
 
@@ -424,152 +423,46 @@ public class UserManagerImpl implements UserManager {
     public UserGroup findGroupByName( String name ) {
         return this.userService.findGroupByName( name );
     }
-    
-    
-   /** @Override
-    @Transactional
-    public UserGroup createUserGroup( String groupName ) {
-        
-        UserGroup group = this.userService.findGroupByName( groupName );
-        String returnString ="";
-        
-        if ( userService.findGroupByName( groupName )!= null ) {
-            returnString = "Group already exists";
-            
-        }else {
-           
-            userService.create( group );
-            userService.addGroupAuthority( group, "ADMIN");
-        }
 
-       return group;
-    }*/
-    
     /**
+     * @Override
+     * @Transactional public UserGroup createUserGroup( String groupName ) { UserGroup group =
+     *                this.userService.findGroupByName( groupName ); String returnString =""; if (
+     *                userService.findGroupByName( groupName )!= null ) { returnString = "Group already exists"; }else {
+     *                userService.create( group ); userService.addGroupAuthority( group, "ADMIN"); } return group; }
+     */
 
-    Exception err = processCommandLine( "Project ", args );
-    authenticate( applicationContext );
-    if ( err != null ) {
-        return err;
-    }
-
-    if ( createUser ) {
-
-        if ( aspireUserPassword == null || aspireUserName == null ) {
-            log.error( "missing -aspireuser or -aspireuserpassword options" );
-            bail( AbstractCLI.ErrorCode.MISSING_OPTION );
-        }
-
-        try {
-
-            userManager.loadUserByUsername( aspireUserName );
-            log.error( "User name already exists" );
-            bail( AbstractCLI.ErrorCode.INVALID_OPTION );
-        } catch ( UsernameNotFoundException e ) {
-
-            String encodedPassword = passwordEncoder.encodePassword( aspireUserPassword, aspireUserName );
-            UserDetailsImpl u = new UserDetailsImpl( encodedPassword, aspireUserName, true, null, null, null,
-                    new Date() );
-
-            userManager.createUser( u );
-
-        }
-
-    } else if ( deleteUser ) {
-
-        if ( aspireUserName == null ) {
-            log.error( "missing -aspireuser or -aspireuserpassword options" );
-            bail( AbstractCLI.ErrorCode.MISSING_OPTION );
-        }
-
-        try {
-
-            userManager.loadUserByUsername( aspireUserName );
-            userManager.deleteByUserName( aspireUserName );
-
-        } catch ( UsernameNotFoundException e ) {
-
-            log.error( "User name doesn't exist" );
-            bail( AbstractCLI.ErrorCode.INVALID_OPTION );
-
-        }
-
-    } else if ( changePassword ) {
-
-        if ( aspireUserName == null || aspireUserPassword == null ) {
-            log.error( "missing -aspireuser or -aspireuserpassword" );
-            bail( AbstractCLI.ErrorCode.INVALID_OPTION );
-        }
-
-        try {
-            String encodedPassword = passwordEncoder.encodePassword( aspireUserPassword, aspireUserName );
-            userManager.changePasswordForUser( aspireUserName, encodedPassword );
-
-        } catch ( UsernameNotFoundException e ) {
-            log.error( "user does not exist" );
-            bail( AbstractCLI.ErrorCode.INVALID_OPTION );
-        }
-
-    } else if ( createGroup ) {
-
-        if ( groupName == null ) {
-            log.error( "missing  -groupname option" );
-            bail( AbstractCLI.ErrorCode.MISSING_OPTION );
-        }
-
-        if ( userManager.groupExists( groupName ) ) {
-            log.error( "Group already exists" );
-            bail( AbstractCLI.ErrorCode.INVALID_OPTION );
-        }
-
-        List<GrantedAuthority> authos = new ArrayList<GrantedAuthority>();
-        authos.add( new GrantedAuthorityImpl( groupName ) );
-
-        userManager.createGroup( groupName, authos );
-
-    } else if ( deleteGroup ) {
-
-        if ( groupName == null ) {
-            log.error( "missing  -groupname option" );
-            bail( AbstractCLI.ErrorCode.MISSING_OPTION );
-        }
-
-        if ( !userManager.groupExists( groupName ) ) {
-            log.error( "Group does not exist" );
-            bail( AbstractCLI.ErrorCode.INVALID_OPTION );
-        }
-
-        userManager.deleteGroup( groupName );
-
-    } else if ( assignUserToGroup ) {
-
-        if ( aspireUserName == null || groupName == null ) {
-            log.error( "missing -aspireuser or -groupname options" );
-            bail( AbstractCLI.ErrorCode.MISSING_OPTION );
-        }
-
-        if ( !userManager.groupExists( groupName ) ) {
-            log.error( "Group does not exist, create group first with -creategroup option" );
-            bail( AbstractCLI.ErrorCode.INVALID_OPTION );
-        }
-
-        try {
-            userManager.loadUserByUsername( aspireUserName );
-        } catch ( UsernameNotFoundException e ) {
-
-            log.error( "Username does not exist, create user first with -createuser option" );
-            bail( AbstractCLI.ErrorCode.INVALID_OPTION );
-
-        }
-
-        userManager.addUserToGroup( aspireUserName, groupName );
-
-    }
-
-*/
-    
-    
-    
+    /**
+     * Exception err = processCommandLine( "Project ", args ); authenticate( applicationContext ); if ( err != null ) {
+     * return err; } if ( createUser ) { if ( aspireUserPassword == null || aspireUserName == null ) { log.error(
+     * "missing -aspireuser or -aspireuserpassword options" ); bail( AbstractCLI.ErrorCode.MISSING_OPTION ); } try {
+     * userManager.loadUserByUsername( aspireUserName ); log.error( "User name already exists" ); bail(
+     * AbstractCLI.ErrorCode.INVALID_OPTION ); } catch ( UsernameNotFoundException e ) { String encodedPassword =
+     * passwordEncoder.encodePassword( aspireUserPassword, aspireUserName ); UserDetailsImpl u = new UserDetailsImpl(
+     * encodedPassword, aspireUserName, true, null, null, null, new Date() ); userManager.createUser( u ); } } else if (
+     * deleteUser ) { if ( aspireUserName == null ) { log.error( "missing -aspireuser or -aspireuserpassword options" );
+     * bail( AbstractCLI.ErrorCode.MISSING_OPTION ); } try { userManager.loadUserByUsername( aspireUserName );
+     * userManager.deleteByUserName( aspireUserName ); } catch ( UsernameNotFoundException e ) { log.error(
+     * "User name doesn't exist" ); bail( AbstractCLI.ErrorCode.INVALID_OPTION ); } } else if ( changePassword ) { if (
+     * aspireUserName == null || aspireUserPassword == null ) { log.error( "missing -aspireuser or -aspireuserpassword"
+     * ); bail( AbstractCLI.ErrorCode.INVALID_OPTION ); } try { String encodedPassword = passwordEncoder.encodePassword(
+     * aspireUserPassword, aspireUserName ); userManager.changePasswordForUser( aspireUserName, encodedPassword ); }
+     * catch ( UsernameNotFoundException e ) { log.error( "user does not exist" ); bail(
+     * AbstractCLI.ErrorCode.INVALID_OPTION ); } } else if ( createGroup ) { if ( groupName == null ) { log.error(
+     * "missing  -groupname option" ); bail( AbstractCLI.ErrorCode.MISSING_OPTION ); } if ( userManager.groupExists(
+     * groupName ) ) { log.error( "Group already exists" ); bail( AbstractCLI.ErrorCode.INVALID_OPTION ); }
+     * List<GrantedAuthority> authos = new ArrayList<GrantedAuthority>(); authos.add( new GrantedAuthorityImpl(
+     * groupName ) ); userManager.createGroup( groupName, authos ); } else if ( deleteGroup ) { if ( groupName == null )
+     * { log.error( "missing  -groupname option" ); bail( AbstractCLI.ErrorCode.MISSING_OPTION ); } if (
+     * !userManager.groupExists( groupName ) ) { log.error( "Group does not exist" ); bail(
+     * AbstractCLI.ErrorCode.INVALID_OPTION ); } userManager.deleteGroup( groupName ); } else if ( assignUserToGroup ) {
+     * if ( aspireUserName == null || groupName == null ) { log.error( "missing -aspireuser or -groupname options" );
+     * bail( AbstractCLI.ErrorCode.MISSING_OPTION ); } if ( !userManager.groupExists( groupName ) ) { log.error(
+     * "Group does not exist, create group first with -creategroup option" ); bail( AbstractCLI.ErrorCode.INVALID_OPTION
+     * ); } try { userManager.loadUserByUsername( aspireUserName ); } catch ( UsernameNotFoundException e ) { log.error(
+     * "Username does not exist, create user first with -createuser option" ); bail(
+     * AbstractCLI.ErrorCode.INVALID_OPTION ); } userManager.addUserToGroup( aspireUserName, groupName ); }
+     */
 
     /*
      * (non-Javadoc)

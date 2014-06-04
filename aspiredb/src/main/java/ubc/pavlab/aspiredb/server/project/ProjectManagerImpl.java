@@ -15,6 +15,8 @@
 
 package ubc.pavlab.aspiredb.server.project;
 
+import gemma.gsec.SecurityService;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -52,7 +54,6 @@ import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
-import ubc.pavlab.aspiredb.server.security.SecurityService;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.service.QueryService;

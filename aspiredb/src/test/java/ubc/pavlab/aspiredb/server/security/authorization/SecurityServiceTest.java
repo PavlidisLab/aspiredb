@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import gemma.gsec.SecurityService;
 import gemma.gsec.model.Securable;
 
 import java.util.Collection;
@@ -42,7 +43,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.model.Subject;
-import ubc.pavlab.aspiredb.server.security.SecurityService;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;

@@ -18,6 +18,7 @@ package ubc.pavlab.aspiredb.server.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import gemma.gsec.SecurityService;
 
 import java.util.ArrayList;
 import java.util.Date;

@@ -15,9 +15,12 @@
 
 package ubc.pavlab.aspiredb.server.security.authorization.acl;
 
+import gemma.gsec.AuthorityConstants;
 import gemma.gsec.model.Securable;
 import gemma.gsec.model.SecuredChild;
 import gemma.gsec.model.SecuredNotChild;
+import gemma.gsec.util.CrudUtils;
+import gemma.gsec.util.CrudUtilsImpl;
 import gemma.gsec.util.SecurityUtil;
 
 import java.beans.PropertyDescriptor;
@@ -53,9 +56,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
-import ubc.pavlab.aspiredb.server.util.AuthorityConstants;
-import ubc.pavlab.aspiredb.server.util.CrudUtils;
-import ubc.pavlab.aspiredb.server.util.CrudUtilsImpl;
 import ubc.pavlab.aspiredb.server.util.ReflectionUtil;
 
 /**

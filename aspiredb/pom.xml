@@ -329,6 +329,8 @@
                     </additionalClasspathElements>
                     <useManifestOnlyJar>false</useManifestOnlyJar>
                     <forkMode>always</forkMode>
+					<argLine>-Xmx1500M -ea -Djava.awt.headless=true -XX:MaxPermSize=512m -XX:-UseSplitVerifier</argLine>
+					<redirectTestOutputToFile>true</redirectTestOutputToFile>
                 </configuration>
             </plugin>
             <plugin>

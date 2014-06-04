@@ -15,6 +15,9 @@
 
 package ubc.pavlab.aspiredb.server.security.authentication;
 
+import gemma.gsec.SecurityService;
+import gemma.gsec.acl.domain.AclService;
+
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +33,6 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserExistsException;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
-import ubc.pavlab.aspiredb.server.security.SecurityService;
-import ubc.pavlab.aspiredb.server.security.authorization.acl.AclService;
 
 /**
  * @author pavlidis
