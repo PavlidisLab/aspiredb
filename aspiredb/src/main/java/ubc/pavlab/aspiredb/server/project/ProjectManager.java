@@ -36,8 +36,8 @@ public interface ProjectManager {
     @Secured("GROUP_ADMIN")
     public Project createProject( String projectName , String description) throws Exception;
     
-  //  @Secured("GROUP_ADMIN")
- //   public Project findProject( String projectName) throws Exception;
+    @Secured("GROUP_ADMIN")
+    public Project findProject( String projectName) throws Exception;
 
     @Secured("GROUP_ADMIN")
     public void deleteProject( String projectName ) throws Exception;
@@ -73,5 +73,7 @@ public interface ProjectManager {
 
     @Secured({ "GROUP_ADMIN" })
     public void populateProjectToProjectOverlap( String projectName, String specialProjectName ) throws Exception;
+
+    public String isProjectHasSubjectPhenotypes( String projectName ) throws Exception;
 
 }

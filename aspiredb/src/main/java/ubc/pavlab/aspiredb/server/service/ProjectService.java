@@ -55,8 +55,8 @@ public interface ProjectService {
     
     public Collection<String> projectReadableBy( Project project );
     
-    public Map<String,Collection<UserGroup>> getProjectUserGroups( String projectName );
-
+    public Map<String, String> getProjectUserGroups( String projectName );
+    
     public Integer numSubjects( Collection<Long> projectIds ) throws NotLoggedInException;
 
     public Integer numVariants( Collection<Long> projectIds ) throws NotLoggedInException;
@@ -75,7 +75,7 @@ public interface ProjectService {
     
     public String createUserProject(String projectName, String projectDescription) throws NotLoggedInException;
     
-   // public ProjectValueObject findUserProject(String projectName) throws NotLoggedInException;
+    public ProjectValueObject findUserProject(String projectName) throws NotLoggedInException;
 
     public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName, String variantType );
     

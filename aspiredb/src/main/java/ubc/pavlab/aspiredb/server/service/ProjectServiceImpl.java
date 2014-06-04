@@ -99,7 +99,7 @@ public class ProjectServiceImpl implements ProjectService {
     public Collection<String> getProjectUserNames( String projectName ) {
         Collection<String> userObject = new ArrayList<String>();
 
-        userObject = null;
+        // userObject =null;
         Collection<String> userNames = new ArrayList<String>();
 
         Project proj = projectDao.findByProjectName( projectName );
@@ -149,10 +149,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @RemoteMethod
-    public Map<String, Collection<UserGroup>> getProjectUserGroups( String projectName ) {
-        Map<String, Collection<UserGroup>> userGroupObject = new HashMap<String, Collection<UserGroup>>();
+    public Map<String, String> getProjectUserGroups( String projectName ) {
+        Map<String, String> userGroupObject = new HashMap<String, String>();
 
         Collection<String> userNames = new ArrayList<String>();
+        String groupNames = "";
 
         Project proj = projectDao.findByProjectName( projectName );
         userNames = securityService.readableBy( proj );
@@ -161,7 +162,11 @@ public class ProjectServiceImpl implements ProjectService {
 
             User user = ( User ) userManager.findByUserName( userName );
             Collection<UserGroup> usergroups = userService.findGroupsForUser( user );
-            userGroupObject.put( userName, usergroups );
+            for ( UserGroup usergroup : usergroups ) {
+                groupNames = groupNames + usergroup.getName() + ',';
+
+            }
+            userGroupObject.put( userName, groupNames );
         }
 
         return userGroupObject;
@@ -191,11 +196,19 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    /**
-     * public ProjectValueObject findUserProject(String projectName) throws NotLoggedInException{ ProjectValueObject
-     * pvo=null; log.info( " finding projectName:" + projectName ); try { pvo.equals( projectManager.findProject(
-     * projectName )); } catch ( Exception e ) { log.error( e.getMessage() ); //return e.getMessage(); } return pvo; }
-     */
+    @Override
+    public ProjectValueObject findUserProject( String projectName ) throws NotLoggedInException {
+        ProjectValueObject pvo = null;
+        log.info( " finding projectName:" + projectName );
+        try {
+            pvo.equals( projectManager.findProject( projectName ) );
+        } catch ( Exception e ) {
+            log.error( e.getMessage() );
+            // return e.getMessage();
+
+        }
+        return pvo;
+    }
 
     /**
      * @author gaya

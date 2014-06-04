@@ -18,6 +18,7 @@ package ubc.pavlab.aspiredb.server.project;
 import gemma.gsec.SecurityService;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -134,12 +135,16 @@ public class ProjectManagerImpl implements ProjectManager {
         return projectDao.create( p );
     }
 
-    /**
-     * @Override
-     * @Transactional public Project findProject( String projectName) throws Exception{ Project project
-     *                =projectDao.findByProjectName( projectName ); if (project!= null){ return project; } else return
-     *                null; }
-     */
+    @Override
+    @Transactional
+    public Project findProject( String projectName ) throws Exception {
+        Project project = projectDao.findByProjectName( projectName );
+        if ( project != null ) {
+            return project;
+        } else
+            return null;
+
+    }
 
     @Transactional
     public Project createSpecialProject( String name, boolean deleteProject ) throws Exception {
@@ -409,6 +414,27 @@ public class ProjectManagerImpl implements ProjectManager {
         }
 
         createSubjectPhenotypesFromPhenotypeValueObjects( proj, voList );
+
+    }
+
+    @Override
+    @Transactional
+    public String isProjectHasSubjectPhenotypes( String projectName ) throws Exception {
+
+        String returnString = "";
+
+        Project proj = projectDao.findByProjectName( projectName );
+        if ( proj == null ) {
+            returnString = "Project does not exist";
+        }
+        Collection<Long> projectIds = new ArrayList<Long>();
+        projectIds.add( proj.getId() );
+
+        Collection<String> phenotypes = phenotypeDao.getExistingNames( projectIds );
+        if ( phenotypes.size() > 0 ) {
+            returnString = "Phenotype exist";
+        }
+        return returnString;
 
     }
 
