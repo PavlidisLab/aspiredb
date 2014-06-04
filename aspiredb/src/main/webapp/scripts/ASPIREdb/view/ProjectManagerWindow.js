@@ -28,7 +28,7 @@ Ext.define('ASPIREdb.view.ProjectManagerWindow', {
    title : 'Project Manager',
    closable : true,
    closeAction : 'hide',
-   width : 1000,
+   width : 1500,
    height : 500,
    layout : 'fit',
    bodyStyle : 'padding: 5px;',

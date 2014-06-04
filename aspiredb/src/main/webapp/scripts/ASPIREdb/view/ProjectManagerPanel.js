@@ -16,39 +16,39 @@
  * limitations under the License.
  *
  */
-Ext.require([
-    'Ext.panel.Panel',
-    'ASPIREdb.view.ProjectGrid',
-    'ASPIREdb.view.ProjectUserGrid', 
-]);
+Ext.require( [ 'Ext.panel.Panel', 'ASPIREdb.view.ProjectGrid', 'ASPIREdb.view.ProjectUserGrid',
+              'ASPIREdb.view.ProjectUploadGrid' ] );
 /**
- * Project panel includes ProjectSetGrid and ProjectGrid 
+ * Project panel includes ProjectSetGrid and ProjectGrid
  */
-Ext.define('ASPIREdb.ProjectManagerPanel',{
-    extend: 'Ext.panel.Panel',
-    alias: 'widget.ASPIREdb_projectmanagerpanel',
-    layout: 'border',
-    items:[
-        {
-            region: 'west',
-            xtype:'ProjectGrid',
-            id : 'ProjectGrid',
-            width: 480,
-            collapsible: true,
-            split: true,
-            title:'Project'
-        },
-        {
-            region: 'east',
-            xtype:'ProjectUserGrid',
-            id :'ProjectUserGrid',
-            width: 480,
-            collapsible: true,
-            split: true,
-            title:'Associated Users'
-        }
-    ],
+Ext.define( 'ASPIREdb.ProjectManagerPanel', {
+   extend : 'Ext.panel.Panel',
+   alias : 'widget.ASPIREdb_projectmanagerpanel',
+   layout : 'border',
+   items : [ {
+      region : 'west',
+      xtype : 'ProjectGrid',
+      id : 'ProjectGrid',
+      width : 480,
+      collapsible : true,
+      split : true,
+      title : 'Project'
+   }, {
+      region : 'center',
+      xtype : 'ProjectUploadGrid',
+      id : 'ProjectUploadGrid',
+      width : 480,
+      title : 'Upload Files'
+   }, {
+      region : 'east',
+      xtype : 'ProjectUserGrid',
+      id : 'ProjectUserGrid',
+      width : 480,
+      collapsible : true,
+      split : true,
+      title : 'Associated Users'
+   }
 
+   ],
 
-
-});
+} );

@@ -115,8 +115,8 @@ public class ProjectServiceImpl implements ProjectService {
     @RemoteMethod
     public Collection<String> getProjectUserNames( String projectName ) {
         Collection<String> userObject = new ArrayList<String>();
-        
-        userObject =null;
+
+        // userObject =null;
         Collection<String> userNames = new ArrayList<String>();
 
         Project proj = projectDao.findByProjectName( projectName );
@@ -129,26 +129,25 @@ public class ProjectServiceImpl implements ProjectService {
 
         return userObject;
     }
-    
+
     @Override
     @RemoteMethod
     public Collection<User> getProjectUsers( String projectName ) {
         Collection<User> userObject = new ArrayList<User>();
-        
-        Collection<String> userNames =new ArrayList<String>();
-                        
+
+        Collection<String> userNames = new ArrayList<String>();
+
         Project proj = projectDao.findByProjectName( projectName );
-        userNames= securityService.readableBy( proj );
-        
-        for (String userName : userNames){
+        userNames = securityService.readableBy( proj );
+
+        for ( String userName : userNames ) {
             User user = userManager.findByUserName( userName );
-            userObject.add( user);
+            userObject.add( user );
         }
-        
+
         return userObject;
     }
 
-    
     @Override
     @RemoteMethod
     public Collection<String> projectReadableBy( Project project ) {
@@ -167,10 +166,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @RemoteMethod
-    public Map<String, Collection<UserGroup>> getProjectUserGroups( String projectName ) {
-        Map<String, Collection<UserGroup>> userGroupObject = new HashMap<String, Collection<UserGroup>>();
+    public Map<String, String> getProjectUserGroups( String projectName ) {
+        Map<String, String> userGroupObject = new HashMap<String, String>();
 
         Collection<String> userNames = new ArrayList<String>();
+        String groupNames = "";
 
         Project proj = projectDao.findByProjectName( projectName );
         userNames = securityService.readableBy( proj );
@@ -179,7 +179,11 @@ public class ProjectServiceImpl implements ProjectService {
 
             User user = userManager.findByUserName( userName );
             Collection<UserGroup> usergroups = userService.findGroupsForUser( user );
-            userGroupObject.put( userName, usergroups );
+            for ( UserGroup usergroup : usergroups ) {
+                groupNames = groupNames + usergroup.getName() + ',';
+
+            }
+            userGroupObject.put( userName, groupNames );
         }
 
         return userGroupObject;
@@ -209,11 +213,18 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    /**
-     * public ProjectValueObject findUserProject(String projectName) throws NotLoggedInException{ ProjectValueObject
-     * pvo=null; log.info( " finding projectName:" + projectName ); try { pvo.equals( projectManager.findProject(
-     * projectName )); } catch ( Exception e ) { log.error( e.getMessage() ); //return e.getMessage(); } return pvo; }
-     */
+    public ProjectValueObject findUserProject( String projectName ) throws NotLoggedInException {
+        ProjectValueObject pvo = null;
+        log.info( " finding projectName:" + projectName );
+        try {
+            pvo.equals( projectManager.findProject( projectName ) );
+        } catch ( Exception e ) {
+            log.error( e.getMessage() );
+            // return e.getMessage();
+            
+        }
+        return pvo;
+    }
 
     /**
      * @author gaya

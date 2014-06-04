@@ -96,7 +96,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
     @Autowired
     VariantDao variantDao;
-    
+
     SecurityService securityservice;
 
     @Autowired
@@ -110,7 +110,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
     @Autowired
     SecurityService securityService;
-    
+
     @Autowired
     UserManager userManager;
 
@@ -123,7 +123,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
     @Override
     @Transactional
-    public Project createProject( String name , String description) throws Exception {
+    public Project createProject( String name, String description ) throws Exception {
         if ( projectDao.findByProjectName( name ) != null ) {
             throw new Exception( "project with that name already exists" );
 
@@ -135,17 +135,17 @@ public class ProjectManagerImpl implements ProjectManager {
 
         return projectDao.create( p );
     }
-    
-  /**  @Override
+
+    @Override
     @Transactional
-    public Project findProject( String projectName) throws Exception{
-        Project project =projectDao.findByProjectName( projectName );
-     if (project!= null){
-         return project;
-     }
-     else return null;
-        
-    }*/
+    public Project findProject( String projectName ) throws Exception {
+        Project project = projectDao.findByProjectName( projectName );
+        if ( project != null ) {
+            return project;
+        } else
+            return null;
+
+    }
 
     @Transactional
     public Project createSpecialProject( String name, boolean deleteProject ) throws Exception {
@@ -192,7 +192,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
         Project proj;
         if ( createProject ) {
-            proj = createProject( projectName ,"");
+            proj = createProject( projectName, "" );
         } else {
             proj = projectDao.findByProjectName( projectName );
             if ( proj == null ) {
@@ -235,7 +235,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
         proj = projectDao.findByProjectName( projectName );
         if ( proj == null ) {
-            proj = createProject( projectName ,"" );
+            proj = createProject( projectName, "" );
         }
 
         createSubjectVariantsFromVariantValueObjects( proj, voList );
@@ -405,7 +405,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
             proj = new Project();
             proj.setName( projectName );
-            proj = createProject( projectName ,"");
+            proj = createProject( projectName, "" );
 
         } else {
             proj = projectDao.findByProjectName( projectName );
@@ -415,6 +415,27 @@ public class ProjectManagerImpl implements ProjectManager {
         }
 
         createSubjectPhenotypesFromPhenotypeValueObjects( proj, voList );
+
+    }
+
+    @Override
+    @Transactional
+    public String isProjectHasSubjectPhenotypes( String projectName ) throws Exception {
+
+        String returnString = "";
+
+        Project proj = projectDao.findByProjectName( projectName );
+        if ( proj == null ) {
+            returnString = "Project does not exist";
+        }
+        Collection<Long> projectIds=new ArrayList<Long>();
+        projectIds.add( proj.getId() );
+        
+       Collection<String> phenotypes = phenotypeDao.getExistingNames( projectIds ) ;
+       if (phenotypes.size() > 0 ){
+           returnString ="Phenotype exist";
+       }
+        return returnString;
 
     }
 
@@ -549,17 +570,11 @@ public class ProjectManagerImpl implements ProjectManager {
         log.info( "FINISHED " + ( grant ? "Granting" : "Removing" ) + " write permissions for group:" + groupName
                 + " on project:" + projectName );
     }
-    
-    /**public Collection<String> getUsersForProject(String projectName){
-        
-        Project proj = projectDao.findByProjectName( projectName );
-        
-        
-        return securityservice.readableBy(proj );
-        
-       
-        
-    } */
+
+    /**
+     * public Collection<String> getUsersForProject(String projectName){ Project proj = projectDao.findByProjectName(
+     * projectName ); return securityservice.readableBy(proj ); }
+     */
 
     private void alterWritePermissionForGroup( Project project, String groupName, boolean grant ) {
 
@@ -611,8 +626,6 @@ public class ProjectManagerImpl implements ProjectManager {
 
         }
     }
-    
-   
 
     @Override
     @Transactional
@@ -645,8 +658,6 @@ public class ProjectManagerImpl implements ProjectManager {
         projectDao.remove( project );
 
     }
-    
-    
 
     @Override
     @Transactional

@@ -18,7 +18,7 @@
  */
 
 Ext.require( [ 'Ext.grid.*', 'ASPIREdb.store.ProjectStore', 'ASPIREdb.TextDataDownloadWindow', 'Ext.data.*',
-              'Ext.util.*', 'Ext.state.*', 'Ext.form.*', 'ASPIREdb.ProjectUserStore',
+              'Ext.util.*', 'Ext.state.*', 'Ext.form.*', 'ASPIREdb.store.ProjectUserStore',
               'ASPIREdb.model.Project', 'ASPIREdb.model.PropertyValue' ] );
 
 var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
@@ -227,7 +227,7 @@ Ext.define( 'ASPIREdb.view.ProjectUserGrid', {
                            ASPIREdb.EVENT_BUS.fireEvent( 'projectUser_added', data );
                            // update the project name grid size
                            var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
-                           var projectUserGrid = panel.down( '#projectUserGrid' );
+                           var projectUserGrid = panel.down( '#ProjectUserGrid' );
 
                            var selection = projectUserGrid.getView().getSelectionModel().getSelection()[0];
                            if ( selection ) {

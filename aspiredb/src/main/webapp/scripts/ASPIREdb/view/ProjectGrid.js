@@ -131,50 +131,42 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
       this.selProject = this.getSelectionModel().getSelection();
       var ProjectName = this.selProject[0].data.ProjectName;
 
-    /**  ProjectService.getProjectUserNames( ProjectName, {
+      ProjectService.getProjectUserNames( ProjectName, {
          callback : function(userNames) {
-            console.log ('project users :'+users);
+            console.log( 'project users :' + userNames );
             me.populateProjectGrid( userNames, ProjectName );
          },
          errorHandler : function(er, exception) {
             Ext.Msg.alert( "Project Grid : get User Error", er + "\n" + exception.stack );
             console.log( exception.stack );
          }
-      } );*/
+      } );
       ASPIREdb.EVENT_BUS.fireEvent( 'Project_selected', this.selProject );
 
    },
 
    // Populate projects in project grid
    populateProjectGrid : function(userNames, projectName) {
-      var test ="";
-      
+      var test = "";
+
       ProjectService.getProjectUserGroups( projectName, {
          callback : function(userGroupMap) {
-            console.log ('project user groups :'+userGroupMap);
-            
-            var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
-            var grid = panel.down( '#projectUserGrid' );
+            console.log( 'project user groups :' + userGroupMap );
 
-            
+            var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
+            var grid = panel.down( '#ProjectUserGrid' );
+
             if ( userGroupMap != null ) {
                var data = [];
-               
+
                for (var i = 0; i < userNames.length; i++) {
                   var userName = userNames[i];
-                  var userGroupNames="";
-                  
-                  var usergroups = userGroupMap[userName];
-                  for (var i = 0; i < usergroups.length; i++) {
-                     userGroupNames=userGroupNames+usergroups[i];
-                  }
                  
-                     var row = [ userName,'', userGroupNames ];
-                     data.push( row );
-               
-                  
+                  var row = [ userName, '', userGroupMap[userName] ];
+                  data.push( row );
+
                }
-               
+
                grid.store.loadData( data );
                grid.setLoading( false );
                grid.getView().refresh();
@@ -186,9 +178,6 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
          }
 
       } );
-
-
-     
 
    },
 
