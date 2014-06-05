@@ -1,27 +1,20 @@
 /*
- * The aspiredb project
- * 
- * Copyright (c) 2012 University of British Columbia
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
- */
+* The aspiredb project
+*
+* Copyright (c) 2012 University of British Columbia
+*
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+* the License. You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+* an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+* specific language governing permissions and limitations under the License.
+*/
 package ubc.pavlab.aspiredb.server.service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -32,10 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.io.StringWriter;
-import java.lang.reflect.Array;
-
-import javax.ws.rs.core.Variant;
 
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
@@ -45,12 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
-
-import com.google.gwt.http.client.URL;
-
-import ubc.pavlab.aspiredb.cli.AbstractCLI.ErrorCode;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadService;
@@ -58,7 +41,6 @@ import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadServiceResult;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadServiceResult;
 import ubc.pavlab.aspiredb.server.model.Project;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
@@ -68,7 +50,8 @@ import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
-import ubc.pavlab.aspiredb.shared.VariantValueObject;
+import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
+import au.com.bytecode.opencsv.CSVWriter;
 
 @Service
 @RemoteProxy(name = "ProjectService")
@@ -141,7 +124,7 @@ public class ProjectServiceImpl implements ProjectService {
         userNames = securityService.readableBy( proj );
 
         for ( String userName : userNames ) {
-            User user = userManager.findByUserName( userName );
+            User user = ( User ) userManager.findByUserName( userName );
             userObject.add( user );
         }
 
@@ -177,7 +160,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         for ( String userName : userNames ) {
 
-            User user = userManager.findByUserName( userName );
+            User user = ( User ) userManager.findByUserName( userName );
             Collection<UserGroup> usergroups = userService.findGroupsForUser( user );
             for ( UserGroup usergroup : usergroups ) {
                 groupNames = groupNames + usergroup.getName() + ',';
@@ -193,9 +176,16 @@ public class ProjectServiceImpl implements ProjectService {
     @RemoteMethod
     @Transactional(readOnly = true)
     public User getCurrentUserName() {
-        return userManager.getCurrentUser();
+        return ( User ) userManager.getCurrentUser();
     }
-
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public void deleteUser(String userName) {
+    userService.deleteByUserName(userName);
+    }
+    
+    
     @Override
     @RemoteMethod
     public String createUserProject( String projectName, String projectDescription ) throws NotLoggedInException {
@@ -213,6 +203,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
+    @Override
     public ProjectValueObject findUserProject( String projectName ) throws NotLoggedInException {
         ProjectValueObject pvo = null;
         log.info( " finding projectName:" + projectName );
@@ -221,18 +212,18 @@ public class ProjectServiceImpl implements ProjectService {
         } catch ( Exception e ) {
             log.error( e.getMessage() );
             // return e.getMessage();
-            
+
         }
         return pvo;
     }
 
     /**
-     * @author gaya
-     * @param fileContent
-     * @param projectName
-     * @param variantType
-     * @return Error String
-     */
+* @author gaya
+* @param fileContent
+* @param projectName
+* @param variantType
+* @return Error String
+*/
     @Override
     @RemoteMethod
     public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName,
@@ -307,12 +298,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /**
-     * @author gaya
-     * @param fileContent
-     * @param projectName
-     * @param variantType
-     * @return Error String
-     */
+* @author gaya
+* @param fileContent
+* @param projectName
+* @param variantType
+* @return Error String
+*/
     @Override
     @RemoteMethod
     public String addSubjectPhenotypeToExistingProject( String fileContent, boolean createProject, String projectName,
@@ -436,18 +427,50 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /*
-     * TODO eventually we want this to work with a collection of projectIds
-     */
+* TODO eventually we want this to work with a collection of projectIds
+*/
     @Override
     @RemoteMethod
     public Integer numSubjects( Collection<Long> projectIds ) {
 
         return this.projectDao.getSubjectCountForProjects( projectIds );
     }
+    @Override
+    @RemoteMethod
+    public UserGroup findGroupByName( String name ){
+     return userService.findGroupByName(name);
+    }
+    
+    
+    
+     @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<String> suggestUsers(SuggestionContext suggestionContext) throws NotLoggedInException {
+        Collection<String> userNames =new ArrayList<String>();
+        //Collection<User> users =userService.loadAll();
+        Collection<User> users = userService.suggestUser( suggestionContext.getValuePrefix());
+        for (User user : users){
+         userNames.add(user.getFirstName()+" "+user.getLastName());
+        }
+        return userNames;
+    }
+    
+     @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public boolean isUser(String userName) throws NotLoggedInException {
+        
+        User user =userService.findByUserName(userName);
+        if (user != null)
+        return true;
+        return false;
+    }
+    
 
     /*
-     * TODO eventually we want this to work with a collection of projectIds
-     */
+* TODO eventually we want this to work with a collection of projectIds
+*/
     @Override
     @RemoteMethod
     public Integer numVariants( Collection<Long> projectIds ) {
@@ -539,7 +562,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             boolean createProject = true;
             if ( projectDao.findByProjectName( projectName ) != null ) {
-                log.info( "Project name already exists,  adding to existing project" );
+                log.info( "Project name already exists, adding to existing project" );
 
                 createProject = false;
             }
