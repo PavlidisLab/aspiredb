@@ -15,8 +15,6 @@
 
 package ubc.pavlab.aspiredb.server.project;
 
-import gemma.gsec.SecurityService;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -38,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ubc.pavlab.aspiredb.cli.InvalidDataException;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
+import ubc.pavlab.aspiredb.server.dao.SecurableDaoBase;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantOverlapDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
@@ -55,6 +54,8 @@ import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
+import ubc.pavlab.aspiredb.server.security.SecurityService;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.service.QueryService;
@@ -427,13 +428,13 @@ public class ProjectManagerImpl implements ProjectManager {
         if ( proj == null ) {
             returnString = "Project does not exist";
         }
-        Collection<Long> projectIds = new ArrayList<Long>();
+        Collection<Long> projectIds=new ArrayList<Long>();
         projectIds.add( proj.getId() );
-
-        Collection<String> phenotypes = phenotypeDao.getExistingNames( projectIds );
-        if ( phenotypes.size() > 0 ) {
-            returnString = "Phenotype exist";
-        }
+        
+       Collection<String> phenotypes = phenotypeDao.getExistingNames( projectIds ) ;
+       if (phenotypes.size() > 0 ){
+           returnString ="Phenotype exist";
+       }
         return returnString;
 
     }

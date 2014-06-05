@@ -29,7 +29,6 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
-import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 /**
  * TODO Document Me
@@ -81,12 +80,4 @@ public interface ProjectService {
     public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName, String variantType );
     
     public String addSubjectPhenotypeToExistingProject( String fileContent, boolean createProject, String projectName, String variantType );
-
-    public UserGroup findGroupByName( String name );
-
-    public Collection<String> suggestUsers( SuggestionContext suggestionContext ) throws NotLoggedInException;
-
-    public void deleteUser( String userName );
-
-    public boolean isUser( String userName ) throws NotLoggedInException;
 }
