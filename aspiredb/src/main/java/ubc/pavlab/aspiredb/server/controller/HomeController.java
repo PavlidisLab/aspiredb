@@ -1,7 +1,5 @@
 package ubc.pavlab.aspiredb.server.controller;
 
-import gemma.gsec.util.SecurityUtil;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.directwebremoting.annotations.RemoteProxy;
@@ -9,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import ubc.pavlab.aspiredb.server.security.SecurityServiceImpl;
 
 @Controller
 @RemoteProxy
@@ -20,7 +20,7 @@ public class HomeController {
     @RequestMapping(method = RequestMethod.GET)
     public String showHome( ModelMap model ) {
 
-        if ( !SecurityUtil.isUserLoggedIn() ) {
+        if ( !SecurityServiceImpl.isUserLoggedIn() ) {
 
             log.info( "User not logged in, redirecting to login page" );
             return "login";

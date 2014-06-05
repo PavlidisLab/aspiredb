@@ -13,11 +13,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>3.2.4.RELEASE</spring.version>
-        <spring.security.version>3.1.4.RELEASE</spring.security.version>
-    
     </properties>
 
     <repositories>
@@ -84,13 +79,6 @@
         </dependency>
 
         <dependency>
-            <groupId>pavlab</groupId>
-            <artifactId>gemma-gsec</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <type>jar</type>
-        </dependency>
-        
-        <dependency>
             <groupId>dwr</groupId>
             <artifactId>dwr</artifactId>
             <version>3.0.RC2</version>
@@ -101,21 +89,20 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
+            <version>4.4</version>
             <scope>test</scope>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
-            <version>3.2</version>
+            <version>2.5.2</version>
             <scope>test</scope>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>${spring.version}</version>
+            <version>2.5</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -140,75 +127,75 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
-            <version>${spring.version}</version>
+            <version>3.2.0.RELEASE</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
-            <version>${spring.version}</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
-            <version>${spring.version}</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aspects</artifactId>
-            <version>${spring.version}</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
-            <version>${spring.version}</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
-            <version>${spring.version}</version>
+            <version>3.2.0.RELEASE</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>${spring.version}</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
-            <version>${spring.security.version}</version>
+            <version>3.0.5.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
-            <version>${spring.security.version}</version>
+            <version>3.0.5.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
-            <version>${spring.security.version}</version>
+            <version>3.0.5.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-acl</artifactId>
-            <version>${spring.security.version}</version>
+            <version>3.0.5.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
-            <version>${spring.version}</version>
+            <version>3.0.5.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -235,34 +222,10 @@
             <artifactId>hibernate-core</artifactId>
             <version>3.6.3.Final</version>
         </dependency>
-        <!--dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-ehcache</artifactId>
-            <version>3.6.7.Final</version>
-        </dependency-->
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-ehcache</artifactId>
             <version>3.6.7.Final</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.sf.ehcache</groupId>
-                    <artifactId>ehache-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <!-- required by hibernate, explicitly import so we get it at runtime. -->
-            <groupId>javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.4.GA</version>
-            <scope>runtime</scope>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache-core</artifactId>
-            <version>2.5.2</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -359,8 +322,6 @@
                     </additionalClasspathElements>
                     <useManifestOnlyJar>false</useManifestOnlyJar>
                     <forkMode>always</forkMode>
-					<argLine>-Xmx1500M -ea -Djava.awt.headless=true -XX:MaxPermSize=512m -XX:-UseSplitVerifier</argLine>
-					<redirectTestOutputToFile>true</redirectTestOutputToFile>
                 </configuration>
             </plugin>
             <plugin>
@@ -675,6 +636,5 @@
         </plugins>
     </reporting>
 
-    
 
 </project>

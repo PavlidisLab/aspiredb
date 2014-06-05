@@ -14,8 +14,6 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
-import gemma.gsec.model.SecuredNotChild;
-
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -25,6 +23,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.SecuredNotChild;
 import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
 
 /**

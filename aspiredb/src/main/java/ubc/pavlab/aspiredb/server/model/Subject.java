@@ -14,8 +14,6 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
-import gemma.gsec.model.Securable;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,6 +34,7 @@ import javax.persistence.Table;
 
 import org.springframework.security.access.annotation.Secured;
 
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;

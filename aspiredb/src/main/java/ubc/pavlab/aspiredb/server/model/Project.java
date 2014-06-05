@@ -14,8 +14,6 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
-import gemma.gsec.model.Securable;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +24,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 
 /**

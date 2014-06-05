@@ -19,7 +19,6 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import static org.junit.Assert.assertEquals;
-import gemma.gsec.SecurityService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,6 +44,7 @@ import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
+import ubc.pavlab.aspiredb.server.security.SecurityService;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;

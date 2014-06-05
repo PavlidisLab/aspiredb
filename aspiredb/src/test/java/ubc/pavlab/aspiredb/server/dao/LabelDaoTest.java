@@ -27,8 +27,10 @@ import java.util.Collection;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.model.Label;
@@ -37,6 +39,7 @@ import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
+@RunWith(SpringJUnit4ClassRunner.class)
 public class LabelDaoTest extends BaseSpringContextTest {
     @Autowired
     private LabelDao labelDao;

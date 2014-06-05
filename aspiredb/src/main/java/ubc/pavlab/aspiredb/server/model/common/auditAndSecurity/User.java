@@ -28,7 +28,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "USER")
-public class User implements gemma.gsec.model.User {
+public class User implements SecuredNotChild {
     @Id
     @GeneratedValue
     @Column(name = "ID")
@@ -69,62 +69,50 @@ public class User implements gemma.gsec.model.User {
         return this.id;
     }
 
-    @Override
     public String getUserName() {
         return this.userName;
     }
 
-    @Override
     public void setUserName( String userName ) {
         this.userName = userName;
     }
 
-    @Override
     public String getPassword() {
         return this.password;
     }
 
-    @Override
     public void setPassword( String password ) {
         this.password = password;
     }
 
-    @Override
     public String getPasswordHint() {
         return this.passwordHint;
     }
 
-    @Override
     public void setPasswordHint( String passwordHint ) {
         this.passwordHint = passwordHint;
     }
 
-    @Override
     public Boolean getEnabled() {
         return this.enabled;
     }
 
-    @Override
     public void setEnabled( Boolean enabled ) {
         this.enabled = enabled;
     }
 
-    @Override
     public String getSignupToken() {
         return this.signupToken;
     }
 
-    @Override
     public void setSignupToken( String signupToken ) {
         this.signupToken = signupToken;
     }
 
-    @Override
     public java.util.Date getSignupTokenDatestamp() {
         return this.signupTokenDatestamp;
     }
 
-    @Override
     public void setSignupTokenDatestamp( java.util.Date signupTokenDatestamp ) {
         this.signupTokenDatestamp = signupTokenDatestamp;
     }
@@ -155,12 +143,10 @@ public class User implements gemma.gsec.model.User {
         return hashCode;
     }
 
-    @Override
     public String getEmail() {
         return email;
     }
 
-    @Override
     public void setEmail( String email ) {
         this.email = email;
     }
@@ -173,50 +159,12 @@ public class User implements gemma.gsec.model.User {
         this.firstName = firstName;
     }
 
-    @Override
     public String getLastName() {
         return lastName;
     }
 
-    @Override
     public void setLastName( String lastName ) {
         this.lastName = lastName;
-    }
-
-    @Override
-    public String getDescription() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getName() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setDescription( String description ) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setId( Long id ) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setName( String name ) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public String getFullName() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }

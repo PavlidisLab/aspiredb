@@ -80,7 +80,7 @@ public class PrincipalTest extends BaseSpringContextTest {
     public final void testLogin() throws Exception {
         Authentication auth = new UsernamePasswordAuthenticationToken( username, pwd );
 
-        Authentication authentication = ( ( ProviderManager ) authenticationManager ).authenticate( auth );
+        Authentication authentication = ( ( ProviderManager ) authenticationManager ).doAuthentication( auth );
         assertTrue( authentication.isAuthenticated() );
     }
 
@@ -89,7 +89,7 @@ public class PrincipalTest extends BaseSpringContextTest {
         Authentication auth = new UsernamePasswordAuthenticationToken( "bad user", "wrong password" );
 
         try {
-            ( ( ProviderManager ) authenticationManager ).authenticate( auth );
+            ( ( ProviderManager ) authenticationManager ).doAuthentication( auth );
             fail( "Should have gotten a bad credentials exception" );
         } catch ( BadCredentialsException e ) {
             //
@@ -101,7 +101,7 @@ public class PrincipalTest extends BaseSpringContextTest {
         Authentication auth = new UsernamePasswordAuthenticationToken( username, "wrong password" );
 
         try {
-            ( ( ProviderManager ) authenticationManager ).authenticate( auth );
+            ( ( ProviderManager ) authenticationManager ).doAuthentication( auth );
             fail( "Should have gotten a bad credentials exception" );
         } catch ( BadCredentialsException e ) {
             //

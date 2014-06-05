@@ -59,7 +59,7 @@ public class UserGroupDaoImpl extends DaoBaseImpl<UserGroup> implements UserGrou
     @Override
     public void addAuthority( UserGroup group, String authority ) {
 
-        for ( gemma.gsec.model.GroupAuthority ga : group.getAuthorities() ) {
+        for ( GroupAuthority ga : group.getAuthorities() ) {
             if ( ga.getAuthority().equals( authority ) ) {
                 log.warn( "Group already has authority " + authority );
                 return;
@@ -103,7 +103,7 @@ public class UserGroupDaoImpl extends DaoBaseImpl<UserGroup> implements UserGrou
     public void removeAuthority( UserGroup group, String authority ) {
 
         for ( Iterator<GroupAuthority> iterator = group.getAuthorities().iterator(); iterator.hasNext(); ) {
-            gemma.gsec.model.GroupAuthority ga = iterator.next();
+            GroupAuthority ga = iterator.next();
             if ( ga.getAuthority().equals( authority ) ) {
                 iterator.remove();
             }

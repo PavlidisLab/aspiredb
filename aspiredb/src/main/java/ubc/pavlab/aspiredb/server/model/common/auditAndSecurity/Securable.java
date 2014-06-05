@@ -14,42 +14,12 @@
  */
 package ubc.pavlab.aspiredb.server.model.common.auditAndSecurity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-@Entity
-@Table(name = "GROUP_AUTHORITY")
-public class GroupAuthority {
-
-    public GroupAuthority() {
-
-    }
-
-    @Id
-    @GeneratedValue
-    @Column(name = "ID")
-    private Long id;
-
-    @Column(name = "AUTHORITY")
-    private String authority;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
-    public String getAuthority() {
-        return authority;
-    }
-
-    public void setAuthority( String authority ) {
-        this.authority = authority;
-    }
-
+/**
+ * TODO Document Me
+ * 
+ * @author ??
+ * @version $Id: Securable.java,v 1.3 2013/05/01 17:53:55 anton Exp $
+ */
+public interface Securable {
+    public Long getId();
 }

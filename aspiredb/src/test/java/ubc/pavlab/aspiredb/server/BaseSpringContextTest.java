@@ -15,10 +15,7 @@
 
 package ubc.pavlab.aspiredb.server;
 
-import gemma.gsec.AuthorityConstants;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -39,7 +36,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.TestingAuthenticationProvider;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ContextConfiguration;
@@ -56,9 +53,8 @@ import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
  * @author pavlidis
  * @version $Id: BaseSpringContextTest.java,v 1.4 2013/06/12 20:18:48 cmcdonald Exp $
  */
-@ContextConfiguration(locations = { "classpath:/test-data-source.xml",
-        "classpath:gemma/gsec/acl/security-bean-baseconfig.xml", "classpath:/applicationContext-security.xml",
-        "classpath:/application-context.xml" })
+@ContextConfiguration(locations = { "classpath:/test-data-source.xml", "classpath:/application-context.xml",
+        "classpath:/applicationContext-security.xml" })
 public abstract class BaseSpringContextTest extends AbstractJUnit4SpringContextTests implements InitializingBean {
 
     @Autowired
@@ -217,8 +213,7 @@ final class AuthenticationTestingUtil {
 
         // Grant all roles to test user.
         TestingAuthenticationToken token = new TestingAuthenticationToken( "administrator", "administrator",
-                Arrays.asList( new GrantedAuthority[] { new SimpleGrantedAuthority(
-                        AuthorityConstants.ADMIN_GROUP_AUTHORITY ) } ) );
+                new GrantedAuthority[] { new GrantedAuthorityImpl( "GROUP_ADMIN" ) } );
 
         token.setAuthenticated( true );
 
@@ -231,8 +226,7 @@ final class AuthenticationTestingUtil {
 
         // Grant all roles to test user.
         TestingAuthenticationToken token = new TestingAuthenticationToken( "anon", "anon",
-                Arrays.asList( new GrantedAuthority[] { new SimpleGrantedAuthority(
-                        AuthorityConstants.IS_AUTHENTICATED_ANONYMOUSLY ) } ) );
+                new GrantedAuthority[] { new GrantedAuthorityImpl( "IS_AUTHENTICATED_ANONYMOUSLY" ) } );
 
         token.setAuthenticated( true );
 

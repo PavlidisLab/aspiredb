@@ -14,6 +14,7 @@ import net.sf.ehcache.search.Results;
 import net.sf.ehcache.search.expression.Criteria;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component;
 @Component
 public abstract class SearchableEhcache<T> {
     @Autowired
+    @Qualifier("ehcache")
     private CacheManager cacheManager;
 
     private Ehcache cache;
