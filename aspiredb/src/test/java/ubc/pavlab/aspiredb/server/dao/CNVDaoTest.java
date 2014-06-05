@@ -24,12 +24,10 @@ import java.util.List;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -45,7 +43,6 @@ import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 public class CNVDaoTest extends BaseSpringContextTest {
 
     @Autowired

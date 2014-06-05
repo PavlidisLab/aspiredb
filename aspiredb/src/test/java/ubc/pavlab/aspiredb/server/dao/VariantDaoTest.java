@@ -27,9 +27,7 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.QueryTestUtils;
@@ -49,7 +47,6 @@ import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
 /**
  * author: anton date: 21/05/13
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 public class VariantDaoTest extends BaseSpringContextTest {
 
     @Autowired
