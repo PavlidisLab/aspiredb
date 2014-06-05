@@ -59,7 +59,7 @@ import ubc.pavlab.aspiredb.server.util.AuthorityConstants;
  * @version $Id: UserManagerImpl.java,v 1.6 2013/06/11 23:02:56 cmcdonald Exp $
  */
 @Service("userManager")
-public class UserManagerImpl implements gemma.gsec.model.UserManager {
+public class UserManagerImpl implements UserManager {
 
     /**
      * Name of the default user group (not to be confused with the group authority GROUP_USER).
@@ -207,9 +207,9 @@ public class UserManagerImpl implements gemma.gsec.model.UserManager {
         return u.getSignupToken();
     }
 
-    // @Override
-    // @Secured("GROUP_ADMIN")
-    // @Transactional
+    @Override
+    @Secured("GROUP_ADMIN")
+    @Transactional
     public void changePasswordForUser( String username, String newPassword ) throws AuthenticationException {
 
         User u = userService.findByUserName( username );
@@ -324,7 +324,7 @@ public class UserManagerImpl implements gemma.gsec.model.UserManager {
         userCache.removeUserFromCache( username );
     }
 
-    // @Override
+    @Override
     public void deleteByUserName( String username ) {
 
         userService.deleteByUserName( username );
