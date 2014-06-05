@@ -171,4 +171,6 @@ public interface UserService {
     @Secured({ "GROUP_USER", "ACL_SECURABLE_EDIT" })
     public void update( UserGroup group );
 
+    public Collection<User> suggestUser( String queryString );
+
 }

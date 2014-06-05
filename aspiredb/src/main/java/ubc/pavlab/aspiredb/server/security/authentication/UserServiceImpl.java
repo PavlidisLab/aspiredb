@@ -1,17 +1,17 @@
 /*
- * The aspiredb project
- * 
- * Copyright (c) 2012 University of British Columbia
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
- */
+* The aspiredb project
+*
+* Copyright (c) 2012 University of British Columbia
+*
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+* the License. You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+* an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+* specific language governing permissions and limitations under the License.
+*/
 
 package ubc.pavlab.aspiredb.server.security.authentication;
 
@@ -35,9 +35,9 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserExistsExcept
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 
 /**
- * @author pavlidis
- * @version $Id: UserServiceImpl.java,v 1.4 2013/06/11 22:30:52 anton Exp $
- */
+* @author pavlidis
+* @version $Id: UserServiceImpl.java,v 1.4 2013/06/11 22:30:52 anton Exp $
+*/
 @Service("userService")
 public class UserServiceImpl implements UserService {
 
@@ -88,6 +88,11 @@ public class UserServiceImpl implements UserService {
 
         this.userDao.remove( user );
     }
+    
+    @Override
+    public Collection<User> suggestUser( String queryString ){
+        return this.userDao.suggestUser( queryString );
+    }
 
     @Override
     public void deleteByUserName( String userName ) {
@@ -109,8 +114,8 @@ public class UserServiceImpl implements UserService {
         }
 
         /*
-         * make sure this isn't one of the special groups - Administrators, Users, Agents
-         */
+* make sure this isn't one of the special groups - Administrators, Users, Agents
+*/
         if ( groupName.equalsIgnoreCase( "Administrator" ) || groupName.equalsIgnoreCase( "Users" )
                 || groupName.equalsIgnoreCase( "Agents" ) ) {
             throw new IllegalArgumentException( "Cannot delete that group, it is required for system operation." );
@@ -125,8 +130,8 @@ public class UserServiceImpl implements UserService {
         this.userGroupDao.remove( group );
 
         /*
-         * clean up acls that use this group...do that last!
-         */
+* clean up acls that use this group...do that last!
+*/
         try {
             aclService.deleteSid( new GrantedAuthoritySid( authority ) );
         } catch ( DataIntegrityViolationException div ) {
@@ -165,8 +170,8 @@ public class UserServiceImpl implements UserService {
         this.userGroupDao.update( group );
 
         /*
-         * TODO: if the group is empty, should we delete it? Not if it is GROUP_USER or ADMIN, but perhaps otherwise.
-         */
+* TODO: if the group is empty, should we delete it? Not if it is GROUP_USER or ADMIN, but perhaps otherwise.
+*/
     }
 
     @Override
@@ -180,8 +185,8 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * @see ubic.gemma.security.authentication.UserService#create(ubic.gemma.model.common.auditAndSecurity.User)
-     */
+* @see ubic.gemma.security.authentication.UserService#create(ubic.gemma.model.common.auditAndSecurity.User)
+*/
     @Override
     public User create( final User user ) throws UserExistsException {
 
@@ -209,8 +214,8 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * @see ubic.gemma.security.authentication.UserService#findByEmail(java.lang.String)
-     */
+* @see ubic.gemma.security.authentication.UserService#findByEmail(java.lang.String)
+*/
     @Override
     public User findByEmail( final String email ) {
         return this.userDao.findByEmail( email );
@@ -218,8 +223,8 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * @see ubic.gemma.security.authentication.UserService#findByUserName(java.lang.String)
-     */
+* @see ubic.gemma.security.authentication.UserService#findByUserName(java.lang.String)
+*/
     @Override
     public User findByUserName( final String userName ) {
         return this.userDao.findByUserName( userName );
@@ -227,8 +232,8 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * @see ubic.gemma.security.authentication.UserService#load(java.lang.Long)
-     */
+* @see ubic.gemma.security.authentication.UserService#load(java.lang.Long)
+*/
     @Override
     public User load( final Long id ) {
         return this.userDao.load( id );
@@ -236,8 +241,8 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * @see ubic.gemma.security.authentication.UserService#loadAll()
-     */
+* @see ubic.gemma.security.authentication.UserService#loadAll()
+*/
     @Override
     public java.util.Collection<User> loadAll() {
         return ( Collection<User> ) this.userDao.loadAll();
@@ -245,8 +250,8 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * @see ubic.gemma.security.authentication.UserService#update(ubic.gemma.model.common.auditAndSecurity.User)
-     */
+* @see ubic.gemma.security.authentication.UserService#update(ubic.gemma.model.common.auditAndSecurity.User)
+*/
     @Override
     public void update( final User user ) {
 

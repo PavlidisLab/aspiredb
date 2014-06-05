@@ -1,17 +1,17 @@
 /*
- * The aspiredb project
- * 
- * Copyright (c) 2012 University of British Columbia
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
- */
+* The aspiredb project
+*
+* Copyright (c) 2012 University of British Columbia
+*
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+* the License. You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+* an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+* specific language governing permissions and limitations under the License.
+*/
 package ubc.pavlab.aspiredb.server.service;
 
 import gemma.gsec.SecurityService;
@@ -51,6 +51,7 @@ import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
+import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 import au.com.bytecode.opencsv.CSVWriter;
 
 @Service
@@ -178,7 +179,14 @@ public class ProjectServiceImpl implements ProjectService {
     public User getCurrentUserName() {
         return ( User ) userManager.getCurrentUser();
     }
-
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public void deleteUser(String userName) {
+    userService.deleteByUserName(userName);
+    }
+    
+    
     @Override
     @RemoteMethod
     public String createUserProject( String projectName, String projectDescription ) throws NotLoggedInException {
@@ -211,12 +219,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /**
-     * @author gaya
-     * @param fileContent
-     * @param projectName
-     * @param variantType
-     * @return Error String
-     */
+* @author gaya
+* @param fileContent
+* @param projectName
+* @param variantType
+* @return Error String
+*/
     @Override
     @RemoteMethod
     public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName,
@@ -291,12 +299,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /**
-     * @author gaya
-     * @param fileContent
-     * @param projectName
-     * @param variantType
-     * @return Error String
-     */
+* @author gaya
+* @param fileContent
+* @param projectName
+* @param variantType
+* @return Error String
+*/
     @Override
     @RemoteMethod
     public String addSubjectPhenotypeToExistingProject( String fileContent, boolean createProject, String projectName,
@@ -420,18 +428,50 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /*
-     * TODO eventually we want this to work with a collection of projectIds
-     */
+* TODO eventually we want this to work with a collection of projectIds
+*/
     @Override
     @RemoteMethod
     public Integer numSubjects( Collection<Long> projectIds ) {
 
         return this.projectDao.getSubjectCountForProjects( projectIds );
     }
+    @Override
+    @RemoteMethod
+    public UserGroup findGroupByName( String name ){
+     return userService.findGroupByName(name);
+    }
+    
+    
+    
+     @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<String> suggestUsers(SuggestionContext suggestionContext) throws NotLoggedInException {
+        Collection<String> userNames =new ArrayList<String>();
+        //Collection<User> users =userService.loadAll();
+        Collection<User> users = userService.suggestUser( suggestionContext.getValuePrefix());
+        for (User user : users){
+         userNames.add(user.getFirstName()+" "+user.getLastName());
+        }
+        return userNames;
+    }
+    
+     @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public boolean isUser(String userName) throws NotLoggedInException {
+        
+        User user =userService.findByUserName(userName);
+        if (user != null)
+        return true;
+        return false;
+    }
+    
 
     /*
-     * TODO eventually we want this to work with a collection of projectIds
-     */
+* TODO eventually we want this to work with a collection of projectIds
+*/
     @Override
     @RemoteMethod
     public Integer numVariants( Collection<Long> projectIds ) {
@@ -523,7 +563,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             boolean createProject = true;
             if ( projectDao.findByProjectName( projectName ) != null ) {
-                log.info( "Project name already exists,  adding to existing project" );
+                log.info( "Project name already exists, adding to existing project" );
 
                 createProject = false;
             }
