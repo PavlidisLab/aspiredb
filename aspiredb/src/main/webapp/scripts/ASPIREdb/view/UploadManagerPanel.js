@@ -143,13 +143,7 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                   }, {
                      id : 'translocation',
                      variantType : 'TRANSLOCATION'
-                  }, {
-                     id : 'decipher',
-                     variantType : 'DECIPHER'
-                  }, {
-                     id : 'dvg',
-                     variantType : 'DGV'
-                  }, ]
+                  }]
                } ),
                labelWidth : 150,
 
@@ -173,9 +167,9 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                emptyText : 'Select phenotype file to upload',
                fieldLabel : 'Upload Phenotype List',
                labelWidth : 150,
-               name : 'phenotypeUploadFile-path',
+            //  name : 'phenotypeUploadFile-path',
                buttonText : 'Select',
-               listeners : {
+              /** listeners : {
                   afterrender : function(el) {
                      var element = el.fileInputEl;
                      console.log( element );
@@ -186,7 +180,7 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                      var newValue = value.replace( /C:\\fakepath\\/g, '' );
                      fld.setRawValue( newValue );
                   }
-               }
+               }*/
             } ]
          }
 
@@ -323,7 +317,6 @@ Ext.define( 'ASPIREdb.view.UploadManagerPanel', {
                   console.log( exception.stack );
                }
             } );
-            
 
             /**
              * form.submit( {
