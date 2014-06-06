@@ -65,7 +65,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
             },
             items : [ {
                xtype : 'filefield',
-               id : 'variantFileEditEdit',
+               id : 'variantFileEdit',
                name : 'file',
                width : 600,
                allowBlanck : false,
@@ -92,34 +92,34 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
             }, {
                xtype : 'combobox',
                fieldLabel : 'variant Type',
-               id : 'variantType',
+               id : 'variantTypeEdit',
                editable : false,
-               displayField : 'variantType',
+               displayField : 'variantTypeEdit',
                // allowBlank : false,
                valueField : 'id',
                store : Ext.create( 'Ext.data.Store', {
-                  fields : [ 'id', 'variantType' ],
+                  fields : [ 'id', 'variantTypeEdit' ],
                   data : [ {
                      id : 'cnv',
-                     variantType : 'CNV'
+                     variantTypeEdit : 'CNV'
                   }, {
                      id : 'snv',
-                     variantType : 'SNV'
+                     variantTypeEdit : 'SNV'
                   }, {
                      id : 'indel',
-                     variantType : 'INDEL'
+                     variantTypeEdit : 'INDEL'
                   }, {
                      id : 'inversion',
-                     variantType : 'INVERSION'
+                     variantTypeEdit : 'INVERSION'
                   }, {
                      id : 'translocation',
-                     variantType : 'TRANSLOCATION'
+                     variantTypeEdit : 'TRANSLOCATION'
                   }, {
                      id : 'decipher',
-                     variantType : 'DECIPHER'
+                     variantTypeEdit : 'DECIPHER'
                   }, {
                      id : 'dvg',
-                     variantType : 'DGV'
+                     variantTypeEdit : 'DGV'
                   }, ]
                } ),
                labelWidth : 150,
@@ -208,7 +208,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
             values = form.getFieldValues();
             var projectName = values['projectName'];
             var projectDescription = values['projectDescription'];
-            var variantType = values['variantType-inputEl'].toUpperCase();
+            var variantTypeEdit = values['variantTypeEdit-inputEl'].toUpperCase();
             var file = Ext.getCmp( 'variantFileEdit' ).getEl().down( 'input[type=file]' ).dom.files[0];
             var phenotypeFileEdit = Ext.getCmp( 'phenotypeFileEdit' ).getEl().down( 'input[type=file]' ).dom.files[0];
 
@@ -227,7 +227,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                         var variantSrc = event.target.result;
 
                         // add variants to the project
-                        ProjectService.addSubjectVariantsToExistingProject( variantSrc, false, projectName, variantType, {
+                        ProjectService.addSubjectVariantsToExistingProject( variantSrc, false, projectName, variantTypeEdit, {
                            callback : function(errorMessage) {
                               if (errorMessage == 'Success'){
                                  Ext.Msg.alert( 'Success', 'You have successfully uploaded variant file');
@@ -249,7 +249,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                         var variantSrc = event.target.result;
 
                         // add variants to the project
-                        ProjectService.addSubjectPhenotypeToExistingProject( variantSrc, false, projectName, variantType, {
+                        ProjectService.addSubjectPhenotypeToExistingProject( variantSrc, false, projectName, variantTypeEdit, {
                            callback : function(errorMessage) {
                               if (errorMessage =="Success"){
                                  Ext.Msg.alert( 'Success', 'You have successfully uploaded phenotype file');

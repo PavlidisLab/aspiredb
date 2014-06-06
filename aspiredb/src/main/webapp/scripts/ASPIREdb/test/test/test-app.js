@@ -7,9 +7,10 @@ Ext.application( {
   //controllers : [ 'SubjectController' ],
    models : [ 'Subject' ],
    stores : [ 'SubjectStore' ],
-   views : [ 'MainPanel' ],
+   views : [ 'ASPIREdb.MainPanel' ],
    autoCreateViewport : false,
    name : 'QAApp',
+   appFolder: 'scripts',
 
    // using the Launch method of Application object to execute the Jasmine
    // Test Cases
@@ -21,3 +22,4 @@ Ext.application( {
       jasmineEnv.execute();
    }
 } );
+

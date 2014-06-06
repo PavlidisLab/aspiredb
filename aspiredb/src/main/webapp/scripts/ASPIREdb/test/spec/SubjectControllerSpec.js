@@ -8,7 +8,7 @@ var controller = null;
         // Initializing the mainPanel.
        mainPanel = Ext.create ('QAApp.view.MainPanel');
        SubjectStore = Ext.StoreManager.lookup ('SubjectStore');
-       controller = Ext.create ('QAApp.controller.SubjectController');
+       //controller = Ext.create ('QAApp.controller.SubjectController');
        storeLength = SubjectStore.data.items.length;
   }); // before each
 
@@ -23,9 +23,9 @@ var controller = null;
    });
 
   /* Test controller is initialized successfully.*/ 
-  it ('Controller shouldn’t be null', function () {
-        expect (controller != null).toBeTruthy();
-   });
+ // it ('Controller shouldn’t be null', function () {
+//        expect (controller != null).toBeTruthy();
+//   });
 
 /* Test if Grid in MainPanel is loaded successfully.*/   
   it ('Grid should be loaded', function () {
