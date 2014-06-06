@@ -17,11 +17,11 @@
  *
  */
 
-Ext.require([ 'Ext.Window', 'ASPIREdb.view.ProjectManagerPanel' ]);
+Ext.require( [ 'Ext.Window', 'ASPIREdb.view.ProjectManagerPanel' ] );
 /**
  * Project manager has Project Panel
  */
-Ext.define('ASPIREdb.view.ProjectManagerWindow', {
+Ext.define( 'ASPIREdb.view.ProjectManagerWindow', {
    extend : 'Ext.Window',
    alias : 'widget.ProjectManagerWindow',
    singleton : true,
@@ -32,76 +32,69 @@ Ext.define('ASPIREdb.view.ProjectManagerWindow', {
    height : 500,
    layout : 'fit',
    bodyStyle : 'padding: 5px;',
-   
-   
-   items : [{
+
+   items : [ {
       region : 'center',
       itemId : 'ASPIREdb_projectmanagerpanel',
       xtype : 'ASPIREdb_projectmanagerpanel',
-   }],
+   } ],
 
-    config :{
-       ProjectsetSize :[],
-    },
-   
+   config : {
+      ProjectsetSize : [],
+   },
+
    initComponent : function() {
-   
+
       var ref = this;
-      this.callParent();      
+      this.callParent();
 
    },
-   
+
    /**
     * Show the Project manager window
-    */   
-   initGridAndShow : function(){
-      
+    */
+   initGridAndShow : function() {
+
       var ref = this;
-      var panel = ASPIREdb.view.ProjectManagerWindow.down('#ASPIREdb_projectmanagerpanel');
-      var grid =panel.down ('#ProjectGrid');
-      
+      var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
+      var grid = panel.down( '#ProjectGrid' );
+
       ref.show();
-      grid.setLoading(true);
-      
-      ref.ProjectsetSize=[]
-                
+      grid.setLoading( true );
+
+      ref.ProjectsetSize = []
+
       ProjectService.getProjects( {
-         callback : function(pvos) { 
-            ASPIREdb.view.ProjectManagerWindow.populateProjectGrid(pvos);
+         callback : function(pvos) {
+            ASPIREdb.view.ProjectManagerWindow.populateProjectGrid( pvos );
          }
-      });
-   
-   
+      } );
+
    },
-   
-   
-   
+
    /**
     * Populate and Project set names in the Project set grid
     */
    populateProjectGrid : function(pvos) {
-      
-      var panel = ASPIREdb.view.ProjectManagerWindow.down('#ASPIREdb_projectmanagerpanel');
-      var grid =panel.down ('#ProjectGrid');
-      
-         
+
+      var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
+      var grid = panel.down( '#ProjectGrid' );
+
       var data = [];
-      for ( var i = 0; i < pvos.length; i++) {
-         var row = [ pvos[i].name,'',0];      
-         data.push(row);               
+      for (var i = 0; i < pvos.length; i++) {
+         var row = [ pvos[i].name, '', 0 ];
+         data.push( row );
       }
-         
-      grid.store.loadData(data);
-      grid.setLoading(false);    
+
+      grid.store.loadData( data );
+      grid.setLoading( false );
       grid.getView().refresh();
       grid.enableToolbar();
-   }, 
-   
-   
-      
-   clearGridAndMask : function(){
-      ASPIREdb.view.ProjectManagerWindow.getComponent('ASPIREdb_projectmanagerpanel').store.removeAll();
-      ASPIREdb.view.ProjectManagerWindow.getComponent('ASPIREdb_projectmanagerpanel').setLoading(true);           
+   },
+
+   clearGridAndMask : function() {
+      ASPIREdb.view.ProjectManagerWindow.getComponent( 'ASPIREdb_projectmanagerpanel' ).store.removeAll();
+      ASPIREdb.view.ProjectManagerWindow.getComponent( 'ASPIREdb_projectmanagerpanel' ).setLoading( true );
    }
 
-});
+} );
