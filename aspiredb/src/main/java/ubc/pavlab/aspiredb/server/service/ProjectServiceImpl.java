@@ -14,6 +14,7 @@
 */
 package ubc.pavlab.aspiredb.server.service;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -232,64 +233,70 @@ public class ProjectServiceImpl implements ProjectService {
         String returnString = "Success";
 
         try {
+        	// Directory created
+        	boolean success = (new File("../uploadFile")).mkdirs();
+        	
+        	if(success){
+        	
+        	            		String csv = "uploadFile/variantFile.csv";
+                CSVWriter writer = new CSVWriter( new FileWriter( csv ) );
 
-            String csv = "uploadFile/variantFile.csv";
-            CSVWriter writer = new CSVWriter( new FileWriter( csv ) );
+                // Object[] objectArray = resultsList.toArray();
+                String[] Outresults = fileContent.split( "\n" );
 
-            // Object[] objectArray = resultsList.toArray();
-            String[] Outresults = fileContent.split( "\n" );
-
-            for ( int i = 0; i < Outresults.length; i++ ) {
-                String[] passedCSVFile = Outresults[i].toString().split( "," );
-                writer.writeNext( passedCSVFile );
-            }
-
-            writer.close();
-
-            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-
-            // create a connection
-            // arg[0] is the directory in which the .csv files are held
-            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
-
-            Statement stmt = conn.createStatement();
-            ResultSet results = stmt.executeQuery( "SELECt * from variantFile" );
-
-            // check weather the project exist
-            if ( createProject ) {
-                if ( projectDao.findByProjectName( projectName ) != null ) {
-                    returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
-                }
-            }
-
-            VariantType VariantType = null;
-            VariantUploadServiceResult result = null;
-
-            if ( variantType.equalsIgnoreCase( "CNV" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.CNV );
-            } else if ( variantType.equalsIgnoreCase( "SNV" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.SNV );
-            } else if ( variantType.equalsIgnoreCase( "INDEL" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INDEL );
-            } else if ( variantType.equalsIgnoreCase( "INVERSION" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INVERSION );
-            } else if ( variantType.equalsIgnoreCase( "DECIPHER" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DECIPHER );
-            } else if ( variantType.equalsIgnoreCase( "DGV" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DGV );
-            }
-
-            if ( result.getErrorMessages().isEmpty() ) {
-                projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
-            } else if ( result.getErrorMessages().isEmpty() ) {
-                returnString = "Success";
-
-            } else {
-                for ( String errorMessage : result.getErrorMessages() ) {
-                    returnString = errorMessage;
+                for ( int i = 0; i < Outresults.length; i++ ) {
+                    String[] passedCSVFile = Outresults[i].toString().split( "," );
+                    writer.writeNext( passedCSVFile );
                 }
 
-            }
+                writer.close();
+
+                Class.forName( "org.relique.jdbc.csv.CsvDriver" );
+
+                // create a connection
+                // arg[0] is the directory in which the .csv files are held
+                Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
+
+                Statement stmt = conn.createStatement();
+                ResultSet results = stmt.executeQuery( "SELECt * from variantFile" );
+
+                // check weather the project exist
+                if ( createProject ) {
+                    if ( projectDao.findByProjectName( projectName ) != null ) {
+                        returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
+                    }
+                }
+
+                VariantType VariantType = null;
+                VariantUploadServiceResult result = null;
+
+                if ( variantType.equalsIgnoreCase( "CNV" ) ) {
+                    result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.CNV );
+                } else if ( variantType.equalsIgnoreCase( "SNV" ) ) {
+                    result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.SNV );
+                } else if ( variantType.equalsIgnoreCase( "INDEL" ) ) {
+                    result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INDEL );
+                } else if ( variantType.equalsIgnoreCase( "INVERSION" ) ) {
+                    result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INVERSION );
+                } else if ( variantType.equalsIgnoreCase( "DECIPHER" ) ) {
+                    result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DECIPHER );
+                } else if ( variantType.equalsIgnoreCase( "DGV" ) ) {
+                    result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DGV );
+                }
+
+                if ( result.getErrorMessages().isEmpty() ) {
+                    projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
+                } else if ( result.getErrorMessages().isEmpty() ) {
+                    returnString = "Success";
+
+                } else {
+                    for ( String errorMessage : result.getErrorMessages() ) {
+                        returnString = errorMessage;
+                    }
+
+                }
+        	}
+            
 
         } catch ( Exception e ) {
             return e.toString();
