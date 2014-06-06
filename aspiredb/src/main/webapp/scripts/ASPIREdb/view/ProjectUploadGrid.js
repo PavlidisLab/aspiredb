@@ -65,7 +65,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
             },
             items : [ {
                xtype : 'filefield',
-               id : 'variantFile',
+               id : 'variantFileEditEdit',
                name : 'file',
                width : 600,
                allowBlanck : false,
@@ -138,8 +138,8 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
             },
             items : [ {
                xtype : 'filefield',
-               id : 'phenotypeFile',
-               name : 'phenotypeFile',
+               id : 'phenotypeFileEdit',
+               name : 'phenotypeFileEdit',
                width : 600,
                emptyText : 'Select phenotype file to upload',
                fieldLabel : 'Upload Phenotype List',
@@ -209,8 +209,8 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
             var projectName = values['projectName'];
             var projectDescription = values['projectDescription'];
             var variantType = values['variantType-inputEl'].toUpperCase();
-            var file = Ext.getCmp( 'variantFile' ).getEl().down( 'input[type=file]' ).dom.files[0];
-            var phenotypeFile = Ext.getCmp( 'phenotypeFile' ).getEl().down( 'input[type=file]' ).dom.files[0];
+            var file = Ext.getCmp( 'variantFileEdit' ).getEl().down( 'input[type=file]' ).dom.files[0];
+            var phenotypeFileEdit = Ext.getCmp( 'phenotypeFileEdit' ).getEl().down( 'input[type=file]' ).dom.files[0];
 
 
             // create project
@@ -243,7 +243,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                      
                      // Uploading phenoypes to the created project
                      var fpReader = new FileReader();
-                     fpReader.readAsBinaryString( phenotypeFile );
+                     fpReader.readAsBinaryString( phenotypeFileEdit );
 
                      fpReader.onloadend = function(event) {
                         var variantSrc = event.target.result;

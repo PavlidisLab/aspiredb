@@ -173,7 +173,7 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
                me.getDockedComponent( 'dashboardToolbar' ).add( {
                   xtype : 'button',
                   id : 'createProject',
-                  text : 'Upload Project',
+                  text : 'New Project',
                   tooltip : 'Craete new Project',
                   icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
                   handler : function() {
