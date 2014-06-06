@@ -80,7 +80,7 @@ public interface ProjectService {
 
     public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName, String variantType );
     
-    public String addSubjectPhenotypeToExistingProject( String fileContent, boolean createProject, String projectName, String variantType );
+    public String addSubjectPhenotypeToExistingProject( String fileContent, boolean createProject, String projectName );
 
     public UserGroup findGroupByName( String name );
 

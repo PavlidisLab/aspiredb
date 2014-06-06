@@ -306,8 +306,7 @@ public class ProjectServiceImpl implements ProjectService {
 */
     @Override
     @RemoteMethod
-    public String addSubjectPhenotypeToExistingProject( String fileContent, boolean createProject, String projectName,
-            String variantType ) {
+    public String addSubjectPhenotypeToExistingProject( String fileContent, boolean createProject, String projectName ) {
 
         String returnString = "Success";
 

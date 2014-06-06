@@ -227,7 +227,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                         var variantSrc = event.target.result;
 
                         // add variants to the project
-                        ProjectService.addSubjectVariantsToExistingProject( variantSrc, false, projectName, variantTypeEdit, {
+                        ProjectService.addSubjectVariantsToExistingProject( variantSrc, false, projectName, {
                            callback : function(errorMessage) {
                               if (errorMessage == 'Success'){
                                  Ext.Msg.alert( 'Success', 'You have successfully uploaded variant file');
