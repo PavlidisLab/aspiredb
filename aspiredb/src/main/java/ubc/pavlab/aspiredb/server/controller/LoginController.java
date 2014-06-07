@@ -1,5 +1,7 @@
 package ubc.pavlab.aspiredb.server.controller;
 
+import gemma.gsec.util.SecurityUtil;
+
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import ubc.pavlab.aspiredb.server.security.SecurityServiceImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.JSONUtil;
 
 @Controller
@@ -27,7 +28,7 @@ public class LoginController {
 
         String jsonText = null;
 
-        if ( !SecurityServiceImpl.isUserLoggedIn() ) {
+        if ( !SecurityUtil.isUserLoggedIn() ) {
             jsonText = "{success:false}";
 
         } else {

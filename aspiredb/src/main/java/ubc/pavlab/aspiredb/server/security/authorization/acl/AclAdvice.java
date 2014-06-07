@@ -15,6 +15,14 @@
 
 package ubc.pavlab.aspiredb.server.security.authorization.acl;
 
+import gemma.gsec.AuthorityConstants;
+import gemma.gsec.model.Securable;
+import gemma.gsec.model.SecuredChild;
+import gemma.gsec.model.SecuredNotChild;
+import gemma.gsec.util.CrudUtils;
+import gemma.gsec.util.CrudUtilsImpl;
+import gemma.gsec.util.SecurityUtil;
+
 import java.beans.PropertyDescriptor;
 import java.util.Collection;
 
@@ -47,14 +55,7 @@ import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.SecuredChild;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.SecuredNotChild;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
-import ubc.pavlab.aspiredb.server.security.SecurityServiceImpl;
-import ubc.pavlab.aspiredb.server.util.AuthorityConstants;
-import ubc.pavlab.aspiredb.server.util.CrudUtils;
-import ubc.pavlab.aspiredb.server.util.CrudUtilsImpl;
 import ubc.pavlab.aspiredb.server.util.ReflectionUtil;
 
 /**
@@ -169,11 +170,11 @@ public class AclAdvice {
 
         Sid sid = new PrincipalSid( authentication );
 
-        boolean isAdmin = SecurityServiceImpl.isUserAdmin();
+        boolean isAdmin = SecurityUtil.isUserAdmin();
 
-        boolean isRunningAsAdmin = SecurityServiceImpl.isRunningAsAdmin();
+        boolean isRunningAsAdmin = SecurityUtil.isRunningAsAdmin();
 
-        boolean isAnonymous = SecurityServiceImpl.isUserAnonymous();
+        boolean isAnonymous = SecurityUtil.isUserAnonymous();
 
         boolean objectIsAUser = User.class.isAssignableFrom( object.getClass() );
 

@@ -22,7 +22,12 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "GROUP_AUTHORITY")
-public class GroupAuthority {
+public class GroupAuthority implements gemma.gsec.model.GroupAuthority {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1284768867713195177L;
 
     public GroupAuthority() {
 
@@ -36,18 +41,22 @@ public class GroupAuthority {
     @Column(name = "AUTHORITY")
     private String authority;
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId( Long id ) {
         this.id = id;
     }
 
+    @Override
     public String getAuthority() {
         return authority;
     }
 
+    @Override
     public void setAuthority( String authority ) {
         this.authority = authority;
     }

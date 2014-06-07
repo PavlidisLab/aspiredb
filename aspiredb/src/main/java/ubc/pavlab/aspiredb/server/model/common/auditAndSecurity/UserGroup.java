@@ -38,7 +38,12 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "USER_GROUP")
-public class UserGroup implements SecuredNotChild {
+public class UserGroup implements gemma.gsec.model.UserGroup {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1802428808035961711L;
+
     @Id
     @GeneratedValue
     @Column(name = "ID")
@@ -68,40 +73,49 @@ public class UserGroup implements SecuredNotChild {
         return id;
     }
 
+    @Override
     public void setId( Long id ) {
         this.id = id;
     }
 
-    public Set<User> getGroupMembers() {
+    @Override
+    public Collection<User> getGroupMembers() {
         return groupMembers;
     }
 
-    public void setGroupMembers( Set<User> groupMembers ) {
-        this.groupMembers = groupMembers;
-    }
-
+    @Override
     public Collection<GroupAuthority> getAuthorities() {
         return authorities;
     }
 
-    public void setAuthorities( Collection<GroupAuthority> authorities ) {
-        this.authorities = authorities;
-    }
-
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName( String name ) {
         this.name = name;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
 
+    @Override
     public void setDescription( String description ) {
         this.description = description;
+    }
+
+    @Override
+    public <T extends gemma.gsec.model.User> void setGroupMembers( Collection<T> groupMembers ) {
+        this.groupMembers = ( Set<User> ) groupMembers;
+    }
+
+    @Override
+    public <T extends gemma.gsec.model.GroupAuthority> void setAuthorities( Collection<T> authorities ) {
+        this.authorities = ( Collection<GroupAuthority> ) authorities;
     }
 
 }

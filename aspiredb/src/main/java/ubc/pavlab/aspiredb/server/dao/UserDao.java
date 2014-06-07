@@ -59,6 +59,4 @@ public interface UserDao extends DaoBase<User> {
 
     public Collection<UserGroup> loadGroups( User user );
 
-    public Collection<User> suggestUser( String queryString );
-
 }
