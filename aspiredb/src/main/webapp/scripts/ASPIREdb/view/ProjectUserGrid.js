@@ -43,7 +43,7 @@ Ext.define( 'ASPIREdb.view.ProjectUserGrid', {
       // collection of selected project value objects
       selectedProject : [],
       gvos : [],
-      selectedproject : [],
+      selectedUser : [],
       suggestionContext : null,
 
    },
@@ -51,14 +51,6 @@ Ext.define( 'ASPIREdb.view.ProjectUserGrid', {
    columns : [ {
       header : 'User Name',
       dataIndex : 'userName',
-      flex : 1,
-      editor : {
-         allowBlank : true
-      }
-   }, {
-      header : 'User Password',
-      dataIndex : 'userPassword',
-      inputType : 'password',
       flex : 1,
       editor : {
          allowBlank : true
@@ -76,7 +68,7 @@ Ext.define( 'ASPIREdb.view.ProjectUserGrid', {
    listeners : {
       'selectionchange' : function(view, records) {
          this.down( '#removeProject' ).setDisabled( !records.length );
-         this.selectedProject = this.getSelectionModel().getSelection();
+         this.selectedUser = this.getSelectionModel().getSelection();
 
       }
    },

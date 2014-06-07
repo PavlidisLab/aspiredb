@@ -29,24 +29,24 @@ Ext.define( 'ASPIREdb.ProjectManagerPanel', {
       region : 'west',
       xtype : 'ProjectGrid',
       id : 'ProjectGrid',
-      width : 480,
+      width : '50%', //480,
       collapsible : true,
       split : true,
       title : 'Project'
    }, {
-      region : 'center',
+      region : 'south',
       xtype : 'ProjectUploadGrid',
       id : 'ProjectUploadGrid',
-      width : 480,
-      title : 'Upload Files'
+      width : '100%', //480,
+      title : 'Upload files to project'
    }, {
       region : 'east',
       xtype : 'ProjectUserGrid',
       id : 'ProjectUserGrid',
-      width : 480,
+      width : '50%', //480,
       collapsible : true,
       split : true,
-      title : 'Associated Users'
+      title : 'Project Users'
    }
 
    ],

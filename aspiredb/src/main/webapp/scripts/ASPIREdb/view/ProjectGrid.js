@@ -162,7 +162,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
                for (var i = 0; i < userNames.length; i++) {
                   var userName = userNames[i];
 
-                  var row = [ userName, '', userGroupMap[userName] ];
+                  var row = [ userName, userGroupMap[userName] ];
                   data.push( row );
 
                }

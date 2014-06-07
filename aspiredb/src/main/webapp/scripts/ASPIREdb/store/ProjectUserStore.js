@@ -29,9 +29,6 @@ Ext.define( 'ASPIREdb.store.ProjectUserStore', {
       name : 'userName',
       type : 'string'
    }, {
-      name : 'userPassword',
-      type : 'string'
-   }, {
       name : 'userGroup',
       type : 'string'
    } ],

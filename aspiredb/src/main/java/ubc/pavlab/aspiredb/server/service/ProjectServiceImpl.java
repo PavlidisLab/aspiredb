@@ -238,7 +238,7 @@ public class ProjectServiceImpl implements ProjectService {
         	
         	if(success){
         	
-        	            		String csv = "uploadFile/variantFile.csv";
+        	    String csv = "uploadFile/variantFile.csv";
                 CSVWriter writer = new CSVWriter( new FileWriter( csv ) );
 
                 // Object[] objectArray = resultsList.toArray();

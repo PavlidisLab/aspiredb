@@ -41,16 +41,14 @@ Ext
          },
 
          items : {
-            xtype : 'tabpanel',
             activeTab : 0,
             defaults : {
                bodyStyle : 'padding:10px'
             },
 
             items : [ {
-               title : 'New Project Upload',
                defaultType : 'textfield',
-               width : 750,
+               width : '100%',
 
                items : [ {
                   xtype : 'fieldset',
@@ -67,13 +65,13 @@ Ext
                      name : 'projectName',
                      id : 'projectName',
                      value : '',
-                     labelWidth : 150,
+                     labelWidth : 100,
                   }, {
                      fieldLabel : 'Project Decription',
                      name : 'projectDescription',
                      id : 'projectDescription',
                      value : '',
-                     labelWidth : 150,
+                     labelWidth : 100,
                   } ]
                },
 
@@ -96,11 +94,11 @@ Ext
                      xtype : 'filefield',
                      id : 'variantFile',
                      name : 'file',
-                     width : 600,
+                     width : 400,
                      allowBlanck : false,
                      emptyText : 'Select variant file to upload',
                      fieldLabel : 'File',
-                     labelWidth : 150,
+                     labelWidth : 100,
                      buttonText : 'Select',
                      handler : function() {
                         console.log( 'file upload handler ' );
@@ -144,7 +142,7 @@ Ext
                            variantType : 'TRANSLOCATION'
                         } ]
                      } ),
-                     labelWidth : 150,
+                     labelWidth : 100,
 
                   } ]
                }, {
@@ -161,10 +159,10 @@ Ext
                      xtype : 'filefield',
                      id : 'phenotypeFile',
                      name : 'phenotypeFile',
-                     width : 600,
+                     width : 400,
                      emptyText : 'Select phenotype file to upload',
                      fieldLabel : 'Upload Phenotype List',
-                     labelWidth : 150,
+                     labelWidth : 100,
                      buttonText : 'Select',
                      listeners : {
                         afterrender : function(el) {
@@ -230,8 +228,8 @@ Ext
                              id : 'pbar4',
                              textEl : 'p4text',
                              cls : 'custom',
-                          // renderTo:'p4',
-                          // renderTo : this,
+                             renderTo:'p4',
+                     
                           } );
 
                           pbar4.show();
