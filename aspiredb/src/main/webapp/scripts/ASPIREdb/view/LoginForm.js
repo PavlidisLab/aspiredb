@@ -3,7 +3,7 @@ Ext.require([ 'Ext.layout.container.*' ]);
 Ext.define('ASPIREdb.view.LoginForm', {
 	extend : 'Ext.container.Viewport',
 	title : 'Welcome, please login.',
-	width : 800,
+	width : 1500,
 	closable : false,
 	resizable : false,
 	layout : {
@@ -74,7 +74,7 @@ Ext.define('ASPIREdb.view.LoginForm', {
 				style : 'font-family: sans-serif; font-size: 10px; color: red;',
 				text : 'Login failed. Username or password incorrect.',
 				hidden : true
-			} ],
+			}],
 
 			buttons : [ {
 				xtype : 'button',
@@ -100,11 +100,37 @@ Ext.define('ASPIREdb.view.LoginForm', {
 				text : 'Login',
 				handler : ref.submitHandler,
 				scope : ref
-			} ]
+			}]
 		});
 
 		this.add(panel);
+		
+		var textPanel = Ext.create('Ext.form.Panel', {
+         id : 'aspireRegistrationForm',
+         border :false,
 
+         layout : 'hbox',
+         defaults : {
+            anchor : '100%'
+         },
+
+         // The fields
+         items : [/**{
+            xtype: 'displayfield',
+            fieldLabel: '',
+           // value: 'Register to use use features of ASPIREDb like data upload. You might want to review the Terms and conditions (which includes our privacy policy) before signing up. After submitting the form, you will be sent an email with your account details.',
+            value :"Are you a new user? <a href ='/aspiredb/register.html'>Register</a> to become a user",
+               
+        },*/{
+           xtype: 'panel',
+           padding : '5 5 30 20',
+           html :"Are you a new user? <a href ='/aspiredb/register.html'>Register</a> to become a user",
+              
+       }]
+		});
+			
+		this.add(textPanel);
+	
 		this.doLayout();
 
 	},
