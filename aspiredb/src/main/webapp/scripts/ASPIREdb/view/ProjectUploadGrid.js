@@ -30,7 +30,7 @@ Ext
          frame : true,
          bodyStyle : 'padding:5px 5px 0',
          fileUpload : true,
-         
+
          config : {
             variantSrc : null,
             selectedProject : [],
@@ -136,8 +136,6 @@ Ext
                      emptyText : 'Select phenotype file to upload',
                      fieldLabel : 'Upload Phenotype List',
                      labelWidth : 100,
-                     // name :
-                     // 'phenotypeUploadFile-path',
                      buttonText : 'Select',
                      listeners : {
                         afterrender : function(el) {
@@ -162,7 +160,7 @@ Ext
                     {
                        text : 'Upload',
                        id : 'uploadFilesEdit',
-                       // disabled : true,
+                       disabled : true,
                        // formBind : true,
                        handler : function() {
                           var form = this.up( 'ProjectUploadGrid' ).getForm();
@@ -203,9 +201,8 @@ Ext
                              values = form.getFieldValues();
                              var variantTypeEdit = values['variantTypeEdit-inputEl'].toUpperCase();
                              var fileEdit = Ext.getCmp( 'variantFileEdit' ).getEl().down( 'input[type=file]' ).dom.files[0];
-                             var phenotypeFileEdit = Ext.getCmp( 'phenotypeFileEdit' ).getEl()
-                                .down( 'input[type=file]' ).dom.files[0];
-                             var projectName = this.selectedProject;
+                             var phenotypeFileEdit = Ext.getCmp( 'phenotypeFileEdit' ).getEl().down( 'input[type=file]' ).dom.files[0];
+                             var projectName = Ext.getCmp('ProjectUploadGrid').selectedProject[0].data.ProjectName;
 
                              if ( fileEdit ) {
                                 /** Uploading variants to the created project */
@@ -275,8 +272,7 @@ Ext
                                 }
 
                              }
-                             if ( phenotypefileEdit ) {
-
+                             if ( phenotypeFileEdit ) {
 
                                 // Uploading
                                 // phenoypes
@@ -295,23 +291,23 @@ Ext
                                    // the
                                    // project
                                    ProjectService
-                                      .addSubjectPhenotypeToExistingProject( variantSrc, false,
-                                      projectName, variantTypeEdit, {
-                                         callback : function(errorMessage) {
-                                            if ( errorMessage == "Success" ) {
-                                               Ext.Msg.alert( 'Success',
-                                                  'You have successfully uploaded phenotype file' );
-                                            } else
-                                               Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :'
-                                                  + errorMessage );
-                                         },
-                                         errorHandler : function(er, exception) {
-                                            Ext.Msg.alert( "Upload phenotype Error", er + "\n" + exception.stack );
-                                            console.log( exception.stack );
-                                         }
-                                      } );
+                                      .addSubjectPhenotypeToExistingProject( variantSrc, false, projectName,
+                                         variantTypeEdit, {
+                                            callback : function(errorMessage) {
+                                               if ( errorMessage == "Success" ) {
+                                                  Ext.Msg.alert( 'Success',
+                                                     'You have successfully uploaded phenotype file' );
+                                               } else
+                                                  Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :'
+                                                     + errorMessage );
+                                            },
+                                            errorHandler : function(er, exception) {
+                                               Ext.Msg.alert( "Upload phenotype Error", er + "\n" + exception.stack );
+                                               console.log( exception.stack );
+                                            }
+                                         } );
                                 };
-                             
+
                              }
 
                              ASPIREdb.EVENT_BUS.fireEvent( 'new_project_created' );
@@ -351,6 +347,7 @@ Ext
 
          projectSelectHandler : function(selProject) {
             this.selectedProject = selProject;
+            this.down( '#uploadFilesEdit' ).setDisabled( false );
          }
 
       } );
