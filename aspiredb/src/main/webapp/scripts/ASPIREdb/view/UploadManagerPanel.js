@@ -191,56 +191,6 @@ Ext
                           var form = this.up( 'uploadManagerPanel' ).getForm();
                           var me = this;
 
-                          var Runner = function() {
-                             var f = function(v, pbar, btn, count, cb) {
-                                return function() {
-                                   if ( v > count ) {
-                                      btn.dom.disabled = false;
-                                      cb();
-                                   } else {
-                                      if ( pbar.id == 'pbar4' ) {
-                                         // give this one a different count style for fun
-                                         var i = v / count;
-                                         pbar.updateProgress( i, Math.round( 100 * i ) + '% completed...' );
-                                      } else {
-                                         pbar.updateProgress( v / count, 'Loading item ' + v + ' of ' + count + '...' );
-                                      }
-                                   }
-                                };
-                             };
-                             return {
-                                run : function(pbar, btn, count, cb) {
-                                   btn.dom.disabled = true;
-                                   var ms = 5000 / count;
-                                   for (var i = 1; i < (count + 2); i++) {
-                                      setTimeout( f( i, pbar, btn, count, cb ), i * ms );
-                                   }
-                                }
-                             };
-                          }();
-
-                          // TODO: display progress bar
-                          // Reset the disabled state on the buttons because firefox will retain the state
-                          // between page refreshes
-
-                          var pbar4 = Ext.create( 'Ext.ProgressBar', {
-                             text : 'Waiting on you...',
-                             id : 'pbar4',
-                             textEl : 'p4text',
-                             cls : 'custom',
-                             renderTo:'p4',
-                     
-                          } );
-
-                          pbar4.show();
-
-                          var btn4 = Ext.get( 'uploadFiles' );
-                          btn4.dom.disabled = false;
-
-                          Runner.run( pbar4, btn4, 19, function() {
-                             pbar4.updateText( 'All finished!' );
-                          } );
-
                           if ( form.isValid() ) {
 
                              // getting the form values

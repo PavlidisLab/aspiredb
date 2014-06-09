@@ -115,13 +115,7 @@ Ext.define('ASPIREdb.view.LoginForm', {
          },
 
          // The fields
-         items : [/**{
-            xtype: 'displayfield',
-            fieldLabel: '',
-           // value: 'Register to use use features of ASPIREDb like data upload. You might want to review the Terms and conditions (which includes our privacy policy) before signing up. After submitting the form, you will be sent an email with your account details.',
-            value :"Are you a new user? <a href ='/aspiredb/register.html'>Register</a> to become a user",
-               
-        },*/{
+         items : [{
            xtype: 'panel',
            padding : '5 5 30 20',
            html :"Are you a new user? <a href ='/aspiredb/register.html'>Register</a> to become a user",

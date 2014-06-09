@@ -166,7 +166,7 @@ Ext
                           var form = this.up( 'ProjectUploadGrid' ).getForm();
                           var me = this;
 
-                          var Runner = function() {
+                    /**      var Runner = function() {
                              var f = function(v, pbar, btn, count, cb) {
                                 return function() {
                                    if ( v > count ) {
@@ -194,7 +194,7 @@ Ext
                                    }
                                 }
                              };
-                          }();
+                          }();*/
 
                           if ( form.isValid() ) {
                              // getting the form values
