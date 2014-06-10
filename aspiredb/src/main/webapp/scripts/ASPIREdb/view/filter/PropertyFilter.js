@@ -187,7 +187,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 				itemId : 'multicombo',
 				width : 450,
 				height : 20,
-				//enableKeyEvents : true,
+				enableKeyEvents :false,
 				suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
 			}, {
 				xtype : 'numberfield',

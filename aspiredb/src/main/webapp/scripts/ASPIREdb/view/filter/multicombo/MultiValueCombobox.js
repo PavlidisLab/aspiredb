@@ -142,7 +142,7 @@ Ext.define('ASPIREdb.view.filter.multicombo.MultiValueCombobox', {
                 triggerAction: 'query',
                 autoSelect: false, 
                 
-                enableKeyEvents: true,
+                enableKeyEvents: false,
                 displayField: 'displayValue',
                 store: Ext.create('ASPIREdb.ValueSuggestionStore',{
                     remoteFunction: this.getSuggestValuesRemoteFunction()
