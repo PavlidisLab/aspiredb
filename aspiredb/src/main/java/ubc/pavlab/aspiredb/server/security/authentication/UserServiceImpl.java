@@ -16,6 +16,7 @@
 package ubc.pavlab.aspiredb.server.security.authentication;
 
 import gemma.gsec.SecurityService;
+import gemma.gsec.acl.domain.AclGrantedAuthoritySid;
 import gemma.gsec.acl.domain.AclService;
 
 import java.util.Collection;
@@ -24,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.stereotype.Service;
 
 import ubc.pavlab.aspiredb.server.dao.UserDao;
@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
          * clean up acls that use this group...do that last!
          */
         try {
-            aclService.deleteSid( new GrantedAuthoritySid( authority ) );
+            aclService.deleteSid( new AclGrantedAuthoritySid( authority ) );
         } catch ( DataIntegrityViolationException div ) {
             throw div;
         }

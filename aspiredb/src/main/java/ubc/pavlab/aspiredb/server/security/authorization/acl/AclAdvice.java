@@ -16,6 +16,8 @@
 package ubc.pavlab.aspiredb.server.security.authorization.acl;
 
 import gemma.gsec.AuthorityConstants;
+import gemma.gsec.acl.domain.AclGrantedAuthoritySid;
+import gemma.gsec.acl.domain.AclPrincipalSid;
 import gemma.gsec.model.Securable;
 import gemma.gsec.model.SecuredChild;
 import gemma.gsec.model.SecuredNotChild;
@@ -37,12 +39,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.acls.domain.BasePermission;
-import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityRetrievalStrategyImpl;
-import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.AccessControlEntry;
 import org.springframework.security.acls.model.Acl;
-import org.springframework.security.acls.model.AuditableAcl;
 import org.springframework.security.acls.model.MutableAcl;
 import org.springframework.security.acls.model.MutableAclService;
 import org.springframework.security.acls.model.NotFoundException;
@@ -51,7 +50,6 @@ import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -124,7 +122,7 @@ public class AclAdvice {
      * @param object The domain object.
      * @return true if an ACL was created, false otherwise.
      */
-    private AuditableAcl addOrUpdateAcl( Securable object, Acl parentAcl ) {
+    private MutableAcl addOrUpdateAcl( Securable object, Acl parentAcl ) {
 
         if ( object.getId() == null ) {
             log.warn( "ACLs cannot be added or updated on non-persistent object: " + object );
@@ -133,14 +131,14 @@ public class AclAdvice {
 
         ObjectIdentity oi = makeObjectIdentity( object );
 
-        AuditableAcl acl = null;
+        MutableAcl acl = null;
 
         boolean exists = false;
         try {
-            acl = ( AuditableAcl ) aclService.readAclById( oi ); // throws exception if not found
+            acl = ( MutableAcl ) aclService.readAclById( oi ); // throws exception if not found
             exists = true;
         } catch ( NotFoundException nfe ) {
-            acl = ( AuditableAcl ) aclService.createAcl( oi );
+            acl = aclService.createAcl( oi );
         }
 
         if ( exists ) {
@@ -168,7 +166,7 @@ public class AclAdvice {
             throw new IllegalStateException( "Principal was null for " + authentication );
         }
 
-        Sid sid = new PrincipalSid( authentication );
+        Sid sid = new AclPrincipalSid( authentication );
 
         boolean isAdmin = SecurityUtil.isUserAdmin();
 
@@ -205,8 +203,8 @@ public class AclAdvice {
             if ( log.isDebugEnabled() ) {
                 log.debug( "Making administratable by GROUP_ADMIN: " + oi );
             }
-            grant( acl, BasePermission.ADMINISTRATION, new GrantedAuthoritySid( new GrantedAuthorityImpl(
-                    AuthorityConstants.ADMIN_GROUP_AUTHORITY ) ) );
+            grant( acl, BasePermission.ADMINISTRATION, new AclGrantedAuthoritySid(
+                    AuthorityConstants.ADMIN_GROUP_AUTHORITY ) );
 
             /*
              * Let agent read anything
@@ -215,8 +213,7 @@ public class AclAdvice {
                 log.debug( "Making readable by GROUP_AGENT: " + oi );
             }
 
-            grant( acl, BasePermission.READ, new GrantedAuthoritySid( new GrantedAuthorityImpl(
-                    AuthorityConstants.AGENT_GROUP_AUTHORITY ) ) );
+            grant( acl, BasePermission.READ, new AclGrantedAuthoritySid( AuthorityConstants.AGENT_GROUP_AUTHORITY ) );
 
             /*
              * Don't add more permissions for the administrator. But whatever it is, the person who created it can
@@ -244,7 +241,7 @@ public class AclAdvice {
 
         if ( objectIsAUser ) {
             User u = ( User ) object;
-            if ( ( ( PrincipalSid ) sid ).getPrincipal().equals( u.getUserName() ) ) {
+            if ( ( ( AclPrincipalSid ) sid ).getPrincipal().equals( u.getUserName() ) ) {
                 /*
                  * This case should actually never happen. "we" are the user who is creating this user. We've already
                  * adding the READ/WRITE permissions above.
@@ -260,7 +257,7 @@ public class AclAdvice {
                     /*
                      * Important: we expect this to normally be the case.
                      */
-                    sid = new PrincipalSid( u.getUserName() );
+                    sid = new AclPrincipalSid( u.getUserName() );
                 }
 
                 /*
@@ -283,7 +280,7 @@ public class AclAdvice {
             acl.setParent( parentAcl );
         }
 
-        return ( AuditableAcl ) aclService.updateAcl( acl );
+        return aclService.updateAcl( acl );
     }
 
     /**
@@ -368,7 +365,7 @@ public class AclAdvice {
      * @param permission which permission
      * @param sid which principal
      */
-    private void grant( AuditableAcl acl, Permission permission, Sid sid ) {
+    private void grant( MutableAcl acl, Permission permission, Sid sid ) {
         acl.insertAce( acl.getEntries().size(), permission, sid, true );
 
         /*

@@ -64,6 +64,12 @@ public class User implements gemma.gsec.model.User {
     @Column(name = "SIGNUP_TOKEN_DATESTAMP")
     private java.util.Date signupTokenDatestamp;
 
+    @Column(name = "DESCRIPTION")
+    private String description;
+
+    @Column(name = "NAME")
+    private String name;
+
     @Override
     public Long getId() {
         return this.id;
@@ -185,38 +191,35 @@ public class User implements gemma.gsec.model.User {
 
     @Override
     public String getDescription() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.description;
     }
 
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.name;
     }
 
     @Override
     public void setDescription( String description ) {
-        // TODO Auto-generated method stub
+        this.description = description;
 
     }
 
     @Override
     public void setId( Long id ) {
-        // TODO Auto-generated method stub
+        this.id = id;
 
     }
 
     @Override
     public void setName( String name ) {
-        // TODO Auto-generated method stub
+        this.name = name;
 
     }
 
     @Override
     public String getFullName() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.getName() + " " + this.getLastName();
     }
 
 }

@@ -26,7 +26,8 @@
  </bean>
 
  <!-- Hibernate SessionFactory -->
- <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean" lazy-init="true">
+ <!-- Disabled because we use production-data-source.xml -->
+ <!--bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean" lazy-init="true">
   <property name="dataSource">
    <ref bean="dataSource" />
   </property>
@@ -41,24 +42,17 @@
    <props>
     <prop key="hibernate.dialect">org.hibernate.dialect.MySQLInnoDBDialect</prop>
     <prop key="hibernate.cache.query_cache_factory">org.hibernate.cache.StandardQueryCacheFactory</prop>
-    <!-- <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop> -->
     <prop key="hibernate.cache.use_query_cache">true</prop>
     <prop key="hibernate.max_fetch_depth">4</prop>
     <prop key="hibernate.cache.use_second_level_cache">true</prop>
     <prop key="hibernate.cache.use_query_cache">true</prop>
     <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
-    <!-- <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop> -->
    </props>
   </property>
   <property name="cacheRegionFactory">
    <ref bean="externalCacheRegionFactory" />
   </property>
-
-  <!--property name="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</property -->
- </bean>
-
-
-
+ </bean-->
 
  <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager" p:cache-manager-ref="ehcache" />
 

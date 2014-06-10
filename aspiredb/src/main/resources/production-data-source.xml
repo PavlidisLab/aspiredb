@@ -48,12 +48,27 @@
         	<value>classpath:hibernate.cfg.xml</value>
     	</property>
 
+        <property name="mappingLocations">
+         <list>
+          <value>classpath:gemma/gsec/model/AclEntry.hbm.xml</value>
+          <value>classpath:gemma/gsec/model/AclObjectIdentity.hbm.xml</value>
+          <value>classpath:gemma/gsec/model/AclSid.hbm.xml</value>
+         </list>
+        </property>
+        
 		<property name="hibernateProperties">
 			<props>
 				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
 				<prop key="hibernate.show_sql">false</prop>
-			</props>
-		</property>
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <prop key="hibernate.cache.use_query_cache">true</prop>
+                <prop key="hibernate.cache.query_cache_factory">org.hibernate.cache.StandardQueryCacheFactory</prop>
+			    <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+           </props>
+          </property>
+         <property name="cacheRegionFactory">
+            <ref bean="externalCacheRegionFactory" />
+         </property>
 	</bean>
     
 </beans>
