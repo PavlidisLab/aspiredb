@@ -73,9 +73,39 @@ Ext
                      value : '',
                      labelWidth : 100,
                   } ]
-               },
+               }, {
+                  xtype : 'fieldset',
+                  title : 'Phenotypes',
+                  autoWidth : true,
+                  autoheight : true,
+                  defaultType : 'textfield',
+                  layout : 'anchor',
+                  defaults : {
+                     anchor : '100%'
+                  },
+                  items : [ {
+                     xtype : 'filefield',
+                     id : 'phenotypeFile',
+                     name : 'phenotypeFile',
+                     width : 400,
+                     emptyText : 'Select phenotype file to upload',
+                     fieldLabel : 'Upload Phenotype List',
+                     labelWidth : 100,
+                     buttonText : 'Select',
+                     listeners : {
+                        afterrender : function(el) {
+                           var element = el.fileInputEl;
+                           console.log( element );
+                           return element;
+                        },
+                        change : function(fld, value) {
 
-               {
+                           var newValue = value.replace( /C:\\fakepath\\/g, '' );
+                           fld.setRawValue( newValue );
+                        }
+                     }
+                  } ]
+               }, {
                   xtype : 'fieldset',
                   title : 'Variants',
                   autoWidth : true,
@@ -86,11 +116,6 @@ Ext
                      anchor : '100%'
                   },
                   items : [ {
-                     /**
-                      * xtype: 'filefield', name: 'file', fieldLabel: 'File', labelWidth: 50, msgTarget: 'side',
-                      * allowBlank: false, anchor: '100%', buttonText: 'Select a File...'
-                      */
-
                      xtype : 'filefield',
                      id : 'variantFile',
                      name : 'file',
@@ -144,38 +169,6 @@ Ext
                      } ),
                      labelWidth : 100,
 
-                  } ]
-               }, {
-                  xtype : 'fieldset',
-                  title : 'Phenotypes',
-                  autoWidth : true,
-                  autoheight : true,
-                  defaultType : 'textfield',
-                  layout : 'anchor',
-                  defaults : {
-                     anchor : '100%'
-                  },
-                  items : [ {
-                     xtype : 'filefield',
-                     id : 'phenotypeFile',
-                     name : 'phenotypeFile',
-                     width : 400,
-                     emptyText : 'Select phenotype file to upload',
-                     fieldLabel : 'Upload Phenotype List',
-                     labelWidth : 100,
-                     buttonText : 'Select',
-                     listeners : {
-                        afterrender : function(el) {
-                           var element = el.fileInputEl;
-                           console.log( element );
-                           return element;
-                        },
-                        change : function(fld, value) {
-
-                           var newValue = value.replace( /C:\\fakepath\\/g, '' );
-                           fld.setRawValue( newValue );
-                        }
-                     }
                   } ]
                }
 
@@ -302,16 +295,16 @@ Ext
                              }
 
                              /**
-                              * form.submit( {
-                              * 
-                              * method : 'POST', url : 'upload_action.html', // submitEmptyText : false, waitMsg :
-                              * 'Uploading your file...', headers : { //'Content-Type' :
-                              * 'multipart/form-data;charset=UTF-8' 'Content-Type' :
-                              * 'application/x-www-form-urlencoded' }, success : function(form, action) {
-                              * Ext.Msg.alert( 'Success', 'Your file has been uploaded.' ); }, failure : function(form,
-                              * action) { Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No
-                              * response' ); } } );
-                              */
+                               * form.submit( {
+                               * 
+                               * method : 'POST', url : 'upload_action.html', // submitEmptyText : false, waitMsg :
+                               * 'Uploading your file...', headers : { //'Content-Type' :
+                               * 'multipart/form-data;charset=UTF-8' 'Content-Type' :
+                               * 'application/x-www-form-urlencoded' }, success : function(form, action) {
+                               * Ext.Msg.alert( 'Success', 'Your file has been uploaded.' ); }, failure : function(form,
+                               * action) { Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No
+                               * response' ); } } );
+                               */
                              ASPIREdb.EVENT_BUS.fireEvent( 'new_project_created' );
 
                           } else {

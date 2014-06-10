@@ -25,29 +25,13 @@
 
 <!-- including the Jasmine Test Case file -->
 <script type="text/javascript"
-	src="scripts/ASPIREdb/test/spec/SubjectControllerSpec.js"></script>
+	src="scripts/ASPIREdb/test/spec/LoginControllerSpec.js"></script>
 
-<!-- including the test-app.js file to load test cases -->
+<!-- including the logintest-app.js file to load test cases -->
 <script type="text/javascript"
-	src="scripts/ASPIREdb/test/test/test-app.js"></script>
-
-<!-- <script>
+	src="scripts/ASPIREdb/test/test/logintest-app.js"></script>
 
 
-    Ext.application({
-        name: 'ASPIREdb',
-        appFolder: 'scripts/ASPIREdb/test',
-
-        launch: function () {
-            //var win = Ext.create();
-            var viewport = Ext.create('ASPIREdb.view.LoginForm');
-            //win.show();
-        }
-    });
-
-   
-
-</script> -->
 
 </head>
 <body>

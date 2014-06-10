@@ -4,13 +4,11 @@ Ext.Loader.setConfig( {
 
 // Loading different components like controller, model, view..
 Ext.application( {
-  //controllers : [ 'SubjectController' ],
-   models : [ 'Subject' ],
-   stores : [ 'SubjectStore' ],
-   views : [ 'ASPIREdb.MainPanel' ],
+
+   views : [ 'LoginForm' ],
    autoCreateViewport : false,
-   name : 'QAApp',
-   appFolder: 'scripts',
+   name : 'AspiredbTest',
+   appFolder: 'scripts/ASPIREdb',
 
    // using the Launch method of Application object to execute the Jasmine
    // Test Cases
