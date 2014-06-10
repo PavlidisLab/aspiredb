@@ -166,43 +166,25 @@ Ext
                           var form = this.up( 'ProjectUploadGrid' ).getForm();
                           var me = this;
 
-                    /**      var Runner = function() {
-                             var f = function(v, pbar, btn, count, cb) {
-                                return function() {
-                                   if ( v > count ) {
-                                      btn.dom.disabled = false;
-                                      cb();
-                                   } else {
-                                      if ( pbar.id == 'pbar4' ) {
-                                         // give this one a
-                                         // different count style
-                                         // for fun
-                                         var i = v / count;
-                                         pbar.updateProgress( i, Math.round( 100 * i ) + '% completed...' );
-                                      } else {
-                                         pbar.updateProgress( v / count, 'Loading item ' + v + ' of ' + count + '...' );
-                                      }
-                                   }
-                                };
-                             };
-                             return {
-                                run : function(pbar, btn, count, cb) {
-                                   btn.dom.disabled = true;
-                                   var ms = 5000 / count;
-                                   for (var i = 1; i < (count + 2); i++) {
-                                      setTimeout( f( i, pbar, btn, count, cb ), i * ms );
-                                   }
-                                }
-                             };
-                          }();*/
+                          /**
+                            * var Runner = function() { var f = function(v, pbar, btn, count, cb) { return function() {
+                            * if ( v > count ) { btn.dom.disabled = false; cb(); } else { if ( pbar.id == 'pbar4' ) { //
+                            * give this one a // different count style // for fun var i = v / count;
+                            * pbar.updateProgress( i, Math.round( 100 * i ) + '% completed...' ); } else {
+                            * pbar.updateProgress( v / count, 'Loading item ' + v + ' of ' + count + '...' ); } } }; };
+                            * return { run : function(pbar, btn, count, cb) { btn.dom.disabled = true; var ms = 5000 /
+                            * count; for (var i = 1; i < (count + 2); i++) { setTimeout( f( i, pbar, btn, count, cb ), i *
+                            * ms ); } } }; }();
+                            */
 
                           if ( form.isValid() ) {
                              // getting the form values
                              values = form.getFieldValues();
                              var variantTypeEdit = values['variantTypeEdit-inputEl'].toUpperCase();
                              var fileEdit = Ext.getCmp( 'variantFileEdit' ).getEl().down( 'input[type=file]' ).dom.files[0];
-                             var phenotypeFileEdit = Ext.getCmp( 'phenotypeFileEdit' ).getEl().down( 'input[type=file]' ).dom.files[0];
-                             var projectName = Ext.getCmp('ProjectUploadGrid').selectedProject[0].data.ProjectName;
+                             var phenotypeFileEdit = Ext.getCmp( 'phenotypeFileEdit' ).getEl()
+                                .down( 'input[type=file]' ).dom.files[0];
+                             var projectName = Ext.getCmp( 'ProjectUploadGrid' ).selectedProject[0].data.ProjectName;
 
                              if ( fileEdit ) {
                                 /** Uploading variants to the created project */
@@ -219,7 +201,7 @@ Ext
                                    // project
                                    ProjectService
                                       .addSubjectVariantsToExistingProject( variantSrc, false, projectName,
-                                         {
+                                         variantTypeEdit, {
                                             callback : function(errorMessage) {
                                                if ( errorMessage == 'Success' ) {
                                                   Ext.Msg.alert( 'Success',
@@ -227,6 +209,8 @@ Ext
                                                } else
                                                   Ext.Msg
                                                      .alert( 'Server Reply', 'Uploading Variants  :' + errorMessage );
+                                               Ext.getCmp( 'variantType' ).setValue( '' );
+                                               Ext.getCmp( 'variantFileEdit' ).setRawValue( '' );
                                             },
                                             errorHandler : function(er, exception) {
                                                Ext.Msg.alert( "Upload variants Error", er + "\n" + exception.stack );
@@ -254,7 +238,7 @@ Ext
                                       // the
                                       // project
                                       ProjectService.addSubjectPhenotypeToExistingProject( variantSrc, false,
-                                         projectName, variantTypeEdit, {
+                                         projectName, {
                                             callback : function(errorMessage) {
                                                if ( errorMessage == "Success" ) {
                                                   Ext.Msg.alert( 'Success',
@@ -262,6 +246,7 @@ Ext
                                                } else
                                                   Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :'
                                                      + errorMessage );
+                                               Ext.getCmp( 'phenotypeFileEdit' ).setRawValue( '' );
                                             },
                                             errorHandler : function(er, exception) {
                                                Ext.Msg.alert( "Upload phenotype Error", er + "\n" + exception.stack );
@@ -271,8 +256,7 @@ Ext
                                    };
                                 }
 
-                             }
-                             else if ( phenotypeFileEdit ) {
+                             } else if ( phenotypeFileEdit ) {
 
                                 // Uploading
                                 // phenoypes
@@ -292,7 +276,7 @@ Ext
                                    // project
                                    ProjectService
                                       .addSubjectPhenotypeToExistingProject( variantSrc, false, projectName,
-                                         variantTypeEdit, {
+                                         {
                                             callback : function(errorMessage) {
                                                if ( errorMessage == "Success" ) {
                                                   Ext.Msg.alert( 'Success',
@@ -300,6 +284,7 @@ Ext
                                                } else
                                                   Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :'
                                                      + errorMessage );
+                                               Ext.getCmp( 'phenotypeFileEdit' ).setRawValue( '' );
                                             },
                                             errorHandler : function(er, exception) {
                                                Ext.Msg.alert( "Upload phenotype Error", er + "\n" + exception.stack );

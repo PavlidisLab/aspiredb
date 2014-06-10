@@ -21,6 +21,7 @@ Ext.require( [ 'Ext.Window','ASPIREdb.view.UploadDataManagerWindow','ASPIREdb.vi
 Ext.define( 'ASPIREdb.view.DashboardWindow', {
    extend : 'Ext.Window',
    alias : 'widget.dashboardWindow',
+   id : 'dashboardWindow',
    singleton : true,
    title : 'Dashboard',
    closable : true,
@@ -35,7 +36,6 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
    border : false,
 
    config : {
-
       // active project ID values holder
       activeProjectIds : [],
 
@@ -213,7 +213,8 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
     * Refresh the dash board
     */
    refreshDashboardHandler : function(){
-      this.getView().refresh( true );
+    //  this.getView().refresh( true );
+      //Ext.getCmp('projectField');
       
    }
 

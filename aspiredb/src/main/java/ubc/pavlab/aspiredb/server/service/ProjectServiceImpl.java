@@ -1,17 +1,17 @@
 /*
-* The aspiredb project
-*
-* Copyright (c) 2012 University of British Columbia
-*
-* Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
-* the License. You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
-* an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
-* specific language governing permissions and limitations under the License.
-*/
+ * The aspiredb project
+ *
+ * Copyright (c) 2012 University of British Columbia
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package ubc.pavlab.aspiredb.server.service;
 
 import java.io.File;
@@ -179,14 +179,14 @@ public class ProjectServiceImpl implements ProjectService {
     public User getCurrentUserName() {
         return ( User ) userManager.getCurrentUser();
     }
+
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public void deleteUser(String userName) {
-    userService.deleteByUserName(userName);
+    public void deleteUser( String userName ) {
+        userService.deleteByUserName( userName );
     }
-    
-    
+
     @Override
     @RemoteMethod
     public String createUserProject( String projectName, String projectDescription ) throws NotLoggedInException {
@@ -219,84 +219,81 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /**
-* @author gaya
-* @param fileContent
-* @param projectName
-* @param variantType
-* @return Error String
-*/
+     * @author gaya
+     * @param fileContent
+     * @param projectName
+     * @param variantType
+     * @return Error String
+     */
     @Override
     @RemoteMethod
     public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName,
             String variantType ) {
 
-        String returnString = "Success";
+        String returnString = "";
 
         try {
-        	// Directory created
-        	boolean success = (new File("../uploadFile")).mkdirs();
-        	
-        	if(success){
-        	
-        	    String csv = "uploadFile/variantFile.csv";
-                CSVWriter writer = new CSVWriter( new FileWriter( csv ) );
+            // Directory created
+            // boolean success = ( new File( "/uploadFile" ) ).mkdirs();
 
-                // Object[] objectArray = resultsList.toArray();
-                String[] Outresults = fileContent.split( "\n" );
+            // if ( success ) {
 
-                for ( int i = 0; i < Outresults.length; i++ ) {
-                    String[] passedCSVFile = Outresults[i].toString().split( "," );
-                    writer.writeNext( passedCSVFile );
+            String csv = "uploadFile/variantFile.csv";
+
+            CSVWriter writer = new CSVWriter( new FileWriter( csv ) );
+
+            String[] Outresults = fileContent.split( "\n" );
+
+            for ( int i = 0; i < Outresults.length; i++ ) {
+                String[] passedCSVFile = Outresults[i].toString().split( "," );
+                writer.writeNext( passedCSVFile );
+            }
+
+            writer.close();
+
+            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
+
+            // create a connection
+            // arg[0] is the directory in which the .csv files are held
+            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
+
+            Statement stmt = conn.createStatement();
+            ResultSet results = stmt.executeQuery( "SELECt * from variantFile" );
+
+            // check weather the project exist
+            if ( createProject ) {
+                if ( projectDao.findByProjectName( projectName ) != null ) {
+                    returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
+                }
+            }
+
+            VariantType VariantType = null;
+            VariantUploadServiceResult result = null;
+
+            if ( variantType.equalsIgnoreCase( "CNV" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.CNV );
+            } else if ( variantType.equalsIgnoreCase( "SNV" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.SNV );
+            } else if ( variantType.equalsIgnoreCase( "INDEL" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INDEL );
+            } else if ( variantType.equalsIgnoreCase( "INVERSION" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INVERSION );
+            } else if ( variantType.equalsIgnoreCase( "DECIPHER" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DECIPHER );
+            } else if ( variantType.equalsIgnoreCase( "DGV" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DGV );
+            }
+
+            if ( result.getErrorMessages().isEmpty() ) {
+                projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
+                returnString = "Success";
+            } else {
+                for ( String errorMessage : result.getErrorMessages() ) {
+                    returnString = errorMessage;
                 }
 
-                writer.close();
-
-                Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-
-                // create a connection
-                // arg[0] is the directory in which the .csv files are held
-                Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
-
-                Statement stmt = conn.createStatement();
-                ResultSet results = stmt.executeQuery( "SELECt * from variantFile" );
-
-                // check weather the project exist
-                if ( createProject ) {
-                    if ( projectDao.findByProjectName( projectName ) != null ) {
-                        returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
-                    }
-                }
-
-                VariantType VariantType = null;
-                VariantUploadServiceResult result = null;
-
-                if ( variantType.equalsIgnoreCase( "CNV" ) ) {
-                    result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.CNV );
-                } else if ( variantType.equalsIgnoreCase( "SNV" ) ) {
-                    result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.SNV );
-                } else if ( variantType.equalsIgnoreCase( "INDEL" ) ) {
-                    result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INDEL );
-                } else if ( variantType.equalsIgnoreCase( "INVERSION" ) ) {
-                    result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INVERSION );
-                } else if ( variantType.equalsIgnoreCase( "DECIPHER" ) ) {
-                    result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DECIPHER );
-                } else if ( variantType.equalsIgnoreCase( "DGV" ) ) {
-                    result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DGV );
-                }
-
-                if ( result.getErrorMessages().isEmpty() ) {
-                    projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
-                } else if ( result.getErrorMessages().isEmpty() ) {
-                    returnString = "Success";
-
-                } else {
-                    for ( String errorMessage : result.getErrorMessages() ) {
-                        returnString = errorMessage;
-                    }
-
-                }
-        	}
-            
+            }
+            // }
 
         } catch ( Exception e ) {
             return e.toString();
@@ -305,17 +302,17 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /**
-* @author gaya
-* @param fileContent
-* @param projectName
-* @param variantType
-* @return Error String
-*/
+     * @author gaya
+     * @param fileContent
+     * @param projectName
+     * @param variantType
+     * @return Error String
+     */
     @Override
     @RemoteMethod
     public String addSubjectPhenotypeToExistingProject( String fileContent, boolean createProject, String projectName ) {
 
-        String returnString = "Success";
+        String returnString = "";
 
         try {
 
@@ -330,6 +327,11 @@ public class ProjectServiceImpl implements ProjectService {
                 }
             }
 
+            // create directory in system root access denied
+            // boolean success = ( new File( "uploadFile" ) ).mkdirs();
+
+            // if ( success ) {
+            // TODO : Now admin need to create a folder uploadFile in sandbox or production to work
             String csv = "uploadFile/phenotypeFile.csv";
             CSVWriter writer = new CSVWriter( new FileWriter( csv ) );
 
@@ -376,6 +378,7 @@ public class ProjectServiceImpl implements ProjectService {
             } else {
                 returnString = "Success";
             }
+            // }
 
         } catch ( Exception e ) {
             return e.toString();
@@ -433,50 +436,47 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /*
-* TODO eventually we want this to work with a collection of projectIds
-*/
+     * TODO eventually we want this to work with a collection of projectIds
+     */
     @Override
     @RemoteMethod
     public Integer numSubjects( Collection<Long> projectIds ) {
 
         return this.projectDao.getSubjectCountForProjects( projectIds );
     }
+
     @Override
     @RemoteMethod
-    public UserGroup findGroupByName( String name ){
-     return userService.findGroupByName(name);
+    public UserGroup findGroupByName( String name ) {
+        return userService.findGroupByName( name );
     }
-    
-    
-    
-     @Override
+
+    @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<String> suggestUsers(SuggestionContext suggestionContext) throws NotLoggedInException {
-        Collection<String> userNames =new ArrayList<String>();
-        //Collection<User> users =userService.loadAll();
-        Collection<User> users = userService.suggestUser( suggestionContext.getValuePrefix());
-        for (User user : users){
-         userNames.add(user.getFirstName()+" "+user.getLastName());
+    public Collection<String> suggestUsers( SuggestionContext suggestionContext ) throws NotLoggedInException {
+        Collection<String> userNames = new ArrayList<String>();
+        // Collection<User> users =userService.loadAll();
+        Collection<User> users = userService.suggestUser( suggestionContext.getValuePrefix() );
+        for ( User user : users ) {
+            userNames.add( user.getFirstName() + " " + user.getLastName() );
         }
         return userNames;
     }
-    
-     @Override
+
+    @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public boolean isUser(String userName) throws NotLoggedInException {
-        
-        User user =userService.findByUserName(userName);
-        if (user != null)
-        return true;
+    public boolean isUser( String userName ) throws NotLoggedInException {
+
+        User user = userService.findByUserName( userName );
+        if ( user != null ) return true;
         return false;
     }
-    
 
     /*
-* TODO eventually we want this to work with a collection of projectIds
-*/
+     * TODO eventually we want this to work with a collection of projectIds
+     */
     @Override
     @RemoteMethod
     public Integer numVariants( Collection<Long> projectIds ) {

@@ -190,7 +190,6 @@ Ext
                              values = form.getFieldValues();
                              var projectName = values['projectName'];
                              var projectDescription = values['projectDescription'];
-
                              var file = Ext.getCmp( 'variantFile' ).getEl().down( 'input[type=file]' ).dom.files[0];
                              var phenotypeFile = Ext.getCmp( 'phenotypeFile' ).getEl().down( 'input[type=file]' ).dom.files[0];
 
@@ -219,6 +218,9 @@ Ext
                                                      } else
                                                         Ext.Msg.alert( 'Server Reply', 'Uploading Variants  :'
                                                            + errorMessage );
+                                                     Ext.getCmp( 'variantType' ).setValue( '' );
+                                                      Ext.getCmp( 'variantFile' ).setRawValue('');
+
                                                   },
                                                   errorHandler : function(er, exception) {
                                                      Ext.Msg.alert( "Upload variants Error", er + "\n"
@@ -246,6 +248,8 @@ Ext
                                                         } else
                                                            Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :'
                                                               + errorMessage );
+                                                        Ext.getCmp( 'phenotypeFile' ).setRawValue( '' );
+                                                       
                                                      },
                                                      errorHandler : function(er, exception) {
                                                         Ext.Msg.alert( "Upload phenotype Error", er + "\n"
@@ -267,7 +271,7 @@ Ext
                              }
 
                              else if ( phenotypeFile ) {
-                                // Uploading phenoypes to the created project
+                                // Uploading phenoytypes to the created project
                                 var fpReader = new FileReader();
                                 fpReader.readAsBinaryString( phenotypeFile );
 
@@ -285,6 +289,7 @@ Ext
                                                } else
                                                   Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :'
                                                      + errorMessage );
+                                               xt.getCmp( 'phenotypeFile' ).setRawValue( '' );
                                             },
                                             errorHandler : function(er, exception) {
                                                Ext.Msg.alert( "Upload phenotype Error", er + "\n" + exception.stack );
@@ -306,7 +311,9 @@ Ext
                                * response' ); } } );
                                */
                              ASPIREdb.EVENT_BUS.fireEvent( 'new_project_created' );
-
+                             Ext.getCmp( 'projectName' ).setValue( '' );
+                             Ext.getCmp( 'projectDescription' ).setValue( '' );
+                             
                           } else {
                              // Ext.Msg.alert( "Error!", "Your form is invalid!" );
                              fieldNames = [];
