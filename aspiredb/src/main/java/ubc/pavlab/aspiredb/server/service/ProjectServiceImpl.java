@@ -601,6 +601,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @RemoteMethod
     public String deleteProject( String projectName ) {
 
         log.info( " In deleteProject projectName:" + projectName );
