@@ -6,6 +6,10 @@ alter table ACLENTRY add index ACL_ENTRY_OBJECTIDENTITY_FKC (OBJECTIDENTITY_FK),
 alter table ACLOBJECTIDENTITY add index FK79E443E74551EDB3 (OWNER_SID_FK), add constraint FK79E443E74551EDB3 foreign key (OWNER_SID_FK) references ACLSID (ID);
 alter table ACLOBJECTIDENTITY add index FK79E443E7D2DE55AA (PARENT_OBJECT_FK), add constraint FK79E443E7D2DE55AA foreign key (PARENT_OBJECT_FK) references ACLOBJECTIDENTITY (ID);
 
+alter table ACLOBJECTIDENTITY add unique key acloid (OBJECT_CLASS,OBJECT_ID);
+alter table ACLOBJECTIDENTITY add key objectclasskey (OBJECT_CLASS);
+alter table ACLOBJECTIDENTITY add key oidkey (OBJECT_ID);
+
 -- The table for this are now created from our hibernate config for ACLs.
 
 -- Base SIDs we'll need these (not all used by this script; the others would be inserted automagically when needed, but this
@@ -20,19 +24,19 @@ insert into ACLSID (ID, class, PRINCIPAL) values(7, "PrincipalSid", "user");
 
 
 -- Add object identity (OI) for the admin user. There is no parent object, the owner = the administrator; non-inheriting.
-insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values (1, "ubic.gemma.model.common.auditAndSecurity.User", 1, 1, 0);
+insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values (1, "ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User", 1, 1, 0);
 
 -- OI for the Admin group (assumes id of this group=1, see init-entities.sql)
-insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values (2, "ubic.gemma.model.common.auditAndSecurity.UserGroup", 1, 1, 0);
+insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values (2, "ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup", 1, 1, 0);
 
 -- OI for the Agent group (assumes id of this group=2, see init-entities.sql)
-insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values (3, "ubic.gemma.model.common.auditAndSecurity.UserGroup", 2, 1, 0);
+insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values (3, "ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup", 2, 1, 0);
 
 -- OI for the User group (assumes id of group=3, see init-entities.sql)
-insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values (4, "ubic.gemma.model.common.auditAndSecurity.UserGroup", 3, 1, 0);
+insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values (4, "ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup", 3, 1, 0);
 
 -- Add object identity (OI) for the agent user. There is no parent object, the owner = the administrator; non-inheriting.
-insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values (5, "ubic.gemma.model.common.auditAndSecurity.User", 2, 1, 0);
+insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values (5, "ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User", 2, 1, 0);
 
 --
 -- give GROUP_ADMIN admin priv on everything - we don't need to give it to a specific user.
@@ -43,6 +47,7 @@ insert into ACLENTRY (ID, ACE_ORDER, MASK, GRANTING, OBJECTIDENTITY_FK, SID_FK) 
 insert into ACLENTRY (ID, ACE_ORDER, MASK, GRANTING, OBJECTIDENTITY_FK, SID_FK) values (3, 1, 16, 1, 3, 1);
 insert into ACLENTRY (ID, ACE_ORDER, MASK, GRANTING, OBJECTIDENTITY_FK, SID_FK) values (4, 1, 16, 1, 4, 1);
 insert into ACLENTRY (ID, ACE_ORDER, MASK, GRANTING, OBJECTIDENTITY_FK, SID_FK) values (5, 1, 16, 1, 5, 1);
+insert into ACLENTRY (ID, ACE_ORDER, MASK, GRANTING, OBJECTIDENTITY_FK, SID_FK) values (6, 1, 16, 1, 5, 5);
 
 -- Give GROUP_USER READ priv on user group sid=2, oi=2, perm=1. (is this necessary?)
 -- insert into ACLENTRY (id, ace_order, mask, granting, audit_success, audit_failure, ACLOBJECTIDENTITY, sid) values (6, 2, 1, 1, 0, 0, 2, 2);
