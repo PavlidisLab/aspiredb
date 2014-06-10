@@ -272,7 +272,7 @@ Ext
                                 }
 
                              }
-                             if ( phenotypeFileEdit ) {
+                             else if ( phenotypeFileEdit ) {
 
                                 // Uploading
                                 // phenoypes

@@ -75,38 +75,6 @@ Ext
                   } ]
                }, {
                   xtype : 'fieldset',
-                  title : 'Phenotypes',
-                  autoWidth : true,
-                  autoheight : true,
-                  defaultType : 'textfield',
-                  layout : 'anchor',
-                  defaults : {
-                     anchor : '100%'
-                  },
-                  items : [ {
-                     xtype : 'filefield',
-                     id : 'phenotypeFile',
-                     name : 'phenotypeFile',
-                     width : 400,
-                     emptyText : 'Select phenotype file to upload',
-                     fieldLabel : 'Upload Phenotype List',
-                     labelWidth : 100,
-                     buttonText : 'Select',
-                     listeners : {
-                        afterrender : function(el) {
-                           var element = el.fileInputEl;
-                           console.log( element );
-                           return element;
-                        },
-                        change : function(fld, value) {
-
-                           var newValue = value.replace( /C:\\fakepath\\/g, '' );
-                           fld.setRawValue( newValue );
-                        }
-                     }
-                  } ]
-               }, {
-                  xtype : 'fieldset',
                   title : 'Variants',
                   autoWidth : true,
                   autoheight : true,
@@ -169,6 +137,38 @@ Ext
                      } ),
                      labelWidth : 100,
 
+                  } ]
+               }, {
+                  xtype : 'fieldset',
+                  title : 'Phenotypes',
+                  autoWidth : true,
+                  autoheight : true,
+                  defaultType : 'textfield',
+                  layout : 'anchor',
+                  defaults : {
+                     anchor : '100%'
+                  },
+                  items : [ {
+                     xtype : 'filefield',
+                     id : 'phenotypeFile',
+                     name : 'phenotypeFile',
+                     width : 400,
+                     emptyText : 'Select phenotype file to upload',
+                     fieldLabel : 'Upload Phenotype List',
+                     labelWidth : 100,
+                     buttonText : 'Select',
+                     listeners : {
+                        afterrender : function(el) {
+                           var element = el.fileInputEl;
+                           console.log( element );
+                           return element;
+                        },
+                        change : function(fld, value) {
+
+                           var newValue = value.replace( /C:\\fakepath\\/g, '' );
+                           fld.setRawValue( newValue );
+                        }
+                     }
                   } ]
                }
 
