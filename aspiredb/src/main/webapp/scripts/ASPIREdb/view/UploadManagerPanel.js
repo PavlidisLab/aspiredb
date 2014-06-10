@@ -219,7 +219,39 @@ Ext
                                                         Ext.Msg.alert( 'Server Reply', 'Uploading Variants  :'
                                                            + errorMessage );
                                                      Ext.getCmp( 'variantType' ).setValue( '' );
-                                                      Ext.getCmp( 'variantFile' ).setRawValue('');
+                                                     Ext.getCmp( 'variantFile' ).setRawValue( '' );
+                                                     
+                                                     if ( phenotypeFile ) {
+                                                        // Uploading phenoypes to the created project
+                                                        var fpReader = new FileReader();
+                                                        fpReader.readAsBinaryString( phenotypeFile );
+
+                                                        fpReader.onloadend = function(event) {
+                                                           var variantSrc = event.target.result;
+
+                                                           // add variants to the project
+                                                           ProjectService.addSubjectPhenotypeToExistingProject( variantSrc, false,
+                                                              projectName, {
+                                                                 callback : function(errorMessage) {
+                                                                    if ( errorMessage == "Success" ) {
+                                                                       Ext.Msg.alert( 'Success',
+                                                                          'You have successfully uploaded phenotype file' );
+                                                                    } else
+                                                                       Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :'
+                                                                          + errorMessage );
+                                                                    Ext.getCmp( 'phenotypeFile' ).setRawValue( '' );
+                                                                   
+                                                                 },
+                                                                 errorHandler : function(er, exception) {
+                                                                    Ext.Msg.alert( "Upload phenotype Error", er + "\n"
+                                                                       + exception.stack );
+                                                                    console.log( exception.stack );
+                                                                 }
+                                                              } );
+                                                        };
+                                                     }
+                                                     Ext.getCmp( 'projectName' ).setValue( '' );
+                                                     Ext.getCmp( 'projectDescription' ).setValue( '' );
 
                                                   },
                                                   errorHandler : function(er, exception) {
@@ -229,36 +261,6 @@ Ext
                                                   }
                                                } );
                                          };
-
-                                         if ( phenotypeFile ) {
-                                            // Uploading phenoypes to the created project
-                                            var fpReader = new FileReader();
-                                            fpReader.readAsBinaryString( phenotypeFile );
-
-                                            fpReader.onloadend = function(event) {
-                                               var variantSrc = event.target.result;
-
-                                               // add variants to the project
-                                               ProjectService.addSubjectPhenotypeToExistingProject( variantSrc, false,
-                                                  projectName, {
-                                                     callback : function(errorMessage) {
-                                                        if ( errorMessage == "Success" ) {
-                                                           Ext.Msg.alert( 'Success',
-                                                              'You have successfully uploaded phenotype file' );
-                                                        } else
-                                                           Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :'
-                                                              + errorMessage );
-                                                        Ext.getCmp( 'phenotypeFile' ).setRawValue( '' );
-                                                       
-                                                     },
-                                                     errorHandler : function(er, exception) {
-                                                        Ext.Msg.alert( "Upload phenotype Error", er + "\n"
-                                                           + exception.stack );
-                                                        console.log( exception.stack );
-                                                     }
-                                                  } );
-                                            };
-                                         }
 
                                       }
 
@@ -279,8 +281,7 @@ Ext
                                    var variantSrc = event.target.result;
 
                                    // add variants to the project
-                                   ProjectService
-                                      .addSubjectPhenotypeToExistingProject( variantSrc, true, projectName,
+                                   ProjectService.addSubjectPhenotypeToExistingProject( variantSrc, true, projectName,
                                          {
                                             callback : function(errorMessage) {
                                                if ( errorMessage == "Success" ) {
@@ -289,7 +290,9 @@ Ext
                                                } else
                                                   Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :'
                                                      + errorMessage );
-                                               xt.getCmp( 'phenotypeFile' ).setRawValue( '' );
+                                               Ext.getCmp( 'phenotypeFile' ).setRawValue( '' );
+                                               Ext.getCmp( 'projectName' ).setValue( '' );
+                                               Ext.getCmp( 'projectDescription' ).setValue( '' );
                                             },
                                             errorHandler : function(er, exception) {
                                                Ext.Msg.alert( "Upload phenotype Error", er + "\n" + exception.stack );
@@ -311,9 +314,9 @@ Ext
                                * response' ); } } );
                                */
                              ASPIREdb.EVENT_BUS.fireEvent( 'new_project_created' );
-                             Ext.getCmp( 'projectName' ).setValue( '' );
-                             Ext.getCmp( 'projectDescription' ).setValue( '' );
+                          
                              
+
                           } else {
                              // Ext.Msg.alert( "Error!", "Your form is invalid!" );
                              fieldNames = [];

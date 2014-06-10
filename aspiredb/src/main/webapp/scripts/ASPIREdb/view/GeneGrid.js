@@ -116,12 +116,13 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
          width : 200,
          displayField : 'displayName',
          triggerAction : 'query',
-         // minChars : 0,
+         minChars : 0,
          matchFieldWidth : false,
          hideTrigger : true,
          triggerAction : 'query',
-         autoSelect : false,
-         enableKeyEvents : true,
+         autoSelect : true,
+         forceSelection : true,
+         enableKeyEvents : false,
          store : Ext.create( 'ASPIREdb.GeneSuggestionStore', {
             remoteFunction : VariantService.suggestGeneValues
          } ),

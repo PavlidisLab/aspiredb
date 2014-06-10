@@ -213,8 +213,8 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
     * Refresh the dash board
     */
    refreshDashboardHandler : function(){
-     // ASPIREdb.view.DashboardWindow.getView().refresh( true );
-      Ext.getCmp('projectField').store.load();
+     this.getView().refresh( true );
+    //  Ext.getCmp('projectField').store.load();
       
    }
 
