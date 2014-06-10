@@ -273,7 +273,7 @@ Ext
                                 } );
                              }
 
-                             if ( phenotypeFile ) {
+                             else if ( phenotypeFile ) {
                                 // Uploading phenoypes to the created project
                                 var fpReader = new FileReader();
                                 fpReader.readAsBinaryString( phenotypeFile );
@@ -302,15 +302,16 @@ Ext
                              }
 
                              /**
-                               * form.submit( {
-                               * 
-                               * method : 'POST', url : '/aspiredb/upload_action.html', // submitEmptyText : false,
-                               * 
-                               * waitMsg : 'Uploading your file...', headers: {'Content-Type':'multipart/form-data;
-                               * charset=UTF-8'}, success : function(form, action) { Ext.Msg.alert( 'Success', 'Your
-                               * file has been uploaded.' ); }, failure : function(form, action) { Ext.Msg.alert(
-                               * 'Failed', action.result ? action.result.message : 'No response' ); } } );
-                               */
+                              * form.submit( {
+                              * 
+                              * method : 'POST', url : 'upload_action.html', // submitEmptyText : false, waitMsg :
+                              * 'Uploading your file...', headers : { //'Content-Type' :
+                              * 'multipart/form-data;charset=UTF-8' 'Content-Type' :
+                              * 'application/x-www-form-urlencoded' }, success : function(form, action) {
+                              * Ext.Msg.alert( 'Success', 'Your file has been uploaded.' ); }, failure : function(form,
+                              * action) { Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No
+                              * response' ); } } );
+                              */
                              ASPIREdb.EVENT_BUS.fireEvent( 'new_project_created' );
 
                           } else {

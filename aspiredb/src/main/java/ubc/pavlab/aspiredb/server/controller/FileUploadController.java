@@ -1,6 +1,7 @@
 package ubc.pavlab.aspiredb.server.controller;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,12 +32,13 @@ import ubc.pavlab.aspiredb.server.model.FileUploadBean;
 @RequestMapping(value = "/upload_action.html")
 public class FileUploadController {
     
-    protected static Log log = LogFactory.getLog( HomeController.class );
+   // protected static Log log = LogFactory.getLog( HomeController.class );
 
     @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody
    String create( FileUploadBean uploadItem, BindingResult result ) {
-      //  String create(HttpServletRequest request, BindingResult result ) throws IOException {
+    //    String create( InputStream uploadItem, BindingResult result ) {
+    //  String create(HttpServletRequest request, BindingResult result ) throws IOException {
 
         ExtJSFormResult extjsFormResult = new ExtJSFormResult();
 

@@ -155,7 +155,7 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
 
       this.add( okButton );
       
-     ASPIREdb.EVENT_BUS.on( 'new_project_created', this.refreshDashboardHandler, this );
+     ASPIREdb.EVENT_BUS.on( 'new_project_created', ref.refreshDashboardHandler, ref );
 
    },
    /**
