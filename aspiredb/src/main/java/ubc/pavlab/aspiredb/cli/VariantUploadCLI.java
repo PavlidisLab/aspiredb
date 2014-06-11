@@ -51,7 +51,7 @@ public class VariantUploadCLI extends AbstractCLI {
     private boolean createProject = false;
 
     private boolean dryRun = false;
-    private boolean predictSNVfunction = true;
+    private boolean predictSNVfunction = false;
 
     private static BeanFactory applicationContext;
 
@@ -141,8 +141,11 @@ public class VariantUploadCLI extends AbstractCLI {
 
         }
 
-        if ( this.hasOption( "predictSNVfunction" ) && variantType.equals( VariantType.SNV ) ) {
-            predictSNVfunction = Boolean.parseBoolean( this.getOptionValue( "predictSNVfunction" ) );
+        if ( variantType.equals( VariantType.SNV ) ) {
+            predictSNVfunction = true;
+            if ( this.hasOption( "predictSNVfunction" ) ) {
+                predictSNVfunction = Boolean.parseBoolean( this.getOptionValue( "predictSNVfunction" ) );
+            }
         }
 
         if ( this.hasOption( "project" ) ) {
