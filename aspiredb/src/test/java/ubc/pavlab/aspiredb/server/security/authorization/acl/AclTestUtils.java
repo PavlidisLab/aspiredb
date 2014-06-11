@@ -19,11 +19,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import gemma.gsec.acl.domain.AclObjectIdentity;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.model.Acl;
 import org.springframework.security.acls.model.AclService;
 import org.springframework.security.acls.model.NotFoundException;
@@ -62,7 +62,7 @@ public class AclTestUtils {
 
     public void checkHasAcl( Object f ) {
         try {
-            aclService.readAclById( new ObjectIdentityImpl( f ) );
+            aclService.readAclById( new AclObjectIdentity( f ) );
             log.debug( "Have acl for " + f );
         } catch ( NotFoundException okaye ) {
             fail( "Failed to create ACL for " + f );
@@ -75,7 +75,7 @@ public class AclTestUtils {
     }
 
     private Acl getAcl( Object f ) {
-        Acl a = aclService.readAclById( new ObjectIdentityImpl( f ) );
+        Acl a = aclService.readAclById( new AclObjectIdentity( f ) );
         return a;
     }
 
