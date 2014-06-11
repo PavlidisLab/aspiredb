@@ -13,11 +13,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>3.2.4.RELEASE</spring.version>
         <spring.security.version>3.1.4.RELEASE</spring.security.version>
-    
+
     </properties>
 
     <repositories>
@@ -89,7 +89,7 @@
             <version>0.0.1-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
-        
+
         <dependency>
             <groupId>dwr</groupId>
             <artifactId>dwr</artifactId>
@@ -354,8 +354,8 @@
                     </additionalClasspathElements>
                     <useManifestOnlyJar>false</useManifestOnlyJar>
                     <forkMode>always</forkMode>
-					<argLine>-Xmx1500M -ea -Djava.awt.headless=true -XX:MaxPermSize=512m -XX:-UseSplitVerifier</argLine>
-					<redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <argLine>-Xmx1500M -ea -Djava.awt.headless=true -XX:MaxPermSize=512m -XX:-UseSplitVerifier</argLine>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
                 </configuration>
             </plugin>
             <plugin>
@@ -438,7 +438,6 @@
                 </executions>
             </plugin>
 
-
             <!-- mvn cobertura:cobertura -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -497,6 +496,32 @@
             </activation>
             <build>
                 <plugins>
+                    <!-- extract gsec sql files -->
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.8</version>
+                        <executions>
+                            <execution>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>pavlab</groupId>
+                                            <artifactId>gemma-gsec</artifactId>
+                                            <version>0.0.1-SNAPSHOT</version>
+                                            <type>jar</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/schema</outputDirectory>
+                                            <includes>**/*.sql</includes>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>sql-maven-plugin</artifactId>
@@ -547,6 +572,7 @@
                                     <url>${aspiredb.testdb.build.url}</url>
                                     <srcFiles>
                                         <srcFile>target/hibernate3/sql/schema.sql</srcFile>
+                                        <srcFile>target/schema/gsec-acl-ddl.sql</srcFile>
                                         <srcFile>src/main/resources/sql/init-acls.sql</srcFile>
                                         <srcFile>src/main/resources/sql/init-entities.sql</srcFile>
                                         <srcFile>src/main/resources/sql/init-indices.sql</srcFile>
@@ -569,6 +595,32 @@
             </activation>
             <build>
                 <plugins>
+                    <!-- extract gsec sql files -->
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.8</version>
+                        <executions>
+                            <execution>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>pavlab</groupId>
+                                            <artifactId>gemma-gsec</artifactId>
+                                            <version>0.0.1-SNAPSHOT</version>
+                                            <type>jar</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/schema</outputDirectory>
+                                            <includes>**/*.sql</includes>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>sql-maven-plugin</artifactId>
@@ -619,6 +671,7 @@
                                     <password>${aspiredb.db.build.password}</password>
                                     <srcFiles>
                                         <srcFile>target/hibernate3/sql/schema.sql</srcFile>
+                                        <srcFile>target/schema/gsec-acl-ddl.sql</srcFile>
                                         <srcFile>src/main/resources/sql/init-acls.sql</srcFile>
                                         <srcFile>src/main/resources/sql/init-entities.sql</srcFile>
                                         <srcFile>src/main/resources/sql/init-indices.sql</srcFile>
@@ -670,6 +723,6 @@
         </plugins>
     </reporting>
 
-    
+
 
 </project>

@@ -1,15 +1,4 @@
-create table ACLENTRY (ID BIGINT not null auto_increment, GRANTING TINYINT not null, MASK INTEGER not null, ACE_ORDER INTEGER not null, SID_FK BIGINT not null, OBJECTIDENTITY_FK BIGINT, primary key (ID));
-create table ACLOBJECTIDENTITY (ID BIGINT not null auto_increment, OBJECT_ID BIGINT not null, OBJECT_CLASS VARCHAR(255) character set latin1 collate latin1_swedish_ci not null, ENTRIES_INHERITING TINYINT not null, OWNER_SID_FK BIGINT not null, PARENT_OBJECT_FK BIGINT, primary key (ID));
-create table ACLSID (ID BIGINT not null auto_increment, class varchar(255) not null, PRINCIPAL VARCHAR(255) character set latin1 collate latin1_swedish_ci unique, GRANTED_AUTHORITY VARCHAR(255) character set latin1 collate latin1_swedish_ci unique, primary key (ID));
-alter table ACLENTRY add index FKBE0F46285EB7C2A7 (SID_FK), add constraint FKBE0F46285EB7C2A7 foreign key (SID_FK) references ACLSID (ID);
-alter table ACLENTRY add index ACL_ENTRY_OBJECTIDENTITY_FKC (OBJECTIDENTITY_FK), add constraint ACL_ENTRY_OBJECTIDENTITY_FKC foreign key (OBJECTIDENTITY_FK) references ACLOBJECTIDENTITY (ID);
-alter table ACLOBJECTIDENTITY add index FK79E443E74551EDB3 (OWNER_SID_FK), add constraint FK79E443E74551EDB3 foreign key (OWNER_SID_FK) references ACLSID (ID);
-alter table ACLOBJECTIDENTITY add index FK79E443E7D2DE55AA (PARENT_OBJECT_FK), add constraint FK79E443E7D2DE55AA foreign key (PARENT_OBJECT_FK) references ACLOBJECTIDENTITY (ID);
-
-alter table ACLOBJECTIDENTITY add unique key acloid (OBJECT_CLASS,OBJECT_ID);
-alter table ACLOBJECTIDENTITY add key objectclasskey (OBJECT_CLASS);
-alter table ACLOBJECTIDENTITY add key oidkey (OBJECT_ID);
-
+-- create tables from gsec-acl-ddl.sql
 -- The table for this are now created from our hibernate config for ACLs.
 
 -- Base SIDs we'll need these (not all used by this script; the others would be inserted automagically when needed, but this
@@ -38,17 +27,17 @@ insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIE
 -- Add object identity (OI) for the agent user. There is no parent object, the owner = the administrator; non-inheriting.
 insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values (5, "ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User", 2, 1, 0);
 
-insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values (6, "ubc.pavlab.aspiredb.server.model.Query", 1, 1, 0);
+-- insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values (6, "ubc.pavlab.aspiredb.server.model.Query", 1, 1, 0);
 
-insert into ACLOBJECTIDENTITY (OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values ("ubc.pavlab.aspiredb.server.model.SNV", 1, 1, 0);
+-- insert into ACLOBJECTIDENTITY (OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values ("ubc.pavlab.aspiredb.server.model.SNV", 1, 1, 0);
 
-insert into ACLOBJECTIDENTITY (OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values ("ubc.pavlab.aspiredb.server.model.CNV", 1, 1, 0);
+-- insert into ACLOBJECTIDENTITY (OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values ("ubc.pavlab.aspiredb.server.model.CNV", 1, 1, 0);
 
-insert into ACLOBJECTIDENTITY (OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values ("ubc.pavlab.aspiredb.server.model.Phenotype", 1, 1, 0);
+-- insert into ACLOBJECTIDENTITY (OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values ("ubc.pavlab.aspiredb.server.model.Phenotype", 1, 1, 0);
 
-insert into ACLOBJECTIDENTITY (OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values ("ubc.pavlab.aspiredb.server.model.Subject", 1, 1, 0);
+-- insert into ACLOBJECTIDENTITY (OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values ("ubc.pavlab.aspiredb.server.model.Subject", 1, 1, 0);
 
-insert into ACLOBJECTIDENTITY (OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values ("ubc.pavlab.aspiredb.server.model.Project", 1, 1, 0);
+-- insert into ACLOBJECTIDENTITY (OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values ("ubc.pavlab.aspiredb.server.model.Project", 1, 1, 0);
 
 --
 -- give GROUP_ADMIN admin priv on everything - we don't need to give it to a specific user.
