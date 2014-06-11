@@ -38,6 +38,18 @@ insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIE
 -- Add object identity (OI) for the agent user. There is no parent object, the owner = the administrator; non-inheriting.
 insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values (5, "ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User", 2, 1, 0);
 
+insert into ACLOBJECTIDENTITY (ID, OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values (6, "ubc.pavlab.aspiredb.server.model.Query", 1, 1, 0);
+
+insert into ACLOBJECTIDENTITY (OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values ("ubc.pavlab.aspiredb.server.model.SNV", 1, 1, 0);
+
+insert into ACLOBJECTIDENTITY (OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values ("ubc.pavlab.aspiredb.server.model.CNV", 1, 1, 0);
+
+insert into ACLOBJECTIDENTITY (OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values ("ubc.pavlab.aspiredb.server.model.Phenotype", 1, 1, 0);
+
+insert into ACLOBJECTIDENTITY (OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values ("ubc.pavlab.aspiredb.server.model.Subject", 1, 1, 0);
+
+insert into ACLOBJECTIDENTITY (OBJECT_CLASS, OBJECT_ID, OWNER_SID_FK, ENTRIES_INHERITING) values ("ubc.pavlab.aspiredb.server.model.Project", 1, 1, 0);
+
 --
 -- give GROUP_ADMIN admin priv on everything - we don't need to give it to a specific user.
 --
@@ -57,5 +69,3 @@ insert into ACLENTRY (ID, ACE_ORDER, MASK, GRANTING, OBJECTIDENTITY_FK, SID_FK) 
 
 -- give agent admin priv on himself.(sid=6). (no group privileges)
 insert into ACLENTRY (ID, ACE_ORDER, MASK, GRANTING, OBJECTIDENTITY_FK, SID_FK) values (8, 2, 16, 1, 5, 6);
-
-
