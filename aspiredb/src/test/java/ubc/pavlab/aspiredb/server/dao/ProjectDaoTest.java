@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.model.Project;
@@ -64,8 +65,8 @@ public class ProjectDaoTest extends BaseSpringContextTest {
 
         detachedProject.setName( projectName );
 
-        Project p = projectDao.create( detachedProject );
-
+        Project p = testObjectHelper.createPersistentProject( detachedProject );
+        
         testObjectHelper.addSubjectToProject( ind1, p );
 
         testObjectHelper.addSubjectToProject( ind2, p );
@@ -104,7 +105,7 @@ public class ProjectDaoTest extends BaseSpringContextTest {
 
         detachedProject.setName( projectName );
 
-        Project p = projectDao.create( detachedProject );
+        Project p = testObjectHelper.createPersistentProject( detachedProject );
 
         ind1.getProjects().add( p );
         ind2.getProjects().add( p );
