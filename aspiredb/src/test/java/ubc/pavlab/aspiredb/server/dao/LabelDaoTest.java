@@ -84,7 +84,7 @@ public class LabelDaoTest extends BaseSpringContextTest {
             public void instructions() {
                 String name = RandomStringUtils.randomAlphabetic( 4 );
                 Label label = new Label( name, "FF0000" );
-                labelDao.create( label );
+                label = testObjectHelper.createPersistentLabel( label );
                 testSubject.addLabel( label );
                 subjectDao.update( testSubject );
 
@@ -98,7 +98,7 @@ public class LabelDaoTest extends BaseSpringContextTest {
     public void addVariantLabel() {
         String name = RandomStringUtils.randomAlphabetic( 4 );
         Label label = new Label( name, "FF0000" );
-        labelDao.create( label );
+        label = testObjectHelper.createPersistentLabel( label );
         testVariant.addLabel( label );
         variantDao.update( testVariant );
 
@@ -116,7 +116,9 @@ public class LabelDaoTest extends BaseSpringContextTest {
     public void labelSuggestion() {
         String name = RandomStringUtils.randomAlphabetic( 4 );
         Label label = new Label( name, "FF0000" );
-        labelDao.create( label );
+        label = testObjectHelper.createPersistentLabel( label );
+
+        label = testObjectHelper.createPersistentLabel( label );
         testSubject.addLabel( label );
         subjectDao.update( testSubject );
 
@@ -129,7 +131,7 @@ public class LabelDaoTest extends BaseSpringContextTest {
     public void labelSuggestionByContext() {
         String name = RandomStringUtils.randomAlphabetic( 4 );
         Label label = new Label( name, "FF0000" );
-        labelDao.create( label );
+        label = testObjectHelper.createPersistentLabel( label );
         testSubject.addLabel( label );
         subjectDao.update( testSubject );
 

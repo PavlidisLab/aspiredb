@@ -23,6 +23,7 @@ import java.util.List;
 
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Indel;
+import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
@@ -82,5 +83,7 @@ public interface PersistentTestObjectHelper {
     void removeVariant( Variant variant );
 
     void removePhenotype( Phenotype phenotype );
+
+    public Label createPersistentLabel( Label label );
 
 }

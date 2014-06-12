@@ -352,6 +352,12 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     @Override
     @Transactional
+    public Label createPersistentLabel( Label label ) {
+        return labelDao.create( label );
+    }
+    
+    @Override
+    @Transactional
     public List<Subject> getSubjectsForProject( Project p ) {
         return p.getSubjects();
     }
