@@ -511,8 +511,8 @@ public class QueryServiceTest extends BaseSpringContextTest {
         // cleanup
         s.getVariants().remove( cnv );
         subjectDao.update( s );
-        cnvDao.remove( cnv );
-        subjectDao.remove( s );
+        persistentTestObjectHelper.removeVariant( cnv );
+        persistentTestObjectHelper.removeSubject( s );
     }
 
     @Test
@@ -538,7 +538,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         assertEquals( variantCount, addedVariantCount ); // no new variants were added!
 
         // cleanup
-        subjectDao.remove( s );
+        persistentTestObjectHelper.removeSubject( s );
     }
 
     @Test
@@ -604,9 +604,9 @@ public class QueryServiceTest extends BaseSpringContextTest {
             CNV c = ( CNV ) v;
             c.setSubject( null );
             cnvDao.update( c );
-            cnvDao.remove( c );
+            persistentTestObjectHelper.removeVariant( c );
         }
-        subjectDao.remove( s );
+        persistentTestObjectHelper.removeSubject( s );
 
     }
 }
