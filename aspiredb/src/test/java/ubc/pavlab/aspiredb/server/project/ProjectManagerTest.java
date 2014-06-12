@@ -170,7 +170,9 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
                 aclTestUtils.checkHasAcl( project );
 
-                assertFalse( securityService.isViewableByUser( project, aDifferentUsername ) );
+                assertFalse( "Project should not be viewable by user '" + aDifferentUsername + "', acl is "
+                        + aclTestUtils.getAcl( project ),
+                        securityService.isViewableByUser( project, aDifferentUsername ) );
 
                 Subject subject = project.getSubjects().iterator().next();
 
