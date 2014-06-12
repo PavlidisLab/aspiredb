@@ -27,6 +27,7 @@ import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 /**
@@ -75,5 +76,11 @@ public interface PersistentTestObjectHelper {
     public Collection<LabelValueObject> getLabelsForVariant( Long variantId );
 
     public void deleteProject( String projectName );
+
+    void removeSubject( Subject subject );
+
+    void removeVariant( Variant variant );
+
+    void removePhenotype( Phenotype phenotype );
 
 }

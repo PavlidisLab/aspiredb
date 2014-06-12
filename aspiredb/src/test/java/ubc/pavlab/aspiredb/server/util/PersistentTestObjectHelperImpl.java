@@ -156,6 +156,24 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     }
 
     @Override
+    @Transactional
+    public void removeSubject( Subject subject ) {
+        subjectDao.remove( subject );
+    }
+
+    @Override
+    @Transactional
+    public void removeVariant( Variant variant ) {
+        variantDao.remove( variant );
+    }
+
+    @Override
+    @Transactional
+    public void removePhenotype( Phenotype phenotype ) {
+        phenotypeDao.remove( phenotype );
+    }
+
+    @Override
     public CNV createDetachedTestCNVObject() {
 
         GenomicLocation genomicLocation = new GenomicLocation();
