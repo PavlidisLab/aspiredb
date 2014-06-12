@@ -28,6 +28,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
 import ubc.pavlab.aspiredb.server.model.ExtJSFormResult;
 import ubc.pavlab.aspiredb.server.model.FileUploadBean;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
+import ubc.pavlab.aspiredb.server.security.authentication.UserService;
 import ubc.pavlab.aspiredb.server.service.ProjectService;
 
 
@@ -35,16 +36,19 @@ import ubc.pavlab.aspiredb.server.service.ProjectService;
 /**
  * Controller - Spring
  * 
- * @author Loiane Groner http://loiane.com http://loianegroner.com
+ * @author gaya
+ * @reference Loiane Groner http://loiane.com http://loianegroner.com
  */
 @Controller
 @RemoteProxy
-@RequestMapping(value = "/upload_action.html")
 public class FileUploadController {
     
-   // protected static Log log = LogFactory.getLog( HomeController.class );
+    protected static Log log = LogFactory.getLog( HomeController.class );
+    
+    @Autowired
+    private ProjectService projectService;
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = "/upload_action.html",method = RequestMethod.POST)
     public @ResponseBody
    String uploadFile( FileUploadBean uploadItem, BindingResult result ) {
 
@@ -78,6 +82,7 @@ public class FileUploadController {
                 String filename =uploadItem.getFile().getOriginalFilename().substring(0,uploadItem.getFile().getOriginalFilename().lastIndexOf('.'));
                 Statement stmt = conn.createStatement();
                 ResultSet results = stmt.executeQuery( "SELECT * FROM "+ filename);
+             //  addSubjectVariantsToExistingProject( filename, true, "test", "CNV" );
 
                 // clean up
                 results.close();
@@ -132,11 +137,10 @@ public class FileUploadController {
      * @throws IOException
      * @throws FileNotFoundException
      */
-    public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName,String variantType ) {
+     public String addSubjectVariantsToExistingProject( String filename, boolean createProject, String projectName,String variantType ) {
        
         String result="";
-        ProjectService projectservice = null;
-        result =projectservice.addSubjectPhenotypeToExistingProject( fileContent, createProject, projectName );
+        result =projectService.addSubjectVariantsToProject( filename, createProject, projectName, variantType );
         System.err.println( "DWR Uploaded file!" );
         return result;
     }

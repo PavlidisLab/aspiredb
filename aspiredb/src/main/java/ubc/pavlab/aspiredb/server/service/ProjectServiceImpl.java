@@ -217,6 +217,72 @@ public class ProjectServiceImpl implements ProjectService {
         }
         return pvo;
     }
+    
+    /**
+     * @author gaya
+     * @param fileContent
+     * @param projectName
+     * @param variantType
+     * @return Error String
+     */
+    @Override
+    @RemoteMethod
+    public String addSubjectVariantsToProject(String filename, boolean createProject, String projectName,
+            String variantType ) {
+
+        String returnString = "";
+
+        try {
+            
+            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
+
+            // create a connection
+            // arg[0] is the directory in which the .csv files are held
+            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
+
+            Statement stmt = conn.createStatement();
+            ResultSet results = stmt.executeQuery( "SELECt * from "+filename );
+
+            // check weather the project exist
+            if ( createProject ) {
+                if ( projectDao.findByProjectName( projectName ) != null ) {
+                    returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
+                }
+            }
+
+            VariantType VariantType = null;
+            VariantUploadServiceResult result = null;
+
+            if ( variantType.equalsIgnoreCase( "CNV" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.CNV );
+            } else if ( variantType.equalsIgnoreCase( "SNV" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.SNV );
+            } else if ( variantType.equalsIgnoreCase( "INDEL" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INDEL );
+            } else if ( variantType.equalsIgnoreCase( "INVERSION" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INVERSION );
+            } else if ( variantType.equalsIgnoreCase( "DECIPHER" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DECIPHER );
+            } else if ( variantType.equalsIgnoreCase( "DGV" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DGV );
+            }
+
+            if ( result.getErrorMessages().isEmpty() ) {
+                projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
+                returnString = "Success";
+            } else {
+                for ( String errorMessage : result.getErrorMessages() ) {
+                    returnString = errorMessage;
+                }
+
+            }
+            // }
+
+        } catch ( Exception e ) {
+            return e.toString();
+        }
+        return returnString;
+    }
 
     /**
      * @author gaya
@@ -386,6 +452,75 @@ public class ProjectServiceImpl implements ProjectService {
 
         return returnString;
     }
+    
+    /**
+     * @author gaya
+     * @param fileContent
+     * @param projectName
+     * @param variantType
+     * @return Error String
+     */
+    @Override
+    @RemoteMethod
+    public String addSubjectPhenotypeToProject( String filename, boolean createProject, String projectName ) {
+
+        String returnString = "";
+
+        try {
+
+            os.getHumanPhenotypeOntologyService().startInitializationThread( true );
+            int c = 0;
+
+            while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
+                Thread.sleep( 10000 );
+                log.info( "Waiting for HumanPhenotypeOntology to load" );
+                if ( ++c > 10 ) {
+                    throw new Exception( "Ontology load timeout" );
+                }
+            }
+
+            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
+
+            // create a connection
+            // arg[0] is the directory in which the .csv files are held
+            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
+
+            Statement stmt = conn.createStatement();
+            ResultSet results = stmt.executeQuery( "SELECT * FROM "+filename );
+
+            if ( createProject ) {
+                if ( projectDao.findByProjectName( projectName ) != null ) {
+                    returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
+                }
+            }
+
+            PhenotypeUploadServiceResult phenResult = phenotypeUploadService
+                    .getPhenotypeValueObjectsFromResultSet( results );
+
+            // clean up
+            results.close();
+            stmt.close();
+            conn.close();
+
+            projectManager.addSubjectPhenotypesToProject( projectName, createProject, phenResult.getPhenotypesToAdd() );
+
+            if ( !phenResult.getErrorMessages().isEmpty() ) {
+                for ( String errorMessage : phenResult.getErrorMessages() ) {
+                    returnString = errorMessage;
+                }
+
+            } else {
+                returnString = "Success";
+            }
+            // }
+
+        } catch ( Exception e ) {
+            return e.toString();
+        }
+
+        return returnString;
+    }
+
 
     @Override
     @RemoteMethod

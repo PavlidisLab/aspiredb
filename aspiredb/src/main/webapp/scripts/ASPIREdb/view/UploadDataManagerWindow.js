@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'Ext.Window','ASPIREdb.view.UploadManagerPanel' ] );
+Ext.require( [ 'Ext.Window','ASPIREdb.view.UploadManagerFormPanel' ] );
 
 Ext.define( 'ASPIREdb.view.UploadDataManagerWindow', {
    extend : 'Ext.Window',
@@ -38,8 +38,8 @@ Ext.define( 'ASPIREdb.view.UploadDataManagerWindow', {
    },
    items : [ {
       region : 'center',
-      itemId : 'uploadManagerPanel',
-      xtype : 'uploadManagerPanel',
+      itemId : 'uploadManagerFormPanel',
+      xtype : 'uploadManagerFormPanel',
    } ],
 
    initComponent : function() {
@@ -53,7 +53,7 @@ Ext.define( 'ASPIREdb.view.UploadDataManagerWindow', {
    initGridAndShow : function() {
 
       var ref = this;
-      var panel = ASPIREdb.view.UploadDataManagerWindow.down( '#uploadManagerPanel' );
+      var panel = ASPIREdb.view.UploadDataManagerWindow.down( '#uploadManagerFormPanel' );
 
       ref.show();
 

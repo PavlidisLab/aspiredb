@@ -89,4 +89,8 @@ public interface ProjectService {
     public void deleteUser( String userName );
 
     public boolean isUser( String userName ) throws NotLoggedInException;
+
+    public String addSubjectVariantsToProject( String filename, boolean createProject, String projectName, String variantType );
+
+    public String addSubjectPhenotypeToProject( String filename, boolean createProject, String projectName );
 }
