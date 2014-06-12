@@ -20,6 +20,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import gemma.gsec.SecurityService;
+import gemma.gsec.acl.ValueObjectAwareIdentityRetrievalStrategyImpl;
 import gemma.gsec.acl.domain.AclPrincipalSid;
 import gemma.gsec.acl.domain.AclService;
 import gemma.gsec.model.Securable;
@@ -32,7 +33,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.acls.domain.ObjectIdentityRetrievalStrategyImpl;
 import org.springframework.security.acls.model.MutableAcl;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.acls.model.ObjectIdentity;
@@ -65,7 +65,7 @@ public class SecurityServiceTest extends BaseSpringContextTest {
     @Autowired
     private UserManager userManager;
 
-    private ObjectIdentityRetrievalStrategy objectIdentityRetrievalStrategy = new ObjectIdentityRetrievalStrategyImpl();
+    private ObjectIdentityRetrievalStrategy objectIdentityRetrievalStrategy = new ValueObjectAwareIdentityRetrievalStrategyImpl();
 
     @Autowired
     private PersistentTestObjectHelper testObjectHelper;
