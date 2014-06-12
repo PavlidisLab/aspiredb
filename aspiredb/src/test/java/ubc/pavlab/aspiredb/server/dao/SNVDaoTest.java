@@ -69,7 +69,7 @@ public class SNVDaoTest extends BaseSpringContextTest {
 
         detachedProject.setName( projectName );
 
-        Project p1 = projectDao.create( detachedProject );
+        Project p1 = testObjectHelper.createPersistentProject( detachedProject );
 
         projectId = p1.getId();
 
@@ -104,8 +104,7 @@ public class SNVDaoTest extends BaseSpringContextTest {
             public void doInTransactionWithoutResult( TransactionStatus status ) {
 
                 // Just a stub to test the plumbing.
-                SNV snv = new SNV();
-                snvDao.create( snv );
+                testObjectHelper.createPersistentTestSNVObject();
 
             }
         } );
