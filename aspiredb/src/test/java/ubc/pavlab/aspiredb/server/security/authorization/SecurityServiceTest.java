@@ -45,6 +45,7 @@ import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
+import ubc.pavlab.aspiredb.server.security.authorization.acl.AclTestUtils;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
 /**
@@ -71,6 +72,9 @@ public class SecurityServiceTest extends BaseSpringContextTest {
 
     @Autowired
     private SubjectDao individualDao;
+
+    @Autowired
+    private AclTestUtils aclTestUtils;
 
     String patientId = RandomStringUtils.randomAlphabetic( 4 );
 
@@ -132,8 +136,10 @@ public class SecurityServiceTest extends BaseSpringContextTest {
     public void testMakeIndividualReadWrite() throws Exception {
 
         String indPatientId = RandomStringUtils.randomAlphabetic( 4 );
+
         Subject ind = testObjectHelper.createPersistentTestSubjectObjectWithCNV( indPatientId );
-        assertTrue( "This should be private because all data should be private", this.securityService.isPrivate( ind ) );
+        assertTrue( "This should be private because all data should be private, acl is " + aclTestUtils.getAcl( ind ),
+                this.securityService.isPrivate( ind ) );
 
         String username = "first_" + randomName();
         String usertwo = "second_" + randomName();

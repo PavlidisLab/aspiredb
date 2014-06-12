@@ -20,12 +20,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import gemma.gsec.acl.domain.AclObjectIdentity;
+import gemma.gsec.acl.domain.AclService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Acl;
-import org.springframework.security.acls.model.AclService;
+import org.springframework.security.acls.model.MutableAcl;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Component;
 
@@ -74,7 +75,7 @@ public class AclTestUtils {
         assertTrue( a + " doesn't have ACEs, it should", a.getEntries().size() > 0 );
     }
 
-    private Acl getAcl( Object f ) {
+    public Acl getAcl( Object f ) {
         Acl a = aclService.readAclById( new AclObjectIdentity( f ) );
         return a;
     }
@@ -98,10 +99,14 @@ public class AclTestUtils {
         log.debug( "ACL has correct parent for " + f + " <----- " + parentAcl.getObjectIdentity() );
     }
 
-    private Acl getParentAcl( Object f ) {
+    public Acl getParentAcl( Object f ) {
         Acl a = getAcl( f );
         Acl parentAcl = a.getParentAcl();
         return parentAcl;
+    }
+
+    public void update( MutableAcl acl ) {
+        this.aclService.updateAcl( acl );
     }
 
 }
