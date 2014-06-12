@@ -175,6 +175,7 @@ Ext.define('ASPIREdb.view.RegistrationForm', {
                var me = this.ownerCt.ownerCt;
                me.getComponent('username').setValue('');
                me.getComponent('password').setValue('');
+               me.getComponent('email').setValue('');
 
             }
          }, {
@@ -206,15 +207,18 @@ Ext.define('ASPIREdb.view.RegistrationForm', {
          params : Ext.Object.toQueryString({
             'j_username' : me.down('#username').getValue(),
             'j_password' : me.down('#password').getValue(),
+            'j_email' : me.down('#email').getValue(),
             'ajaxLoginTrue' : true
          }),
          success : function(response) {
             var messageLabel = me.down('#message');
             var usernameTextfield = me.down('#username');
             var passwordTextfield = me.down('#password');
+            var emailTextfield = me.down('#email');
 
             usernameTextfield.reset();
             passwordTextfield.reset();
+            emailTextfield.reset();
 
             if (response.responseText === 'success') {
                window.location.href = "home.html";
