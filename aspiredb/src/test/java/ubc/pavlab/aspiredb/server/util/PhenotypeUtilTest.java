@@ -79,7 +79,7 @@ public class PhenotypeUtilTest extends BaseSpringContextTest {
     @After
     public void tearDown() {
         for ( Phenotype pheno : phenolist ) {
-            phenotypeDao.remove( pheno );
+            persistentTestObjectHelper.removePhenotype( pheno );
         }
     }
 
