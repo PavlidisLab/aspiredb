@@ -41,7 +41,7 @@ public interface PhenotypeDao extends SecurableDaoBase<Phenotype> {
     public Collection<Phenotype> loadBySubjectIds( Collection<Long> subjectIds );
 
     @Transactional(readOnly = true)
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    @Secured({ "GROUP_USER" })
     public List<String> getExistingValues( String name );
 
     /**
@@ -52,7 +52,7 @@ public interface PhenotypeDao extends SecurableDaoBase<Phenotype> {
      * @return
      */
     @Transactional(readOnly = true)
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    @Secured({ "GROUP_USER" })
     public List<String> getExistingNames( Collection<Long> activeProjectIds );
 
     // TODO: reuse for suggestions
@@ -72,7 +72,7 @@ public interface PhenotypeDao extends SecurableDaoBase<Phenotype> {
     @Transactional(readOnly = true)
     boolean isInDatabase( Collection<String> names );
 
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    @Secured({ "GROUP_USER" })
     public List<String> getDistinctOntologyUris( Collection<Long> activeProjects );
 
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
