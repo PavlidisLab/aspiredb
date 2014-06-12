@@ -20,6 +20,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import gemma.gsec.SecurityService;
+import gemma.gsec.acl.domain.AclPrincipalSid;
+import gemma.gsec.acl.domain.AclService;
 import gemma.gsec.model.Securable;
 
 import java.util.Collection;
@@ -31,8 +33,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.acls.domain.ObjectIdentityRetrievalStrategyImpl;
-import org.springframework.security.acls.domain.PrincipalSid;
-import org.springframework.security.acls.model.AclService;
 import org.springframework.security.acls.model.MutableAcl;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.acls.model.ObjectIdentity;
@@ -118,8 +118,8 @@ public class SecurityServiceTest extends BaseSpringContextTest {
         this.securityService.setOwner( ind, username );
 
         Sid owner = this.securityService.getOwner( ind );
-        assertTrue( owner instanceof PrincipalSid );
-        assertEquals( username, ( ( PrincipalSid ) owner ).getPrincipal() );
+        assertTrue( owner instanceof AclPrincipalSid );
+        assertEquals( username, ( ( AclPrincipalSid ) owner ).getPrincipal() );
 
     }
 
