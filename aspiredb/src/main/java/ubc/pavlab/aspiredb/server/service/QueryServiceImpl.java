@@ -14,6 +14,8 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import gemma.gsec.SecurityService;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -103,12 +105,17 @@ public class QueryServiceImpl implements QueryService {
     @Autowired
     private VariantDao variantDao;
 
+    @Autowired
+    SecurityService securityService;
+
     @Override
     @Transactional
     @RemoteMethod
     public void deleteQuery( String name ) {
         List<Query> querys = queryDao.findByName( name );
-        queryDao.remove( querys.iterator().next() );
+        if ( querys.size() > 0 ) {
+            queryDao.remove( querys.iterator().next() );
+        }
     }
 
     @Override
@@ -462,6 +469,14 @@ public class QueryServiceImpl implements QueryService {
     }
 
     @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Query getQuery( Long id ) {
+        Query q = queryDao.load( id );
+        return q;
+    }
+    
+    @Override
     @Transactional
     @RemoteMethod
     public Long saveQuery( String name, Set<AspireDbFilterConfig> filters ) {
@@ -478,6 +493,9 @@ public class QueryServiceImpl implements QueryService {
         } else {
             throw new IllegalStateException( "Found more than one saved query with same name belonging to one user." );
         }
+        
+        securityService.makePrivate( savedQuery );
+        
         return savedQuery.getId();
     }
 

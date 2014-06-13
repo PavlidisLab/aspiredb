@@ -25,6 +25,7 @@ import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
+import ubc.pavlab.aspiredb.server.model.Query;
 import ubc.pavlab.aspiredb.shared.BoundedList;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
@@ -97,6 +98,8 @@ public interface QueryService {
      */
     public Map<Integer, Integer> getSubjectVariantCounts( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException;
+
+    Query getQuery( Long id );
 
     // // TODO: To be removed
     // @Deprecated

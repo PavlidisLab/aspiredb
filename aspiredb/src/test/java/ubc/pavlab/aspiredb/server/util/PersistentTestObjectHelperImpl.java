@@ -169,6 +169,12 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     @Override
     @Transactional
+    public void removeLabel( Label label ) {
+        labelDao.remove( label );
+    }
+    
+    @Override
+    @Transactional
     public void removePhenotype( Phenotype phenotype ) {
         phenotypeDao.remove( phenotype );
     }

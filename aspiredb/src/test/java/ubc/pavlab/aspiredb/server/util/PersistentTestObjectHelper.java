@@ -86,4 +86,6 @@ public interface PersistentTestObjectHelper {
 
     public Label createPersistentLabel( Label label );
 
+    void removeLabel( Label label );
+
 }
