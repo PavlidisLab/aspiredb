@@ -19,6 +19,7 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import gemma.gsec.SecurityService;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
@@ -152,8 +154,19 @@ public class LabelServiceTest extends BaseSpringContextTest {
 
         Collection<LabelValueObject> lvos = persistentTestObjectHelper.getLabelsForSubject( subjectId );
 
-        labelService.deleteSubjectLabel( lvos.iterator().next() );
+        super.runAsUser( this.username );
+        try {
+            labelService.deleteSubjectLabel( lvos.iterator().next() );
+            fail("Admin created label");
+        } catch ( AccessDeniedException e ) {
+        }
 
+        super.runAsAdmin();
+        try {
+            labelService.deleteSubjectLabel( lvos.iterator().next() );
+        } catch ( AccessDeniedException e ) {
+            fail("Admin created label");
+        }
     }
 
     @Test
