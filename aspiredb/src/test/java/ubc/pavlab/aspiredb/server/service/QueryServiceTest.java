@@ -146,20 +146,20 @@ public class QueryServiceTest extends BaseSpringContextTest {
         // run save query as administrator in filter window
         super.runAsAdmin();
 
-        for ( Subject s : project.getSubjects() ) {
-            try {
-
-                for ( Phenotype p : s.getPhenotypes() ) {
-                    phenotypeDao.remove( p );
-                }
-
-                subjectDao.remove( s );
-
-            } catch ( Exception e ) {
-                e.printStackTrace();
-            }
-        }
-        projectDao.remove( project );
+        // for ( Subject s : project.getSubjects() ) {
+        // try {
+        //
+        // for ( Phenotype p : s.getPhenotypes() ) {
+        // phenotypeDao.remove( p );
+        // }
+        //
+        // subjectDao.remove( s );
+        //
+        // } catch ( Exception e ) {
+        // e.printStackTrace();
+        // }
+        // }
+        // projectDao.remove( project );
     }
 
     @Test

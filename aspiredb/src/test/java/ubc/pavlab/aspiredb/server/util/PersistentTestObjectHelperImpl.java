@@ -355,7 +355,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     public Label createPersistentLabel( Label label ) {
         return labelDao.create( label );
     }
-    
+
     @Override
     @Transactional
     public List<Subject> getSubjectsForProject( Project p ) {
@@ -383,9 +383,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         Project project = projectDao.findByProjectName( projectName );
 
         if ( project == null ) {
-
             return;
-
         }
 
         variant2SpecialVariantOverlapDao.deleteByOverlapProjectId( project.getId() );
@@ -399,13 +397,20 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
                 for ( Variant v : s.getVariants() ) {
                     variantDao.remove( v );
                 }
+                s.getPhenotypes().clear();
+                s.getVariants().clear();
                 subjectDao.remove( s );
 
             } catch ( Exception e ) {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
         }
-        projectDao.remove( project );
+
+        try {
+            projectDao.remove( project );
+        } catch ( Exception e ) {
+            // noop
+        }
     }
 
 }
