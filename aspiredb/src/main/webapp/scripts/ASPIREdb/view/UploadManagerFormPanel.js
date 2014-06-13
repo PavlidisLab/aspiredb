@@ -28,8 +28,9 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
    fileUpload : true,
    config : {
       variantSrc : null,
-      VariantFile :null,
-      PhenotypeFile:null,
+      VariantFile : '',
+      PhenotypeFile : '',
+      variantType : '',
    },
    fieldDefaults : {
       labelWidth : 75,
@@ -68,18 +69,20 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
             values = form.getFieldValues();
             var projectName = values['projectName'];
             var projectDescription = values['projectDescription'];
-            var file = Ext.getCmp( 'variantFile' ).getEl().down( 'input[type=file]' ).dom.files[0];
-            var phenotypeFile = Ext.getCmp( 'phenotypeFile' ).getEl().down( 'input[type=file]' ).dom.files[0];
-            
-            if ( file ) {
-               var variantType = values['variantType-inputEl'].toUpperCase();
+            //var file = Ext.getCmp( 'variantFile' ).getEl().down( 'input[type=file]' ).dom.files[0];
+            //var phenotypeFile = Ext.getCmp( 'phenotypeFile' ).getEl().down( 'input[type=file]' ).dom.files[0];
+            var variantfilename =form.owner.VariantFile;
+            var phenotypefilename =form.owner.PhenotypeFile;
+               
+            if ( variantfilename != '' ) {
+               var variantType = form.owner.variantType;
                // create project
                ProjectService.createUserProject( projectName, projectDescription, {
                   callback : function(message) {
 
                      if ( message == "Success" ) {
                         // add variants to the project
-                        ProjectService.addSubjectVariantsToProject( file.name, false, projectName, variantType, {
+                        ProjectService.addSubjectVariantsToProject( variantfilename, false, projectName, variantType, {
                            callback : function(errorMessage) {
                               if ( errorMessage == 'Success' ) {
                                  Ext.Msg.alert( 'Success', 'You have successfully uploaded variant file' );
@@ -90,7 +93,7 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
 
                               if ( phenotypeFile ) {
                                  // Uploading phenotypes to the created project
-                                 ProjectService.addSubjectPhenotypeToProject( phenotypeFile.name, false, projectName, {
+                                 ProjectService.addSubjectPhenotypeToProject( phenotypefilename, false, projectName, {
                                     callback : function(errorMessage) {
                                        if ( errorMessage == "Success" ) {
                                           Ext.Msg.alert( 'Success', 'You have successfully uploaded phenotype file' );
@@ -128,7 +131,7 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
 
             else if ( phenotypeFile ) {
                // Uploading phenoytypes to the created project
-               ProjectService.addSubjectPhenotypeToProject( phenotypeFile.name, true, projectName, {
+               ProjectService.addSubjectPhenotypeToProject( phenotypefilename, true, projectName, {
                   callback : function(errorMessage) {
                      if ( errorMessage == "Success" ) {
                         Ext.Msg.alert( 'Success', 'You have successfully uploaded phenotype file' );
@@ -253,8 +256,12 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
             id : 'uploadVariantFiles',
             text : 'Uplaod Variants',
             handler : function() {
-               var form = variantPanel.getForm();
+               var form = variantPanel;
                var me = this;
+               values = form.getValues();
+               ref.variantType = values['variantType-inputEl'].toUpperCase();
+               var file = Ext.getCmp( 'variantFile' ).getEl().down( 'input[type=file]' ).dom.files[0];
+               ref.VariantFile = file.name;
 
                if ( form.isValid() ) {
                   form.submit( {
@@ -265,7 +272,7 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                         'Content-Type' : 'multipart/form-data;charset=UTF-8'
                      },
                      success : function(form, action) {
-                        Ext.Msg.alert( 'Success', 'Your file has been uploaded.' );                        
+                        Ext.Msg.alert( 'Success', 'Your file has been uploaded.' );
                      },
                      failure : function(form, action) {
                         Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' );
@@ -334,10 +341,13 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
             id : 'UploadPhenotypeFiles',
             text : 'Uplaod Phenotypes',
             handler : function() {
-               var form = phenotypePanel.getForm();
+               var form = phenotypePanel;
                var me = this;
+               var file = Ext.getCmp( 'phenotypeFile' ).getEl().down( 'input[type=file]' ).dom.files[0];
+               ref.PhenotypeFile = file.name;
 
                if ( form.isValid() ) {
+
                   form.submit( {
 
                      method : 'POST',
