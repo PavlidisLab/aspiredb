@@ -65,11 +65,6 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
          // defaults to text field if no xtype is supplied
          allowBlank : true
       }
-   }, {
-      header : 'size',
-      dataIndex : 'ProjectSize',
-      flex : 1,
-
    } ],
 
    plugins : [ rowEditing ],
