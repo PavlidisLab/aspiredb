@@ -235,6 +235,12 @@ public class ProjectServiceImpl implements ProjectService {
         try {
             
             Class.forName( "org.relique.jdbc.csv.CsvDriver" );
+            
+            if ( filename.endsWith( ".csv" ) ) {
+                filename = filename.substring( 0, filename.length() - 4 );
+            } else {
+                return "File not processed, file name must end with .csv";
+            }
 
             // create a connection
             // arg[0] is the directory in which the .csv files are held
@@ -480,6 +486,12 @@ public class ProjectServiceImpl implements ProjectService {
             }
 
             Class.forName( "org.relique.jdbc.csv.CsvDriver" );
+            
+            if ( filename.endsWith( ".csv" ) ) {
+                filename = filename.substring( 0, filename.length() - 4 );
+            } else {
+                return "File not processed, file name must end with .csv";
+            }
 
             // create a connection
             // arg[0] is the directory in which the .csv files are held

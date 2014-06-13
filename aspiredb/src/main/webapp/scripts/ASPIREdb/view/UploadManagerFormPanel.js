@@ -87,10 +87,10 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                               } else
                                  Ext.Msg.alert( 'Server Reply', 'Uploading Variants  :' + errorMessage );
 
-                              Ext.getCmp( 'variantType' ).setValue( '' );
-                              Ext.getCmp( 'variantFile' ).setRawValue( '' );
+                            //  Ext.getCmp( 'variantType' ).setValue( '' );
+                             // Ext.getCmp( 'variantFile' ).setRawValue( '' );
 
-                              if ( phenotypeFile ) {
+                              if ( phenotypefilename != '' ) {
                                  // Uploading phenotypes to the created project
                                  ProjectService.addSubjectPhenotypeToProject( phenotypefilename, false, projectName, {
                                     callback : function(errorMessage) {
@@ -99,7 +99,7 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                                           Ext.Msg.alert( 'Success', 'You have successfully uploaded phenotype file' );
                                        } else
                                           Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :' + errorMessage );
-                                       Ext.getCmp( 'phenotypeFile' ).setRawValue( '' );
+                                  //     Ext.getCmp( 'phenotypeFile' ).setRawValue( '' );
 
                                     },
                                     errorHandler : function(er, exception) {
@@ -109,8 +109,8 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                                  } );
 
                               }
-                              Ext.getCmp( 'projectName' ).setValue( '' );
-                              Ext.getCmp( 'projectDescription' ).setValue( '' );
+                          //    Ext.getCmp( 'projectName' ).setValue( '' );
+                          //    Ext.getCmp( 'projectDescription' ).setValue( '' );
 
                            },
                            errorHandler : function(er, exception) {
@@ -129,7 +129,7 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                } );
             }
 
-            else if ( phenotypeFile ) {
+            else if ( phenotypefilename != '' ) {
                // Uploading phenoytypes to the created project
                ProjectService.addSubjectPhenotypeToProject( phenotypefilename, true, projectName, {
                   callback : function(errorMessage) {
@@ -138,9 +138,9 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                         Ext.Msg.alert( 'Success', 'You have successfully uploaded phenotype file' );
                      } else
                         Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :' + errorMessage );
-                     Ext.getCmp( 'phenotypeFile' ).setRawValue( '' );
-                     Ext.getCmp( 'projectName' ).setValue( '' );
-                     Ext.getCmp( 'projectDescription' ).setValue( '' );
+                  //   Ext.getCmp( 'phenotypeFile' ).setRawValue( '' );
+                 //    Ext.getCmp( 'projectName' ).setValue( '' );
+                  //   Ext.getCmp( 'projectDescription' ).setValue( '' );
                   },
                   errorHandler : function(er, exception) {
                      Ext.Msg.alert( "Upload phenotype Error", er + "\n" + exception.stack );
