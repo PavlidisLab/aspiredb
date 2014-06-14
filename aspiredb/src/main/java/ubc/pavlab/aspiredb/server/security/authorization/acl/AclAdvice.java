@@ -16,14 +16,17 @@
 package ubc.pavlab.aspiredb.server.security.authorization.acl;
 
 import gemma.gsec.AuthorityConstants;
+import gemma.gsec.SecurityService;
 import gemma.gsec.acl.BaseAclAdvice;
 import gemma.gsec.acl.domain.AclGrantedAuthoritySid;
 import gemma.gsec.model.Securable;
+import gemma.gsec.model.SecuredChild;
 
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.MutableAcl;
 import org.springframework.security.acls.model.ObjectIdentity;
@@ -48,6 +51,9 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 @Component
 public class AclAdvice extends BaseAclAdvice {
 
+    @Autowired
+    SecurityService securityService;
+    
     private static Log log = LogFactory.getLog( AclAdvice.class );
 
     /*
@@ -93,4 +99,16 @@ public class AclAdvice extends BaseAclAdvice {
         return UserGroup.class.isAssignableFrom( object.getClass() );
     }
     
+    /**
+     * Certain objects are not made public immediately on creation by administrators. The default implementation returns
+     * true if clazz is assignable to SecuredChild; otherwise false. Subclasses overriding this method should probably
+     * call super.specialCaseToKeepPrivateOnCreation()
+     * 
+     * @param clazz
+     * @return true if it's a special case to be kept private on creation.
+     */
+    @Override
+    protected boolean specialCaseToKeepPrivateOnCreation( Class<? extends Securable> clazz ) {
+        return true;
+    }
 }
