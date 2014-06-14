@@ -15,13 +15,19 @@
 
 package ubc.pavlab.aspiredb.server.security.authorization.acl;
 
+import gemma.gsec.AuthorityConstants;
 import gemma.gsec.acl.BaseAclAdvice;
+import gemma.gsec.acl.domain.AclGrantedAuthoritySid;
 import gemma.gsec.model.Securable;
 
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.model.MutableAcl;
+import org.springframework.security.acls.model.ObjectIdentity;
+import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -86,4 +92,5 @@ public class AclAdvice extends BaseAclAdvice {
     protected boolean objectIsUserGroup( Securable object ) {
         return UserGroup.class.isAssignableFrom( object.getClass() );
     }
+    
 }

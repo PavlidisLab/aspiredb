@@ -18,6 +18,8 @@
  */
 package ubc.pavlab.aspiredb.server.util;
 
+import gemma.gsec.SecurityService;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -80,6 +82,9 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     @Autowired
     SubjectDao subjectDao;
+
+    @Autowired
+    SecurityService securityService;
 
     @Autowired
     ProjectDao projectDao;
@@ -172,7 +177,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     public void removeLabel( Label label ) {
         labelDao.remove( label );
     }
-    
+
     @Override
     @Transactional
     public void removePhenotype( Phenotype phenotype ) {
@@ -353,7 +358,9 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     @Override
     @Transactional
     public Project createPersistentProject( Project p ) {
-        return projectDao.create( p );
+        Project pp = projectDao.create( p );
+        securityService.makePrivate( pp );
+        return pp;
     }
 
     @Override

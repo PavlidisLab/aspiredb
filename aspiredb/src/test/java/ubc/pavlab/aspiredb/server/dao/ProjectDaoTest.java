@@ -27,13 +27,13 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
+import ubc.pavlab.aspiredb.server.security.authorization.acl.AclTestUtils;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
 public class ProjectDaoTest extends BaseSpringContextTest {
@@ -46,6 +46,9 @@ public class ProjectDaoTest extends BaseSpringContextTest {
 
     @Autowired
     UserManager userManager;
+
+    @Autowired
+    AclTestUtils aclUtils;
 
     String projectName = RandomStringUtils.randomAlphabetic( 5 );
 
@@ -66,7 +69,7 @@ public class ProjectDaoTest extends BaseSpringContextTest {
         detachedProject.setName( projectName );
 
         Project p = testObjectHelper.createPersistentProject( detachedProject );
-        
+
         testObjectHelper.addSubjectToProject( ind1, p );
 
         testObjectHelper.addSubjectToProject( ind2, p );
@@ -121,7 +124,8 @@ public class ProjectDaoTest extends BaseSpringContextTest {
         super.runAsUser( someUsername );
 
         try {
-            projectDao.findByProjectName( projectName );
+            p = projectDao.findByProjectName( projectName );
+            log.debug( "Project '" + projectName + "' has acls " + aclUtils.getAcl( p ) );
             fail( "Should have gotten an access denied" );
         } catch ( AccessDeniedException e ) {
 

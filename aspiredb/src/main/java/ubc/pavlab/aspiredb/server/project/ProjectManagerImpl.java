@@ -16,6 +16,7 @@
 package ubc.pavlab.aspiredb.server.project;
 
 import gemma.gsec.SecurityService;
+import gemma.gsec.SecurityServiceImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -96,8 +97,6 @@ public class ProjectManagerImpl implements ProjectManager {
     @Autowired
     VariantDao variantDao;
 
-    SecurityService securityservice;
-
     @Autowired
     Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
 
@@ -131,8 +130,11 @@ public class ProjectManagerImpl implements ProjectManager {
         Project p = new Project();
         p.setName( name );
         p.setDescription( description );
+        p = projectDao.create( p );
+        
+        securityService.makePrivate(p);
 
-        return projectDao.create( p );
+        return p;
     }
 
     @Override
@@ -175,7 +177,11 @@ public class ProjectManagerImpl implements ProjectManager {
             p.setVariantSupportCharacteristicKey( DGV_SUPPORT_CHARACTERISTIC_KEY );
         }
 
-        return projectDao.create( p );
+        p = projectDao.create( p );
+        
+        securityService.makePrivate( p );
+        
+        return p;
     }
 
     /*
