@@ -456,14 +456,18 @@ public class SubjectServiceImpl implements SubjectService {
     @RemoteMethod
     @Transactional
     public LabelValueObject addLabel( Collection<Long> subjectIds, LabelValueObject labelVO ) {
-
+        LabelValueObject ret = null;
         Collection<Subject> subjects = subjectDao.load( subjectIds );
         Label label = labelDao.findOrCreate( labelVO );
+        if ( label == null ) {
+            return ret;
+        }
         for ( Subject subject : subjects ) {
             subject.addLabel( label );
             subjectDao.update( subject );
         }
-        return label.toValueObject();
+        ret = label.toValueObject();
+        return ret;
     }
 
     @Override

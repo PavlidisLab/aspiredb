@@ -19,8 +19,12 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import gemma.gsec.SecurityService;
+import gemma.gsec.util.SecurityUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,12 +47,14 @@ import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.CNV;
+import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
+import ubc.pavlab.aspiredb.server.security.authorization.acl.AclTestUtils;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
@@ -94,6 +100,9 @@ public class LabelServiceTest extends BaseSpringContextTest {
     @Autowired
     UserManager userManager;
 
+    @Autowired
+    AclTestUtils aclUtil;
+
     private Project project;
 
     private String HP_HEAD = "Abnormality of the head";
@@ -136,6 +145,8 @@ public class LabelServiceTest extends BaseSpringContextTest {
     @Test
     public void testMultipleUsersCreateSameLabelName() {
 
+        Collection<LabelValueObject> lvos = null;
+
         super.runAsAdmin();
 
         LabelValueObject lvo = new LabelValueObject();
@@ -144,29 +155,51 @@ public class LabelServiceTest extends BaseSpringContextTest {
         lvo.setName( "blah" );
         lvo.setIsShown( true );
 
+        // Admin created subject, try adding label
         Collection<Long> subjectIds = new ArrayList<Long>();
         subjectIds.add( subjectId );
 
-        subjectService.addLabel( subjectIds, lvo );
+        lvo = subjectService.addLabel( subjectIds, lvo );
+        assertNotNull( lvo );
+        Label l = labelDao.load( lvo.getId() );
+        aclUtil.checkHasAcl( l );
+        assertTrue( SecurityUtil.getCurrentUsername() + " owns the label", securityService.isOwnedByCurrentUser( l ) );
+        assertTrue( SecurityUtil.getCurrentUsername() + " can edit the label", securityService.isEditable( l ) );
 
+        // Now let's try a normal user, try adding label
         super.runAsUser( this.username );
-        subjectService.addLabel( subjectIds, lvo );
 
-        Collection<LabelValueObject> lvos = persistentTestObjectHelper.getLabelsForSubject( subjectId );
-
-        super.runAsUser( this.username );
+        assertFalse( SecurityUtil.getCurrentUsername() + " does not own the label",
+                securityService.isOwnedByCurrentUser( l ) );
+        Subject subject = persistentTestObjectHelper.createDetachedIndividualObject( "userSubject" );
+        Long userSubjectId = subject.getId();
+        subjectIds.clear();
+        subjectIds.add( userSubjectId );
         try {
-            labelService.deleteSubjectLabel( lvos.iterator().next() );
-            fail("Admin created label");
+            // try adding admin label as a normal user
+            lvo = subjectService.addLabel( subjectIds, l.toValueObject() );
+            fail( "User can not use admin label" );
         } catch ( AccessDeniedException e ) {
+
         }
 
+        try {
+            securityService.isEditable( l );
+            fail( SecurityUtil.getCurrentUsername() + " can not edit the label" );
+        } catch ( AccessDeniedException e ) {
+
+        }
+
+        // try admin delete
         super.runAsAdmin();
+        lvos = persistentTestObjectHelper.getLabelsForSubject( subjectId );
+        assertEquals( 1, lvos.size() );
         try {
             labelService.deleteSubjectLabel( lvos.iterator().next() );
         } catch ( AccessDeniedException e ) {
-            fail("Admin created label");
+            fail( "Admin created label" );
         }
+
     }
 
     @Test
