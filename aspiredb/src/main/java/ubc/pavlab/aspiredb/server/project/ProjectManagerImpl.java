@@ -16,7 +16,6 @@
 package ubc.pavlab.aspiredb.server.project;
 
 import gemma.gsec.SecurityService;
-import gemma.gsec.SecurityServiceImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -131,8 +130,8 @@ public class ProjectManagerImpl implements ProjectManager {
         p.setName( name );
         p.setDescription( description );
         p = projectDao.create( p );
-        
-        securityService.makePrivate(p);
+
+        securityService.makePrivate( p );
 
         return p;
     }
@@ -178,9 +177,9 @@ public class ProjectManagerImpl implements ProjectManager {
         }
 
         p = projectDao.create( p );
-        
+
         securityService.makePrivate( p );
-        
+
         return p;
     }
 
@@ -546,9 +545,13 @@ public class ProjectManagerImpl implements ProjectManager {
         v = variantDao.create( v );
         subject.addVariant( v );
 
+        log.debug( "Adding variant ID " + v.getId() + " to subject " + subject.getPatientId() );
+
         if ( newSubject ) {
             subject.getProjects().add( project );
         }
+
+        subjectDao.update( subject );
     }
 
     private void addCommonVariantData( Variant v, VariantValueObject vvo ) {
