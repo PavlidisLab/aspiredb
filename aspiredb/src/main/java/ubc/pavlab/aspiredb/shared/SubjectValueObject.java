@@ -36,69 +36,10 @@ public class SubjectValueObject implements Serializable {
     private Collection<LabelValueObject> labels;
     private Integer numOfPhenotypes = 0;
 
-    public Collection<LabelValueObject> getLabels() {
-        return labels;
-    }
-
-    public void setLabels( Collection<LabelValueObject> labels ) {
-        this.labels = labels;
-    }
-
     private Integer variants = 0;
 
     public SubjectValueObject() {
         this.phenotypes = new HashMap<String, PhenotypeValueObject>();
-    }
-
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setPatientId( String patientId ) {
-        this.patientId = patientId;
-    }
-
-    public String getPatientId() {
-        return patientId;
-    }
-
-    public String getGender() {
-        return getPhenotypeValue( "Gender" );
-    }
-
-    public void setPhenotypes( Map<String, PhenotypeValueObject> phenotypes ) {
-        this.phenotypes = phenotypes;
-    }
-
-    public PhenotypeValueObject getPhenotype( String name ) {
-        return this.phenotypes.get( name );
-    }
-
-    public String getPhenotypeValue( String name ) {
-        PhenotypeValueObject p = this.phenotypes.get( name );
-        if ( p == null ) return null;
-        return p.getDbValue();
-    }
-
-    public Map<String, PhenotypeValueObject> getPhenotypes() {
-        return phenotypes;
-    }
-
-    public void setVariants( Integer variants ) {
-        this.variants = variants;
-    }
-
-    public Integer getVariants() {
-        return variants;
-    }
-
-    @Override
-    public String toString() {
-        return phenotypes.toString();
     }
 
     /**
@@ -110,17 +51,76 @@ public class SubjectValueObject implements Serializable {
         return ( ( SubjectValueObject ) o ).getId().equals( this.getId() );
     }
 
+    public String getGender() {
+        return getPhenotypeValue( "Gender" );
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Collection<LabelValueObject> getLabels() {
+        return labels;
+    }
+
+    public Integer getNumOfPhenotypes() {
+        return numOfPhenotypes;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public PhenotypeValueObject getPhenotype( String name ) {
+        return this.phenotypes.get( name );
+    }
+
+    public Map<String, PhenotypeValueObject> getPhenotypes() {
+        return phenotypes;
+    }
+
+    public String getPhenotypeValue( String name ) {
+        PhenotypeValueObject p = this.phenotypes.get( name );
+        if ( p == null ) return null;
+        return p.getDbValue();
+    }
+
+    public Integer getVariants() {
+        return variants;
+    }
+
     @Override
     public int hashCode() {
         return this.getId().hashCode();
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setLabels( Collection<LabelValueObject> labels ) {
+        this.labels = labels;
     }
 
     public void setNumOfPhenotypes( Integer size ) {
         this.numOfPhenotypes = size;
     }
 
-    public Integer getNumOfPhenotypes() {
-        return numOfPhenotypes;
+    public void setPatientId( String patientId ) {
+        this.patientId = patientId;
+    }
+
+    public void setPhenotypes( Map<String, PhenotypeValueObject> phenotypes ) {
+        this.phenotypes = phenotypes;
+    }
+
+    public void setVariants( Integer variants ) {
+        this.variants = variants;
+    }
+
+    @Override
+    public String toString() {
+        return phenotypes.toString();
     }
 
 }

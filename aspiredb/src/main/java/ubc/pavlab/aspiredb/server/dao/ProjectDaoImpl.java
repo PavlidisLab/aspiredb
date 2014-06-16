@@ -57,42 +57,6 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
 
     @Override
     @Transactional(readOnly = true)
-    public Integer getVariantCountForProjects( Collection<Long> projectIds ) {
-
-        Query query = this
-                .getSessionFactory()
-                .getCurrentSession()
-                .createQuery(
-                        "select count(*) from Variant v join v.subject subject join subject.projects projs where projs.id in(:ids )" );
-
-        query.setParameterList( "ids", projectIds );
-
-        Long count = ( Long ) query.uniqueResult();
-
-        return count.intValue();
-
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Integer getSubjectCountForProjects( Collection<Long> projectIds ) {
-
-        Query query = this
-                .getSessionFactory()
-                .getCurrentSession()
-                .createQuery(
-                        "select count(*) from Subject subject join subject.projects projs where projs.id in(:ids )" );
-
-        query.setParameterList( "ids", projectIds );
-
-        Long count = ( Long ) query.uniqueResult();
-
-        return count.intValue();
-
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Collection<Project> getOverlapProjects( Collection<Long> ids ) {
 
         // Currently Only supports 1 project
@@ -125,6 +89,12 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
 
     @Override
     @Transactional(readOnly = true)
+    public String getOverlapProjectVariantSupportCharacteristicKey( Long projectId ) {
+        return this.load( projectId ).getVariantSupportCharacteristicKey();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Collection<Project> getSpecialOverlapProjects() {
 
         Collection<Project> projects = this.loadAll();
@@ -143,7 +113,37 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
 
     @Override
     @Transactional(readOnly = true)
-    public String getOverlapProjectVariantSupportCharacteristicKey( Long projectId ) {
-        return this.load( projectId ).getVariantSupportCharacteristicKey();
+    public Integer getSubjectCountForProjects( Collection<Long> projectIds ) {
+
+        Query query = this
+                .getSessionFactory()
+                .getCurrentSession()
+                .createQuery(
+                        "select count(*) from Subject subject join subject.projects projs where projs.id in(:ids )" );
+
+        query.setParameterList( "ids", projectIds );
+
+        Long count = ( Long ) query.uniqueResult();
+
+        return count.intValue();
+
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Integer getVariantCountForProjects( Collection<Long> projectIds ) {
+
+        Query query = this
+                .getSessionFactory()
+                .getCurrentSession()
+                .createQuery(
+                        "select count(*) from Variant v join v.subject subject join subject.projects projs where projs.id in(:ids )" );
+
+        query.setParameterList( "ids", projectIds );
+
+        Long count = ( Long ) query.uniqueResult();
+
+        return count.intValue();
+
     }
 }

@@ -19,13 +19,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import gemma.gsec.acl.domain.AclObjectIdentity;
+import gemma.gsec.acl.domain.AclService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.model.Acl;
-import org.springframework.security.acls.model.AclService;
+import org.springframework.security.acls.model.MutableAcl;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Component;
 
@@ -60,28 +61,18 @@ public class AclTestUtils {
         }
     }
 
-    public void checkHasAcl( Object f ) {
-        try {
-            aclService.readAclById( new ObjectIdentityImpl( f ) );
-            log.debug( "Have acl for " + f );
-        } catch ( NotFoundException okaye ) {
-            fail( "Failed to create ACL for " + f );
-        }
-    }
-
     public void checkHasAces( Object f ) {
         Acl a = getAcl( f );
         assertTrue( a + " doesn't have ACEs, it should", a.getEntries().size() > 0 );
     }
 
-    private Acl getAcl( Object f ) {
-        Acl a = aclService.readAclById( new ObjectIdentityImpl( f ) );
-        return a;
-    }
-
-    public void checkLacksAces( Object f ) {
-        Acl a = getAcl( f );
-        assertTrue( f + " has ACEs, it shouldn't", a.getEntries().size() == 0 );
+    public void checkHasAcl( Object f ) {
+        try {
+            aclService.readAclById( new AclObjectIdentity( f ) );
+            log.debug( "Have acl for " + f );
+        } catch ( NotFoundException okaye ) {
+            fail( "Failed to create ACL for " + f );
+        }
     }
 
     public void checkHasAclParent( Object f, Object parent ) {
@@ -98,10 +89,24 @@ public class AclTestUtils {
         log.debug( "ACL has correct parent for " + f + " <----- " + parentAcl.getObjectIdentity() );
     }
 
-    private Acl getParentAcl( Object f ) {
+    public void checkLacksAces( Object f ) {
+        Acl a = getAcl( f );
+        assertTrue( f + " has ACEs, it shouldn't", a.getEntries().size() == 0 );
+    }
+
+    public Acl getAcl( Object f ) {
+        Acl a = aclService.readAclById( new AclObjectIdentity( f ) );
+        return a;
+    }
+
+    public Acl getParentAcl( Object f ) {
         Acl a = getAcl( f );
         Acl parentAcl = a.getParentAcl();
         return parentAcl;
+    }
+
+    public void update( MutableAcl acl ) {
+        this.aclService.updateAcl( acl );
     }
 
 }

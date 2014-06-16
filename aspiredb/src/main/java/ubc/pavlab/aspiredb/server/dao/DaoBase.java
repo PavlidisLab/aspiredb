@@ -29,13 +29,13 @@ public interface DaoBase<T> {
 
     public T create( T entity );
 
+    public long getCountAll();
+
     public Collection<? extends T> load( Collection<Long> ids );
 
     public T load( Long id );
 
     public Collection<? extends T> loadAll();
-
-    public long getCountAll();
 
     public void remove( Collection<? extends T> entities );
 

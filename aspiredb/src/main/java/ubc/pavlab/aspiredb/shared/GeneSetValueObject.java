@@ -28,25 +28,28 @@ import org.directwebremoting.annotations.DataTransferObject;
 @DataTransferObject(javascript = "GeneSetValueObject")
 public class GeneSetValueObject implements Displayable, Serializable {
 
-   
     /**
      * auto generated serializable id
      */
     private static final long serialVersionUID = 3637627637659836236L;
-    
-    
+
     private String name;
     private String description;
     private Long id;
     private Serializable object;
 
-
     public GeneSetValueObject() {
+    }
+
+    public GeneSetValueObject( Long id, String name ) {
+        this.id = id;
+        this.name = name;
+
     }
 
     public GeneSetValueObject( String name ) {
         this.name = name;
-        
+
     }
 
     public GeneSetValueObject( String name, Serializable object ) {
@@ -54,42 +57,10 @@ public class GeneSetValueObject implements Displayable, Serializable {
         this.setObject( object );
     }
 
-    public GeneSetValueObject( Long id, String name ) {
-        this.id = id;
-        this.name = name;
-  
+    public String getDescription() {
+        return description;
     }
 
-   
-    @Override
-    public String getLabel() {
-        return name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
-   
-    public void setName( String name ) {
-        this.name = name;
-    }
-
-    
-    @Override
-    public String toString() {
-        return this.getName();
-    }
-
-    
     public String getGeneSet() {
         return name;
     }
@@ -99,24 +70,46 @@ public class GeneSetValueObject implements Displayable, Serializable {
         return name;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     @Override
-    public String getTooltip() {
-        return "";
+    public String getLabel() {
+        return name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Serializable getObject() {
         return object;
     }
 
-    public void setObject( Serializable object ) {
-        this.object = object;
-    }
-
-    public String getDescription() {
-        return description;
+    @Override
+    public String getTooltip() {
+        return "";
     }
 
     public void setDescription( String description ) {
         this.description = description;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    public void setObject( Serializable object ) {
+        this.object = object;
+    }
+
+    @Override
+    public String toString() {
+        return this.getName();
     }
 }

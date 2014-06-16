@@ -24,12 +24,10 @@ import java.util.List;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -45,7 +43,6 @@ import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 public class CNVDaoTest extends BaseSpringContextTest {
 
     @Autowired
@@ -72,6 +69,42 @@ public class CNVDaoTest extends BaseSpringContextTest {
     String groupName = RandomStringUtils.randomAlphabetic( 4 );
 
     Long projectId;
+
+    @Before
+    public void createIndividualAndCNVs() {
+
+        TransactionTemplate tt = new TransactionTemplate( transactionManager );
+        tt.execute( new TransactionCallbackWithoutResult() {
+            @Override
+            public void doInTransactionWithoutResult( TransactionStatus status ) {
+                individual = new Subject();
+
+                String patientId = "test_patient";
+                individual.setPatientId( patientId );
+
+                GenomicLocation genomicLocation1 = new GenomicLocation();
+                genomicLocation1.setChromosome( "40" );
+                genomicLocation1.setStart( 50500000 );
+                genomicLocation1.setEnd( 54500000 );
+
+                cnv1 = new CNV();
+                cnv1.setLocation( genomicLocation1 );
+                cnv1.setCopyNumber( 1 );
+                cnv1.setType( CnvType.valueOf( "LOSS" ) );
+
+                cnvDao.create( cnv1 );
+
+                individual.addVariant( cnv1 );
+
+                Phenotype ph = new Phenotype();
+                ph.setName( "Test Phenotype" );
+                ph.setValue( "1234" );
+                individual.addPhenotype( ph );
+
+                individualDao.create( individual );
+            }
+        } );
+    }
 
     @Before
     public void setup() throws Exception {
@@ -122,24 +155,6 @@ public class CNVDaoTest extends BaseSpringContextTest {
         } );
     }
 
-    @Test
-    public void testUpdateLoad() {
-
-        // this method creates a LOSS cnv
-        CNV cnv = testObjectHelper.createPersistentTestCNVObject();
-        Long id = cnv.getId();
-        assertEquals( cnv.getType(), CnvType.LOSS );
-
-        cnv.setType( CnvType.GAIN );
-
-        cnvDao.update( cnv );
-
-        CNV updatedCnv = cnvDao.load( id );
-
-        assertEquals( updatedCnv.getType(), CnvType.GAIN );
-
-    }
-
     // @Test
     // public void testMakeQueryAndFind() {
     // super.runAsAdmin();
@@ -177,40 +192,22 @@ public class CNVDaoTest extends BaseSpringContextTest {
     //
     // }
 
-    @Before
-    public void createIndividualAndCNVs() {
+    @Test
+    public void testUpdateLoad() {
 
-        TransactionTemplate tt = new TransactionTemplate( transactionManager );
-        tt.execute( new TransactionCallbackWithoutResult() {
-            @Override
-            public void doInTransactionWithoutResult( TransactionStatus status ) {
-                individual = new Subject();
+        // this method creates a LOSS cnv
+        CNV cnv = testObjectHelper.createPersistentTestCNVObject();
+        Long id = cnv.getId();
+        assertEquals( cnv.getType(), CnvType.LOSS );
 
-                String patientId = "test_patient";
-                individual.setPatientId( patientId );
+        cnv.setType( CnvType.GAIN );
 
-                GenomicLocation genomicLocation1 = new GenomicLocation();
-                genomicLocation1.setChromosome( "40" );
-                genomicLocation1.setStart( 50500000 );
-                genomicLocation1.setEnd( 54500000 );
+        cnvDao.update( cnv );
 
-                cnv1 = new CNV();
-                cnv1.setLocation( genomicLocation1 );
-                cnv1.setCopyNumber( 1 );
-                cnv1.setType( CnvType.valueOf( "LOSS" ) );
+        CNV updatedCnv = cnvDao.load( id );
 
-                cnvDao.create( cnv1 );
+        assertEquals( updatedCnv.getType(), CnvType.GAIN );
 
-                individual.addVariant( cnv1 );
-
-                Phenotype ph = new Phenotype();
-                ph.setName( "Test Phenotype" );
-                ph.setValue( "1234" );
-                individual.addPhenotype( ph );
-
-                individualDao.create( individual );
-            }
-        } );
     }
 
 }

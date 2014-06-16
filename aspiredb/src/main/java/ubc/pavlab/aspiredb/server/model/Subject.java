@@ -14,6 +14,8 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
+import gemma.gsec.model.Securable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +36,6 @@ import javax.persistence.Table;
 
 import org.springframework.security.access.annotation.Secured;
 
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
@@ -44,6 +45,18 @@ import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 public class Subject implements Serializable, Securable {
 
     private static final long serialVersionUID = -7549951725408353980L;
+
+    public static SubjectValueObject convertToValueObject( Subject subject ) {
+        SubjectValueObject valueObject = new SubjectValueObject();
+        valueObject.setId( subject.getId() );
+        valueObject.setPatientId( subject.getPatientId() );
+        valueObject.setLabels( Label.toValueObjects( subject.getLabels() ) );
+        return valueObject;
+    }
+
+    public static Collection<Subject> emptyCollection() {
+        return new ArrayList<Subject>();
+    }
 
     @Id
     @GeneratedValue
@@ -76,61 +89,14 @@ public class Subject implements Serializable, Securable {
         this.labels.add( label );
     }
 
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    public void setPatientId( String patientId ) {
-        this.patientId = patientId;
-    }
-
-    public String getPatientId() {
-        return patientId;
-    }
-
-    public void addVariant( Variant variant ) {
-        variant.setSubject( this );
-        variants.add( variant );
-    }
-
-    @Override
-    public String toString() {
-        return "id=" + id + " patientId=" + patientId;
-    }
-
-    public void setPhenotypes( Collection<Phenotype> phenotypes ) {
-        this.phenotypes = phenotypes;
-    }
-
-    public Collection<Phenotype> getPhenotypes() {
-        return phenotypes;
-    }
-
     public void addPhenotype( Phenotype p ) {
         p.setSubject( this );
         phenotypes.add( p );
     }
 
-    public List<Variant> getVariants() {
-        return variants;
-    }
-
-    public void setVariants( List<Variant> variants ) {
-        this.variants = variants;
-    }
-
-    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
-    public Collection<Label> getLabels() {
-        return labels;
-    }
-
-    public void setLabels( Collection<Label> labels ) {
-        this.labels = labels;
+    public void addVariant( Variant variant ) {
+        variant.setSubject( this );
+        variants.add( variant );
     }
 
     public SubjectValueObject convertToValueObject() {
@@ -166,12 +132,55 @@ public class Subject implements Serializable, Securable {
         return valueObject;
     }
 
+    @Override
+    public boolean equals( Object object ) {
+
+        if ( this == object ) {
+            return true;
+        }
+        if ( !( object instanceof Subject ) ) {
+            return false;
+        }
+        final Subject that = ( Subject ) object;
+        if ( this.id == null || that.getId() == null || !this.id.equals( that.getId() ) ) {
+            return false;
+        }
+        return true;
+
+    }
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
+    public Collection<Label> getLabels() {
+        return labels;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public Collection<Phenotype> getPhenotypes() {
+        return phenotypes;
+    }
+
     public List<Project> getProjects() {
         return projects;
     }
 
-    public void setProjects( List<Project> projects ) {
-        this.projects = projects;
+    public List<Variant> getVariants() {
+        return variants;
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode = 29 * hashCode + ( id == null ? 0 : id.hashCode() );
+
+        return hashCode;
     }
 
     public boolean hasPhenotype( String phenotype ) {
@@ -196,44 +205,36 @@ public class Subject implements Serializable, Securable {
         return false;
     }
 
-    @Override
-    public boolean equals( Object object ) {
-
-        if ( this == object ) {
-            return true;
-        }
-        if ( !( object instanceof Subject ) ) {
-            return false;
-        }
-        final Subject that = ( Subject ) object;
-        if ( this.id == null || that.getId() == null || !this.id.equals( that.getId() ) ) {
-            return false;
-        }
-        return true;
-
-    }
-
-    @Override
-    public int hashCode() {
-        int hashCode = 0;
-        hashCode = 29 * hashCode + ( id == null ? 0 : id.hashCode() );
-
-        return hashCode;
-    }
-
-    public static Collection<Subject> emptyCollection() {
-        return new ArrayList<Subject>();
-    }
-
     public void removeLabel( Label label ) {
         this.labels.remove( label );
     }
 
-    public static SubjectValueObject convertToValueObject( Subject subject ) {
-        SubjectValueObject valueObject = new SubjectValueObject();
-        valueObject.setId( subject.getId() );
-        valueObject.setPatientId( subject.getPatientId() );
-        valueObject.setLabels( Label.toValueObjects( subject.getLabels() ) );
-        return valueObject;
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setLabels( Collection<Label> labels ) {
+        this.labels = labels;
+    }
+
+    public void setPatientId( String patientId ) {
+        this.patientId = patientId;
+    }
+
+    public void setPhenotypes( Collection<Phenotype> phenotypes ) {
+        this.phenotypes = phenotypes;
+    }
+
+    public void setProjects( List<Project> projects ) {
+        this.projects = projects;
+    }
+
+    public void setVariants( List<Variant> variants ) {
+        this.variants = variants;
+    }
+
+    @Override
+    public String toString() {
+        return "id=" + id + " patientId=" + patientId;
     }
 }

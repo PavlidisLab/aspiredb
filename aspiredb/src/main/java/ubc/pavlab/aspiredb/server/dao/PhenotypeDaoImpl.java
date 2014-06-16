@@ -86,72 +86,18 @@ public class PhenotypeDaoImpl extends SecurableDaoBaseImpl<Phenotype> implements
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<Phenotype> loadAllByProjectIds( Collection<Long> projectIds ) {
+    public List<String> getDistinctOntologyUris( Collection<Long> activeProjects ) {
+
         Session session = currentSession();
 
-        Criteria criteria = session.createCriteria( Phenotype.class ).createAlias( "subject", "subject" );
-        criteria.createCriteria( "subject.projects" ).add( Restrictions.in( "id", projectIds ) );
-        criteria.setProjection( Projections.distinct( Projections.id() ) );
+        Criteria criteria = session.createCriteria( Phenotype.class ).createAlias( "subject", "subject" )
+                .createAlias( "subject.projects", "project" ).add( Restrictions.in( "project.id", activeProjects ) )
+                .add( Restrictions.eq( "valueType", "HPONTOLOGY" ) );
 
-        List<Long> ids = criteria.list();
-
-        return this.load( ids );
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean isInDatabase( Collection<String> names ) {
-        Session session = currentSession();
-
-        Criteria criteria = session.createCriteria( Phenotype.class );
-        criteria.add( Restrictions.in( "name", names ) );
-        // TODO: finish this to filter by project
-        // criteria.createAlias( "individual", "individual" );
-        // criteria.createCriteria( "individual.projects" ).add( Restrictions.in( "id", projectIds ) );
-
-        return !criteria.list().isEmpty();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<String> getListOfPossibleValuesByName( Collection<Long> projectIds, String name ) {
-        Session session = currentSession();
-
-        Criteria criteria = session.createCriteria( Phenotype.class );
-        criteria.add( Restrictions.eq( "name", name ) );
-        criteria.setProjection( Projections.distinct( Projections.property( "value" ) ) );
-        criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
-                .add( Restrictions.in( "project.id", projectIds ) );
+        criteria.setProjection( Projections.distinct( Projections.property( "uri" ) ) );
 
         return criteria.list();
-    }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<String> getListOfPossibleValuesByUri( Collection<Long> projectIds, String uri ) {
-        Session session = currentSession();
-
-        Criteria criteria = session.createCriteria( Phenotype.class ).createAlias( "subject", "subject" );
-        criteria.add( Restrictions.eq( "uri", uri ) );
-
-        criteria.createCriteria( "subject.projects" ).add( Restrictions.in( "id", projectIds ) );
-        criteria.setProjection( Projections.distinct( Projections.property( "value" ) ) );
-
-        return criteria.list();
-    }
-
-    @Override
-    public List<String> getExistingURIs( String name ) {
-        Query query = currentSession().createQuery( "select distinct p.uri from Phenotype as p where p.name=:name" );
-        query.setParameter( "name", name );
-        return query.list();
-    }
-
-    @Override
-    public List<String> getExistingValues( String name ) {
-        Query query = currentSession().createQuery( "select distinct p.value from Phenotype as p where p.name=:name" );
-        query.setParameter( "name", name );
-        return query.list();
     }
 
     @Override
@@ -193,6 +139,76 @@ public class PhenotypeDaoImpl extends SecurableDaoBaseImpl<Phenotype> implements
     }
 
     @Override
+    public List<String> getExistingURIs( String name ) {
+        Query query = currentSession().createQuery( "select distinct p.uri from Phenotype as p where p.name=:name" );
+        query.setParameter( "name", name );
+        return query.list();
+    }
+
+    @Override
+    public List<String> getExistingValues( String name ) {
+        Query query = currentSession().createQuery( "select distinct p.value from Phenotype as p where p.name=:name" );
+        query.setParameter( "name", name );
+        return query.list();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> getListOfPossibleValuesByName( Collection<Long> projectIds, String name ) {
+        Session session = currentSession();
+
+        Criteria criteria = session.createCriteria( Phenotype.class );
+        criteria.add( Restrictions.eq( "name", name ) );
+        criteria.setProjection( Projections.distinct( Projections.property( "value" ) ) );
+        criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
+                .add( Restrictions.in( "project.id", projectIds ) );
+
+        return criteria.list();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> getListOfPossibleValuesByUri( Collection<Long> projectIds, String uri ) {
+        Session session = currentSession();
+
+        Criteria criteria = session.createCriteria( Phenotype.class ).createAlias( "subject", "subject" );
+        criteria.add( Restrictions.eq( "uri", uri ) );
+
+        criteria.createCriteria( "subject.projects" ).add( Restrictions.in( "id", projectIds ) );
+        criteria.setProjection( Projections.distinct( Projections.property( "value" ) ) );
+
+        return criteria.list();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isInDatabase( Collection<String> names ) {
+        Session session = currentSession();
+
+        Criteria criteria = session.createCriteria( Phenotype.class );
+        criteria.add( Restrictions.in( "name", names ) );
+        // TODO: finish this to filter by project
+        // criteria.createAlias( "individual", "individual" );
+        // criteria.createCriteria( "individual.projects" ).add( Restrictions.in( "id", projectIds ) );
+
+        return !criteria.list().isEmpty();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Collection<Phenotype> loadAllByProjectIds( Collection<Long> projectIds ) {
+        Session session = currentSession();
+
+        Criteria criteria = session.createCriteria( Phenotype.class ).createAlias( "subject", "subject" );
+        criteria.createCriteria( "subject.projects" ).add( Restrictions.in( "id", projectIds ) );
+        criteria.setProjection( Projections.distinct( Projections.id() ) );
+
+        List<Long> ids = criteria.list();
+
+        return this.load( ids );
+    }
+
+    @Override
     public Collection<Phenotype> loadBySubjectIds( Collection<Long> subjectIds ) {
         if ( subjectIds.isEmpty() ) {
             return new HashSet<Phenotype>();
@@ -207,21 +223,5 @@ public class PhenotypeDaoImpl extends SecurableDaoBaseImpl<Phenotype> implements
         List<Long> ids = criteria.list();
 
         return this.load( ids );
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<String> getDistinctOntologyUris( Collection<Long> activeProjects ) {
-
-        Session session = currentSession();
-
-        Criteria criteria = session.createCriteria( Phenotype.class ).createAlias( "subject", "subject" )
-                .createAlias( "subject.projects", "project" ).add( Restrictions.in( "project.id", activeProjects ) )
-                .add( Restrictions.eq( "valueType", "HPONTOLOGY" ) );
-
-        criteria.setProjection( Projections.distinct( Projections.property( "uri" ) ) );
-
-        return criteria.list();
-
     }
 }

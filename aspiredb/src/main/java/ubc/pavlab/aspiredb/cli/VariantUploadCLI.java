@@ -51,7 +51,7 @@ public class VariantUploadCLI extends AbstractCLI {
     private boolean createProject = false;
 
     private boolean dryRun = false;
-    private boolean predictSNVfunction = true;
+    private boolean predictSNVfunction = false;
 
     private static BeanFactory applicationContext;
 
@@ -85,27 +85,41 @@ public class VariantUploadCLI extends AbstractCLI {
         }
     }
 
+    @Override
+    public String getShortDesc() {
+        return "Upload a variant data file and create / assign it to a project";
+    }
+
     @SuppressWarnings("static-access")
     @Override
     protected void buildOptions() {
-        Option d = OptionBuilder.isRequired().hasArg().withArgName( "Directory" )
-                .withDescription( "Directory containing csv files" ).withLongOpt( "directory" ).create( 'd' );
+        OptionBuilder.isRequired();
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "Directory" );
+        OptionBuilder.withDescription( "Directory containing csv files" );
+        OptionBuilder.withLongOpt( "directory" );
+        Option d = OptionBuilder.create( 'd' );
 
-        Option f = OptionBuilder.isRequired().hasArg().withArgName( "File name" ).withDescription( "The file to parse" )
-                .withLongOpt( "filename" ).create( 'f' );
+        OptionBuilder.isRequired();
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "File name" );
+        OptionBuilder.withDescription( "The file to parse" );
+        OptionBuilder.withLongOpt( "filename" );
+        Option f = OptionBuilder.create( 'f' );
 
-        Option variantType = OptionBuilder.isRequired().hasArg().withArgName( "Variant Type" )
-                .withDescription( "The type of variant in this file, one of: CNV, Indel, SNV, Inversion" )
-                .create( "variant" );
+        OptionBuilder.isRequired();
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "Variant Type" );
+        OptionBuilder.withDescription( "The type of variant in this file, one of: CNV, Indel, SNV, Inversion" );
+        Option variantType = OptionBuilder.create( "variant" );
 
-        Option project = OptionBuilder
-                .isRequired()
-                .hasArg()
-                .withArgName( "Project name" )
-                .withDescription(
-                        "The project where this data will reside. Project will be created if does not exist,"
-                                + "If the project does exist use the existingproject option to add to an existing project" )
-                .create( "project" );
+        OptionBuilder.isRequired();
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "Project name" );
+        OptionBuilder
+                .withDescription( "The project where this data will reside. Project will be created if does not exist,"
+                        + "If the project does exist use the existingproject option to add to an existing project" );
+        Option project = OptionBuilder.create( "project" );
 
         addOption( "existingproject", false, "You must use this option if you are adding to an existing project" );
 
@@ -119,45 +133,6 @@ public class VariantUploadCLI extends AbstractCLI {
         addOption( variantType );
 
         addOption( project );
-
-    }
-
-    @Override
-    protected void processOptions() {
-        if ( this.hasOption( 'd' ) ) {
-            directory = this.getOptionValue( 'd' );
-        }
-        if ( this.hasOption( 'f' ) ) {
-            filename = this.getOptionValue( 'f' );
-        }
-
-        if ( this.hasOption( "variant" ) ) {
-            String variant = this.getOptionValue( "variant" );
-            if ( VariantType.findByName( variant ) == null ) {
-                bail( ErrorCode.INVALID_OPTION );
-            }
-
-            variantType = VariantType.findByName( variant );
-
-        }
-
-        if ( this.hasOption( "predictSNVfunction" ) && variantType.equals( VariantType.SNV ) ) {
-            predictSNVfunction = Boolean.parseBoolean( this.getOptionValue( "predictSNVfunction" ) );
-        }
-
-        if ( this.hasOption( "project" ) ) {
-            projectName = this.getOptionValue( "project" );
-        }
-
-        if ( this.hasOption( "existingproject" ) ) {
-            createProject = false;
-        } else {
-            createProject = true;
-        }
-
-        if ( this.hasOption( "dryrun" ) ) {
-            dryRun = true;
-        }
 
     }
 
@@ -223,8 +198,45 @@ public class VariantUploadCLI extends AbstractCLI {
     }
 
     @Override
-    public String getShortDesc() {
-        return "Upload a variant data file and create / assign it to a project";
+    protected void processOptions() {
+        if ( this.hasOption( 'd' ) ) {
+            directory = this.getOptionValue( 'd' );
+        }
+        if ( this.hasOption( 'f' ) ) {
+            filename = this.getOptionValue( 'f' );
+        }
+
+        if ( this.hasOption( "variant" ) ) {
+            String variant = this.getOptionValue( "variant" );
+            if ( VariantType.findByName( variant ) == null ) {
+                bail( ErrorCode.INVALID_OPTION );
+            }
+
+            variantType = VariantType.findByName( variant );
+
+        }
+
+        if ( variantType.equals( VariantType.SNV ) ) {
+            predictSNVfunction = true;
+            if ( this.hasOption( "predictSNVfunction" ) ) {
+                predictSNVfunction = Boolean.parseBoolean( this.getOptionValue( "predictSNVfunction" ) );
+            }
+        }
+
+        if ( this.hasOption( "project" ) ) {
+            projectName = this.getOptionValue( "project" );
+        }
+
+        if ( this.hasOption( "existingproject" ) ) {
+            createProject = false;
+        } else {
+            createProject = true;
+        }
+
+        if ( this.hasOption( "dryrun" ) ) {
+            dryRun = true;
+        }
+
     }
 
 }

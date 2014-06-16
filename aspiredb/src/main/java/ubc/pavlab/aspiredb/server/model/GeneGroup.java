@@ -46,20 +46,20 @@ public class GeneGroup {
     public GeneGroup() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
     public List<Gene> getGenes() {
         return genes;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public void setGenes( List<Gene> genes ) {
         this.genes = genes;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
     }
 
 }

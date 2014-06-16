@@ -30,31 +30,31 @@ public class PhenotypeSuggestion implements Serializable {
         return name;
     }
 
-    public void setName( String name ) {
-        this.name = name;
-    }
-
     public String getUri() {
         return uri;
-    }
-
-    public void setUri( String uri ) {
-        this.uri = uri;
-    }
-
-    public boolean isOntologyTerm() {
-        return isOntologyTerm;
-    }
-
-    public void setOntologyTerm( boolean ontologyTerm ) {
-        isOntologyTerm = ontologyTerm;
     }
 
     public boolean isExistInDatabase() {
         return existInDatabase;
     }
 
+    public boolean isOntologyTerm() {
+        return isOntologyTerm;
+    }
+
     public void setExistInDatabase( boolean existInDatabase ) {
         this.existInDatabase = existInDatabase;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    public void setOntologyTerm( boolean ontologyTerm ) {
+        isOntologyTerm = ontologyTerm;
+    }
+
+    public void setUri( String uri ) {
+        this.uri = uri;
     }
 }

@@ -12,20 +12,29 @@ public class StringMatrix<R, C> implements Serializable {
     private Collection<C> columnNames;
     private String[][] matrix;
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8061560995437516094L;
+
     public StringMatrix( int x, int y ) {
         matrix = new String[x][y];
+    }
+
+    public String get( int i, int j ) {
+        return matrix[i][j];
+    }
+
+    public Collection<C> getColumnNames() {
+        return columnNames;
     }
 
     public String[][] getMatrix() {
         return this.matrix;
     }
 
-    public void setMatrix( String[][] matrix ) {
-        this.matrix = matrix;
-    }
-
-    public String get( int i, int j ) {
-        return matrix[i][j];
+    public Collection<R> getRowNames() {
+        return rowNames;
     }
 
     public String set( int i, int j, String value ) {
@@ -36,21 +45,12 @@ public class StringMatrix<R, C> implements Serializable {
         this.columnNames = columnNames;
     }
 
-    public Collection<C> getColumnNames() {
-        return columnNames;
-    }
-
-    public Collection<R> getRowNames() {
-        return rowNames;
+    public void setMatrix( String[][] matrix ) {
+        this.matrix = matrix;
     }
 
     public void setRowNames( Collection<R> rowNames ) {
         this.rowNames = rowNames;
     }
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 8061560995437516094L;
 
 }

@@ -28,14 +28,11 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "USER")
-public class User implements SecuredNotChild {
+public class User implements gemma.gsec.model.User {
     @Id
     @GeneratedValue
     @Column(name = "ID")
     private Long id;
-
-    public User() {
-    }
 
     @Column(name = "USERNAME")
     private String userName;
@@ -64,57 +61,13 @@ public class User implements SecuredNotChild {
     @Column(name = "SIGNUP_TOKEN_DATESTAMP")
     private java.util.Date signupTokenDatestamp;
 
-    @Override
-    public Long getId() {
-        return this.id;
-    }
+    @Column(name = "DESCRIPTION")
+    private String description;
 
-    public String getUserName() {
-        return this.userName;
-    }
+    @Column(name = "NAME")
+    private String name;
 
-    public void setUserName( String userName ) {
-        this.userName = userName;
-    }
-
-    public String getPassword() {
-        return this.password;
-    }
-
-    public void setPassword( String password ) {
-        this.password = password;
-    }
-
-    public String getPasswordHint() {
-        return this.passwordHint;
-    }
-
-    public void setPasswordHint( String passwordHint ) {
-        this.passwordHint = passwordHint;
-    }
-
-    public Boolean getEnabled() {
-        return this.enabled;
-    }
-
-    public void setEnabled( Boolean enabled ) {
-        this.enabled = enabled;
-    }
-
-    public String getSignupToken() {
-        return this.signupToken;
-    }
-
-    public void setSignupToken( String signupToken ) {
-        this.signupToken = signupToken;
-    }
-
-    public java.util.Date getSignupTokenDatestamp() {
-        return this.signupTokenDatestamp;
-    }
-
-    public void setSignupTokenDatestamp( java.util.Date signupTokenDatestamp ) {
-        this.signupTokenDatestamp = signupTokenDatestamp;
+    public User() {
     }
 
     @Override
@@ -132,6 +85,70 @@ public class User implements SecuredNotChild {
         return true;
     }
 
+    @Override
+    public String getDescription() {
+        return this.description;
+    }
+
+    @Override
+    public String getEmail() {
+        return email;
+    }
+
+    @Override
+    public Boolean getEnabled() {
+        return this.enabled;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    @Override
+    public String getFullName() {
+        return this.getName() + " " + this.getLastName();
+    }
+
+    @Override
+    public Long getId() {
+        return this.id;
+    }
+
+    @Override
+    public String getLastName() {
+        return lastName;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public String getPassword() {
+        return this.password;
+    }
+
+    @Override
+    public String getPasswordHint() {
+        return this.passwordHint;
+    }
+
+    @Override
+    public String getSignupToken() {
+        return this.signupToken;
+    }
+
+    @Override
+    public java.util.Date getSignupTokenDatestamp() {
+        return this.signupTokenDatestamp;
+    }
+
+    @Override
+    public String getUserName() {
+        return this.userName;
+    }
+
     /**
      * Returns a hash code based on this entity's identifiers.
      */
@@ -143,28 +160,66 @@ public class User implements SecuredNotChild {
         return hashCode;
     }
 
-    public String getEmail() {
-        return email;
+    @Override
+    public void setDescription( String description ) {
+        this.description = description;
+
     }
 
+    @Override
     public void setEmail( String email ) {
         this.email = email;
     }
 
-    public String getFirstName() {
-        return firstName;
+    @Override
+    public void setEnabled( Boolean enabled ) {
+        this.enabled = enabled;
     }
 
     public void setFirstName( String firstName ) {
         this.firstName = firstName;
     }
 
-    public String getLastName() {
-        return lastName;
+    @Override
+    public void setId( Long id ) {
+        this.id = id;
+
     }
 
+    @Override
     public void setLastName( String lastName ) {
         this.lastName = lastName;
+    }
+
+    @Override
+    public void setName( String name ) {
+        this.name = name;
+
+    }
+
+    @Override
+    public void setPassword( String password ) {
+        this.password = password;
+    }
+
+    @Override
+    public void setPasswordHint( String passwordHint ) {
+        this.passwordHint = passwordHint;
+    }
+
+    @Override
+    public void setSignupToken( String signupToken ) {
+        this.signupToken = signupToken;
+    }
+
+    @Override
+    public void setSignupTokenDatestamp( java.util.Date signupTokenDatestamp ) {
+        this.signupTokenDatestamp = signupTokenDatestamp;
+    }
+
+    @Override
+    public void setUserName( String userName ) {
+        this.userName = userName;
     }
 
 }

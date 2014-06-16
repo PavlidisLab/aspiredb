@@ -1,5 +1,5 @@
 <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ehcache.xsd"
-	updateCheck="true" monitoring="autodetect">
+	updateCheck="true" monitoring="autodetect" name="aspiredbEhcache">
 
 	<!--  File for use in non-clustered environments (no terracotta) -->
 

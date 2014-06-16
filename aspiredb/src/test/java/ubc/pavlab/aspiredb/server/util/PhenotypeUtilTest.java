@@ -79,7 +79,7 @@ public class PhenotypeUtilTest extends BaseSpringContextTest {
     @After
     public void tearDown() {
         for ( Phenotype pheno : phenolist ) {
-            phenotypeDao.remove( pheno );
+            persistentTestObjectHelper.removePhenotype( pheno );
         }
     }
 
@@ -91,29 +91,6 @@ public class PhenotypeUtilTest extends BaseSpringContextTest {
         assertEquals( "1", result );
         result = PhenotypeUtil.convertValueToHPOntologyStandardValue( "N" );
         assertEquals( "0", result );
-    }
-
-    @Test
-    public void testIsUri() {
-        boolean result = PhenotypeUtil.isUri( "HP_00000271" );
-        assertEquals( true, result );
-        result = PhenotypeUtil.isUri( "Abnormality" );
-        assertEquals( false, result );
-        result = PhenotypeUtil.isUri( "http://purl.obolibrary.org/obo/HP_0000271" );
-        assertEquals( false, result );
-    }
-
-    private void expandRestrictions( RestrictionExpression re, Collection<PhenotypeRestriction> phenotypeRestrictions ) {
-        if ( re instanceof PhenotypeRestriction ) {
-            phenotypeRestrictions.add( ( PhenotypeRestriction ) re );
-            return;
-        } else if ( re instanceof Junction ) {
-            for ( RestrictionExpression re2 : ( ( Junction ) re ).getRestrictions() ) {
-                expandRestrictions( re2, phenotypeRestrictions );
-            }
-        } else {
-            return;
-        }
     }
 
     @Test
@@ -138,5 +115,28 @@ public class PhenotypeUtilTest extends BaseSpringContextTest {
         }
 
         assertTrue( foundFace );
+    }
+
+    @Test
+    public void testIsUri() {
+        boolean result = PhenotypeUtil.isUri( "HP_00000271" );
+        assertEquals( true, result );
+        result = PhenotypeUtil.isUri( "Abnormality" );
+        assertEquals( false, result );
+        result = PhenotypeUtil.isUri( "http://purl.obolibrary.org/obo/HP_0000271" );
+        assertEquals( false, result );
+    }
+
+    private void expandRestrictions( RestrictionExpression re, Collection<PhenotypeRestriction> phenotypeRestrictions ) {
+        if ( re instanceof PhenotypeRestriction ) {
+            phenotypeRestrictions.add( ( PhenotypeRestriction ) re );
+            return;
+        } else if ( re instanceof Junction ) {
+            for ( RestrictionExpression re2 : ( ( Junction ) re ).getRestrictions() ) {
+                expandRestrictions( re2, phenotypeRestrictions );
+            }
+        } else {
+            return;
+        }
     }
 }

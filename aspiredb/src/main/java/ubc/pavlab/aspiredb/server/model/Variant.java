@@ -14,6 +14,8 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
+import gemma.gsec.model.SecuredNotChild;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -40,7 +42,6 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import ubc.pavlab.aspiredb.server.ValueObjectConvertible;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.SecuredNotChild;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 /**
@@ -86,77 +87,77 @@ public abstract class Variant implements SecuredNotChild, ValueObjectConvertible
     @Column(name = "EXTERNALID")
     private String externalId;
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    public void setSubject( Subject subject ) {
-        this.subject = subject;
-    }
-
-    public Subject getSubject() {
-        return subject;
-    }
-
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
-    public GenomicLocation getLocation() {
-        return location;
-    }
-
-    public void setLocation( GenomicLocation location ) {
-        this.location = location;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription( String description ) {
-        this.description = description;
-    }
-
-    public String getExternalId() {
-        return externalId;
-    }
-
-    public void setExternalId( String externalId ) {
-        this.externalId = externalId;
+    // TODO: has to be unique
+    public void addLabel( Label label ) {
+        this.labels.add( label );
     }
 
     public List<Characteristic> getCharacteristics() {
         return characteristics;
     }
 
-    public void setCharacteristics( List<Characteristic> characteristics ) {
-        this.characteristics = characteristics;
+    public String getDescription() {
+        return description;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public Long getId() {
+        return id;
     }
 
     public Collection<Label> getLabels() {
         return labels;
     }
 
-    public void setLabels( Set<Label> labels ) {
-        this.labels = labels;
+    public GenomicLocation getLocation() {
+        return location;
+    }
+
+    public Subject getSubject() {
+        return subject;
     }
 
     public String getUserVariantId() {
         return userVariantId;
     }
 
-    public void setUserVariantId( String userVariantId ) {
-        this.userVariantId = userVariantId;
-    }
-
-    // TODO: has to be unique
-    public void addLabel( Label label ) {
-        this.labels.add( label );
-    }
-
     public void removeLabel( Label label ) {
         this.labels.remove( label );
+    }
+
+    public void setCharacteristics( List<Characteristic> characteristics ) {
+        this.characteristics = characteristics;
+    }
+
+    public void setDescription( String description ) {
+        this.description = description;
+    }
+
+    public void setExternalId( String externalId ) {
+        this.externalId = externalId;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setLabels( Set<Label> labels ) {
+        this.labels = labels;
+    }
+
+    public void setLocation( GenomicLocation location ) {
+        this.location = location;
+    }
+
+    public void setSubject( Subject subject ) {
+        this.subject = subject;
+    }
+
+    public void setUserVariantId( String userVariantId ) {
+        this.userVariantId = userVariantId;
     }
 }

@@ -18,7 +18,7 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -27,15 +27,12 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.QueryTestUtils;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
-import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Subject;
@@ -49,7 +46,6 @@ import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
 /**
  * author: anton date: 21/05/13
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 public class VariantDaoTest extends BaseSpringContextTest {
 
     @Autowired
@@ -71,8 +67,20 @@ public class VariantDaoTest extends BaseSpringContextTest {
     private Subject subject;
     private Label label;
 
+    @After
+    public void cleanup() {
+        new InlineTransaction() {
+            @Override
+            public void instructions() {
+                variantDao.remove( cnv );
+                subjectDao.remove( subject );
+                labelDao.remove( label );
+            }
+        }.execute();
+    }
+
     @Before
-    public void setup() throws NotLoggedInException {
+    public void setup() {
         new InlineTransaction() {
             @Override
             public void instructions() {
@@ -87,40 +95,12 @@ public class VariantDaoTest extends BaseSpringContextTest {
         }.execute();
     }
 
-    @After
-    public void cleanup() {
-        new InlineTransaction() {
-            @Override
-            public void instructions() {
-                variantDao.remove( cnv );
-                subjectDao.remove( subject );
-                labelDao.remove( label );
-            }
-        }.execute();
-    }
-
-    @Test
+    // @Test
     public void testFindByGenomicLocation() throws Exception {
 
     }
 
-    @Test
-    public void testSuggestValuesForEntityProperty() throws Exception {
-        // final Property cnvTypeProperty = new CNVTypeProperty();
-        // final SuggestionContext suggestionContext = new SuggestionContext();
-        // suggestionContext.setValuePrefix("LOS");
-        //
-        // new InlineTransaction() {
-        // @Override
-        // public void instructions() {
-        // Collection<String> values = variantDao.suggestValuesForEntityProperty(cnvTypeProperty, suggestionContext);
-        // assertEquals(values.size(), 1);
-        // assertEquals(values.iterator().next(), "LOSS");
-        // }
-        // }.execute();
-    }
-
-    @Test
+    // @Test
     public void testFindBySubjectId() throws Exception {
 
     }
@@ -135,11 +115,12 @@ public class VariantDaoTest extends BaseSpringContextTest {
                 Collection<? extends Variant> variants = null;
                 try {
                     variants = variantDao.load( filters );
+                    assertEquals( 1, variants.size() );
+
                 } catch ( BioMartServiceException e ) {
                 } catch ( NeurocartaServiceException e ) {
                 }
 
-                assertTrue( variants.size() == 1 );
             }
         }.execute();
 
@@ -150,14 +131,32 @@ public class VariantDaoTest extends BaseSpringContextTest {
             @Override
             public void instructions() {
                 Collection<? extends Variant> variants = null;
+
                 try {
                     variants = variantDao.load( filters );
+                    assertEquals( 1, variants.size() );
+
                 } catch ( BioMartServiceException e ) {
                 } catch ( NeurocartaServiceException e ) {
                 }
 
-                assertTrue( variants.size() == 1 );
             }
         }.execute();
+    }
+
+    // @Test
+    public void testSuggestValuesForEntityProperty() throws Exception {
+        // final Property cnvTypeProperty = new CNVTypeProperty();
+        // final SuggestionContext suggestionContext = new SuggestionContext();
+        // suggestionContext.setValuePrefix("LOS");
+        //
+        // new InlineTransaction() {
+        // @Override
+        // public void instructions() {
+        // Collection<String> values = variantDao.suggestValuesForEntityProperty(cnvTypeProperty, suggestionContext);
+        // assertEquals(values.size(), 1);
+        // assertEquals(values.iterator().next(), "LOSS");
+        // }
+        // }.execute();
     }
 }

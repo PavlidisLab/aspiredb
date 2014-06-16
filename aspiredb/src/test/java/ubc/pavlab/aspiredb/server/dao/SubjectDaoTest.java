@@ -17,12 +17,14 @@ package ubc.pavlab.aspiredb.server.dao;
 
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -30,6 +32,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
@@ -77,24 +82,6 @@ public class SubjectDaoTest extends BaseSpringContextTest {
     private Subject subject;
     private Label label;
 
-    @Before
-    public void setup() throws NotLoggedInException {
-        new InlineTransaction() {
-            @Override
-            public void instructions() {
-                subject = testObjectHelper.createPersistentTestIndividualObject( "testPatientId" );
-                label = labelDao.findOrCreate( new LabelValueObject( "SUBJECT_TEST_LABEL" ) );
-                Collection<Long> ids = new ArrayList<Long>( Arrays.asList( subject.getId() ) );
-                try {
-                    subjectService.addLabel( ids, new LabelValueObject( label.getId(), "SUBJECT_TEST_LABEL" ) );
-                } catch ( Exception e ) {
-
-                }
-
-            }
-        }.execute();
-    }
-
     @After
     public void cleanup() {
         new InlineTransaction() {
@@ -102,41 +89,6 @@ public class SubjectDaoTest extends BaseSpringContextTest {
             public void instructions() {
                 subjectDao.remove( subject );
                 labelDao.remove( label );
-            }
-        }.execute();
-    }
-
-    @Test
-    public void testLoad() {
-        final Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
-        filters.add( new SubjectFilterConfig( makeTestRestrictionExpression() ) );
-        new InlineTransaction() {
-            @Override
-            public void instructions() {
-                Collection<? extends Subject> subjects = null;
-                try {
-                    subjects = subjectDao.load( filters );
-                } catch ( BioMartServiceException e ) {
-                } catch ( NeurocartaServiceException e ) {
-                }
-
-                assertTrue( subjects.size() == 1 );
-            }
-        }.execute();
-
-        filters.clear();
-        filters.add( new SubjectFilterConfig( makeTestRestrictionExpressionWithSets() ) );
-        new InlineTransaction() {
-            @Override
-            public void instructions() {
-                Collection<? extends Subject> subjects = null;
-                try {
-                    subjects = subjectDao.load( filters );
-                } catch ( BioMartServiceException e ) {
-                } catch ( NeurocartaServiceException e ) {
-                }
-
-                assertTrue( subjects.size() == 1 );
             }
         }.execute();
     }
@@ -174,6 +126,24 @@ public class SubjectDaoTest extends BaseSpringContextTest {
         return restriction;
     }
 
+    @Before
+    public void setup() throws NotLoggedInException {
+        new InlineTransaction() {
+            @Override
+            public void instructions() {
+                subject = testObjectHelper.createPersistentTestIndividualObject( "testPatientId" );
+                label = labelDao.findOrCreate( new LabelValueObject( "SUBJECT_TEST_LABEL" ) );
+                Collection<Long> ids = new ArrayList<Long>( Arrays.asList( subject.getId() ) );
+                try {
+                    subjectService.addLabel( ids, new LabelValueObject( label.getId(), "SUBJECT_TEST_LABEL" ) );
+                } catch ( Exception e ) {
+
+                }
+
+            }
+        }.execute();
+    }
+
     @Test
     public void testFindByPatientId() throws Exception {
         Project p1 = new Project();
@@ -196,5 +166,68 @@ public class SubjectDaoTest extends BaseSpringContextTest {
         Subject s2 = subjectDao.findByPatientId( p1, patientId );
 
         assertEquals( patientId, s2.getPatientId() );
+    }
+
+    @Test
+    public void testLoad() {
+        final Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
+        filters.add( new SubjectFilterConfig( makeTestRestrictionExpression() ) );
+        new InlineTransaction() {
+            @Override
+            public void instructions() {
+                Collection<? extends Subject> subjects = null;
+                try {
+                    subjects = subjectDao.load( filters );
+                } catch ( BioMartServiceException e ) {
+                } catch ( NeurocartaServiceException e ) {
+                }
+
+                assertTrue( subjects.size() == 1 );
+            }
+        }.execute();
+
+        filters.clear();
+        filters.add( new SubjectFilterConfig( makeTestRestrictionExpressionWithSets() ) );
+        new InlineTransaction() {
+            @Override
+            public void instructions() {
+                Collection<? extends Subject> subjects = null;
+                try {
+                    subjects = subjectDao.load( filters );
+                } catch ( BioMartServiceException e ) {
+                } catch ( NeurocartaServiceException e ) {
+                }
+
+                assertTrue( subjects.size() == 1 );
+            }
+        }.execute();
+    }
+
+    public void testCreateAndFindByPatientId() throws Exception {
+
+        TransactionTemplate tt = new TransactionTemplate( transactionManager );
+        tt.execute( new TransactionCallbackWithoutResult() {
+            @Override
+            public void doInTransactionWithoutResult( TransactionStatus status ) {
+                Project p1 = new Project();
+                p1.setName( project1Name );
+
+                p1 = testObjectHelper.createPersistentProject( p1 );
+
+                assertNull( "Subject hasn't been created yet", subjectDao.findByPatientId( p1, patientId ) );
+
+                List<Project> projects = new ArrayList<>();
+                projects.add( p1 );
+
+                Subject s = new Subject();
+                s.setPatientId( patientId );
+                s.setProjects( projects );
+                s = subjectDao.create( s );
+
+                assertNotNull( s );
+
+                assertNotNull( "Subject should have been created", subjectDao.findByPatientId( p1, patientId ) );
+            }
+        } );
     }
 }

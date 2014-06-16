@@ -26,6 +26,17 @@ public class VariantDaoImpl extends VariantDaoBaseImpl<Variant> implements Varia
     }
 
     @Override
+    public Collection<Variant> findByLabel( LabelValueObject label ) {
+        Criteria criteria = currentSession().createCriteria( Variant.class );
+        SimpleRestriction restrictionExpression = new SimpleRestriction( new VariantLabelProperty(),
+                Operator.TEXT_EQUAL, label );
+        Criterion criterion = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
+                CriteriaBuilder.EntityType.VARIANT );
+        criteria.add( criterion );
+        return criteria.list();
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Variant findByUserVariantId( String userVariantId, String patientId ) {
 
@@ -40,17 +51,6 @@ public class VariantDaoImpl extends VariantDaoBaseImpl<Variant> implements Varia
 
         return ( Variant ) query.uniqueResult();
 
-    }
-
-    @Override
-    public Collection<Variant> findByLabel( LabelValueObject label ) {
-        Criteria criteria = currentSession().createCriteria( Variant.class );
-        SimpleRestriction restrictionExpression = new SimpleRestriction( new VariantLabelProperty(),
-                Operator.TEXT_EQUAL, label );
-        Criterion criterion = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
-                CriteriaBuilder.EntityType.VARIANT );
-        criteria.add( criterion );
-        return criteria.list();
     }
 
 }

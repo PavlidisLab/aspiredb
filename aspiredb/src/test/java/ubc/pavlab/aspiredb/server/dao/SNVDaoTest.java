@@ -24,12 +24,10 @@ import java.util.List;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -41,7 +39,6 @@ import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 public class SNVDaoTest extends BaseSpringContextTest {
 
     @Autowired
@@ -72,7 +69,7 @@ public class SNVDaoTest extends BaseSpringContextTest {
 
         detachedProject.setName( projectName );
 
-        Project p1 = projectDao.create( detachedProject );
+        Project p1 = testObjectHelper.createPersistentProject( detachedProject );
 
         projectId = p1.getId();
 
@@ -107,8 +104,7 @@ public class SNVDaoTest extends BaseSpringContextTest {
             public void doInTransactionWithoutResult( TransactionStatus status ) {
 
                 // Just a stub to test the plumbing.
-                SNV snv = new SNV();
-                snvDao.create( snv );
+                testObjectHelper.createPersistentTestSNVObject();
 
             }
         } );

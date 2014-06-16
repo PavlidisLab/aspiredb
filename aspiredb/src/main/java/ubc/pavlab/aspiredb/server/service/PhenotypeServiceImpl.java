@@ -65,19 +65,227 @@ public class PhenotypeServiceImpl implements PhenotypeService {
 
     private static final String HUMAN_PHENOTYPE_URI_PREFIX = "http://purl.org/obo/owl/HP#";
 
-    DecimalFormat dformat = new DecimalFormat( "#.#####" );
+    public static boolean isUri( String uriOrName ) {
+        if ( uriOrName == null ) return false;
 
+        return uriOrName.trim().startsWith( "HP_" );
+    }
+
+    DecimalFormat dformat = new DecimalFormat( "#.#####" );
     @Autowired
     PhenotypeDao phenotypeDao;
     @Autowired
     OntologyService ontologyService;
-    @Autowired
-    ProjectDao projectDao;
 
     @Autowired
+    ProjectDao projectDao;
+    @Autowired
     private NeurocartaCache neurocartaCache;
+
     @Autowired
     private NeurocartaQueryService neurocartaQueryService;
+
+    public String convertValueToHPOntologyStandardValue( String value ) {
+        try {
+            Integer.parseInt( value );
+        } catch ( NumberFormatException nfe ) {
+            if ( value != null && value.trim().equalsIgnoreCase( "Y" ) ) {
+                return PhenotypeUtil.VALUE_PRESENT;
+            }
+            return PhenotypeUtil.VALUE_ABSENT;
+
+        }
+
+        return value;
+    }
+
+    /**
+     * TODO make this work with ontology propagation
+     * 
+     * @param uriPhenotypes -all the phenotypes for a specific uri in the db for subjectIds and complementSubjectIds
+     * @param subjectIds
+     * @param complementSubjectIds
+     */
+    public PhenotypeEnrichmentValueObject getPhenotypeEnrichment( Collection<Phenotype> uriPhenotypes,
+            Collection<Long> subjectIds, Collection<Long> complementSubjectIds ) {
+
+        Integer successes = 0;
+
+        Integer compSuccesses = 0;
+
+        Integer positives = 0;
+
+        Integer n = subjectIds.size();
+
+        Integer complementGroupSize = complementSubjectIds.size();
+
+        Integer totalSize = subjectIds.size() + complementSubjectIds.size();
+
+        for ( Phenotype p : uriPhenotypes ) {
+            // this should always be true the way we are currently using this method.
+            if ( p.getValue().equals( "1" ) ) {
+
+                positives++;
+
+                if ( subjectIds.contains( p.getSubject().getId() ) ) {
+                    successes++;
+                }
+
+                if ( complementSubjectIds.contains( p.getSubject().getId() ) ) {
+                    compSuccesses++;
+                }
+
+            }
+        }
+
+        if ( successes == 0 || successes == n ) {
+            return null;
+        }
+
+        // do it this way because of possible unobserved phenotypes(no recorded value) for certain subjects, this could
+        // be wrong
+        Integer negatives = totalSize - positives;
+
+        // note lower.tail: logical; if TRUE (default), probabilities are P[X <= x],
+        // otherwise, P[X > x].
+        // Since we want P[X >= x], we want to set x = x - 1 and lower.tail false
+        double pValue;
+
+        pValue = SpecFunc.phyper( successes - 1, positives, negatives, n, false );
+
+        PhenotypeEnrichmentValueObject vo = new PhenotypeEnrichmentValueObject();
+
+        vo.setPValue( pValue );
+
+        Phenotype valueGrabber = uriPhenotypes.iterator().next();
+        vo.setUri( valueGrabber.getUri() );
+        vo.setName( valueGrabber.getName() );
+        vo.setInGroupTotal( successes );
+        vo.setOutGroupTotal( compSuccesses );
+        vo.setTotal( totalSize );
+
+        vo.setInGroupTotalString( vo.getInGroupTotal().toString() + "/" + n.toString() );
+        vo.setOutGroupTotalString( vo.getOutGroupTotal().toString() + "/" + complementGroupSize.toString() );
+
+        vo.setPValueString( dformat.format( pValue ) );
+
+        return vo;
+
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public List<PhenotypeEnrichmentValueObject> getPhenotypeEnrichmentValueObjects( Collection<Long> activeProjects,
+            Collection<Long> subjectIds ) throws NotLoggedInException {
+
+        ArrayList<PhenotypeEnrichmentValueObject> list = new ArrayList<PhenotypeEnrichmentValueObject>();
+
+        Project activeProject = projectDao.load( activeProjects.iterator().next() );
+
+        List<Subject> subjectList = activeProject.getSubjects();
+        List<Long> complementSubjectIds = new ArrayList<Long>();
+
+        for ( Subject s : subjectList ) {
+            if ( !subjectIds.contains( s.getId() ) ) {
+                complementSubjectIds.add( s.getId() );
+            }
+        }
+
+        Collection<String> distinctUris = phenotypeDao.getDistinctOntologyUris( activeProjects );
+
+        for ( String uri : distinctUris ) {
+            // TODO change this fetching to be more efficient when we make this functionality more robust(currently it
+            // grabs all phenotypes in the projects for a specific uri
+            // change later to grab only for subjectIds and complementSubjectIds)
+            Collection<Phenotype> phenotypes = phenotypeDao.findPresentByProjectIdsAndUri( activeProjects, uri );
+            PhenotypeEnrichmentValueObject pevo = getPhenotypeEnrichment( phenotypes, subjectIds, complementSubjectIds );
+
+            if ( pevo != null ) {
+                list.add( pevo );
+            }
+
+        }
+
+        multipleTestCorrectionForPhenotypeEnrichmentList( list );
+
+        return list;
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional
+    public Map<String, PhenotypeValueObject> getPhenotypes( Long subjectId ) throws NotLoggedInException {
+
+        StopWatch timer = new StopWatch();
+        timer.start();
+
+        Collection<Phenotype> phenotypes = phenotypeDao.findBySubjectId( subjectId );
+
+        if ( timer.getTime() > 100 ) {
+            log.info( "loading phenotypes for subjectId: " + subjectId + " took " + timer.getTime() + "ms" );
+        }
+
+        // Insert phenotype loaded from DB.
+        Map<String, PhenotypeValueObject> valueObjectsMap = new HashMap<String, PhenotypeValueObject>();
+        for ( Phenotype phenotype : phenotypes ) {
+            valueObjectsMap.put( phenotype.getName(), phenotype.convertToValueObject() );
+        }
+
+        // FIXME: disabled temporarily
+        // Insert inferred phenotype values using Ontology.
+        // valueObjectsMap = addDescendantsAndAncestors(valueObjectsMap);
+        // propagateAbsentPresentValues(valueObjectsMap);
+
+        return valueObjectsMap;
+    }
+
+    public void multipleTestCorrectionForPhenotypeEnrichmentList( List<PhenotypeEnrichmentValueObject> list ) {
+
+        DoubleArrayList doubleArrayList = new DoubleArrayList();
+
+        for ( PhenotypeEnrichmentValueObject pvo : list ) {
+            doubleArrayList.add( pvo.getPValue() );
+        }
+
+        doubleArrayList = MultipleTestCorrection.benjaminiHochberg( doubleArrayList );
+
+        for ( int i = 0; i < doubleArrayList.size(); i++ ) {
+            list.get( i ).setPValueCorrected( doubleArrayList.get( i ) );
+            list.get( i ).setPValueCorrectedString( dformat.format( doubleArrayList.get( i ) ) );
+        }
+
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional
+    // TODO: Test
+    public Map<String, Collection<GeneValueObject>> populateDescendantPhenotypes( String phenotypeUri )
+            throws NeurocartaServiceException, BioMartServiceException {
+
+        Map<String, Collection<GeneValueObject>> valueObjectsMap = new HashMap<String, Collection<GeneValueObject>>();
+        // List<GeneValueObject> gvos = (List<GeneValueObject>) this.neurocartaQueryService.getPhenotypes(names)
+        // .fetchGenesAssociatedWithPhenotype(phenotypeUri);
+
+        HumanPhenotypeOntologyService hpoService = ontologyService.getHumanPhenotypeOntologyService();
+        OntologyTerm ontologyTerm = hpoService.getTerm( phenotypeUri );
+
+        if ( ontologyTerm == null ) { // Not an ontology term.
+            return null;
+        }
+
+        Collection<OntologyTerm> descendantsTerms = ontologyTerm.getChildren( false );
+
+        for ( OntologyTerm childTerm : descendantsTerms ) {
+            String uri = PhenotypeUtil.HUMAN_PHENOTYPE_URI_PREFIX + childTerm.getLocalName();
+            Collection<GeneValueObject> gvos = neurocartaQueryService.fetchGenesAssociatedWithPhenotype( uri );
+            valueObjectsMap.put( childTerm.getTerm(), gvos );
+        }
+
+        return valueObjectsMap;
+
+    }
 
     public boolean setNameUriValueType( Phenotype phenotype, String key ) {
         if ( isUri( key ) ) {
@@ -126,84 +334,6 @@ public class PhenotypeServiceImpl implements PhenotypeService {
         }
 
         return true;
-    }
-
-    public String convertValueToHPOntologyStandardValue( String value ) {
-        try {
-            Integer.parseInt( value );
-        } catch ( NumberFormatException nfe ) {
-            if ( value != null && value.trim().equalsIgnoreCase( "Y" ) ) {
-                return PhenotypeUtil.VALUE_PRESENT;
-            }
-            return PhenotypeUtil.VALUE_ABSENT;
-
-        }
-
-        return value;
-    }
-
-    public static boolean isUri( String uriOrName ) {
-        if ( uriOrName == null ) return false;
-
-        return uriOrName.trim().startsWith( "HP_" );
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional
-    public Map<String, PhenotypeValueObject> getPhenotypes( Long subjectId ) throws NotLoggedInException {
-
-        StopWatch timer = new StopWatch();
-        timer.start();
-
-        Collection<Phenotype> phenotypes = phenotypeDao.findBySubjectId( subjectId );
-
-        if ( timer.getTime() > 100 ) {
-            log.info( "loading phenotypes for subjectId: " + subjectId + " took " + timer.getTime() + "ms" );
-        }
-
-        // Insert phenotype loaded from DB.
-        Map<String, PhenotypeValueObject> valueObjectsMap = new HashMap<String, PhenotypeValueObject>();
-        for ( Phenotype phenotype : phenotypes ) {
-            valueObjectsMap.put( phenotype.getName(), phenotype.convertToValueObject() );
-        }
-
-        // FIXME: disabled temporarily
-        // Insert inferred phenotype values using Ontology.
-        // valueObjectsMap = addDescendantsAndAncestors(valueObjectsMap);
-        // propagateAbsentPresentValues(valueObjectsMap);
-
-        return valueObjectsMap;
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional
-    // TODO: Test
-    public Map<String, Collection<GeneValueObject>> populateDescendantPhenotypes( String phenotypeUri )
-            throws NeurocartaServiceException, BioMartServiceException {
-
-        Map<String, Collection<GeneValueObject>> valueObjectsMap = new HashMap<String, Collection<GeneValueObject>>();
-        // List<GeneValueObject> gvos = (List<GeneValueObject>) this.neurocartaQueryService.getPhenotypes(names)
-        // .fetchGenesAssociatedWithPhenotype(phenotypeUri);
-
-        HumanPhenotypeOntologyService hpoService = ontologyService.getHumanPhenotypeOntologyService();
-        OntologyTerm ontologyTerm = hpoService.getTerm( phenotypeUri );
-
-        if ( ontologyTerm == null ) { // Not an ontology term.
-            return null;
-        }
-
-        Collection<OntologyTerm> descendantsTerms = ontologyTerm.getChildren( false );
-
-        for ( OntologyTerm childTerm : descendantsTerms ) {
-            String uri = PhenotypeUtil.HUMAN_PHENOTYPE_URI_PREFIX + childTerm.getLocalName();
-            Collection<GeneValueObject> gvos = neurocartaQueryService.fetchGenesAssociatedWithPhenotype( uri );
-            valueObjectsMap.put( childTerm.getTerm(), gvos );
-        }
-
-        return valueObjectsMap;
-
     }
 
     @Override
@@ -384,136 +514,6 @@ public class PhenotypeServiceImpl implements PhenotypeService {
                 }
             }
         }
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional(readOnly = true)
-    public List<PhenotypeEnrichmentValueObject> getPhenotypeEnrichmentValueObjects( Collection<Long> activeProjects,
-            Collection<Long> subjectIds ) throws NotLoggedInException {
-
-        ArrayList<PhenotypeEnrichmentValueObject> list = new ArrayList<PhenotypeEnrichmentValueObject>();
-
-        Project activeProject = projectDao.load( activeProjects.iterator().next() );
-
-        List<Subject> subjectList = activeProject.getSubjects();
-        List<Long> complementSubjectIds = new ArrayList<Long>();
-
-        for ( Subject s : subjectList ) {
-            if ( !subjectIds.contains( s.getId() ) ) {
-                complementSubjectIds.add( s.getId() );
-            }
-        }
-
-        Collection<String> distinctUris = phenotypeDao.getDistinctOntologyUris( activeProjects );
-
-        for ( String uri : distinctUris ) {
-            // TODO change this fetching to be more efficient when we make this functionality more robust(currently it
-            // grabs all phenotypes in the projects for a specific uri
-            // change later to grab only for subjectIds and complementSubjectIds)
-            Collection<Phenotype> phenotypes = phenotypeDao.findPresentByProjectIdsAndUri( activeProjects, uri );
-            PhenotypeEnrichmentValueObject pevo = getPhenotypeEnrichment( phenotypes, subjectIds, complementSubjectIds );
-
-            if ( pevo != null ) {
-                list.add( pevo );
-            }
-
-        }
-
-        multipleTestCorrectionForPhenotypeEnrichmentList( list );
-
-        return list;
-    }
-
-    /**
-     * TODO make this work with ontology propagation
-     * 
-     * @param uriPhenotypes -all the phenotypes for a specific uri in the db for subjectIds and complementSubjectIds
-     * @param subjectIds
-     * @param complementSubjectIds
-     */
-    public PhenotypeEnrichmentValueObject getPhenotypeEnrichment( Collection<Phenotype> uriPhenotypes,
-            Collection<Long> subjectIds, Collection<Long> complementSubjectIds ) {
-
-        Integer successes = 0;
-
-        Integer compSuccesses = 0;
-
-        Integer positives = 0;
-
-        Integer n = subjectIds.size();
-
-        Integer complementGroupSize = complementSubjectIds.size();
-
-        Integer totalSize = subjectIds.size() + complementSubjectIds.size();
-
-        for ( Phenotype p : uriPhenotypes ) {
-            // this should always be true the way we are currently using this method.
-            if ( p.getValue().equals( "1" ) ) {
-
-                positives++;
-
-                if ( subjectIds.contains( p.getSubject().getId() ) ) {
-                    successes++;
-                }
-
-                if ( complementSubjectIds.contains( p.getSubject().getId() ) ) {
-                    compSuccesses++;
-                }
-
-            }
-        }
-
-        if ( successes == 0 || successes == n ) {
-            return null;
-        }
-
-        // do it this way because of possible unobserved phenotypes(no recorded value) for certain subjects, this could
-        // be wrong
-        Integer negatives = totalSize - positives;
-
-        // note lower.tail: logical; if TRUE (default), probabilities are P[X <= x],
-        // otherwise, P[X > x].
-        // Since we want P[X >= x], we want to set x = x - 1 and lower.tail false
-        double pValue;
-
-        pValue = SpecFunc.phyper( successes - 1, positives, negatives, n, false );
-
-        PhenotypeEnrichmentValueObject vo = new PhenotypeEnrichmentValueObject();
-
-        vo.setPValue( pValue );
-
-        Phenotype valueGrabber = uriPhenotypes.iterator().next();
-        vo.setUri( valueGrabber.getUri() );
-        vo.setName( valueGrabber.getName() );
-        vo.setInGroupTotal( successes );
-        vo.setOutGroupTotal( compSuccesses );
-        vo.setTotal( totalSize );
-
-        vo.setInGroupTotalString( vo.getInGroupTotal().toString() + "/" + n.toString() );
-        vo.setOutGroupTotalString( vo.getOutGroupTotal().toString() + "/" + complementGroupSize.toString() );
-
-        vo.setPValueString( dformat.format( pValue ) );
-
-        return vo;
-
-    }
-
-    public void multipleTestCorrectionForPhenotypeEnrichmentList( List<PhenotypeEnrichmentValueObject> list ) {
-
-        DoubleArrayList doubleArrayList = new DoubleArrayList();
-
-        for ( PhenotypeEnrichmentValueObject pvo : list ) {
-            doubleArrayList.add( pvo.getPValue() );
-        }
-
-        doubleArrayList = MultipleTestCorrection.benjaminiHochberg( doubleArrayList );
-
-        for ( int i = 0; i < doubleArrayList.size(); i++ ) {
-            list.get( i ).setPValueCorrected( doubleArrayList.get( i ) );
-            list.get( i ).setPValueCorrectedString( dformat.format( doubleArrayList.get( i ) ) );
-        }
-
     }
 
 }

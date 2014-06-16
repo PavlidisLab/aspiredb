@@ -31,60 +31,12 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
 
     private Map<String, Set<Long>> subjects;
 
-    public String getDisplaySummary() {
-        return displaySummary;
-    }
-
-    public void setDisplaySummary( String displaySummary ) {
-        this.displaySummary = displaySummary;
-    }
-
     private boolean isNeurocartaPhenotype;
 
     private PhenotypeValueObject selectedPhenotype;
 
-    public PhenotypeValueObject getSelectedPhenotype() {
-        return selectedPhenotype;
-    }
-
-    public void setSelectedPhenotype( PhenotypeValueObject selectedPhenotype ) {
-        this.selectedPhenotype = selectedPhenotype;
-    }
-
     public PhenotypeSummaryValueObject() {
 
-    }
-
-    public String getUri() {
-        return uri;
-    }
-
-    public void setUri( String uri ) {
-        this.uri = uri;
-    }
-
-    public String getValueType() {
-        return valueType;
-    }
-
-    public void setValueType( String valueType ) {
-        this.valueType = valueType;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName( String name ) {
-        this.name = name;
-    }
-
-    public boolean isNeurocartaPhenotype() {
-        return this.isNeurocartaPhenotype;
-    }
-
-    public void setNeurocartaPhenotype( boolean isNeurocartaPhenotype ) {
-        this.isNeurocartaPhenotype = isNeurocartaPhenotype;
     }
 
     @Override
@@ -92,16 +44,56 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
         return this.name.compareTo( summaryValueObject.getName() );
     }
 
-    public Map<String, Integer> getPhenoSummaryMap() {
-        return phenoSummaryMap;
+    public String getDisplaySummary() {
+        return displaySummary;
     }
 
-    public void setPhenoSummaryMap( Map<String, Integer> phenoSummaryMap ) {
-        this.phenoSummaryMap = phenoSummaryMap;
+    public String getName() {
+        return name;
     }
 
     public Set<String> getPhenoSet() {
         return phenoSet;
+    }
+
+    public Map<String, Integer> getPhenoSummaryMap() {
+        return phenoSummaryMap;
+    }
+
+    public PhenotypeValueObject getSelectedPhenotype() {
+        return selectedPhenotype;
+    }
+
+    public long getSortValue() {
+        return sortValue;
+    }
+
+    public Map<String, Set<Long>> getSubjects() {
+        return subjects;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public String getValueType() {
+        return valueType;
+    }
+
+    public boolean isNeurocartaPhenotype() {
+        return this.isNeurocartaPhenotype;
+    }
+
+    public void setDisplaySummary( String displaySummary ) {
+        this.displaySummary = displaySummary;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    public void setNeurocartaPhenotype( boolean isNeurocartaPhenotype ) {
+        this.isNeurocartaPhenotype = isNeurocartaPhenotype;
     }
 
     public void setPhenoSet( Set<String> phenoset ) {
@@ -109,20 +101,28 @@ public class PhenotypeSummaryValueObject implements Serializable, Comparable<Phe
         ;
     }
 
-    public long getSortValue() {
-        return sortValue;
+    public void setPhenoSummaryMap( Map<String, Integer> phenoSummaryMap ) {
+        this.phenoSummaryMap = phenoSummaryMap;
+    }
+
+    public void setSelectedPhenotype( PhenotypeValueObject selectedPhenotype ) {
+        this.selectedPhenotype = selectedPhenotype;
     }
 
     public void setSortValue( long sortValue ) {
         this.sortValue = sortValue;
     }
 
-    public Map<String, Set<Long>> getSubjects() {
-        return subjects;
-    }
-
     public void setSubjects( Map<String, Set<Long>> subjects ) {
         this.subjects = subjects;
+    }
+
+    public void setUri( String uri ) {
+        this.uri = uri;
+    }
+
+    public void setValueType( String valueType ) {
+        this.valueType = valueType;
     }
 
 }

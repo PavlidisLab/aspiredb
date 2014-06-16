@@ -62,6 +62,17 @@ public class VariantServiceTest extends BaseSpringContextTest {
     private Variant variant;
     private Subject subject;
 
+    @After
+    public void cleanup() {
+        new InlineTransaction() {
+            @Override
+            public void instructions() {
+                variantDao.remove( variant );
+                subjectDao.remove( subject );
+            }
+        }.execute();
+    }
+
     @Before
     public void init() {
         new InlineTransaction() {
@@ -70,17 +81,6 @@ public class VariantServiceTest extends BaseSpringContextTest {
                 subject = testObjectHelper.createPersistentTestIndividualObject( "testSubjectVariantServiceTest" );
                 variant = testObjectHelper.createPersistentTestCNVObject();
                 variant.setSubject( subject );
-            }
-        }.execute();
-    }
-
-    @After
-    public void cleanup() {
-        new InlineTransaction() {
-            @Override
-            public void instructions() {
-                variantDao.remove( variant );
-                subjectDao.remove( subject );
             }
         }.execute();
     }

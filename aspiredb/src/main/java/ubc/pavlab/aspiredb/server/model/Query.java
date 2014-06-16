@@ -18,6 +18,8 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
+import gemma.gsec.model.SecuredNotChild;
+
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -26,14 +28,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
-
 /**
  * author: anton date: 14/04/13
  */
 @Entity
 @Table(name = "QUERY")
-public class Query implements Securable {
+public class Query implements SecuredNotChild {
 
     @Id
     @GeneratedValue
@@ -46,12 +46,12 @@ public class Query implements Securable {
     @Column(name = "OBJECT", columnDefinition = "MEDIUMBLOB")
     private Serializable object;
 
+    public Query() {
+    }
+
     public Query( String name, Serializable object ) {
         this.name = name;
         this.object = object;
-    }
-
-    public Query() {
     }
 
     @Override
@@ -59,20 +59,20 @@ public class Query implements Securable {
         return this.id;
     }
 
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName( String name ) {
-        this.name = name;
-    }
-
     public Serializable getObject() {
         return object;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
     }
 
     public void setObject( Serializable object ) {

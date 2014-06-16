@@ -34,7 +34,7 @@ public interface UserGeneSetDao extends SecurableDaoBase<UserGeneSet> {
 
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public List<UserGeneSet> findByName( String geneSetName );
-    
+
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public List<UserGeneSet> suggestGeneSetNames( String query );
 

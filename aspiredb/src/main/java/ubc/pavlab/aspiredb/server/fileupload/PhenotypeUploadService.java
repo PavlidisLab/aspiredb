@@ -37,63 +37,6 @@ public class PhenotypeUploadService {
 
     protected static Log log = LogFactory.getLog( PhenotypeUploadService.class );
 
-    public PhenotypeUploadServiceResult getPhenotypeValueObjectsFromResultSet( ResultSet results ) throws Exception {
-
-        ArrayList<String> phenotypeFileColumns = new ArrayList<String>();
-
-        ResultSetMetaData rsmd = results.getMetaData();
-        int numColumns = rsmd.getColumnCount();
-
-        // Get the column names; column indices start from 1
-        for ( int i = 1; i < numColumns + 1; i++ ) {
-            String columnName = rsmd.getColumnName( i );
-            phenotypeFileColumns.add( columnName.trim() );
-        }
-
-        int lineNumber = 1;
-
-        ArrayList<String> errorMessages = new ArrayList<String>();
-
-        ArrayList<PhenotypeValueObject> voList = new ArrayList<PhenotypeValueObject>();
-
-        while ( results.next() ) {
-
-            for ( String p : phenotypeFileColumns ) {
-
-                try {
-
-                    if ( !p.equals( CommonVariantColumn.SUBJECTID.key ) && results.getString( p ) != null
-                            && !results.getString( p ).trim().isEmpty() ) {
-
-                        // No data means unobserved. Change later if people change their minds again.
-                        if ( results.getString( p ) != null && !results.getString( p ).trim().isEmpty() ) {
-
-                            PhenotypeValueObject vo = new PhenotypeValueObject();
-                            vo.setExternalSubjectId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
-
-                            phenotypeUtil.setNameUriValueType( vo, p );
-                            phenotypeUtil.setValue( vo, results.getString( p ).trim() );
-
-                            voList.add( vo );
-
-                        }
-                    }
-                } catch ( InvalidDataException e ) {
-
-                    errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:"
-                            + e.getMessage() );
-
-                }
-
-                lineNumber++;
-            }
-
-        }
-
-        return new PhenotypeUploadServiceResult( voList, errorMessages, new HashSet<String>() );
-
-    }
-
     // cut and pasted and modified to handle decipher file to quickly get it into the system
     // no point making this pretty because some guy at decipher is going to break this code next time he uploads a file
     // to the decipher ftp server
@@ -157,6 +100,63 @@ public class PhenotypeUploadService {
         }
 
         return new PhenotypeUploadServiceResult( voList, errorMessages, unmatched );
+
+    }
+
+    public PhenotypeUploadServiceResult getPhenotypeValueObjectsFromResultSet( ResultSet results ) throws Exception {
+
+        ArrayList<String> phenotypeFileColumns = new ArrayList<String>();
+
+        ResultSetMetaData rsmd = results.getMetaData();
+        int numColumns = rsmd.getColumnCount();
+
+        // Get the column names; column indices start from 1
+        for ( int i = 1; i < numColumns + 1; i++ ) {
+            String columnName = rsmd.getColumnName( i );
+            phenotypeFileColumns.add( columnName.trim() );
+        }
+
+        int lineNumber = 1;
+
+        ArrayList<String> errorMessages = new ArrayList<String>();
+
+        ArrayList<PhenotypeValueObject> voList = new ArrayList<PhenotypeValueObject>();
+
+        while ( results.next() ) {
+
+            for ( String p : phenotypeFileColumns ) {
+
+                try {
+
+                    if ( !p.equals( CommonVariantColumn.SUBJECTID.key ) && results.getString( p ) != null
+                            && !results.getString( p ).trim().isEmpty() ) {
+
+                        // No data means unobserved. Change later if people change their minds again.
+                        if ( results.getString( p ) != null && !results.getString( p ).trim().isEmpty() ) {
+
+                            PhenotypeValueObject vo = new PhenotypeValueObject();
+                            vo.setExternalSubjectId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
+
+                            phenotypeUtil.setNameUriValueType( vo, p );
+                            phenotypeUtil.setValue( vo, results.getString( p ).trim() );
+
+                            voList.add( vo );
+
+                        }
+                    }
+                } catch ( InvalidDataException e ) {
+
+                    errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:"
+                            + e.getMessage() );
+
+                }
+
+                lineNumber++;
+            }
+
+        }
+
+        return new PhenotypeUploadServiceResult( voList, errorMessages, new HashSet<String>() );
 
     }
 

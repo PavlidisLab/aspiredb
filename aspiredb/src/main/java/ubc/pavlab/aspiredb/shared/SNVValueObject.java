@@ -41,28 +41,12 @@ public class SNVValueObject extends VariantValueObject {
     public SNVValueObject() {
     }
 
-    public String getReferenceBase() {
-        return referenceBase;
-    }
-
-    public void setReferenceBase( String referenceBase ) {
-        this.referenceBase = referenceBase;
-    }
-
-    public String getObservedBase() {
-        return observedBase;
-    }
-
-    public void setObservedBase( String observedBase ) {
-        this.observedBase = observedBase;
-    }
-
     public String getDbSNPID() {
         return dbSNPID;
     }
 
-    public void setDbSNPID( String dbSNPID ) {
-        this.dbSNPID = dbSNPID;
+    public String getObservedBase() {
+        return observedBase;
     }
 
     @Override
@@ -75,5 +59,21 @@ public class SNVValueObject extends VariantValueObject {
             return this.getReferenceBase();
         }
         return super.getPropertyStringValue( property );
+    }
+
+    public String getReferenceBase() {
+        return referenceBase;
+    }
+
+    public void setDbSNPID( String dbSNPID ) {
+        this.dbSNPID = dbSNPID;
+    }
+
+    public void setObservedBase( String observedBase ) {
+        this.observedBase = observedBase;
+    }
+
+    public void setReferenceBase( String referenceBase ) {
+        this.referenceBase = referenceBase;
     }
 }

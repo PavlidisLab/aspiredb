@@ -53,11 +53,58 @@ public class PhenotypeUtil {
 
     private static Log log = LogFactory.getLog( PhenotypeUtil.class.getName() );
 
+    /**
+     * we want to use the standard 0,1,2,3 values of the human phenotype ontology but some of the data we are loading in
+     * has Y and N. This method is to convert special cases to the standard value. Hopefully we can enforce a standard
+     * and get rid of this method
+     */
+    public static String convertValueToHPOntologyStandardValue( String value ) throws InvalidDataException {
+        try {
+            Integer intValue = Integer.parseInt( value );
+
+            if ( intValue != 1 && intValue != 0 ) {
+                throw new InvalidDataException( "Invalid HP Ontology value. Must be one of 1,0,Y,N" );
+            }
+
+        } catch ( NumberFormatException nfe ) {
+            if ( value != null && value.trim().equalsIgnoreCase( "Y" ) ) {
+                return VALUE_PRESENT;
+            } else if ( value != null && value.trim().equalsIgnoreCase( "N" ) ) {
+                return VALUE_ABSENT;
+            } else {
+                throw new InvalidDataException( "Invalid HP Ontology value. Must be one of 1,0,Y,N" );
+            }
+        }
+        return value;
+    }
+
+    public static boolean isUri( String uriOrName ) {
+        if ( uriOrName == null ) {
+            return false;
+        } else {
+            return uriOrName.trim().startsWith( "HP_" );
+        }
+    }
+
     @Autowired
     OntologyService os;
 
     @Autowired
     PhenotypeDao phenotypeDao;
+
+    public PhenotypeFilterConfig expandOntologyTerms( PhenotypeFilterConfig filterConfig,
+            Collection<Long> activeProjectIds ) {
+        StopWatch timer = new StopWatch();
+        timer.start();
+        RestrictionExpression restrictionTree = filterConfig.getRestriction();
+        // Traverse and expand ontology terms
+        restrictionTree = expandNodesUsingOntologyInference( restrictionTree, activeProjectIds );
+        filterConfig.setRestriction( restrictionTree );
+        if ( timer.getTime() > 100 ) {
+            log.info( "Expanding ontology terms took " + timer.getTime() + "ms" );
+        }
+        return filterConfig;
+    }
 
     public void setNameUriValueType( PhenotypeValueObject phenotype, String key ) throws InvalidDataException {
         if ( isUri( key ) ) {
@@ -94,74 +141,50 @@ public class PhenotypeUtil {
 
     }
 
-    /**
-     * we want to use the standard 0,1,2,3 values of the human phenotype ontology but some of the data we are loading in
-     * has Y and N. This method is to convert special cases to the standard value. Hopefully we can enforce a standard
-     * and get rid of this method
-     */
-    public static String convertValueToHPOntologyStandardValue( String value ) throws InvalidDataException {
-        try {
-            Integer intValue = Integer.parseInt( value );
+    private Set<PhenotypeRestriction> createRestrictionsForDescendants( String value, OntologyTerm term,
+            Set<PhenotypeRestriction> expandedRestrictions, Collection<String> remainingTerms ) {
+        Collection<OntologyTerm> childTerms = term.getChildren( false );
 
-            if ( intValue != 1 && intValue != 0 ) {
-                throw new InvalidDataException( "Invalid HP Ontology value. Must be one of 1,0,Y,N" );
-            }
+        for ( OntologyTerm childTerm : childTerms ) {
+            PhenotypeRestriction phenotypeRestriction = new PhenotypeRestriction( childTerm.getLabel(), value,
+                    childTerm.getUri() );
 
-        } catch ( NumberFormatException nfe ) {
-            if ( value != null && value.trim().equalsIgnoreCase( "Y" ) ) {
-                return VALUE_PRESENT;
-            } else if ( value != null && value.trim().equalsIgnoreCase( "N" ) ) {
-                return VALUE_ABSENT;
+            HashSet<String> termList = new HashSet<String>();
+            termList.add( childTerm.getLabel() );
+
+            if ( remainingTerms.contains( childTerm.getLabel() ) ) {
+                expandedRestrictions.add( phenotypeRestriction );
+                remainingTerms.remove( childTerm.getLabel() );
+                // log.info( "Phenotype \"" + childTerm.getLabel() + " found in database." );
             } else {
-                throw new InvalidDataException( "Invalid HP Ontology value. Must be one of 1,0,Y,N" );
+                // log.info("Phenotype \"" + childTerm.getLabel() + " not found in database.");
             }
+
         }
-        return value;
+        return expandedRestrictions;
     }
 
-    public static boolean isUri( String uriOrName ) {
-        if ( uriOrName == null ) {
-            return false;
-        } else {
-            return uriOrName.trim().startsWith( "HP_" );
-        }
-    }
+    private RestrictionExpression expandNodesUsingOntologyInference( RestrictionExpression node,
+            Collection<Long> activeProjectIds ) {
+        if ( node instanceof PhenotypeRestriction ) {
+            // log.info("node instanceof PhenotypeRestriction");
+            PhenotypeRestriction phenotype = ( PhenotypeRestriction ) node;
+            Disjunction disjunction = new Disjunction();
+            disjunction.replaceAll( expandPhenotypeRestriction( phenotype, activeProjectIds ) );
+            return disjunction;
 
-    /**
-     * Sets the first URI that matches the phenotype name
-     * 
-     * @param phenotype
-     */
-    private void resolveUri( PhenotypeRestriction phenotype ) {
-        if ( phenotype == null ) {
-            return;
-        }
-        List<String> uriList = phenotypeDao.getExistingURIs( phenotype.getName() );
-        if ( uriList.size() == 0 ) {
-            log.warn( " No URI found for phenotype \"" + phenotype.getName() + "\"" );
-            return;
-        }
-
-        phenotype.setUri( uriList.iterator().next() );
-    }
-
-    private void loadOntology() {
-        HumanPhenotypeOntologyService humanPhenotypeOntology = os.getHumanPhenotypeOntologyService();
-        humanPhenotypeOntology.startInitializationThread( true );
-        int c = 0;
-
-        try {
-            while ( !humanPhenotypeOntology.isOntologyLoaded() ) {
-                Thread.sleep( 10000 );
-                log.info( "Waiting for HumanPhenotypeOntology to load" );
-                if ( ++c > 10 ) {
-                    log.error( "Ontology load timed out" );
-                    return;
-                }
+        } else if ( node instanceof Junction ) {
+            Collection<RestrictionExpression> restrictions = ( ( Junction ) node ).getRestrictions();
+            Collection<RestrictionExpression> results = new ArrayList<RestrictionExpression>();
+            for ( RestrictionExpression restriction : restrictions ) {
+                RestrictionExpression result = expandNodesUsingOntologyInference( restriction, activeProjectIds );
+                results.add( result );
             }
-        } catch ( InterruptedException e ) {
-            log.error( "Failed to load the Human Phenotype Ontology service" );
-            return;
+            ( ( Junction ) node ).replaceAll( results );
+            return node;
+        } else { // Any other leaf node
+            log.debug( "node leaf node" );
+            return node;
         }
     }
 
@@ -234,64 +257,41 @@ public class PhenotypeUtil {
         return expandedRestrictions;
     }
 
-    private Set<PhenotypeRestriction> createRestrictionsForDescendants( String value, OntologyTerm term,
-            Set<PhenotypeRestriction> expandedRestrictions, Collection<String> remainingTerms ) {
-        Collection<OntologyTerm> childTerms = term.getChildren( false );
+    private void loadOntology() {
+        HumanPhenotypeOntologyService humanPhenotypeOntology = os.getHumanPhenotypeOntologyService();
+        humanPhenotypeOntology.startInitializationThread( true );
+        int c = 0;
 
-        for ( OntologyTerm childTerm : childTerms ) {
-            PhenotypeRestriction phenotypeRestriction = new PhenotypeRestriction( childTerm.getLabel(), value,
-                    childTerm.getUri() );
-
-            HashSet<String> termList = new HashSet<String>();
-            termList.add( childTerm.getLabel() );
-
-            if ( remainingTerms.contains( childTerm.getLabel() ) ) {
-                expandedRestrictions.add( phenotypeRestriction );
-                remainingTerms.remove( childTerm.getLabel() );
-                // log.info( "Phenotype \"" + childTerm.getLabel() + " found in database." );
-            } else {
-                // log.info("Phenotype \"" + childTerm.getLabel() + " not found in database.");
+        try {
+            while ( !humanPhenotypeOntology.isOntologyLoaded() ) {
+                Thread.sleep( 10000 );
+                log.info( "Waiting for HumanPhenotypeOntology to load" );
+                if ( ++c > 10 ) {
+                    log.error( "Ontology load timed out" );
+                    return;
+                }
             }
-
-        }
-        return expandedRestrictions;
-    }
-
-    private RestrictionExpression expandNodesUsingOntologyInference( RestrictionExpression node,
-            Collection<Long> activeProjectIds ) {
-        if ( node instanceof PhenotypeRestriction ) {
-            // log.info("node instanceof PhenotypeRestriction");
-            PhenotypeRestriction phenotype = ( PhenotypeRestriction ) node;
-            Disjunction disjunction = new Disjunction();
-            disjunction.replaceAll( expandPhenotypeRestriction( phenotype, activeProjectIds ) );
-            return disjunction;
-
-        } else if ( node instanceof Junction ) {
-            Collection<RestrictionExpression> restrictions = ( ( Junction ) node ).getRestrictions();
-            Collection<RestrictionExpression> results = new ArrayList<RestrictionExpression>();
-            for ( RestrictionExpression restriction : restrictions ) {
-                RestrictionExpression result = expandNodesUsingOntologyInference( restriction, activeProjectIds );
-                results.add( result );
-            }
-            ( ( Junction ) node ).replaceAll( results );
-            return node;
-        } else { // Any other leaf node
-            log.debug( "node leaf node" );
-            return node;
+        } catch ( InterruptedException e ) {
+            log.error( "Failed to load the Human Phenotype Ontology service" );
+            return;
         }
     }
 
-    public PhenotypeFilterConfig expandOntologyTerms( PhenotypeFilterConfig filterConfig,
-            Collection<Long> activeProjectIds ) {
-        StopWatch timer = new StopWatch();
-        timer.start();
-        RestrictionExpression restrictionTree = filterConfig.getRestriction();
-        // Traverse and expand ontology terms
-        restrictionTree = expandNodesUsingOntologyInference( restrictionTree, activeProjectIds );
-        filterConfig.setRestriction( restrictionTree );
-        if ( timer.getTime() > 100 ) {
-            log.info( "Expanding ontology terms took " + timer.getTime() + "ms" );
+    /**
+     * Sets the first URI that matches the phenotype name
+     * 
+     * @param phenotype
+     */
+    private void resolveUri( PhenotypeRestriction phenotype ) {
+        if ( phenotype == null ) {
+            return;
         }
-        return filterConfig;
+        List<String> uriList = phenotypeDao.getExistingURIs( phenotype.getName() );
+        if ( uriList.size() == 0 ) {
+            log.warn( " No URI found for phenotype \"" + phenotype.getName() + "\"" );
+            return;
+        }
+
+        phenotype.setUri( uriList.iterator().next() );
     }
 }

@@ -54,9 +54,6 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
 
     private static Log log = LogFactory.getLog( BioMartQueryServiceImpl.class.getName() );
 
-    @Autowired
-    private BioMartCache bioMartCache;
-
     private static String sendRequest( String xmlQueryString ) throws BioMartServiceException {
         Client client = Client.create();
 
@@ -78,6 +75,58 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
         }
 
         return response.getEntity( String.class );
+    }
+
+    @Autowired
+    private BioMartCache bioMartCache;
+
+    @Override
+    public Collection<GeneValueObject> fetchGenesByGeneSymbols( Collection<String> geneSymbols )
+            throws BioMartServiceException {
+        updateCacheIfExpired();
+
+        return bioMartCache.fetchGenesByGeneSymbols( geneSymbols );
+    }
+
+    @Override
+    public Collection<GeneValueObject> fetchGenesByLocation( String chromosomeName, Long start, Long end )
+            throws BioMartServiceException {
+        updateCacheIfExpired();
+
+        return bioMartCache.fetchGenesByLocation( chromosomeName, start, end );
+    }
+
+    @Override
+    public Collection<GenomicRange> fetchGenomicRangesByGeneSymbols( Collection<String> geneSymbols )
+            throws BioMartServiceException {
+        Collection<GeneValueObject> genes = fetchGenesByGeneSymbols( geneSymbols );
+        Collection<GenomicRange> genomicRanges = new HashSet<GenomicRange>( genes.size() );
+
+        for ( GeneValueObject gene : genes ) {
+            genomicRanges.add( gene.getGenomicRange() );
+        }
+
+        return genomicRanges;
+    }
+
+    @Override
+    public Collection<GeneValueObject> findGenes( String queryString ) throws BioMartServiceException {
+        updateCacheIfExpired();
+
+        return bioMartCache.findGenes( queryString );
+    }
+
+    /**
+     * get the genes using the list of gene ids or list of gene symbols
+     * 
+     * @param List of gene strings
+     * @return Gene value Objects associated with the given gene string list
+     */
+    @Override
+    public List<GeneValueObject> getGenes( List<String> geneStrings ) throws BioMartServiceException {
+        updateCacheIfExpired();
+
+        return bioMartCache.getGenes( geneStrings );
     }
 
     @SuppressWarnings("unused")
@@ -163,54 +212,5 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
 
             this.bioMartCache.putAll( genes );
         }
-    }
-
-    @Override
-    public Collection<GeneValueObject> findGenes( String queryString ) throws BioMartServiceException {
-        updateCacheIfExpired();
-
-        return bioMartCache.findGenes( queryString );
-    }
-
-    /**
-     * get the genes using the list of gene ids or list of gene symbols
-     * 
-     * @param List of gene strings
-     * @return Gene value Objects associated with the given gene string list
-     */
-    @Override
-    public List<GeneValueObject> getGenes( List<String> geneStrings ) throws BioMartServiceException {
-        updateCacheIfExpired();
-
-        return bioMartCache.getGenes( geneStrings );
-    }
-
-    @Override
-    public Collection<GeneValueObject> fetchGenesByLocation( String chromosomeName, Long start, Long end )
-            throws BioMartServiceException {
-        updateCacheIfExpired();
-
-        return bioMartCache.fetchGenesByLocation( chromosomeName, start, end );
-    }
-
-    @Override
-    public Collection<GenomicRange> fetchGenomicRangesByGeneSymbols( Collection<String> geneSymbols )
-            throws BioMartServiceException {
-        Collection<GeneValueObject> genes = fetchGenesByGeneSymbols( geneSymbols );
-        Collection<GenomicRange> genomicRanges = new HashSet<GenomicRange>( genes.size() );
-
-        for ( GeneValueObject gene : genes ) {
-            genomicRanges.add( gene.getGenomicRange() );
-        }
-
-        return genomicRanges;
-    }
-
-    @Override
-    public Collection<GeneValueObject> fetchGenesByGeneSymbols( Collection<String> geneSymbols )
-            throws BioMartServiceException {
-        updateCacheIfExpired();
-
-        return bioMartCache.fetchGenesByGeneSymbols( geneSymbols );
     }
 }

@@ -14,7 +14,8 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import java.io.File;
+import gemma.gsec.SecurityService;
+
 import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -46,7 +47,6 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
-import ubc.pavlab.aspiredb.server.security.SecurityService;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;

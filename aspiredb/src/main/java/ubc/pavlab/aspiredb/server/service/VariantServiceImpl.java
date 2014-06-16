@@ -79,7 +79,7 @@ import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
 
 /**
  * TODO Document Me
- *
+ * 
  * @author ??
  * @version $Id: VariantServiceImpl.java,v 1.39 2013/07/02 18:20:21 anton Exp $
  */
@@ -106,78 +106,103 @@ public class VariantServiceImpl implements VariantService {
 
     private String patientId;
 
-    private String getSortColumn( PagingLoadConfig config ) {
-        // default value
-        String property = "id";
+    @Override
+    @RemoteMethod
+    @Transactional
+    public LabelValueObject addLabel( Collection<Long> ids, LabelValueObject label ) {
 
-        if ( config.getSortInfo() != null && !config.getSortInfo().isEmpty() ) {
-            SortInfo sortInfo = config.getSortInfo().iterator().next();
-            property = sortInfo.getSortField();
+        Collection<Variant> variants = variantDao.load( ids );
+        Label labelEntity = labelDao.findOrCreate( label );
+        for ( Variant variant : variants ) {
+            variant.addLabel( labelEntity );
+            variantDao.update( variant );
+        }
+        return labelEntity.toValueObject();
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional
+    public LabelValueObject addLabel( Long id, LabelValueObject label ) {
+
+        Variant variant = variantDao.load( id );
+        Label labelEntity = labelDao.findOrCreate( label );
+        variant.addLabel( labelEntity );
+        return labelEntity.toValueObject();
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public List<VariantValueObject> getSubjectsVariants( List<String> patientIds ) {
+        List<VariantValueObject> vvo = new ArrayList<VariantValueObject>();
+
+        for ( String patientId : patientIds ) {
+            Collection<Variant> variantCollection = variantDao.findBySubjectPatientId( patientId );
+            for ( Variant variant : variantCollection ) {
+                vvo.add( variant.toValueObject() );
+            }
         }
 
-        // String columnName = propertyToColumnName.get( property );
-        return "id";
+        return vvo;
     }
 
-    private String getSortDirection( PagingLoadConfig config ) {
-        // default value
-        String direction = "ASC";
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public List<VariantValueObject> getSubjectVariants( String patientId ) {
+        List<VariantValueObject> vvo = new ArrayList<VariantValueObject>();
 
-        if ( config.getSortInfo() != null && !config.getSortInfo().isEmpty() ) {
-            SortInfo sortInfo = config.getSortInfo().iterator().next();
-            direction = sortInfo.getSortDir().toString();
+        Collection<Variant> variantCollection = variantDao.findBySubjectPatientId( patientId );
+        for ( Variant variant : variantCollection ) {
+            vvo.add( variant.toValueObject() );
         }
-        return direction;
+
+        return vvo;
     }
 
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<Property> suggestPropertiesForVariantType( VariantType variantType ) {
-        Collection<Property> properties = new ArrayList<Property>();
+    public Integer getTotalNoOfVariantsBySubjectId( String patientId ) {
+        Collection<Variant> variantCollection = variantDao.findBySubjectPatientId( patientId );
 
-        properties.add( new VariantLabelProperty() );
+        return variantCollection.size();
+    }
 
-        properties.addAll( suggestEntityProperties( variantType ) );
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public VariantValueObject getVariant( Long id ) {
 
-        Collection<String> characteristics = characteristicDao.getKeysMatching( "" );
-        for ( String characteristic : characteristics ) {
-            properties.add( new CharacteristicProperty( characteristic ) );
+        Variant variant = variantDao.load( id );
+        return variant.toValueObject();
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional
+    public void removeLabel( Collection<Long> variantIds, LabelValueObject label ) {
+        for ( Long variantId : variantIds ) {
+            removeLabel( variantId, label );
         }
-        return properties;
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional
+    public void removeLabel( Long id, LabelValueObject label ) {
+        Variant variant = variantDao.load( id );
+        Label labelEntity = labelDao.load( label.getId() );
+        variant.removeLabel( labelEntity );
+        variantDao.update( variant );
     }
 
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<Property> suggestPropertiesForProjectOverlap() {
-        Collection<Property> properties = new ArrayList<Property>();
-        properties.add( new OverlapBasesProperty() );
-        properties.add( new MutualOverlapPercentageProperty() );
-        properties.add( new OverlapPercentageMyVariantProperty() );
-        properties.add( new OverlapPercentageOtherVariantProperty() );
-        return properties;
-
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional(readOnly = true)
-    public Collection<Property> suggestPropertiesForNumberOfVariantsInProjectOverlap() {
-        Collection<Property> properties = new ArrayList<Property>();
-        properties.add( new DoesOverlapWithXProperty() );
-        return properties;
-
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional(readOnly = true)
-    public Collection<Property> suggestPropertiesForSupportOfVariantsInProjectOverlap() {
-        Collection<Property> properties = new ArrayList<Property>();
-        properties.add( new SupportValueProperty() );
-        return properties;
-
+    public Collection<String> suggestCharacteristicPropertyValues( CharacteristicProperty property ) {
+        return characteristicDao.getValuesForKey( property.getName() );
     }
 
     @Override
@@ -205,30 +230,40 @@ public class VariantServiceImpl implements VariantService {
 
     }
 
-    private Collection<Property> suggestEntityProperties( VariantType variantType ) {
-        Collection<Property> properties = new ArrayList<Property>();
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<GeneProperty> suggestGeneValues( SuggestionContext suggestionContext )
+            throws BioMartServiceException, NeurocartaServiceException {
 
-        switch ( variantType ) {
-            case CNV:
-                properties.add( new CopyNumberProperty() );
-                properties.add( new CNVTypeProperty() );
-                properties.add( new CnvLengthProperty() );
-                break;
-            case SNV:
-                properties.add( new DbSnpIdProperty() );
-                properties.add( new ObservedBaseProperty() );
-                properties.add( new ReferenceBaseProperty() );
-                break;
-            case INDEL:
-                properties.add( new IndelLengthProperty() );
-                break;
-            case INVERSION:
-                break;
-            case TRANSLOCATION:
-                properties.add( new TranslocationTypeProperty() );
-                break;
+        Collection<GeneProperty> geneSymbols = new ArrayList<GeneProperty>();
+
+        String query = suggestionContext.getValuePrefix();
+        if ( query.length() >= 2 ) {
+            final Collection<GeneValueObject> genes = bioMartQueryService.findGenes( query );
+            for ( GeneValueObject gene : genes ) {
+                GeneProperty geneProperty = new GeneProperty();
+                geneProperty.setName( gene.getName() );
+                geneProperty.setDisplayName( gene.getSymbol() );
+                geneSymbols.add( geneProperty );
+            }
         }
-        return properties;
+
+        return geneSymbols;
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public List<LabelValueObject> suggestLabels( SuggestionContext suggestionContext ) {
+        // TODO: filter out labels non-applicable to variants
+        // labelDao.getLabelsMatching( partialName );
+        Collection<Label> labels = labelDao.getVariantLabels();
+        List<LabelValueObject> vos = new ArrayList<LabelValueObject>();
+        for ( Label label : labels ) {
+            vos.add( label.toValueObject() );
+        }
+        return vos;
     }
 
     @Override
@@ -253,23 +288,51 @@ public class VariantServiceImpl implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<GeneProperty> suggestGeneValues( SuggestionContext suggestionContext )
-            throws BioMartServiceException, NeurocartaServiceException {
+    public Collection<Property> suggestPropertiesForNumberOfVariantsInProjectOverlap() {
+        Collection<Property> properties = new ArrayList<Property>();
+        properties.add( new DoesOverlapWithXProperty() );
+        return properties;
 
-        Collection<GeneProperty> geneSymbols = new ArrayList<GeneProperty>();
+    }
 
-        String query = suggestionContext.getValuePrefix();
-        if ( query.length() >= 2 ) {
-            final Collection<GeneValueObject> genes = bioMartQueryService.findGenes( query );
-            for ( GeneValueObject gene : genes ) {
-                GeneProperty geneProperty = new GeneProperty();
-                geneProperty.setName( gene.getName() );
-                geneProperty.setDisplayName( gene.getSymbol() );
-                geneSymbols.add( geneProperty );
-            }
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<Property> suggestPropertiesForProjectOverlap() {
+        Collection<Property> properties = new ArrayList<Property>();
+        properties.add( new OverlapBasesProperty() );
+        properties.add( new MutualOverlapPercentageProperty() );
+        properties.add( new OverlapPercentageMyVariantProperty() );
+        properties.add( new OverlapPercentageOtherVariantProperty() );
+        return properties;
+
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<Property> suggestPropertiesForSupportOfVariantsInProjectOverlap() {
+        Collection<Property> properties = new ArrayList<Property>();
+        properties.add( new SupportValueProperty() );
+        return properties;
+
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<Property> suggestPropertiesForVariantType( VariantType variantType ) {
+        Collection<Property> properties = new ArrayList<Property>();
+
+        properties.add( new VariantLabelProperty() );
+
+        properties.addAll( suggestEntityProperties( variantType ) );
+
+        Collection<String> characteristics = characteristicDao.getKeysMatching( "" );
+        for ( String characteristic : characteristics ) {
+            properties.add( new CharacteristicProperty( characteristic ) );
         }
-
-        return geneSymbols;
+        return properties;
     }
 
     @Override
@@ -297,15 +360,16 @@ public class VariantServiceImpl implements VariantService {
                 }
             }
         } else if ( property instanceof GeneSetProperty ) {
-            Collection<UserGeneSet> geneSets = this.userGeneSetDao.suggestGeneSetNames( suggestionContext.getValuePrefix() );
-          for ( UserGeneSet geneset : geneSets ) {
-              GeneSetValueObject gvo =new GeneSetValueObject();
-              gvo.setId( geneset.getId() );
-              gvo.setName( geneset.getName() );
-              gvo.setObject( geneset.getObject() );
-              values.add( new PropertyValue<GeneSetValueObject>( gvo) );           
-      }
-  }else if ( property instanceof NeurocartaPhenotypeProperty ) {
+            Collection<UserGeneSet> geneSets = this.userGeneSetDao.suggestGeneSetNames( suggestionContext
+                    .getValuePrefix() );
+            for ( UserGeneSet geneset : geneSets ) {
+                GeneSetValueObject gvo = new GeneSetValueObject();
+                gvo.setId( geneset.getId() );
+                gvo.setName( geneset.getName() );
+                gvo.setObject( geneset.getObject() );
+                values.add( new PropertyValue<GeneSetValueObject>( gvo ) );
+            }
+        } else if ( property instanceof NeurocartaPhenotypeProperty ) {
             String query = suggestionContext.getValuePrefix();
             if ( query.length() >= 3 ) {
                 final Collection<NeurocartaPhenotypeValueObject> phenotypes = neurocartaQueryService
@@ -326,61 +390,6 @@ public class VariantServiceImpl implements VariantService {
             }
         }
         return values;
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional(readOnly = true)
-    public Collection<String> suggestCharacteristicPropertyValues( CharacteristicProperty property ) {
-        return characteristicDao.getValuesForKey( property.getName() );
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional(readOnly = true)
-    public VariantValueObject getVariant( Long id ) {
-
-        Variant variant = variantDao.load( id );
-        return variant.toValueObject();
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional(readOnly = true)
-    public List<VariantValueObject> getSubjectVariants( String patientId ) {
-        List<VariantValueObject> vvo = new ArrayList<VariantValueObject>();
-
-        Collection<Variant> variantCollection = variantDao.findBySubjectPatientId( patientId );
-        for ( Variant variant : variantCollection ) {
-            vvo.add( variant.toValueObject() );
-        }
-
-        return vvo;
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional(readOnly = true)
-    public List<VariantValueObject> getSubjectsVariants( List<String> patientIds ) {
-        List<VariantValueObject> vvo = new ArrayList<VariantValueObject>();
-
-        for ( String patientId : patientIds ) {
-            Collection<Variant> variantCollection = variantDao.findBySubjectPatientId( patientId );
-            for ( Variant variant : variantCollection ) {
-                vvo.add( variant.toValueObject() );
-            }
-        }
-
-        return vvo;
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional(readOnly = true)
-    public Integer getTotalNoOfVariantsBySubjectId( String patientId ) {
-        Collection<Variant> variantCollection = variantDao.findBySubjectPatientId( patientId );
-
-        return variantCollection.size();
     }
 
     @Override
@@ -408,14 +417,15 @@ public class VariantServiceImpl implements VariantService {
                 values.add( new PropertyValue<GeneValueObject>( gene ) );
             }
         } else if ( property instanceof GeneSetProperty ) {
-              Collection<UserGeneSet> geneSets = this.userGeneSetDao.suggestGeneSetNames( suggestionContext.getValuePrefix() );
+            Collection<UserGeneSet> geneSets = this.userGeneSetDao.suggestGeneSetNames( suggestionContext
+                    .getValuePrefix() );
             for ( UserGeneSet geneset : geneSets ) {
-                GeneSetValueObject gvo =new GeneSetValueObject();
+                GeneSetValueObject gvo = new GeneSetValueObject();
                 gvo.setId( geneset.getId() );
                 gvo.setName( geneset.getName() );
-                values.add( new PropertyValue<GeneSetValueObject>( gvo) );           
-        }
-    }else if ( property instanceof GenomicLocationProperty ) {
+                values.add( new PropertyValue<GeneSetValueObject>( gvo ) );
+            }
+        } else if ( property instanceof GenomicLocationProperty ) {
             return suggestVariantRange( suggestionContext.getValuePrefix() );
         } else if ( property instanceof NeurocartaPhenotypeProperty ) {
             Collection<NeurocartaPhenotypeValueObject> phenotypes = this.neurocartaQueryService
@@ -426,6 +436,56 @@ public class VariantServiceImpl implements VariantService {
         }
 
         return values;
+    }
+
+    private String getSortColumn( PagingLoadConfig config ) {
+        // default value
+        String property = "id";
+
+        if ( config.getSortInfo() != null && !config.getSortInfo().isEmpty() ) {
+            SortInfo sortInfo = config.getSortInfo().iterator().next();
+            property = sortInfo.getSortField();
+        }
+
+        // String columnName = propertyToColumnName.get( property );
+        return "id";
+    }
+
+    private String getSortDirection( PagingLoadConfig config ) {
+        // default value
+        String direction = "ASC";
+
+        if ( config.getSortInfo() != null && !config.getSortInfo().isEmpty() ) {
+            SortInfo sortInfo = config.getSortInfo().iterator().next();
+            direction = sortInfo.getSortDir().toString();
+        }
+        return direction;
+    }
+
+    private Collection<Property> suggestEntityProperties( VariantType variantType ) {
+        Collection<Property> properties = new ArrayList<Property>();
+
+        switch ( variantType ) {
+            case CNV:
+                properties.add( new CopyNumberProperty() );
+                properties.add( new CNVTypeProperty() );
+                properties.add( new CnvLengthProperty() );
+                break;
+            case SNV:
+                properties.add( new DbSnpIdProperty() );
+                properties.add( new ObservedBaseProperty() );
+                properties.add( new ReferenceBaseProperty() );
+                break;
+            case INDEL:
+                properties.add( new IndelLengthProperty() );
+                break;
+            case INVERSION:
+                break;
+            case TRANSLOCATION:
+                properties.add( new TranslocationTypeProperty() );
+                break;
+        }
+        return properties;
     }
 
     private List<PropertyValue> suggestVariantRange( String query ) {
@@ -481,63 +541,5 @@ public class VariantServiceImpl implements VariantService {
             }
         }
         return suggestions;
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional
-    public LabelValueObject addLabel( Long id, LabelValueObject label ) {
-
-        Variant variant = variantDao.load( id );
-        Label labelEntity = labelDao.findOrCreate( label );
-        variant.addLabel( labelEntity );
-        return labelEntity.toValueObject();
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional
-    public LabelValueObject addLabel( Collection<Long> ids, LabelValueObject label ) {
-
-        Collection<Variant> variants = variantDao.load( ids );
-        Label labelEntity = labelDao.findOrCreate( label );
-        for ( Variant variant : variants ) {
-            variant.addLabel( labelEntity );
-            variantDao.update( variant );
-        }
-        return labelEntity.toValueObject();
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional
-    public void removeLabel( Long id, LabelValueObject label ) {
-        Variant variant = variantDao.load( id );
-        Label labelEntity = labelDao.load( label.getId() );
-        variant.removeLabel( labelEntity );
-        variantDao.update( variant );
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional
-    public void removeLabel( Collection<Long> variantIds, LabelValueObject label ) {
-        for ( Long variantId : variantIds ) {
-            removeLabel( variantId, label );
-        }
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional(readOnly = true)
-    public List<LabelValueObject> suggestLabels( SuggestionContext suggestionContext ) {
-        // TODO: filter out labels non-applicable to variants
-        // labelDao.getLabelsMatching( partialName );
-        Collection<Label> labels = labelDao.getVariantLabels();
-        List<LabelValueObject> vos = new ArrayList<LabelValueObject>();
-        for ( Label label : labels ) {
-            vos.add( label.toValueObject() );
-        }
-        return vos;
     }
 }

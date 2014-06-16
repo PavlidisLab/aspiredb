@@ -19,28 +19,28 @@ public class GenomicLocationValueObject implements Serializable {
     public GenomicLocationValueObject() {
     }
 
-    public void setStart( int start ) {
-        this.start = start;
-    }
-
-    public int getStart() {
-        return start;
-    }
-
-    public void setEnd( int end ) {
-        this.end = end;
+    public String getChromosome() {
+        return chromosome;
     }
 
     public int getEnd() {
         return end;
     }
 
+    public int getStart() {
+        return start;
+    }
+
     public void setChromosome( String chromosome ) {
         this.chromosome = chromosome;
     }
 
-    public String getChromosome() {
-        return chromosome;
+    public void setEnd( int end ) {
+        this.end = end;
+    }
+
+    public void setStart( int start ) {
+        this.start = start;
     }
 
 }

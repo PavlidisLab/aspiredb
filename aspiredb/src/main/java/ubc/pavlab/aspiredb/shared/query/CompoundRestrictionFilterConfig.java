@@ -43,20 +43,20 @@ public abstract class CompoundRestrictionFilterConfig extends AspireDbFilterConf
         return restriction1;
     }
 
-    public void setRestriction1( RestrictionExpression restriction1 ) {
-        this.restriction1 = restriction1;
-    }
-
     public RestrictionExpression getRestriction2() {
         return restriction2;
     }
 
-    public void setRestriction2( RestrictionExpression restriction2 ) {
-        this.restriction2 = restriction2;
-    }
-
     public RestrictionExpression getRestriction3() {
         return restriction3;
+    }
+
+    public void setRestriction1( RestrictionExpression restriction1 ) {
+        this.restriction1 = restriction1;
+    }
+
+    public void setRestriction2( RestrictionExpression restriction2 ) {
+        this.restriction2 = restriction2;
     }
 
     public void setRestriction3( RestrictionExpression restriction3 ) {

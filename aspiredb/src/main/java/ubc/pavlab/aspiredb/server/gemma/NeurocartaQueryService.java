@@ -31,17 +31,17 @@ import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
  */
 public interface NeurocartaQueryService {
 
-    public boolean isNeurocartaPhenotype( String phenotypeUri ) throws NeurocartaServiceException;
-
-    public Collection<NeurocartaPhenotypeValueObject> findPhenotypes( String queryString )
-            throws NeurocartaServiceException;
+    public Collection<GeneValueObject> fetchGenesAssociatedWithPhenotype( String phenotypeUri )
+            throws NeurocartaServiceException, BioMartServiceException;
 
     public Map<String, GeneValueObject> findPhenotypeGenes( String queryString ) throws NeurocartaServiceException,
             BioMartServiceException;
 
+    public Collection<NeurocartaPhenotypeValueObject> findPhenotypes( String queryString )
+            throws NeurocartaServiceException;
+
     public List<NeurocartaPhenotypeValueObject> getPhenotypes( List<String> names ) throws NeurocartaServiceException;
 
-    public Collection<GeneValueObject> fetchGenesAssociatedWithPhenotype( String phenotypeUri )
-            throws NeurocartaServiceException, BioMartServiceException;
+    public boolean isNeurocartaPhenotype( String phenotypeUri ) throws NeurocartaServiceException;
 
 }

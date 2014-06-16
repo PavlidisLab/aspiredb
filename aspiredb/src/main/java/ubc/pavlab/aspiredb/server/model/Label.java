@@ -18,6 +18,8 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
+import gemma.gsec.model.Securable;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -32,12 +34,19 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import ubc.pavlab.aspiredb.server.ValueObjectConvertible;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.Securable;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 @Entity
 @Table(name = "LABEL")
 public class Label implements Securable, ValueObjectConvertible<LabelValueObject> {
+
+    public static Collection<LabelValueObject> toValueObjects( Collection<Label> labels ) {
+        Collection<LabelValueObject> valueObjects = new ArrayList<LabelValueObject>();
+        for ( Label label : labels ) {
+            valueObjects.add( label.toValueObject() );
+        }
+        return valueObjects;
+    }
 
     @Id
     @GeneratedValue
@@ -73,47 +82,6 @@ public class Label implements Securable, ValueObjectConvertible<LabelValueObject
     }
 
     @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName( String name ) {
-        this.name = name;
-    }
-
-    public String getColour() {
-        return colour;
-    }
-
-    public void setColour( String colour ) {
-        this.colour = colour;
-    }
-
-    public Query getQuery() {
-        return query;
-    }
-
-    public void setQuery( Query query ) {
-        this.query = query;
-    }
-
-    public Boolean isShown() {
-        return isShown;
-    }
-
-    public void setIsShown( Boolean isShown ) {
-        this.isShown = isShown;
-    }
-
-    @Override
     public boolean equals( Object o ) {
         if ( this == o ) {
             return true;
@@ -134,6 +102,23 @@ public class Label implements Securable, ValueObjectConvertible<LabelValueObject
         return true;
     }
 
+    public String getColour() {
+        return colour;
+    }
+
+    @Override
+    public Long getId() {
+        return this.id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Query getQuery() {
+        return query;
+    }
+
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
@@ -141,16 +126,32 @@ public class Label implements Securable, ValueObjectConvertible<LabelValueObject
         return result;
     }
 
+    public Boolean isShown() {
+        return isShown;
+    }
+
+    public void setColour( String colour ) {
+        this.colour = colour;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setIsShown( Boolean isShown ) {
+        this.isShown = isShown;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    public void setQuery( Query query ) {
+        this.query = query;
+    }
+
     @Override
     public LabelValueObject toValueObject() {
         return new LabelValueObject( id, name, colour, isShown );
-    }
-
-    public static Collection<LabelValueObject> toValueObjects( Collection<Label> labels ) {
-        Collection<LabelValueObject> valueObjects = new ArrayList<LabelValueObject>();
-        for ( Label label : labels ) {
-            valueObjects.add( label.toValueObject() );
-        }
-        return valueObjects;
     }
 }

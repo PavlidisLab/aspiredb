@@ -26,9 +26,9 @@ import ubc.pavlab.aspiredb.shared.GeneValueObject;
  * @version $Id: BioMartCache.java,v 1.3 2013/06/11 22:30:47 anton Exp $
  */
 public interface BioMartCache {
-    public boolean hasExpired();
+    public Collection<GeneValueObject> fetchGenesByGeneSymbols( Collection<String> geneSymbols );
 
-    public void putAll( Collection<GeneValueObject> genes );
+    public Collection<GeneValueObject> fetchGenesByLocation( String chromosomeName, Long start, Long end );
 
     public Collection<GeneValueObject> findGenes( String queryString );
 
@@ -41,7 +41,7 @@ public interface BioMartCache {
      */
     public List<GeneValueObject> getGenes( List<String> geneStrings );
 
-    public Collection<GeneValueObject> fetchGenesByLocation( String chromosomeName, Long start, Long end );
+    public boolean hasExpired();
 
-    public Collection<GeneValueObject> fetchGenesByGeneSymbols( Collection<String> geneSymbols );
+    public void putAll( Collection<GeneValueObject> genes );
 }

@@ -41,27 +41,27 @@ public class PhenotypeProperty extends Property {
         this.supportsSuggestions = true;
     }
 
-    public boolean isOntologyTerm() {
-        return isOntologyTerm;
-    }
-
-    public void setOntologyTerm( boolean ontologyTerm ) {
-        isOntologyTerm = ontologyTerm;
-    }
-
     public String getUri() {
         return uri;
     }
 
-    public void setUri( String uri ) {
-        this.uri = uri;
+    public boolean isExistInDatabase() {
+        return existInDatabase;
+    }
+
+    public boolean isOntologyTerm() {
+        return isOntologyTerm;
     }
 
     public void setExistInDatabase( boolean existInDatabase ) {
         this.existInDatabase = existInDatabase;
     }
 
-    public boolean isExistInDatabase() {
-        return existInDatabase;
+    public void setOntologyTerm( boolean ontologyTerm ) {
+        isOntologyTerm = ontologyTerm;
+    }
+
+    public void setUri( String uri ) {
+        this.uri = uri;
     }
 }

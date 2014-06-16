@@ -28,55 +28,56 @@ import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.PropertyValue;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
-/** @author azoubare
+/**
+ * @author azoubare
  * @version $Id: VariantService.java,v 1.19 2013/06/13 19:57:16 anton Exp $
  */
 public interface VariantService {
 
-    public VariantValueObject getVariant( Long variantId );
+    public LabelValueObject addLabel( Collection<Long> variantIds, LabelValueObject label );
 
-    public List<VariantValueObject> getSubjectVariants( String patientId );
+    public LabelValueObject addLabel( Long variantId, LabelValueObject label );
 
     public List<VariantValueObject> getSubjectsVariants( List<String> patientIds );
 
+    public List<VariantValueObject> getSubjectVariants( String patientId );
+
     public Integer getTotalNoOfVariantsBySubjectId( String patientId );
+
+    public VariantValueObject getVariant( Long variantId );
+
+    public void removeLabel( Collection<Long> variantIds, LabelValueObject label );
+
+    public void removeLabel( Long variantId, LabelValueObject label );
+
+    @Deprecated
+    public Collection<String> suggestCharacteristicPropertyValues( CharacteristicProperty property );
+
+    public Collection<Property> suggestEntityPropertiesByStringName( String variantType );
+
+    public Collection<GeneProperty> suggestGeneValues( SuggestionContext suggestionContext )
+            throws BioMartServiceException, NeurocartaServiceException;
+
+    @Deprecated
+    public List<LabelValueObject> suggestLabels( SuggestionContext suggestionContext );
+
+    public Collection<Property> suggestProperties();
+
+    public Collection<Property> suggestPropertiesForNumberOfVariantsInProjectOverlap();
+
+    public Collection<Property> suggestPropertiesForProjectOverlap();
+
+    public Collection<Property> suggestPropertiesForSupportOfVariantsInProjectOverlap();
+
+    public Collection<Property> suggestPropertiesForVariantType( VariantType variantType );
+
+    public Collection<PropertyValue> suggestValues( Property property, SuggestionContext suggestionContext )
+            throws BioMartServiceException, NeurocartaServiceException;
 
     public Collection<Property> suggestVariantLocationProperties();
 
     public Collection<PropertyValue> suggestVariantLocationValues( Property property,
             SuggestionContext suggestionContext ) throws BioMartServiceException, NeurocartaServiceException,
             BioMartServiceException, NeurocartaServiceException;
-
-    public Collection<Property> suggestEntityPropertiesByStringName( String variantType );
-
-    public Collection<Property> suggestPropertiesForVariantType( VariantType variantType );
-
-    public Collection<Property> suggestPropertiesForProjectOverlap();
-
-    public Collection<Property> suggestPropertiesForNumberOfVariantsInProjectOverlap();
-
-    public Collection<Property> suggestPropertiesForSupportOfVariantsInProjectOverlap();
-
-    public Collection<Property> suggestProperties();
-
-    public Collection<PropertyValue> suggestValues( Property property, SuggestionContext suggestionContext )
-            throws BioMartServiceException, NeurocartaServiceException;
-
-    public Collection<GeneProperty> suggestGeneValues( SuggestionContext suggestionContext )
-            throws BioMartServiceException, NeurocartaServiceException;
-
-    @Deprecated
-    public Collection<String> suggestCharacteristicPropertyValues( CharacteristicProperty property );
-
-    @Deprecated
-    public List<LabelValueObject> suggestLabels( SuggestionContext suggestionContext );
-
-    public LabelValueObject addLabel( Long variantId, LabelValueObject label );
-
-    public LabelValueObject addLabel( Collection<Long> variantIds, LabelValueObject label );
-
-    public void removeLabel( Long variantId, LabelValueObject label );
-
-    public void removeLabel( Collection<Long> variantIds, LabelValueObject label );
 
 }

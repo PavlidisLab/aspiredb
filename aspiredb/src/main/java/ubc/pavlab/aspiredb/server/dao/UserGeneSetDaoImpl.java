@@ -51,7 +51,7 @@ public class UserGeneSetDaoImpl extends SecurableDaoBaseImpl<UserGeneSet> implem
         criteria.add( Restrictions.eq( "name", geneSetName ) );
         return criteria.list();
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<UserGeneSet> suggestGeneSetNames( String query ) {
@@ -59,6 +59,5 @@ public class UserGeneSetDaoImpl extends SecurableDaoBaseImpl<UserGeneSet> implem
         criteria.add( Restrictions.ilike( "name", query ) );
         return criteria.list();
     }
-    
-    
+
 }

@@ -37,31 +37,15 @@ public class CNVValueObject extends VariantValueObject {
 
     protected String type;
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType( String type ) {
-        this.type = type;
-    }
-
     public CNVValueObject() {
-    }
-
-    public Integer getCopyNumber() {
-        return copyNumber;
-    }
-
-    public void setCopyNumber( Integer copyNumber ) {
-        this.copyNumber = copyNumber;
     }
 
     public Integer getCnvLength() {
         return cnvLength;
     }
 
-    public void setCnvLength( Integer cnvLength ) {
-        this.cnvLength = cnvLength;
+    public Integer getCopyNumber() {
+        return copyNumber;
     }
 
     @Override
@@ -81,6 +65,22 @@ public class CNVValueObject extends VariantValueObject {
         }
 
         return super.getPropertyStringValue( property );
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setCnvLength( Integer cnvLength ) {
+        this.cnvLength = cnvLength;
+    }
+
+    public void setCopyNumber( Integer copyNumber ) {
+        this.copyNumber = copyNumber;
+    }
+
+    public void setType( String type ) {
+        this.type = type;
     }
 
     @Override

@@ -14,10 +14,6 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.Reader;
-import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +24,6 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
-import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 /**

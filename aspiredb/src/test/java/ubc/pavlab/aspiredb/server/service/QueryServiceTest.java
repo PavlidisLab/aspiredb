@@ -20,6 +20,8 @@ package ubc.pavlab.aspiredb.server.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -51,10 +53,12 @@ import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.model.Query;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
+import ubc.pavlab.aspiredb.server.security.authorization.acl.AclTestUtils;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.AspireDbPagingLoadConfig;
@@ -106,6 +110,9 @@ public class QueryServiceTest extends BaseSpringContextTest {
     private PhenotypeUtil phenotypeUtil;
 
     @Autowired
+    private AclTestUtils aclUtils;
+
+    @Autowired
     UserManager userManager;
 
     private Project project;
@@ -146,20 +153,20 @@ public class QueryServiceTest extends BaseSpringContextTest {
         // run save query as administrator in filter window
         super.runAsAdmin();
 
-        for ( Subject s : project.getSubjects() ) {
-            try {
-
-                for ( Phenotype p : s.getPhenotypes() ) {
-                    phenotypeDao.remove( p );
-                }
-
-                subjectDao.remove( s );
-
-            } catch ( Exception e ) {
-                e.printStackTrace();
-            }
-        }
-        projectDao.remove( project );
+        // for ( Subject s : project.getSubjects() ) {
+        // try {
+        //
+        // for ( Phenotype p : s.getPhenotypes() ) {
+        // phenotypeDao.remove( p );
+        // }
+        //
+        // subjectDao.remove( s );
+        //
+        // } catch ( Exception e ) {
+        // e.printStackTrace();
+        // }
+        // }
+        // projectDao.remove( project );
     }
 
     @Test
@@ -183,13 +190,26 @@ public class QueryServiceTest extends BaseSpringContextTest {
         Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
         filters.add( projConfig );
         filters.add( phenoConfig );
-        queryService.saveQuery( testname, filters );
 
-        // run as user to check wheather the admin created query is accessble by the user
-        super.runAsUser( this.username );
+        // Remove any existing query
+        queryService.deleteQuery( testname );
         boolean returnvalue = queryService.isQueryName( testname );
         assertFalse( returnvalue );
-
+        
+        // Admin creates query
+        super.runAsAdmin();
+        Long queryId = queryService.saveQuery( testname, filters );
+        Query queryObj = queryService.getQuery( queryId );
+        assertNotNull(queryObj);
+        returnvalue = queryService.isQueryName( testname );
+        assertTrue( returnvalue );
+        log.debug("Query acl is " + aclUtils.getAcl( queryObj ));
+        
+        // run as user to check whether the admin created query is accessble by the user
+        super.runAsUser( this.username );
+        returnvalue = queryService.isQueryName( testname );
+        assertFalse( returnvalue );
+        
         tearDownPhenotypes();
     }
 
@@ -511,8 +531,8 @@ public class QueryServiceTest extends BaseSpringContextTest {
         // cleanup
         s.getVariants().remove( cnv );
         subjectDao.update( s );
-        cnvDao.remove( cnv );
-        subjectDao.remove( s );
+        persistentTestObjectHelper.removeVariant( cnv );
+        persistentTestObjectHelper.removeSubject( s );
     }
 
     @Test
@@ -538,7 +558,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         assertEquals( variantCount, addedVariantCount ); // no new variants were added!
 
         // cleanup
-        subjectDao.remove( s );
+        persistentTestObjectHelper.removeSubject( s );
     }
 
     @Test
@@ -604,9 +624,9 @@ public class QueryServiceTest extends BaseSpringContextTest {
             CNV c = ( CNV ) v;
             c.setSubject( null );
             cnvDao.update( c );
-            cnvDao.remove( c );
+            persistentTestObjectHelper.removeVariant( c );
         }
-        subjectDao.remove( s );
+        persistentTestObjectHelper.removeSubject( s );
 
     }
 }

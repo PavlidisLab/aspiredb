@@ -24,12 +24,10 @@ import java.util.List;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -43,7 +41,6 @@ import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 public class IndelDaoTest extends BaseSpringContextTest {
 
     @Autowired
@@ -69,6 +66,34 @@ public class IndelDaoTest extends BaseSpringContextTest {
     String groupName = RandomStringUtils.randomAlphabetic( 4 );
 
     Long projectId;
+
+    @Before
+    public void createIndividualAndIndels() {
+
+        TransactionTemplate tt = new TransactionTemplate( transactionManager );
+        tt.execute( new TransactionCallbackWithoutResult() {
+            @Override
+            public void doInTransactionWithoutResult( TransactionStatus status ) {
+                individual = new Subject();
+
+                String patientId = "test_patient";
+                individual.setPatientId( patientId );
+
+                Indel indel = testObjectHelper.createDetachedTestIndelObject();
+
+                indelDao.create( indel );
+
+                individual.addVariant( indel );
+
+                Phenotype ph = new Phenotype();
+                ph.setName( "Test Phenotype" );
+                ph.setValue( "1234" );
+                individual.addPhenotype( ph );
+
+                individualDao.create( individual );
+            }
+        } );
+    }
 
     @Before
     public void setup() throws Exception {
@@ -136,34 +161,6 @@ public class IndelDaoTest extends BaseSpringContextTest {
 
         assertEquals( updatedIndel.getIndelLength().intValue(), 93939393 );
 
-    }
-
-    @Before
-    public void createIndividualAndIndels() {
-
-        TransactionTemplate tt = new TransactionTemplate( transactionManager );
-        tt.execute( new TransactionCallbackWithoutResult() {
-            @Override
-            public void doInTransactionWithoutResult( TransactionStatus status ) {
-                individual = new Subject();
-
-                String patientId = "test_patient";
-                individual.setPatientId( patientId );
-
-                Indel indel = testObjectHelper.createDetachedTestIndelObject();
-
-                indelDao.create( indel );
-
-                individual.addVariant( indel );
-
-                Phenotype ph = new Phenotype();
-                ph.setName( "Test Phenotype" );
-                ph.setValue( "1234" );
-                individual.addPhenotype( ph );
-
-                individualDao.create( individual );
-            }
-        } );
     }
 
 }

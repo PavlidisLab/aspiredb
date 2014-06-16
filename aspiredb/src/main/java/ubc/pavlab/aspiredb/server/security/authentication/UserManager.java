@@ -15,136 +15,14 @@
 
 package ubc.pavlab.aspiredb.server.security.authentication;
 
-import java.util.Collection;
-
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.provisioning.GroupManager;
-import org.springframework.security.provisioning.UserDetailsManager;
-
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
-
 /**
  * @author paul
  * @version $Id: UserManager.java,v 1.5 2013/06/11 22:30:52 anton Exp $
  */
 
-public interface UserManager extends UserDetailsManager, GroupManager {
-
-    /**
-     * @param email
-     * @param username
-     * @param newPassword - encoded
-     * @return the confirmation token they will need to use.
-     */
-    public String changePasswordForUser( String email, String username, String newPassword );
+public interface UserManager extends gemma.gsec.model.UserManager {
 
     public void changePasswordForUser( String username, String newPassword );
-
-    /**
-     * @return list of all available usernames.
-     */
-    public Collection<String> findAllUsers();
-
-    /**
-     * @param emailAddress
-     * @return
-     */
-    public User findbyEmail( String emailAddress );
-
-    /**
-     * @param emailAddress
-     * @return
-     */
-    public User findByEmail( String emailAddress );
-
-    /**
-     * Need a passthrough method to userService else we get a circular dependancy issue at runtime startup.
-     * 
-     * @param userName
-     * @return
-     */
-    public User findByUserName( String userName ) throws UsernameNotFoundException;
-
-    /**
-     * Need a passthrough method to userService else we get a circular dependancy issue at runtime startup.
-     * 
-     * @param name
-     * @return
-     */
-    public UserGroup findGroupByName( String name );
-    
-    
-   // public UserGroup createUserGroup( String groupName );
-
-    /**
-     * @param username
-     * @return names of groups the user is in.
-     */
-    public Collection<String> findGroupsForUser( String username ) throws UsernameNotFoundException;
-
-    /**
-     * Generate a token that can be used to check if the user's email is valid.
-     * 
-     * @param username
-     * @return
-     */
-    public String generateSignupToken( String username ) throws UsernameNotFoundException;
-
-    /**
-     * @return the current user or null if the user is anonymous.
-     */
-    public User getCurrentUser();
-
-    /**
-     * Returns a String username (the principal).
-     * 
-     * @return
-     */
-    public String getCurrentUsername();
-
-    /**
-     * @return the prefix use on roles (groups, actually) e.g. "GROUP_"
-     */
-    public String getRolePrefix();
-
-    /**
-     * @param name
-     * @return
-     */
-    public boolean groupExists( String name );
-
-    /**
-     * Need a passthrough method to userService else we get a circular dependency issue at runtime startup.
-     * 
-     * @return
-     */
-    public Collection<User> loadAll();
-
-    public boolean loggedIn();
-
-    /**
-     * Sign in the user identified
-     * 
-     * @param userName
-     * @param password
-     */
-    public void reauthenticate( String userName, String password );
-
-    /**
-     * @param emailAddress
-     * @return
-     */
-    public boolean userWithEmailExists( String emailAddress );
-
-    /**
-     * Validate the token.
-     * 
-     * @param username
-     * @param key
-     * @return true if okay, false otherwise
-     */
-    public boolean validateSignupToken( String username, String key );
 
     public void deleteByUserName( String username );
 

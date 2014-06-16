@@ -42,10 +42,6 @@ public class ChromosomeBand implements Serializable {
         this.staining = staining;
     }
 
-    public int getStart() {
-        return start;
-    }
-
     public int getEnd() {
         return end;
     }
@@ -56,5 +52,9 @@ public class ChromosomeBand implements Serializable {
 
     public String getStaining() {
         return staining;
+    }
+
+    public int getStart() {
+        return start;
     }
 }

@@ -26,15 +26,15 @@ import org.directwebremoting.annotations.DataTransferObject;
 @DataTransferObject(javascript = "LabelProperty")
 public class LabelProperty extends TextProperty {
 
-    protected LabelProperty() {
-    }
-
     public LabelProperty( String displayName, String name ) {
         super( displayName, name );
     }
 
     public LabelProperty( String displayName, String name, String color ) {
         super( displayName, name );
+    }
+
+    protected LabelProperty() {
     }
 
 }

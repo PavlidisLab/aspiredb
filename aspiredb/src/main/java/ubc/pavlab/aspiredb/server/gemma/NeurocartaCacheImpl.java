@@ -39,8 +39,12 @@ public class NeurocartaCacheImpl extends SearchableEhcache<NeurocartaPhenotypeVa
     private static final String PHENOTYPE_NAME_SEARCH_ATTRIBUTE_NAME = "name";
 
     @Override
-    public Object getKey( NeurocartaPhenotypeValueObject neurocartaPhenotype ) {
-        return neurocartaPhenotype.getUri();
+    public Collection<NeurocartaPhenotypeValueObject> findPhenotypes( String queryString ) {
+        String regexQueryString = "*" + queryString + "*";
+
+        Criteria nameCriteria = getSearchAttribute( PHENOTYPE_NAME_SEARCH_ATTRIBUTE_NAME ).ilike( regexQueryString );
+
+        return fetchByCriteria( nameCriteria );
     }
 
     @Override
@@ -49,17 +53,8 @@ public class NeurocartaCacheImpl extends SearchableEhcache<NeurocartaPhenotypeVa
     }
 
     @Override
-    public boolean hasPhenotype( String phenotypeUri ) {
-        return isKeyInCache( phenotypeUri );
-    }
-
-    @Override
-    public Collection<NeurocartaPhenotypeValueObject> findPhenotypes( String queryString ) {
-        String regexQueryString = "*" + queryString + "*";
-
-        Criteria nameCriteria = getSearchAttribute( PHENOTYPE_NAME_SEARCH_ATTRIBUTE_NAME ).ilike( regexQueryString );
-
-        return fetchByCriteria( nameCriteria );
+    public Object getKey( NeurocartaPhenotypeValueObject neurocartaPhenotype ) {
+        return neurocartaPhenotype.getUri();
     }
 
     @Override
@@ -81,5 +76,10 @@ public class NeurocartaCacheImpl extends SearchableEhcache<NeurocartaPhenotypeVa
         }
 
         return phenotypes;
+    }
+
+    @Override
+    public boolean hasPhenotype( String phenotypeUri ) {
+        return isKeyInCache( phenotypeUri );
     }
 }

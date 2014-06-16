@@ -93,19 +93,29 @@ public class GroupManagerCLI extends AbstractCLI {
         }
     }
 
+    @Override
+    public String getShortDesc() {
+        return "Add users and groups";
+    }
+
     @SuppressWarnings("static-access")
     @Override
     protected void buildOptions() {
 
-        Option groupname = OptionBuilder.hasArg().withArgName( "group name" )
-                .withDescription( "The group to give permissions to, if it doesn't exist it will be created" )
-                .create( "groupname" );
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "group name" );
+        OptionBuilder.withDescription( "The group to give permissions to, if it doesn't exist it will be created" );
+        Option groupname = OptionBuilder.create( "groupname" );
 
-        Option aspireuser = OptionBuilder.hasArg().withArgName( "User" )
-                .withDescription( "The aspiredb user to assign to a group" ).create( "aspireuser" );
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "User" );
+        OptionBuilder.withDescription( "The aspiredb user to assign to a group" );
+        Option aspireuser = OptionBuilder.create( "aspireuser" );
 
-        Option aspireuserpassword = OptionBuilder.hasArg().withArgName( "User password" )
-                .withDescription( "The user to assign to a group" ).create( "aspireuserpassword" );
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "User password" );
+        OptionBuilder.withDescription( "The user to assign to a group" );
+        Option aspireuserpassword = OptionBuilder.create( "aspireuserpassword" );
 
         addOption( groupname );
         addOption( aspireuser );
@@ -250,11 +260,6 @@ public class GroupManagerCLI extends AbstractCLI {
         }
 
         return null;
-    }
-
-    @Override
-    public String getShortDesc() {
-        return "Add users and groups";
     }
 
     @Override

@@ -18,6 +18,7 @@ package ubc.pavlab.aspiredb.server.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import gemma.gsec.SecurityService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -137,18 +138,6 @@ public class UserGroupServiceTest extends BaseSpringContextTest {
 
     }
 
-    @Test
-    public void testUserAddSelvesToAdmin() {
-        super.runAsUser( this.userName1 );
-
-        try {
-            this.userManager.addUserToGroup( this.userName1, "Administrators" );
-            fail( "Should have gotten access denied when user tried to make themselves admin" );
-        } catch ( AccessDeniedException ok ) {
-            // expected behaviour
-        }
-    }
-
     /**
      * Tests updating the UserGroup
      */
@@ -208,6 +197,18 @@ public class UserGroupServiceTest extends BaseSpringContextTest {
             // expected behaviour
         }
 
+    }
+
+    @Test
+    public void testUserAddSelvesToAdmin() {
+        super.runAsUser( this.userName1 );
+
+        try {
+            this.userManager.addUserToGroup( this.userName1, "Administrators" );
+            fail( "Should have gotten access denied when user tried to make themselves admin" );
+        } catch ( AccessDeniedException ok ) {
+            // expected behaviour
+        }
     }
 
 }

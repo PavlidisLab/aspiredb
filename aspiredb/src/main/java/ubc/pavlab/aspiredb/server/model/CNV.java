@@ -40,6 +40,19 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 @DiscriminatorValue("CNV")
 public class CNV extends Variant {
 
+    public static CNVValueObject getCNVValueObject( CNV cnv ) {
+        CNVValueObject vo = new CNVValueObject();
+        vo.setId( cnv.getId() );
+        vo.setPatientId( cnv.getSubject().getPatientId() );
+        vo.setSubjectId( cnv.getSubject().getId() );
+        vo.setType( cnv.getType().toString() );
+        vo.setGenomicRange( new GenomicRange( cnv.getLocation().getChromosome(), cnv.getLocation().getStart(), cnv
+                .getLocation().getEnd() ) );
+        vo.setCnvLength( cnv.getCnvLength() );
+
+        return vo;
+    }
+
     @Column(name = "CNVTYPE")
     @Enumerated(javax.persistence.EnumType.STRING)
     private CnvType type;
@@ -57,41 +70,36 @@ public class CNV extends Variant {
     public CNV() {
     }
 
-    public static CNVValueObject getCNVValueObject( CNV cnv ) {
-        CNVValueObject vo = new CNVValueObject();
-        vo.setId( cnv.getId() );
-        vo.setPatientId( cnv.getSubject().getPatientId() );
-        vo.setSubjectId( cnv.getSubject().getId() );
-        vo.setType( cnv.getType().toString() );
-        vo.setGenomicRange( new GenomicRange( cnv.getLocation().getChromosome(), cnv.getLocation().getStart(), cnv
-                .getLocation().getEnd() ) );
-        vo.setCnvLength( cnv.getCnvLength() );
-
-        return vo;
-    }
-
-    public void setType( CnvType type ) {
-        this.type = type;
-    }
-
-    public CnvType getType() {
-        return type;
+    public Integer getCnvLength() {
+        return cnvLength;
     }
 
     public Integer getCopyNumber() {
         return copyNumber;
     }
 
-    public void setCopyNumber( Integer copyNumber ) {
-        this.copyNumber = copyNumber;
-    }
-
     public List<GenomicLocation> getTargetLocations() {
         return targetLocations;
     }
 
+    public CnvType getType() {
+        return type;
+    }
+
+    public void setCnvLength( Integer cnvLength ) {
+        this.cnvLength = cnvLength;
+    }
+
+    public void setCopyNumber( Integer copyNumber ) {
+        this.copyNumber = copyNumber;
+    }
+
     public void setTargetLocations( List<GenomicLocation> targetLocations ) {
         this.targetLocations = targetLocations;
+    }
+
+    public void setType( CnvType type ) {
+        this.type = type;
     }
 
     @Override
@@ -118,13 +126,5 @@ public class CNV extends Variant {
         vo.setLabels( Label.toValueObjects( this.getLabels() ) );
 
         return vo;
-    }
-
-    public Integer getCnvLength() {
-        return cnvLength;
-    }
-
-    public void setCnvLength( Integer cnvLength ) {
-        this.cnvLength = cnvLength;
     }
 }

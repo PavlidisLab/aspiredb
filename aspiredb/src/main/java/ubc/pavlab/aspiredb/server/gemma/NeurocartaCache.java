@@ -26,13 +26,13 @@ import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
  * @version $Id: NeurocartaCache.java,v 1.3 2013/06/11 22:30:46 anton Exp $
  */
 public interface NeurocartaCache {
-    public boolean hasExpired();
-
-    public void putAll( Collection<NeurocartaPhenotypeValueObject> phenotypes );
-
-    public boolean hasPhenotype( String phenotypeUri );
-
     public Collection<NeurocartaPhenotypeValueObject> findPhenotypes( String queryString );
 
     public List<NeurocartaPhenotypeValueObject> getPhenotypes( List<String> names );
+
+    public boolean hasExpired();
+
+    public boolean hasPhenotype( String phenotypeUri );
+
+    public void putAll( Collection<NeurocartaPhenotypeValueObject> phenotypes );
 }

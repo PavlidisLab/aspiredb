@@ -27,10 +27,8 @@ import java.util.Collection;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.model.Label;
@@ -39,7 +37,6 @@ import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 public class LabelDaoTest extends BaseSpringContextTest {
     @Autowired
     private LabelDao labelDao;
@@ -64,6 +61,42 @@ public class LabelDaoTest extends BaseSpringContextTest {
     Variant testVariant;
     Project testProject;
 
+    @Test
+    public void addSubjectLabel() {
+
+        new InlineTransaction() {
+            @Override
+            public void instructions() {
+                String name = RandomStringUtils.randomAlphabetic( 4 );
+                Label label = new Label( name, "FF0000" );
+                label = testObjectHelper.createPersistentLabel( label );
+                testSubject.addLabel( label );
+                subjectDao.update( testSubject );
+
+                Subject s = subjectDao.findByPatientId( testSubjectId );
+                assertTrue( s.getLabels().size() > 0 );
+            }
+        }.execute();
+    }
+
+    @Test
+    public void addVariantLabel() {
+        String name = RandomStringUtils.randomAlphabetic( 4 );
+        Label label = new Label( name, "FF0000" );
+        label = testObjectHelper.createPersistentLabel( label );
+        testVariant.addLabel( label );
+        variantDao.update( testVariant );
+
+        new InlineTransaction() {
+            @Override
+            public void instructions() {
+                Subject s = subjectDao.findByPatientId( testSubjectId );
+                Variant v = s.getVariants().iterator().next();
+                assertTrue( v.getLabels().size() > 0 );
+            }
+        }.execute();
+    }
+
     @Before
     public void init() {
         testSubjectId = RandomStringUtils.randomAlphanumeric( 5 );
@@ -80,46 +113,12 @@ public class LabelDaoTest extends BaseSpringContextTest {
     }
 
     @Test
-    public void addSubjectLabel() {
-
-        new InlineTransaction() {
-            @Override
-            public void instructions() {
-                String name = RandomStringUtils.randomAlphabetic( 4 );
-                Label label = new Label( name, "FF0000" );
-                labelDao.create( label );
-                testSubject.addLabel( label );
-                subjectDao.update( testSubject );
-
-                Subject s = subjectDao.findByPatientId( testSubjectId );
-                assertTrue( s.getLabels().size() > 0 );
-            }
-        }.execute();
-    }
-
-    @Test
-    public void addVariantLabel() {
-        String name = RandomStringUtils.randomAlphabetic( 4 );
-        Label label = new Label( name, "FF0000" );
-        labelDao.create( label );
-        testVariant.addLabel( label );
-        variantDao.update( testVariant );
-
-        new InlineTransaction() {
-            @Override
-            public void instructions() {
-                Subject s = subjectDao.findByPatientId( testSubjectId );
-                Variant v = s.getVariants().iterator().next();
-                assertTrue( v.getLabels().size() > 0 );
-            }
-        }.execute();
-    }
-
-    @Test
     public void labelSuggestion() {
         String name = RandomStringUtils.randomAlphabetic( 4 );
         Label label = new Label( name, "FF0000" );
-        labelDao.create( label );
+        label = testObjectHelper.createPersistentLabel( label );
+
+        label = testObjectHelper.createPersistentLabel( label );
         testSubject.addLabel( label );
         subjectDao.update( testSubject );
 
@@ -132,7 +131,7 @@ public class LabelDaoTest extends BaseSpringContextTest {
     public void labelSuggestionByContext() {
         String name = RandomStringUtils.randomAlphabetic( 4 );
         Label label = new Label( name, "FF0000" );
-        labelDao.create( label );
+        label = testObjectHelper.createPersistentLabel( label );
         testSubject.addLabel( label );
         subjectDao.update( testSubject );
 

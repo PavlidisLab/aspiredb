@@ -270,20 +270,6 @@ public class Project2SpecialProjectOverlapTest {// extends BaseSpringContextTest
 
     }
 
-    private ProjectFilterConfig getProjectFilterConfigById( Project p ) {
-
-        ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();
-
-        ArrayList<Long> projectIds = new ArrayList<Long>();
-
-        projectIds.add( p.getId() );
-
-        projectFilterConfig.setProjectIds( projectIds );
-
-        return projectFilterConfig;
-
-    }
-
     private CNVValueObject getCNV( String chrom, int baseStart, int baseEnd, String userVariantId, String patientId ) {
 
         CharacteristicValueObject cvo = new CharacteristicValueObject();
@@ -310,6 +296,20 @@ public class Project2SpecialProjectOverlapTest {// extends BaseSpringContextTest
         cnv.setPatientId( patientId );
 
         return cnv;
+
+    }
+
+    private ProjectFilterConfig getProjectFilterConfigById( Project p ) {
+
+        ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();
+
+        ArrayList<Long> projectIds = new ArrayList<Long>();
+
+        projectIds.add( p.getId() );
+
+        projectFilterConfig.setProjectIds( projectIds );
+
+        return projectFilterConfig;
 
     }
 

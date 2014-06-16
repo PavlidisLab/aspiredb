@@ -28,9 +28,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import antlr.collections.List;
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
-import ubc.pavlab.aspiredb.server.dao.SecurableDaoBase;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.Label;
@@ -39,8 +37,7 @@ import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 /**
- * author: anton date: 10/06/13 
- * 
+ * author: anton date: 10/06/13
  */
 @Component("labelService")
 @Service("labelService")
@@ -56,42 +53,20 @@ public class LabelServiceImpl implements LabelService {
     @Autowired
     private VariantDao variantDao;
 
-    /**
-     * update the label
-     */
     @Override
     @Transactional
     @RemoteMethod
-    public void updateLabel( LabelValueObject label ) {
-        Label labelEntity = labelDao.load( label.getId() );
-        labelEntity.setName( label.getName() );
-        labelEntity.setColour( label.getColour() );
-        labelEntity.setIsShown( label.getIsShown() );
-        labelDao.update( labelEntity );
-       // updateSubjectLabel( label );
-    }
-    
-    /**
-     * update subject label
-     */
-    @Override
-    @Transactional
-    @RemoteMethod
-    public void updateSubjectLabel( LabelValueObject label ) {
+    public void deleteSubjectLabel( LabelValueObject label ) {
         Collection<Subject> subjects = subjectDao.findByLabel( label );
-
-        for ( Subject subject : subjects ) {
-            Collection<Label> subjectlabels = subject.getLabels();
-            for ( Label subjectlabel : subjectlabels ) {
-                if ( subjectlabel.getId().equals( label.getId() ) ) {
-                    subjectlabel.equals( label );
-                }
-            }
-
-            subject.setLabels( subjectlabels );
-            subjectDao.update( subject );
+        Collection<Long> subjectIds = new ArrayList<>();
+        for ( Subject s : subjects ) {
+            subjectIds.add( s.getId() );
         }
-
+        Collection<LabelValueObject> labels = new ArrayList<>();
+        labels.add( label );
+        removeLabelsFromSubjects( labels, subjectIds );
+        Label labelEntity = labelDao.load( label.getId() );
+        labelDao.remove( labelEntity );
     }
 
     @Override
@@ -100,20 +75,6 @@ public class LabelServiceImpl implements LabelService {
     public void deleteSubjectLabels( Collection<LabelValueObject> labels ) {
         for ( LabelValueObject lvo : labels ) {
             deleteSubjectLabel( lvo );
-        }
-    }
-
-    @Override
-    @Transactional
-    @RemoteMethod
-    public void removeLabelsFromSubjects( Collection<LabelValueObject> labels, Collection<Long> subjectIds ) {
-        // Collection<Label labelEntity = labelDao.load( labelIds );
-        Collection<Subject> subjects = subjectDao.load( subjectIds );
-        for ( Subject subject : subjects ) {
-            for ( LabelValueObject label : labels ) {
-                subject.getLabels().remove( labelDao.findOrCreate( label ) );
-                subjectDao.update( subject );
-            }
         }
     }
 
@@ -145,6 +106,20 @@ public class LabelServiceImpl implements LabelService {
     @Override
     @Transactional
     @RemoteMethod
+    public void removeLabelsFromSubjects( Collection<LabelValueObject> labels, Collection<Long> subjectIds ) {
+        // Collection<Label labelEntity = labelDao.load( labelIds );
+        Collection<Subject> subjects = subjectDao.load( subjectIds );
+        for ( Subject subject : subjects ) {
+            for ( LabelValueObject label : labels ) {
+                subject.getLabels().remove( labelDao.findOrCreate( label ) );
+                subjectDao.update( subject );
+            }
+        }
+    }
+
+    @Override
+    @Transactional
+    @RemoteMethod
     public void removeLabelsFromVariants( Collection<LabelValueObject> labels, Collection<Long> variantIds ) {
         Collection<Variant> variants = variantDao.load( variantIds );
         // Collection<Label> labels = labelDao.load( labelIds );
@@ -156,20 +131,42 @@ public class LabelServiceImpl implements LabelService {
         }
     }
 
+    /**
+     * update the label
+     */
     @Override
     @Transactional
     @RemoteMethod
-    public void deleteSubjectLabel( LabelValueObject label ) {
-        Collection<Subject> subjects = subjectDao.findByLabel( label );
-        Collection<Long> subjectIds = new ArrayList<>();
-        for ( Subject s : subjects ) {
-            subjectIds.add( s.getId() );
-        }
-        Collection<LabelValueObject> labels = new ArrayList<>();
-        labels.add( label );
-        removeLabelsFromSubjects( labels, subjectIds );
+    public void updateLabel( LabelValueObject label ) {
         Label labelEntity = labelDao.load( label.getId() );
-        labelDao.remove( labelEntity );
+        labelEntity.setName( label.getName() );
+        labelEntity.setColour( label.getColour() );
+        labelEntity.setIsShown( label.getIsShown() );
+        labelDao.update( labelEntity );
+        // updateSubjectLabel( label );
+    }
+
+    /**
+     * update subject label
+     */
+    @Override
+    @Transactional
+    @RemoteMethod
+    public void updateSubjectLabel( LabelValueObject label ) {
+        Collection<Subject> subjects = subjectDao.findByLabel( label );
+
+        for ( Subject subject : subjects ) {
+            Collection<Label> subjectlabels = subject.getLabels();
+            for ( Label subjectlabel : subjectlabels ) {
+                if ( subjectlabel.getId().equals( label.getId() ) ) {
+                    subjectlabel.equals( label );
+                }
+            }
+
+            subject.setLabels( subjectlabels );
+            subjectDao.update( subject );
+        }
+
     }
 
 }

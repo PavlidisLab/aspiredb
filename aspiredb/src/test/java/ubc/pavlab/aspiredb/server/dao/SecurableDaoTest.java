@@ -15,12 +15,11 @@
 
 package ubc.pavlab.aspiredb.server.dao;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import gemma.gsec.SecurityService;
 
-import java.util.Collection;
 import java.util.Date;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -33,7 +32,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.model.Subject;
-import ubc.pavlab.aspiredb.server.security.SecurityService;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.security.authorization.acl.AclTestUtils;
@@ -67,6 +65,9 @@ public class SecurableDaoTest extends BaseSpringContextTest {
 
     @Autowired
     CNVDao cnvDao;
+
+    @Autowired
+    AclTestUtils aclUtils;
 
     String ownerUsername = RandomStringUtils.randomAlphabetic( 6 );
 
@@ -161,21 +162,31 @@ public class SecurableDaoTest extends BaseSpringContextTest {
         Subject ind = testObjectHelper.createPersistentTestSubjectObjectWithCNV( patientId );
 
         aclTestUtils.checkHasAcl( ind );
-        // ownerUserName will own the individual
-        assertTrue( "User should own the individual", securityService.isOwnedByCurrentUser( ind ) );
 
-        super.runAsUser( this.aDifferentUsername );
-        // test loadAll
-        Collection<Subject> indCollection = individualDao.loadAll();
-        assertEquals( 0, indCollection.size() );
+        // ownerUserName will own the individual
+        assertTrue( "User '" + ownerUsername + "' should own the individual",
+                securityService.isOwnedByCurrentUser( ind ) );
 
         // test update
         ind.setPatientId( "badder" );
         try {
             individualDao.update( ind );
+        } catch ( AccessDeniedException e ) {
+            fail( "Should not have gotten an access denied" );
+        }
+
+        super.runAsUser( this.aDifferentUsername );
+
+        assertFalse( "User '" + aDifferentUsername + "' should not own the individual",
+                securityService.isOwnedByCurrentUser( ind ) );
+
+        // test update
+        ind.setPatientId( "evenbadder" );
+        try {
+            individualDao.update( ind );
             fail( "Should have gotten an access denied" );
         } catch ( AccessDeniedException e ) {
-
+            // "Should have gotten an access denied"
         }
 
         // testRemove
@@ -184,7 +195,7 @@ public class SecurableDaoTest extends BaseSpringContextTest {
             individualDao.remove( ind );
             fail( "Should have gotten an access denied" );
         } catch ( AccessDeniedException e ) {
-
+            // "Should have gotten an access denied"
         }
 
     }

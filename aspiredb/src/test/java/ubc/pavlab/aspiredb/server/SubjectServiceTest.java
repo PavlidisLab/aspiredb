@@ -18,8 +18,8 @@
  */
 package ubc.pavlab.aspiredb.server;
 
-import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,9 +29,7 @@ import java.util.Set;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
 import ubc.pavlab.aspiredb.server.dao.Page;
@@ -55,7 +53,7 @@ import ubc.pavlab.aspiredb.shared.query.restriction.Conjunction;
 import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 import ubc.pavlab.aspiredb.shared.query.restriction.VariantTypeRestriction;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+//@RunWith(SpringJUnit4ClassRunner.class)
 public class SubjectServiceTest extends BaseSpringContextTest {
     @Autowired
     private LabelDao labelDao;
@@ -73,12 +71,21 @@ public class SubjectServiceTest extends BaseSpringContextTest {
     Subject testSubject;
     Variant testVariant;
 
-    @Before
-    public void init() {
-        testSubjectId = RandomStringUtils.randomAlphanumeric( 5 );
-        testSubject = testObjectHelper.createPersistentTestSubjectObjectWithCNV( testSubjectId );
-        testVariant = testSubject.getVariants().iterator().next();
-        testSubject = testObjectHelper.createPersistentTestSubjectObjectWithHPOntologyPhenotypes( testSubjectId );
+    @Test
+    public void addSubjectLabel() {
+        Collection<Long> ids = new ArrayList<Long>();
+        ids.add( testSubject.getId() );
+
+        String name = RandomStringUtils.randomAlphabetic( 4 );
+
+        try {
+            subjectService.addLabel( ids, new LabelValueObject( name ) );
+        } catch ( Exception e ) {
+
+        }
+
+        Collection<Label> labels = labelDao.getLabelsMatching( name );
+        assertTrue( labels.size() > 0 );
     }
 
     @Test
@@ -96,6 +103,14 @@ public class SubjectServiceTest extends BaseSpringContextTest {
         assertTrue( subjects.size() > 0 );
     }
 
+    @Before
+    public void init() {
+        testSubjectId = RandomStringUtils.randomAlphanumeric( 5 );
+        testSubject = testObjectHelper.createPersistentTestSubjectObjectWithCNV( testSubjectId );
+        testVariant = testSubject.getVariants().iterator().next();
+        testSubject = testObjectHelper.createPersistentTestSubjectObjectWithHPOntologyPhenotypes( testSubjectId );
+    }
+
     @Test
     public void testGetPhenotypeBySubjectIds() {
         Collection<Long> ids = new ArrayList<Long>();
@@ -110,22 +125,5 @@ public class SubjectServiceTest extends BaseSpringContextTest {
             e.printStackTrace();
             assertTrue( false );
         }
-    }
-
-    @Test
-    public void addSubjectLabel() {
-        Collection<Long> ids = new ArrayList<Long>();
-        ids.add( testSubject.getId() );
-
-        String name = RandomStringUtils.randomAlphabetic( 4 );
-
-        try {
-            subjectService.addLabel( ids, new LabelValueObject( name ) );
-        } catch ( Exception e ) {
-
-        }
-
-        Collection<Label> labels = labelDao.getLabelsMatching( name );
-        assertTrue( labels.size() > 0 );
     }
 }

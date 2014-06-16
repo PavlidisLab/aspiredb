@@ -36,6 +36,28 @@ public class OntologyServiceTest extends BaseSpringContextTest {
     OntologyService os;
 
     @Test
+    public void testHumanPhenotypeOntology() throws Exception {
+        os.getHumanPhenotypeOntologyService().startInitializationThread( true );
+        int c = 0;
+
+        while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
+            Thread.sleep( 10000 );
+            log.info( "Waiting for HumanPhenotypeOntology to load" );
+            if ( ++c > 10 ) {
+                fail( "Ontology load timeout" );
+            }
+        }
+
+        // e.g. http://purl.org/obo/owl/HP#HP_0001748, http://purl.org/obo/owl/HP#HP_0004950,
+        // http://purl.org/obo/owl/HP#HP_0001746
+
+        OntologyResource t1 = os.getTerm( "http://purl.obolibrary.org/obo/HP_0004209" );
+
+        assertNotNull( t1 );
+
+    }
+
+    @Test
     public void testObsolete() throws Exception {
         os.getDiseaseOntologyService().startInitializationThread( true );
         int c = 0;
@@ -55,30 +77,8 @@ public class OntologyServiceTest extends BaseSpringContextTest {
         assertTrue( os.isObsolete( "http://purl.obolibrary.org/obo/DOID_0050001" ) );
 
         // inflammatory diarrhea, not obsolete as of May 2012.
-       // assertNotNull( os.getTerm( "http://purl.obolibrary.org/obo/DOID_0050132" ) );
-      //  assertTrue( !os.isObsolete( "http://purl.obolibrary.org/obo/DOID_0050132" ) );
-
-    }
-
-    @Test
-    public void testHumanPhenotypeOntology() throws Exception {
-        os.getHumanPhenotypeOntologyService().startInitializationThread( true );
-        int c = 0;
-
-        while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
-            Thread.sleep( 10000 );
-            log.info( "Waiting for HumanPhenotypeOntology to load" );
-            if ( ++c > 10 ) {
-                fail( "Ontology load timeout" );
-            }
-        }
-
-        // e.g. http://purl.org/obo/owl/HP#HP_0001748, http://purl.org/obo/owl/HP#HP_0004950,
-        // http://purl.org/obo/owl/HP#HP_0001746
-
-        OntologyResource t1 = os.getTerm( "http://purl.obolibrary.org/obo/HP_0004209" );
-
-        assertNotNull( t1 );
+        // assertNotNull( os.getTerm( "http://purl.obolibrary.org/obo/DOID_0050132" ) );
+        // assertTrue( !os.isObsolete( "http://purl.obolibrary.org/obo/DOID_0050132" ) );
 
     }
 

@@ -68,7 +68,7 @@ public class AclAdviceTest extends BaseSpringContextTest {
 
         aclTestUtils.checkHasAcl( cnv );
 
-        variantDao.remove( cnv );
+        testObjectHelper.removeVariant( cnv );
 
         aclTestUtils.checkDeletedAcl( cnv );
 
@@ -82,7 +82,7 @@ public class AclAdviceTest extends BaseSpringContextTest {
 
         aclTestUtils.checkHasAcl( ind );
 
-        indDao.remove( ind );
+        testObjectHelper.removeSubject( ind );
 
         aclTestUtils.checkDeletedAcl( ind );
 
@@ -106,7 +106,7 @@ public class AclAdviceTest extends BaseSpringContextTest {
 
         for ( Phenotype apheno : phenos ) {
             aclTestUtils.checkHasAcl( apheno );
-            phenotypeDao.remove( apheno );
+            testObjectHelper.removePhenotype( apheno );
             aclTestUtils.checkDeletedAcl( apheno );
         }
 

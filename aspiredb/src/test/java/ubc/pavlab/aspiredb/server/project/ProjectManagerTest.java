@@ -15,9 +15,11 @@
 
 package ubc.pavlab.aspiredb.server.project;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import gemma.gsec.SecurityService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,7 +47,6 @@ import ubc.pavlab.aspiredb.server.model.Characteristic;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
-import ubc.pavlab.aspiredb.server.security.SecurityService;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.security.authorization.acl.AclTestUtils;
@@ -148,8 +149,16 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
         cnv.setPatientId( patientId );
 
+        // Another CNV from the same patient
+        CNVValueObject cnv2 = new CNVValueObject();
+        cnv2.setCharacteristics( charMap );
+        cnv2.setType( "LOSS" );
+        cnv2.setGenomicRange( gr );
+        cnv2.setPatientId( patientId );
+
         ArrayList<VariantValueObject> cnvList = new ArrayList<VariantValueObject>();
         cnvList.add( cnv );
+        cnvList.add( cnv2 );
 
         try {
 
@@ -157,10 +166,10 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
         } catch ( Exception e ) {
 
-            fail( "projectManager.addSubjectVariantsToProject threw an exception" );
+            fail( "projectManager.addSubjectVariantsToProject threw an exception " + e );
 
         }
-
+        
         TransactionTemplate tt = new TransactionTemplate( transactionManager );
         tt.execute( new TransactionCallbackWithoutResult() {
             @Override
@@ -170,14 +179,23 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
                 aclTestUtils.checkHasAcl( project );
 
-                assertFalse( securityService.isViewableByUser( project, aDifferentUsername ) );
+                assertFalse( "Project should not be viewable by user '" + aDifferentUsername + "', acl is "
+                        + aclTestUtils.getAcl( project ),
+                        securityService.isViewableByUser( project, aDifferentUsername ) );
 
+                // now to test
+                List<Subject> subjects = project.getSubjects();
+                assertEquals( 1, subjects.size() );
+                
                 Subject subject = project.getSubjects().iterator().next();
 
                 aclTestUtils.checkHasAcl( subject );
 
                 assertFalse( securityService.isViewableByUser( subject, aDifferentUsername ) );
 
+                // equals to cnvList
+                assertEquals( 2, subject.getVariants().size() );
+                
                 Collection<Variant> variantCollection = variantDao.findBySubjectPatientId( patientId );
 
                 for ( Variant v : variantCollection ) {

@@ -33,6 +33,7 @@ import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
+import ubc.pavlab.aspiredb.server.security.authorization.acl.AclTestUtils;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
 public class ProjectDaoTest extends BaseSpringContextTest {
@@ -45,6 +46,9 @@ public class ProjectDaoTest extends BaseSpringContextTest {
 
     @Autowired
     UserManager userManager;
+
+    @Autowired
+    AclTestUtils aclUtils;
 
     String projectName = RandomStringUtils.randomAlphabetic( 5 );
 
@@ -64,7 +68,7 @@ public class ProjectDaoTest extends BaseSpringContextTest {
 
         detachedProject.setName( projectName );
 
-        Project p = projectDao.create( detachedProject );
+        Project p = testObjectHelper.createPersistentProject( detachedProject );
 
         testObjectHelper.addSubjectToProject( ind1, p );
 
@@ -104,7 +108,7 @@ public class ProjectDaoTest extends BaseSpringContextTest {
 
         detachedProject.setName( projectName );
 
-        Project p = projectDao.create( detachedProject );
+        Project p = testObjectHelper.createPersistentProject( detachedProject );
 
         ind1.getProjects().add( p );
         ind2.getProjects().add( p );
@@ -120,7 +124,8 @@ public class ProjectDaoTest extends BaseSpringContextTest {
         super.runAsUser( someUsername );
 
         try {
-            projectDao.findByProjectName( projectName );
+            p = projectDao.findByProjectName( projectName );
+            log.debug( "Project '" + projectName + "' has acls " + aclUtils.getAcl( p ) );
             fail( "Should have gotten an access denied" );
         } catch ( AccessDeniedException e ) {
 

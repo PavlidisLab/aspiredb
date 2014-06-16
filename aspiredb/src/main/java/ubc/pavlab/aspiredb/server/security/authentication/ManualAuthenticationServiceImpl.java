@@ -86,6 +86,12 @@ public class ManualAuthenticationServiceImpl implements ApplicationContextAware,
     }
 
     @Override
+    public void setApplicationContext( ApplicationContext applicationContext ) throws BeansException {
+        this.context = applicationContext;
+
+    }
+
+    @Override
     public boolean validateRequest( String username, String password ) {
 
         Authentication authResult = null;
@@ -132,12 +138,6 @@ public class ManualAuthenticationServiceImpl implements ApplicationContextAware,
     protected void unsuccessfulAuthentication( AuthenticationException failed ) {
         log.debug( "Updated SecurityContextHolder to contain null Authentication" );
         log.debug( "Authentication request failed: " + failed.toString() );
-
-    }
-
-    @Override
-    public void setApplicationContext( ApplicationContext applicationContext ) throws BeansException {
-        this.context = applicationContext;
 
     }
 
