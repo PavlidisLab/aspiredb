@@ -68,6 +68,34 @@ public class IndelDaoTest extends BaseSpringContextTest {
     Long projectId;
 
     @Before
+    public void createIndividualAndIndels() {
+
+        TransactionTemplate tt = new TransactionTemplate( transactionManager );
+        tt.execute( new TransactionCallbackWithoutResult() {
+            @Override
+            public void doInTransactionWithoutResult( TransactionStatus status ) {
+                individual = new Subject();
+
+                String patientId = "test_patient";
+                individual.setPatientId( patientId );
+
+                Indel indel = testObjectHelper.createDetachedTestIndelObject();
+
+                indelDao.create( indel );
+
+                individual.addVariant( indel );
+
+                Phenotype ph = new Phenotype();
+                ph.setName( "Test Phenotype" );
+                ph.setValue( "1234" );
+                individual.addPhenotype( ph );
+
+                individualDao.create( individual );
+            }
+        } );
+    }
+
+    @Before
     public void setup() throws Exception {
 
         Project detachedProject = new Project();
@@ -133,34 +161,6 @@ public class IndelDaoTest extends BaseSpringContextTest {
 
         assertEquals( updatedIndel.getIndelLength().intValue(), 93939393 );
 
-    }
-
-    @Before
-    public void createIndividualAndIndels() {
-
-        TransactionTemplate tt = new TransactionTemplate( transactionManager );
-        tt.execute( new TransactionCallbackWithoutResult() {
-            @Override
-            public void doInTransactionWithoutResult( TransactionStatus status ) {
-                individual = new Subject();
-
-                String patientId = "test_patient";
-                individual.setPatientId( patientId );
-
-                Indel indel = testObjectHelper.createDetachedTestIndelObject();
-
-                indelDao.create( indel );
-
-                individual.addVariant( indel );
-
-                Phenotype ph = new Phenotype();
-                ph.setName( "Test Phenotype" );
-                ph.setValue( "1234" );
-                individual.addPhenotype( ph );
-
-                individualDao.create( individual );
-            }
-        } );
     }
 
 }

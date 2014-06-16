@@ -80,6 +80,23 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService {
         return phenotypeSummaries;
     }
 
+    private void addSubjectToPhenotypeCountingSet( PhenotypeSummary phenotypeSummary, Phenotype subjectPhenotype ) {
+
+        Long subjectId = subjectPhenotype.getSubject().getId();
+        String phenotypeValue = subjectPhenotype.getValue();
+
+        Map<String, Set<Long>> dbValueToSubjects = phenotypeSummary.getDbValueToSubjectSet();
+        Set<Long> subjects = dbValueToSubjects.get( phenotypeValue );
+        Set<Long> subjectsWithUnknown = phenotypeSummary.getDbValueToSubjectSet().get( "Unknown" );
+
+        if ( subjects == null ) {
+            subjects = new HashSet<Long>();
+            dbValueToSubjects.put( phenotypeValue, subjects );
+        }
+        subjects.add( subjectId );
+        subjectsWithUnknown.remove( subjectId );
+    }
+
     private Map<String, PhenotypeSummary> constructPhenotypeSummarys( Collection<Phenotype> phenotypes,
             Collection<Long> subjectIds, Collection<Long> projectIds ) throws NeurocartaServiceException {
 
@@ -159,47 +176,6 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService {
         return phenotypeNameToSummary;
     }
 
-    private PhenotypeSummary makePhenotypeSummary( Phenotype phenotype, List<String> possibleValues,
-            Collection<Long> subjectIds, Boolean disableForLargeProject ) throws NeurocartaServiceException {
-        Map<String, Set<Long>> valueToSubjectIds = new HashMap<String, Set<Long>>();
-
-        PhenotypeSummary phenotypeSummary;
-
-        valueToSubjectIds.put( "Unknown", new HashSet<Long>( subjectIds ) ); // Initialize with unknown.
-        // Pre-populate possible values.
-        for ( String phenotypeValue : possibleValues ) {
-            valueToSubjectIds.put( phenotypeValue, new HashSet<Long>() );
-        }
-
-        phenotypeSummary = new PhenotypeSummary( phenotype.convertToValueObject(), valueToSubjectIds );
-
-        // if ( !disableForLargeProject ) {
-        phenotypeSummary.setNeurocartaPhenotype( isNeurocartaPhenotype( PhenotypeUtil.HUMAN_PHENOTYPE_URI_PREFIX
-                + phenotypeSummary.getUri() ) );
-        // } else {
-        // phenotypeSummary.setNeurocartaPhenotype( false );
-        // }
-
-        return phenotypeSummary;
-    }
-
-    private void addSubjectToPhenotypeCountingSet( PhenotypeSummary phenotypeSummary, Phenotype subjectPhenotype ) {
-
-        Long subjectId = subjectPhenotype.getSubject().getId();
-        String phenotypeValue = subjectPhenotype.getValue();
-
-        Map<String, Set<Long>> dbValueToSubjects = phenotypeSummary.getDbValueToSubjectSet();
-        Set<Long> subjects = dbValueToSubjects.get( phenotypeValue );
-        Set<Long> subjectsWithUnknown = phenotypeSummary.getDbValueToSubjectSet().get( "Unknown" );
-
-        if ( subjects == null ) {
-            subjects = new HashSet<Long>();
-            dbValueToSubjects.put( phenotypeValue, subjects );
-        }
-        subjects.add( subjectId );
-        subjectsWithUnknown.remove( subjectId );
-    }
-
     // FIXME: temporarily disabled
     private PhenotypeSummary fillInferredPhenotypeSummaries( PhenotypeSummary phenotypeSummary,
             Map<String, PhenotypeSummary> phenotypeToSummaryMap ) throws NeurocartaServiceException {
@@ -261,6 +237,10 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService {
         return phenotypeSummary;
     }
 
+    private boolean isNeurocartaPhenotype( String uri ) throws NeurocartaServiceException {
+        return uri != null && this.neurocartaQueryService.isNeurocartaPhenotype( uri );
+    }
+
     private Collection<Phenotype> loadPhenotypesBySubjectIds( Collection<Long> subjectIds ) {
 
         log.info( "loading phenotypes for " + subjectIds.size() + " subjects" );
@@ -276,7 +256,27 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService {
         return phenotypes;
     }
 
-    private boolean isNeurocartaPhenotype( String uri ) throws NeurocartaServiceException {
-        return uri != null && this.neurocartaQueryService.isNeurocartaPhenotype( uri );
+    private PhenotypeSummary makePhenotypeSummary( Phenotype phenotype, List<String> possibleValues,
+            Collection<Long> subjectIds, Boolean disableForLargeProject ) throws NeurocartaServiceException {
+        Map<String, Set<Long>> valueToSubjectIds = new HashMap<String, Set<Long>>();
+
+        PhenotypeSummary phenotypeSummary;
+
+        valueToSubjectIds.put( "Unknown", new HashSet<Long>( subjectIds ) ); // Initialize with unknown.
+        // Pre-populate possible values.
+        for ( String phenotypeValue : possibleValues ) {
+            valueToSubjectIds.put( phenotypeValue, new HashSet<Long>() );
+        }
+
+        phenotypeSummary = new PhenotypeSummary( phenotype.convertToValueObject(), valueToSubjectIds );
+
+        // if ( !disableForLargeProject ) {
+        phenotypeSummary.setNeurocartaPhenotype( isNeurocartaPhenotype( PhenotypeUtil.HUMAN_PHENOTYPE_URI_PREFIX
+                + phenotypeSummary.getUri() ) );
+        // } else {
+        // phenotypeSummary.setNeurocartaPhenotype( false );
+        // }
+
+        return phenotypeSummary;
     }
 }

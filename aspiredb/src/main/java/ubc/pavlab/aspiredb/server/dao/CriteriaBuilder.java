@@ -100,12 +100,203 @@ public class CriteriaBuilder {
                 + " is not supported yet." );
     }
 
-    private static Criterion processRestrictionExpression( Disjunction disjunction, EntityType target ) {
-        Junction criteriaDisjunction = Restrictions.disjunction();
-        for ( RestrictionExpression restriction : disjunction.getRestrictions() ) {
-            criteriaDisjunction.add( buildCriteriaRestriction( restriction, target ) );
+    /**
+     * @param subquery (side effects)
+     * @param target
+     */
+    private static void addCharacteristicAlias( DetachedCriteria subquery, EntityType target ) {
+        if ( target == EntityType.SUBJECT ) {
+            subquery.createAlias( "variants", "variant" ).createAlias( "variant.characteristics", "characteristic",
+                    CriteriaSpecification.LEFT_JOIN );
+        } else {
+            subquery.createAlias( "characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN );
         }
-        return criteriaDisjunction;
+    }
+
+    private static void addLabelAlias( DetachedCriteria subquery, EntityType target ) {
+        if ( target == EntityType.SUBJECT ) {
+            subquery.createAlias( "variants", "variant", CriteriaSpecification.LEFT_JOIN )
+                    .createAlias( "variant.labels", "variant_label", CriteriaSpecification.LEFT_JOIN )
+                    .createAlias( "labels", "subject_label", CriteriaSpecification.LEFT_JOIN );
+        } else {
+            subquery.createAlias( "subject", "subject" )
+                    .createAlias( "subject.labels", "subject_label", CriteriaSpecification.LEFT_JOIN )
+                    .createAlias( "labels", "variant_label", CriteriaSpecification.LEFT_JOIN );
+        }
+    }
+
+    private static void addLocationAlias( DetachedCriteria subquery, EntityType target ) {
+        if ( target == EntityType.SUBJECT ) {
+            subquery.createAlias( "variants", "variant" );
+            subquery.createAlias( "variant.location", "location" );
+        }
+    }
+
+    private static void addPhenotypeAlias( DetachedCriteria subquery, EntityType target ) {
+        if ( target == EntityType.SUBJECT ) {
+            subquery.createAlias( "phenotypes", "phenotype" );
+        } else {
+            subquery.createAlias( "subject", "subject" ).createAlias( "subject.phenotypes", "phenotype" );
+        }
+    }
+
+    private static Criterion createCharacteristicCriterion( CharacteristicProperty property, Operator operator,
+            TextValue value, EntityType target ) {
+        DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
+
+        addCharacteristicAlias( subquery, target );
+
+        Junction conjunction = Restrictions.conjunction().add(
+                Restrictions.eq( "characteristic.key", property.getName() ) );
+
+        switch ( operator ) {
+            case TEXT_EQUAL:
+            case TEXT_NOT_EQUAL:
+                conjunction.add( createTextCriterion( operator, "characteristic.value", value.toString() ) );
+                break;
+            case NUMERIC_EQUAL:
+            case NUMERIC_GREATER:
+            case NUMERIC_LESS:
+            case NUMERIC_NOT_EQUAL:
+                NumericValue numValue = new NumericValue( Integer.valueOf( value.getValue() ) );
+                conjunction.add( createNumericalCriterion( operator, "characteristic.value", numValue ) );
+                break;
+            default:
+                throw new IllegalArgumentException( "Operator type not supported." );
+        }
+
+        subquery.add( conjunction );
+
+        subquery.setProjection( Projections.distinct( Projections.id() ) );
+        return Subqueries.propertyIn( "id", subquery );
+    }
+
+    private static Criterion createCNVTypeCriterion( Operator operator, String property, TextValue value ) {
+        CnvType enumValue = CnvType.valueOf( value.toString() );
+        return createTextCriterion( operator, property, enumValue );
+    }
+
+    private static Criterion createGenomicRangeCriterion( Operator operator, GenomicRange range, EntityType target ) {
+        DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
+
+        addLocationAlias( subquery, target );
+
+        subquery.add( overlapsGenomicRegionCriterion( range ) );
+
+        subquery.setProjection( Projections.distinct( Projections.id() ) );
+        switch ( operator ) {
+            case IS_IN_SET:
+                return Subqueries.propertyIn( "id", subquery );
+            case IS_NOT_IN_SET:
+                return Subqueries.propertyNotIn( "id", subquery );
+            default:
+                throw new IllegalArgumentException( "Operator not supported." );
+        }
+    }
+
+    private static Criterion createLabelCriterion( LabelProperty property, Operator operator, LabelValueObject value,
+            EntityType target ) {
+        DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
+
+        addLabelAlias( subquery, target );
+
+        if ( property instanceof VariantLabelProperty ) {
+            subquery.add( Restrictions.eq( "variant_label.id", value.getId() ) );
+        } else if ( property instanceof SubjectLabelProperty ) {
+            subquery.add( Restrictions.eq( "subject_label.id", value.getId() ) );
+        }
+
+        subquery.setProjection( Projections.distinct( Projections.id() ) );
+
+        if ( operator == Operator.TEXT_EQUAL ) {
+            return Subqueries.propertyIn( "id", subquery );
+        } else if ( operator == Operator.TEXT_NOT_EQUAL ) {
+            return Subqueries.propertyNotIn( "id", subquery );
+        }
+
+        throw new IllegalArgumentException();
+    }
+
+    /**
+     * @param operator
+     * @param property
+     * @param value
+     * @return
+     */
+    private static Criterion createNumericalCriterion( Operator operator, String property, NumericValue value ) {
+        Criterion criterion;
+        switch ( operator ) {
+            case NUMERIC_GREATER:
+                criterion = Restrictions.gt( property, value.getValue() );
+                break;
+            case NUMERIC_LESS:
+                criterion = Restrictions.lt( property, value.getValue() );
+                break;
+            case NUMERIC_EQUAL:
+                criterion = Restrictions.eq( property, value.getValue() );
+                break;
+            case NUMERIC_NOT_EQUAL:
+                criterion = Restrictions.ne( property, value.getValue() );
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+        return criterion;
+    }
+
+    /**
+     * @param operator EQUALS or NOT_EQUALS
+     * @param property property
+     * @param value text value
+     * @return Hibernate criterion
+     */
+    private static Criterion createTextCriterion( Operator operator, String property, Object value ) {
+        Criterion criterion;
+        switch ( operator ) {
+            case TEXT_EQUAL:
+                criterion = Restrictions.eq( property, value );
+                break;
+            case TEXT_NOT_EQUAL:
+                criterion = Restrictions.ne( property, value );
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+        return criterion;
+    }
+
+    /**
+     * Construct full entity property name to be used in criteria query.
+     * 
+     * @param filterTarget entity type criteria query will return
+     * @param propertyOf entity type that the property is member of
+     * @param property Property
+     * @return full entity property name
+     */
+    private static String fullEntityPropertyName( EntityType filterTarget, EntityType propertyOf, Property property ) {
+        return propertyPrefix( filterTarget, propertyOf ) + property.getName();
+    }
+
+    private static Criterion overlapsGenomicRegionCriterion( GenomicRange range ) {
+        Junction variantInsideRegion = Restrictions.conjunction()
+                .add( Restrictions.eq( "location.chromosome", range.getChromosome() ) )
+                .add( Restrictions.ge( "location.start", range.getBaseStart() ) )
+                .add( Restrictions.le( "location.end", range.getBaseEnd() ) );
+
+        Junction variantHitsStartOfRegion = Restrictions.conjunction()
+                .add( Restrictions.eq( "location.chromosome", range.getChromosome() ) )
+                .add( Restrictions.le( "location.start", range.getBaseStart() ) )
+                .add( Restrictions.ge( "location.end", range.getBaseStart() ) );
+
+        Junction variantHitsEndOfRegion = Restrictions.conjunction()
+                .add( Restrictions.eq( "location.chromosome", range.getChromosome() ) )
+                .add( Restrictions.le( "location.start", range.getBaseEnd() ) )
+                .add( Restrictions.ge( "location.end", range.getBaseEnd() ) );
+
+        Criterion rangeCriterion = Restrictions.disjunction().add( variantInsideRegion ).add( variantHitsStartOfRegion )
+                .add( variantHitsEndOfRegion );
+
+        return rangeCriterion;
     }
 
     private static Criterion processRestrictionExpression( Conjunction conjunction, EntityType target ) {
@@ -114,6 +305,27 @@ public class CriteriaBuilder {
             criteriaConjunction.add( buildCriteriaRestriction( restriction, target ) );
         }
         return criteriaConjunction;
+    }
+
+    private static Criterion processRestrictionExpression( Disjunction disjunction, EntityType target ) {
+        Junction criteriaDisjunction = Restrictions.disjunction();
+        for ( RestrictionExpression restriction : disjunction.getRestrictions() ) {
+            criteriaDisjunction.add( buildCriteriaRestriction( restriction, target ) );
+        }
+        return criteriaDisjunction;
+    }
+
+    private static Criterion processRestrictionExpression( PhenotypeRestriction restriction, EntityType target ) {
+        DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
+
+        addPhenotypeAlias( subquery, target );
+
+        subquery.add( Restrictions.conjunction().add( Restrictions.eq( "phenotype.name", restriction.getName() ) )
+                .add( Restrictions.eq( "phenotype.value", restriction.getValue() ) ) );
+
+        subquery.setProjection( Projections.distinct( Projections.id() ) );
+
+        return Subqueries.propertyIn( "id", subquery );
     }
 
     private static Criterion processRestrictionExpression( SetRestriction setRestriction, EntityType target ) {
@@ -186,27 +398,6 @@ public class CriteriaBuilder {
         }
     }
 
-    private static Criterion processRestrictionExpression( PhenotypeRestriction restriction, EntityType target ) {
-        DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
-
-        addPhenotypeAlias( subquery, target );
-
-        subquery.add( Restrictions.conjunction().add( Restrictions.eq( "phenotype.name", restriction.getName() ) )
-                .add( Restrictions.eq( "phenotype.value", restriction.getValue() ) ) );
-
-        subquery.setProjection( Projections.distinct( Projections.id() ) );
-
-        return Subqueries.propertyIn( "id", subquery );
-    }
-
-    private static void addPhenotypeAlias( DetachedCriteria subquery, EntityType target ) {
-        if ( target == EntityType.SUBJECT ) {
-            subquery.createAlias( "phenotypes", "phenotype" );
-        } else {
-            subquery.createAlias( "subject", "subject" ).createAlias( "subject.phenotypes", "phenotype" );
-        }
-    }
-
     private static Criterion processRestrictionExpression( SimpleRestriction restriction, EntityType target ) {
         Property property = restriction.getProperty();
         Operator operator = restriction.getOperator();
@@ -256,197 +447,6 @@ public class CriteriaBuilder {
         } else {
             return Restrictions.eq( "class", restriction.getType() );
         }
-    }
-
-    private static Criterion overlapsGenomicRegionCriterion( GenomicRange range ) {
-        Junction variantInsideRegion = Restrictions.conjunction()
-                .add( Restrictions.eq( "location.chromosome", range.getChromosome() ) )
-                .add( Restrictions.ge( "location.start", range.getBaseStart() ) )
-                .add( Restrictions.le( "location.end", range.getBaseEnd() ) );
-
-        Junction variantHitsStartOfRegion = Restrictions.conjunction()
-                .add( Restrictions.eq( "location.chromosome", range.getChromosome() ) )
-                .add( Restrictions.le( "location.start", range.getBaseStart() ) )
-                .add( Restrictions.ge( "location.end", range.getBaseStart() ) );
-
-        Junction variantHitsEndOfRegion = Restrictions.conjunction()
-                .add( Restrictions.eq( "location.chromosome", range.getChromosome() ) )
-                .add( Restrictions.le( "location.start", range.getBaseEnd() ) )
-                .add( Restrictions.ge( "location.end", range.getBaseEnd() ) );
-
-        Criterion rangeCriterion = Restrictions.disjunction().add( variantInsideRegion ).add( variantHitsStartOfRegion )
-                .add( variantHitsEndOfRegion );
-
-        return rangeCriterion;
-    }
-
-    private static Criterion createGenomicRangeCriterion( Operator operator, GenomicRange range, EntityType target ) {
-        DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
-
-        addLocationAlias( subquery, target );
-
-        subquery.add( overlapsGenomicRegionCriterion( range ) );
-
-        subquery.setProjection( Projections.distinct( Projections.id() ) );
-        switch ( operator ) {
-            case IS_IN_SET:
-                return Subqueries.propertyIn( "id", subquery );
-            case IS_NOT_IN_SET:
-                return Subqueries.propertyNotIn( "id", subquery );
-            default:
-                throw new IllegalArgumentException( "Operator not supported." );
-        }
-    }
-
-    private static void addLocationAlias( DetachedCriteria subquery, EntityType target ) {
-        if ( target == EntityType.SUBJECT ) {
-            subquery.createAlias( "variants", "variant" );
-            subquery.createAlias( "variant.location", "location" );
-        }
-    }
-
-    private static Criterion createCNVTypeCriterion( Operator operator, String property, TextValue value ) {
-        CnvType enumValue = CnvType.valueOf( value.toString() );
-        return createTextCriterion( operator, property, enumValue );
-    }
-
-    private static Criterion createLabelCriterion( LabelProperty property, Operator operator, LabelValueObject value,
-            EntityType target ) {
-        DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
-
-        addLabelAlias( subquery, target );
-
-        if ( property instanceof VariantLabelProperty ) {
-            subquery.add( Restrictions.eq( "variant_label.id", value.getId() ) );
-        } else if ( property instanceof SubjectLabelProperty ) {
-            subquery.add( Restrictions.eq( "subject_label.id", value.getId() ) );
-        }
-
-        subquery.setProjection( Projections.distinct( Projections.id() ) );
-
-        if ( operator == Operator.TEXT_EQUAL ) {
-            return Subqueries.propertyIn( "id", subquery );
-        } else if ( operator == Operator.TEXT_NOT_EQUAL ) {
-            return Subqueries.propertyNotIn( "id", subquery );
-        }
-
-        throw new IllegalArgumentException();
-    }
-
-    private static void addLabelAlias( DetachedCriteria subquery, EntityType target ) {
-        if ( target == EntityType.SUBJECT ) {
-            subquery.createAlias( "variants", "variant", CriteriaSpecification.LEFT_JOIN )
-                    .createAlias( "variant.labels", "variant_label", CriteriaSpecification.LEFT_JOIN )
-                    .createAlias( "labels", "subject_label", CriteriaSpecification.LEFT_JOIN );
-        } else {
-            subquery.createAlias( "subject", "subject" )
-                    .createAlias( "subject.labels", "subject_label", CriteriaSpecification.LEFT_JOIN )
-                    .createAlias( "labels", "variant_label", CriteriaSpecification.LEFT_JOIN );
-        }
-    }
-
-    /**
-     * @param subquery (side effects)
-     * @param target
-     */
-    private static void addCharacteristicAlias( DetachedCriteria subquery, EntityType target ) {
-        if ( target == EntityType.SUBJECT ) {
-            subquery.createAlias( "variants", "variant" ).createAlias( "variant.characteristics", "characteristic",
-                    CriteriaSpecification.LEFT_JOIN );
-        } else {
-            subquery.createAlias( "characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN );
-        }
-    }
-
-    private static Criterion createCharacteristicCriterion( CharacteristicProperty property, Operator operator,
-            TextValue value, EntityType target ) {
-        DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
-
-        addCharacteristicAlias( subquery, target );
-
-        Junction conjunction = Restrictions.conjunction().add(
-                Restrictions.eq( "characteristic.key", property.getName() ) );
-
-        switch ( operator ) {
-            case TEXT_EQUAL:
-            case TEXT_NOT_EQUAL:
-                conjunction.add( createTextCriterion( operator, "characteristic.value", value.toString() ) );
-                break;
-            case NUMERIC_EQUAL:
-            case NUMERIC_GREATER:
-            case NUMERIC_LESS:
-            case NUMERIC_NOT_EQUAL:
-                NumericValue numValue = new NumericValue( Integer.valueOf( value.getValue() ) );
-                conjunction.add( createNumericalCriterion( operator, "characteristic.value", numValue ) );
-                break;
-            default:
-                throw new IllegalArgumentException( "Operator type not supported." );
-        }
-
-        subquery.add( conjunction );
-
-        subquery.setProjection( Projections.distinct( Projections.id() ) );
-        return Subqueries.propertyIn( "id", subquery );
-    }
-
-    /**
-     * @param operator
-     * @param property
-     * @param value
-     * @return
-     */
-    private static Criterion createNumericalCriterion( Operator operator, String property, NumericValue value ) {
-        Criterion criterion;
-        switch ( operator ) {
-            case NUMERIC_GREATER:
-                criterion = Restrictions.gt( property, value.getValue() );
-                break;
-            case NUMERIC_LESS:
-                criterion = Restrictions.lt( property, value.getValue() );
-                break;
-            case NUMERIC_EQUAL:
-                criterion = Restrictions.eq( property, value.getValue() );
-                break;
-            case NUMERIC_NOT_EQUAL:
-                criterion = Restrictions.ne( property, value.getValue() );
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
-        return criterion;
-    }
-
-    /**
-     * @param operator EQUALS or NOT_EQUALS
-     * @param property property
-     * @param value text value
-     * @return Hibernate criterion
-     */
-    private static Criterion createTextCriterion( Operator operator, String property, Object value ) {
-        Criterion criterion;
-        switch ( operator ) {
-            case TEXT_EQUAL:
-                criterion = Restrictions.eq( property, value );
-                break;
-            case TEXT_NOT_EQUAL:
-                criterion = Restrictions.ne( property, value );
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
-        return criterion;
-    }
-
-    /**
-     * Construct full entity property name to be used in criteria query.
-     * 
-     * @param filterTarget entity type criteria query will return
-     * @param propertyOf entity type that the property is member of
-     * @param property Property
-     * @return full entity property name
-     */
-    private static String fullEntityPropertyName( EntityType filterTarget, EntityType propertyOf, Property property ) {
-        return propertyPrefix( filterTarget, propertyOf ) + property.getName();
     }
 
     /**

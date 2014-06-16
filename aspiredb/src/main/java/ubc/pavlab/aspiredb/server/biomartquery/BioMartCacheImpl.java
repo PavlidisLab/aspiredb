@@ -52,25 +52,27 @@ public class BioMartCacheImpl extends SearchableEhcache<GeneValueObject> impleme
     private Attribute<Object> startAttribute;
     private Attribute<Object> endAttribute;
 
-    @SuppressWarnings("unused")
-    @PostConstruct
-    private void initialize() {
-        geneEnsemblIdAttribute = getSearchAttribute( GENE_ENSEMBL_ID_SEARCH_ATTRIBUTE_NAME );
-        geneNameAttribute = getSearchAttribute( GENE_NAME_SEARCH_ATTRIBUTE_NAME );
-        geneSymbolAttribute = getSearchAttribute( GENE_SYMBOL_SEARCH_ATTRIBUTE_NAME );
-        chromosomeAttribute = getSearchAttribute( CHROMOSOME_SEARCH_ATTRIBUTE_NAME );
-        startAttribute = getSearchAttribute( START_SEARCH_ATTRIBUTE_NAME );
-        endAttribute = getSearchAttribute( END_SEARCH_ATTRIBUTE_NAME );
+    @Override
+    public Collection<GeneValueObject> fetchGenesByGeneSymbols( Collection<String> geneSymbols ) {
+        Criteria symbolCriteria = geneSymbolAttribute.in( geneSymbols );
+
+        return fetchByCriteria( symbolCriteria );
     }
 
     @Override
-    public Object getKey( GeneValueObject gene ) {
-        return gene.getEnsemblId();
-    }
+    public Collection<GeneValueObject> fetchGenesByLocation( String chromosomeName, Long start, Long end ) {
+        Criteria chromosomeCriteria = chromosomeAttribute.eq( chromosomeName );
+        Criteria insideVariant = startAttribute.between( start.intValue(), end.intValue() ).or(
+                endAttribute.between( start.intValue(), end.intValue() ) );
+        Criteria overlapsStart = startAttribute.le( start.intValue() ).and( endAttribute.ge( start.intValue() ) );
+        Criteria overlapsEnd = startAttribute.le( end.intValue() ).and( endAttribute.ge( end.intValue() ) );
 
-    @Override
-    public String getCacheName() {
-        return CACHE_NAME;
+        Criteria hasName = geneSymbolAttribute.ne( "" );
+
+        final Collection<GeneValueObject> geneValueObjects = fetchByCriteria( hasName.and( chromosomeCriteria
+                .and( insideVariant.or( overlapsStart ).or( overlapsEnd ) ) ) );
+
+        return geneValueObjects;
     }
 
     @Override
@@ -81,6 +83,11 @@ public class BioMartCacheImpl extends SearchableEhcache<GeneValueObject> impleme
         Criteria symbolCriteria = geneSymbolAttribute.ilike( regexQueryString );
 
         return fetchByCriteria( nameCriteria.or( symbolCriteria ) );
+    }
+
+    @Override
+    public String getCacheName() {
+        return CACHE_NAME;
     }
 
     @Override
@@ -103,25 +110,18 @@ public class BioMartCacheImpl extends SearchableEhcache<GeneValueObject> impleme
     }
 
     @Override
-    public Collection<GeneValueObject> fetchGenesByLocation( String chromosomeName, Long start, Long end ) {
-        Criteria chromosomeCriteria = chromosomeAttribute.eq( chromosomeName );
-        Criteria insideVariant = startAttribute.between( start.intValue(), end.intValue() ).or(
-                endAttribute.between( start.intValue(), end.intValue() ) );
-        Criteria overlapsStart = startAttribute.le( start.intValue() ).and( endAttribute.ge( start.intValue() ) );
-        Criteria overlapsEnd = startAttribute.le( end.intValue() ).and( endAttribute.ge( end.intValue() ) );
-
-        Criteria hasName = geneSymbolAttribute.ne( "" );
-
-        final Collection<GeneValueObject> geneValueObjects = fetchByCriteria( hasName.and( chromosomeCriteria
-                .and( insideVariant.or( overlapsStart ).or( overlapsEnd ) ) ) );
-
-        return geneValueObjects;
+    public Object getKey( GeneValueObject gene ) {
+        return gene.getEnsemblId();
     }
 
-    @Override
-    public Collection<GeneValueObject> fetchGenesByGeneSymbols( Collection<String> geneSymbols ) {
-        Criteria symbolCriteria = geneSymbolAttribute.in( geneSymbols );
-
-        return fetchByCriteria( symbolCriteria );
+    @SuppressWarnings("unused")
+    @PostConstruct
+    private void initialize() {
+        geneEnsemblIdAttribute = getSearchAttribute( GENE_ENSEMBL_ID_SEARCH_ATTRIBUTE_NAME );
+        geneNameAttribute = getSearchAttribute( GENE_NAME_SEARCH_ATTRIBUTE_NAME );
+        geneSymbolAttribute = getSearchAttribute( GENE_SYMBOL_SEARCH_ATTRIBUTE_NAME );
+        chromosomeAttribute = getSearchAttribute( CHROMOSOME_SEARCH_ATTRIBUTE_NAME );
+        startAttribute = getSearchAttribute( START_SEARCH_ATTRIBUTE_NAME );
+        endAttribute = getSearchAttribute( END_SEARCH_ATTRIBUTE_NAME );
     }
 }

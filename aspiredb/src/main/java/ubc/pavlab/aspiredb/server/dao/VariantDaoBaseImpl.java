@@ -72,13 +72,6 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
     private Class<T> elementClass;
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected VariantDaoBaseImpl( Class elementClass ) {
-        super( elementClass );
-        assert elementClass.isAssignableFrom( elementClass );
-        this.elementClass = elementClass;
-    }
-
     @Autowired
     private Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
 
@@ -90,6 +83,13 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
     @Autowired
     private PhenotypeUtil phenotypeUtils;
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    protected VariantDaoBaseImpl( Class elementClass ) {
+        super( elementClass );
+        assert elementClass.isAssignableFrom( elementClass );
+        this.elementClass = elementClass;
+    }
 
     @Override
     public Collection<T> findByGenomicLocation( GenomicRange range, Collection<Long> activeProjectIds ) {
@@ -107,24 +107,19 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         return variants;
     }
 
-    @Override
-    public Collection<String> suggestValuesForEntityProperty( Property property, SuggestionContext suggestionContext ) {
-        Session session = currentSession();
+    /**
+     * Returns list of IDs that satisfy the PhenotypeFilter. Get a list of Subjects first then get the list of all the
+     * Variants for that Subject. This is done for performance reasons.
+     * 
+     * @param filterConfig
+     */
+    public List<Variant> findByPhenotype( PhenotypeFilterConfig filterConfig ) {
 
-        Criteria criteria = session.createCriteria( this.elementClass );
-        if ( suggestionContext.getValuePrefix() != null ) {
-            // TODO: escape certain chars
-            String valuePrefix = suggestionContext.getValuePrefix();
-            String valueWildcard = "%" + valuePrefix + "%";
-            criteria.add( Restrictions.like( property.getName(), valueWildcard ) );
-        }
-        criteria.setProjection( Projections.distinct( Projections.property( property.getName() ) ) );
-        if ( suggestionContext.getActiveProjectIds() != null && !suggestionContext.getActiveProjectIds().isEmpty() ) {
-            criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
-                    .add( Restrictions.in( "project.id", suggestionContext.getActiveProjectIds() ) );
-        }
+        Collection<Subject> subjects = subjectDao.findByPhenotype( filterConfig );
 
-        return criteria.list();
+        return this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
+                .add( Restrictions.in( "subject", subjects ) ).list();
+
     }
 
     @Override
@@ -141,167 +136,6 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         List<T> variants = this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
                 .add( Restrictions.in( "subject", subjects ) ).list();
         return variants;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<? extends T> loadPage( int offset, int limit, String sortField, String sortDirection,
-            Set<AspireDbFilterConfig> filters ) throws BioMartServiceException, NeurocartaServiceException {
-        assert ( filters != null );
-
-        List<Long> variantIds = getFilteredIds( filters );
-        List<T> variants = new ArrayList<T>( this.load( variantIds ) );
-        if ( limit == 0 ) {
-            limit = variants.size();
-        }
-        int pageSize = Math.min( limit, variants.size() );
-        List<T> variantPage = variants.subList( 0, pageSize );
-
-        return new PageBean( variantPage, variantIds.size() );
-    }
-
-    @Override
-    public Collection<? extends T> load( Set<AspireDbFilterConfig> filters ) throws BioMartServiceException,
-            NeurocartaServiceException {
-        return loadPage( 0, 0, null, null, filters );
-    }
-
-    private List<Long> getFilteredIds( Set<AspireDbFilterConfig> filters ) throws BioMartServiceException,
-            NeurocartaServiceException {
-        Iterator<AspireDbFilterConfig> iterator = filters.iterator();
-        AspireDbFilterConfig filterConfig = iterator.next();
-        // First iteration
-
-        log.info( "findIds for filterconfig:" + filterConfig.getClass() );
-        List<Long> variantIds = findIds( filterConfig );
-        log.info( "findIds finished for filterconfig:" + filterConfig.getClass() );
-
-        while ( iterator.hasNext() ) {
-            filterConfig = iterator.next();
-            log.info( "findIds for filterconfig:" + filterConfig.getClass() );
-            List<Long> ids = findIds( filterConfig );
-
-            log.info( "findIds finished for filterconfig:" + filterConfig.getClass() );
-
-            // intersect results
-            variantIds.retainAll( ids );
-
-            // if size is 0 -> stop
-            if ( variantIds.isEmpty() ) {
-                break;
-            }
-        }
-        return variantIds;
-    }
-
-    private List<Long> findIds( AspireDbFilterConfig filter ) throws BioMartServiceException,
-            NeurocartaServiceException {
-        // Project overlap filter requires a little more data processing than the other filters and uses precalculated
-        // database table
-        // as it doesn't quite fit the same paradigm as the other filters I am breaking it off into its own method
-        if ( filter instanceof ProjectOverlapFilterConfig ) {
-
-            return this.getProjectOverlapVariantIds( ( ProjectOverlapFilterConfig ) filter );
-
-        } else if ( filter instanceof PhenotypeFilterConfig ) {
-            List<Variant> variants = findByPhenotype( ( PhenotypeFilterConfig ) filter );
-
-            ArrayList<Long> variantIds = new ArrayList<Long>();
-
-            for ( Variant v : variants ) {
-                variantIds.add( v.getId() );
-            }
-
-            return variantIds;
-        }
-
-        Session session = this.getSessionFactory().getCurrentSession();
-        Criteria criteria = session.createCriteria( this.elementClass );
-
-        addSingleFilter( filter, criteria );
-
-        log.info( " criteria.list() in findIds" );
-        criteria.setProjection( Projections.distinct( Projections.id() ) );
-        return criteria.list();
-    }
-
-    /**
-     * Returns list of IDs that satisfy the PhenotypeFilter. Get a list of Subjects first then get the list of all the
-     * Variants for that Subject. This is done for performance reasons.
-     * 
-     * @param filterConfig
-     */
-    public List<Variant> findByPhenotype( PhenotypeFilterConfig filterConfig ) {
-
-        Collection<Subject> subjects = subjectDao.findByPhenotype( filterConfig );
-
-        return this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
-                .add( Restrictions.in( "subject", subjects ) ).list();
-
-    }
-
-    /**
-     * Returns list of Subject and Variant IDs that satisfy the PhenotypeFilter. Get a list of Subjects first then get
-     * the list of all the Variants for that Subject. This is done for performance reasons. {@link Bug#3892}
-     * 
-     * @param filterConfig
-     * @return key = {@link VariantDao#SUBJECT_IDS_KEY} and {@link VariantDao#VARIANT_IDS_KEY}
-     */
-    public Map<Integer, Collection<Long>> getSubjectVariantIdsByPhenotype( PhenotypeFilterConfig filterConfig ) {
-
-        Collection<Subject> subjects = subjectDao.findByPhenotype( filterConfig );
-        Collection<Variant> variants = this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
-                .add( Restrictions.in( "subject", subjects ) ).list();
-
-        Collection<Long> subjectIds = new HashSet<Long>();
-        Collection<Long> variantIds = new HashSet<Long>();
-
-        for ( Subject s : subjects ) {
-            subjectIds.add( s.getId() );
-        }
-        for ( Variant v : variants ) {
-            variantIds.add( v.getId() );
-        }
-
-        Map<Integer, Collection<Long>> map = new HashMap<Integer, Collection<Long>>();
-        map.put( VariantDao.SUBJECT_IDS_KEY, subjectIds );
-        map.put( VariantDao.VARIANT_IDS_KEY, variantIds );
-
-        return map;
-
-    }
-
-    // - use Factory pattern with registration? to map config to appropriate filter subclass
-    // FOR NOW: use getClass
-    private void addSingleFilter( AspireDbFilterConfig filter, Criteria criteria ) throws BioMartServiceException,
-            NeurocartaServiceException {
-        if ( filter.getClass() == VariantFilterConfig.class ) {
-            VariantFilterConfig locationFilter = ( VariantFilterConfig ) filter;
-            RestrictionExpression restriction = locationFilter.getRestriction();
-            addSingleVariantFilter( restriction, criteria );
-        } else if ( filter.getClass() == ProjectFilterConfig.class ) {
-            ProjectFilterConfig projectFilter = ( ProjectFilterConfig ) filter;
-            criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
-                    .add( Restrictions.in( "project.id", projectFilter.getProjectIds() ) );
-        } else if ( filter.getClass() == SubjectFilterConfig.class ) {
-            SubjectFilterConfig subjectFilter = ( SubjectFilterConfig ) filter;
-            RestrictionExpression restrictionExpression = subjectFilter.getRestriction();
-            Criterion criterion = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
-                    CriteriaBuilder.EntityType.VARIANT );
-            criteria.createAlias( "subject", "subject" ).createAlias( "subject.labels", "subject_label",
-                    CriteriaSpecification.LEFT_JOIN );
-            criteria.add( criterion );
-        }
-    }
-
-    private void addSingleVariantFilter( RestrictionExpression restrictionExpression, Criteria criteria ) {
-        criteria.createAlias( "location", "location" ).createAlias( "subject", "subject" )
-        // .createAlias("subject.labels", "subject_label", CriteriaSpecification.LEFT_JOIN)
-        // .createAlias("labels", "variant_label", CriteriaSpecification.LEFT_JOIN)
-                .createAlias( "characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN );
-        Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
-                CriteriaBuilder.EntityType.VARIANT );
-        criteria.add( junction );
     }
 
     public List<Long> getProjectOverlapVariantIds( ProjectOverlapFilterConfig overlapFilter ) {
@@ -469,17 +303,170 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
     }
 
-    private Boolean validateOverlapRestriction( SimpleRestriction r ) {
-        // TODO test other things like value and type, discern if it is percentage or number of bases
+    /**
+     * Returns list of Subject and Variant IDs that satisfy the PhenotypeFilter. Get a list of Subjects first then get
+     * the list of all the Variants for that Subject. This is done for performance reasons. {@link Bug#3892}
+     * 
+     * @param filterConfig
+     * @return key = {@link VariantDao#SUBJECT_IDS_KEY} and {@link VariantDao#VARIANT_IDS_KEY}
+     */
+    public Map<Integer, Collection<Long>> getSubjectVariantIdsByPhenotype( PhenotypeFilterConfig filterConfig ) {
 
-        if ( r == null || r.getValue() == null ) {
-            return false;
+        Collection<Subject> subjects = subjectDao.findByPhenotype( filterConfig );
+        Collection<Variant> variants = this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
+                .add( Restrictions.in( "subject", subjects ) ).list();
+
+        Collection<Long> subjectIds = new HashSet<Long>();
+        Collection<Long> variantIds = new HashSet<Long>();
+
+        for ( Subject s : subjects ) {
+            subjectIds.add( s.getId() );
+        }
+        for ( Variant v : variants ) {
+            variantIds.add( v.getId() );
         }
 
-        NumericValue numeric = ( NumericValue ) r.getValue();
-        Integer value = numeric.getValue();
+        Map<Integer, Collection<Long>> map = new HashMap<Integer, Collection<Long>>();
+        map.put( VariantDao.SUBJECT_IDS_KEY, subjectIds );
+        map.put( VariantDao.VARIANT_IDS_KEY, variantIds );
 
-        return value != null && value >= 0 && r.getOperator() != null;
+        return map;
+
+    }
+
+    @Override
+    public Collection<? extends T> load( Set<AspireDbFilterConfig> filters ) throws BioMartServiceException,
+            NeurocartaServiceException {
+        return loadPage( 0, 0, null, null, filters );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<? extends T> loadPage( int offset, int limit, String sortField, String sortDirection,
+            Set<AspireDbFilterConfig> filters ) throws BioMartServiceException, NeurocartaServiceException {
+        assert ( filters != null );
+
+        List<Long> variantIds = getFilteredIds( filters );
+        List<T> variants = new ArrayList<T>( this.load( variantIds ) );
+        if ( limit == 0 ) {
+            limit = variants.size();
+        }
+        int pageSize = Math.min( limit, variants.size() );
+        List<T> variantPage = variants.subList( 0, pageSize );
+
+        return new PageBean( variantPage, variantIds.size() );
+    }
+
+    @Override
+    public Collection<String> suggestValuesForEntityProperty( Property property, SuggestionContext suggestionContext ) {
+        Session session = currentSession();
+
+        Criteria criteria = session.createCriteria( this.elementClass );
+        if ( suggestionContext.getValuePrefix() != null ) {
+            // TODO: escape certain chars
+            String valuePrefix = suggestionContext.getValuePrefix();
+            String valueWildcard = "%" + valuePrefix + "%";
+            criteria.add( Restrictions.like( property.getName(), valueWildcard ) );
+        }
+        criteria.setProjection( Projections.distinct( Projections.property( property.getName() ) ) );
+        if ( suggestionContext.getActiveProjectIds() != null && !suggestionContext.getActiveProjectIds().isEmpty() ) {
+            criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
+                    .add( Restrictions.in( "project.id", suggestionContext.getActiveProjectIds() ) );
+        }
+
+        return criteria.list();
+    }
+
+    // - use Factory pattern with registration? to map config to appropriate filter subclass
+    // FOR NOW: use getClass
+    private void addSingleFilter( AspireDbFilterConfig filter, Criteria criteria ) throws BioMartServiceException,
+            NeurocartaServiceException {
+        if ( filter.getClass() == VariantFilterConfig.class ) {
+            VariantFilterConfig locationFilter = ( VariantFilterConfig ) filter;
+            RestrictionExpression restriction = locationFilter.getRestriction();
+            addSingleVariantFilter( restriction, criteria );
+        } else if ( filter.getClass() == ProjectFilterConfig.class ) {
+            ProjectFilterConfig projectFilter = ( ProjectFilterConfig ) filter;
+            criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
+                    .add( Restrictions.in( "project.id", projectFilter.getProjectIds() ) );
+        } else if ( filter.getClass() == SubjectFilterConfig.class ) {
+            SubjectFilterConfig subjectFilter = ( SubjectFilterConfig ) filter;
+            RestrictionExpression restrictionExpression = subjectFilter.getRestriction();
+            Criterion criterion = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
+                    CriteriaBuilder.EntityType.VARIANT );
+            criteria.createAlias( "subject", "subject" ).createAlias( "subject.labels", "subject_label",
+                    CriteriaSpecification.LEFT_JOIN );
+            criteria.add( criterion );
+        }
+    }
+
+    private void addSingleVariantFilter( RestrictionExpression restrictionExpression, Criteria criteria ) {
+        criteria.createAlias( "location", "location" ).createAlias( "subject", "subject" )
+        // .createAlias("subject.labels", "subject_label", CriteriaSpecification.LEFT_JOIN)
+        // .createAlias("labels", "variant_label", CriteriaSpecification.LEFT_JOIN)
+                .createAlias( "characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN );
+        Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
+                CriteriaBuilder.EntityType.VARIANT );
+        criteria.add( junction );
+    }
+
+    private List<Long> findIds( AspireDbFilterConfig filter ) throws BioMartServiceException,
+            NeurocartaServiceException {
+        // Project overlap filter requires a little more data processing than the other filters and uses precalculated
+        // database table
+        // as it doesn't quite fit the same paradigm as the other filters I am breaking it off into its own method
+        if ( filter instanceof ProjectOverlapFilterConfig ) {
+
+            return this.getProjectOverlapVariantIds( ( ProjectOverlapFilterConfig ) filter );
+
+        } else if ( filter instanceof PhenotypeFilterConfig ) {
+            List<Variant> variants = findByPhenotype( ( PhenotypeFilterConfig ) filter );
+
+            ArrayList<Long> variantIds = new ArrayList<Long>();
+
+            for ( Variant v : variants ) {
+                variantIds.add( v.getId() );
+            }
+
+            return variantIds;
+        }
+
+        Session session = this.getSessionFactory().getCurrentSession();
+        Criteria criteria = session.createCriteria( this.elementClass );
+
+        addSingleFilter( filter, criteria );
+
+        log.info( " criteria.list() in findIds" );
+        criteria.setProjection( Projections.distinct( Projections.id() ) );
+        return criteria.list();
+    }
+
+    private List<Long> getFilteredIds( Set<AspireDbFilterConfig> filters ) throws BioMartServiceException,
+            NeurocartaServiceException {
+        Iterator<AspireDbFilterConfig> iterator = filters.iterator();
+        AspireDbFilterConfig filterConfig = iterator.next();
+        // First iteration
+
+        log.info( "findIds for filterconfig:" + filterConfig.getClass() );
+        List<Long> variantIds = findIds( filterConfig );
+        log.info( "findIds finished for filterconfig:" + filterConfig.getClass() );
+
+        while ( iterator.hasNext() ) {
+            filterConfig = iterator.next();
+            log.info( "findIds for filterconfig:" + filterConfig.getClass() );
+            List<Long> ids = findIds( filterConfig );
+
+            log.info( "findIds finished for filterconfig:" + filterConfig.getClass() );
+
+            // intersect results
+            variantIds.retainAll( ids );
+
+            // if size is 0 -> stop
+            if ( variantIds.isEmpty() ) {
+                break;
+            }
+        }
+        return variantIds;
     }
 
     // This restriction is of the type:
@@ -512,6 +499,57 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         }
 
         return new ArrayList<Variant2SpecialVariantOverlap>();
+
+    }
+
+    private List<Long> getPhenoAssociatedVariantIdsForProjects( ProjectOverlapFilterConfig overlapFilter ) {
+
+        List<Long> ids = new ArrayList<Long>();
+
+        PhenotypeFilterConfig phenConfig = new PhenotypeFilterConfig();
+        phenConfig.setRestriction( overlapFilter.getPhenotypeRestriction() );
+        phenConfig.setActiveProjectIds( overlapFilter.getOverlapProjectIds() );
+
+        Set<AspireDbFilterConfig> phenFilterSet = new HashSet<AspireDbFilterConfig>();
+        phenFilterSet.add( phenConfig );
+
+        try {
+            StopWatch timer = new StopWatch();
+            timer.start();
+
+            log.info( "fetching phenotype associated variant ids for overlapped projects" );
+            ids = getFilteredIds( phenFilterSet );
+
+            if ( timer.getTime() > 100 ) {
+                log.info( "fetching phenotype associated variant ids for overlapped projects took " + timer.getTime()
+                        + "ms" );
+            }
+        } catch ( Exception e ) {
+            log.error( "exception while getting projectOverlapIds for phenotype" );
+        }
+
+        return ids;
+
+    }
+
+    private List<Long> getVariantIdsForProjects( Collection<Long> projectIds ) {
+
+        ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();
+        projectFilterConfig.setProjectIds( projectIds );
+
+        Set<AspireDbFilterConfig> filterSet = new HashSet<AspireDbFilterConfig>();
+        filterSet.add( projectFilterConfig );
+
+        List<Long> projectsVariantIds = new ArrayList<Long>();
+
+        try {
+            // get the variantIds of all the variants in the activeProjects to iterate over later and search for overlap
+            projectsVariantIds = getFilteredIds( filterSet );
+        } catch ( Exception e ) {
+            log.error( "exception while getting projectOverlapIds" );
+        }
+
+        return projectsVariantIds;
 
     }
 
@@ -585,54 +623,16 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
     }
 
-    private List<Long> getPhenoAssociatedVariantIdsForProjects( ProjectOverlapFilterConfig overlapFilter ) {
+    private Boolean validateOverlapRestriction( SimpleRestriction r ) {
+        // TODO test other things like value and type, discern if it is percentage or number of bases
 
-        List<Long> ids = new ArrayList<Long>();
-
-        PhenotypeFilterConfig phenConfig = new PhenotypeFilterConfig();
-        phenConfig.setRestriction( overlapFilter.getPhenotypeRestriction() );
-        phenConfig.setActiveProjectIds( overlapFilter.getOverlapProjectIds() );
-
-        Set<AspireDbFilterConfig> phenFilterSet = new HashSet<AspireDbFilterConfig>();
-        phenFilterSet.add( phenConfig );
-
-        try {
-            StopWatch timer = new StopWatch();
-            timer.start();
-
-            log.info( "fetching phenotype associated variant ids for overlapped projects" );
-            ids = getFilteredIds( phenFilterSet );
-
-            if ( timer.getTime() > 100 ) {
-                log.info( "fetching phenotype associated variant ids for overlapped projects took " + timer.getTime()
-                        + "ms" );
-            }
-        } catch ( Exception e ) {
-            log.error( "exception while getting projectOverlapIds for phenotype" );
+        if ( r == null || r.getValue() == null ) {
+            return false;
         }
 
-        return ids;
+        NumericValue numeric = ( NumericValue ) r.getValue();
+        Integer value = numeric.getValue();
 
-    }
-
-    private List<Long> getVariantIdsForProjects( Collection<Long> projectIds ) {
-
-        ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();
-        projectFilterConfig.setProjectIds( projectIds );
-
-        Set<AspireDbFilterConfig> filterSet = new HashSet<AspireDbFilterConfig>();
-        filterSet.add( projectFilterConfig );
-
-        List<Long> projectsVariantIds = new ArrayList<Long>();
-
-        try {
-            // get the variantIds of all the variants in the activeProjects to iterate over later and search for overlap
-            projectsVariantIds = getFilteredIds( filterSet );
-        } catch ( Exception e ) {
-            log.error( "exception while getting projectOverlapIds" );
-        }
-
-        return projectsVariantIds;
-
+        return value != null && value >= 0 && r.getOperator() != null;
     }
 }

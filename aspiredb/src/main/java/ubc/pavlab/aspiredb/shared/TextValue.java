@@ -38,7 +38,17 @@ public class TextValue implements Displayable, Serializable {
     }
 
     @Override
-    public String toString() {
+    public String getHtmlLabel() {
+        return value;
+    }
+
+    @Override
+    public String getLabel() {
+        return value;
+    }
+
+    @Override
+    public String getTooltip() {
         return value;
     }
 
@@ -51,17 +61,7 @@ public class TextValue implements Displayable, Serializable {
     }
 
     @Override
-    public String getLabel() {
-        return value;
-    }
-
-    @Override
-    public String getHtmlLabel() {
-        return value;
-    }
-
-    @Override
-    public String getTooltip() {
+    public String toString() {
         return value;
     }
 }

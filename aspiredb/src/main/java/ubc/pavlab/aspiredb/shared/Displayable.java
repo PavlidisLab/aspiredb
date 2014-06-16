@@ -19,9 +19,9 @@ package ubc.pavlab.aspiredb.shared;
  * @version $Id: Displayable.java,v 1.1 2013/05/29 21:01:47 frances Exp $
  */
 public interface Displayable {
-    public String getLabel();
-
     public String getHtmlLabel();
+
+    public String getLabel();
 
     public String getTooltip();
 }

@@ -37,17 +37,17 @@ public class Dataset {
     @XmlAttribute
     public String config;
 
+    @XmlElement
+    public List<Filter> Filter = new ArrayList<Filter>();
+
+    @XmlElement
+    public List<Attribute> Attribute = new ArrayList<Attribute>();
+
     public Dataset() {
     }
 
     public Dataset( String name ) {
         this.name = name;
     }
-
-    @XmlElement
-    public List<Filter> Filter = new ArrayList<Filter>();
-
-    @XmlElement
-    public List<Attribute> Attribute = new ArrayList<Attribute>();
 
 }

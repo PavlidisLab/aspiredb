@@ -42,8 +42,6 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 @Component
 public class AclAdvice extends BaseAclAdvice {
 
-    private static Log log = LogFactory.getLog( AclAdvice.class );
-
     /*
      * (non-Javadoc)
      * 
@@ -85,5 +83,18 @@ public class AclAdvice extends BaseAclAdvice {
     @Override
     protected boolean objectIsUserGroup( Securable object ) {
         return UserGroup.class.isAssignableFrom( object.getClass() );
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see gemma.gsec.acl.BaseAclAdvice#specialCaseToKeepPrivateOnCreation(java.lang.Class)
+     */
+    @Override
+    protected boolean specialCaseToKeepPrivateOnCreation( Class<? extends Securable> clazz ) {
+        /*
+         * Important: all entities are private, to begin with.
+         */
+        return true;
     }
 }

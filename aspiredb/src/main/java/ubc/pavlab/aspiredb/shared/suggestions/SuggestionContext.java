@@ -33,20 +33,20 @@ public class SuggestionContext implements Serializable {
     private Collection<Long> activeProjectIds;
     private String valuePrefix;
 
-    public String getValuePrefix() {
-        return valuePrefix;
-    }
-
-    public void setValuePrefix( String valuePrefix ) {
-        this.valuePrefix = valuePrefix;
-    }
-
     public Collection<Long> getActiveProjectIds() {
         return activeProjectIds;
     }
 
+    public String getValuePrefix() {
+        return valuePrefix;
+    }
+
     public void setActiveProjectIds( Collection<Long> activeProjectIds ) {
         this.activeProjectIds = activeProjectIds;
+    }
+
+    public void setValuePrefix( String valuePrefix ) {
+        this.valuePrefix = valuePrefix;
     }
 
 }

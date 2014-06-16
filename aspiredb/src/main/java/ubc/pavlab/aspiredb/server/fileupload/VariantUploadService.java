@@ -50,122 +50,135 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 public class VariantUploadService {
 
+    public enum CommonVariantColumn {
+        SUBJECTID(ConfigUtils.getString( "aspiredb.cli.variant.subjectid" )), CHROM(ConfigUtils
+                .getString( "aspiredb.cli.variant.chrom" )), START(ConfigUtils.getString( "aspiredb.cli.variant.start" )), END(
+                ConfigUtils.getString( "aspiredb.cli.variant.end" ));
+
+        public static List<String> getCommonVariantColumnNames() {
+            ArrayList<String> columnNames = new ArrayList<String>();
+
+            for ( CommonVariantColumn column : CommonVariantColumn.values() ) {
+                columnNames.add( column.key );
+            }
+
+            return columnNames;
+        }
+
+        public String key;
+
+        private CommonVariantColumn( String key ) {
+            this.key = key;
+        }
+    }
+
+    public enum OptionalCNVColumn {
+        COPYNUMBER(ConfigUtils.getString( "aspiredb.cli.variant.cnv.copynumber" ));
+
+        public static List<String> getOptionalCNVColumnNames() {
+            ArrayList<String> columnNames = new ArrayList<String>();
+
+            for ( OptionalCNVColumn column : OptionalCNVColumn.values() ) {
+                columnNames.add( column.key );
+            }
+
+            return columnNames;
+        }
+
+        String key;
+
+        private OptionalCNVColumn( String key ) {
+            this.key = key;
+        }
+    }
+
+    public enum OptionalSNVColumn {
+        DBSNPID(ConfigUtils.getString( "aspiredb.cli.variant.snv.dbsnpid" ));
+
+        public static List<String> getOptionalSNVColumnNames() {
+            ArrayList<String> columnNames = new ArrayList<String>();
+
+            for ( OptionalSNVColumn column : OptionalSNVColumn.values() ) {
+                columnNames.add( column.key );
+            }
+
+            return columnNames;
+        }
+
+        String key;
+
+        private OptionalSNVColumn( String key ) {
+            this.key = key;
+        }
+    }
+
+    public enum OptionalVariantColumn {
+        USERVARIANTID(ConfigUtils.getString( "aspiredb.cli.variant.uservariantid" )), DESCRIPTION(ConfigUtils
+                .getString( "aspiredb.cli.variant.description" )), EXTERNALID(ConfigUtils
+                .getString( "aspiredb.cli.variant.externalid" ));
+
+        public static List<String> getOptionalVariantColumnNames() {
+            ArrayList<String> columnNames = new ArrayList<String>();
+
+            for ( OptionalVariantColumn column : OptionalVariantColumn.values() ) {
+                columnNames.add( column.key );
+            }
+
+            return columnNames;
+        }
+
+        String key;
+
+        private OptionalVariantColumn( String key ) {
+            this.key = key;
+        }
+    }
+
     protected static Log log = LogFactory.getLog( VariantUploadService.class );
 
-    public static VariantUploadServiceResult makeVariantValueObjectsFromResultSet( ResultSet results,
-            VariantType variantType ) throws Exception {
+/**
+         * Returns a position based map of SNVs.
+         * 
+         * @param vos
+         * @return HashMap< 'chr', HashMap< 'base start position', Collection<SNVValueObject> > >
+         */
+    public static HashMap<String, HashMap<Integer, Collection<SNVValueObject>>> constructQuerySNVMap(
+            ArrayList<VariantValueObject> vos ) {
+        HashMap<String, HashMap<Integer, Collection<SNVValueObject>>> map = new HashMap<>();
 
-        ArrayList<VariantValueObject> variantsToAdd = new ArrayList<VariantValueObject>();
-        int lineNumber = 1;
-        ArrayList<String> errorMessages = new ArrayList<String>();
-
-        // TODO maybe validate columns first, and bail if they are all not there
-        while ( results.next() ) {
-            lineNumber++;
-            try {
-                variantsToAdd.add( makeVariantValueObjectFromResultSet( results, variantType ) );
-            } catch ( InvalidDataException e ) {
-                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
-            } catch ( NumberFormatException e ) {
-                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
-            } catch ( SQLException e ) {
-                errorMessages.add( "Invalid data format on line number: " + lineNumber + " error message:"
-                        + e.getMessage() );
-            } catch ( Exception e ) {
-                errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
+        // store variant positions in memory
+        for ( VariantValueObject vvo : vos ) {
+            if ( vvo == null ) {
+                continue;
             }
-        }
-
-        VariantUploadServiceResult serviceResult = new VariantUploadServiceResult( variantsToAdd, errorMessages );
-
-        return serviceResult;
-
-    }
-
-    // Decipher gave us a weird file, this may only need to be done as a one off
-    public static VariantUploadServiceResult makeVariantValueObjectsFromDecipherResultSet( ResultSet results )
-            throws Exception {
-
-        ArrayList<VariantValueObject> variantsToAdd = new ArrayList<VariantValueObject>();
-        int lineNumber = 1;
-        ArrayList<String> errorMessages = new ArrayList<String>();
-
-        // TODO maybe validate columns first, and bail if they are all not there
-        while ( results.next() ) {
-            lineNumber++;
-            try {
-                variantsToAdd.add( makeVariantValueObjectFromResultSet( results, VariantType.DECIPHER ) );
-            } catch ( InvalidDataException e ) {
-                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
-            } catch ( NumberFormatException e ) {
-                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
-            } catch ( SQLException e ) {
-                errorMessages.add( "Invalid data format on line number: " + lineNumber + " error message:"
-                        + e.getMessage() );
-            } catch ( Exception e ) {
-                errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
+            if ( !( vvo instanceof SNVValueObject ) ) {
+                log.warn( "SNVValueObject expected." );
+                continue;
             }
-        }
+            SNVValueObject vo = ( SNVValueObject ) vvo;
 
-        VariantUploadServiceResult serviceResult = new VariantUploadServiceResult( variantsToAdd, errorMessages );
-
-        return serviceResult;
-
-    }
-
-    // DGV file parser
-    public static VariantUploadServiceResult makeVariantValueObjectsFromDGVResultSet( ResultSet results )
-            throws Exception {
-
-        ArrayList<VariantValueObject> variantsToAdd = new ArrayList<VariantValueObject>();
-        int lineNumber = 1;
-        ArrayList<String> errorMessages = new ArrayList<String>();
-
-        // TODO maybe validate columns first, and bail if they are all not there
-        while ( results.next() ) {
-            lineNumber++;
-            try {
-                variantsToAdd.add( makeVariantValueObjectFromResultSet( results, VariantType.DGV ) );
-            } catch ( InvalidDataException e ) {
-                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
-            } catch ( NumberFormatException e ) {
-                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
-            } catch ( SQLException e ) {
-                errorMessages.add( "Invalid data format on line number: " + lineNumber + " error message:"
-                        + e.getMessage() );
-            } catch ( Exception e ) {
-
-                // should just be ignored data
-                // errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
+            GenomicRange coord = vo.getGenomicRange();
+            if ( coord == null ) {
+                continue;
             }
+            int snvLength = Math.abs( coord.getBaseEnd() - coord.getBaseStart() );
+            if ( snvLength > 1 ) {
+                log.warn( "Variant " + vo.getGenomeCoordinates() + " is " + snvLength + " bases long!" );
+            }
+            Collection<SNVValueObject> volist;
+            if ( map.get( coord.getChromosome() ) == null ) {
+                map.put( coord.getChromosome(), new HashMap<Integer, Collection<SNVValueObject>>() );
+            }
+            volist = map.get( coord.getChromosome() ).get( coord.getBaseStart() );
+            if ( volist == null ) {
+                volist = new ArrayList<>();
+                map.get( coord.getChromosome() ).put( coord.getBaseStart(), volist );
+            }
+
+            volist.add( vo );
         }
 
-        VariantUploadServiceResult serviceResult = new VariantUploadServiceResult( variantsToAdd, errorMessages );
-
-        return serviceResult;
-
-    }
-
-    public static VariantValueObject makeVariantValueObjectFromResultSet( ResultSet results, VariantType variantType )
-            throws Exception {
-
-        if ( variantType.equals( VariantType.CNV ) ) {
-            return makeCNVFromResultSet( results );
-        } else if ( variantType.equals( VariantType.SNV ) ) {
-            return makeSNVFromResultSet( results );
-        } else if ( variantType.equals( VariantType.INDEL ) ) {
-            return makeIndelFromResultSet( results );
-        } else if ( variantType.equals( VariantType.INVERSION ) ) {
-            return makeInversionFromResultSet( results );
-        } else if ( variantType.equals( VariantType.DECIPHER ) ) {
-            return makeDecipherCNVFromResultSet( results );
-        } else if ( variantType.equals( VariantType.DGV ) ) {
-            return makeDGVCNVFromResultSet( results );
-        } else {
-            log.error( "VariantType not supported" );
-            throw new InvalidDataException( "VariantType not supported" );
-        }
-
+        return map;
     }
 
     public static CNVValueObject makeCNVFromResultSet( ResultSet results ) throws Exception {
@@ -199,7 +212,6 @@ public class VariantUploadService {
 
     }
 
-  
     // Quick and dirty method to grab data from decipher's poorly formatted data file they gave us
     // no point in making this pretty because of the one off nature of the file
     public static CNVValueObject makeDecipherCNVFromResultSet( ResultSet results ) throws Exception {
@@ -311,6 +323,45 @@ public class VariantUploadService {
 
     }
 
+    public static IndelValueObject makeIndelFromResultSet( ResultSet results ) throws Exception {
+
+        String indelLength = ConfigUtils.getString( "aspiredb.cli.variant.indel.length" );
+
+        IndelValueObject indel = new IndelValueObject();
+
+        indel.setGenomicRange( getGenomicRangeFromResultSet( results ) );
+        indel.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
+        indel.setLength( results.getInt( indelLength ) );
+
+        if ( indel.getLength() < 0 ) {
+            throw new InvalidDataException( indelLength + " " + indel.getLength() + " is not allowed" );
+        }
+
+        ArrayList<String> requiredIndelColumns = new ArrayList<String>();
+        requiredIndelColumns.add( indelLength );
+        requiredIndelColumns.addAll( CommonVariantColumn.getCommonVariantColumnNames() );
+
+        indel.setCharacteristics( getCharacteristicsFromResultSet( results, requiredIndelColumns ) );
+
+        return indel;
+
+    }
+
+    public static InversionValueObject makeInversionFromResultSet( ResultSet results ) throws Exception {
+
+        List<String> reservedIndelColumns = CommonVariantColumn.getCommonVariantColumnNames();
+
+        InversionValueObject inversion = new InversionValueObject();
+
+        inversion.setGenomicRange( getGenomicRangeFromResultSet( results ) );
+        inversion.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
+
+        inversion.setCharacteristics( getCharacteristicsFromResultSet( results, reservedIndelColumns ) );
+
+        return inversion;
+
+    }
+
     public static SNVValueObject makeSNVFromResultSet( ResultSet results ) throws Exception {
 
         List<String> acceptableValues = Arrays.asList( new String[] { "A", "C", "G", "T", "N" } );
@@ -353,149 +404,120 @@ public class VariantUploadService {
 
     }
 
-    /**
-     * Compares query SNVs in chrMap against annotated SNVs in dbResults. If a match is found, save the functional
-     * prediction's value as the query SNV's CharacteristicValueObject.
-     * 
-     * @param chrMap
-     * @param dbResults
-     * @param dbPredColname functional prediction method name in the database (e.g. LR_pred)
-     * @return
-     * @throws NumberFormatException
-     * @throws SQLException
-     */
-    public static Collection<SNVValueObject> predictSNVFunction( HashMap<Integer, Collection<SNVValueObject>> chrMap,
-            ResultSet dbResults, String dbPredColname ) {
+    public static VariantValueObject makeVariantValueObjectFromResultSet( ResultSet results, VariantType variantType )
+            throws Exception {
 
-        Collection<SNVValueObject> matched = new ArrayList<>();
-        int posFound = 0;
-        int line = 0;
-
-        if ( chrMap == null ) {
-            return matched;
+        if ( variantType.equals( VariantType.CNV ) ) {
+            return makeCNVFromResultSet( results );
+        } else if ( variantType.equals( VariantType.SNV ) ) {
+            return makeSNVFromResultSet( results );
+        } else if ( variantType.equals( VariantType.INDEL ) ) {
+            return makeIndelFromResultSet( results );
+        } else if ( variantType.equals( VariantType.INVERSION ) ) {
+            return makeInversionFromResultSet( results );
+        } else if ( variantType.equals( VariantType.DECIPHER ) ) {
+            return makeDecipherCNVFromResultSet( results );
+        } else if ( variantType.equals( VariantType.DGV ) ) {
+            return makeDGVCNVFromResultSet( results );
+        } else {
+            log.error( "VariantType not supported" );
+            throw new InvalidDataException( "VariantType not supported" );
         }
 
-        String dbChr = "";
-
-        StopWatch timer = new StopWatch();
-        timer.start();
-
-        while ( true ) {
-
-            try {
-                if ( !dbResults.next() ) {
-                    break;
-                }
-
-                line++;
-                if ( ( line % 1e5 ) == 0 ) {
-                    log.debug( "Read " + line + " lines ..." );
-                }
-                dbChr = dbResults.getString( "#chr" );
-                String dbPos = dbResults.getString( "pos(1-coor)" );
-                String resultRef = dbResults.getString( "ref" );
-                String resultAlt = dbResults.getString( "alt" );
-                String resultPred = dbResults.getString( dbPredColname );
-                Collection<SNVValueObject> resultVoList;
-
-                try {
-                    resultVoList = chrMap.get( Integer.parseInt( dbPos ) );
-                } catch ( NumberFormatException e ) {
-                    log.error( dbPos + " is not a valid Integer" );
-                    continue;
-                }
-
-                if ( resultVoList == null ) {
-                    continue;
-                } else {
-                    posFound++;
-                }
-
-                for ( SNVValueObject snvResultVo : resultVoList ) {
-
-                    String refBaseVo = snvResultVo.getReferenceBase();
-                    String obsBaseVo = snvResultVo.getObservedBase();
-
-                    if ( !snvResultVo.getGenomicRange().getChromosome().equals( dbChr ) ) {
-                        log.warn( "Chromosomes do not match!" );
-                        return matched;
-                    }
-                    Map<String, CharacteristicValueObject> characteristics = snvResultVo.getCharacteristics();
-                    if ( characteristics == null ) {
-                        continue;
-                    }
-
-                    if ( ( refBaseVo != null ) && ( obsBaseVo != null ) && ( resultRef != null )
-                            && ( resultAlt != null ) ) {
-                        if ( ( refBaseVo.equals( resultRef ) ) && ( obsBaseVo.equals( resultAlt ) ) ) {
-                            matched.add( snvResultVo );
-                            CharacteristicValueObject dbPredVo = new CharacteristicValueObject();
-                            dbPredVo.setKey( dbPredColname );
-                            dbPredVo.setValue( resultPred );
-                            characteristics.put( dbPredColname, dbPredVo );
-                        }
-                    }
-
-                    // found all query positions
-                    if ( posFound >= chrMap.keySet().size() ) {
-                        break;
-                    }
-                }
-            } catch ( SQLException e ) {
-                log.error( e );
-                continue;
-            }
-        }
-
-        log.info( "Read " + line + " variants in chr" + dbChr + " which took " + timer.getTime() + " ms. "
-                + matched.size() + " variants matched the query." );
-
-        return matched;
     }
 
-/**
-     * Returns a position based map of SNVs.
-     * 
-     * @param vos
-     * @return HashMap< 'chr', HashMap< 'base start position', Collection<SNVValueObject> > >
-     */
-    public static HashMap<String, HashMap<Integer, Collection<SNVValueObject>>> constructQuerySNVMap(
-            ArrayList<VariantValueObject> vos ) {
-        HashMap<String, HashMap<Integer, Collection<SNVValueObject>>> map = new HashMap<>();
+    // Decipher gave us a weird file, this may only need to be done as a one off
+    public static VariantUploadServiceResult makeVariantValueObjectsFromDecipherResultSet( ResultSet results )
+            throws Exception {
 
-        // store variant positions in memory
-        for ( VariantValueObject vvo : vos ) {
-            if ( vvo == null ) {
-                continue;
-            }
-            if ( !( vvo instanceof SNVValueObject ) ) {
-                log.warn( "SNVValueObject expected." );
-                continue;
-            }
-            SNVValueObject vo = ( SNVValueObject ) vvo;
+        ArrayList<VariantValueObject> variantsToAdd = new ArrayList<VariantValueObject>();
+        int lineNumber = 1;
+        ArrayList<String> errorMessages = new ArrayList<String>();
 
-            GenomicRange coord = vo.getGenomicRange();
-            if ( coord == null ) {
-                continue;
+        // TODO maybe validate columns first, and bail if they are all not there
+        while ( results.next() ) {
+            lineNumber++;
+            try {
+                variantsToAdd.add( makeVariantValueObjectFromResultSet( results, VariantType.DECIPHER ) );
+            } catch ( InvalidDataException e ) {
+                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
+            } catch ( NumberFormatException e ) {
+                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
+            } catch ( SQLException e ) {
+                errorMessages.add( "Invalid data format on line number: " + lineNumber + " error message:"
+                        + e.getMessage() );
+            } catch ( Exception e ) {
+                errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
             }
-            int snvLength = Math.abs( coord.getBaseEnd() - coord.getBaseStart() );
-            if ( snvLength > 1 ) {
-                log.warn( "Variant " + vo.getGenomeCoordinates() + " is " + snvLength + " bases long!" );
-            }
-            Collection<SNVValueObject> volist;
-            if ( map.get( coord.getChromosome() ) == null ) {
-                map.put( coord.getChromosome(), new HashMap<Integer, Collection<SNVValueObject>>() );
-            }
-            volist = map.get( coord.getChromosome() ).get( coord.getBaseStart() );
-            if ( volist == null ) {
-                volist = new ArrayList<>();
-                map.get( coord.getChromosome() ).put( coord.getBaseStart(), volist );
-            }
-
-            volist.add( vo );
         }
 
-        return map;
+        VariantUploadServiceResult serviceResult = new VariantUploadServiceResult( variantsToAdd, errorMessages );
+
+        return serviceResult;
+
+    }
+
+    // DGV file parser
+    public static VariantUploadServiceResult makeVariantValueObjectsFromDGVResultSet( ResultSet results )
+            throws Exception {
+
+        ArrayList<VariantValueObject> variantsToAdd = new ArrayList<VariantValueObject>();
+        int lineNumber = 1;
+        ArrayList<String> errorMessages = new ArrayList<String>();
+
+        // TODO maybe validate columns first, and bail if they are all not there
+        while ( results.next() ) {
+            lineNumber++;
+            try {
+                variantsToAdd.add( makeVariantValueObjectFromResultSet( results, VariantType.DGV ) );
+            } catch ( InvalidDataException e ) {
+                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
+            } catch ( NumberFormatException e ) {
+                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
+            } catch ( SQLException e ) {
+                errorMessages.add( "Invalid data format on line number: " + lineNumber + " error message:"
+                        + e.getMessage() );
+            } catch ( Exception e ) {
+
+                // should just be ignored data
+                // errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
+            }
+        }
+
+        VariantUploadServiceResult serviceResult = new VariantUploadServiceResult( variantsToAdd, errorMessages );
+
+        return serviceResult;
+
+    }
+
+    public static VariantUploadServiceResult makeVariantValueObjectsFromResultSet( ResultSet results,
+            VariantType variantType ) throws Exception {
+
+        ArrayList<VariantValueObject> variantsToAdd = new ArrayList<VariantValueObject>();
+        int lineNumber = 1;
+        ArrayList<String> errorMessages = new ArrayList<String>();
+
+        // TODO maybe validate columns first, and bail if they are all not there
+        while ( results.next() ) {
+            lineNumber++;
+            try {
+                variantsToAdd.add( makeVariantValueObjectFromResultSet( results, variantType ) );
+            } catch ( InvalidDataException e ) {
+                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
+            } catch ( NumberFormatException e ) {
+                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
+            } catch ( SQLException e ) {
+                errorMessages.add( "Invalid data format on line number: " + lineNumber + " error message:"
+                        + e.getMessage() );
+            } catch ( Exception e ) {
+                errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
+            }
+        }
+
+        VariantUploadServiceResult serviceResult = new VariantUploadServiceResult( variantsToAdd, errorMessages );
+
+        return serviceResult;
+
     }
 
     /**
@@ -607,91 +629,104 @@ public class VariantUploadService {
         return matched;
     }
 
-    public static IndelValueObject makeIndelFromResultSet( ResultSet results ) throws Exception {
+    /**
+     * Compares query SNVs in chrMap against annotated SNVs in dbResults. If a match is found, save the functional
+     * prediction's value as the query SNV's CharacteristicValueObject.
+     * 
+     * @param chrMap
+     * @param dbResults
+     * @param dbPredColname functional prediction method name in the database (e.g. LR_pred)
+     * @return
+     * @throws NumberFormatException
+     * @throws SQLException
+     */
+    public static Collection<SNVValueObject> predictSNVFunction( HashMap<Integer, Collection<SNVValueObject>> chrMap,
+            ResultSet dbResults, String dbPredColname ) {
 
-        String indelLength = ConfigUtils.getString( "aspiredb.cli.variant.indel.length" );
+        Collection<SNVValueObject> matched = new ArrayList<>();
+        int posFound = 0;
+        int line = 0;
 
-        IndelValueObject indel = new IndelValueObject();
-
-        indel.setGenomicRange( getGenomicRangeFromResultSet( results ) );
-        indel.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
-        indel.setLength( results.getInt( indelLength ) );
-
-        if ( indel.getLength() < 0 ) {
-            throw new InvalidDataException( indelLength + " " + indel.getLength() + " is not allowed" );
+        if ( chrMap == null ) {
+            return matched;
         }
 
-        ArrayList<String> requiredIndelColumns = new ArrayList<String>();
-        requiredIndelColumns.add( indelLength );
-        requiredIndelColumns.addAll( CommonVariantColumn.getCommonVariantColumnNames() );
+        String dbChr = "";
 
-        indel.setCharacteristics( getCharacteristicsFromResultSet( results, requiredIndelColumns ) );
+        StopWatch timer = new StopWatch();
+        timer.start();
 
-        return indel;
+        while ( true ) {
 
-    }
+            try {
+                if ( !dbResults.next() ) {
+                    break;
+                }
 
-    public static InversionValueObject makeInversionFromResultSet( ResultSet results ) throws Exception {
+                line++;
+                if ( ( line % 1e5 ) == 0 ) {
+                    log.debug( "Read " + line + " lines ..." );
+                }
+                dbChr = dbResults.getString( "#chr" );
+                String dbPos = dbResults.getString( "pos(1-coor)" );
+                String resultRef = dbResults.getString( "ref" );
+                String resultAlt = dbResults.getString( "alt" );
+                String resultPred = dbResults.getString( dbPredColname );
+                Collection<SNVValueObject> resultVoList;
 
-        List<String> reservedIndelColumns = CommonVariantColumn.getCommonVariantColumnNames();
+                try {
+                    resultVoList = chrMap.get( Integer.parseInt( dbPos ) );
+                } catch ( NumberFormatException e ) {
+                    log.error( dbPos + " is not a valid Integer" );
+                    continue;
+                }
 
-        InversionValueObject inversion = new InversionValueObject();
+                if ( resultVoList == null ) {
+                    continue;
+                } else {
+                    posFound++;
+                }
 
-        inversion.setGenomicRange( getGenomicRangeFromResultSet( results ) );
-        inversion.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
+                for ( SNVValueObject snvResultVo : resultVoList ) {
 
-        inversion.setCharacteristics( getCharacteristicsFromResultSet( results, reservedIndelColumns ) );
+                    String refBaseVo = snvResultVo.getReferenceBase();
+                    String obsBaseVo = snvResultVo.getObservedBase();
 
-        return inversion;
+                    if ( !snvResultVo.getGenomicRange().getChromosome().equals( dbChr ) ) {
+                        log.warn( "Chromosomes do not match!" );
+                        return matched;
+                    }
+                    Map<String, CharacteristicValueObject> characteristics = snvResultVo.getCharacteristics();
+                    if ( characteristics == null ) {
+                        continue;
+                    }
 
-    }
+                    if ( ( refBaseVo != null ) && ( obsBaseVo != null ) && ( resultRef != null )
+                            && ( resultAlt != null ) ) {
+                        if ( ( refBaseVo.equals( resultRef ) ) && ( obsBaseVo.equals( resultAlt ) ) ) {
+                            matched.add( snvResultVo );
+                            CharacteristicValueObject dbPredVo = new CharacteristicValueObject();
+                            dbPredVo.setKey( dbPredColname );
+                            dbPredVo.setValue( resultPred );
+                            characteristics.put( dbPredColname, dbPredVo );
+                        }
+                    }
 
-    private static GenomicRange getGenomicRangeFromResultSet( ResultSet results ) throws Exception {
-        GenomicRange gr = new GenomicRange();
-
-        String chrom = results.getString( CommonVariantColumn.CHROM.key ).toUpperCase();
-
-        // For decipher data, this really shouldn't be here, adding it to quickly add in decipher data
-        if ( chrom.startsWith( "CHR" ) ) {
-            chrom = chrom.replace( "CHR", "" );
-        }
-
-        gr.setChromosome( chrom );
-
-        // Note that results.getInt return 0 if it is not a number
-        gr.setBaseStart( results.getInt( CommonVariantColumn.START.key ) );
-        gr.setBaseEnd( results.getInt( CommonVariantColumn.END.key ) );
-
-        validateGenomicRange( gr );
-
-        return gr;
-
-    }
-
-    // this can be more strict, when we start importing different data files we should factor this kind of validation
-    // out into its own class
-    private static void validateGenomicRange( GenomicRange gr ) throws Exception {
-
-        if ( gr.getBaseStart() < 1 || gr.getBaseEnd() < 1 ) {
-            throw new InvalidDataException( "Invalid Genomic Coordinates" );
-        }
-
-        if ( StringUtils.isAlpha( gr.getChromosome() ) ) {
-            if ( !gr.getChromosome().equals( "X" ) && !gr.getChromosome().equals( "Y" ) ) {
-                throw new InvalidDataException( "Chromosome value " + gr.getChromosome() + " is not allowed" );
+                    // found all query positions
+                    if ( posFound >= chrMap.keySet().size() ) {
+                        break;
+                    }
+                }
+            } catch ( SQLException e ) {
+                log.error( e );
+                continue;
             }
-
         }
 
-        if ( StringUtils.isNumeric( gr.getChromosome() ) ) {
-            Integer chrom = Integer.parseInt( gr.getChromosome() );
+        log.info( "Read " + line + " variants in chr" + dbChr + " which took " + timer.getTime() + " ms. "
+                + matched.size() + " variants matched the query." );
 
-            if ( chrom < 1 || chrom > 22 ) {
-                throw new InvalidDataException( "Chromosome value " + gr.getChromosome() + " is not allowed" );
-            }
-
-        }
-
+        return matched;
     }
 
     private static Map<String, CharacteristicValueObject> getCharacteristicsFromResultSet( ResultSet results,
@@ -719,6 +754,28 @@ public class VariantUploadService {
         return characteristics;
     }
 
+    private static GenomicRange getGenomicRangeFromResultSet( ResultSet results ) throws Exception {
+        GenomicRange gr = new GenomicRange();
+
+        String chrom = results.getString( CommonVariantColumn.CHROM.key ).toUpperCase();
+
+        // For decipher data, this really shouldn't be here, adding it to quickly add in decipher data
+        if ( chrom.startsWith( "CHR" ) ) {
+            chrom = chrom.replace( "CHR", "" );
+        }
+
+        gr.setChromosome( chrom );
+
+        // Note that results.getInt return 0 if it is not a number
+        gr.setBaseStart( results.getInt( CommonVariantColumn.START.key ) );
+        gr.setBaseEnd( results.getInt( CommonVariantColumn.END.key ) );
+
+        validateGenomicRange( gr );
+
+        return gr;
+
+    }
+
     private static ArrayList<String> getReservedVariantColumns() {
 
         ArrayList<String> reservedColumns = new ArrayList<String>();
@@ -726,28 +783,6 @@ public class VariantUploadService {
         reservedColumns.addAll( OptionalVariantColumn.getOptionalVariantColumnNames() );
 
         return reservedColumns;
-
-    }
-
-    private static void populateOptionalVariantColumns( ResultSet results, VariantValueObject vo ) throws Exception {
-
-        vo.setUserVariantId( getValueFromResultSet( OptionalVariantColumn.USERVARIANTID.key, results ) );
-        vo.setDescription( getValueFromResultSet( OptionalVariantColumn.DESCRIPTION.key, results ) );
-        vo.setExternalId( getValueFromResultSet( OptionalVariantColumn.EXTERNALID.key, results ) );
-
-    }
-
-    private static void populateOptionalCNVColumns( ResultSet results, CNVValueObject vo ) throws Exception {
-
-        Integer copyNumber = null;
-        String copyNumberString = getValueFromResultSet( OptionalCNVColumn.COPYNUMBER.key, results );
-
-        if ( copyNumberString == null || copyNumberString.isEmpty() ) {
-            vo.setCopyNumber( null );
-        } else {
-            copyNumber = Integer.parseInt( copyNumberString );
-            vo.setCopyNumber( copyNumber );
-        }
 
     }
 
@@ -767,88 +802,52 @@ public class VariantUploadService {
         return null;
     }
 
-    public enum CommonVariantColumn {
-        SUBJECTID(ConfigUtils.getString( "aspiredb.cli.variant.subjectid" )), CHROM(ConfigUtils
-                .getString( "aspiredb.cli.variant.chrom" )), START(ConfigUtils.getString( "aspiredb.cli.variant.start" )), END(
-                ConfigUtils.getString( "aspiredb.cli.variant.end" ));
+    private static void populateOptionalCNVColumns( ResultSet results, CNVValueObject vo ) throws Exception {
 
-        public String key;
+        Integer copyNumber = null;
+        String copyNumberString = getValueFromResultSet( OptionalCNVColumn.COPYNUMBER.key, results );
 
-        private CommonVariantColumn( String key ) {
-            this.key = key;
+        if ( copyNumberString == null || copyNumberString.isEmpty() ) {
+            vo.setCopyNumber( null );
+        } else {
+            copyNumber = Integer.parseInt( copyNumberString );
+            vo.setCopyNumber( copyNumber );
         }
 
-        public static List<String> getCommonVariantColumnNames() {
-            ArrayList<String> columnNames = new ArrayList<String>();
-
-            for ( CommonVariantColumn column : CommonVariantColumn.values() ) {
-                columnNames.add( column.key );
-            }
-
-            return columnNames;
-        }
     }
 
-    public enum OptionalVariantColumn {
-        USERVARIANTID(ConfigUtils.getString( "aspiredb.cli.variant.uservariantid" )), DESCRIPTION(ConfigUtils
-                .getString( "aspiredb.cli.variant.description" )), EXTERNALID(ConfigUtils
-                .getString( "aspiredb.cli.variant.externalid" ));
+    private static void populateOptionalVariantColumns( ResultSet results, VariantValueObject vo ) throws Exception {
 
-        String key;
+        vo.setUserVariantId( getValueFromResultSet( OptionalVariantColumn.USERVARIANTID.key, results ) );
+        vo.setDescription( getValueFromResultSet( OptionalVariantColumn.DESCRIPTION.key, results ) );
+        vo.setExternalId( getValueFromResultSet( OptionalVariantColumn.EXTERNALID.key, results ) );
 
-        private OptionalVariantColumn( String key ) {
-            this.key = key;
-        }
-
-        public static List<String> getOptionalVariantColumnNames() {
-            ArrayList<String> columnNames = new ArrayList<String>();
-
-            for ( OptionalVariantColumn column : OptionalVariantColumn.values() ) {
-                columnNames.add( column.key );
-            }
-
-            return columnNames;
-        }
     }
 
-    public enum OptionalSNVColumn {
-        DBSNPID(ConfigUtils.getString( "aspiredb.cli.variant.snv.dbsnpid" ));
+    // this can be more strict, when we start importing different data files we should factor this kind of validation
+    // out into its own class
+    private static void validateGenomicRange( GenomicRange gr ) throws Exception {
 
-        String key;
-
-        private OptionalSNVColumn( String key ) {
-            this.key = key;
+        if ( gr.getBaseStart() < 1 || gr.getBaseEnd() < 1 ) {
+            throw new InvalidDataException( "Invalid Genomic Coordinates" );
         }
 
-        public static List<String> getOptionalSNVColumnNames() {
-            ArrayList<String> columnNames = new ArrayList<String>();
-
-            for ( OptionalSNVColumn column : OptionalSNVColumn.values() ) {
-                columnNames.add( column.key );
+        if ( StringUtils.isAlpha( gr.getChromosome() ) ) {
+            if ( !gr.getChromosome().equals( "X" ) && !gr.getChromosome().equals( "Y" ) ) {
+                throw new InvalidDataException( "Chromosome value " + gr.getChromosome() + " is not allowed" );
             }
 
-            return columnNames;
-        }
-    }
-
-    public enum OptionalCNVColumn {
-        COPYNUMBER(ConfigUtils.getString( "aspiredb.cli.variant.cnv.copynumber" ));
-
-        String key;
-
-        private OptionalCNVColumn( String key ) {
-            this.key = key;
         }
 
-        public static List<String> getOptionalCNVColumnNames() {
-            ArrayList<String> columnNames = new ArrayList<String>();
+        if ( StringUtils.isNumeric( gr.getChromosome() ) ) {
+            Integer chrom = Integer.parseInt( gr.getChromosome() );
 
-            for ( OptionalCNVColumn column : OptionalCNVColumn.values() ) {
-                columnNames.add( column.key );
+            if ( chrom < 1 || chrom > 22 ) {
+                throw new InvalidDataException( "Chromosome value " + gr.getChromosome() + " is not allowed" );
             }
 
-            return columnNames;
         }
+
     }
 
 }

@@ -40,10 +40,8 @@ public class GeneSetProperty extends TextProperty {
         this.supportsSuggestions = true;
     }
 
-    /**public GeneSetProperty( String displayName, String name ) {
-        super( displayName, name );
-    }*/
-
-   
+    /**
+     * public GeneSetProperty( String displayName, String name ) { super( displayName, name ); }
+     */
 
 }

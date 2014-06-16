@@ -39,39 +39,39 @@ public class SetRestriction implements RestrictionExpression {
     public SetRestriction() {
     }
 
-    public SetRestriction( Property property, Operator operator, Set<? extends Serializable> values ) {
-        this.property = property;
-        this.operator = operator;
-        this.values.addAll( values );
-    }
-
     public SetRestriction( Property property, Operator operator, Serializable value ) {
         this.property = property;
         this.operator = operator;
         this.values.add( value );
     }
 
-    public void setProperty( Property property ) {
+    public SetRestriction( Property property, Operator operator, Set<? extends Serializable> values ) {
         this.property = property;
-    }
-
-    public void setOperator( Operator operator ) {
         this.operator = operator;
+        this.values.addAll( values );
     }
 
-    public void setValues( Set<Object> values ) {
-        this.values = values;
-    }
-
-    public Set<Object> getValues() {
-        return values;
+    public Operator getOperator() {
+        return operator;
     }
 
     public Property getProperty() {
         return property;
     }
 
-    public Operator getOperator() {
-        return operator;
+    public Set<Object> getValues() {
+        return values;
+    }
+
+    public void setOperator( Operator operator ) {
+        this.operator = operator;
+    }
+
+    public void setProperty( Property property ) {
+        this.property = property;
+    }
+
+    public void setValues( Set<Object> values ) {
+        this.values = values;
     }
 }

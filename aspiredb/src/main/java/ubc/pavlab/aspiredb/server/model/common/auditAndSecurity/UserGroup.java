@@ -69,13 +69,13 @@ public class UserGroup implements gemma.gsec.model.UserGroup {
     }
 
     @Override
-    public Long getId() {
-        return id;
+    public Collection<GroupAuthority> getAuthorities() {
+        return authorities;
     }
 
     @Override
-    public void setId( Long id ) {
-        this.id = id;
+    public String getDescription() {
+        return description;
     }
 
     @Override
@@ -84,8 +84,8 @@ public class UserGroup implements gemma.gsec.model.UserGroup {
     }
 
     @Override
-    public Collection<GroupAuthority> getAuthorities() {
-        return authorities;
+    public Long getId() {
+        return id;
     }
 
     @Override
@@ -94,13 +94,8 @@ public class UserGroup implements gemma.gsec.model.UserGroup {
     }
 
     @Override
-    public void setName( String name ) {
-        this.name = name;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
+    public <T extends gemma.gsec.model.GroupAuthority> void setAuthorities( Collection<T> authorities ) {
+        this.authorities = ( Collection<GroupAuthority> ) authorities;
     }
 
     @Override
@@ -114,8 +109,13 @@ public class UserGroup implements gemma.gsec.model.UserGroup {
     }
 
     @Override
-    public <T extends gemma.gsec.model.GroupAuthority> void setAuthorities( Collection<T> authorities ) {
-        this.authorities = ( Collection<GroupAuthority> ) authorities;
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    @Override
+    public void setName( String name ) {
+        this.name = name;
     }
 
 }

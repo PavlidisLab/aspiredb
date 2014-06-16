@@ -43,14 +43,6 @@ public class ReflectionUtil {
     }
 
     /**
-     * @param obj
-     * @return base object for Impl; for example, for a FooImpl instance it returns Foo.class.
-     */
-    public static Class<?> getBaseForImpl( Object obj ) {
-        return getBaseForImpl( obj.getClass() );
-    }
-
-    /**
      * @param cls
      * @return base object for Impl; for example, for a FooImpl.class it returns Foo.class.
      */
@@ -63,10 +55,10 @@ public class ReflectionUtil {
 
     /**
      * @param obj
-     * @return Unqualified type name; for example, given an instance of an edu.bar.Foo, returns "Foo".
+     * @return base object for Impl; for example, for a FooImpl instance it returns Foo.class.
      */
-    public static String objectToTypeName( Object obj ) {
-        return obj.getClass().getSimpleName();
+    public static Class<?> getBaseForImpl( Object obj ) {
+        return getBaseForImpl( obj.getClass() );
     }
 
     /**
@@ -81,6 +73,14 @@ public class ReflectionUtil {
         Method getter = descriptor.getReadMethod();
         Object associatedObject = getter.invoke( object, new Object[] {} );
         return associatedObject;
+    }
+
+    /**
+     * @param obj
+     * @return Unqualified type name; for example, given an instance of an edu.bar.Foo, returns "Foo".
+     */
+    public static String objectToTypeName( Object obj ) {
+        return obj.getClass().getSimpleName();
     }
 
 }

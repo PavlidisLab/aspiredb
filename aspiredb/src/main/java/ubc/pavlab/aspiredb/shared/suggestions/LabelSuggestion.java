@@ -28,11 +28,11 @@ public class LabelSuggestion implements Serializable {
 
     private String name;
 
-    public LabelSuggestion( String name ) {
-        this.name = name;
+    public LabelSuggestion() {
     }
 
-    public LabelSuggestion() {
+    public LabelSuggestion( String name ) {
+        this.name = name;
     }
 
     public String getName() {

@@ -80,216 +80,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     PhenotypeUploadService phenotypeUploadService;
 
-    @Override
-    @RemoteMethod
-    public List<ProjectValueObject> getProjects() {
-
-        Collection<Project> projects = projectDao.loadAll();
-        List<ProjectValueObject> vos = new ArrayList<ProjectValueObject>();
-
-        for ( Project p : projects ) {
-            vos.add( Project.convertToValueObject( p ) );
-        }
-
-        return vos;
-    }
-
-    @Override
-    @RemoteMethod
-    public Collection<String> getProjectUserNames( String projectName ) {
-        Collection<String> userObject = new ArrayList<String>();
-
-        // userObject =null;
-        Collection<String> userNames = new ArrayList<String>();
-
-        Project proj = projectDao.findByProjectName( projectName );
-        userNames = projectReadableBy( proj );
-
-        for ( String userName : userNames ) {
-            User user = userService.findByUserName( userName );
-            userObject.add( user.getFirstName() );
-        }
-
-        return userObject;
-    }
-
-    @Override
-    @RemoteMethod
-    public Collection<User> getProjectUsers( String projectName ) {
-        Collection<User> userObject = new ArrayList<User>();
-
-        Collection<String> userNames = new ArrayList<String>();
-
-        Project proj = projectDao.findByProjectName( projectName );
-        userNames = securityService.readableBy( proj );
-
-        for ( String userName : userNames ) {
-            User user = ( User ) userManager.findByUserName( userName );
-            userObject.add( user );
-        }
-
-        return userObject;
-    }
-
-    @Override
-    @RemoteMethod
-    public Collection<String> projectReadableBy( Project project ) {
-        Collection<String> allUsers = userManager.findAllUsers();
-
-        Collection<String> result = new HashSet<String>();
-
-        for ( String u : allUsers ) {
-            if ( securityService.isViewableByUser( project, u ) ) {
-                result.add( u );
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    @RemoteMethod
-    public Map<String, String> getProjectUserGroups( String projectName ) {
-        Map<String, String> userGroupObject = new HashMap<String, String>();
-
-        Collection<String> userNames = new ArrayList<String>();
-        String groupNames = "";
-
-        Project proj = projectDao.findByProjectName( projectName );
-        userNames = securityService.readableBy( proj );
-
-        for ( String userName : userNames ) {
-
-            User user = ( User ) userManager.findByUserName( userName );
-            Collection<UserGroup> usergroups = userService.findGroupsForUser( user );
-            for ( UserGroup usergroup : usergroups ) {
-                groupNames = groupNames + usergroup.getName() + ',';
-
-            }
-            userGroupObject.put( userName, groupNames );
-        }
-
-        return userGroupObject;
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional(readOnly = true)
-    public User getCurrentUserName() {
-        return ( User ) userManager.getCurrentUser();
-    }
-
-    @Override
-    @RemoteMethod
-    public String createUserProject( String projectName, String projectDescription ) throws NotLoggedInException {
-
-        log.info( " In createProject projectName:" + projectName );
-
-        try {
-            projectManager.createProject( projectName, projectDescription );
-        } catch ( Exception e ) {
-            log.error( e.getMessage() );
-            return e.getMessage();
-        }
-
-        return "Success";
-
-    }
-
-    @Override
-    public ProjectValueObject findUserProject( String projectName ) throws NotLoggedInException {
-        ProjectValueObject pvo = null;
-        log.info( " finding projectName:" + projectName );
-        try {
-            pvo.equals( projectManager.findProject( projectName ) );
-        } catch ( Exception e ) {
-            log.error( e.getMessage() );
-            // return e.getMessage();
-
-        }
-        return pvo;
-    }
-
-    /**
-     * @author gaya
-     * @param fileContent
-     * @param projectName
-     * @param variantType
-     * @return Error String
-     */
-    @Override
-    @RemoteMethod
-    public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName,
-            String variantType ) {
-
-        String returnString = "Success";
-
-        try {
-
-            String csv = "uploadFile/variantFile.csv";
-            CSVWriter writer = new CSVWriter( new FileWriter( csv ) );
-
-            // Object[] objectArray = resultsList.toArray();
-            String[] Outresults = fileContent.split( "\n" );
-
-            for ( int i = 0; i < Outresults.length; i++ ) {
-                String[] passedCSVFile = Outresults[i].toString().split( "," );
-                writer.writeNext( passedCSVFile );
-            }
-
-            writer.close();
-
-            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-
-            // create a connection
-            // arg[0] is the directory in which the .csv files are held
-            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
-
-            Statement stmt = conn.createStatement();
-            ResultSet results = stmt.executeQuery( "SELECt * from variantFile" );
-
-            // check weather the project exist
-            if ( createProject ) {
-                if ( projectDao.findByProjectName( projectName ) != null ) {
-                    returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
-                }
-            }
-
-            VariantType VariantType = null;
-            VariantUploadServiceResult result = null;
-
-            if ( variantType.equalsIgnoreCase( "CNV" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.CNV );
-            } else if ( variantType.equalsIgnoreCase( "SNV" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.SNV );
-            } else if ( variantType.equalsIgnoreCase( "INDEL" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INDEL );
-            } else if ( variantType.equalsIgnoreCase( "INVERSION" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INVERSION );
-            } else if ( variantType.equalsIgnoreCase( "DECIPHER" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DECIPHER );
-            } else if ( variantType.equalsIgnoreCase( "DGV" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DGV );
-            }
-
-            if ( result.getErrorMessages().isEmpty() ) {
-                projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
-            } else if ( result.getErrorMessages().isEmpty() ) {
-                returnString = "Success";
-
-            } else {
-                for ( String errorMessage : result.getErrorMessages() ) {
-                    returnString = errorMessage;
-                }
-
-            }
-
-        } catch ( Exception e ) {
-            return e.toString();
-        }
-        return returnString;
-    }
-
     /**
      * @author gaya
      * @param fileContent
@@ -371,18 +161,207 @@ public class ProjectServiceImpl implements ProjectService {
         return returnString;
     }
 
+    /**
+     * @author gaya
+     * @param fileContent
+     * @param projectName
+     * @param variantType
+     * @return Error String
+     */
     @Override
     @RemoteMethod
-    public List<ProjectValueObject> getOverlapProjects( Collection<Long> ids ) {
+    public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName,
+            String variantType ) {
 
-        Collection<Project> projects = projectDao.getOverlapProjects( ids );
-        List<ProjectValueObject> vos = new ArrayList<ProjectValueObject>();
+        String returnString = "Success";
 
-        for ( Project p : projects ) {
-            vos.add( Project.convertToValueObject( p ) );
+        try {
+
+            String csv = "uploadFile/variantFile.csv";
+            CSVWriter writer = new CSVWriter( new FileWriter( csv ) );
+
+            // Object[] objectArray = resultsList.toArray();
+            String[] Outresults = fileContent.split( "\n" );
+
+            for ( int i = 0; i < Outresults.length; i++ ) {
+                String[] passedCSVFile = Outresults[i].toString().split( "," );
+                writer.writeNext( passedCSVFile );
+            }
+
+            writer.close();
+
+            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
+
+            // create a connection
+            // arg[0] is the directory in which the .csv files are held
+            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
+
+            Statement stmt = conn.createStatement();
+            ResultSet results = stmt.executeQuery( "SELECt * from variantFile" );
+
+            // check weather the project exist
+            if ( createProject ) {
+                if ( projectDao.findByProjectName( projectName ) != null ) {
+                    returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
+                }
+            }
+
+            VariantType VariantType = null;
+            VariantUploadServiceResult result = null;
+
+            if ( variantType.equalsIgnoreCase( "CNV" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results,
+                        ubc.pavlab.aspiredb.shared.VariantType.CNV );
+            } else if ( variantType.equalsIgnoreCase( "SNV" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results,
+                        ubc.pavlab.aspiredb.shared.VariantType.SNV );
+            } else if ( variantType.equalsIgnoreCase( "INDEL" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results,
+                        ubc.pavlab.aspiredb.shared.VariantType.INDEL );
+            } else if ( variantType.equalsIgnoreCase( "INVERSION" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results,
+                        ubc.pavlab.aspiredb.shared.VariantType.INVERSION );
+            } else if ( variantType.equalsIgnoreCase( "DECIPHER" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results,
+                        ubc.pavlab.aspiredb.shared.VariantType.DECIPHER );
+            } else if ( variantType.equalsIgnoreCase( "DGV" ) ) {
+                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results,
+                        ubc.pavlab.aspiredb.shared.VariantType.DGV );
+            }
+
+            if ( result.getErrorMessages().isEmpty() ) {
+                projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
+            } else if ( result.getErrorMessages().isEmpty() ) {
+                returnString = "Success";
+
+            } else {
+                for ( String errorMessage : result.getErrorMessages() ) {
+                    returnString = errorMessage;
+                }
+
+            }
+
+        } catch ( Exception e ) {
+            return e.toString();
+        }
+        return returnString;
+    }
+
+    @Override
+    public String alterGroupPermissions( String projectName, String groupName, Boolean grant )
+            throws NotLoggedInException {
+        log.info( " In alterGroupPermissions projectName:" + projectName + " group name: " + groupName + " grant:"
+                + grant );
+
+        if ( projectName == null || groupName == null ) {
+            log.error( "null projectName or groupName options" );
+            return "missing project name or group name";
         }
 
-        return vos;
+        if ( !userManager.groupExists( groupName ) ) {
+            log.error( "Group does not exist" );
+            return "Group does not exist";
+        }
+
+        Project proj = projectDao.findByProjectName( projectName );
+
+        if ( proj == null ) {
+            log.error( "Project does not exist" );
+            return "Project does not exist";
+        }
+
+        projectManager.alterGroupWritePermissions( projectName, groupName, grant );
+
+        return "Success";
+
+    }
+
+    @Override
+    public String createUserAndAssignToGroup( String userName, String password, String groupName )
+            throws NotLoggedInException {
+
+        log.info( " In createUserAndAssignToGroup userName:" + userName + " group name: " + groupName );
+
+        return projectManager.createUserAndAssignToGroup( userName, password, groupName );
+
+    }
+
+    @Override
+    @RemoteMethod
+    public String createUserProject( String projectName, String projectDescription ) throws NotLoggedInException {
+
+        log.info( " In createProject projectName:" + projectName );
+
+        try {
+            projectManager.createProject( projectName, projectDescription );
+        } catch ( Exception e ) {
+            log.error( e.getMessage() );
+            return e.getMessage();
+        }
+
+        return "Success";
+
+    }
+
+    @Override
+    public String deleteProject( String projectName ) {
+
+        log.info( " In deleteProject projectName:" + projectName );
+
+        Project proj = projectDao.findByProjectName( projectName );
+
+        if ( proj == null ) {
+            log.error( "Project does not exist" );
+            return "Project does not exist";
+        }
+
+        try {
+            projectManager.deleteProject( projectName );
+        } catch ( Exception e ) {
+            log.error( e.getMessage() );
+            return e.getMessage();
+        }
+
+        return "Success";
+
+    }
+
+    @Override
+    public ProjectValueObject findUserProject( String projectName ) throws NotLoggedInException {
+        ProjectValueObject pvo = null;
+        log.info( " finding projectName:" + projectName );
+        try {
+            pvo.equals( projectManager.findProject( projectName ) );
+        } catch ( Exception e ) {
+            log.error( e.getMessage() );
+            // return e.getMessage();
+
+        }
+        return pvo;
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public User getCurrentUserName() {
+        return ( User ) userManager.getCurrentUser();
+    }
+
+    // Hard code these special project's access for clarity
+    @Override
+    @RemoteMethod
+    public ProjectValueObject getDecipherProject() {
+
+        ProjectValueObject pvo = new ProjectValueObject();
+        Collection<Project> projects = projectDao.getSpecialOverlapProjects();
+
+        for ( Project p : projects ) {
+            if ( p.getName().equals( "DECIPHER" ) ) {
+                return Project.convertToValueObject( p );
+            }
+        }
+        return pvo;
+
     }
 
     // Hard code these special project's access for clarity
@@ -402,21 +381,94 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    // Hard code these special project's access for clarity
     @Override
     @RemoteMethod
-    public ProjectValueObject getDecipherProject() {
+    public List<ProjectValueObject> getOverlapProjects( Collection<Long> ids ) {
 
-        ProjectValueObject pvo = new ProjectValueObject();
-        Collection<Project> projects = projectDao.getSpecialOverlapProjects();
+        Collection<Project> projects = projectDao.getOverlapProjects( ids );
+        List<ProjectValueObject> vos = new ArrayList<ProjectValueObject>();
 
         for ( Project p : projects ) {
-            if ( p.getName().equals( "DECIPHER" ) ) {
-                return Project.convertToValueObject( p );
-            }
+            vos.add( Project.convertToValueObject( p ) );
         }
-        return pvo;
 
+        return vos;
+    }
+
+    @Override
+    @RemoteMethod
+    public List<ProjectValueObject> getProjects() {
+
+        Collection<Project> projects = projectDao.loadAll();
+        List<ProjectValueObject> vos = new ArrayList<ProjectValueObject>();
+
+        for ( Project p : projects ) {
+            vos.add( Project.convertToValueObject( p ) );
+        }
+
+        return vos;
+    }
+
+    @Override
+    @RemoteMethod
+    public Map<String, String> getProjectUserGroups( String projectName ) {
+        Map<String, String> userGroupObject = new HashMap<String, String>();
+
+        Collection<String> userNames = new ArrayList<String>();
+        String groupNames = "";
+
+        Project proj = projectDao.findByProjectName( projectName );
+        userNames = securityService.readableBy( proj );
+
+        for ( String userName : userNames ) {
+
+            User user = ( User ) userManager.findByUserName( userName );
+            Collection<UserGroup> usergroups = userService.findGroupsForUser( user );
+            for ( UserGroup usergroup : usergroups ) {
+                groupNames = groupNames + usergroup.getName() + ',';
+
+            }
+            userGroupObject.put( userName, groupNames );
+        }
+
+        return userGroupObject;
+    }
+
+    @Override
+    @RemoteMethod
+    public Collection<String> getProjectUserNames( String projectName ) {
+        Collection<String> userObject = new ArrayList<String>();
+
+        // userObject =null;
+        Collection<String> userNames = new ArrayList<String>();
+
+        Project proj = projectDao.findByProjectName( projectName );
+        userNames = projectReadableBy( proj );
+
+        for ( String userName : userNames ) {
+            User user = userService.findByUserName( userName );
+            userObject.add( user.getFirstName() );
+        }
+
+        return userObject;
+    }
+
+    @Override
+    @RemoteMethod
+    public Collection<User> getProjectUsers( String projectName ) {
+        Collection<User> userObject = new ArrayList<User>();
+
+        Collection<String> userNames = new ArrayList<String>();
+
+        Project proj = projectDao.findByProjectName( projectName );
+        userNames = securityService.readableBy( proj );
+
+        for ( String userName : userNames ) {
+            User user = ( User ) userManager.findByUserName( userName );
+            userObject.add( user );
+        }
+
+        return userObject;
     }
 
     /*
@@ -556,65 +608,19 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public String deleteProject( String projectName ) {
+    @RemoteMethod
+    public Collection<String> projectReadableBy( Project project ) {
+        Collection<String> allUsers = userManager.findAllUsers();
 
-        log.info( " In deleteProject projectName:" + projectName );
+        Collection<String> result = new HashSet<String>();
 
-        Project proj = projectDao.findByProjectName( projectName );
-
-        if ( proj == null ) {
-            log.error( "Project does not exist" );
-            return "Project does not exist";
+        for ( String u : allUsers ) {
+            if ( securityService.isViewableByUser( project, u ) ) {
+                result.add( u );
+            }
         }
 
-        try {
-            projectManager.deleteProject( projectName );
-        } catch ( Exception e ) {
-            log.error( e.getMessage() );
-            return e.getMessage();
-        }
-
-        return "Success";
-
-    }
-
-    @Override
-    public String alterGroupPermissions( String projectName, String groupName, Boolean grant )
-            throws NotLoggedInException {
-        log.info( " In alterGroupPermissions projectName:" + projectName + " group name: " + groupName + " grant:"
-                + grant );
-
-        if ( projectName == null || groupName == null ) {
-            log.error( "null projectName or groupName options" );
-            return "missing project name or group name";
-        }
-
-        if ( !userManager.groupExists( groupName ) ) {
-            log.error( "Group does not exist" );
-            return "Group does not exist";
-        }
-
-        Project proj = projectDao.findByProjectName( projectName );
-
-        if ( proj == null ) {
-            log.error( "Project does not exist" );
-            return "Project does not exist";
-        }
-
-        projectManager.alterGroupWritePermissions( projectName, groupName, grant );
-
-        return "Success";
-
-    }
-
-    @Override
-    public String createUserAndAssignToGroup( String userName, String password, String groupName )
-            throws NotLoggedInException {
-
-        log.info( " In createUserAndAssignToGroup userName:" + userName + " group name: " + groupName );
-
-        return projectManager.createUserAndAssignToGroup( userName, password, groupName );
-
+        return result;
     }
 
 }

@@ -46,24 +46,6 @@ public class DGVVariantUploadCLI extends AbstractCLI {
     private static ProjectManager projectManager;
     private static ProjectDao projectDao;
 
-    private String directory = "";
-
-    private String filename = "";
-    private String projectName = "";
-
-    private int batchSize = 5000;
-
-    private boolean deleteProject = true;
-
-    private boolean dryRun = false;
-
-    private static BeanFactory applicationContext;
-
-    @Override
-    public String getLogger() {
-        return "ubc.pavlab.aspiredb.cli.DGVVariantUploadCLI";
-    }
-
     /**
      * @param args
      */
@@ -95,27 +77,58 @@ public class DGVVariantUploadCLI extends AbstractCLI {
         }
     }
 
+    private String directory = "";
+    private String filename = "";
+
+    private String projectName = "";
+
+    private int batchSize = 5000;
+
+    private boolean deleteProject = true;
+
+    private boolean dryRun = false;
+
+    private static BeanFactory applicationContext;
+
+    @Override
+    public String getLogger() {
+        return "ubc.pavlab.aspiredb.cli.DGVVariantUploadCLI";
+    }
+
+    @Override
+    public String getShortDesc() {
+        return "Upload a variant data file and create / assign it to a project";
+    }
+
     @SuppressWarnings("static-access")
     @Override
     protected void buildOptions() {
-        Option d = OptionBuilder.isRequired().hasArg().withArgName( "Directory" )
-                .withDescription( "Directory containing csv files" ).withLongOpt( "directory" ).create( 'd' );
+        OptionBuilder.isRequired();
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "Directory" );
+        OptionBuilder.withDescription( "Directory containing csv files" );
+        OptionBuilder.withLongOpt( "directory" );
+        Option d = OptionBuilder.create( 'd' );
 
-        Option f = OptionBuilder.isRequired().hasArg().withArgName( "File name" ).withDescription( "The file to parse" )
-                .withLongOpt( "filename" ).create( 'f' );
+        OptionBuilder.isRequired();
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "File name" );
+        OptionBuilder.withDescription( "The file to parse" );
+        OptionBuilder.withLongOpt( "filename" );
+        Option f = OptionBuilder.create( 'f' );
 
+        OptionBuilder.isRequired();
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "Project name" );
+        OptionBuilder
+                .withDescription( "The project where this data will reside. Project will be deleted if existingproject option is not specified,"
+                        + "Acceptable values = 'DGV" );
         // DGV will reside in a 'Special project' and are all CNVs
         /*
          * Option variantType = OptionBuilder.isRequired().hasArg().withArgName( "Variant Type" ) .withDescription(
          * "The type of variant in this file, one of: CNV, Indel, SNV, Inversion" ) .create( "variant" );
          */
-        Option project = OptionBuilder
-                .isRequired()
-                .hasArg()
-                .withArgName( "Project name" )
-                .withDescription(
-                        "The project where this data will reside. Project will be deleted if existingproject option is not specified,"
-                                + "Acceptable values = 'DGV" ).create( "project" );
+        Option project = OptionBuilder.create( "project" );
 
         addOption( "existingproject", false, "You must use this option if you are adding to an existing project" );
 
@@ -125,31 +138,6 @@ public class DGVVariantUploadCLI extends AbstractCLI {
         addOption( f );
 
         addOption( project );
-
-    }
-
-    @Override
-    protected void processOptions() {
-        if ( this.hasOption( 'd' ) ) {
-            directory = this.getOptionValue( 'd' );
-        }
-        if ( this.hasOption( 'f' ) ) {
-            filename = this.getOptionValue( 'f' );
-        }
-
-        if ( this.hasOption( "project" ) ) {
-            projectName = this.getOptionValue( "project" );
-        }
-
-        if ( this.hasOption( "existingproject" ) ) {
-            deleteProject = false;
-        } else {
-            deleteProject = true;
-        }
-
-        if ( this.hasOption( "dryrun" ) ) {
-            dryRun = true;
-        }
 
     }
 
@@ -230,8 +218,28 @@ public class DGVVariantUploadCLI extends AbstractCLI {
     }
 
     @Override
-    public String getShortDesc() {
-        return "Upload a variant data file and create / assign it to a project";
+    protected void processOptions() {
+        if ( this.hasOption( 'd' ) ) {
+            directory = this.getOptionValue( 'd' );
+        }
+        if ( this.hasOption( 'f' ) ) {
+            filename = this.getOptionValue( 'f' );
+        }
+
+        if ( this.hasOption( "project" ) ) {
+            projectName = this.getOptionValue( "project" );
+        }
+
+        if ( this.hasOption( "existingproject" ) ) {
+            deleteProject = false;
+        } else {
+            deleteProject = true;
+        }
+
+        if ( this.hasOption( "dryrun" ) ) {
+            dryRun = true;
+        }
+
     }
 
 }

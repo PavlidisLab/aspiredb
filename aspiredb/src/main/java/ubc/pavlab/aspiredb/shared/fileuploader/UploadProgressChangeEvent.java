@@ -18,12 +18,12 @@ public final class UploadProgressChangeEvent implements FileEvent, Serializable 
         return filename;
     }
 
-    public void setFilename( final String filename ) {
-        this.filename = filename;
-    }
-
     public Integer getPercentage() {
         return percentage;
+    }
+
+    public void setFilename( final String filename ) {
+        this.filename = filename;
     }
 
     public void setPercentage( final Integer percentage ) {

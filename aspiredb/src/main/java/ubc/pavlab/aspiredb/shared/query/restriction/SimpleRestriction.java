@@ -46,24 +46,24 @@ public class SimpleRestriction implements RestrictionExpression {
         this.value = value;
     }
 
-    public Object getValue() {
-        return value;
+    public Operator getOperator() {
+        return operator;
     }
 
     public Property getProperty() {
         return property;
     }
 
-    public Operator getOperator() {
-        return operator;
-    }
-
-    public void setProperty( Property property ) {
-        this.property = property;
+    public Object getValue() {
+        return value;
     }
 
     public void setOperator( Operator operator ) {
         this.operator = operator;
+    }
+
+    public void setProperty( Property property ) {
+        this.property = property;
     }
 
     public void setValue( Object value ) {

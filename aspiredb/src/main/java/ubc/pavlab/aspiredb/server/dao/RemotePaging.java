@@ -28,12 +28,12 @@ public interface RemotePaging<T> {
 
     @Transactional(readOnly = true)
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
-    public Page<? extends T> loadPage( int offset, int limit, String sortProperty, String sortDirection,
-            Set<AspireDbFilterConfig> filters ) throws BioMartServiceException, NeurocartaServiceException;
+    public Collection<? extends T> load( Set<AspireDbFilterConfig> filters ) throws BioMartServiceException,
+            NeurocartaServiceException;
 
     @Transactional(readOnly = true)
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
-    public Collection<? extends T> load( Set<AspireDbFilterConfig> filters ) throws BioMartServiceException,
-            NeurocartaServiceException;
+    public Page<? extends T> loadPage( int offset, int limit, String sortProperty, String sortDirection,
+            Set<AspireDbFilterConfig> filters ) throws BioMartServiceException, NeurocartaServiceException;
 
 }

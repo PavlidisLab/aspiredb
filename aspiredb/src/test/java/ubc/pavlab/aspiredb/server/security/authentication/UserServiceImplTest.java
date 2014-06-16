@@ -76,6 +76,18 @@ public class UserServiceImplTest {
     }
 
     @Test
+    public void testHandleRemoveUser() {
+
+        userDaoMock.loadGroups( testUser );
+        expectLastCall().andReturn( userGroups );
+        userDaoMock.remove( testUser );
+        expectLastCall().once();
+        replay( userDaoMock );
+        userService.delete( testUser );
+        verify( userDaoMock );
+    }
+
+    @Test
     public void testHandleSaveUser() throws Exception {
         userDaoMock.findByUserName( "foobar" );
         expectLastCall().andReturn( null );
@@ -85,18 +97,6 @@ public class UserServiceImplTest {
         expectLastCall().andReturn( testUser );
         replay( userDaoMock );
         userService.create( testUser );
-        verify( userDaoMock );
-    }
-
-    @Test
-    public void testHandleRemoveUser() {
-
-        userDaoMock.loadGroups( testUser );
-        expectLastCall().andReturn( userGroups );
-        userDaoMock.remove( testUser );
-        expectLastCall().once();
-        replay( userDaoMock );
-        userService.delete( testUser );
         verify( userDaoMock );
     }
 

@@ -38,16 +38,6 @@ public class LabelValueObject implements Displayable, Serializable {
     public LabelValueObject() {
     }
 
-    public LabelValueObject( String name ) {
-        this.name = name;
-        this.colour = "E6E6FA"; // TODO: define default
-    }
-
-    public LabelValueObject( String name, String colour ) {
-        this.name = name;
-        this.colour = colour;
-    }
-
     public LabelValueObject( Long id, String name ) {
         this.id = id;
         this.name = name;
@@ -68,46 +58,18 @@ public class LabelValueObject implements Displayable, Serializable {
         this.isShown = isShown;
     }
 
-    public String getName() {
-        return name;
+    public LabelValueObject( String name ) {
+        this.name = name;
+        this.colour = "E6E6FA"; // TODO: define default
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId( Long id ) {
-        this.id = id;
+    public LabelValueObject( String name, String colour ) {
+        this.name = name;
+        this.colour = colour;
     }
 
     public String getColour() {
         return colour;
-    }
-
-    public Boolean getIsShown() {
-        return isShown;
-    }
-
-    public void setName( String name ) {
-        this.name = name;
-    }
-
-    public void setColour( String colour ) {
-        this.colour = colour;
-    }
-
-    public void setIsShown( Boolean isShown ) {
-        this.isShown = isShown;
-    }
-
-    @Override
-    public String toString() {
-        return this.getName();
-    }
-
-    @Override
-    public String getLabel() {
-        return name;
     }
 
     @Override
@@ -117,8 +79,46 @@ public class LabelValueObject implements Displayable, Serializable {
                 + this.name + "&nbsp</span></font>&nbsp&nbsp&nbsp";
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public Boolean getIsShown() {
+        return isShown;
+    }
+
+    @Override
+    public String getLabel() {
+        return name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     @Override
     public String getTooltip() {
         return name;
+    }
+
+    public void setColour( String colour ) {
+        this.colour = colour;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setIsShown( Boolean isShown ) {
+        this.isShown = isShown;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return this.getName();
     }
 }

@@ -100,134 +100,15 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     }
 
     @Override
-    public SNV createDetachedTestSNVObject() {
-
-        GenomicLocation genomicLocation = new GenomicLocation();
-        genomicLocation.setChromosome( "X" );
-        genomicLocation.setStart( 56650362 );
-        genomicLocation.setEnd( 56729961 );
-        SNV snv = new SNV();
-        snv.setLocation( genomicLocation );
-
-        snv.setReferenceBase( "referenceBase" );
-        snv.setObservedBase( "observedBase" );
-        snv.setDbSNPID( "567id" );
-
-        List<Characteristic> characteristics = new ArrayList<Characteristic>();
-        characteristics.add( new Characteristic( "BENIGN", "YES" ) );
-
-        snv.setCharacteristics( characteristics );
-
-        return snv;
-    }
-
-    @Override
     @Transactional
-    public SNV createPersistentTestSNVObject() {
+    public Subject addSubjectToProject( Subject s, Project p ) {
 
-        return snvDao.create( createDetachedTestSNVObject() );
-    }
+        s.getProjects().add( p );
 
-    @Override
-    public Indel createDetachedTestIndelObject() {
+        subjectDao.update( s );
 
-        GenomicLocation genomicLocation = new GenomicLocation();
-        genomicLocation.setChromosome( "X" );
-        genomicLocation.setStart( 56650362 );
-        genomicLocation.setEnd( 56729961 );
-        Indel indel = new Indel();
-        indel.setLocation( genomicLocation );
+        return s;
 
-        indel.setIndelLength( 13214124 );
-
-        List<Characteristic> characteristics = new ArrayList<Characteristic>();
-        characteristics.add( new Characteristic( "BENIGN", "YES" ) );
-
-        indel.setCharacteristics( characteristics );
-
-        return indel;
-    }
-
-    @Override
-    @Transactional
-    public Indel createPersistentTestIndelObject() {
-
-        return indelDao.create( createDetachedTestIndelObject() );
-    }
-
-    @Override
-    @Transactional
-    public void removeSubject( Subject subject ) {
-        subjectDao.remove( subject );
-    }
-
-    @Override
-    @Transactional
-    public void removeVariant( Variant variant ) {
-        variantDao.remove( variant );
-    }
-
-    @Override
-    @Transactional
-    public void removePhenotype( Phenotype phenotype ) {
-        phenotypeDao.remove( phenotype );
-    }
-
-    @Override
-    public CNV createDetachedTestCNVObject() {
-
-        GenomicLocation genomicLocation = new GenomicLocation();
-        genomicLocation.setChromosome( "X" );
-        genomicLocation.setStart( 56650362 );
-        genomicLocation.setEnd( 56729961 );
-        CNV cnv = new CNV();
-        cnv.setLocation( genomicLocation );
-        cnv.setCopyNumber( 2 );
-
-        List<GenomicLocation> targetLocations = new ArrayList<GenomicLocation>();
-
-        GenomicLocation targLocation = new GenomicLocation();
-        targLocation.setChromosome( "11" );
-        targLocation.setStart( 1123232 );
-        targLocation.setEnd( 23433443 );
-
-        GenomicLocation targLocation2 = new GenomicLocation();
-        targLocation.setChromosome( "12" );
-        targLocation.setStart( 12232 );
-        targLocation.setEnd( 134456 );
-
-        targetLocations.add( targLocation );
-        targetLocations.add( targLocation2 );
-
-        cnv.setTargetLocations( targetLocations );
-
-        cnv.setType( CnvType.valueOf( "LOSS" ) );
-
-        List<Characteristic> characteristics = new ArrayList<Characteristic>();
-        characteristics.add( new Characteristic( "BENIGN", "YES" ) );
-
-        cnv.setCharacteristics( characteristics );
-
-        return cnv;
-    }
-
-    public Phenotype createDetachedPhenotypeObject( String name, String uri, String valueType, String value ) {
-
-        Phenotype p = new Phenotype();
-
-        p.setName( name );
-        p.setValueType( valueType );
-        p.setUri( uri );
-        p.setValue( value );
-
-        return p;
-
-    }
-
-    @Override
-    @Transactional
-    public CNV createPersistentTestCNVObject() {
-        return cnvDao.create( createDetachedTestCNVObject() );
     }
 
     public CNV createDetachedCNVObject() {
@@ -272,6 +153,124 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         return individual;
     }
 
+    public Phenotype createDetachedPhenotypeObject( String name, String uri, String valueType, String value ) {
+
+        Phenotype p = new Phenotype();
+
+        p.setName( name );
+        p.setValueType( valueType );
+        p.setUri( uri );
+        p.setValue( value );
+
+        return p;
+
+    }
+
+    @Override
+    public CNV createDetachedTestCNVObject() {
+
+        GenomicLocation genomicLocation = new GenomicLocation();
+        genomicLocation.setChromosome( "X" );
+        genomicLocation.setStart( 56650362 );
+        genomicLocation.setEnd( 56729961 );
+        CNV cnv = new CNV();
+        cnv.setLocation( genomicLocation );
+        cnv.setCopyNumber( 2 );
+
+        List<GenomicLocation> targetLocations = new ArrayList<GenomicLocation>();
+
+        GenomicLocation targLocation = new GenomicLocation();
+        targLocation.setChromosome( "11" );
+        targLocation.setStart( 1123232 );
+        targLocation.setEnd( 23433443 );
+
+        GenomicLocation targLocation2 = new GenomicLocation();
+        targLocation.setChromosome( "12" );
+        targLocation.setStart( 12232 );
+        targLocation.setEnd( 134456 );
+
+        targetLocations.add( targLocation );
+        targetLocations.add( targLocation2 );
+
+        cnv.setTargetLocations( targetLocations );
+
+        cnv.setType( CnvType.valueOf( "LOSS" ) );
+
+        List<Characteristic> characteristics = new ArrayList<Characteristic>();
+        characteristics.add( new Characteristic( "BENIGN", "YES" ) );
+
+        cnv.setCharacteristics( characteristics );
+
+        return cnv;
+    }
+
+    @Override
+    public Indel createDetachedTestIndelObject() {
+
+        GenomicLocation genomicLocation = new GenomicLocation();
+        genomicLocation.setChromosome( "X" );
+        genomicLocation.setStart( 56650362 );
+        genomicLocation.setEnd( 56729961 );
+        Indel indel = new Indel();
+        indel.setLocation( genomicLocation );
+
+        indel.setIndelLength( 13214124 );
+
+        List<Characteristic> characteristics = new ArrayList<Characteristic>();
+        characteristics.add( new Characteristic( "BENIGN", "YES" ) );
+
+        indel.setCharacteristics( characteristics );
+
+        return indel;
+    }
+
+    @Override
+    public SNV createDetachedTestSNVObject() {
+
+        GenomicLocation genomicLocation = new GenomicLocation();
+        genomicLocation.setChromosome( "X" );
+        genomicLocation.setStart( 56650362 );
+        genomicLocation.setEnd( 56729961 );
+        SNV snv = new SNV();
+        snv.setLocation( genomicLocation );
+
+        snv.setReferenceBase( "referenceBase" );
+        snv.setObservedBase( "observedBase" );
+        snv.setDbSNPID( "567id" );
+
+        List<Characteristic> characteristics = new ArrayList<Characteristic>();
+        characteristics.add( new Characteristic( "BENIGN", "YES" ) );
+
+        snv.setCharacteristics( characteristics );
+
+        return snv;
+    }
+
+    @Override
+    @Transactional
+    public Label createPersistentLabel( Label label ) {
+        return labelDao.create( label );
+    }
+
+    @Override
+    @Transactional
+    public Project createPersistentProject( Project p ) {
+        return projectDao.create( p );
+    }
+
+    @Override
+    @Transactional
+    public CNV createPersistentTestCNVObject() {
+        return cnvDao.create( createDetachedTestCNVObject() );
+    }
+
+    @Override
+    @Transactional
+    public Indel createPersistentTestIndelObject() {
+
+        return indelDao.create( createDetachedTestIndelObject() );
+    }
+
     @Override
     @Transactional
     public Subject createPersistentTestIndividualObject( String patientId ) {
@@ -288,6 +287,13 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         Phenotype p = createDetachedPhenotypeObject( name, uri, valueType, value );
 
         return phenotypeDao.create( p );
+    }
+
+    @Override
+    @Transactional
+    public SNV createPersistentTestSNVObject() {
+
+        return snvDao.create( createDetachedTestSNVObject() );
     }
 
     @Override
@@ -321,18 +327,6 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     @Override
     @Transactional
-    public Subject addSubjectToProject( Subject s, Project p ) {
-
-        s.getProjects().add( p );
-
-        subjectDao.update( s );
-
-        return s;
-
-    }
-
-    @Override
-    @Transactional
     public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypesForEnrichmentTest( String patientId,
             String phenName, String phenUri, String phenValue ) {
 
@@ -342,38 +336,6 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
         return subject;
 
-    }
-
-    @Override
-    @Transactional
-    public Project createPersistentProject( Project p ) {
-        return projectDao.create( p );
-    }
-
-    @Override
-    @Transactional
-    public Label createPersistentLabel( Label label ) {
-        return labelDao.create( label );
-    }
-
-    @Override
-    @Transactional
-    public List<Subject> getSubjectsForProject( Project p ) {
-        return p.getSubjects();
-    }
-
-    @Override
-    @Transactional
-    public Collection<LabelValueObject> getLabelsForSubject( Long subjectId ) {
-
-        return Label.toValueObjects( labelDao.getSubjectLabelsBySubjectId( subjectId ) );
-    }
-
-    @Override
-    @Transactional
-    public Collection<LabelValueObject> getLabelsForVariant( Long variantId ) {
-
-        return Label.toValueObjects( labelDao.getVariantLabelsByVariantId( variantId ) );
     }
 
     @Override
@@ -411,6 +373,44 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         } catch ( Exception e ) {
             // noop
         }
+    }
+
+    @Override
+    @Transactional
+    public Collection<LabelValueObject> getLabelsForSubject( Long subjectId ) {
+
+        return Label.toValueObjects( labelDao.getSubjectLabelsBySubjectId( subjectId ) );
+    }
+
+    @Override
+    @Transactional
+    public Collection<LabelValueObject> getLabelsForVariant( Long variantId ) {
+
+        return Label.toValueObjects( labelDao.getVariantLabelsByVariantId( variantId ) );
+    }
+
+    @Override
+    @Transactional
+    public List<Subject> getSubjectsForProject( Project p ) {
+        return p.getSubjects();
+    }
+
+    @Override
+    @Transactional
+    public void removePhenotype( Phenotype phenotype ) {
+        phenotypeDao.remove( phenotype );
+    }
+
+    @Override
+    @Transactional
+    public void removeSubject( Subject subject ) {
+        subjectDao.remove( subject );
+    }
+
+    @Override
+    @Transactional
+    public void removeVariant( Variant variant ) {
+        variantDao.remove( variant );
     }
 
 }

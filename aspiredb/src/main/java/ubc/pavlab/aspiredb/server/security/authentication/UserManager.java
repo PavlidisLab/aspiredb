@@ -15,7 +15,6 @@
 
 package ubc.pavlab.aspiredb.server.security.authentication;
 
-
 /**
  * @author paul
  * @version $Id: UserManager.java,v 1.5 2013/06/11 22:30:52 anton Exp $

@@ -46,12 +46,12 @@ public class Query implements Securable {
     @Column(name = "OBJECT", columnDefinition = "MEDIUMBLOB")
     private Serializable object;
 
+    public Query() {
+    }
+
     public Query( String name, Serializable object ) {
         this.name = name;
         this.object = object;
-    }
-
-    public Query() {
     }
 
     @Override
@@ -59,20 +59,20 @@ public class Query implements Securable {
         return this.id;
     }
 
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName( String name ) {
-        this.name = name;
-    }
-
     public Serializable getObject() {
         return object;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
     }
 
     public void setObject( Serializable object ) {

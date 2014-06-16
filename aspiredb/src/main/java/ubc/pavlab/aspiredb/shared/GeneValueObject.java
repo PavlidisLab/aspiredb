@@ -40,30 +40,6 @@ public class GeneValueObject implements Displayable, Serializable {
     public GeneValueObject() {
     }
 
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public void setSymbol( String symbol ) {
-        this.symbol = symbol;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName( String name ) {
-        this.name = name;
-    }
-
-    public String getGeneBioType() {
-        return geneBioType;
-    }
-
-    public void setGeneBioType( String geneBioType ) {
-        this.geneBioType = geneBioType;
-    }
-
     public GeneValueObject( String ensemblId, String symbol, String geneName, String gene_biotype, String taxon ) {
         this.ensemblId = ensemblId;
         this.symbol = symbol;
@@ -73,44 +49,25 @@ public class GeneValueObject implements Displayable, Serializable {
         this.key = symbol + ":" + taxon;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey( String key ) {
-        this.key = key;
-    }
-
     public String getEnsemblId() {
         return ensemblId;
     }
 
-    public void setEnsemblId( String ensemblId ) {
-        this.ensemblId = ensemblId;
-    }
-
-    public String getLinkToGemma() {
-        return linkToGemma;
-    }
-
-    public void setLinkToGemma( String linkToGemma ) {
-        this.linkToGemma = linkToGemma;
-    }
-
-    public String getTaxon() {
-        return taxon;
-    }
-
-    public void setTaxon( String taxon ) {
-        this.taxon = taxon;
+    public String getGeneBioType() {
+        return geneBioType;
     }
 
     public GenomicRange getGenomicRange() {
         return this.genomicRange;
     }
 
-    public void setGenomicRange( GenomicRange genomicRange ) {
-        this.genomicRange = genomicRange;
+    @Override
+    public String getHtmlLabel() {
+        return "<b>" + getLabel() + "</b>: " + name;
+    }
+
+    public String getKey() {
+        return key;
     }
 
     @Override
@@ -118,9 +75,20 @@ public class GeneValueObject implements Displayable, Serializable {
         return symbol.equals( "" ) ? ensemblId : symbol;
     }
 
-    @Override
-    public String getHtmlLabel() {
-        return "<b>" + getLabel() + "</b>: " + name;
+    public String getLinkToGemma() {
+        return linkToGemma;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public String getTaxon() {
+        return taxon;
     }
 
     @Override
@@ -130,5 +98,37 @@ public class GeneValueObject implements Displayable, Serializable {
             ret += " - " + this.genomicRange.toString();
         }
         return ret;
+    }
+
+    public void setEnsemblId( String ensemblId ) {
+        this.ensemblId = ensemblId;
+    }
+
+    public void setGeneBioType( String geneBioType ) {
+        this.geneBioType = geneBioType;
+    }
+
+    public void setGenomicRange( GenomicRange genomicRange ) {
+        this.genomicRange = genomicRange;
+    }
+
+    public void setKey( String key ) {
+        this.key = key;
+    }
+
+    public void setLinkToGemma( String linkToGemma ) {
+        this.linkToGemma = linkToGemma;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    public void setSymbol( String symbol ) {
+        this.symbol = symbol;
+    }
+
+    public void setTaxon( String taxon ) {
+        this.taxon = taxon;
     }
 }

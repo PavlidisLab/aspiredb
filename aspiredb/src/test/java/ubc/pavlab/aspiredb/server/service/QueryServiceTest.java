@@ -162,6 +162,140 @@ public class QueryServiceTest extends BaseSpringContextTest {
         // projectDao.remove( project );
     }
 
+    /**
+     * @throws ExternalDependencyException
+     * @throws NotLoggedInException
+     */
+    @Test
+    public void testGetSubjectVariantCountsForLocation() throws NotLoggedInException, ExternalDependencyException {
+
+        String chr = "1";
+        String patientId = "testGetSubjectVariantCountsForLocation";
+
+        // look at how many there are currently in the database
+        Map<Integer, Integer> ret = getSubjectVariantCountForChromosome( chr );
+        int subjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
+        int variantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+
+        // add a variant in Chr 1
+        Subject s = persistentTestObjectHelper.createPersistentTestSubjectObjectWithCNV( patientId );
+        CNV cnv = ( CNV ) s.getVariants().iterator().next();
+        cnv.getLocation().setChromosome( chr );
+        cnv.getLocation().setStart( 1 );
+        cnv.getLocation().setEnd( 100 );
+        cnvDao.update( cnv );
+        subjectDao.update( s );
+
+        // now there should be one more
+        ret = getSubjectVariantCountForChromosome( chr );
+        int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
+        int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+
+        assertEquals( subjectCount + 1, addedSubjectCount );
+        assertEquals( variantCount + 1, addedVariantCount );
+
+        // cleanup
+        s.getVariants().remove( cnv );
+        subjectDao.update( s );
+        persistentTestObjectHelper.removeVariant( cnv );
+        persistentTestObjectHelper.removeSubject( s );
+    }
+
+    @Test
+    public void testGetSubjectVariantCountsForPatientId() throws NotLoggedInException, ExternalDependencyException {
+
+        String patientId = "testGetSubjectVariantCountsForPatientId";
+
+        // look at how many there are currently in the database
+        Map<Integer, Integer> ret = getSubjectVariantCountForPatientId( patientId );
+        int subjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
+        int variantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+        // add a subject
+        Subject s = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
+
+        assertEquals( patientId, s.getPatientId() );
+
+        // now there should be one more
+        ret = getSubjectVariantCountForPatientId( patientId );
+        int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
+        int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+
+        assertEquals( subjectCount + 1, addedSubjectCount ); // one subject was added
+        assertEquals( variantCount, addedVariantCount ); // no new variants were added!
+
+        // cleanup
+        persistentTestObjectHelper.removeSubject( s );
+    }
+
+    @Test
+    public void testGetSubjectVariantCountsForPhenocarta() throws NotLoggedInException, ExternalDependencyException {
+
+        String patientId = "testGetSubjectVariantCountsForLocation";
+
+        String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_219"; // colon cancer (~321 genes)
+        // String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_0060041"; // autism spectrum disorder (~853 genes)
+
+        // look at how many there are currently in the database
+        Map<Integer, Integer> ret = getSubjectVariantCountForPhenocarta( phenotypeURI );
+        int subjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
+        int variantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+
+        // add some variants the would overlap
+        // 17:37885247-37885647
+        // 4:72247-5545043
+        Subject s = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
+        CNV cnv1 = persistentTestObjectHelper.createPersistentTestCNVObject();
+        cnv1.setSubject( s );
+        cnv1.getLocation().setChromosome( "17" );
+        cnv1.getLocation().setStart( 37885247 );
+        cnv1.getLocation().setEnd( 37885647 );
+        cnvDao.update( cnv1 );
+        CNV cnv2 = persistentTestObjectHelper.createPersistentTestCNVObject();
+        cnv2.setSubject( s );
+        cnv2.getLocation().setChromosome( "4" );
+        cnv2.getLocation().setStart( 72247 );
+        cnv2.getLocation().setEnd( 5545043 );
+        cnvDao.update( cnv2 );
+        CNV cnv3 = persistentTestObjectHelper.createPersistentTestCNVObject(); // this one doesn't count
+        cnv3.setSubject( s );
+        cnv3.getLocation().setChromosome( "4" );
+        cnv3.getLocation().setStart( 1 );
+        cnv3.getLocation().setEnd( 2 );
+        cnvDao.update( cnv3 );
+        s.addVariant( cnv1 );
+        s.addVariant( cnv2 );
+        s.addVariant( cnv3 );
+        subjectDao.update( s );
+
+        assertEquals( patientId, s.getPatientId() );
+        assertEquals( 3, s.getVariants().size() );
+
+        // now there should be one more
+        StopWatch watch = new StopWatch();
+        watch.start();
+        ret = getSubjectVariantCountForPhenocarta( phenotypeURI );
+        watch.stop();
+        // System.out.println("time to get variants = " + watch );
+        int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
+        int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+
+        assertEquals( subjectCount + 1, addedSubjectCount ); // one subject was added
+        assertEquals( variantCount + s.getVariants().size() - 1, addedVariantCount ); // no new variants were added!
+
+        // cleanup
+        List<Variant> sv = s.getVariants();
+        s.setVariants( null );
+        subjectDao.update( s );
+        for ( Variant v : sv ) {
+            CNV c = ( CNV ) v;
+            c.setSubject( null );
+            cnvDao.update( c );
+            persistentTestObjectHelper.removeVariant( c );
+        }
+        persistentTestObjectHelper.removeSubject( s );
+
+    }
+
     @Test
     public void testIsQueryName() throws Exception {
 
@@ -191,95 +325,6 @@ public class QueryServiceTest extends BaseSpringContextTest {
         assertFalse( returnvalue );
 
         tearDownPhenotypes();
-    }
-
-    private Subject createSubjectWithPhenotypes( String headPhenoValue, String facePhenoValue, String mouthPhenoValue,
-            String nervousPhenoValue ) {
-
-        if ( project == null ) {
-            project = new Project();
-            project.setName( RandomStringUtils.randomAlphabetic( 4 ) );
-            project = persistentTestObjectHelper.createPersistentProject( project );
-        }
-
-        List<Project> plist = new ArrayList<Project>();
-        plist.add( project );
-        Collection<Long> projectIds = new ArrayList<Long>();
-        projectIds.add( project.getId() );
-        activeProjectIds = projectIds;
-
-        Phenotype phenoHead = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_HEAD, "HP_0000234",
-                "HPONTOLOGY", headPhenoValue );
-        Phenotype phenoFace = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_FACE, "HP_0000271",
-                "HPONTOLOGY", facePhenoValue );
-        Phenotype phenoMouth = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_MOUTH, "HP_0000153",
-                "HPONTOLOGY", mouthPhenoValue );
-        Phenotype phenoNervous = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_NERVOUS,
-                "HP_0000707", "HPONTOLOGY", nervousPhenoValue );
-
-        List<Subject> subjectList = project.getSubjects();
-        log.debug( "subjectList.size=" + subjectList.size() );
-        String patientId = "" + subjectList.size();
-
-        if ( headPhenoValue.equals( "1" ) ) {
-            patientId += "_" + HP_HEAD + "=" + headPhenoValue;
-        }
-
-        if ( facePhenoValue.equals( "1" ) ) {
-            patientId += "_" + HP_FACE + "=" + facePhenoValue;
-        }
-
-        if ( mouthPhenoValue.equals( "1" ) ) {
-            patientId += "_" + HP_MOUTH + "=" + mouthPhenoValue;
-        }
-
-        if ( nervousPhenoValue.equals( "1" ) ) {
-            patientId += "_" + HP_NERVOUS + "=" + nervousPhenoValue;
-        }
-
-        Subject subject = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
-        subject.setProjects( plist );
-        subject.addPhenotype( phenoHead );
-        subject.addPhenotype( phenoFace );
-        subject.addPhenotype( phenoMouth );
-        subject.addPhenotype( phenoNervous );
-        subjectList.add( subject );
-        subjectDao.update( subject );
-        phenotypeDao.update( phenoHead );
-        phenotypeDao.update( phenoFace );
-        phenotypeDao.update( phenoMouth );
-        phenotypeDao.update( phenoNervous );
-
-        projectDao.update( project );
-
-        return subject;
-    }
-
-    /**
-     * Counts the number of Subjects that satisfies "restriction"
-     * 
-     * @param restriction
-     * @return
-     * @throws NotLoggedInException
-     * @throws ExternalDependencyException
-     */
-    private List<SubjectValueObject> querySubjects( PhenotypeRestriction restriction ) throws NotLoggedInException,
-            ExternalDependencyException {
-        Collection<Long> projectIds = new HashSet<Long>();
-        projectIds.add( project.getId() );
-        ProjectFilterConfig projConfig = new ProjectFilterConfig();
-        projConfig.setProjectIds( projectIds );
-
-        PhenotypeFilterConfig phenoConfig = new PhenotypeFilterConfig();
-        phenoConfig.setRestriction( restriction );
-        phenoConfig.setActiveProjectIds( activeProjectIds );
-
-        Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
-        filters.add( projConfig );
-        filters.add( phenoConfig );
-        AspireDbPagingLoadConfig loadConfig = new AspireDbPagingLoadConfigBean();
-        loadConfig.setFilters( filters );
-        return queryService.querySubjects( filters ).getItems();
     }
 
     /**
@@ -430,6 +475,81 @@ public class QueryServiceTest extends BaseSpringContextTest {
         tearDownPhenotypes();
     }
 
+    private Subject createSubjectWithPhenotypes( String headPhenoValue, String facePhenoValue, String mouthPhenoValue,
+            String nervousPhenoValue ) {
+
+        if ( project == null ) {
+            project = new Project();
+            project.setName( RandomStringUtils.randomAlphabetic( 4 ) );
+            project = persistentTestObjectHelper.createPersistentProject( project );
+        }
+
+        List<Project> plist = new ArrayList<Project>();
+        plist.add( project );
+        Collection<Long> projectIds = new ArrayList<Long>();
+        projectIds.add( project.getId() );
+        activeProjectIds = projectIds;
+
+        Phenotype phenoHead = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_HEAD, "HP_0000234",
+                "HPONTOLOGY", headPhenoValue );
+        Phenotype phenoFace = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_FACE, "HP_0000271",
+                "HPONTOLOGY", facePhenoValue );
+        Phenotype phenoMouth = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_MOUTH, "HP_0000153",
+                "HPONTOLOGY", mouthPhenoValue );
+        Phenotype phenoNervous = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_NERVOUS,
+                "HP_0000707", "HPONTOLOGY", nervousPhenoValue );
+
+        List<Subject> subjectList = project.getSubjects();
+        log.debug( "subjectList.size=" + subjectList.size() );
+        String patientId = "" + subjectList.size();
+
+        if ( headPhenoValue.equals( "1" ) ) {
+            patientId += "_" + HP_HEAD + "=" + headPhenoValue;
+        }
+
+        if ( facePhenoValue.equals( "1" ) ) {
+            patientId += "_" + HP_FACE + "=" + facePhenoValue;
+        }
+
+        if ( mouthPhenoValue.equals( "1" ) ) {
+            patientId += "_" + HP_MOUTH + "=" + mouthPhenoValue;
+        }
+
+        if ( nervousPhenoValue.equals( "1" ) ) {
+            patientId += "_" + HP_NERVOUS + "=" + nervousPhenoValue;
+        }
+
+        Subject subject = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
+        subject.setProjects( plist );
+        subject.addPhenotype( phenoHead );
+        subject.addPhenotype( phenoFace );
+        subject.addPhenotype( phenoMouth );
+        subject.addPhenotype( phenoNervous );
+        subjectList.add( subject );
+        subjectDao.update( subject );
+        phenotypeDao.update( phenoHead );
+        phenotypeDao.update( phenoFace );
+        phenotypeDao.update( phenoMouth );
+        phenotypeDao.update( phenoNervous );
+
+        projectDao.update( project );
+
+        return subject;
+    }
+
+    private Map<Integer, Integer> getSubjectVariantCountForChromosome( String chromosome ) throws NotLoggedInException,
+            ExternalDependencyException {
+        SimpleRestriction simpleRe = new SimpleRestriction();
+        simpleRe.setOperator( Operator.IS_IN_SET );
+        simpleRe.setProperty( new GenomicLocationProperty() );
+        simpleRe.setValue( new GenomicRange( chromosome ) );
+
+        Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
+        filters.add( new VariantFilterConfig( simpleRe ) );
+        Map<Integer, Integer> ret = queryService.getSubjectVariantCounts( filters );
+        return ret;
+    }
+
     private Map<Integer, Integer> getSubjectVariantCountForPatientId( String patientId ) throws NotLoggedInException,
             ExternalDependencyException {
         SimpleRestriction simpleRe = new SimpleRestriction();
@@ -442,19 +562,6 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
         // System.out.println("getSubjectCount=" + queryService.getSubjectCount( filters ));
 
-        Map<Integer, Integer> ret = queryService.getSubjectVariantCounts( filters );
-        return ret;
-    }
-
-    private Map<Integer, Integer> getSubjectVariantCountForChromosome( String chromosome ) throws NotLoggedInException,
-            ExternalDependencyException {
-        SimpleRestriction simpleRe = new SimpleRestriction();
-        simpleRe.setOperator( Operator.IS_IN_SET );
-        simpleRe.setProperty( new GenomicLocationProperty() );
-        simpleRe.setValue( new GenomicRange( chromosome ) );
-
-        Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
-        filters.add( new VariantFilterConfig( simpleRe ) );
         Map<Integer, Integer> ret = queryService.getSubjectVariantCounts( filters );
         return ret;
     }
@@ -477,136 +584,29 @@ public class QueryServiceTest extends BaseSpringContextTest {
     }
 
     /**
-     * @throws ExternalDependencyException
+     * Counts the number of Subjects that satisfies "restriction"
+     * 
+     * @param restriction
+     * @return
      * @throws NotLoggedInException
+     * @throws ExternalDependencyException
      */
-    @Test
-    public void testGetSubjectVariantCountsForLocation() throws NotLoggedInException, ExternalDependencyException {
+    private List<SubjectValueObject> querySubjects( PhenotypeRestriction restriction ) throws NotLoggedInException,
+            ExternalDependencyException {
+        Collection<Long> projectIds = new HashSet<Long>();
+        projectIds.add( project.getId() );
+        ProjectFilterConfig projConfig = new ProjectFilterConfig();
+        projConfig.setProjectIds( projectIds );
 
-        String chr = "1";
-        String patientId = "testGetSubjectVariantCountsForLocation";
+        PhenotypeFilterConfig phenoConfig = new PhenotypeFilterConfig();
+        phenoConfig.setRestriction( restriction );
+        phenoConfig.setActiveProjectIds( activeProjectIds );
 
-        // look at how many there are currently in the database
-        Map<Integer, Integer> ret = getSubjectVariantCountForChromosome( chr );
-        int subjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
-        int variantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
-
-        // add a variant in Chr 1
-        Subject s = persistentTestObjectHelper.createPersistentTestSubjectObjectWithCNV( patientId );
-        CNV cnv = ( CNV ) s.getVariants().iterator().next();
-        cnv.getLocation().setChromosome( chr );
-        cnv.getLocation().setStart( 1 );
-        cnv.getLocation().setEnd( 100 );
-        cnvDao.update( cnv );
-        subjectDao.update( s );
-
-        // now there should be one more
-        ret = getSubjectVariantCountForChromosome( chr );
-        int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
-        int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
-
-        assertEquals( subjectCount + 1, addedSubjectCount );
-        assertEquals( variantCount + 1, addedVariantCount );
-
-        // cleanup
-        s.getVariants().remove( cnv );
-        subjectDao.update( s );
-        persistentTestObjectHelper.removeVariant( cnv );
-        persistentTestObjectHelper.removeSubject( s );
-    }
-
-    @Test
-    public void testGetSubjectVariantCountsForPatientId() throws NotLoggedInException, ExternalDependencyException {
-
-        String patientId = "testGetSubjectVariantCountsForPatientId";
-
-        // look at how many there are currently in the database
-        Map<Integer, Integer> ret = getSubjectVariantCountForPatientId( patientId );
-        int subjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
-        int variantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
-        // add a subject
-        Subject s = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
-
-        assertEquals( patientId, s.getPatientId() );
-
-        // now there should be one more
-        ret = getSubjectVariantCountForPatientId( patientId );
-        int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
-        int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
-
-        assertEquals( subjectCount + 1, addedSubjectCount ); // one subject was added
-        assertEquals( variantCount, addedVariantCount ); // no new variants were added!
-
-        // cleanup
-        persistentTestObjectHelper.removeSubject( s );
-    }
-
-    @Test
-    public void testGetSubjectVariantCountsForPhenocarta() throws NotLoggedInException, ExternalDependencyException {
-
-        String patientId = "testGetSubjectVariantCountsForLocation";
-
-        String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_219"; // colon cancer (~321 genes)
-        // String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_0060041"; // autism spectrum disorder (~853 genes)
-
-        // look at how many there are currently in the database
-        Map<Integer, Integer> ret = getSubjectVariantCountForPhenocarta( phenotypeURI );
-        int subjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
-        int variantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
-
-        // add some variants the would overlap
-        // 17:37885247-37885647
-        // 4:72247-5545043
-        Subject s = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
-        CNV cnv1 = persistentTestObjectHelper.createPersistentTestCNVObject();
-        cnv1.setSubject( s );
-        cnv1.getLocation().setChromosome( "17" );
-        cnv1.getLocation().setStart( 37885247 );
-        cnv1.getLocation().setEnd( 37885647 );
-        cnvDao.update( cnv1 );
-        CNV cnv2 = persistentTestObjectHelper.createPersistentTestCNVObject();
-        cnv2.setSubject( s );
-        cnv2.getLocation().setChromosome( "4" );
-        cnv2.getLocation().setStart( 72247 );
-        cnv2.getLocation().setEnd( 5545043 );
-        cnvDao.update( cnv2 );
-        CNV cnv3 = persistentTestObjectHelper.createPersistentTestCNVObject(); // this one doesn't count
-        cnv3.setSubject( s );
-        cnv3.getLocation().setChromosome( "4" );
-        cnv3.getLocation().setStart( 1 );
-        cnv3.getLocation().setEnd( 2 );
-        cnvDao.update( cnv3 );
-        s.addVariant( cnv1 );
-        s.addVariant( cnv2 );
-        s.addVariant( cnv3 );
-        subjectDao.update( s );
-
-        assertEquals( patientId, s.getPatientId() );
-        assertEquals( 3, s.getVariants().size() );
-
-        // now there should be one more
-        StopWatch watch = new StopWatch();
-        watch.start();
-        ret = getSubjectVariantCountForPhenocarta( phenotypeURI );
-        watch.stop();
-        // System.out.println("time to get variants = " + watch );
-        int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
-        int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
-
-        assertEquals( subjectCount + 1, addedSubjectCount ); // one subject was added
-        assertEquals( variantCount + s.getVariants().size() - 1, addedVariantCount ); // no new variants were added!
-
-        // cleanup
-        List<Variant> sv = s.getVariants();
-        s.setVariants( null );
-        subjectDao.update( s );
-        for ( Variant v : sv ) {
-            CNV c = ( CNV ) v;
-            c.setSubject( null );
-            cnvDao.update( c );
-            persistentTestObjectHelper.removeVariant( c );
-        }
-        persistentTestObjectHelper.removeSubject( s );
-
+        Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
+        filters.add( projConfig );
+        filters.add( phenoConfig );
+        AspireDbPagingLoadConfig loadConfig = new AspireDbPagingLoadConfigBean();
+        loadConfig.setFilters( filters );
+        return queryService.querySubjects( filters ).getItems();
     }
 }

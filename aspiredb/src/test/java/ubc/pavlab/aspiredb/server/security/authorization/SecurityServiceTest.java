@@ -88,48 +88,48 @@ public class SecurityServiceTest extends BaseSpringContextTest {
 
     }
 
+    /**
+     * Tests that the same ACL can not be added to a securable object.
+     * 
+     * @throws Exception
+     */
     @Test
-    public void testUserCanEdit() {
-        Collection<String> editableBy = this.securityService.editableBy( this.individual );
-        assertTrue( editableBy.contains( "administrator" ) );
-        assertTrue( !editableBy.contains( "aspiredbAgent" ) );
-
-        assertTrue( this.securityService.isEditableByUser( this.individual, "administrator" ) );
-    }
-
-    @Test
-    public void testUserCanRead() {
-        Collection<String> us = this.securityService.readableBy( this.individual );
-        assertTrue( us.contains( "administrator" ) );
-        assertTrue( us.contains( "aspiredbAgent" ) );
-
-        assertTrue( this.securityService.isViewableByUser( this.individual, "administrator" ) );
-        assertTrue( this.securityService.isViewableByUser( this.individual, "aspiredbAgent" ) );
-    }
-
-    @Test
-    public void testSetOwner() {
+    public void testDuplicateAcesNotAddedOnIndividual() throws Exception {
+        // make private experiment
         Subject ind = testObjectHelper
                 .createPersistentTestSubjectObjectWithCNV( RandomStringUtils.randomAlphabetic( 4 ) );
-
-        String username = "first_" + randomName();
+        assertTrue( "This should be private because all data should be private", this.securityService.isPrivate( ind ) );
+        // add user and add the user to the group
+        String username = "bananabread" + randomName();
+        String groupName = "bakedgoods" + randomName();
         makeUser( username );
+        this.securityService.makeOwnedByUser( ind, username );
+        assertTrue( this.securityService.isEditableByUser( ind, username ) );
+        this.runAsUser( username );
 
-        this.securityService.setOwner( ind, username );
+        this.securityService.createGroup( groupName );
 
-        Sid owner = this.securityService.getOwner( ind );
-        assertTrue( owner instanceof AclPrincipalSid );
-        assertEquals( username, ( ( AclPrincipalSid ) owner ).getPrincipal() );
+        MutableAcl acl = getAcl( ind );
+        int numberOfAces = acl.getEntries().size();
 
-    }
+        this.securityService.makeReadableByGroup( ind, groupName );
+        MutableAcl aclAfterReadableAdded = getAcl( ind );
+        assertEquals( numberOfAces + 1, aclAfterReadableAdded.getEntries().size() );
 
-    private void makeUser( String username ) {
-        try {
-            this.userManager.loadUserByUsername( username );
-        } catch ( UsernameNotFoundException e ) {
-            this.userManager.createUser( new UserDetailsImpl( "foo", username, true, null, RandomStringUtils
-                    .randomAlphabetic( 10 ) + "@gmail.com", "key", new Date() ) );
-        }
+        this.securityService.makeWriteableByGroup( ind, groupName );
+        MutableAcl aclAfterWritableAdded = getAcl( ind );
+        assertEquals( numberOfAces + 2, aclAfterWritableAdded.getEntries().size() );
+
+        // this time the acl there and should not be added again
+        this.securityService.makeReadableByGroup( ind, groupName );
+        MutableAcl aclAfterReadableAddedAgain = getAcl( ind );
+        assertEquals( numberOfAces + 2, aclAfterReadableAddedAgain.getEntries().size() );
+
+        // check writable too
+        this.securityService.makeWriteableByGroup( ind, groupName );
+        MutableAcl aclAfterWritableAddedAgain = getAcl( ind );
+        assertEquals( numberOfAces + 2, aclAfterWritableAddedAgain.getEntries().size() );
+
     }
 
     @Test
@@ -197,57 +197,19 @@ public class SecurityServiceTest extends BaseSpringContextTest {
 
     }
 
-    private MutableAcl getAcl( Securable s ) {
-        ObjectIdentity oi = this.objectIdentityRetrievalStrategy.getObjectIdentity( s );
-
-        try {
-            return ( MutableAcl ) this.aclService.readAclById( oi );
-        } catch ( NotFoundException e ) {
-            return null;
-        }
-    }
-
-    /**
-     * Tests that the same ACL can not be added to a securable object.
-     * 
-     * @throws Exception
-     */
     @Test
-    public void testDuplicateAcesNotAddedOnIndividual() throws Exception {
-        // make private experiment
+    public void testSetOwner() {
         Subject ind = testObjectHelper
                 .createPersistentTestSubjectObjectWithCNV( RandomStringUtils.randomAlphabetic( 4 ) );
-        assertTrue( "This should be private because all data should be private", this.securityService.isPrivate( ind ) );
-        // add user and add the user to the group
-        String username = "bananabread" + randomName();
-        String groupName = "bakedgoods" + randomName();
+
+        String username = "first_" + randomName();
         makeUser( username );
-        this.securityService.makeOwnedByUser( ind, username );
-        assertTrue( this.securityService.isEditableByUser( ind, username ) );
-        this.runAsUser( username );
 
-        this.securityService.createGroup( groupName );
+        this.securityService.setOwner( ind, username );
 
-        MutableAcl acl = getAcl( ind );
-        int numberOfAces = acl.getEntries().size();
-
-        this.securityService.makeReadableByGroup( ind, groupName );
-        MutableAcl aclAfterReadableAdded = getAcl( ind );
-        assertEquals( numberOfAces + 1, aclAfterReadableAdded.getEntries().size() );
-
-        this.securityService.makeWriteableByGroup( ind, groupName );
-        MutableAcl aclAfterWritableAdded = getAcl( ind );
-        assertEquals( numberOfAces + 2, aclAfterWritableAdded.getEntries().size() );
-
-        // this time the acl there and should not be added again
-        this.securityService.makeReadableByGroup( ind, groupName );
-        MutableAcl aclAfterReadableAddedAgain = getAcl( ind );
-        assertEquals( numberOfAces + 2, aclAfterReadableAddedAgain.getEntries().size() );
-
-        // check writable too
-        this.securityService.makeWriteableByGroup( ind, groupName );
-        MutableAcl aclAfterWritableAddedAgain = getAcl( ind );
-        assertEquals( numberOfAces + 2, aclAfterWritableAddedAgain.getEntries().size() );
+        Sid owner = this.securityService.getOwner( ind );
+        assertTrue( owner instanceof AclPrincipalSid );
+        assertEquals( username, ( ( AclPrincipalSid ) owner ).getPrincipal() );
 
     }
 
@@ -275,5 +237,43 @@ public class SecurityServiceTest extends BaseSpringContextTest {
 
         }
 
+    }
+
+    @Test
+    public void testUserCanEdit() {
+        Collection<String> editableBy = this.securityService.editableBy( this.individual );
+        assertTrue( editableBy.contains( "administrator" ) );
+        assertTrue( !editableBy.contains( "aspiredbAgent" ) );
+
+        assertTrue( this.securityService.isEditableByUser( this.individual, "administrator" ) );
+    }
+
+    @Test
+    public void testUserCanRead() {
+        Collection<String> us = this.securityService.readableBy( this.individual );
+        assertTrue( us.contains( "administrator" ) );
+        assertTrue( us.contains( "aspiredbAgent" ) );
+
+        assertTrue( this.securityService.isViewableByUser( this.individual, "administrator" ) );
+        assertTrue( this.securityService.isViewableByUser( this.individual, "aspiredbAgent" ) );
+    }
+
+    private MutableAcl getAcl( Securable s ) {
+        ObjectIdentity oi = this.objectIdentityRetrievalStrategy.getObjectIdentity( s );
+
+        try {
+            return ( MutableAcl ) this.aclService.readAclById( oi );
+        } catch ( NotFoundException e ) {
+            return null;
+        }
+    }
+
+    private void makeUser( String username ) {
+        try {
+            this.userManager.loadUserByUsername( username );
+        } catch ( UsernameNotFoundException e ) {
+            this.userManager.createUser( new UserDetailsImpl( "foo", username, true, null, RandomStringUtils
+                    .randomAlphabetic( 10 ) + "@gmail.com", "key", new Date() ) );
+        }
     }
 }

@@ -40,6 +40,21 @@ import ubc.pavlab.aspiredb.shared.query.restriction.VariantTypeRestriction;
  */
 public class QueryTestUtils {
 
+    public static RestrictionExpression makeTestVariantRestrictionExpression() {
+        RestrictionExpression type = new VariantTypeRestriction( VariantType.CNV );
+        RestrictionExpression copyNumber = new SimpleRestriction( new CopyNumberProperty(), Operator.NUMERIC_EQUAL,
+                new NumericValue( 2 ) );
+        RestrictionExpression characteristic = new SimpleRestriction( new CharacteristicProperty( "BENIGN" ),
+                Operator.TEXT_EQUAL, new TextValue( "YES" ) );
+
+        Conjunction restriction = new Conjunction();
+        restriction.add( type );
+        restriction.add( copyNumber );
+        restriction.add( characteristic );
+
+        return restriction;
+    }
+
     public static RestrictionExpression makeTestVariantRestrictionExpression( Long labelId ) {
         RestrictionExpression location = new SimpleRestriction( new GenomicLocationProperty(), Operator.IS_IN_SET,
                 new GenomicRange( "X", 56600000, 56800000 ) );
@@ -84,21 +99,6 @@ public class QueryTestUtils {
         restriction.add( type );
         restriction.add( cnvType );
         restriction.add( labelRestriction );
-        restriction.add( copyNumber );
-        restriction.add( characteristic );
-
-        return restriction;
-    }
-
-    public static RestrictionExpression makeTestVariantRestrictionExpression() {
-        RestrictionExpression type = new VariantTypeRestriction( VariantType.CNV );
-        RestrictionExpression copyNumber = new SimpleRestriction( new CopyNumberProperty(), Operator.NUMERIC_EQUAL,
-                new NumericValue( 2 ) );
-        RestrictionExpression characteristic = new SimpleRestriction( new CharacteristicProperty( "BENIGN" ),
-                Operator.TEXT_EQUAL, new TextValue( "YES" ) );
-
-        Conjunction restriction = new Conjunction();
-        restriction.add( type );
         restriction.add( copyNumber );
         restriction.add( characteristic );
 

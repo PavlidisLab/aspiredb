@@ -60,6 +60,24 @@ public class GeneServiceImpl implements GeneService {
     private NeurocartaQueryService neurocartaQueryService;
 
     @Override
+    @RemoteMethod
+    public Map<String, GeneValueObject> findGenesAndURIsWithNeurocartaPhenotype( String phenotypeValueUri )
+            throws NotLoggedInException, ExternalDependencyException {
+        Map<String, GeneValueObject> genes = new HashMap<String, GeneValueObject>();
+        genes = this.neurocartaQueryService.findPhenotypeGenes( phenotypeValueUri );
+
+        return genes;
+    }
+
+    @Override
+    @RemoteMethod
+    public Collection<GeneValueObject> findGenesWithNeurocartaPhenotype( String phenotypeValueUri )
+            throws NotLoggedInException, ExternalDependencyException {
+
+        return this.neurocartaQueryService.fetchGenesAssociatedWithPhenotype( phenotypeValueUri );
+    }
+
+    @Override
     @Transactional(readOnly = true)
     @RemoteMethod
     public List<GeneValueObject> getGenesInsideVariants( Collection<Long> ids ) throws NotLoggedInException,
@@ -83,20 +101,16 @@ public class GeneServiceImpl implements GeneService {
 
     @Override
     @RemoteMethod
-    public Collection<GeneValueObject> findGenesWithNeurocartaPhenotype( String phenotypeValueUri )
-            throws NotLoggedInException, ExternalDependencyException {
+    public boolean isGeneSetName( String name ) {
 
-        return this.neurocartaQueryService.fetchGenesAssociatedWithPhenotype( phenotypeValueUri );
-    }
+        List<UserGeneSet> geneSet = userGeneSetDao.findByName( name );
 
-    @Override
-    @RemoteMethod
-    public Map<String, GeneValueObject> findGenesAndURIsWithNeurocartaPhenotype( String phenotypeValueUri )
-            throws NotLoggedInException, ExternalDependencyException {
-        Map<String, GeneValueObject> genes =new HashMap<String, GeneValueObject>();
-                genes =this.neurocartaQueryService.findPhenotypeGenes( phenotypeValueUri );
-        
-        return genes;
+        if ( geneSet.size() > 0 ) {
+            return true;
+        }
+
+        return false;
+
     }
 
     @Override
@@ -118,20 +132,6 @@ public class GeneServiceImpl implements GeneService {
                     "Found more than one saved gene sets with same name belonging to one user." );
         }
         return savedUserGeneSet.getId();
-    }
-
-    @Override
-    @RemoteMethod
-    public boolean isGeneSetName( String name ) {
-
-        List<UserGeneSet> geneSet = userGeneSetDao.findByName( name );
-
-        if ( geneSet.size() > 0 ) {
-            return true;
-        }
-
-        return false;
-
     }
 
 }

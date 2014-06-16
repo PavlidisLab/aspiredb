@@ -54,96 +54,96 @@ public class PhenotypeEnrichmentValueObject implements Serializable {
         return id;
     }
 
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
-    public String getUri() {
-        return uri;
-    }
-
-    public void setUri( String uri ) {
-        this.uri = uri;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName( String name ) {
-        this.name = name;
-    }
-
     public Integer getInGroupTotal() {
         return inGroupTotal;
-    }
-
-    public void setInGroupTotal( Integer inGroupTotal ) {
-        this.inGroupTotal = inGroupTotal;
-    }
-
-    public Integer getOutGroupTotal() {
-        return outGroupTotal;
     }
 
     public String getInGroupTotalString() {
         return inGroupTotalString;
     }
 
-    public void setInGroupTotalString( String inGroupTotalString ) {
-        this.inGroupTotalString = inGroupTotalString;
+    public String getName() {
+        return name;
+    }
+
+    public Integer getOutGroupTotal() {
+        return outGroupTotal;
     }
 
     public String getOutGroupTotalString() {
         return outGroupTotalString;
     }
 
-    public void setOutGroupTotalString( String outGroupTotalString ) {
-        this.outGroupTotalString = outGroupTotalString;
-    }
-
-    public String getPValueString() {
-        return pValueString;
-    }
-
-    public void setPValueString( String pValueString ) {
-        this.pValueString = pValueString;
-    }
-
-    public String getPValueCorrectedString() {
-        return pValueCorrectedString;
-    }
-
-    public void setPValueCorrectedString( String pValueCorrectedString ) {
-        this.pValueCorrectedString = pValueCorrectedString;
-    }
-
-    public void setOutGroupTotal( Integer outGroupTotal ) {
-        this.outGroupTotal = outGroupTotal;
-    }
-
     public Double getPValue() {
         return pValue;
-    }
-
-    public void setPValue( Double pValue ) {
-        this.pValue = pValue;
     }
 
     public Double getPValueCorrected() {
         return pValueCorrected;
     }
 
-    public void setPValueCorrected( Double pValueCorrected ) {
-        this.pValueCorrected = pValueCorrected;
+    public String getPValueCorrectedString() {
+        return pValueCorrectedString;
+    }
+
+    public String getPValueString() {
+        return pValueString;
     }
 
     public Integer getTotal() {
         return total;
     }
 
+    public String getUri() {
+        return uri;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setInGroupTotal( Integer inGroupTotal ) {
+        this.inGroupTotal = inGroupTotal;
+    }
+
+    public void setInGroupTotalString( String inGroupTotalString ) {
+        this.inGroupTotalString = inGroupTotalString;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    public void setOutGroupTotal( Integer outGroupTotal ) {
+        this.outGroupTotal = outGroupTotal;
+    }
+
+    public void setOutGroupTotalString( String outGroupTotalString ) {
+        this.outGroupTotalString = outGroupTotalString;
+    }
+
+    public void setPValue( Double pValue ) {
+        this.pValue = pValue;
+    }
+
+    public void setPValueCorrected( Double pValueCorrected ) {
+        this.pValueCorrected = pValueCorrected;
+    }
+
+    public void setPValueCorrectedString( String pValueCorrectedString ) {
+        this.pValueCorrectedString = pValueCorrectedString;
+    }
+
+    public void setPValueString( String pValueString ) {
+        this.pValueString = pValueString;
+    }
+
     public void setTotal( Integer total ) {
         this.total = total;
+    }
+
+    public void setUri( String uri ) {
+        this.uri = uri;
     }
 
 }

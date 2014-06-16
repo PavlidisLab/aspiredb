@@ -41,49 +41,49 @@ import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 public interface PersistentTestObjectHelper {
 
-    public SNV createPersistentTestSNVObject();
+    public Subject addSubjectToProject( Subject s, Project p );
 
-    public SNV createDetachedTestSNVObject();
+    public Subject createDetachedIndividualObject( String patientId );
 
-    public Indel createPersistentTestIndelObject();
+    public CNV createDetachedTestCNVObject();
 
     public Indel createDetachedTestIndelObject();
 
+    public SNV createDetachedTestSNVObject();
+
+    public Label createPersistentLabel( Label label );
+
+    public Project createPersistentProject( Project p );
+
     public CNV createPersistentTestCNVObject();
 
-    public CNV createDetachedTestCNVObject();
+    public Indel createPersistentTestIndelObject();
+
+    public Subject createPersistentTestIndividualObject( String patientId );
+
+    public Phenotype createPersistentTestPhenotypeObject( String name, String uri, String valueType, String value );
+
+    public SNV createPersistentTestSNVObject();
 
     public Subject createPersistentTestSubjectObjectWithCNV( String patientId );
 
     public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypes( String patientId );
 
-    public Phenotype createPersistentTestPhenotypeObject( String name, String uri, String valueType, String value );
-
     public Subject createPersistentTestSubjectObjectWithHPOntologyPhenotypesForEnrichmentTest( String patientId,
             String phenName, String phenUri, String phenValue );
 
-    public Subject createPersistentTestIndividualObject( String patientId );
-
-    public Subject createDetachedIndividualObject( String patientId );
-
-    public Project createPersistentProject( Project p );
-
-    public Subject addSubjectToProject( Subject s, Project p );
-
-    public List<Subject> getSubjectsForProject( Project p );
+    public void deleteProject( String projectName );
 
     public Collection<LabelValueObject> getLabelsForSubject( Long subjectId );
 
     public Collection<LabelValueObject> getLabelsForVariant( Long variantId );
 
-    public void deleteProject( String projectName );
+    public List<Subject> getSubjectsForProject( Project p );
+
+    void removePhenotype( Phenotype phenotype );
 
     void removeSubject( Subject subject );
 
     void removeVariant( Variant variant );
-
-    void removePhenotype( Phenotype phenotype );
-
-    public Label createPersistentLabel( Label label );
 
 }

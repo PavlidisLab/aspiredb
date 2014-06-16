@@ -45,12 +45,12 @@ public class BoundedList<T> {
         return items;
     }
 
-    public boolean isMoreResultsAvailable() {
-        return moreResultsAvailable;
-    }
-
     public int getTotalSize() {
         return totalSize;
+    }
+
+    public boolean isMoreResultsAvailable() {
+        return moreResultsAvailable;
     }
 
 }

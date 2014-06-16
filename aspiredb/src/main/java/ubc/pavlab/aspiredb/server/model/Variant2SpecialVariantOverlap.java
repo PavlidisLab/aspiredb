@@ -39,44 +39,6 @@ public class Variant2SpecialVariantOverlap implements Serializable {
      */
     private static final long serialVersionUID = 6734779432249098068L;
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ( ( overlapSpecialVariantId == null ) ? 0 : overlapSpecialVariantId.hashCode() );
-        result = prime * result + ( ( variantId == null ) ? 0 : variantId.hashCode() );
-        return result;
-    }
-
-    @Override
-    public boolean equals( Object obj ) {
-        if ( this == obj ) {
-            return true;
-        }
-        if ( obj == null ) {
-            return false;
-        }
-        if ( getClass() != obj.getClass() ) {
-            return false;
-        }
-        Variant2SpecialVariantOverlap other = ( Variant2SpecialVariantOverlap ) obj;
-        if ( overlapSpecialVariantId == null ) {
-            if ( other.overlapSpecialVariantId != null ) {
-                return false;
-            }
-        } else if ( !overlapSpecialVariantId.equals( other.overlapSpecialVariantId ) ) {
-            return false;
-        }
-        if ( variantId == null ) {
-            if ( other.variantId != null ) {
-                return false;
-            }
-        } else if ( !variantId.equals( other.variantId ) ) {
-            return false;
-        }
-        return true;
-    }
-
     // note this is a composite key with variantId and overlapSpecialVariantId
     @Id
     @Column(name = "VARIANTID")
@@ -108,60 +70,98 @@ public class Variant2SpecialVariantOverlap implements Serializable {
 
     }
 
-    public Long getVariantId() {
-        return variantId;
-    }
-
-    public void setVariantId( Long variantId ) {
-        this.variantId = variantId;
-    }
-
-    public Long getOverlapSpecialVariantId() {
-        return overlapSpecialVariantId;
-    }
-
-    public void setOverlapSpecialVariantId( Long overlappedSpecialVariantId ) {
-        this.overlapSpecialVariantId = overlappedSpecialVariantId;
+    @Override
+    public boolean equals( Object obj ) {
+        if ( this == obj ) {
+            return true;
+        }
+        if ( obj == null ) {
+            return false;
+        }
+        if ( getClass() != obj.getClass() ) {
+            return false;
+        }
+        Variant2SpecialVariantOverlap other = ( Variant2SpecialVariantOverlap ) obj;
+        if ( overlapSpecialVariantId == null ) {
+            if ( other.overlapSpecialVariantId != null ) {
+                return false;
+            }
+        } else if ( !overlapSpecialVariantId.equals( other.overlapSpecialVariantId ) ) {
+            return false;
+        }
+        if ( variantId == null ) {
+            if ( other.variantId != null ) {
+                return false;
+            }
+        } else if ( !variantId.equals( other.variantId ) ) {
+            return false;
+        }
+        return true;
     }
 
     public Integer getOverlap() {
         return overlap;
     }
 
-    public void setOverlap( Integer overlap ) {
-        this.overlap = overlap;
+    public Integer getOverlappedOverlapPercentage() {
+        return overlappedOverlapPercentage;
     }
 
     public Integer getOverlapPercentage() {
         return overlapPercentage;
     }
 
-    public void setOverlapPercentage( Integer overlapPercentage ) {
-        this.overlapPercentage = overlapPercentage;
-    }
-
-    public Integer getOverlappedOverlapPercentage() {
-        return overlappedOverlapPercentage;
-    }
-
-    public void setOverlappedOverlapPercentage( Integer overlappedOverlapPercentage ) {
-        this.overlappedOverlapPercentage = overlappedOverlapPercentage;
-    }
-
     public Long getOverlapProjectId() {
         return overlapProjectId;
     }
 
-    public void setOverlapProjectId( Long overlapProjectId ) {
-        this.overlapProjectId = overlapProjectId;
+    public Long getOverlapSpecialVariantId() {
+        return overlapSpecialVariantId;
     }
 
     public Long getProjectId() {
         return projectId;
     }
 
+    public Long getVariantId() {
+        return variantId;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ( ( overlapSpecialVariantId == null ) ? 0 : overlapSpecialVariantId.hashCode() );
+        result = prime * result + ( ( variantId == null ) ? 0 : variantId.hashCode() );
+        return result;
+    }
+
+    public void setOverlap( Integer overlap ) {
+        this.overlap = overlap;
+    }
+
+    public void setOverlappedOverlapPercentage( Integer overlappedOverlapPercentage ) {
+        this.overlappedOverlapPercentage = overlappedOverlapPercentage;
+    }
+
+    public void setOverlapPercentage( Integer overlapPercentage ) {
+        this.overlapPercentage = overlapPercentage;
+    }
+
+    public void setOverlapProjectId( Long overlapProjectId ) {
+        this.overlapProjectId = overlapProjectId;
+    }
+
+    public void setOverlapSpecialVariantId( Long overlappedSpecialVariantId ) {
+        this.overlapSpecialVariantId = overlappedSpecialVariantId;
+    }
+
     public void setProjectId( Long projectId ) {
         this.projectId = projectId;
+    }
+
+    public void setVariantId( Long variantId ) {
+        this.variantId = variantId;
     }
 
 }

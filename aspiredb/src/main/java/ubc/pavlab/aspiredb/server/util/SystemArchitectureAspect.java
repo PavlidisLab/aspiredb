@@ -40,10 +40,14 @@ public class SystemArchitectureAspect {
      */
 
     /**
-     * Encompasses the 'model' packages
+     * Methods that create new objects in the persistent store
      */
-    @Pointcut("within(ubc.pavlab.aspiredb.server..*)")
-    public void inModelLayer() {
+    @Pointcut("ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.daoMethod() && ( execution(* save(..)) || execution(* create*(..)) || execution(* findOrCreate(..)) || execution(* persist*(..))   )")
+    public void creator() {//
+    }
+
+    @Pointcut("ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.deleter() ||ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.loader() || ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.creator() || ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.updater() || ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.deleter()")
+    public void crud() {//
     }
 
     /**
@@ -53,43 +57,18 @@ public class SystemArchitectureAspect {
     public void daoMethod() {//
     }
 
-    @Pointcut("@target(org.springframework.stereotype.Service) && (execution(public * ubc.pavlab.aspiredb.server..*.*(*)) || execution(public * ubc.pavlab.aspiredb.server..*.*(*,..)))")
-    public void serviceMethodWithArg() {//
-    }
-
-    /**
-     * A entity service method: a public method in a \@Service.
-     */
-    @Pointcut("@target(org.springframework.stereotype.Service) && execution(public * ubc.pavlab.aspiredb.server..*.*(..))")
-    public void serviceMethod() {
-        /*
-         * Important document:
-         * http://forum.springsource.org/showthread.php?28525-Difference-between-target-and-within-in-Spring-AOP
-         * 
-         * Using @target makes a proxy out of everything, which causes problems if services aren't implementing
-         * interfaces -- seems for InitializingBeans in particular. @within doesn't work, at least for the ACLs.
-         */
-    }
-
-    /**
-     * Methods that create new objects in the persistent store
-     */
-    @Pointcut("ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.daoMethod() && ( execution(* save(..)) || execution(* create*(..)) || execution(* findOrCreate(..)) || execution(* persist*(..))   )")
-    public void creator() {//
-    }
-
-    /**
-     * Methods that update items in the persistent store
-     */
-    @Pointcut("ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.daoMethod() && execution(* update(..))")
-    public void updater() {//
-    }
-
     /**
      * Methods that delete items in the persistent store
      */
     @Pointcut("ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.daoMethod() && (execution(* remove(..)) || execution(* delete*(..)))")
     public void deleter() {//
+    }
+
+    /**
+     * Encompasses the 'model' packages
+     */
+    @Pointcut("within(ubc.pavlab.aspiredb.server..*)")
+    public void inModelLayer() {
     }
 
     /**
@@ -106,8 +85,29 @@ public class SystemArchitectureAspect {
     public void modifier() {//
     }
 
-    @Pointcut("ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.deleter() ||ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.loader() || ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.creator() || ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.updater() || ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.deleter()")
-    public void crud() {//
+    /**
+     * A entity service method: a public method in a \@Service.
+     */
+    @Pointcut("@target(org.springframework.stereotype.Service) && execution(public * ubc.pavlab.aspiredb.server..*.*(..))")
+    public void serviceMethod() {
+        /*
+         * Important document:
+         * http://forum.springsource.org/showthread.php?28525-Difference-between-target-and-within-in-Spring-AOP
+         * 
+         * Using @target makes a proxy out of everything, which causes problems if services aren't implementing
+         * interfaces -- seems for InitializingBeans in particular. @within doesn't work, at least for the ACLs.
+         */
+    }
+
+    @Pointcut("@target(org.springframework.stereotype.Service) && (execution(public * ubc.pavlab.aspiredb.server..*.*(*)) || execution(public * ubc.pavlab.aspiredb.server..*.*(*,..)))")
+    public void serviceMethodWithArg() {//
+    }
+
+    /**
+     * Methods that update items in the persistent store
+     */
+    @Pointcut("ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.daoMethod() && execution(* update(..))")
+    public void updater() {//
     }
 
 }

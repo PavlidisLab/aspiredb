@@ -46,20 +46,20 @@ public class PropertyValue<T extends Displayable> implements Serializable {
         return displayValue;
     }
 
+    public T getValue() {
+        return this.value;
+    }
+
     public void setDisplayValue( String displayValue ) {
         this.displayValue = displayValue;
+    }
+
+    public void setValue( T value ) {
+        this.value = value;
     }
 
     @Override
     public String toString() {
         return value.toString();
-    }
-
-    public T getValue() {
-        return this.value;
-    }
-
-    public void setValue( T value ) {
-        this.value = value;
     }
 }

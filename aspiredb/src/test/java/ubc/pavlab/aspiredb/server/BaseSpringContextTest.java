@@ -57,10 +57,30 @@ import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
  * @version $Id: BaseSpringContextTest.java,v 1.4 2013/06/12 20:18:48 cmcdonald Exp $
  */
 @ContextConfiguration(locations = { "classpath:/test-data-source.xml",
-        "classpath:gemma/gsec/acl/security-bean-baseconfig.xml", 
-        "classpath:/application-context.xml",
+        "classpath:gemma/gsec/acl/security-bean-baseconfig.xml", "classpath:/application-context.xml",
         "classpath:/applicationContext-security.xml" })
 public abstract class BaseSpringContextTest extends AbstractJUnit4SpringContextTests implements InitializingBean {
+
+    protected abstract class InlineTransaction {
+        private TransactionStatus txStatus;
+
+        public void execute() {
+            beginTransaction();
+            instructions();
+            commitTransaction();
+        }
+
+        public abstract void instructions();
+
+        protected void beginTransaction() {
+            txStatus = transactionManager.getTransaction( new DefaultTransactionDefinition() );
+        }
+
+        protected void commitTransaction() {
+            transactionManager.commit( txStatus );
+        }
+
+    }
 
     @Autowired
     protected HibernateTransactionManager transactionManager;
@@ -91,46 +111,13 @@ public abstract class BaseSpringContextTest extends AbstractJUnit4SpringContextT
         runAsAdmin();
     }
 
-    protected abstract class InlineTransaction {
-        public abstract void instructions();
-
-        public void execute() {
-            beginTransaction();
-            instructions();
-            commitTransaction();
-        }
-
-        private TransactionStatus txStatus;
-
-        protected void beginTransaction() {
-            txStatus = transactionManager.getTransaction( new DefaultTransactionDefinition() );
-        }
-
-        protected void commitTransaction() {
-            transactionManager.commit( txStatus );
-        }
-
-    }
-
     /**
-     * Run as a regular user.
+     * Convenience shortcut for RandomStringUtils.randomAlphabetic( 10 ) (or something similar to that)
      * 
-     * @param userName
+     * @return
      */
-    protected final void runAsUser( String userName ) {
-        authenticationTestingUtil.switchToUser( this.applicationContext, userName );
-    }
-
-    /**
-     * Elevate to administrative privileges (tests normally run this way, this can be used to set it back if you called
-     * runAsUser). This gets called before each test, no need to run it yourself otherwise.
-     */
-    protected final void runAsAdmin() {
-        authenticationTestingUtil.grantAdminAuthority( this.applicationContext );
-    }
-
-    protected final void runAsAnon() {
-        authenticationTestingUtil.grantAnonAuthority( this.applicationContext );
+    public String randomName() {
+        return RandomStringUtils.randomAlphabetic( 10 );
     }
 
     /**
@@ -139,15 +126,6 @@ public abstract class BaseSpringContextTest extends AbstractJUnit4SpringContextT
     @Autowired
     public void setDataSource( DataSource dataSource ) {
         this.simpleJdbcTemplate = new SimpleJdbcTemplate( dataSource );
-    }
-
-    /**
-     * Convenience shortcut for RandomStringUtils.randomAlphabetic( 10 ) (or something similar to that)
-     * 
-     * @return
-     */
-    public String randomName() {
-        return RandomStringUtils.randomAlphabetic( 10 );
     }
 
     /**
@@ -171,6 +149,14 @@ public abstract class BaseSpringContextTest extends AbstractJUnit4SpringContextT
     }
 
     /**
+     * @param t
+     * @return
+     */
+    protected <T> T getBean( Class<T> t ) {
+        return this.applicationContext.getBean( t );
+    }
+
+    /**
      * Convenience method to obtain instance of any bean by name. Use this only when necessary, you should wire your
      * tests by injection instead.
      * 
@@ -188,11 +174,24 @@ public abstract class BaseSpringContextTest extends AbstractJUnit4SpringContextT
     }
 
     /**
-     * @param t
-     * @return
+     * Elevate to administrative privileges (tests normally run this way, this can be used to set it back if you called
+     * runAsUser). This gets called before each test, no need to run it yourself otherwise.
      */
-    protected <T> T getBean( Class<T> t ) {
-        return this.applicationContext.getBean( t );
+    protected final void runAsAdmin() {
+        authenticationTestingUtil.grantAdminAuthority( this.applicationContext );
+    }
+
+    protected final void runAsAnon() {
+        authenticationTestingUtil.grantAnonAuthority( this.applicationContext );
+    }
+
+    /**
+     * Run as a regular user.
+     * 
+     * @param userName
+     */
+    protected final void runAsUser( String userName ) {
+        authenticationTestingUtil.switchToUser( this.applicationContext, userName );
     }
 
 }
@@ -200,13 +199,20 @@ public abstract class BaseSpringContextTest extends AbstractJUnit4SpringContextT
 final class AuthenticationTestingUtil {
 
     /**
+     * @param token
+     */
+    private static void putTokenInContext( AbstractAuthenticationToken token ) {
+        SecurityContextHolder.getContext().setAuthentication( token );
+    }
+
+    private UserManager userManager;
+
+    /**
      * @param userManager the userManager to set
      */
     public void setUserManager( UserManager userManager ) {
         this.userManager = userManager;
     }
-
-    private UserManager userManager;
 
     /**
      * Grant authority to a test user, with admin privileges, and put the token in the context. This means your tests
@@ -257,12 +263,5 @@ final class AuthenticationTestingUtil {
         token.setAuthenticated( true );
 
         putTokenInContext( token );
-    }
-
-    /**
-     * @param token
-     */
-    private static void putTokenInContext( AbstractAuthenticationToken token ) {
-        SecurityContextHolder.getContext().setAuthentication( token );
     }
 }

@@ -31,40 +31,6 @@ public class UserExistsException extends java.lang.Exception {
     private static final long serialVersionUID = -6191531408977402526L;
 
     /**
-     * The default constructor.
-     */
-    public UserExistsException() {
-    }
-
-    /**
-     * Constructs a new instance of UserExistsException
-     * 
-     * @param throwable the parent Throwable
-     */
-    public UserExistsException( Throwable throwable ) {
-        super( findRootCause( throwable ) );
-    }
-
-    /**
-     * Constructs a new instance of UserExistsException
-     * 
-     * @param message the throwable message.
-     */
-    public UserExistsException( String message ) {
-        super( message );
-    }
-
-    /**
-     * Constructs a new instance of UserExistsException
-     * 
-     * @param message the throwable message.
-     * @param throwable the parent of this Throwable.
-     */
-    public UserExistsException( String message, Throwable throwable ) {
-        super( message, findRootCause( throwable ) );
-    }
-
-    /**
      * Finds the root cause of the parent exception by traveling up the exception tree
      */
     private static Throwable findRootCause( Throwable th ) {
@@ -98,5 +64,39 @@ public class UserExistsException extends java.lang.Exception {
             }
         }
         return th;
+    }
+
+    /**
+     * The default constructor.
+     */
+    public UserExistsException() {
+    }
+
+    /**
+     * Constructs a new instance of UserExistsException
+     * 
+     * @param message the throwable message.
+     */
+    public UserExistsException( String message ) {
+        super( message );
+    }
+
+    /**
+     * Constructs a new instance of UserExistsException
+     * 
+     * @param message the throwable message.
+     * @param throwable the parent of this Throwable.
+     */
+    public UserExistsException( String message, Throwable throwable ) {
+        super( message, findRootCause( throwable ) );
+    }
+
+    /**
+     * Constructs a new instance of UserExistsException
+     * 
+     * @param throwable the parent Throwable
+     */
+    public UserExistsException( Throwable throwable ) {
+        super( findRootCause( throwable ) );
     }
 }

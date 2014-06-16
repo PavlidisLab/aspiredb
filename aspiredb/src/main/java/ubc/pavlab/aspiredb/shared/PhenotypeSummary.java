@@ -16,14 +16,6 @@ public class PhenotypeSummary implements Comparable<PhenotypeSummary> {
     private String uri;
     private String valueType;
 
-    public boolean isInferredBinaryType() {
-        return isInferredBinaryType;
-    }
-
-    public void setInferredBinaryType( boolean inferredBinaryType ) {
-        isInferredBinaryType = inferredBinaryType;
-    }
-
     private boolean isInferredBinaryType = false;
 
     private boolean isNeurocartaPhenotype;
@@ -31,36 +23,10 @@ public class PhenotypeSummary implements Comparable<PhenotypeSummary> {
     private Collection<PhenotypeSummary> descendantOntologyTermSummaries = new ArrayList<PhenotypeSummary>();
 
     private Map<String, Set<Long>> inferredValueToSubjectSet = new HashMap<String, Set<Long>>();
+
     private Map<String, Set<Long>> dbValueToSubjectSet = new HashMap<String, Set<Long>>();
 
     private PhenotypeValueObject selectedPhenotype;
-
-    public Collection<PhenotypeSummary> getDescendantOntologyTermSummaries() {
-        return descendantOntologyTermSummaries;
-    }
-
-    public void setDescendantOntologyTermSummaries( Collection<PhenotypeSummary> descendantOntologyTermSummaries ) {
-        this.descendantOntologyTermSummaries = descendantOntologyTermSummaries;
-    }
-
-    public Map<String, Set<Long>> getDbValueToSubjectSet() {
-        return dbValueToSubjectSet;
-    }
-
-    public void setDbValueToSubjectSet( Map<String, Set<Long>> dbValueToSubjectSet ) {
-        this.dbValueToSubjectSet = dbValueToSubjectSet;
-    }
-
-    public void setSelectedSubjectId( String subjectId ) {
-    }
-
-    public PhenotypeValueObject getSelectedPhenotype() {
-        return selectedPhenotype;
-    }
-
-    public void setSelectedPhenotype( PhenotypeValueObject selectedPhenotype ) {
-        this.selectedPhenotype = selectedPhenotype;
-    }
 
     public PhenotypeSummary() {
 
@@ -75,52 +41,25 @@ public class PhenotypeSummary implements Comparable<PhenotypeSummary> {
         this.descendantOntologyTermSummaries = new ArrayList<PhenotypeSummary>();
     }
 
-    public PhenotypeSummary getSummary() {
-        return this;
+    @Override
+    public int compareTo( PhenotypeSummary summaryValueObject ) {
+        return this.name.compareTo( summaryValueObject.getName() );
     }
 
-    public String getUri() {
-        return uri;
+    public Map<String, Set<Long>> getDbValueToSubjectSet() {
+        return dbValueToSubjectSet;
     }
 
-    public void setUri( String uri ) {
-        this.uri = uri;
-    }
-
-    public String getValueType() {
-        return valueType;
-    }
-
-    public void setValueType( String valueType ) {
-        this.valueType = valueType;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName( String name ) {
-        this.name = name;
+    public Collection<PhenotypeSummary> getDescendantOntologyTermSummaries() {
+        return descendantOntologyTermSummaries;
     }
 
     public Map<String, Set<Long>> getInferredValueToSubjectSet() {
         return inferredValueToSubjectSet;
     }
 
-    public boolean isNeurocartaPhenotype() {
-        return this.isNeurocartaPhenotype;
-    }
-
-    public void setNeurocartaPhenotype( boolean isNeurocartaPhenotype ) {
-        this.isNeurocartaPhenotype = isNeurocartaPhenotype;
-    }
-
-    public void initializeInferredPhenotypes() {
-        // Deep copy
-        // inferredValueToSubjectSet = new HashMap<String, Set<Long>>();
-        for ( String value : dbValueToSubjectSet.keySet() ) {
-            inferredValueToSubjectSet.put( value, new HashSet<Long>( dbValueToSubjectSet.get( value ) ) );
-        }
+    public String getName() {
+        return name;
     }
 
     public double getPresentRatio() {
@@ -142,8 +81,70 @@ public class PhenotypeSummary implements Comparable<PhenotypeSummary> {
         }
     }
 
-    @Override
-    public int compareTo( PhenotypeSummary summaryValueObject ) {
-        return this.name.compareTo( summaryValueObject.getName() );
+    public PhenotypeValueObject getSelectedPhenotype() {
+        return selectedPhenotype;
+    }
+
+    public PhenotypeSummary getSummary() {
+        return this;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public String getValueType() {
+        return valueType;
+    }
+
+    public void initializeInferredPhenotypes() {
+        // Deep copy
+        // inferredValueToSubjectSet = new HashMap<String, Set<Long>>();
+        for ( String value : dbValueToSubjectSet.keySet() ) {
+            inferredValueToSubjectSet.put( value, new HashSet<Long>( dbValueToSubjectSet.get( value ) ) );
+        }
+    }
+
+    public boolean isInferredBinaryType() {
+        return isInferredBinaryType;
+    }
+
+    public boolean isNeurocartaPhenotype() {
+        return this.isNeurocartaPhenotype;
+    }
+
+    public void setDbValueToSubjectSet( Map<String, Set<Long>> dbValueToSubjectSet ) {
+        this.dbValueToSubjectSet = dbValueToSubjectSet;
+    }
+
+    public void setDescendantOntologyTermSummaries( Collection<PhenotypeSummary> descendantOntologyTermSummaries ) {
+        this.descendantOntologyTermSummaries = descendantOntologyTermSummaries;
+    }
+
+    public void setInferredBinaryType( boolean inferredBinaryType ) {
+        isInferredBinaryType = inferredBinaryType;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    public void setNeurocartaPhenotype( boolean isNeurocartaPhenotype ) {
+        this.isNeurocartaPhenotype = isNeurocartaPhenotype;
+    }
+
+    public void setSelectedPhenotype( PhenotypeValueObject selectedPhenotype ) {
+        this.selectedPhenotype = selectedPhenotype;
+    }
+
+    public void setSelectedSubjectId( String subjectId ) {
+    }
+
+    public void setUri( String uri ) {
+        this.uri = uri;
+    }
+
+    public void setValueType( String valueType ) {
+        this.valueType = valueType;
     }
 }

@@ -36,6 +36,8 @@ public interface ManualAuthenticationService {
     public abstract Authentication attemptAuthentication( String username, String password )
             throws AuthenticationException;
 
+    public abstract void setApplicationContext( ApplicationContext applicationContext ) throws BeansException;
+
     /**
      * Entry point for non-http request.
      * 
@@ -43,7 +45,5 @@ public interface ManualAuthenticationService {
      * @param password
      */
     public abstract boolean validateRequest( String username, String password );
-
-    public abstract void setApplicationContext( ApplicationContext applicationContext ) throws BeansException;
 
 }

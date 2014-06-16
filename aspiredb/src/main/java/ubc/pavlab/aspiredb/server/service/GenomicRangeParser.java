@@ -24,27 +24,6 @@ import com.google.gwt.regexp.shared.RegExp;
  * @version $Id: GenomicRangeParser.java,v 1.2 2013/04/19 06:51:20 frances Exp $
  */
 public class GenomicRangeParser {
-    public static enum State {
-        INITIAL, CHROMOSOME, START_RANGE, END_RANGE, COORDINATE
-    }
-
-    private static final String CHROMOSOME_PATTERN = "(1\\d|2[0-2]|[xy]|[1-9])";
-    private static final String BAND_PATTERN = "([pq]\\d+(\\.\\d+)?)";
-    private static final String COORDINATE_PATTERN = "(\\d{1,9})\\-(\\d{1,9})";
-
-    private static final int[] CHROMOSOME_INDICES = { 2, 8, 12, 15 };
-    private static final int[] START_BAND_INDICES = { 3, 13 };
-    private static final int[] END_BAND_INDICES = { 5 };
-    private static final int[] START_BASE_INDICES = { 9 };
-    private static final int[] END_BASE_INDICES = { 10 };
-
-    // Note: if it is changed, all of the above indices AND the indices used in parse() must be changed as well.
-    private static final String PATTERN = "(" + CHROMOSOME_PATTERN + BAND_PATTERN + "\\-" + BAND_PATTERN + ")" + "|"
-            + "(" + CHROMOSOME_PATTERN + "\\:" + COORDINATE_PATTERN + ")" + "|" + "(" + CHROMOSOME_PATTERN
-            + BAND_PATTERN + ")" + "|" + CHROMOSOME_PATTERN;
-
-    private static final RegExp REG_EXP = RegExp.compile( PATTERN, "i" ); // ignore case
-
     public static class ParseResult {
         private MatchResult matchResult;
         private State state;
@@ -56,31 +35,22 @@ public class GenomicRangeParser {
             this.isValid = isValid;
         }
 
-        private String getMatchedGroupByIndices( int[] indices ) {
-            for ( int index : indices ) {
-                String group = this.matchResult.getGroup( index );
-
-                if ( group != null ) {
-                    return group;
-                }
-            }
-            return null;
-        }
-
-        public State getState() {
-            return this.state;
-        }
-
         public String getChromosome() {
             return getMatchedGroupByIndices( CHROMOSOME_INDICES );
         }
 
-        public String getStartBand() {
-            return getMatchedGroupByIndices( START_BAND_INDICES );
-        }
-
         public String getEndBand() {
             return getMatchedGroupByIndices( END_BAND_INDICES );
+        }
+
+        public int getEndBase() {
+            String endBase = getMatchedGroupByIndices( END_BASE_INDICES );
+
+            return endBase == null ? -1 : Integer.valueOf( endBase );
+        }
+
+        public String getStartBand() {
+            return getMatchedGroupByIndices( START_BAND_INDICES );
         }
 
         public int getStartBase() {
@@ -89,10 +59,8 @@ public class GenomicRangeParser {
             return startBase == null ? -1 : Integer.valueOf( startBase );
         }
 
-        public int getEndBase() {
-            String endBase = getMatchedGroupByIndices( END_BASE_INDICES );
-
-            return endBase == null ? -1 : Integer.valueOf( endBase );
+        public State getState() {
+            return this.state;
         }
 
         public boolean isBand() {
@@ -107,11 +75,40 @@ public class GenomicRangeParser {
         public boolean isValid() {
             return isValid;
         }
+
+        private String getMatchedGroupByIndices( int[] indices ) {
+            for ( int index : indices ) {
+                String group = this.matchResult.getGroup( index );
+
+                if ( group != null ) {
+                    return group;
+                }
+            }
+            return null;
+        }
     }
 
-    // private constructor
-    private GenomicRangeParser() {
+    public static enum State {
+        INITIAL, CHROMOSOME, START_RANGE, END_RANGE, COORDINATE
     }
+
+    private static final String CHROMOSOME_PATTERN = "(1\\d|2[0-2]|[xy]|[1-9])";
+    private static final String BAND_PATTERN = "([pq]\\d+(\\.\\d+)?)";
+
+    private static final String COORDINATE_PATTERN = "(\\d{1,9})\\-(\\d{1,9})";
+    private static final int[] CHROMOSOME_INDICES = { 2, 8, 12, 15 };
+    private static final int[] START_BAND_INDICES = { 3, 13 };
+    private static final int[] END_BAND_INDICES = { 5 };
+    private static final int[] START_BASE_INDICES = { 9 };
+
+    private static final int[] END_BASE_INDICES = { 10 };
+
+    // Note: if it is changed, all of the above indices AND the indices used in parse() must be changed as well.
+    private static final String PATTERN = "(" + CHROMOSOME_PATTERN + BAND_PATTERN + "\\-" + BAND_PATTERN + ")" + "|"
+            + "(" + CHROMOSOME_PATTERN + "\\:" + COORDINATE_PATTERN + ")" + "|" + "(" + CHROMOSOME_PATTERN
+            + BAND_PATTERN + ")" + "|" + CHROMOSOME_PATTERN;
+
+    private static final RegExp REG_EXP = RegExp.compile( PATTERN, "i" ); // ignore case
 
     public static ParseResult parse( String query ) {
         String queryInLowerCase = query.toLowerCase();
@@ -143,5 +140,9 @@ public class GenomicRangeParser {
         }
 
         return parseResult;
+    }
+
+    // private constructor
+    private GenomicRangeParser() {
     }
 }

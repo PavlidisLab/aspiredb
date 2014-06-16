@@ -51,20 +51,20 @@ public class Translocation extends Variant {
     public Translocation() {
     }
 
-    public TranslocationType getType() {
-        return type;
-    }
-
-    public void setType( TranslocationType type ) {
-        this.type = type;
-    }
-
     public GenomicLocation getTargetLocation() {
         return targetLocation;
     }
 
+    public TranslocationType getType() {
+        return type;
+    }
+
     public void setTargetLocation( GenomicLocation targetLocation ) {
         this.targetLocation = targetLocation;
+    }
+
+    public void setType( TranslocationType type ) {
+        this.type = type;
     }
 
     @Override

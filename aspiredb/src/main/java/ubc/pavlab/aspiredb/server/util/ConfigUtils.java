@@ -131,13 +131,13 @@ public class ConfigUtils {
 
     }
 
+    public static String getAdminEmailAddress() {
+        return getString( "aspiredb.admin.email" );
+    }
+
     @RemoteMethod
     public static String getAppVersion() {
         return getString( "aspiredb.version" );
-    }
-
-    public static String getAdminEmailAddress() {
-        return getString( "aspiredb.admin.email" );
     }
 
     /**
@@ -149,19 +149,6 @@ public class ConfigUtils {
             return url + "/";
         }
         return url;
-    }
-
-    public static String getGemmaBaseUrl() {
-        String url = getString( "gemma.base.url", "http://chibi.ubc.ca/Gemma" );
-
-        return url;
-    }
-
-    /**
-     * @return host url e.g. http://www.chibi.ubc.ca
-     */
-    public static String getHostUrl() {
-        return getString( "aspiredb.hosturl", "http://www.chibi.ubc.ca/" );
     }
 
     /**
@@ -367,6 +354,19 @@ public class ConfigUtils {
      */
     public static Float getFloat( String key, Float defaultValue ) {
         return config.getFloat( key, defaultValue );
+    }
+
+    public static String getGemmaBaseUrl() {
+        String url = getString( "gemma.base.url", "http://chibi.ubc.ca/Gemma" );
+
+        return url;
+    }
+
+    /**
+     * @return host url e.g. http://www.chibi.ubc.ca
+     */
+    public static String getHostUrl() {
+        return getString( "aspiredb.hosturl", "http://www.chibi.ubc.ca/" );
     }
 
     /**
@@ -598,16 +598,6 @@ public class ConfigUtils {
     }
 
     /**
-     * Set an environment/application variable programatically.
-     * 
-     * @param enablePropertyName
-     * @param b
-     */
-    public static void setProperty( String key, Object value ) {
-        config.setProperty( key, value );
-    }
-
-    /**
      * Returns true if filters has an instance of {@link SubjectFilterConfig}
      * 
      * @param filters
@@ -621,6 +611,16 @@ public class ConfigUtils {
             }
         }
         return found;
+    }
+
+    /**
+     * Set an environment/application variable programatically.
+     * 
+     * @param enablePropertyName
+     * @param b
+     */
+    public static void setProperty( String key, Object value ) {
+        config.setProperty( key, value );
     }
 
 }

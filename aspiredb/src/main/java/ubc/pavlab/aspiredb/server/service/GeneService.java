@@ -32,17 +32,17 @@ import ubc.pavlab.aspiredb.shared.GeneValueObject;
  */
 public interface GeneService {
 
-    public List<GeneValueObject> getGenesInsideVariants( Collection<Long> variantIds ) throws NotLoggedInException,
-            BioMartServiceException;
+    public Map<String, GeneValueObject> findGenesAndURIsWithNeurocartaPhenotype( String phenotypeValueUri )
+            throws NotLoggedInException, ExternalDependencyException;
 
     public Collection<GeneValueObject> findGenesWithNeurocartaPhenotype( String phenotypeValueUri )
             throws NotLoggedInException, ExternalDependencyException;
 
-    public Map<String, GeneValueObject> findGenesAndURIsWithNeurocartaPhenotype( String phenotypeValueUri )
-            throws NotLoggedInException, ExternalDependencyException;
-
-    public Long saveUserGeneSet( String geneName, List<GeneValueObject> genes );
+    public List<GeneValueObject> getGenesInsideVariants( Collection<Long> variantIds ) throws NotLoggedInException,
+            BioMartServiceException;
 
     public boolean isGeneSetName( String name );
+
+    public Long saveUserGeneSet( String geneName, List<GeneValueObject> genes );
 
 }

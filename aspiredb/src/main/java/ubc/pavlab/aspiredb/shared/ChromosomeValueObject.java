@@ -35,30 +35,14 @@ public class ChromosomeValueObject implements Serializable {
     private int baseSize;
     private int centromereLocation;
 
+    public ChromosomeValueObject() {
+    }
+
     public ChromosomeValueObject( String name, Map<String, ChromosomeBand> bands, int baseSize, int centromereLocation ) {
         this.name = name;
         this.bands = bands;
         this.baseSize = baseSize;
         this.centromereLocation = centromereLocation;
-    }
-
-    public ChromosomeValueObject() {
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Map<String, ChromosomeBand> getBands() {
-        return bands;
-    }
-
-    public int getSize() {
-        return baseSize;
-    }
-
-    public int getCentromereLocation() {
-        return centromereLocation;
     }
 
     // TODO: performance can be improved
@@ -69,5 +53,21 @@ public class ChromosomeValueObject implements Serializable {
             }
         }
         return "";
+    }
+
+    public Map<String, ChromosomeBand> getBands() {
+        return bands;
+    }
+
+    public int getCentromereLocation() {
+        return centromereLocation;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getSize() {
+        return baseSize;
     }
 }

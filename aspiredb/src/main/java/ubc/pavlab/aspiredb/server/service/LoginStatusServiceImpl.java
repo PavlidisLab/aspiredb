@@ -31,6 +31,12 @@ import org.springframework.stereotype.Service;
 public class LoginStatusServiceImpl implements LoginStatusService {
 
     @Override
+    @RemoteMethod
+    public String getCurrentUsername() {
+        return SecurityUtil.getCurrentUsername();
+    }
+
+    @Override
     public Boolean isLoggedIn() {
         return SecurityUtil.isUserLoggedIn();
     }
@@ -39,11 +45,5 @@ public class LoginStatusServiceImpl implements LoginStatusService {
     @RemoteMethod
     public Boolean isUserAdministrator() {
         return SecurityUtil.isUserAdmin();
-    }
-
-    @Override
-    @RemoteMethod
-    public String getCurrentUsername() {
-        return SecurityUtil.getCurrentUsername();
     }
 }

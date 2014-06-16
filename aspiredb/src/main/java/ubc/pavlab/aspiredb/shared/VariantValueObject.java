@@ -40,116 +40,54 @@ public class VariantValueObject implements Serializable {
     protected String patientId;
     protected Map<String, CharacteristicValueObject> characteristics;
 
-    public void setLabels( Collection<LabelValueObject> labels ) {
-        this.labels = labels;
-    }
-
     protected Collection<LabelValueObject> labels = new ArrayList<LabelValueObject>();
-
-    public Collection<LabelValueObject> getLabels() {
-        return labels;
-    }
 
     protected GenomicRange genomicRange;
 
     protected String userVariantId;
+
     protected String description;
+
     protected String externalId;
 
     public VariantValueObject() {
         super();
     }
 
-    public String getDetails() {
-        return details;
-    }
-
-    public void setDetails( String details ) {
-        this.details = details;
-    }
-
-    public Long getSubjectId() {
-        return subjectId;
-    }
-
-    public SubjectValueObject getSubject() {
-        return subject;
-    }
-
-    public void setSubject( SubjectValueObject subject ) {
-        this.subject = subject;
-    }
-
-    public void setSubjectId( Long subjectId ) {
-        this.subjectId = subjectId;
-    }
-
-    public String getVariantType() {
-        return variantType;
-    }
-
-    public void setVariantType( String variantType ) {
-        this.variantType = variantType;
-    }
-
-    public String getGenomeCoordinates() {
-        return this.genomicRange.toBaseString();
-    }
-
     public Map<String, CharacteristicValueObject> getCharacteristics() {
         return characteristics;
-    }
-
-    public void setCharacteristics( Map<String, CharacteristicValueObject> characteristics ) {
-        this.characteristics = characteristics;
-    }
-
-    public GenomicRange getGenomicRange() {
-        return genomicRange;
-    }
-
-    public void setGenomicRange( GenomicRange genomicRange ) {
-        this.genomicRange = genomicRange;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
-    public String getPatientId() {
-        return patientId;
-    }
-
-    public void setPatientId( String id ) {
-        this.patientId = id;
-    }
-
-    public String getUserVariantId() {
-        return userVariantId;
-    }
-
-    public void setUserVariantId( String userVariantId ) {
-        this.userVariantId = userVariantId;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription( String description ) {
-        this.description = description;
+    public String getDetails() {
+        return details;
     }
 
     public String getExternalId() {
         return externalId;
     }
 
-    public void setExternalId( String externalId ) {
-        this.externalId = externalId;
+    public String getGenomeCoordinates() {
+        return this.genomicRange.toBaseString();
+    }
+
+    public GenomicRange getGenomicRange() {
+        return genomicRange;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Collection<LabelValueObject> getLabels() {
+        return labels;
+    }
+
+    public String getPatientId() {
+        return patientId;
     }
 
     public String getPropertyStringValue( Property property ) {
@@ -164,5 +102,69 @@ public class VariantValueObject implements Serializable {
             return characteristicValueObject.getValue();
         }
         return null;
+    }
+
+    public SubjectValueObject getSubject() {
+        return subject;
+    }
+
+    public Long getSubjectId() {
+        return subjectId;
+    }
+
+    public String getUserVariantId() {
+        return userVariantId;
+    }
+
+    public String getVariantType() {
+        return variantType;
+    }
+
+    public void setCharacteristics( Map<String, CharacteristicValueObject> characteristics ) {
+        this.characteristics = characteristics;
+    }
+
+    public void setDescription( String description ) {
+        this.description = description;
+    }
+
+    public void setDetails( String details ) {
+        this.details = details;
+    }
+
+    public void setExternalId( String externalId ) {
+        this.externalId = externalId;
+    }
+
+    public void setGenomicRange( GenomicRange genomicRange ) {
+        this.genomicRange = genomicRange;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setLabels( Collection<LabelValueObject> labels ) {
+        this.labels = labels;
+    }
+
+    public void setPatientId( String id ) {
+        this.patientId = id;
+    }
+
+    public void setSubject( SubjectValueObject subject ) {
+        this.subject = subject;
+    }
+
+    public void setSubjectId( Long subjectId ) {
+        this.subjectId = subjectId;
+    }
+
+    public void setUserVariantId( String userVariantId ) {
+        this.userVariantId = userVariantId;
+    }
+
+    public void setVariantType( String variantType ) {
+        this.variantType = variantType;
     }
 }

@@ -46,19 +46,23 @@ public class UserGeneSet implements Securable {
 
     @Column(name = "NAME")
     private String name;
-    
+
     @Column(name = "DESCRIPTION")
     private String description;
 
     @Column(name = "OBJECT", columnDefinition = "MEDIUMBLOB")
     private Serializable object;
 
+    public UserGeneSet() {
+    }
+
     public UserGeneSet( String name, Serializable object ) {
         this.name = name;
         this.object = object;
     }
 
-    public UserGeneSet() {
+    public String getDescription() {
+        return description;
     }
 
     @Override
@@ -66,32 +70,28 @@ public class UserGeneSet implements Securable {
         return this.id;
     }
 
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName( String name ) {
-        this.name = name;
     }
 
     public Serializable getObject() {
         return object;
     }
 
-    public void setObject( Serializable object ) {
-        this.object = object;
-    }
-    
-    public String getDescription() {
-        return description;
-    }
-
     public void setDescription( String description ) {
         this.description = description;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    public void setObject( Serializable object ) {
+        this.object = object;
     }
 
 }

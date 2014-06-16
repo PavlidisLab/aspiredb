@@ -40,15 +40,15 @@ public class IndelValueObject extends VariantValueObject {
         return length;
     }
 
-    public void setLength( int length ) {
-        this.length = length;
-    }
-
     @Override
     public String getPropertyStringValue( Property property ) {
         if ( property instanceof IndelLengthProperty ) {
             return String.valueOf( this.getLength() );
         }
         return super.getPropertyStringValue( property );
+    }
+
+    public void setLength( int length ) {
+        this.length = length;
     }
 }

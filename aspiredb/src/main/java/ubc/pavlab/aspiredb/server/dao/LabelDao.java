@@ -31,24 +31,24 @@ import ubc.pavlab.aspiredb.shared.LabelValueObject;
  */
 public interface LabelDao extends SecurableDaoBase<Label> {
 
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
-    Collection<Label> getVariantLabels();
+    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
+    Label findOrCreate( LabelValueObject labelVO );
+
+    @Deprecated
+    List<Label> getLabelsMatching( String partialName );
 
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     Collection<Label> getSubjectLabels();
 
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    Collection<Label> getSubjectLabelsByProjectId( Long projectId );
+
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     Collection<Label> getSubjectLabelsBySubjectId( Long id );
 
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
-    Collection<Label> getVariantLabelsByVariantId( Long id );
+    Collection<Label> getVariantLabels();
 
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
-    Collection<Label> getSubjectLabelsByProjectId( Long projectId );
-
-    @Deprecated
-    List<Label> getLabelsMatching( String partialName );
-
-    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
-    Label findOrCreate( LabelValueObject labelVO );
+    Collection<Label> getVariantLabelsByVariantId( Long id );
 }

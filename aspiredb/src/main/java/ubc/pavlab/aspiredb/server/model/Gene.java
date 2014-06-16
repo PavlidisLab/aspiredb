@@ -55,32 +55,32 @@ public class Gene {
     public Gene() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
-    public void setName( String name ) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
     public List<GeneGroup> getGeneGroups() {
         return genegroups;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public GenomicLocation getLocation() {
         return location;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
     public void setLocation( GenomicLocation location ) {
         this.location = location;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
     }
 
 }

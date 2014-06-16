@@ -32,12 +32,12 @@ public class OntologyTermValueObject implements Serializable {
         return name;
     }
 
-    public void setName( String name ) {
-        this.name = name;
-    }
-
     public String getUri() {
         return uri;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
     }
 
     public void setUri( String uri ) {
