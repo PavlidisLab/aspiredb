@@ -51,14 +51,11 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 @Component
 public class AclAdvice extends BaseAclAdvice {
 
-<<<<<<< HEAD
-=======
     @Autowired
     SecurityService securityService;
     
     private static Log log = LogFactory.getLog( AclAdvice.class );
 
->>>>>>> FETCH_HEAD
     /*
      * (non-Javadoc)
      * 
@@ -101,20 +98,7 @@ public class AclAdvice extends BaseAclAdvice {
     protected boolean objectIsUserGroup( Securable object ) {
         return UserGroup.class.isAssignableFrom( object.getClass() );
     }
-<<<<<<< HEAD
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see gemma.gsec.acl.BaseAclAdvice#specialCaseToKeepPrivateOnCreation(java.lang.Class)
-     */
-    @Override
-    protected boolean specialCaseToKeepPrivateOnCreation( Class<? extends Securable> clazz ) {
-        /*
-         * Important: all entities are private, to begin with.
-         */
-=======
-    
     /**
      * Certain objects are not made public immediately on creation by administrators. The default implementation returns
      * true if clazz is assignable to SecuredChild; otherwise false. Subclasses overriding this method should probably
@@ -125,7 +109,6 @@ public class AclAdvice extends BaseAclAdvice {
      */
     @Override
     protected boolean specialCaseToKeepPrivateOnCreation( Class<? extends Securable> clazz ) {
->>>>>>> FETCH_HEAD
         return true;
     }
 }

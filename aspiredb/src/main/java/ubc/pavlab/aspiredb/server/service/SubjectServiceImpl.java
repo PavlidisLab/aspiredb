@@ -37,6 +37,7 @@ import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
@@ -44,6 +45,7 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.StringMatrix;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.TextValue;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.ExternalSubjectIdProperty;
 import ubc.pavlab.aspiredb.shared.query.LabelProperty;
 import ubc.pavlab.aspiredb.shared.query.Property;
@@ -78,82 +80,100 @@ public class SubjectServiceImpl implements SubjectService {
     @Autowired
     private VariantDao variantDao;
 
+    /**
+     * Get the Subject value Object of the given subject Id
+     * 
+     * @param projectId, subjectId
+     * @return SubjectValueObject
+     */
     @Override
     @RemoteMethod
-    @Transactional
-    public LabelValueObject addLabel( Collection<Long> subjectIds, LabelValueObject labelVO ) {
-
-        Collection<Subject> subjects = subjectDao.load( subjectIds );
-        Label label = labelDao.findOrCreate( labelVO );
-        for ( Subject subject : subjects ) {
-            subject.addLabel( label );
-            subjectDao.update( subject );
+    @Transactional(readOnly = true)
+    public SubjectValueObject getSubject( Long projectId, Long subjectId ) {
+        // throwGwtExceptionIfNotLoggedIn();
+        Subject subject = subjectDao.load( subjectId );
+        if ( subject == null ) {
+            return null;
         }
-        return label.toValueObject();
+
+        SubjectValueObject vo = subject.convertToValueObject();
+        Integer numVariants = cnvDao.findBySubjectPatientId( subject.getPatientId() ).size();
+        vo.setVariants( numVariants != null ? numVariants : 0 );
+
+        return vo;
     }
 
     @Override
     @RemoteMethod
-    @Transactional
-    public StringMatrix<String, String> getPhenotypeBySubjectIds( Collection<Long> subjectIds, boolean removeEmpty ) {
+    @Transactional(readOnly = true)
+    public List<Long> getVariantsSubjects( List<String> patientIds ) {
+        List<Long> subjectIds = new ArrayList<Long>();
 
-        List<String> columnNames = new ArrayList<>();
-        List<String> rowNames = new ArrayList<>();
-
-        List<SubjectValueObject> svoList = new ArrayList<SubjectValueObject>();
-
-        Collection<Subject> subjectList = subjectDao.load( subjectIds );
-
-        HashMap<String, String> phenotypeFileColumnsMap = new HashMap<String, String>();
-
-        for ( Subject s : subjectList ) {
-            SubjectValueObject svo = s.convertToValueObjectWithPhenotypes();
-            if ( removeEmpty && svo.getPhenotypes().size() == 0 ) {
-                continue;
-            }
-
-            svoList.add( svo );
-            rowNames.add( svo.getPatientId() );
-
-            for ( PhenotypeValueObject pvo : svo.getPhenotypes().values() ) {
-
-                String columnName = pvo.getUri() != null ? ( pvo.getUri() + ":" + pvo.getName() ) : pvo.getName();
-
-                if ( !phenotypeFileColumnsMap.containsKey( columnName ) ) {
-                    phenotypeFileColumnsMap.put( columnName, pvo.getName() );
-                    columnNames.add( columnName );
-                }
-
-            }
-
+        for ( String patientId : patientIds ) {
+            Subject variantSubject = subjectDao.findByPatientId( patientId );
+            subjectIds.add( variantSubject.getId() );
         }
 
-        StringMatrix<String, String> matrix = new StringMatrix<String, String>( rowNames.size(), columnNames.size() );
-        matrix.setColumnNames( columnNames );
-        matrix.setRowNames( rowNames );
+        return subjectIds;
+    }
 
-        int i = 0;
-        for ( SubjectValueObject svo : svoList ) {
-            Map<String, PhenotypeValueObject> phenotypeMap = svo.getPhenotypes();
-
-            int j = 0;
-            for ( String columnName : columnNames ) {
-
-                PhenotypeValueObject vo = phenotypeMap.get( phenotypeFileColumnsMap.get( columnName ) );
-
-                if ( vo != null ) {
-                    matrix.set( i, j, vo.getDbValue() );
-                } else {
-                    matrix.set( i, j, "" );
-                }
-
-                j++;
-            }
-
-            i++;
+    /**
+     * Get the list of Subject value Objects of the given subject Ids
+     * 
+     * @param projectId, subjectId
+     * @return SubjectValueObject
+     */
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<SubjectValueObject> getSubjects( Long projectId, List<Long> subjectIds ) {
+        // throwGwtExceptionIfNotLoggedIn();
+        Collection<Subject> subjects = subjectDao.load( subjectIds );
+        if ( subjects.isEmpty() ) {
+            return null;
         }
 
-        return matrix;
+        List<SubjectValueObject> vos = new ArrayList<>();
+
+        for ( Subject subject : subjects ) {
+
+            SubjectValueObject vo = subject.convertToValueObject();
+            Integer numVariants = cnvDao.findBySubjectPatientId( subject.getPatientId() ).size();
+            vo.setVariants( numVariants != null ? numVariants : 0 );
+            vos.add( vo );
+        }
+        return vos;
+    }
+
+    @Override
+    @RemoteMethod
+    public Collection<Property> suggestProperties() {
+        Collection<Property> properties = new ArrayList<Property>();
+        properties.add( new ExternalSubjectIdProperty() );
+        properties.add( new SubjectLabelProperty() );
+        return properties;
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<PropertyValue> suggestValues( Property property, SuggestionContext suggestionContext ) {
+        List<PropertyValue> values = new ArrayList<PropertyValue>();
+        if ( property instanceof LabelProperty ) {
+            List<LabelValueObject> labels = suggestLabels( suggestionContext );
+            for ( LabelValueObject label : labels ) {
+                values.add( new PropertyValue<LabelValueObject>( label ) );
+            }
+        } else if ( property instanceof TextProperty ) {
+            Collection<String> stringValues = ( ( TextProperty ) property ).getDataType().getAllowedValues();
+            if ( stringValues.isEmpty() ) {
+                stringValues = subjectDao.suggestValuesForEntityProperty( property, suggestionContext );
+            }
+            for ( String stringValue : stringValues ) {
+                values.add( new PropertyValue<TextValue>( new TextValue( stringValue ) ) );
+            }
+        }
+        return values;
     }
 
     /**
@@ -432,69 +452,9 @@ public class SubjectServiceImpl implements SubjectService {
         return text.toString();
     }
 
-    /**
-     * Get the Subject value Object of the given subject Id
-     * 
-     * @param projectId, subjectId
-     * @return SubjectValueObject
-     */
     @Override
     @RemoteMethod
-    @Transactional(readOnly = true)
-    public SubjectValueObject getSubject( Long projectId, Long subjectId ) {
-        // throwGwtExceptionIfNotLoggedIn();
-        Subject subject = subjectDao.load( subjectId );
-        if ( subject == null ) {
-            return null;
-        }
-
-        SubjectValueObject vo = subject.convertToValueObject();
-        Integer numVariants = cnvDao.findBySubjectPatientId( subject.getPatientId() ).size();
-        vo.setVariants( numVariants != null ? numVariants : 0 );
-
-        return vo;
-    }
-
-    @Override
     @Transactional
-<<<<<<< HEAD
-    @RemoteMethod
-    public Collection<Label> getSubjectLabels( Collection<Long> subjectIds ) {
-        // Collection<Label labelEntity = labelDao.load( labelIds );
-        Collection<Label> labels = new ArrayList<Label>();
-
-        for ( Long subjectId : subjectIds ) {
-            Collection<Label> subjectLabels = labelDao.getSubjectLabelsBySubjectId( subjectId );
-            if ( subjectLabels == null ) {
-                //
-            } else {
-                for ( Label subjectLabel : subjectLabels ) {
-                    labels.add( subjectLabel );
-                }
-            }
-        }
-        return labels;
-    }
-
-    /**
-     * Get the list of Subject value Objects of the given subject Ids
-     * 
-     * @param projectId, subjectId
-     * @return SubjectValueObject
-     */
-    @Override
-    @RemoteMethod
-    @Transactional(readOnly = true)
-    public Collection<SubjectValueObject> getSubjects( Long projectId, List<Long> subjectIds ) {
-        // throwGwtExceptionIfNotLoggedIn();
-        Collection<Subject> subjects = subjectDao.load( subjectIds );
-        if ( subjects.isEmpty() ) {
-            return null;
-        }
-
-        List<SubjectValueObject> vos = new ArrayList<>();
-
-=======
     public LabelValueObject addLabel( Collection<Long> subjectIds, LabelValueObject labelVO ) {
         LabelValueObject ret = null;
         Collection<Subject> subjects = subjectDao.load( subjectIds );
@@ -502,44 +462,12 @@ public class SubjectServiceImpl implements SubjectService {
         if ( label == null ) {
             return ret;
         }
->>>>>>> FETCH_HEAD
         for ( Subject subject : subjects ) {
-
-            SubjectValueObject vo = subject.convertToValueObject();
-            Integer numVariants = cnvDao.findBySubjectPatientId( subject.getPatientId() ).size();
-            vo.setVariants( numVariants != null ? numVariants : 0 );
-            vos.add( vo );
+            subject.addLabel( label );
+            subjectDao.update( subject );
         }
-<<<<<<< HEAD
-        return vos;
-=======
         ret = label.toValueObject();
         return ret;
->>>>>>> FETCH_HEAD
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional(readOnly = true)
-    public List<Long> getVariantsSubjects( List<String> patientIds ) {
-        List<Long> subjectIds = new ArrayList<Long>();
-
-        for ( String patientId : patientIds ) {
-            Subject variantSubject = subjectDao.findByPatientId( patientId );
-            subjectIds.add( variantSubject.getId() );
-        }
-
-        return subjectIds;
-    }
-
-    @Override
-    @RemoteMethod
-    @Transactional
-    public void removeLabel( Collection<Long> subjectIds, LabelValueObject label ) {
-
-        for ( Long subjectId : subjectIds ) {
-            removeLabel( subjectId, label );
-        }
     }
 
     @Override
@@ -551,6 +479,16 @@ public class SubjectServiceImpl implements SubjectService {
         Label labelEntity = labelDao.load( label.getId() );
         subject.removeLabel( labelEntity );
         subjectDao.update( subject );
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional
+    public void removeLabel( Collection<Long> subjectIds, LabelValueObject label ) {
+
+        for ( Long subjectId : subjectIds ) {
+            removeLabel( subjectId, label );
+        }
     }
 
     @Override
@@ -571,33 +509,86 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
+    @Transactional
     @RemoteMethod
-    public Collection<Property> suggestProperties() {
-        Collection<Property> properties = new ArrayList<Property>();
-        properties.add( new ExternalSubjectIdProperty() );
-        properties.add( new SubjectLabelProperty() );
-        return properties;
+    public Collection<Label> getSubjectLabels( Collection<Long> subjectIds ) {
+        // Collection<Label labelEntity = labelDao.load( labelIds );
+        Collection<Label> labels = new ArrayList<Label>();
+
+        for ( Long subjectId : subjectIds ) {
+            Collection<Label> subjectLabels = labelDao.getSubjectLabelsBySubjectId( subjectId );
+            if ( subjectLabels == null ) {
+                //
+            } else {
+                for ( Label subjectLabel : subjectLabels ) {
+                    labels.add( subjectLabel );
+                }
+            }
+        }
+        return labels;
     }
 
     @Override
     @RemoteMethod
-    @Transactional(readOnly = true)
-    public Collection<PropertyValue> suggestValues( Property property, SuggestionContext suggestionContext ) {
-        List<PropertyValue> values = new ArrayList<PropertyValue>();
-        if ( property instanceof LabelProperty ) {
-            List<LabelValueObject> labels = suggestLabels( suggestionContext );
-            for ( LabelValueObject label : labels ) {
-                values.add( new PropertyValue<LabelValueObject>( label ) );
+    @Transactional
+    public StringMatrix<String, String> getPhenotypeBySubjectIds( Collection<Long> subjectIds, boolean removeEmpty ) {
+
+        List<String> columnNames = new ArrayList<>();
+        List<String> rowNames = new ArrayList<>();
+
+        List<SubjectValueObject> svoList = new ArrayList<SubjectValueObject>();
+
+        Collection<Subject> subjectList = subjectDao.load( subjectIds );
+
+        HashMap<String, String> phenotypeFileColumnsMap = new HashMap<String, String>();
+
+        for ( Subject s : subjectList ) {
+            SubjectValueObject svo = s.convertToValueObjectWithPhenotypes();
+            if ( removeEmpty && svo.getPhenotypes().size() == 0 ) {
+                continue;
             }
-        } else if ( property instanceof TextProperty ) {
-            Collection<String> stringValues = ( ( TextProperty ) property ).getDataType().getAllowedValues();
-            if ( stringValues.isEmpty() ) {
-                stringValues = subjectDao.suggestValuesForEntityProperty( property, suggestionContext );
+
+            svoList.add( svo );
+            rowNames.add( svo.getPatientId() );
+
+            for ( PhenotypeValueObject pvo : svo.getPhenotypes().values() ) {
+
+                String columnName = pvo.getUri() != null ? ( pvo.getUri() + ":" + pvo.getName() ) : pvo.getName();
+
+                if ( !phenotypeFileColumnsMap.containsKey( columnName ) ) {
+                    phenotypeFileColumnsMap.put( columnName, pvo.getName() );
+                    columnNames.add( columnName );
+                }
+
             }
-            for ( String stringValue : stringValues ) {
-                values.add( new PropertyValue<TextValue>( new TextValue( stringValue ) ) );
-            }
+
         }
-        return values;
+
+        StringMatrix<String, String> matrix = new StringMatrix<String, String>( rowNames.size(), columnNames.size() );
+        matrix.setColumnNames( columnNames );
+        matrix.setRowNames( rowNames );
+
+        int i = 0;
+        for ( SubjectValueObject svo : svoList ) {
+            Map<String, PhenotypeValueObject> phenotypeMap = svo.getPhenotypes();
+
+            int j = 0;
+            for ( String columnName : columnNames ) {
+
+                PhenotypeValueObject vo = phenotypeMap.get( phenotypeFileColumnsMap.get( columnName ) );
+
+                if ( vo != null ) {
+                    matrix.set( i, j, vo.getDbValue() );
+                } else {
+                    matrix.set( i, j, "" );
+                }
+
+                j++;
+            }
+
+            i++;
+        }
+
+        return matrix;
     }
 }

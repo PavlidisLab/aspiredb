@@ -17,8 +17,6 @@ package ubc.pavlab.aspiredb.server.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import gemma.gsec.SecurityService;
-import gemma.gsec.acl.domain.AclService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,9 +43,6 @@ public class ProjectDaoTest extends BaseSpringContextTest {
 
     @Autowired
     PersistentTestObjectHelper testObjectHelper;
-
-    @Autowired
-    SecurityService securityService;
 
     @Autowired
     UserManager userManager;
@@ -97,6 +92,7 @@ public class ProjectDaoTest extends BaseSpringContextTest {
     public void testProjectDaoSecurity() throws Exception {
 
         String patientId1 = RandomStringUtils.randomAlphabetic( 5 );
+
         String patientId2 = RandomStringUtils.randomAlphabetic( 6 );
 
         super.runAsAdmin();
@@ -128,19 +124,11 @@ public class ProjectDaoTest extends BaseSpringContextTest {
         super.runAsUser( someUsername );
 
         try {
-<<<<<<< HEAD
-            projectDao.findByProjectName( projectName );
-=======
             p = projectDao.findByProjectName( projectName );
             log.debug( "Project '" + projectName + "' has acls " + aclUtils.getAcl( p ) );
             fail( "Should have gotten an access denied" );
         } catch ( AccessDeniedException e ) {
->>>>>>> FETCH_HEAD
 
-            fail( "Should have gotten an access denied on" + securityService.getAcl( p ) + " accessed by user ="
-                    + someUsername );
-        } catch ( AccessDeniedException e ) {
-            // expected
         }
 
     }

@@ -43,7 +43,18 @@ import com.sencha.gxt.data.shared.loader.PagingLoadResult;
  */
 public interface QueryService {
 
-    public void deleteQuery( String name );
+    public BoundedList<SubjectValueObject> querySubjects( Set<AspireDbFilterConfig> filters )
+            throws NotLoggedInException, ExternalDependencyException;
+
+    public BoundedList<VariantValueObject> queryVariants( Set<AspireDbFilterConfig> filters )
+            throws NotLoggedInException, ExternalDependencyException;
+
+    public PagingLoadResult<OntologyTermValueObject> getOntologyTermSuggestions( String query );
+
+    public List<String> getValuesForOntologyTerm( String ontologyTermUri );
+
+    public PagingLoadResult<PhenotypeSuggestion> getPhenotypeSuggestionLoadResult( String query,
+            Collection<Long> activeProjects );
 
     public PagingLoadResult<GeneValueObject> getGeneSuggestionLoadResult( String query )
             throws BioMartServiceException, BioMartServiceException;
@@ -51,21 +62,30 @@ public interface QueryService {
     public PagingLoadResult<NeurocartaPhenotypeValueObject> getNeurocartaPhenotypeSuggestionLoadResult( String query )
             throws NeurocartaServiceException, NeurocartaServiceException;
 
-    public PagingLoadResult<OntologyTermValueObject> getOntologyTermSuggestions( String query );
+    public PagingLoadResult<SubjectValueObject> getSubjectSuggestionLoadResult( String query );
 
-    public PagingLoadResult<PhenotypeSuggestion> getPhenotypeSuggestionLoadResult( String query,
-            Collection<Long> activeProjects );
+    public List<Serializable> getVariantLocationValueObjects( Property property, List<String> text )
+            throws BioMartServiceException, NeurocartaServiceException;
 
     public List<PhenotypeSuggestion> getPhenotypeSuggestions( List<String> names );
 
+    public List<SubjectValueObject> getSubjects( List<String> subjectIds );
+
+    public Long saveQuery( String name, Set<AspireDbFilterConfig> filters );
+
+    public Set<AspireDbFilterConfig> loadQuery( String name );
+
     public Collection<String> getSavedQueryNames();
+
+    public void deleteQuery( String name );
+
+    public boolean isQueryName( String name );
 
     public int getSubjectCount( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException,
             ExternalDependencyException;
 
-    public List<SubjectValueObject> getSubjects( List<String> subjectIds );
-
-    public PagingLoadResult<SubjectValueObject> getSubjectSuggestionLoadResult( String query );
+    public int getVariantCount( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException,
+            ExternalDependencyException;
 
     /**
      * Combination of {@link QueryService#getSubjectCount(Set)} and {@link QueryService#getVariantCount(Set)} that
@@ -79,29 +99,7 @@ public interface QueryService {
     public Map<Integer, Integer> getSubjectVariantCounts( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException;
 
-<<<<<<< HEAD
-    public List<String> getValuesForOntologyTerm( String ontologyTermUri );
-
-    public int getVariantCount( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException,
-            ExternalDependencyException;
-
-    public List<Serializable> getVariantLocationValueObjects( Property property, List<String> text )
-            throws BioMartServiceException, NeurocartaServiceException;
-
-    public boolean isQueryName( String name );
-
-    public Set<AspireDbFilterConfig> loadQuery( String name );
-
-    public BoundedList<SubjectValueObject> querySubjects( Set<AspireDbFilterConfig> filters )
-            throws NotLoggedInException, ExternalDependencyException;
-
-    public BoundedList<VariantValueObject> queryVariants( Set<AspireDbFilterConfig> filters )
-            throws NotLoggedInException, ExternalDependencyException;
-
-    public Long saveQuery( String name, Set<AspireDbFilterConfig> filters );
-=======
     Query getQuery( Long id );
->>>>>>> FETCH_HEAD
 
     // // TODO: To be removed
     // @Deprecated

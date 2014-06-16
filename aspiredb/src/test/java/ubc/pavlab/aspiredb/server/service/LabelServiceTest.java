@@ -143,8 +143,6 @@ public class LabelServiceTest extends BaseSpringContextTest {
     }
 
     @Test
-<<<<<<< HEAD
-=======
     public void testMultipleUsersCreateSameLabelName() {
 
         Collection<LabelValueObject> lvos = null;
@@ -205,7 +203,6 @@ public class LabelServiceTest extends BaseSpringContextTest {
     }
 
     @Test
->>>>>>> FETCH_HEAD
     public void testDeleteVariant() {
 
         super.runAsAdmin();
@@ -236,31 +233,6 @@ public class LabelServiceTest extends BaseSpringContextTest {
         lvos2 = persistentTestObjectHelper.getLabelsForVariant( v2.getId() );
         assertEquals( 0, lvos1.size() );
         assertEquals( 1, lvos2.size() );
-    }
-
-    @Test
-    public void testMultipleUsersCreateSameLabelName() {
-
-        super.runAsAdmin();
-
-        LabelValueObject lvo = new LabelValueObject();
-
-        lvo.setColour( "red" );
-        lvo.setName( "blah" );
-        lvo.setIsShown( true );
-
-        Collection<Long> subjectIds = new ArrayList<Long>();
-        subjectIds.add( subjectId );
-
-        subjectService.addLabel( subjectIds, lvo );
-
-        super.runAsUser( this.username );
-        subjectService.addLabel( subjectIds, lvo );
-
-        Collection<LabelValueObject> lvos = persistentTestObjectHelper.getLabelsForSubject( subjectId );
-
-        labelService.deleteSubjectLabel( lvos.iterator().next() );
-
     }
 
     private Subject createSubjectWithPhenotypes( String headPhenoValue, String facePhenoValue, String mouthPhenoValue,
