@@ -15,10 +15,13 @@
 package ubc.pavlab.aspiredb.server.dao;
 
 import gemma.gsec.model.Securable;
+import gemma.gsec.util.SecurityUtil;
 
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -28,6 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 //for example calling the remove method didn't remove the appropriate acls
 public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSupport implements SecurableDaoBase<T> {
 
+    Log log = LogFactory.getLog( SecurableDaoBaseImpl.class );
+    
     // Generic class
     private Class<T> elementClass;
 

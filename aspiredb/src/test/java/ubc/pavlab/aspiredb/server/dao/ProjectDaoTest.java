@@ -35,6 +35,7 @@ import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
+import ubc.pavlab.aspiredb.server.security.authorization.acl.AclTestUtils;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
 public class ProjectDaoTest extends BaseSpringContextTest {
@@ -50,6 +51,9 @@ public class ProjectDaoTest extends BaseSpringContextTest {
 
     @Autowired
     UserManager userManager;
+
+    @Autowired
+    AclTestUtils aclUtils;
 
     String projectName = RandomStringUtils.randomAlphabetic( 5 );
 
@@ -124,7 +128,14 @@ public class ProjectDaoTest extends BaseSpringContextTest {
         super.runAsUser( someUsername );
 
         try {
+<<<<<<< HEAD
             projectDao.findByProjectName( projectName );
+=======
+            p = projectDao.findByProjectName( projectName );
+            log.debug( "Project '" + projectName + "' has acls " + aclUtils.getAcl( p ) );
+            fail( "Should have gotten an access denied" );
+        } catch ( AccessDeniedException e ) {
+>>>>>>> FETCH_HEAD
 
             fail( "Should have gotten an access denied on" + securityService.getAcl( p ) + " accessed by user ="
                     + someUsername );

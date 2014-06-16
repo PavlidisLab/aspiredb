@@ -457,6 +457,7 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Override
     @Transactional
+<<<<<<< HEAD
     @RemoteMethod
     public Collection<Label> getSubjectLabels( Collection<Long> subjectIds ) {
         // Collection<Label labelEntity = labelDao.load( labelIds );
@@ -493,6 +494,15 @@ public class SubjectServiceImpl implements SubjectService {
 
         List<SubjectValueObject> vos = new ArrayList<>();
 
+=======
+    public LabelValueObject addLabel( Collection<Long> subjectIds, LabelValueObject labelVO ) {
+        LabelValueObject ret = null;
+        Collection<Subject> subjects = subjectDao.load( subjectIds );
+        Label label = labelDao.findOrCreate( labelVO );
+        if ( label == null ) {
+            return ret;
+        }
+>>>>>>> FETCH_HEAD
         for ( Subject subject : subjects ) {
 
             SubjectValueObject vo = subject.convertToValueObject();
@@ -500,7 +510,12 @@ public class SubjectServiceImpl implements SubjectService {
             vo.setVariants( numVariants != null ? numVariants : 0 );
             vos.add( vo );
         }
+<<<<<<< HEAD
         return vos;
+=======
+        ret = label.toValueObject();
+        return ret;
+>>>>>>> FETCH_HEAD
     }
 
     @Override

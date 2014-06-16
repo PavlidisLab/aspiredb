@@ -16,6 +16,7 @@
 package ubc.pavlab.aspiredb.server.project;
 
 import gemma.gsec.SecurityService;
+import gemma.gsec.SecurityServiceImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -96,8 +97,6 @@ public class ProjectManagerImpl implements ProjectManager {
     @Autowired
     VariantDao variantDao;
 
-    SecurityService securityservice;
-
     @Autowired
     Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
 
@@ -128,6 +127,7 @@ public class ProjectManagerImpl implements ProjectManager {
         Project proj;
         if ( createProject ) {
 
+<<<<<<< HEAD
             proj = new Project();
             proj.setName( projectName );
             proj = createProject( projectName, "" );
@@ -138,6 +138,17 @@ public class ProjectManagerImpl implements ProjectManager {
                 throw new Exception( "Project does not exist" );
             }
         }
+=======
+        Project p = new Project();
+        p.setName( name );
+        p.setDescription( description );
+        p = projectDao.create( p );
+        
+        securityService.makePrivate(p);
+
+        return p;
+    }
+>>>>>>> FETCH_HEAD
 
         createSubjectPhenotypesFromPhenotypeValueObjects( proj, voList );
 
@@ -152,6 +163,14 @@ public class ProjectManagerImpl implements ProjectManager {
 
         createSubjectPhenotypesFromPhenotypeValueObjects( proj, voList );
 
+<<<<<<< HEAD
+=======
+        p = projectDao.create( p );
+        
+        securityService.makePrivate( p );
+        
+        return p;
+>>>>>>> FETCH_HEAD
     }
 
     /*

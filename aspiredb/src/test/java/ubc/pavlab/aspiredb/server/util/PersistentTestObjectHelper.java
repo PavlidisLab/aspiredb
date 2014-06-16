@@ -86,4 +86,13 @@ public interface PersistentTestObjectHelper {
 
     void removeVariant( Variant variant );
 
+<<<<<<< HEAD
+=======
+    void removePhenotype( Phenotype phenotype );
+
+    public Label createPersistentLabel( Label label );
+
+    void removeLabel( Label label );
+
+>>>>>>> FETCH_HEAD
 }

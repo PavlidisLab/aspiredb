@@ -18,6 +18,8 @@
  */
 package ubc.pavlab.aspiredb.server.util;
 
+import gemma.gsec.SecurityService;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -80,6 +82,9 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     @Autowired
     SubjectDao subjectDao;
+
+    @Autowired
+    SecurityService securityService;
 
     @Autowired
     ProjectDao projectDao;
@@ -153,6 +158,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         return individual;
     }
 
+<<<<<<< HEAD
     public Phenotype createDetachedPhenotypeObject( String name, String uri, String valueType, String value ) {
 
         Phenotype p = new Phenotype();
@@ -164,6 +170,18 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
         return p;
 
+=======
+    @Override
+    @Transactional
+    public void removeLabel( Label label ) {
+        labelDao.remove( label );
+    }
+
+    @Override
+    @Transactional
+    public void removePhenotype( Phenotype phenotype ) {
+        phenotypeDao.remove( phenotype );
+>>>>>>> FETCH_HEAD
     }
 
     @Override
@@ -340,6 +358,43 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     @Override
     @Transactional
+<<<<<<< HEAD
+=======
+    public Project createPersistentProject( Project p ) {
+        Project pp = projectDao.create( p );
+        securityService.makePrivate( pp );
+        return pp;
+    }
+
+    @Override
+    @Transactional
+    public Label createPersistentLabel( Label label ) {
+        return labelDao.create( label );
+    }
+
+    @Override
+    @Transactional
+    public List<Subject> getSubjectsForProject( Project p ) {
+        return p.getSubjects();
+    }
+
+    @Override
+    @Transactional
+    public Collection<LabelValueObject> getLabelsForSubject( Long subjectId ) {
+
+        return Label.toValueObjects( labelDao.getSubjectLabelsBySubjectId( subjectId ) );
+    }
+
+    @Override
+    @Transactional
+    public Collection<LabelValueObject> getLabelsForVariant( Long variantId ) {
+
+        return Label.toValueObjects( labelDao.getVariantLabelsByVariantId( variantId ) );
+    }
+
+    @Override
+    @Transactional
+>>>>>>> FETCH_HEAD
     public void deleteProject( String projectName ) {
 
         Project project = projectDao.findByProjectName( projectName );

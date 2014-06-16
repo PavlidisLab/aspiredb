@@ -18,7 +18,7 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
-import gemma.gsec.model.Securable;
+import gemma.gsec.model.SecuredNotChild;
 
 import java.io.Serializable;
 
@@ -33,7 +33,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "QUERY")
-public class Query implements Securable {
+public class Query implements SecuredNotChild {
 
     @Id
     @GeneratedValue
