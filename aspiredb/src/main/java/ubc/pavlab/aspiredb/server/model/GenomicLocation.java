@@ -55,59 +55,59 @@ public class GenomicLocation {
     public GenomicLocation() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
-    public String getChromosome() {
-        return chromosome;
-    }
-
-    public void setChromosome( String chromosome ) {
-        this.chromosome = chromosome;
-    }
-
-    public int getStart() {
-        return start;
-    }
-
-    public void setStart( int start ) {
-        this.start = start;
-    }
-
-    public int getEnd() {
-        return end;
-    }
-
-    public void setEnd( int end ) {
-        this.end = end;
-    }
-
     public String getAssemblyVersion() {
         return assemblyVersion;
-    }
-
-    public void setAssemblyVersion( String assemblyVersion ) {
-        this.assemblyVersion = assemblyVersion;
-    }
-
-    public String getStrand() {
-        return strand;
-    }
-
-    public void setStrand( String strand ) {
-        this.strand = strand;
     }
 
     public String getChrBand() {
         return chrBand;
     }
 
+    public String getChromosome() {
+        return chromosome;
+    }
+
+    public int getEnd() {
+        return end;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public int getStart() {
+        return start;
+    }
+
+    public String getStrand() {
+        return strand;
+    }
+
+    public void setAssemblyVersion( String assemblyVersion ) {
+        this.assemblyVersion = assemblyVersion;
+    }
+
     public void setChrBand( String chrBand ) {
         this.chrBand = chrBand;
+    }
+
+    public void setChromosome( String chromosome ) {
+        this.chromosome = chromosome;
+    }
+
+    public void setEnd( int end ) {
+        this.end = end;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setStart( int start ) {
+        this.start = start;
+    }
+
+    public void setStrand( String strand ) {
+        this.strand = strand;
     }
 }

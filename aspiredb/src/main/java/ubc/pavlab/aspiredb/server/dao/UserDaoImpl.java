@@ -59,9 +59,35 @@ public class UserDaoImpl extends DaoBaseImpl<User> implements UserDao {
     }
 
     @Override
+    public java.util.Collection<? extends User> create( final java.util.Collection<? extends User> entities ) {
+        if ( entities == null ) {
+            throw new IllegalArgumentException( "User.create - 'entities' can not be null" );
+        }
+        for ( User user : entities ) {
+            create( user );
+        }
+        return entities;
+    }
+
+    @Override
+    public User create( final User user ) {
+        if ( user == null ) {
+            throw new IllegalArgumentException( "User.create - 'user' can not be null" );
+        }
+        this.getHibernateTemplate().save( user );
+        return user;
+
+    }
+
+    @Override
     public User find( User user ) {
 
         return this.findByUserName( user.getUserName() );
+    }
+
+    @Override
+    public User findByEmail( final java.lang.String email ) {
+        return this.findByEmail( "from User c where c.email = :email", email );
     }
 
     @Override
@@ -83,34 +109,8 @@ public class UserDaoImpl extends DaoBaseImpl<User> implements UserDao {
     }
 
     @Override
-    public java.util.Collection<? extends User> create( final java.util.Collection<? extends User> entities ) {
-        if ( entities == null ) {
-            throw new IllegalArgumentException( "User.create - 'entities' can not be null" );
-        }
-        for ( User user : entities ) {
-            create( user );
-        }
-        return entities;
-    }
-
-    @Override
     public Collection<User> load( Collection<Long> ids ) {
         return this.getHibernateTemplate().findByNamedParam( "from User where id in (:ids)", "ids", ids );
-    }
-
-    @Override
-    public User create( final User user ) {
-        if ( user == null ) {
-            throw new IllegalArgumentException( "User.create - 'user' can not be null" );
-        }
-        this.getHibernateTemplate().save( user );
-        return user;
-
-    }
-
-    @Override
-    public User findByEmail( final java.lang.String email ) {
-        return this.findByEmail( "from User c where c.email = :email", email );
     }
 
     @Override
@@ -129,14 +129,15 @@ public class UserDaoImpl extends DaoBaseImpl<User> implements UserDao {
     }
 
     @Override
-    public void remove( java.lang.Long id ) {
-        if ( id == null ) {
-            throw new IllegalArgumentException( "User.remove - 'id' can not be null" );
-        }
-        User entity = this.load( id );
-        if ( entity != null ) {
-            this.remove( entity );
-        }
+    public Collection<GroupAuthority> loadGroupAuthorities( User u ) {
+        return this.getHibernateTemplate().findByNamedParam(
+                "select gr.authorities from UserGroup gr inner join gr.groupMembers m where m = :user ", "user", u );
+    }
+
+    @Override
+    public Collection<UserGroup> loadGroups( User user ) {
+        return this.getHibernateTemplate().findByNamedParam(
+                "select gr from UserGroup gr inner join gr.groupMembers m where m = :user ", "user", user );
     }
 
     @Override
@@ -145,6 +146,17 @@ public class UserDaoImpl extends DaoBaseImpl<User> implements UserDao {
             throw new IllegalArgumentException( "User.remove - 'entities' can not be null" );
         }
         this.getHibernateTemplate().deleteAll( entities );
+    }
+
+    @Override
+    public void remove( java.lang.Long id ) {
+        if ( id == null ) {
+            throw new IllegalArgumentException( "User.remove - 'id' can not be null" );
+        }
+        User entity = this.load( id );
+        if ( entity != null ) {
+            this.remove( entity );
+        }
     }
 
     @Override
@@ -188,18 +200,6 @@ public class UserDaoImpl extends DaoBaseImpl<User> implements UserDao {
             result = results.iterator().next();
         }
         return result;
-    }
-
-    @Override
-    public Collection<GroupAuthority> loadGroupAuthorities( User u ) {
-        return this.getHibernateTemplate().findByNamedParam(
-                "select gr.authorities from UserGroup gr inner join gr.groupMembers m where m = :user ", "user", u );
-    }
-
-    @Override
-    public Collection<UserGroup> loadGroups( User user ) {
-        return this.getHibernateTemplate().findByNamedParam(
-                "select gr from UserGroup gr inner join gr.groupMembers m where m = :user ", "user", user );
     }
 
 }

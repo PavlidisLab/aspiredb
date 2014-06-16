@@ -38,6 +38,15 @@ import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 @Table(name = "PROJECT")
 public class Project implements Securable {
 
+    public static ProjectValueObject convertToValueObject( Project project ) {
+        ProjectValueObject valueObject = new ProjectValueObject();
+        valueObject.setId( project.getId() );
+        valueObject.setName( project.getName() );
+        valueObject.setDescription( project.getDescription() );
+        valueObject.setSpecial( project.getSpecialData() );
+        return valueObject;
+    }
+
     @Id
     @GeneratedValue
     @Column(name = "ID")
@@ -64,8 +73,8 @@ public class Project implements Securable {
     public Project() {
     }
 
-    public void setId( Long id ) {
-        this.id = id;
+    public String getDescription() {
+        return description;
     }
 
     @Override
@@ -77,24 +86,8 @@ public class Project implements Securable {
         return name;
     }
 
-    public void setName( String name ) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription( String description ) {
-        this.description = description;
-    }
-
     public Boolean getSpecialData() {
         return specialData;
-    }
-
-    public void setSpecialData( Boolean specialData ) {
-        this.specialData = specialData;
     }
 
     public List<Subject> getSubjects() {
@@ -105,17 +98,24 @@ public class Project implements Securable {
         return variantSupportCharacteristicKey;
     }
 
-    public void setVariantSupportCharacteristicKey( String variantSupportCharacteristicKey ) {
-        this.variantSupportCharacteristicKey = variantSupportCharacteristicKey;
+    public void setDescription( String description ) {
+        this.description = description;
     }
 
-    public static ProjectValueObject convertToValueObject( Project project ) {
-        ProjectValueObject valueObject = new ProjectValueObject();
-        valueObject.setId( project.getId() );
-        valueObject.setName( project.getName() );
-        valueObject.setDescription( project.getDescription() );
-        valueObject.setSpecial( project.getSpecialData() );
-        return valueObject;
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    public void setSpecialData( Boolean specialData ) {
+        this.specialData = specialData;
+    }
+
+    public void setVariantSupportCharacteristicKey( String variantSupportCharacteristicKey ) {
+        this.variantSupportCharacteristicKey = variantSupportCharacteristicKey;
     }
 
 }

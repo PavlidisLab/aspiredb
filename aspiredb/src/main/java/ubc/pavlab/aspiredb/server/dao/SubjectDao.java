@@ -29,6 +29,9 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 public interface SubjectDao extends SecurableDaoBase<Subject>, RemotePaging<Subject> {
 
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    public Collection<Subject> findByLabel( LabelValueObject labelEntity );
+
     @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
     public Subject findByPatientId( Project p, String patientId );
 
@@ -38,17 +41,14 @@ public interface SubjectDao extends SecurableDaoBase<Subject>, RemotePaging<Subj
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<Subject> findByPatientIds( Collection<String> patientIds );
 
-    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
-    public Collection<Subject> findPatients( String queryString );
-
-    public Collection<String> suggestValuesForEntityProperty( Property property, SuggestionContext suggestionContext );
-
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
-    public Collection<Subject> findByLabel( LabelValueObject labelEntity );
-
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<Subject> findByPhenotype( PhenotypeFilterConfig filter );
 
+    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
+    public Collection<Subject> findPatients( String queryString );
+
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<Subject> loadByVariantIds( List<Long> variantIds );
+
+    public Collection<String> suggestValuesForEntityProperty( Property property, SuggestionContext suggestionContext );
 }

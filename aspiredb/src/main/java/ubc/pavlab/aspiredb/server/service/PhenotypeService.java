@@ -30,6 +30,9 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 public interface PhenotypeService {
 
+    public List<PhenotypeEnrichmentValueObject> getPhenotypeEnrichmentValueObjects( Collection<Long> activeProjects,
+            Collection<Long> subjectIds ) throws NotLoggedInException;
+
     public Map<String, PhenotypeValueObject> getPhenotypes( Long subjectId ) throws NotLoggedInException,
             NotLoggedInException;
 
@@ -43,8 +46,5 @@ public interface PhenotypeService {
     // NOT IMPLEMENTED YET
     public Collection<PropertyValue> suggestPhenotypeValues( PhenotypeProperty property,
             SuggestionContext suggestionContext ) throws NotLoggedInException;
-
-    public List<PhenotypeEnrichmentValueObject> getPhenotypeEnrichmentValueObjects( Collection<Long> activeProjects,
-            Collection<Long> subjectIds ) throws NotLoggedInException;
 
 }

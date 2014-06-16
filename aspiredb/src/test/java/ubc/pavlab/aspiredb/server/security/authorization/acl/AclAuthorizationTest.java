@@ -88,6 +88,28 @@ public class AclAuthorizationTest extends BaseSpringContextTest {
 
     }
 
+    @Test
+    public void testEditCNV() {
+
+        super.runAsUser( this.ownerUsername );
+
+        Collection<CNV> ownedCNVs = cnvDao.findBySubjectPatientId( patientId );
+
+        CNV cnv = ownedCNVs.iterator().next();
+
+        super.runAsUser( this.aDifferentUsername );
+
+        cnv.setCopyNumber( 234 );
+
+        try {
+
+            cnvDao.update( cnv );
+            fail( "Should have gotten an access denied exception, acl was: " );
+        } catch ( AccessDeniedException e ) {
+
+        }
+    }
+
     /**
      * Tests getting composite sequences (target objects) with correct privileges on domain object.
      * 
@@ -118,21 +140,6 @@ public class AclAuthorizationTest extends BaseSpringContextTest {
     }
 
     @Test
-    public void testUserOwnsIndividualAndIndividualCNVs() throws Exception {
-
-        super.runAsUser( this.ownerUsername );
-
-        CNV cnv = cnvDao.findBySubjectPatientId( patientId ).iterator().next();
-
-        assertTrue( "User should own the individual's cnvs", securityService.isOwnedByCurrentUser( cnv ) );
-
-        super.runAsUser( this.aDifferentUsername );
-
-        assertFalse( "User shouldn't own the individual's cnvs", securityService.isOwnedByCurrentUser( cnv ) );
-
-    }
-
-    @Test
     public void testIndividualSecured() throws Exception {
 
         super.runAsUser( this.aDifferentUsername );
@@ -147,25 +154,18 @@ public class AclAuthorizationTest extends BaseSpringContextTest {
     }
 
     @Test
-    public void testEditCNV() {
+    public void testUserOwnsIndividualAndIndividualCNVs() throws Exception {
 
         super.runAsUser( this.ownerUsername );
 
-        Collection<CNV> ownedCNVs = cnvDao.findBySubjectPatientId( patientId );
+        CNV cnv = cnvDao.findBySubjectPatientId( patientId ).iterator().next();
 
-        CNV cnv = ownedCNVs.iterator().next();
+        assertTrue( "User should own the individual's cnvs", securityService.isOwnedByCurrentUser( cnv ) );
 
         super.runAsUser( this.aDifferentUsername );
 
-        cnv.setCopyNumber( 234 );
+        assertFalse( "User shouldn't own the individual's cnvs", securityService.isOwnedByCurrentUser( cnv ) );
 
-        try {
-
-            cnvDao.update( cnv );
-            fail( "Should have gotten an access denied exception, acl was: " );
-        } catch ( AccessDeniedException e ) {
-
-        }
     }
 
 }

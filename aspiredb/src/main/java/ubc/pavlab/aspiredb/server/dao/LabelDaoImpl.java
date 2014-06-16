@@ -45,14 +45,23 @@ public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDa
     }
 
     @Override
-    public Collection<Label> getVariantLabels() {
-        Collection<BigInteger> labelIds = currentSession().createSQLQuery(
-                "select distinct LABEL_FK from VARIANT_LABEL" ).list();
-        Collection<Long> ids = new ArrayList<Long>();
-        for ( BigInteger labelId : labelIds ) {
-            ids.add( labelId.longValue() );
+    @Transactional
+    public Label findOrCreate( LabelValueObject labelVO ) {
+        if ( labelVO.getId() == null ) {
+            Label label = new Label( labelVO.getName(), labelVO.getColour(), labelVO.getIsShown() );
+            this.create( label );
+            return label;
+        } else {
+            return this.load( labelVO.getId() );
         }
-        return load( ids );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
+    public List<Label> getLabelsMatching( String partialName ) {
+        return currentSession().createQuery( "select label from Label as label where label.name like :partialName" )
+                .setParameter( "partialName", "%" + partialName + "%" ).list();
     }
 
     @Override
@@ -85,23 +94,6 @@ public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDa
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<Label> getVariantLabelsByVariantId( Long id ) {
-
-        String sqlString = "select distinct LABEL_FK from VARIANT_LABEL vl WHERE vl.VARIANT_FK = :variantId ";
-        Query query = currentSession().createSQLQuery( sqlString );
-        query.setLong( "variantId", id );
-
-        Collection<BigInteger> labelIds = query.list();
-
-        Collection<Long> ids = new ArrayList<Long>();
-        for ( BigInteger labelId : labelIds ) {
-            ids.add( labelId.longValue() );
-        }
-        return load( ids );
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Collection<Label> getSubjectLabelsBySubjectId( Long id ) {
 
         String sqlString = "select distinct LABEL_FK from SUBJECT_LABEL sl WHERE sl.SUBJECT_FK = :subjectId ";
@@ -118,22 +110,30 @@ public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDa
     }
 
     @Override
-    @Transactional(readOnly = true)
-    @SuppressWarnings("unchecked")
-    public List<Label> getLabelsMatching( String partialName ) {
-        return currentSession().createQuery( "select label from Label as label where label.name like :partialName" )
-                .setParameter( "partialName", "%" + partialName + "%" ).list();
+    public Collection<Label> getVariantLabels() {
+        Collection<BigInteger> labelIds = currentSession().createSQLQuery(
+                "select distinct LABEL_FK from VARIANT_LABEL" ).list();
+        Collection<Long> ids = new ArrayList<Long>();
+        for ( BigInteger labelId : labelIds ) {
+            ids.add( labelId.longValue() );
+        }
+        return load( ids );
     }
 
     @Override
-    @Transactional
-    public Label findOrCreate( LabelValueObject labelVO ) {
-        if ( labelVO.getId() == null ) {
-            Label label = new Label( labelVO.getName(), labelVO.getColour(), labelVO.getIsShown() );
-            this.create( label );
-            return label;
-        } else {
-            return this.load( labelVO.getId() );
+    @Transactional(readOnly = true)
+    public Collection<Label> getVariantLabelsByVariantId( Long id ) {
+
+        String sqlString = "select distinct LABEL_FK from VARIANT_LABEL vl WHERE vl.VARIANT_FK = :variantId ";
+        Query query = currentSession().createSQLQuery( sqlString );
+        query.setLong( "variantId", id );
+
+        Collection<BigInteger> labelIds = query.list();
+
+        Collection<Long> ids = new ArrayList<Long>();
+        for ( BigInteger labelId : labelIds ) {
+            ids.add( labelId.longValue() );
         }
+        return load( ids );
     }
 }

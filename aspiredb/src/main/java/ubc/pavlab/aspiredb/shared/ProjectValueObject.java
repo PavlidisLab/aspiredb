@@ -41,8 +41,8 @@ public class ProjectValueObject implements Serializable {
     public ProjectValueObject() {
     }
 
-    public void setId( Long id ) {
-        this.id = id;
+    public String getDescription() {
+        return description;
     }
 
     public Long getId() {
@@ -53,20 +53,20 @@ public class ProjectValueObject implements Serializable {
         return name;
     }
 
-    public void setName( String name ) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
+    public Boolean getSpecial() {
+        return special;
     }
 
     public void setDescription( String description ) {
         this.description = description;
     }
 
-    public Boolean getSpecial() {
-        return special;
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
     }
 
     public void setSpecial( Boolean special ) {

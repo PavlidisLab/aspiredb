@@ -18,7 +18,6 @@
  */
 package ubc.pavlab.aspiredb.shared.query;
 
-
 /**
  * author: anton date: 24/05/13
  */

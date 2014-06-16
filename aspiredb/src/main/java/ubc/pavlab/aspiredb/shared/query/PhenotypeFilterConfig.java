@@ -23,12 +23,12 @@ import org.directwebremoting.annotations.DataTransferObject;
 public class PhenotypeFilterConfig extends RestrictionFilterConfig {
     private static final long serialVersionUID = -6273822469846069494L;
 
-    public PhenotypeFilterConfig() {
-    }
-
     // its possible we could use the project filter config for this, just putting it here to get it out of the
     // queryvariants method signature
     Collection<Long> activeProjectIds = new ArrayList<Long>();
+
+    public PhenotypeFilterConfig() {
+    }
 
     public Collection<Long> getActiveProjectIds() {
         return activeProjectIds;

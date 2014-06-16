@@ -18,11 +18,6 @@ import ubc.pavlab.aspiredb.server.security.authentication.JSONUtil;
 @RemoteProxy
 public class LoginController {
 
-    @RequestMapping("/login.html")
-    public String showLogin( ModelMap model ) {
-        return "login";
-    }
-
     @RequestMapping("/keep_alive.html")
     public void loadUser( HttpServletRequest request, HttpServletResponse response ) throws IOException {
 
@@ -39,6 +34,11 @@ public class LoginController {
 
         jsonUtil.writeToResponse( jsonText );
 
+    }
+
+    @RequestMapping("/login.html")
+    public String showLogin( ModelMap model ) {
+        return "login";
     }
 
 }

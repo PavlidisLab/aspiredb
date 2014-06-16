@@ -73,46 +73,6 @@ public class PhenotypeDaoTest extends BaseSpringContextTest {
     }
 
     @Test
-    public void testGetDistinctOntologyPhenotypes() throws Exception {
-
-        Project p1 = new Project();
-        p1.setName( project1Name );
-
-        p1 = testObjectHelper.createPersistentProject( p1 );
-
-        List<Project> p1List = new ArrayList<Project>();
-        p1List.add( p1 );
-
-        testObjectHelper.addSubjectToProject( subject1, p1 );
-
-        testObjectHelper.addSubjectToProject( subject2, p1 );
-
-        Project p2 = new Project();
-        p2.setName( project2Name );
-
-        p2 = testObjectHelper.createPersistentProject( p2 );
-
-        testObjectHelper.addSubjectToProject( subject3, p2 );
-
-        final ArrayList<Long> activeProjects = new ArrayList<Long>();
-        activeProjects.add( p1.getId() );
-
-        new InlineTransaction() {
-            @Override
-            public void instructions() {
-                Collection<String> distinctPhenotypes = phenotypeDao.getDistinctOntologyUris( activeProjects );
-
-                assertEquals( 2, distinctPhenotypes.size() );
-
-                assertTrue( distinctPhenotypes.contains( "uri1" ) );
-                assertTrue( distinctPhenotypes.contains( "uri2" ) );
-                assertTrue( !distinctPhenotypes.contains( "uri3" ) );
-            }
-        }.execute();
-
-    }
-
-    @Test
     public void testfindByProjectIdsAndUri() throws Exception {
 
         Project p1 = new Project();
@@ -148,6 +108,46 @@ public class PhenotypeDaoTest extends BaseSpringContextTest {
 
                 assertEquals( 0, phenotypes2.size() );
 
+            }
+        }.execute();
+
+    }
+
+    @Test
+    public void testGetDistinctOntologyPhenotypes() throws Exception {
+
+        Project p1 = new Project();
+        p1.setName( project1Name );
+
+        p1 = testObjectHelper.createPersistentProject( p1 );
+
+        List<Project> p1List = new ArrayList<Project>();
+        p1List.add( p1 );
+
+        testObjectHelper.addSubjectToProject( subject1, p1 );
+
+        testObjectHelper.addSubjectToProject( subject2, p1 );
+
+        Project p2 = new Project();
+        p2.setName( project2Name );
+
+        p2 = testObjectHelper.createPersistentProject( p2 );
+
+        testObjectHelper.addSubjectToProject( subject3, p2 );
+
+        final ArrayList<Long> activeProjects = new ArrayList<Long>();
+        activeProjects.add( p1.getId() );
+
+        new InlineTransaction() {
+            @Override
+            public void instructions() {
+                Collection<String> distinctPhenotypes = phenotypeDao.getDistinctOntologyUris( activeProjects );
+
+                assertEquals( 2, distinctPhenotypes.size() );
+
+                assertTrue( distinctPhenotypes.contains( "uri1" ) );
+                assertTrue( distinctPhenotypes.contains( "uri2" ) );
+                assertTrue( !distinctPhenotypes.contains( "uri3" ) );
             }
         }.execute();
 

@@ -49,20 +49,6 @@ public class DecipherPhenotypeUploadCLI extends AbstractCLI {
 
     private static PhenotypeUploadService phenotypeUploadService;
 
-    private String directory = "";
-    private String columns = "";
-    private String filename = "";
-    private String projectName = "";
-
-    private boolean deleteProject = true;
-
-    private static BeanFactory applicationContext;
-
-    @Override
-    public String getLogger() {
-        return "ubc.pavlab.aspiredb.cli.DecipherPhenotypeUploadCLI";
-    }
-
     /**
      * @param args
      */
@@ -93,23 +79,48 @@ public class DecipherPhenotypeUploadCLI extends AbstractCLI {
         }
     }
 
+    private String directory = "";
+    private String columns = "";
+    private String filename = "";
+
+    private String projectName = "";
+
+    private boolean deleteProject = true;
+
+    private static BeanFactory applicationContext;
+
+    @Override
+    public String getLogger() {
+        return "ubc.pavlab.aspiredb.cli.DecipherPhenotypeUploadCLI";
+    }
+
+    @Override
+    public String getShortDesc() {
+        return "Upload a phenotype data file";
+    }
+
     @SuppressWarnings("static-access")
     @Override
     protected void buildOptions() {
-        Option d = OptionBuilder.hasArg().withArgName( "Directory" ).withDescription( "Directory containing csv files" )
-                .withLongOpt( "directory" ).create( 'd' );
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "Directory" );
+        OptionBuilder.withDescription( "Directory containing csv files" );
+        OptionBuilder.withLongOpt( "directory" );
+        Option d = OptionBuilder.create( 'd' );
 
-        Option f = OptionBuilder.hasArg().withArgName( "File name" ).withDescription( "The file to parse" )
-                .withLongOpt( "filename" ).create( 'f' );
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "File name" );
+        OptionBuilder.withDescription( "The file to parse" );
+        OptionBuilder.withLongOpt( "filename" );
+        Option f = OptionBuilder.create( 'f' );
 
-        Option project = OptionBuilder
-                .isRequired()
-                .hasArg()
-                .withArgName( "Project name" )
-                .withDescription(
-                        "The project where this data will reside. Project will be created if does not exist,"
-                                + "If the project does exist use the existingproject option to add to an existing project" )
-                .create( "project" );
+        OptionBuilder.isRequired();
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "Project name" );
+        OptionBuilder
+                .withDescription( "The project where this data will reside. Project will be created if does not exist,"
+                        + "If the project does exist use the existingproject option to add to an existing project" );
+        Option project = OptionBuilder.create( "project" );
 
         addOption( "existingproject", false, "You must use this option if you are adding to an existing project" );
 
@@ -182,11 +193,6 @@ public class DecipherPhenotypeUploadCLI extends AbstractCLI {
         }
 
         return null;
-    }
-
-    @Override
-    public String getShortDesc() {
-        return "Upload a phenotype data file";
     }
 
     @Override

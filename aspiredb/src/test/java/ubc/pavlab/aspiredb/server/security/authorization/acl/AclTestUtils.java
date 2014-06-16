@@ -61,6 +61,11 @@ public class AclTestUtils {
         }
     }
 
+    public void checkHasAces( Object f ) {
+        Acl a = getAcl( f );
+        assertTrue( a + " doesn't have ACEs, it should", a.getEntries().size() > 0 );
+    }
+
     public void checkHasAcl( Object f ) {
         try {
             aclService.readAclById( new AclObjectIdentity( f ) );
@@ -68,21 +73,6 @@ public class AclTestUtils {
         } catch ( NotFoundException okaye ) {
             fail( "Failed to create ACL for " + f );
         }
-    }
-
-    public void checkHasAces( Object f ) {
-        Acl a = getAcl( f );
-        assertTrue( a + " doesn't have ACEs, it should", a.getEntries().size() > 0 );
-    }
-
-    public Acl getAcl( Object f ) {
-        Acl a = aclService.readAclById( new AclObjectIdentity( f ) );
-        return a;
-    }
-
-    public void checkLacksAces( Object f ) {
-        Acl a = getAcl( f );
-        assertTrue( f + " has ACEs, it shouldn't", a.getEntries().size() == 0 );
     }
 
     public void checkHasAclParent( Object f, Object parent ) {
@@ -97,6 +87,16 @@ public class AclTestUtils {
         assertNotNull( parentAcl );
 
         log.debug( "ACL has correct parent for " + f + " <----- " + parentAcl.getObjectIdentity() );
+    }
+
+    public void checkLacksAces( Object f ) {
+        Acl a = getAcl( f );
+        assertTrue( f + " has ACEs, it shouldn't", a.getEntries().size() == 0 );
+    }
+
+    public Acl getAcl( Object f ) {
+        Acl a = aclService.readAclById( new AclObjectIdentity( f ) );
+        return a;
     }
 
     public Acl getParentAcl( Object f ) {

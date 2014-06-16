@@ -98,7 +98,7 @@ public class AclAdvice extends BaseAclAdvice {
     protected boolean objectIsUserGroup( Securable object ) {
         return UserGroup.class.isAssignableFrom( object.getClass() );
     }
-    
+
     /**
      * Certain objects are not made public immediately on creation by administrators. The default implementation returns
      * true if clazz is assignable to SecuredChild; otherwise false. Subclasses overriding this method should probably

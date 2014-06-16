@@ -46,6 +46,19 @@ public class JSONUtil {
         this.response = response;
     }
 
+    public String getJSONErrorMessage( Exception e ) {
+
+        String errMsg;
+
+        if ( e.getCause() != null ) {
+            errMsg = e.getCause().getMessage();
+        } else {
+            errMsg = e.getLocalizedMessage();
+        }
+        String jsonText = "{success:false, message:\"" + errMsg + "\"}";
+        return jsonText;
+    }
+
     /**
      * Writes the text, which is in JSON format, to the {@link HttpServletResponse}.
      * 
@@ -58,19 +71,6 @@ public class JSONUtil {
         Writer out = responseWrapper.getWriter();
         out.write( jsonText );
         out.close();
-    }
-
-    public String getJSONErrorMessage( Exception e ) {
-
-        String errMsg;
-
-        if ( e.getCause() != null ) {
-            errMsg = e.getCause().getMessage();
-        } else {
-            errMsg = e.getLocalizedMessage();
-        }
-        String jsonText = "{success:false, message:\"" + errMsg + "\"}";
-        return jsonText;
     }
 
 }

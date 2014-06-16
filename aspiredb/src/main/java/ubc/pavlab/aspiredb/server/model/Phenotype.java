@@ -63,63 +63,6 @@ public class Phenotype implements SecuredNotChild {
     public Phenotype() {
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType( String type ) {
-        this.type = type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName( String name ) {
-        this.name = name;
-    }
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
-    public void setValue( String value ) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setSubject( Subject subject ) {
-        this.subject = subject;
-    }
-
-    public Subject getSubject() {
-        return subject;
-    }
-
-    public String getUri() {
-        return uri;
-    }
-
-    public void setUri( String uri ) {
-        this.uri = uri;
-    }
-
-    public String getValueType() {
-        return valueType;
-    }
-
-    public void setValueType( String valueType ) {
-        this.valueType = valueType;
-    }
-
     public PhenotypeValueObject convertToValueObject() {
         PhenotypeValueObject valueObject = new PhenotypeValueObject();
         valueObject.setId( this.getId() );
@@ -130,5 +73,62 @@ public class Phenotype implements SecuredNotChild {
         valueObject.setValueType( this.getValueType() );
         valueObject.setDbValue( this.getValue() );
         return valueObject;
+    }
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Subject getSubject() {
+        return subject;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getValueType() {
+        return valueType;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    public void setSubject( Subject subject ) {
+        this.subject = subject;
+    }
+
+    public void setType( String type ) {
+        this.type = type;
+    }
+
+    public void setUri( String uri ) {
+        this.uri = uri;
+    }
+
+    public void setValue( String value ) {
+        this.value = value;
+    }
+
+    public void setValueType( String valueType ) {
+        this.valueType = valueType;
     }
 }

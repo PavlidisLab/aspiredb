@@ -14,10 +14,6 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.Reader;
-import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -25,10 +21,8 @@ import java.util.Map;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
-import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 /**
  * TODO Document Me
@@ -39,24 +33,40 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 public interface ProjectService {
 
-    public List<ProjectValueObject> getProjects() throws NotLoggedInException;
-    
-    public List<ProjectValueObject> getOverlapProjects( Collection<Long> projectIds );
+    public String addSubjectPhenotypeToExistingProject( String fileContent, boolean createProject, String projectName,
+            String variantType );
+
+    public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName,
+            String variantType );
+
+    public String alterGroupPermissions( String projectName, String groupName, Boolean grant )
+            throws NotLoggedInException;
+
+    public String createUserAndAssignToGroup( String userName, String password, String groupName )
+            throws NotLoggedInException;
+
+    public String createUserProject( String projectName, String projectDescription ) throws NotLoggedInException;
+
+    public String deleteProject( String projectName ) throws NotLoggedInException;
+
+    public ProjectValueObject findUserProject( String projectName ) throws NotLoggedInException;
+
+    public User getCurrentUserName();
+
+    public ProjectValueObject getDecipherProject();
 
     public ProjectValueObject getDgvProject();
 
-    public ProjectValueObject getDecipherProject();
-    
-    public User getCurrentUserName();
-    
-    public Collection<String> getProjectUserNames(String projectName);
-    
-    public Collection<User> getProjectUsers( String projectName );
-    
-    public Collection<String> projectReadableBy( Project project );
-    
+    public List<ProjectValueObject> getOverlapProjects( Collection<Long> projectIds );
+
+    public List<ProjectValueObject> getProjects() throws NotLoggedInException;
+
     public Map<String, String> getProjectUserGroups( String projectName );
-    
+
+    public Collection<String> getProjectUserNames( String projectName );
+
+    public Collection<User> getProjectUsers( String projectName );
+
     public Integer numSubjects( Collection<Long> projectIds ) throws NotLoggedInException;
 
     public Integer numVariants( Collection<Long> projectIds ) throws NotLoggedInException;
@@ -65,19 +75,5 @@ public interface ProjectService {
 
     public String processUploadedPhenotypeFile( String projectName, String filename ) throws NotLoggedInException;
 
-    public String deleteProject( String projectName ) throws NotLoggedInException;
-
-    public String alterGroupPermissions( String projectName, String groupName, Boolean grant )
-            throws NotLoggedInException;
-
-    public String createUserAndAssignToGroup( String userName, String password, String groupName )
-            throws NotLoggedInException;
-    
-    public String createUserProject(String projectName, String projectDescription) throws NotLoggedInException;
-    
-    public ProjectValueObject findUserProject(String projectName) throws NotLoggedInException;
-
-    public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName, String variantType );
-    
-    public String addSubjectPhenotypeToExistingProject( String fileContent, boolean createProject, String projectName, String variantType );
+    public Collection<String> projectReadableBy( Project project );
 }

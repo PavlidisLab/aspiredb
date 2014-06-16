@@ -36,62 +36,62 @@ public class Property<D extends DataType> implements Serializable {
     protected boolean supportsSuggestions = false;
     protected boolean isCharacteristic = false;
 
-    public boolean isCharacteristic() {
-        return isCharacteristic;
-    }
-
-    public void setCharacteristic( boolean isCharacteristic ) {
-        this.isCharacteristic = isCharacteristic;
-    }
-
     public Property() {
-    }
-
-    public boolean isSupportsSuggestions() {
-        return supportsSuggestions;
-    }
-
-    public void setSupportsSuggestions( boolean supportsSuggestions ) {
-        this.supportsSuggestions = supportsSuggestions;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDisplayName() {
-        return displayName;
     }
 
     public D getDataType() {
         return dataType;
     }
 
+    public String getDisplayName() {
+        return displayName;
+    }
+
     public String getExampleValues() {
         return exampleValues;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Collection<Operator> getOperators() {
         return operators;
     }
 
-    public void setName( String name ) {
-        this.name = name;
+    public boolean isCharacteristic() {
+        return isCharacteristic;
     }
 
-    public void setDisplayName( String displayName ) {
-        this.displayName = displayName;
+    public boolean isSupportsSuggestions() {
+        return supportsSuggestions;
+    }
+
+    public void setCharacteristic( boolean isCharacteristic ) {
+        this.isCharacteristic = isCharacteristic;
     }
 
     public void setDataType( D dataType ) {
         this.dataType = dataType;
     }
 
+    public void setDisplayName( String displayName ) {
+        this.displayName = displayName;
+    }
+
     public void setExampleValues( String exampleValues ) {
         this.exampleValues = exampleValues;
     }
 
+    public void setName( String name ) {
+        this.name = name;
+    }
+
     public void setOperators( Collection<Operator> operators ) {
         this.operators = operators;
+    }
+
+    public void setSupportsSuggestions( boolean supportsSuggestions ) {
+        this.supportsSuggestions = supportsSuggestions;
     }
 }

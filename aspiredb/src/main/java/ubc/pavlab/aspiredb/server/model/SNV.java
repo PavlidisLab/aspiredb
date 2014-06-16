@@ -46,28 +46,28 @@ public class SNV extends Variant {
     public SNV() {
     }
 
-    public String getObservedBase() {
-        return observedBase;
+    public String getDbSNPID() {
+        return dbSNPID;
     }
 
-    public void setObservedBase( String observedBase ) {
-        this.observedBase = observedBase;
+    public String getObservedBase() {
+        return observedBase;
     }
 
     public String getReferenceBase() {
         return referenceBase;
     }
 
-    public void setReferenceBase( String referenceBase ) {
-        this.referenceBase = referenceBase;
-    }
-
-    public String getDbSNPID() {
-        return dbSNPID;
-    }
-
     public void setDbSNPID( String dbSNPID ) {
         this.dbSNPID = dbSNPID;
+    }
+
+    public void setObservedBase( String observedBase ) {
+        this.observedBase = observedBase;
+    }
+
+    public void setReferenceBase( String referenceBase ) {
+        this.referenceBase = referenceBase;
     }
 
     @Override

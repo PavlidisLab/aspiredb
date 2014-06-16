@@ -21,15 +21,83 @@ import ubc.pavlab.aspiredb.shared.GenomicRange;
 @Component("genomeCoordinateConverter")
 public class GenomeCoordinateConverter {
 
+    class BandInterval {
+        private String chromosome;
+        private String startBand;
+        private String endBand;
+
+        public BandInterval( String chromosome, String startBand, String endBand ) {
+            super();
+            this.chromosome = chromosome;
+            this.startBand = startBand;
+            this.endBand = endBand;
+        }
+
+        public String getChromosome() {
+            return chromosome;
+        }
+
+        public String getEndBand() {
+            return endBand;
+        }
+
+        public String getStartBand() {
+            return startBand;
+        }
+
+        public void setChromosome( String chromosome ) {
+            this.chromosome = chromosome;
+        }
+
+        public void setEndBand( String endBand ) {
+            this.endBand = endBand;
+        }
+
+        public void setStartBand( String startBand ) {
+            this.startBand = startBand;
+        }
+
+        @Override
+        public String toString() {
+            if ( startBand.equals( endBand ) ) {
+                return chromosome + ":" + startBand;
+            } else {
+                return chromosome + ":" + startBand + "-" + endBand;
+            }
+        }
+    }
+
+    class BaseInterval {
+        private Integer start;
+        private Integer end;
+
+        public BaseInterval( Integer start, Integer end ) {
+            super();
+            this.start = start;
+            this.end = end;
+        }
+
+        public Integer getEnd() {
+            return end;
+        }
+
+        public Integer getStart() {
+            return start;
+        }
+
+        public void setEnd( Integer end ) {
+            this.end = end;
+        }
+
+        public void setStart( Integer start ) {
+            this.start = start;
+        }
+    }
+
     @Autowired
     private CytobandFileLoader cytobandFileLoader;
 
     private Map<String, Chromosome> chromosomes = new HashMap<String, Chromosome>();
-
-    @PostConstruct
-    public void initializeFromFile() {
-        chromosomes = cytobandFileLoader.load();
-    }
 
     public BaseInterval bandToBase( String chromosomeName, String bandStart, String bandEnd ) {
         Chromosome chromosome = chromosomes.get( chromosomeName );
@@ -54,17 +122,11 @@ public class GenomeCoordinateConverter {
         return interval.toString();
     }
 
-    public Set<String> getChromosomeNames() {
-        return chromosomes.keySet();
-    }
-
-    public Set<String> getBands( String chromosomeName ) {
-        Chromosome chromosome = chromosomes.get( chromosomeName.toUpperCase() );
-        if ( chromosome == null ) {
-            return new HashSet<String>( 0 );
-        }
-
-        return chromosome.getBands().keySet();
+    public void fillInCytobandCoordinates( GenomicRange range ) {
+        BandInterval interval = baseToBand( range.getChromosome(), range.getBaseStart(), range.getBaseEnd() );
+        range.setBandStart( interval.getStartBand() );
+        range.setBandEnd( interval.getEndBand() );
+        range.initBandCoordinates();
     }
 
     // /**
@@ -108,88 +170,26 @@ public class GenomeCoordinateConverter {
     // return new GenomicRange (chromosomeName, start, end);
     // }
 
-    public void fillInCytobandCoordinates( GenomicRange range ) {
-        BandInterval interval = baseToBand( range.getChromosome(), range.getBaseStart(), range.getBaseEnd() );
-        range.setBandStart( interval.getStartBand() );
-        range.setBandEnd( interval.getEndBand() );
-        range.initBandCoordinates();
+    public Set<String> getBands( String chromosomeName ) {
+        Chromosome chromosome = chromosomes.get( chromosomeName.toUpperCase() );
+        if ( chromosome == null ) {
+            return new HashSet<String>( 0 );
+        }
+
+        return chromosome.getBands().keySet();
     }
 
-    class BandInterval {
-        private String chromosome;
-        private String startBand;
-        private String endBand;
-
-        public BandInterval( String chromosome, String startBand, String endBand ) {
-            super();
-            this.chromosome = chromosome;
-            this.startBand = startBand;
-            this.endBand = endBand;
-        }
-
-        public String getChromosome() {
-            return chromosome;
-        }
-
-        public void setChromosome( String chromosome ) {
-            this.chromosome = chromosome;
-        }
-
-        public String getStartBand() {
-            return startBand;
-        }
-
-        public void setStartBand( String startBand ) {
-            this.startBand = startBand;
-        }
-
-        public String getEndBand() {
-            return endBand;
-        }
-
-        public void setEndBand( String endBand ) {
-            this.endBand = endBand;
-        }
-
-        @Override
-        public String toString() {
-            if ( startBand.equals( endBand ) ) {
-                return chromosome + ":" + startBand;
-            } else {
-                return chromosome + ":" + startBand + "-" + endBand;
-            }
-        }
-    }
-
-    class BaseInterval {
-        private Integer start;
-        private Integer end;
-
-        public BaseInterval( Integer start, Integer end ) {
-            super();
-            this.start = start;
-            this.end = end;
-        }
-
-        public Integer getStart() {
-            return start;
-        }
-
-        public void setStart( Integer start ) {
-            this.start = start;
-        }
-
-        public Integer getEnd() {
-            return end;
-        }
-
-        public void setEnd( Integer end ) {
-            this.end = end;
-        }
+    public Set<String> getChromosomeNames() {
+        return chromosomes.keySet();
     }
 
     public Map<String, Chromosome> getChromosomes() {
         return chromosomes;
+    }
+
+    @PostConstruct
+    public void initializeFromFile() {
+        chromosomes = cytobandFileLoader.load();
     }
 
 }

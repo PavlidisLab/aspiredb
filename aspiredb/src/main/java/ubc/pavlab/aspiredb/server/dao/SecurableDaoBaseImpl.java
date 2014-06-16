@@ -86,6 +86,15 @@ public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSuppo
         return entity;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public long getCountAll() {
+        Session session = this.getHibernateTemplate().getSessionFactory().getCurrentSession();
+        Number totalSize = ( Number ) session.createCriteria( this.elementClass )
+                .setProjection( Projections.rowCount() ).uniqueResult();
+        return totalSize.longValue();
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -124,15 +133,6 @@ public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSuppo
     @Transactional(readOnly = true)
     public Collection<T> loadAll() {
         return this.getHibernateTemplate().loadAll( elementClass );
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public long getCountAll() {
-        Session session = this.getHibernateTemplate().getSessionFactory().getCurrentSession();
-        Number totalSize = ( Number ) session.createCriteria( this.elementClass )
-                .setProjection( Projections.rowCount() ).uniqueResult();
-        return totalSize.longValue();
     }
 
     /*
@@ -187,6 +187,10 @@ public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSuppo
         this.getHibernateTemplate().update( entity );
     }
 
+    protected Session currentSession() {
+        return this.getSessionFactory().getCurrentSession();
+    }
+
     /**
      * @param entity
      */
@@ -194,9 +198,5 @@ public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSuppo
         if ( entity == null ) {
             throw new IllegalArgumentException( "Argument cannot be null" );
         }
-    }
-
-    protected Session currentSession() {
-        return this.getSessionFactory().getCurrentSession();
     }
 }

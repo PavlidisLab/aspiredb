@@ -40,21 +40,8 @@ public class NeurocartaPhenotypeValueObject extends PhenotypeValueObject impleme
         return this.geneCount;
     }
 
-    public void setGeneCount( int geneCount ) {
-        this.geneCount = geneCount;
-    }
-
     public Collection<GeneValueObject> getGenes() {
         return genes;
-    }
-
-    public void setGenes( Collection<GeneValueObject> genes ) {
-        this.genes = genes;
-    }
-
-    @Override
-    public String getLabel() {
-        return this.getName();
     }
 
     @Override
@@ -63,7 +50,20 @@ public class NeurocartaPhenotypeValueObject extends PhenotypeValueObject impleme
     }
 
     @Override
+    public String getLabel() {
+        return this.getName();
+    }
+
+    @Override
     public String getTooltip() {
         return this.getName() + " - " + this.geneCount + " genes";
+    }
+
+    public void setGeneCount( int geneCount ) {
+        this.geneCount = geneCount;
+    }
+
+    public void setGenes( Collection<GeneValueObject> genes ) {
+        this.genes = genes;
     }
 }

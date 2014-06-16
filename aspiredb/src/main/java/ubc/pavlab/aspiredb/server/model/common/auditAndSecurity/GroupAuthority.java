@@ -29,10 +29,6 @@ public class GroupAuthority implements gemma.gsec.model.GroupAuthority {
      */
     private static final long serialVersionUID = -1284768867713195177L;
 
-    public GroupAuthority() {
-
-    }
-
     @Id
     @GeneratedValue
     @Column(name = "ID")
@@ -41,14 +37,8 @@ public class GroupAuthority implements gemma.gsec.model.GroupAuthority {
     @Column(name = "AUTHORITY")
     private String authority;
 
-    @Override
-    public Long getId() {
-        return id;
-    }
+    public GroupAuthority() {
 
-    @Override
-    public void setId( Long id ) {
-        this.id = id;
     }
 
     @Override
@@ -57,8 +47,18 @@ public class GroupAuthority implements gemma.gsec.model.GroupAuthority {
     }
 
     @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
     public void setAuthority( String authority ) {
         this.authority = authority;
+    }
+
+    @Override
+    public void setId( Long id ) {
+        this.id = id;
     }
 
 }

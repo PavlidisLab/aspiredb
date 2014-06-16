@@ -35,15 +35,15 @@ public class TextDataType extends DataType {
     public TextDataType() {
     }
 
+    public void addAllowedValues( Collection<String> allowedValues ) {
+        this.allowedValues.addAll( allowedValues );
+    }
+
     public Collection<String> getAllowedValues() {
         return allowedValues;
     }
 
     public void setAllowedValues( Collection<String> allowedValues ) {
         this.allowedValues = allowedValues;
-    }
-
-    public void addAllowedValues( Collection<String> allowedValues ) {
-        this.allowedValues.addAll( allowedValues );
     }
 }

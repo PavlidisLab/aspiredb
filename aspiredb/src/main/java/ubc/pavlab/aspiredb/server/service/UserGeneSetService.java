@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.List;
 
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
-import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.shared.GeneSetValueObject;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 
@@ -27,32 +26,32 @@ import ubc.pavlab.aspiredb.shared.GeneValueObject;
  */
 public interface UserGeneSetService {
 
-    public List<GeneValueObject> loadUserGeneSet( String name );
-
-    public Collection<String> getSavedUserGeneSetNames();
-
     public GeneValueObject addGenes( String geneName, String geneSymbol ) throws BioMartServiceException;
-
-    public void deleteUserGeneSet( String name );
 
     public void deleteGene( String geneSetName, String geneSymbol ) throws BioMartServiceException;
 
-    public Long saveUserGeneSet( String geneName, List<GeneValueObject> genes ) throws BioMartServiceException;
-
-    public boolean isGeneSetName( String name );
-
-    public boolean isGeneInGeneSet( String genSetName, String geneSymbol );
+    public void deleteUserGeneSet( String name );
 
     public List<GeneValueObject> getGenes( String geneSymbol ) throws BioMartServiceException;
 
-    List<GeneSetValueObject> suggestUserGeneSet( String query );
+    public Collection<String> getSavedUserGeneSetNames();
 
-    void addGenesToGeneSet( String geneSetName, List<String> geneSymbol ) throws BioMartServiceException;
+    public boolean isGeneInGeneSet( String genSetName, String geneSymbol );
+
+    public boolean isGeneSetName( String name );
+
+    public List<GeneValueObject> loadUserGeneSet( String name );
+
+    public Long saveUserGeneSet( String geneName, List<GeneValueObject> genes ) throws BioMartServiceException;
 
     public void updateUserGeneSet( GeneSetValueObject geneset );
+
+    void addGenesToGeneSet( String geneSetName, List<String> geneSymbol ) throws BioMartServiceException;
 
     GeneSetValueObject findUserGeneSet( String geneSetName );
 
     List<GeneSetValueObject> getSavedUserGeneSets();
+
+    List<GeneSetValueObject> suggestUserGeneSet( String query );
 
 }

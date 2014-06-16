@@ -39,6 +39,14 @@ public class CytobandFileLoaderImpl implements CytobandFileLoader {
     // @Value("${aspiredb.cytoband.path}")
     // private String filePath;
 
+    private static class FileRow {
+        String chromosome;
+        Integer start;
+        Integer end;
+        String cytoband;
+        String staining;
+    }
+
     private Map<String, Chromosome> chromosomes = new HashMap<String, Chromosome>();
 
     @Override
@@ -74,14 +82,6 @@ public class CytobandFileLoaderImpl implements CytobandFileLoader {
             chromosomes.put( name, chromosome );
         }
         return chromosome;
-    }
-
-    private static class FileRow {
-        String chromosome;
-        Integer start;
-        Integer end;
-        String cytoband;
-        String staining;
     }
 
     private FileRow parseFileRow( String row ) {

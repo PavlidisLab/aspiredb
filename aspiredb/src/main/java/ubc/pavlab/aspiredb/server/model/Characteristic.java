@@ -35,6 +35,14 @@ import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
 @Table(name = "CHARACTERISTIC")
 public class Characteristic implements SecuredNotChild {
 
+    public static Collection<CharacteristicValueObject> toValueObjects( Collection<Characteristic> entityCharacteristics ) {
+        Collection<CharacteristicValueObject> characteristicValueObjects = new ArrayList<CharacteristicValueObject>();
+        for ( Characteristic entityCharacteristic : entityCharacteristics ) {
+            characteristicValueObjects.add( entityCharacteristic.toValueObject() );
+        }
+        return characteristicValueObjects;
+    }
+
     @Id
     @GeneratedValue
     @Column(name = "ID")
@@ -59,20 +67,20 @@ public class Characteristic implements SecuredNotChild {
         return id;
     }
 
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
     public String getKey() {
         return key;
     }
 
-    public void setKey( String key ) {
-        this.key = key;
-    }
-
     public String getValue() {
         return value;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setKey( String key ) {
+        this.key = key;
     }
 
     public void setValue( String value ) {
@@ -81,13 +89,5 @@ public class Characteristic implements SecuredNotChild {
 
     public CharacteristicValueObject toValueObject() {
         return new CharacteristicValueObject( id, key, value );
-    }
-
-    public static Collection<CharacteristicValueObject> toValueObjects( Collection<Characteristic> entityCharacteristics ) {
-        Collection<CharacteristicValueObject> characteristicValueObjects = new ArrayList<CharacteristicValueObject>();
-        for ( Characteristic entityCharacteristic : entityCharacteristics ) {
-            characteristicValueObjects.add( entityCharacteristic.toValueObject() );
-        }
-        return characteristicValueObjects;
     }
 }

@@ -41,14 +41,8 @@ public class UserDetailsImpl implements UserDetails {
     private Boolean enabled;
     private Collection<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
 
-    /**
-     * @param enabled the enabled to set
-     */
-    public void setEnabled( Boolean enabled ) {
-        this.enabled = enabled;
-    }
-
     private String password;
+
     private String signupToken;
     private Date signupTokenDatestamp;
     private String userName;
@@ -189,6 +183,13 @@ public class UserDetailsImpl implements UserDetails {
      */
     public void setEmail( String email ) {
         this.email = email;
+    }
+
+    /**
+     * @param enabled the enabled to set
+     */
+    public void setEnabled( Boolean enabled ) {
+        this.enabled = enabled;
     }
 
     @Override

@@ -71,12 +71,21 @@ public class SubjectServiceTest extends BaseSpringContextTest {
     Subject testSubject;
     Variant testVariant;
 
-    @Before
-    public void init() {
-        testSubjectId = RandomStringUtils.randomAlphanumeric( 5 );
-        testSubject = testObjectHelper.createPersistentTestSubjectObjectWithCNV( testSubjectId );
-        testVariant = testSubject.getVariants().iterator().next();
-        testSubject = testObjectHelper.createPersistentTestSubjectObjectWithHPOntologyPhenotypes( testSubjectId );
+    @Test
+    public void addSubjectLabel() {
+        Collection<Long> ids = new ArrayList<Long>();
+        ids.add( testSubject.getId() );
+
+        String name = RandomStringUtils.randomAlphabetic( 4 );
+
+        try {
+            subjectService.addLabel( ids, new LabelValueObject( name ) );
+        } catch ( Exception e ) {
+
+        }
+
+        Collection<Label> labels = labelDao.getLabelsMatching( name );
+        assertTrue( labels.size() > 0 );
     }
 
     @Test
@@ -94,6 +103,14 @@ public class SubjectServiceTest extends BaseSpringContextTest {
         assertTrue( subjects.size() > 0 );
     }
 
+    @Before
+    public void init() {
+        testSubjectId = RandomStringUtils.randomAlphanumeric( 5 );
+        testSubject = testObjectHelper.createPersistentTestSubjectObjectWithCNV( testSubjectId );
+        testVariant = testSubject.getVariants().iterator().next();
+        testSubject = testObjectHelper.createPersistentTestSubjectObjectWithHPOntologyPhenotypes( testSubjectId );
+    }
+
     @Test
     public void testGetPhenotypeBySubjectIds() {
         Collection<Long> ids = new ArrayList<Long>();
@@ -108,22 +125,5 @@ public class SubjectServiceTest extends BaseSpringContextTest {
             e.printStackTrace();
             assertTrue( false );
         }
-    }
-
-    @Test
-    public void addSubjectLabel() {
-        Collection<Long> ids = new ArrayList<Long>();
-        ids.add( testSubject.getId() );
-
-        String name = RandomStringUtils.randomAlphabetic( 4 );
-
-        try {
-            subjectService.addLabel( ids, new LabelValueObject( name ) );
-        } catch ( Exception e ) {
-
-        }
-
-        Collection<Label> labels = labelDao.getLabelsMatching( name );
-        assertTrue( labels.size() > 0 );
     }
 }

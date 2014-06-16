@@ -75,20 +75,14 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
     }
 
     @Override
-    public Collection<Subject> loadByVariantIds( List<Long> variantIds ) {
-
-        Collection<Variant> variants = variantDao.load( variantIds );
-
-        HashSet<Subject> subjects = new HashSet<Subject>();
-
-        for ( Variant v : variants ) {
-
-            subjects.add( v.getSubject() );
-
-        }
-
-        return subjects;
-
+    public Collection<Subject> findByLabel( LabelValueObject label ) {
+        Criteria criteria = currentSession().createCriteria( Subject.class );
+        SimpleRestriction restrictionExpression = new SimpleRestriction( new SubjectLabelProperty(),
+                Operator.TEXT_EQUAL, label );
+        Criterion criterion = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
+                CriteriaBuilder.EntityType.SUBJECT );
+        criteria.add( criterion );
+        return criteria.list();
     }
 
     @Override
@@ -144,6 +138,25 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
     }
 
     @Override
+    public Collection<Subject> findByPhenotype( PhenotypeFilterConfig filterConfig ) {
+
+        Session session = this.getSessionFactory().getCurrentSession();
+        Criteria criteria = session.createCriteria( Subject.class );
+
+        filterConfig = phenotypeUtils.expandOntologyTerms( filterConfig, filterConfig.getActiveProjectIds() );
+
+        RestrictionExpression restrictionExpression = filterConfig.getRestriction();
+
+        criteria.createAlias( "phenotypes", "phenotype" );
+        Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
+                CriteriaBuilder.EntityType.SUBJECT );
+        criteria.add( junction );
+
+        return criteria.list();
+
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Collection<Subject> findPatients( String queryString ) {
         // Escape the character '_'. Otherwise, users cannot use it in the query string.
@@ -155,32 +168,28 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
     }
 
     @Override
-    public Collection<String> suggestValuesForEntityProperty( Property property, SuggestionContext suggestionContext ) {
-        Session session = currentSession();
-
-        Criteria criteria = session.createCriteria( Subject.class );
-        if ( suggestionContext.getValuePrefix() != null ) {
-            String valuePrefix = suggestionContext.getValuePrefix();
-            String valueWildcard = valuePrefix.replaceAll( "_", "\\_" ) + "%";
-
-            criteria.add( Restrictions.like( property.getName(), valueWildcard ) );
-        }
-        criteria.setProjection( Projections.distinct( Projections.property( property.getName() ) ) )
-                .createAlias( "projects", "project" )
-                .add( Restrictions.in( "project.id", suggestionContext.getActiveProjectIds() ) );
-
-        return criteria.list();
+    @Transactional(readOnly = true)
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    public Collection<? extends Subject> load( Set<AspireDbFilterConfig> filters ) throws BioMartServiceException,
+            NeurocartaServiceException {
+        return loadPage( 0, 2000, null, null, filters );
     }
 
     @Override
-    public Collection<Subject> findByLabel( LabelValueObject label ) {
-        Criteria criteria = currentSession().createCriteria( Subject.class );
-        SimpleRestriction restrictionExpression = new SimpleRestriction( new SubjectLabelProperty(),
-                Operator.TEXT_EQUAL, label );
-        Criterion criterion = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
-                CriteriaBuilder.EntityType.SUBJECT );
-        criteria.add( criterion );
-        return criteria.list();
+    public Collection<Subject> loadByVariantIds( List<Long> variantIds ) {
+
+        Collection<Variant> variants = variantDao.load( variantIds );
+
+        HashSet<Subject> subjects = new HashSet<Subject>();
+
+        for ( Variant v : variants ) {
+
+            subjects.add( v.getSubject() );
+
+        }
+
+        return subjects;
+
     }
 
     @Override
@@ -208,26 +217,55 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
         return new PageBean<Subject>( sortedResults, subjectIds.size() );
     }
 
-    private List<Long> getFilteredIds( Set<AspireDbFilterConfig> filterConfigs ) throws BioMartServiceException,
-            NeurocartaServiceException {
-        Iterator<AspireDbFilterConfig> iterator = filterConfigs.iterator();
-        AspireDbFilterConfig filterConfig = iterator.next();
-        // First iteration
-        List<Long> subjectIds = findIds( filterConfig );
+    @Override
+    public Collection<String> suggestValuesForEntityProperty( Property property, SuggestionContext suggestionContext ) {
+        Session session = currentSession();
 
-        while ( iterator.hasNext() ) {
-            filterConfig = iterator.next();
-            List<Long> ids = findIds( filterConfig );
+        Criteria criteria = session.createCriteria( Subject.class );
+        if ( suggestionContext.getValuePrefix() != null ) {
+            String valuePrefix = suggestionContext.getValuePrefix();
+            String valueWildcard = valuePrefix.replaceAll( "_", "\\_" ) + "%";
 
-            // Intersect results
-            subjectIds.retainAll( ids );
-
-            // Stop if nothing is left to filter.
-            if ( subjectIds.isEmpty() ) {
-                break;
-            }
+            criteria.add( Restrictions.like( property.getName(), valueWildcard ) );
         }
-        return subjectIds;
+        criteria.setProjection( Projections.distinct( Projections.property( property.getName() ) ) )
+                .createAlias( "projects", "project" )
+                .add( Restrictions.in( "project.id", suggestionContext.getActiveProjectIds() ) );
+
+        return criteria.list();
+    }
+
+    // - use Factory pattern with registration? to map config to appropriate filter subclass
+    // FOR NOW: use getClass
+    private void addSingleFilter( AspireDbFilterConfig filter, Criteria criteria ) throws BioMartServiceException,
+            NeurocartaServiceException {
+        if ( filter.getClass() == VariantFilterConfig.class ) {
+            VariantFilterConfig locationFilter = ( VariantFilterConfig ) filter;
+            RestrictionExpression restriction = locationFilter.getRestriction();
+            addSingleVariantFilter( restriction, criteria );
+        } else if ( filter.getClass() == SubjectFilterConfig.class ) {
+            SubjectFilterConfig subjectFilter = ( SubjectFilterConfig ) filter;
+            RestrictionExpression restrictionExpression = subjectFilter.getRestriction();
+            Criterion criterion = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
+                    CriteriaBuilder.EntityType.SUBJECT );
+            criteria.createAlias( "labels", "subject_label", CriteriaSpecification.LEFT_JOIN );
+            criteria.add( criterion );
+        } else if ( filter.getClass() == ProjectFilterConfig.class ) {
+            ProjectFilterConfig projectFilter = ( ProjectFilterConfig ) filter;
+            criteria.createAlias( "projects", "project" ).add(
+                    Restrictions.in( "project.id", projectFilter.getProjectIds() ) );
+
+        }
+    }
+
+    private void addSingleVariantFilter( RestrictionExpression restrictionExpression, Criteria criteria ) {
+        criteria.createAlias( "variants", "variant" ).createAlias( "variant.location", "location" )
+        // .createAlias("labels", "subject_label", CriteriaSpecification.LEFT_JOIN)
+        // .createAlias("variant.labels", "variant_label", CriteriaSpecification.LEFT_JOIN)
+                .createAlias( "variant.characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN );
+        Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
+                CriteriaBuilder.EntityType.SUBJECT );
+        criteria.add( junction );
     }
 
     private List<Long> findIds( AspireDbFilterConfig filter ) throws BioMartServiceException,
@@ -266,64 +304,26 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
         return criteria.list();
     }
 
-    // - use Factory pattern with registration? to map config to appropriate filter subclass
-    // FOR NOW: use getClass
-    private void addSingleFilter( AspireDbFilterConfig filter, Criteria criteria ) throws BioMartServiceException,
+    private List<Long> getFilteredIds( Set<AspireDbFilterConfig> filterConfigs ) throws BioMartServiceException,
             NeurocartaServiceException {
-        if ( filter.getClass() == VariantFilterConfig.class ) {
-            VariantFilterConfig locationFilter = ( VariantFilterConfig ) filter;
-            RestrictionExpression restriction = locationFilter.getRestriction();
-            addSingleVariantFilter( restriction, criteria );
-        } else if ( filter.getClass() == SubjectFilterConfig.class ) {
-            SubjectFilterConfig subjectFilter = ( SubjectFilterConfig ) filter;
-            RestrictionExpression restrictionExpression = subjectFilter.getRestriction();
-            Criterion criterion = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
-                    CriteriaBuilder.EntityType.SUBJECT );
-            criteria.createAlias( "labels", "subject_label", CriteriaSpecification.LEFT_JOIN );
-            criteria.add( criterion );
-        } else if ( filter.getClass() == ProjectFilterConfig.class ) {
-            ProjectFilterConfig projectFilter = ( ProjectFilterConfig ) filter;
-            criteria.createAlias( "projects", "project" ).add(
-                    Restrictions.in( "project.id", projectFilter.getProjectIds() ) );
+        Iterator<AspireDbFilterConfig> iterator = filterConfigs.iterator();
+        AspireDbFilterConfig filterConfig = iterator.next();
+        // First iteration
+        List<Long> subjectIds = findIds( filterConfig );
 
+        while ( iterator.hasNext() ) {
+            filterConfig = iterator.next();
+            List<Long> ids = findIds( filterConfig );
+
+            // Intersect results
+            subjectIds.retainAll( ids );
+
+            // Stop if nothing is left to filter.
+            if ( subjectIds.isEmpty() ) {
+                break;
+            }
         }
-    }
-
-    @Override
-    public Collection<Subject> findByPhenotype( PhenotypeFilterConfig filterConfig ) {
-
-        Session session = this.getSessionFactory().getCurrentSession();
-        Criteria criteria = session.createCriteria( Subject.class );
-
-        filterConfig = phenotypeUtils.expandOntologyTerms( filterConfig, filterConfig.getActiveProjectIds() );
-
-        RestrictionExpression restrictionExpression = filterConfig.getRestriction();
-
-        criteria.createAlias( "phenotypes", "phenotype" );
-        Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
-                CriteriaBuilder.EntityType.SUBJECT );
-        criteria.add( junction );
-
-        return criteria.list();
-
-    }
-
-    private void addSingleVariantFilter( RestrictionExpression restrictionExpression, Criteria criteria ) {
-        criteria.createAlias( "variants", "variant" ).createAlias( "variant.location", "location" )
-        // .createAlias("labels", "subject_label", CriteriaSpecification.LEFT_JOIN)
-        // .createAlias("variant.labels", "variant_label", CriteriaSpecification.LEFT_JOIN)
-                .createAlias( "variant.characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN );
-        Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
-                CriteriaBuilder.EntityType.SUBJECT );
-        criteria.add( junction );
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
-    public Collection<? extends Subject> load( Set<AspireDbFilterConfig> filters ) throws BioMartServiceException,
-            NeurocartaServiceException {
-        return loadPage( 0, 2000, null, null, filters );
+        return subjectIds;
     }
 
 }

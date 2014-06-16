@@ -77,6 +77,19 @@ public abstract class DaoBaseImpl<T> extends HibernateDaoSupport implements DaoB
         return entity;
     }
 
+    /**
+     * 
+     * 
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public long getCountAll() {
+        Session session = this.getHibernateTemplate().getSessionFactory().getCurrentSession();
+        Number totalSize = ( Number ) session.createCriteria( this.elementClass )
+                .setProjection( Projections.rowCount() ).uniqueResult();
+        return totalSize.longValue();
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -114,19 +127,6 @@ public abstract class DaoBaseImpl<T> extends HibernateDaoSupport implements DaoB
     @Transactional(readOnly = true)
     public Collection<T> loadAll() {
         return this.getHibernateTemplate().loadAll( elementClass );
-    }
-
-    /**
-     * 
-     * 
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public long getCountAll() {
-        Session session = this.getHibernateTemplate().getSessionFactory().getCurrentSession();
-        Number totalSize = ( Number ) session.createCriteria( this.elementClass )
-                .setProjection( Projections.rowCount() ).uniqueResult();
-        return totalSize.longValue();
     }
 
     /*

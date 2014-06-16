@@ -39,11 +39,11 @@ public class VariantTypeRestriction implements RestrictionExpression {
         this.type = type.name();
     }
 
-    public void setType( String type ) {
-        this.type = type;
-    }
-
     public String getType() {
         return type;
+    }
+
+    public void setType( String type ) {
+        this.type = type;
     }
 }

@@ -69,15 +69,15 @@ public class GeneServiceTest extends BaseSpringContextTest {
     }
 
     @Test
+    public void testFindGenesWithNeurocartaPhenotype() throws Exception {
+
+    }
+
+    @Test
     public void testGetGenesInsideVariants() throws Exception {
         List<GeneValueObject> genes = geneService.getGenesInsideVariants( Arrays.asList( 2L ) );
 
         assertEquals( genes.size(), 1 );
         assertEquals( genes.iterator().next().getSymbol(), "HAIRCH" );
-    }
-
-    @Test
-    public void testFindGenesWithNeurocartaPhenotype() throws Exception {
-
     }
 }

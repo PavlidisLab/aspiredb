@@ -32,16 +32,6 @@ import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
 public interface OntologyService extends InitializingBean {
 
     /**
-     * @return the diseaseOntologyService
-     */
-    public DiseaseOntologyService getDiseaseOntologyService();
-
-    /**
-     * @return the HumanPhenotypeOntologyService
-     */
-    public HumanPhenotypeOntologyService getHumanPhenotypeOntologyService();
-
-    /**
      * @param givenSearch
      * @return
      */
@@ -55,6 +45,16 @@ public interface OntologyService extends InitializingBean {
      * @return returns a collection of ontologyTerm's
      */
     public Collection<OntologyTerm> findTerms( String search );
+
+    /**
+     * @return the diseaseOntologyService
+     */
+    public DiseaseOntologyService getDiseaseOntologyService();
+
+    /**
+     * @return the HumanPhenotypeOntologyService
+     */
+    public HumanPhenotypeOntologyService getHumanPhenotypeOntologyService();
 
     /**
      * @return the OntologyResource for the specified URI

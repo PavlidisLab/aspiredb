@@ -110,6 +110,72 @@ public class VariantUploadServiceTest extends BaseSpringContextTest {
     }
 
     @Test
+    public void testMakeValueObjectsFromIndelFile() {
+
+        super.runAsAdmin();
+
+        try {
+
+            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
+            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:src/test/resources/data" );
+
+            Statement stmt = conn.createStatement();
+            ResultSet results = stmt.executeQuery( "SELECT * FROM testindel" );
+
+            VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromResultSet( results,
+                    VariantType.INDEL );
+
+            results.close();
+            stmt.close();
+            conn.close();
+
+            assertEquals( result.getErrorMessages().size(), 0 );
+            assertEquals( result.getVariantsToAdd().size(), 4 );
+
+            VariantValueObject temp1vo = result.getVariantsToAdd().get( 0 );
+
+            assertTrue( temp1vo instanceof IndelValueObject );
+
+            IndelValueObject temp1indel = ( IndelValueObject ) temp1vo;
+
+            assertEquals( temp1indel.getPatientId(), "ind1" );
+            assertEquals( temp1indel.getGenomicRange().getChromosome(), "10" );
+            assertEquals( temp1indel.getGenomicRange().getBaseStart(), 1 );
+            assertEquals( temp1indel.getGenomicRange().getBaseEnd(), 5 );
+            assertEquals( temp1indel.getLength(), 200 );
+
+            Map<String, CharacteristicValueObject> charMap = temp1indel.getCharacteristics();
+
+            assertEquals( charMap.size(), 3 );
+
+            assertEquals( charMap.get( "exonic_function" ).getValue(), "frameshift" );
+
+            VariantValueObject temp3vo = result.getVariantsToAdd().get( 3 );
+
+            assertTrue( temp3vo instanceof IndelValueObject );
+
+            IndelValueObject temp3indel = ( IndelValueObject ) temp3vo;
+
+            assertEquals( temp3indel.getPatientId(), "ind4" );
+            assertEquals( temp3indel.getGenomicRange().getChromosome(), "17" );
+            assertEquals( temp3indel.getGenomicRange().getBaseStart(), 4 );
+            assertEquals( temp3indel.getGenomicRange().getBaseEnd(), 8 );
+            assertEquals( temp3indel.getLength(), 0 );
+
+            charMap = temp3indel.getCharacteristics();
+
+            assertEquals( charMap.size(), 3 );
+
+            assertEquals( charMap.get( "function_prediction" ).getValue(), "bla" );
+
+        } catch ( Exception e ) {
+
+            fail();
+        }
+
+    }
+
+    @Test
     public void testMakeValueObjectsFromSNVFile() {
 
         super.runAsAdmin();
@@ -169,72 +235,6 @@ public class VariantUploadServiceTest extends BaseSpringContextTest {
             assertEquals( charMap.size(), 3 );
 
             assertEquals( charMap.get( "damaging" ).getValue(), "NA" );
-
-        } catch ( Exception e ) {
-
-            fail();
-        }
-
-    }
-
-    @Test
-    public void testMakeValueObjectsFromIndelFile() {
-
-        super.runAsAdmin();
-
-        try {
-
-            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:src/test/resources/data" );
-
-            Statement stmt = conn.createStatement();
-            ResultSet results = stmt.executeQuery( "SELECT * FROM testindel" );
-
-            VariantUploadServiceResult result = VariantUploadService.makeVariantValueObjectsFromResultSet( results,
-                    VariantType.INDEL );
-
-            results.close();
-            stmt.close();
-            conn.close();
-
-            assertEquals( result.getErrorMessages().size(), 0 );
-            assertEquals( result.getVariantsToAdd().size(), 4 );
-
-            VariantValueObject temp1vo = result.getVariantsToAdd().get( 0 );
-
-            assertTrue( temp1vo instanceof IndelValueObject );
-
-            IndelValueObject temp1indel = ( IndelValueObject ) temp1vo;
-
-            assertEquals( temp1indel.getPatientId(), "ind1" );
-            assertEquals( temp1indel.getGenomicRange().getChromosome(), "10" );
-            assertEquals( temp1indel.getGenomicRange().getBaseStart(), 1 );
-            assertEquals( temp1indel.getGenomicRange().getBaseEnd(), 5 );
-            assertEquals( temp1indel.getLength(), 200 );
-
-            Map<String, CharacteristicValueObject> charMap = temp1indel.getCharacteristics();
-
-            assertEquals( charMap.size(), 3 );
-
-            assertEquals( charMap.get( "exonic_function" ).getValue(), "frameshift" );
-
-            VariantValueObject temp3vo = result.getVariantsToAdd().get( 3 );
-
-            assertTrue( temp3vo instanceof IndelValueObject );
-
-            IndelValueObject temp3indel = ( IndelValueObject ) temp3vo;
-
-            assertEquals( temp3indel.getPatientId(), "ind4" );
-            assertEquals( temp3indel.getGenomicRange().getChromosome(), "17" );
-            assertEquals( temp3indel.getGenomicRange().getBaseStart(), 4 );
-            assertEquals( temp3indel.getGenomicRange().getBaseEnd(), 8 );
-            assertEquals( temp3indel.getLength(), 0 );
-
-            charMap = temp3indel.getCharacteristics();
-
-            assertEquals( charMap.size(), 3 );
-
-            assertEquals( charMap.get( "function_prediction" ).getValue(), "bla" );
 
         } catch ( Exception e ) {
 

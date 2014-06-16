@@ -33,14 +33,6 @@ public abstract class Junction implements RestrictionExpression {
 
     protected List<RestrictionExpression> restrictions = new ArrayList<RestrictionExpression>();
 
-    public void setRestrictions( List<RestrictionExpression> restrictions ) {
-        this.restrictions = restrictions;
-    }
-
-    public Collection<RestrictionExpression> getRestrictions() {
-        return this.restrictions;
-    }
-
     public void add( RestrictionExpression restriction ) {
         this.restrictions.add( restriction );
     }
@@ -49,8 +41,16 @@ public abstract class Junction implements RestrictionExpression {
         this.restrictions.addAll( restrictions );
     }
 
+    public Collection<RestrictionExpression> getRestrictions() {
+        return this.restrictions;
+    }
+
     public void replaceAll( Collection<RestrictionExpression> restrictions ) {
         this.restrictions.clear();
         this.restrictions.addAll( restrictions );
+    }
+
+    public void setRestrictions( List<RestrictionExpression> restrictions ) {
+        this.restrictions = restrictions;
     }
 }

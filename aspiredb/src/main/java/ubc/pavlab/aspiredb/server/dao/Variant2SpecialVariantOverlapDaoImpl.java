@@ -50,6 +50,67 @@ public class Variant2SpecialVariantOverlapDaoImpl extends DaoBaseImpl<Variant2Sp
     }
 
     @Override
+    @Transactional
+    public void deleteByOverlapProjectId( Long id ) {
+
+        Collection<Variant2SpecialVariantOverlap> overlaps = loadByOverlapProjectId( id );
+
+        this.getHibernateTemplate().deleteAll( overlaps );
+
+    }
+
+    @Override
+    @Transactional
+    public void deleteByOverlapProjectIds( Collection<Long> ids ) {
+
+        for ( Long id : ids ) {
+
+            Collection<Variant2SpecialVariantOverlap> overlaps = loadByOverlapProjectId( id );
+
+            this.getHibernateTemplate().deleteAll( overlaps );
+
+        }
+
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Collection<Variant2SpecialVariantOverlap> loadByOverlapProjectId( Long overlapProjectId ) {
+
+        if ( overlapProjectId == null ) {
+            return new ArrayList<Variant2SpecialVariantOverlap>();
+        }
+
+        String[] paramNames = { "overlapProjectId" };
+        Object[] objectValues = { overlapProjectId };
+
+        return this.getHibernateTemplate().findByNamedParam(
+                "from Variant2SpecialVariantOverlap where overlapProjectId =:overlapProjectId", paramNames,
+                objectValues );
+
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Collection<Variant2SpecialVariantOverlap> loadByProjectIdAndOverlapProjectId( Long projectId,
+            Long overlapProjectId ) {
+
+        if ( overlapProjectId == null ) {
+            return new ArrayList<Variant2SpecialVariantOverlap>();
+        }
+
+        String[] paramNames = { "projectId", "overlapProjectId" };
+        Object[] objectValues = { projectId, overlapProjectId };
+
+        return this
+                .getHibernateTemplate()
+                .findByNamedParam(
+                        "from Variant2SpecialVariantOverlap where projectId =:projectId and overlapProjectId =:overlapProjectId",
+                        paramNames, objectValues );
+
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Collection<Variant2SpecialVariantOverlap> loadByVariantId( Long id, Collection<Long> overlapProjectIds ) {
 
@@ -119,67 +180,6 @@ public class Variant2SpecialVariantOverlapDaoImpl extends DaoBaseImpl<Variant2Sp
         Object[] objectValues = { id, numeric.getValue(), overlapProjectIds };
 
         return this.getHibernateTemplate().findByNamedParam( queryString, paramNames, objectValues );
-
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Collection<Variant2SpecialVariantOverlap> loadByOverlapProjectId( Long overlapProjectId ) {
-
-        if ( overlapProjectId == null ) {
-            return new ArrayList<Variant2SpecialVariantOverlap>();
-        }
-
-        String[] paramNames = { "overlapProjectId" };
-        Object[] objectValues = { overlapProjectId };
-
-        return this.getHibernateTemplate().findByNamedParam(
-                "from Variant2SpecialVariantOverlap where overlapProjectId =:overlapProjectId", paramNames,
-                objectValues );
-
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Collection<Variant2SpecialVariantOverlap> loadByProjectIdAndOverlapProjectId( Long projectId,
-            Long overlapProjectId ) {
-
-        if ( overlapProjectId == null ) {
-            return new ArrayList<Variant2SpecialVariantOverlap>();
-        }
-
-        String[] paramNames = { "projectId", "overlapProjectId" };
-        Object[] objectValues = { projectId, overlapProjectId };
-
-        return this
-                .getHibernateTemplate()
-                .findByNamedParam(
-                        "from Variant2SpecialVariantOverlap where projectId =:projectId and overlapProjectId =:overlapProjectId",
-                        paramNames, objectValues );
-
-    }
-
-    @Override
-    @Transactional
-    public void deleteByOverlapProjectId( Long id ) {
-
-        Collection<Variant2SpecialVariantOverlap> overlaps = loadByOverlapProjectId( id );
-
-        this.getHibernateTemplate().deleteAll( overlaps );
-
-    }
-
-    @Override
-    @Transactional
-    public void deleteByOverlapProjectIds( Collection<Long> ids ) {
-
-        for ( Long id : ids ) {
-
-            Collection<Variant2SpecialVariantOverlap> overlaps = loadByOverlapProjectId( id );
-
-            this.getHibernateTemplate().deleteAll( overlaps );
-
-        }
 
     }
 

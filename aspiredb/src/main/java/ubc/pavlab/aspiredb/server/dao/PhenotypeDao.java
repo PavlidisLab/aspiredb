@@ -36,13 +36,11 @@ public interface PhenotypeDao extends SecurableDaoBase<Phenotype> {
     @Secured({ "GROUP_USER" })
     public Integer findPhenotypeCountBySubjectId( Long id );
 
-    // @Secured({"GROUP_USER" ,"AFTER_ACL_COLLECTION_READ"})
-    @Secured({ "GROUP_USER" })
-    public Collection<Phenotype> loadBySubjectIds( Collection<Long> subjectIds );
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    public Collection<Phenotype> findPresentByProjectIdsAndUri( Collection<Long> ids, String uri );
 
-    @Transactional(readOnly = true)
     @Secured({ "GROUP_USER" })
-    public List<String> getExistingValues( String name );
+    public List<String> getDistinctOntologyUris( Collection<Long> activeProjects );
 
     /**
      * Returns the list of Phenotype names that is specific to activeProjectIds. If activeProjectIds is null, return all
@@ -62,6 +60,10 @@ public interface PhenotypeDao extends SecurableDaoBase<Phenotype> {
     @Transactional(readOnly = true)
     public List<String> getExistingURIs( String name );
 
+    @Transactional(readOnly = true)
+    @Secured({ "GROUP_USER" })
+    public List<String> getExistingValues( String name );
+
     // TODO: reuse for suggestions
     @Secured({ "GROUP_USER" })
     public List<String> getListOfPossibleValuesByName( Collection<Long> projectIds, String name );
@@ -70,16 +72,14 @@ public interface PhenotypeDao extends SecurableDaoBase<Phenotype> {
     public List<String> getListOfPossibleValuesByUri( Collection<Long> projectIds, String uri );
 
     @Transactional(readOnly = true)
-    boolean isInDatabase( Collection<String> names );
-
-    @Secured({ "GROUP_USER" })
-    public List<String> getDistinctOntologyUris( Collection<Long> activeProjects );
-
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
-    public Collection<Phenotype> findPresentByProjectIdsAndUri( Collection<Long> ids, String uri );
-
-    @Transactional(readOnly = true)
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<Phenotype> loadAllByProjectIds( Collection<Long> projectIds );
+
+    // @Secured({"GROUP_USER" ,"AFTER_ACL_COLLECTION_READ"})
+    @Secured({ "GROUP_USER" })
+    public Collection<Phenotype> loadBySubjectIds( Collection<Long> subjectIds );
+
+    @Transactional(readOnly = true)
+    boolean isInDatabase( Collection<String> names );
 
 }

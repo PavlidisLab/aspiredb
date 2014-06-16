@@ -45,9 +45,8 @@ public class PhenotypeValueObject implements Comparable<PhenotypeValueObject>, S
     public PhenotypeValueObject() {
     }
 
-    public PhenotypeValueObject( PhenotypeValueObject phenotype, String uri, String name, String inferredValue ) {
-        this.subjectId = phenotype.getSubjectId();
-        this.inferredValue = inferredValue;
+    public PhenotypeValueObject( Long subjectId, String uri, String name ) {
+        this.subjectId = subjectId;
         this.name = name;
         this.uri = uri;
     }
@@ -59,105 +58,11 @@ public class PhenotypeValueObject implements Comparable<PhenotypeValueObject>, S
         this.uri = uri;
     }
 
-    public PhenotypeValueObject( Long subjectId, String uri, String name ) {
-        this.subjectId = subjectId;
-        this.name = name;
-        this.uri = uri;
-    }
-
-    public Map<String, PhenotypeValueObject> getDescendantPhenotypes() {
-        return descendantPhenotypes;
-    }
-
-    public boolean isOntologyTerm() {
-        return isOntologyTerm;
-    }
-
-    public void setOntologyTerm( boolean ontologyTerm ) {
-        isOntologyTerm = ontologyTerm;
-    }
-
-    public void setDescendantPhenotypes( Map<String, PhenotypeValueObject> descendantPhenotypes ) {
-        this.descendantPhenotypes = descendantPhenotypes;
-    }
-
-    public String getInferredValue() {
-        return inferredValue;
-    }
-
-    public void setInferredValue( String inferredValue ) {
+    public PhenotypeValueObject( PhenotypeValueObject phenotype, String uri, String name, String inferredValue ) {
+        this.subjectId = phenotype.getSubjectId();
         this.inferredValue = inferredValue;
-    }
-
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getSubjectId() {
-        return subjectId;
-    }
-
-    public void setSubjectId( Long subjectId ) {
-        this.subjectId = subjectId;
-    }
-
-    public String getUri() {
-        return uri;
-    }
-
-    public void setUri( String uri ) {
-        this.uri = uri;
-    }
-
-    public String getDbValue() {
-        return dbValue;
-    }
-
-    public void setDbValue( String dbValue ) {
-        this.dbValue = dbValue;
-    }
-
-    public String getValueType() {
-        return valueType;
-    }
-
-    public void setValueType( String valueType ) {
-        this.valueType = valueType;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName( String name ) {
         this.name = name;
-    }
-
-    @Override
-    public boolean equals( Object o ) {
-        return ( o != null && ( ( PhenotypeValueObject ) o ).getName().equals( this.getName() ) );
-    }
-
-    public String getExternalSubjectId() {
-        return externalSubjectId;
-    }
-
-    public void setExternalSubjectId( String externalSubjectId ) {
-        this.externalSubjectId = externalSubjectId;
-    }
-
-    @Override
-    public int hashCode() {
-        return this.getName().hashCode();
-    }
-
-    @Override
-    public int compareTo( PhenotypeValueObject o ) {
-        return this.getName().compareTo( o.getName() );
+        this.uri = uri;
     }
 
     public void addChild( PhenotypeValueObject child ) {
@@ -168,5 +73,100 @@ public class PhenotypeValueObject implements Comparable<PhenotypeValueObject>, S
         if ( !this.getDescendantPhenotypes().containsKey( child.getName() ) ) {
             addChild( child );
         }
+    }
+
+    @Override
+    public int compareTo( PhenotypeValueObject o ) {
+        return this.getName().compareTo( o.getName() );
+    }
+
+    @Override
+    public boolean equals( Object o ) {
+        return ( o != null && ( ( PhenotypeValueObject ) o ).getName().equals( this.getName() ) );
+    }
+
+    public String getDbValue() {
+        return dbValue;
+    }
+
+    public Map<String, PhenotypeValueObject> getDescendantPhenotypes() {
+        return descendantPhenotypes;
+    }
+
+    public String getExternalSubjectId() {
+        return externalSubjectId;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getInferredValue() {
+        return inferredValue;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Long getSubjectId() {
+        return subjectId;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public String getValueType() {
+        return valueType;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getName().hashCode();
+    }
+
+    public boolean isOntologyTerm() {
+        return isOntologyTerm;
+    }
+
+    public void setDbValue( String dbValue ) {
+        this.dbValue = dbValue;
+    }
+
+    public void setDescendantPhenotypes( Map<String, PhenotypeValueObject> descendantPhenotypes ) {
+        this.descendantPhenotypes = descendantPhenotypes;
+    }
+
+    public void setExternalSubjectId( String externalSubjectId ) {
+        this.externalSubjectId = externalSubjectId;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setInferredValue( String inferredValue ) {
+        this.inferredValue = inferredValue;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    public void setOntologyTerm( boolean ontologyTerm ) {
+        isOntologyTerm = ontologyTerm;
+    }
+
+    public void setSubjectId( Long subjectId ) {
+        this.subjectId = subjectId;
+    }
+
+    public void setUri( String uri ) {
+        this.uri = uri;
+    }
+
+    public void setValueType( String valueType ) {
+        this.valueType = valueType;
     }
 }

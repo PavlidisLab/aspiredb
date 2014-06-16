@@ -22,9 +22,9 @@ package ubc.pavlab.aspiredb.server.service;
  */
 public interface LoginStatusService {
 
+    public String getCurrentUsername();
+
     public Boolean isLoggedIn();
 
     public Boolean isUserAdministrator();
-
-    public String getCurrentUsername();
 }

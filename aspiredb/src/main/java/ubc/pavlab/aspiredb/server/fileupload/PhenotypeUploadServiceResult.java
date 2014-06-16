@@ -22,6 +22,12 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 
 public class PhenotypeUploadServiceResult {
 
+    HashSet<String> unmatched = new HashSet<String>();
+
+    ArrayList<PhenotypeValueObject> phenotypesToAdd;
+
+    List<String> errorMessages;
+
     public PhenotypeUploadServiceResult( ArrayList<PhenotypeValueObject> phenotypes, List<String> errors,
             HashSet<String> unmatchedStrings ) {
 
@@ -31,30 +37,24 @@ public class PhenotypeUploadServiceResult {
 
     }
 
-    HashSet<String> unmatched = new HashSet<String>();
-
-    ArrayList<PhenotypeValueObject> phenotypesToAdd;
-
-    List<String> errorMessages;
+    public List<String> getErrorMessages() {
+        return errorMessages;
+    }
 
     public ArrayList<PhenotypeValueObject> getPhenotypesToAdd() {
         return phenotypesToAdd;
     }
 
-    public void setPhenotypesToAdd( ArrayList<PhenotypeValueObject> phenotypesToAdd ) {
-        this.phenotypesToAdd = phenotypesToAdd;
-    }
-
-    public List<String> getErrorMessages() {
-        return errorMessages;
+    public HashSet<String> getUnmatched() {
+        return unmatched;
     }
 
     public void setErrorMessages( List<String> errorMessages ) {
         this.errorMessages = errorMessages;
     }
 
-    public HashSet<String> getUnmatched() {
-        return unmatched;
+    public void setPhenotypesToAdd( ArrayList<PhenotypeValueObject> phenotypesToAdd ) {
+        this.phenotypesToAdd = phenotypesToAdd;
     }
 
     public void setUnmatched( HashSet<String> unmatched ) {

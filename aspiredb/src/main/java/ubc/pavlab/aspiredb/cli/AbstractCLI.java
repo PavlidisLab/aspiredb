@@ -63,12 +63,13 @@ import ubc.pavlab.aspiredb.server.util.ConfigUtils;
  */
 public abstract class AbstractCLI {
 
-    protected static final String THREADS_OPTION = "threads";
-    protected static final String AUTO_OPTION_NAME = "auto";
-
     public enum ErrorCode {
         NORMAL, MISSING_OPTION, INVALID_OPTION, MISSING_ARGUMENT, FATAL_ERROR, AUTHENTICATION_ERROR
     }
+
+    protected static final String THREADS_OPTION = "threads";
+
+    protected static final String AUTO_OPTION_NAME = "auto";
 
     private static final char PASSWORD_CONSTANT = 'p';
     private static final char USERNAME_OPTION = 'u';
@@ -126,8 +127,6 @@ public abstract class AbstractCLI {
         this.addUserNameAndPasswordOptions();
 
     }
-
-    public abstract String getShortDesc();
 
     /**
      * @param opt
@@ -240,6 +239,8 @@ public abstract class AbstractCLI {
         return this.options.getRequiredOptions();
     }
 
+    public abstract String getShortDesc();
+
     public boolean hasOption( char opt ) {
         return commandLine.hasOption( opt );
     }
@@ -247,6 +248,340 @@ public abstract class AbstractCLI {
     public boolean hasOption( String opt ) {
         return commandLine.hasOption( opt );
     }
+
+    /** check username and password. */
+    void authenticate( BeanFactory ctx ) {
+
+        /*
+         * Allow security settings (authorization etc) in a given context to be passed into spawned threads
+         */
+        SecurityContextHolder.setStrategyName( SecurityContextHolder.MODE_GLOBAL );
+
+        ManualAuthenticationService manAuthentication = ctx.getBean( ManualAuthenticationService.class );
+        if ( hasOption( 'u' ) && hasOption( 'p' ) ) {
+            username = getOptionValue( 'u' );
+            password = getOptionValue( 'p' );
+
+            if ( StringUtils.isBlank( username ) ) {
+                System.err.println( "Not authenticated. Username was blank" );
+                log.debug( "Username=" + username );
+                bail( ErrorCode.AUTHENTICATION_ERROR );
+            }
+
+            if ( StringUtils.isBlank( password ) ) {
+                System.err.println( "Not authenticated. You didn't enter a password" );
+                bail( ErrorCode.AUTHENTICATION_ERROR );
+            }
+
+            boolean success = manAuthentication.validateRequest( username, password );
+            if ( !success ) {
+                System.err.println( "Not authenticated. Make sure you entered a valid username (got '" + username
+                        + "') and/or password" );
+                bail( ErrorCode.AUTHENTICATION_ERROR );
+            } else {
+                log.info( "Logged in as " + username );
+            }
+        } else {
+            log.info( "Logging in as anonymous guest with limited privileges" );
+            // manAuthentication.authenticateAnonymously();
+        }
+
+    }
+
+    /**
+     * You must implement the handling for this option.
+     */
+    @SuppressWarnings("static-access")
+    protected void addAutoOption() {
+        OptionBuilder.withArgName( AUTO_OPTION_NAME );
+        OptionBuilder.withDescription( "Attempt to process entities that need processing based on workflow criteria." );
+        Option autoSeekOption = OptionBuilder.create( AUTO_OPTION_NAME );
+
+        addOption( autoSeekOption );
+    }
+
+    @SuppressWarnings("static-access")
+    protected void addDateOption() {
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "mdate" );
+        OptionBuilder.withDescription( "Constrain to run only on entities with analyses older than the given date. "
+                + "For example, to run only on entities that have not been analyzed in the last 10 days, use '-10d'. "
+                + "If there is no record of when the analysis was last run, it will be run." );
+        Option dateOption = OptionBuilder.create( "mdate" );
+
+        addOption( dateOption );
+    }
+
+    /**
+     * Convenience method to add a standard pair of options to intake a host name and port number. *
+     * 
+     * @param hostRequired Whether the host name is required
+     * @param portRequired Whether the port is required
+     */
+    @SuppressWarnings("static-access")
+    protected void addHostAndPortOptions( boolean hostRequired, boolean portRequired ) {
+        OptionBuilder.withArgName( "host" );
+        OptionBuilder.withLongOpt( "host" );
+        OptionBuilder.hasArg();
+        OptionBuilder.withDescription( "Hostname to use (Default = " + DEFAULT_HOST + ")" );
+        Option hostOpt = OptionBuilder.create( HOST_OPTION );
+
+        hostOpt.setRequired( hostRequired );
+
+        OptionBuilder.withArgName( "port" );
+        OptionBuilder.withLongOpt( "port" );
+        OptionBuilder.hasArg();
+        OptionBuilder.withDescription( "Port to use on host (Default = " + DEFAULT_PORT + ")" );
+        Option portOpt = OptionBuilder.create( PORT_OPTION );
+
+        portOpt.setRequired( portRequired );
+
+        options.addOption( hostOpt );
+        options.addOption( portOpt );
+    }
+
+    /**
+     * Convenience method to add an option for parallel processing option.
+     */
+    @SuppressWarnings("static-access")
+    protected void addThreadsOption() {
+        OptionBuilder.withArgName( "numThreads" );
+        OptionBuilder.hasArg();
+        OptionBuilder.withDescription( "Number of threads to use for batch processing." );
+        Option threadsOpt = OptionBuilder.create( THREADS_OPTION );
+        options.addOption( threadsOpt );
+    }
+
+    /**
+     * Add required user name and password options.
+     */
+    protected void addUserNameAndPasswordOptions() {
+        /*
+         * Changed to make it so password is not required.
+         */
+        this.addUserNameAndPasswordOptions( false );
+    }
+
+    /**
+     * Convenience method to add a standard pair of (required) options to intake a user name and password, optionally
+     * required
+     */
+    @SuppressWarnings("static-access")
+    protected void addUserNameAndPasswordOptions( boolean required ) {
+        OptionBuilder.withArgName( "user" );
+        OptionBuilder.withLongOpt( "user" );
+        OptionBuilder.hasArg();
+        OptionBuilder.withDescription( "User name for accessing the system (optional for some tools)" );
+        this.usernameOpt = OptionBuilder.create( USERNAME_OPTION );
+
+        usernameOpt.setRequired( required );
+
+        OptionBuilder.withArgName( "passwd" );
+        OptionBuilder.withLongOpt( "password" );
+        OptionBuilder.hasArg();
+        OptionBuilder.withDescription( "Password for accessing the system (optional for some tools)" );
+        this.passwordOpt = OptionBuilder.create( PASSWORD_CONSTANT );
+        passwordOpt.setRequired( required );
+
+        options.addOption( usernameOpt );
+        options.addOption( passwordOpt );
+    }
+
+    /**
+     * Stop exeucting the CLI.
+     */
+    protected void bail( ErrorCode errorCode ) {
+        // do something, but not System.exit.
+        log.debug( "Bailing with error code " + errorCode );
+        resetLogging();
+        throw new IllegalStateException( errorCode.toString() );
+    }
+
+    /**
+     * Implement this method to add options to your command line, using the OptionBuilder.
+     * 
+     * @see OptionBuilder
+     */
+    protected abstract void buildOptions();
+
+    @SuppressWarnings("static-access")
+    protected void buildStandardOptions() {
+        log.debug( "Creating standard options" );
+        Option helpOpt = new Option( "h", "help", false, "Print this message" );
+        Option testOpt = new Option( "testing", false, "Use the test environment" );
+        Option logOpt = new Option( "v", "verbosity", true,
+                "Set verbosity level (0=silent, 5=very verbose; default is " + DEFAULT_VERBOSITY + ")" );
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "logger" );
+        OptionBuilder
+                .withDescription( "Set the selected logger to the verbosity level after the equals sign. For example, '-logger=org.hibernate.SQL=4'" );
+        Option otherLogOpt = OptionBuilder.create( "logger" );
+
+        options.addOption( otherLogOpt );
+        options.addOption( logOpt );
+        options.addOption( helpOpt );
+        options.addOption( testOpt );
+
+    }
+
+    /**
+     * @param args
+     * @return
+     * @throws Exception
+     */
+    protected abstract Exception doWork( String[] args );
+
+    protected final double getDoubleOptionValue( char option ) {
+        try {
+            return Double.parseDouble( commandLine.getOptionValue( option ) );
+        } catch ( NumberFormatException e ) {
+            System.out.println( invalidOptionString( "" + option ) + ", not a valid double" );
+            bail( ErrorCode.INVALID_OPTION );
+        }
+        return 0.0;
+    }
+
+    protected final double getDoubleOptionValue( String option ) {
+        try {
+            return Double.parseDouble( commandLine.getOptionValue( option ) );
+        } catch ( NumberFormatException e ) {
+            System.out.println( invalidOptionString( option ) + ", not a valid double" );
+            bail( ErrorCode.INVALID_OPTION );
+        }
+        return 0.0;
+    }
+
+    /**
+     * @param c
+     * @return
+     */
+    protected final String getFileNameOptionValue( char c ) {
+        String fileName = commandLine.getOptionValue( c );
+        File f = new File( fileName );
+        if ( !f.canRead() ) {
+            System.out.println( invalidOptionString( "" + c ) + ", cannot read from file" );
+            bail( ErrorCode.INVALID_OPTION );
+        }
+        return fileName;
+    }
+
+    /**
+     * @param c
+     * @return
+     */
+    protected final String getFileNameOptionValue( String c ) {
+        String fileName = commandLine.getOptionValue( c );
+        File f = new File( fileName );
+        if ( !f.canRead() ) {
+            System.out.println( invalidOptionString( "" + c ) + ", cannot read from file" );
+            bail( ErrorCode.INVALID_OPTION );
+        }
+        return fileName;
+    }
+
+    protected final int getIntegerOptionValue( char option ) {
+        try {
+            return Integer.parseInt( commandLine.getOptionValue( option ) );
+        } catch ( NumberFormatException e ) {
+            System.out.println( invalidOptionString( "" + option ) + ", not a valid integer" );
+            bail( ErrorCode.INVALID_OPTION );
+        }
+        return 0;
+    }
+
+    protected final int getIntegerOptionValue( String option ) {
+        try {
+            return Integer.parseInt( commandLine.getOptionValue( option ) );
+        } catch ( NumberFormatException e ) {
+            System.out.println( invalidOptionString( option ) + ", not a valid integer" );
+            bail( ErrorCode.INVALID_OPTION );
+        }
+        return 0;
+    }
+
+    protected String getLogger() {
+        return "set your own logger";
+    }
+
+    /**
+     * @param command The name of the command as used at the command line.
+     */
+    protected void printHelp( String command ) {
+        HelpFormatter h = new HelpFormatter();
+        h.printHelp( command + " [options]", HEADER, options, FOOTER );
+    }
+
+    /**
+     * This must be called in your main method. It triggers parsing of the command line and processing of the options.
+     * Check the error code to decide whether execution of your program should proceed.
+     * 
+     * @param args
+     * @return Exception; null if nothing went wrong.
+     * @throws ParseException
+     */
+    protected final Exception processCommandLine( String commandName, String[] args ) {
+        /* COMMAND LINE PARSER STAGE */
+        BasicParser parser = new BasicParser();
+        System.err.println( "ASPIREdb version " + ConfigUtils.getAppVersion() );
+
+        if ( args == null ) {
+            printHelp( commandName );
+            return new Exception( "No arguments" );
+        }
+
+        try {
+            commandLine = parser.parse( options, args );
+        } catch ( ParseException e ) {
+            if ( e instanceof MissingOptionException ) {
+                System.err.println( "Required option(s) were not supplied: " + e.getMessage() );
+            } else if ( e instanceof AlreadySelectedException ) {
+                System.err.println( "The option(s) " + e.getMessage() + " were already selected" );
+            } else if ( e instanceof MissingArgumentException ) {
+                System.err.println( "Missing argument: " + e.getMessage() );
+            } else if ( e instanceof UnrecognizedOptionException ) {
+                System.err.println( "Unrecognized option: " + e.getMessage() );
+            } else {
+                e.printStackTrace();
+            }
+
+            printHelp( commandName );
+
+            if ( log.isDebugEnabled() ) {
+                log.debug( e );
+            }
+
+            return e;
+        }
+
+        /* INTERROGATION STAGE */
+        if ( commandLine.hasOption( 'h' ) ) {
+            printHelp( commandName );
+            return new Exception( "Help selected" );
+        }
+
+        processStandardOptions();
+        processOptions();
+
+        return null;
+
+    }
+
+    /**
+     * Implement this to provide processing of options. It is called at the end of processCommandLine.
+     */
+    protected abstract void processOptions();
+
+    // /**
+    // * @return
+    // */
+    // protected Date getLimitingDate() {
+    // Date skipIfLastRunLaterThan = null;
+    // if ( StringUtils.isNotBlank( mDate ) ) {
+    // skipIfLastRunLaterThan = DateUtil.getRelativeDate( new Date(), mDate );
+    // log.info( "Analyses will be run only if last was older than " + skipIfLastRunLaterThan );
+    // }
+    // return skipIfLastRunLaterThan;
+    // }
 
     /**
      * Call in 'buildOptions' to force users to provide a user name and password.
@@ -257,6 +592,70 @@ public abstract class AbstractCLI {
         }
         if ( this.usernameOpt != null ) {
             this.usernameOpt.setRequired( true );
+        }
+    }
+
+    /**
+     * This is needed for CLIs that run in tests, so the logging settings get reset.
+     */
+    protected void resetLogging() {
+        for ( Logger log4jLogger : this.originalLoggingLevels.keySet() ) {
+            log4jLogger.setLevel( this.originalLoggingLevels.get( log4jLogger ) );
+        }
+    }
+
+    /**
+     * Print out a summary of what the program did. Useful when analyzing lists of experiments etc. Use the
+     * 'successObjects' and 'errorObjects'
+     * 
+     * @param errorObjects
+     * @param successObjects
+     */
+    protected void summarizeProcessing() {
+        if ( successObjects.size() > 0 ) {
+            StringBuilder buf = new StringBuilder();
+            buf.append( "\n---------------------\n   Processed:\n" );
+            for ( Object object : successObjects ) {
+                buf.append( "    " + object + "\n" );
+            }
+            buf.append( "---------------------\n" );
+
+            log.info( buf );
+        } else {
+            log.error( "No objects processed successfully!" );
+        }
+
+        if ( errorObjects.size() > 0 ) {
+            StringBuilder buf = new StringBuilder();
+            buf.append( "\n---------------------\n   Errors occurred during the processing of:\n" );
+            for ( Object object : errorObjects ) {
+                buf.append( "    " + object + "\n" );
+            }
+            buf.append( "---------------------\n" );
+            log.error( buf );
+        }
+    }
+
+    /**
+     * Wait for completion.
+     */
+    protected void waitForThreadPoolCompletion( Collection<Thread> threads ) {
+
+        while ( true ) {
+            boolean anyAlive = false;
+            for ( Thread k : threads ) {
+                if ( k.isAlive() ) {
+                    anyAlive = true;
+                }
+            }
+            if ( !anyAlive ) {
+                break;
+            }
+            try {
+                Thread.sleep( 1000 );
+            } catch ( InterruptedException e ) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -369,395 +768,6 @@ public abstract class AbstractCLI {
 
         if ( hasOption( "mdate" ) ) {
             this.mDate = this.getOptionValue( "mdate" );
-        }
-
-    }
-
-    protected String getLogger() {
-        return "set your own logger";
-    }
-
-    @SuppressWarnings("static-access")
-    protected void addDateOption() {
-        Option dateOption = OptionBuilder
-                .hasArg()
-                .withArgName( "mdate" )
-                .withDescription(
-                        "Constrain to run only on entities with analyses older than the given date. "
-                                + "For example, to run only on entities that have not been analyzed in the last 10 days, use '-10d'. "
-                                + "If there is no record of when the analysis was last run, it will be run." )
-                .create( "mdate" );
-
-        addOption( dateOption );
-    }
-
-    /**
-     * You must implement the handling for this option.
-     */
-    @SuppressWarnings("static-access")
-    protected void addAutoOption() {
-        Option autoSeekOption = OptionBuilder.withArgName( AUTO_OPTION_NAME )
-                .withDescription( "Attempt to process entities that need processing based on workflow criteria." )
-                .create( AUTO_OPTION_NAME );
-
-        addOption( autoSeekOption );
-    }
-
-    /**
-     * Convenience method to add a standard pair of options to intake a host name and port number. *
-     * 
-     * @param hostRequired Whether the host name is required
-     * @param portRequired Whether the port is required
-     */
-    @SuppressWarnings("static-access")
-    protected void addHostAndPortOptions( boolean hostRequired, boolean portRequired ) {
-        Option hostOpt = OptionBuilder.withArgName( "host" ).withLongOpt( "host" ).hasArg()
-                .withDescription( "Hostname to use (Default = " + DEFAULT_HOST + ")" ).create( HOST_OPTION );
-
-        hostOpt.setRequired( hostRequired );
-
-        Option portOpt = OptionBuilder.withArgName( "port" ).withLongOpt( "port" ).hasArg()
-                .withDescription( "Port to use on host (Default = " + DEFAULT_PORT + ")" ).create( PORT_OPTION );
-
-        portOpt.setRequired( portRequired );
-
-        options.addOption( hostOpt );
-        options.addOption( portOpt );
-    }
-
-    /**
-     * Convenience method to add an option for parallel processing option.
-     */
-    @SuppressWarnings("static-access")
-    protected void addThreadsOption() {
-        Option threadsOpt = OptionBuilder.withArgName( "numThreads" ).hasArg()
-                .withDescription( "Number of threads to use for batch processing." ).create( THREADS_OPTION );
-        options.addOption( threadsOpt );
-    }
-
-    /**
-     * Convenience method to add a standard pair of (required) options to intake a user name and password, optionally
-     * required
-     */
-    @SuppressWarnings("static-access")
-    protected void addUserNameAndPasswordOptions( boolean required ) {
-        this.usernameOpt = OptionBuilder.withArgName( "user" ).withLongOpt( "user" ).hasArg()
-                .withDescription( "User name for accessing the system (optional for some tools)" )
-                .create( USERNAME_OPTION );
-
-        usernameOpt.setRequired( required );
-
-        this.passwordOpt = OptionBuilder.withArgName( "passwd" ).withLongOpt( "password" ).hasArg()
-                .withDescription( "Password for accessing the system (optional for some tools)" )
-                .create( PASSWORD_CONSTANT );
-        passwordOpt.setRequired( required );
-
-        options.addOption( usernameOpt );
-        options.addOption( passwordOpt );
-    }
-
-    /**
-     * Add required user name and password options.
-     */
-    protected void addUserNameAndPasswordOptions() {
-        /*
-         * Changed to make it so password is not required.
-         */
-        this.addUserNameAndPasswordOptions( false );
-    }
-
-    /**
-     * Stop exeucting the CLI.
-     */
-    protected void bail( ErrorCode errorCode ) {
-        // do something, but not System.exit.
-        log.debug( "Bailing with error code " + errorCode );
-        resetLogging();
-        throw new IllegalStateException( errorCode.toString() );
-    }
-
-    /**
-     * Implement this method to add options to your command line, using the OptionBuilder.
-     * 
-     * @see OptionBuilder
-     */
-    protected abstract void buildOptions();
-
-    @SuppressWarnings("static-access")
-    protected void buildStandardOptions() {
-        log.debug( "Creating standard options" );
-        Option helpOpt = new Option( "h", "help", false, "Print this message" );
-        Option testOpt = new Option( "testing", false, "Use the test environment" );
-        Option logOpt = new Option( "v", "verbosity", true,
-                "Set verbosity level (0=silent, 5=very verbose; default is " + DEFAULT_VERBOSITY + ")" );
-        Option otherLogOpt = OptionBuilder
-                .hasArg()
-                .withArgName( "logger" )
-                .withDescription(
-                        "Set the selected logger to the verbosity level after the equals sign. For example, '-logger=org.hibernate.SQL=4'" )
-                .create( "logger" );
-
-        options.addOption( otherLogOpt );
-        options.addOption( logOpt );
-        options.addOption( helpOpt );
-        options.addOption( testOpt );
-
-    }
-
-    /**
-     * @param args
-     * @return
-     * @throws Exception
-     */
-    protected abstract Exception doWork( String[] args );
-
-    protected final double getDoubleOptionValue( char option ) {
-        try {
-            return Double.parseDouble( commandLine.getOptionValue( option ) );
-        } catch ( NumberFormatException e ) {
-            System.out.println( invalidOptionString( "" + option ) + ", not a valid double" );
-            bail( ErrorCode.INVALID_OPTION );
-        }
-        return 0.0;
-    }
-
-    protected final double getDoubleOptionValue( String option ) {
-        try {
-            return Double.parseDouble( commandLine.getOptionValue( option ) );
-        } catch ( NumberFormatException e ) {
-            System.out.println( invalidOptionString( option ) + ", not a valid double" );
-            bail( ErrorCode.INVALID_OPTION );
-        }
-        return 0.0;
-    }
-
-    /**
-     * @param c
-     * @return
-     */
-    protected final String getFileNameOptionValue( char c ) {
-        String fileName = commandLine.getOptionValue( c );
-        File f = new File( fileName );
-        if ( !f.canRead() ) {
-            System.out.println( invalidOptionString( "" + c ) + ", cannot read from file" );
-            bail( ErrorCode.INVALID_OPTION );
-        }
-        return fileName;
-    }
-
-    /**
-     * @param c
-     * @return
-     */
-    protected final String getFileNameOptionValue( String c ) {
-        String fileName = commandLine.getOptionValue( c );
-        File f = new File( fileName );
-        if ( !f.canRead() ) {
-            System.out.println( invalidOptionString( "" + c ) + ", cannot read from file" );
-            bail( ErrorCode.INVALID_OPTION );
-        }
-        return fileName;
-    }
-
-    protected final int getIntegerOptionValue( char option ) {
-        try {
-            return Integer.parseInt( commandLine.getOptionValue( option ) );
-        } catch ( NumberFormatException e ) {
-            System.out.println( invalidOptionString( "" + option ) + ", not a valid integer" );
-            bail( ErrorCode.INVALID_OPTION );
-        }
-        return 0;
-    }
-
-    protected final int getIntegerOptionValue( String option ) {
-        try {
-            return Integer.parseInt( commandLine.getOptionValue( option ) );
-        } catch ( NumberFormatException e ) {
-            System.out.println( invalidOptionString( option ) + ", not a valid integer" );
-            bail( ErrorCode.INVALID_OPTION );
-        }
-        return 0;
-    }
-
-    // /**
-    // * @return
-    // */
-    // protected Date getLimitingDate() {
-    // Date skipIfLastRunLaterThan = null;
-    // if ( StringUtils.isNotBlank( mDate ) ) {
-    // skipIfLastRunLaterThan = DateUtil.getRelativeDate( new Date(), mDate );
-    // log.info( "Analyses will be run only if last was older than " + skipIfLastRunLaterThan );
-    // }
-    // return skipIfLastRunLaterThan;
-    // }
-
-    /**
-     * @param command The name of the command as used at the command line.
-     */
-    protected void printHelp( String command ) {
-        HelpFormatter h = new HelpFormatter();
-        h.printHelp( command + " [options]", HEADER, options, FOOTER );
-    }
-
-    /**
-     * This must be called in your main method. It triggers parsing of the command line and processing of the options.
-     * Check the error code to decide whether execution of your program should proceed.
-     * 
-     * @param args
-     * @return Exception; null if nothing went wrong.
-     * @throws ParseException
-     */
-    protected final Exception processCommandLine( String commandName, String[] args ) {
-        /* COMMAND LINE PARSER STAGE */
-        BasicParser parser = new BasicParser();
-        System.err.println( "ASPIREdb version " + ConfigUtils.getAppVersion() );
-
-        if ( args == null ) {
-            printHelp( commandName );
-            return new Exception( "No arguments" );
-        }
-
-        try {
-            commandLine = parser.parse( options, args );
-        } catch ( ParseException e ) {
-            if ( e instanceof MissingOptionException ) {
-                System.err.println( "Required option(s) were not supplied: " + e.getMessage() );
-            } else if ( e instanceof AlreadySelectedException ) {
-                System.err.println( "The option(s) " + e.getMessage() + " were already selected" );
-            } else if ( e instanceof MissingArgumentException ) {
-                System.err.println( "Missing argument: " + e.getMessage() );
-            } else if ( e instanceof UnrecognizedOptionException ) {
-                System.err.println( "Unrecognized option: " + e.getMessage() );
-            } else {
-                e.printStackTrace();
-            }
-
-            printHelp( commandName );
-
-            if ( log.isDebugEnabled() ) {
-                log.debug( e );
-            }
-
-            return e;
-        }
-
-        /* INTERROGATION STAGE */
-        if ( commandLine.hasOption( 'h' ) ) {
-            printHelp( commandName );
-            return new Exception( "Help selected" );
-        }
-
-        processStandardOptions();
-        processOptions();
-
-        return null;
-
-    }
-
-    /**
-     * Wait for completion.
-     */
-    protected void waitForThreadPoolCompletion( Collection<Thread> threads ) {
-
-        while ( true ) {
-            boolean anyAlive = false;
-            for ( Thread k : threads ) {
-                if ( k.isAlive() ) {
-                    anyAlive = true;
-                }
-            }
-            if ( !anyAlive ) {
-                break;
-            }
-            try {
-                Thread.sleep( 1000 );
-            } catch ( InterruptedException e ) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * Implement this to provide processing of options. It is called at the end of processCommandLine.
-     */
-    protected abstract void processOptions();
-
-    /**
-     * This is needed for CLIs that run in tests, so the logging settings get reset.
-     */
-    protected void resetLogging() {
-        for ( Logger log4jLogger : this.originalLoggingLevels.keySet() ) {
-            log4jLogger.setLevel( this.originalLoggingLevels.get( log4jLogger ) );
-        }
-    }
-
-    /**
-     * Print out a summary of what the program did. Useful when analyzing lists of experiments etc. Use the
-     * 'successObjects' and 'errorObjects'
-     * 
-     * @param errorObjects
-     * @param successObjects
-     */
-    protected void summarizeProcessing() {
-        if ( successObjects.size() > 0 ) {
-            StringBuilder buf = new StringBuilder();
-            buf.append( "\n---------------------\n   Processed:\n" );
-            for ( Object object : successObjects ) {
-                buf.append( "    " + object + "\n" );
-            }
-            buf.append( "---------------------\n" );
-
-            log.info( buf );
-        } else {
-            log.error( "No objects processed successfully!" );
-        }
-
-        if ( errorObjects.size() > 0 ) {
-            StringBuilder buf = new StringBuilder();
-            buf.append( "\n---------------------\n   Errors occurred during the processing of:\n" );
-            for ( Object object : errorObjects ) {
-                buf.append( "    " + object + "\n" );
-            }
-            buf.append( "---------------------\n" );
-            log.error( buf );
-        }
-    }
-
-    /** check username and password. */
-    void authenticate( BeanFactory ctx ) {
-
-        /*
-         * Allow security settings (authorization etc) in a given context to be passed into spawned threads
-         */
-        SecurityContextHolder.setStrategyName( SecurityContextHolder.MODE_GLOBAL );
-
-        ManualAuthenticationService manAuthentication = ctx.getBean( ManualAuthenticationService.class );
-        if ( hasOption( 'u' ) && hasOption( 'p' ) ) {
-            username = getOptionValue( 'u' );
-            password = getOptionValue( 'p' );
-
-            if ( StringUtils.isBlank( username ) ) {
-                System.err.println( "Not authenticated. Username was blank" );
-                log.debug( "Username=" + username );
-                bail( ErrorCode.AUTHENTICATION_ERROR );
-            }
-
-            if ( StringUtils.isBlank( password ) ) {
-                System.err.println( "Not authenticated. You didn't enter a password" );
-                bail( ErrorCode.AUTHENTICATION_ERROR );
-            }
-
-            boolean success = manAuthentication.validateRequest( username, password );
-            if ( !success ) {
-                System.err.println( "Not authenticated. Make sure you entered a valid username (got '" + username
-                        + "') and/or password" );
-                bail( ErrorCode.AUTHENTICATION_ERROR );
-            } else {
-                log.info( "Logged in as " + username );
-            }
-        } else {
-            log.info( "Logging in as anonymous guest with limited privileges" );
-            // manAuthentication.authenticateAnonymously();
         }
 
     }

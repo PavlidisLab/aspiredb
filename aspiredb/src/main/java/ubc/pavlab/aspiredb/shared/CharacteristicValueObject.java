@@ -30,33 +30,48 @@ public class CharacteristicValueObject implements Displayable {
     private String key;
     private String value;
 
+    public CharacteristicValueObject() {
+    }
+
     public CharacteristicValueObject( Long id, String key, String value ) {
         this.id = id;
         this.key = key;
         this.value = value;
     }
 
-    public CharacteristicValueObject() {
+    @Override
+    public String getHtmlLabel() {
+        return value;
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId( Long id ) {
-        this.id = id;
-    }
-
     public String getKey() {
         return key;
     }
 
-    public void setKey( String key ) {
-        this.key = key;
+    @Override
+    public String getLabel() {
+        return value;
+    }
+
+    @Override
+    public String getTooltip() {
+        return value;
     }
 
     public String getValue() {
         return value;
+    }
+
+    public void setId( Long id ) {
+        this.id = id;
+    }
+
+    public void setKey( String key ) {
+        this.key = key;
     }
 
     public void setValue( String value ) {
@@ -66,20 +81,5 @@ public class CharacteristicValueObject implements Displayable {
     @Override
     public String toString() {
         return key + "=" + value;
-    }
-
-    @Override
-    public String getLabel() {
-        return value;
-    }
-
-    @Override
-    public String getHtmlLabel() {
-        return value;
-    }
-
-    @Override
-    public String getTooltip() {
-        return value;
     }
 }

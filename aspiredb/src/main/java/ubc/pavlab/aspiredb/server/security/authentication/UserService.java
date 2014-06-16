@@ -45,6 +45,9 @@ public interface UserService {
     @Secured({ "GROUP_USER", "ACL_SECURABLE_EDIT" /* this applies to the first arg only! - should use an expression */})
     public void addUserToGroup( UserGroup group, User user );
 
+    @Secured({ "GROUP_ADMIN" })
+    public void adminUpdate( User user );
+
     /**
      * @param user
      * @return
@@ -69,14 +72,6 @@ public interface UserService {
     public void delete( User user );
 
     /**
-     * Remove a user from the persistent store.
-     * 
-     * @param user
-     */
-    @Secured({ "GROUP_ADMIN" })
-    public void deleteByUserName( String userName );
-
-    /**
      * Remove a group from the persistent store
      * 
      * @param group
@@ -85,18 +80,26 @@ public interface UserService {
     public void delete( UserGroup group );
 
     /**
+     * Remove a user from the persistent store.
+     * 
+     * @param user
+     */
+    @Secured({ "GROUP_ADMIN" })
+    public void deleteByUserName( String userName );
+
+    /**
      * 
      */
     @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
     public User findByEmail( java.lang.String email );
+
+    // to allow login
 
     /**
      * @param userName
      * @return user or null if they don't exist.
      */
     public User findByUserName( String userName ); // don't secure,
-
-    // to allow login
 
     /**
      * @param oldName
@@ -105,15 +108,15 @@ public interface UserService {
     @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
     public UserGroup findGroupByName( String name );
 
-    @Secured("GROUP_USER")
-    public boolean groupExists( String name );
-
     /**
      * @param usernName
      * @return
      */
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<UserGroup> findGroupsForUser( User user );
+
+    @Secured("GROUP_USER")
+    public boolean groupExists( String name );
 
     /**
      * A list of groups available (will be security-filtered)...might need to allow anonymous.
@@ -161,9 +164,6 @@ public interface UserService {
      */
     @Secured({ "GROUP_USER", "ACL_SECURABLE_EDIT" })
     public void update( User user );
-
-    @Secured({ "GROUP_ADMIN" })
-    public void adminUpdate( User user );
 
     /**
      * @param group

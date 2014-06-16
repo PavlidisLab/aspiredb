@@ -61,21 +61,6 @@ public class LabelDaoTest extends BaseSpringContextTest {
     Variant testVariant;
     Project testProject;
 
-    @Before
-    public void init() {
-        testSubjectId = RandomStringUtils.randomAlphanumeric( 5 );
-        testSubject = testObjectHelper.createPersistentTestSubjectObjectWithCNV( testSubjectId );
-        testVariant = testSubject.getVariants().iterator().next();
-
-        testProject = new Project();
-        testProject.setName( RandomStringUtils.randomAlphabetic( 4 ) );
-
-        testProject = testObjectHelper.createPersistentProject( testProject );
-
-        testObjectHelper.addSubjectToProject( testSubject, testProject );
-
-    }
-
     @Test
     public void addSubjectLabel() {
 
@@ -110,6 +95,21 @@ public class LabelDaoTest extends BaseSpringContextTest {
                 assertTrue( v.getLabels().size() > 0 );
             }
         }.execute();
+    }
+
+    @Before
+    public void init() {
+        testSubjectId = RandomStringUtils.randomAlphanumeric( 5 );
+        testSubject = testObjectHelper.createPersistentTestSubjectObjectWithCNV( testSubjectId );
+        testVariant = testSubject.getVariants().iterator().next();
+
+        testProject = new Project();
+        testProject.setName( RandomStringUtils.randomAlphabetic( 4 ) );
+
+        testProject = testObjectHelper.createPersistentProject( testProject );
+
+        testObjectHelper.addSubjectToProject( testSubject, testProject );
+
     }
 
     @Test

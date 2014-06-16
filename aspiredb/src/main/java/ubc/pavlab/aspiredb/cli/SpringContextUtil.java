@@ -36,6 +36,14 @@ public class SpringContextUtil {
 
     /**
      * @param testing If true, it will get a test configured-BeanFactory
+     * @return BeanFactory or null if no context could be created.
+     */
+    public static BeanFactory getApplicationContext( boolean testing ) {
+        return getApplicationContext( testing, new String[] {} );
+    }
+
+    /**
+     * @param testing If true, it will get a test configured-BeanFactory
      * @param additionalConfigurationLocations, like "classpath*:/myproject/applicationContext-mine.xml"
      * @return BeanFactory or null if no context could be created.
      */
@@ -61,28 +69,6 @@ public class SpringContextUtil {
     }
 
     /**
-     * @param additionalConfigurationLocations
-     * @param paths
-     * @return
-     */
-    private static String[] addPaths( String[] additionalConfigurationLocations, String[] paths ) {
-        Object[] allPaths = ArrayUtils.addAll( paths, additionalConfigurationLocations );
-        paths = new String[allPaths.length];
-        for ( int i = 0; i < allPaths.length; i++ ) {
-            paths[i] = ( String ) allPaths[i];
-        }
-        return paths;
-    }
-
-    /**
-     * @param testing If true, it will get a test configured-BeanFactory
-     * @return BeanFactory or null if no context could be created.
-     */
-    public static BeanFactory getApplicationContext( boolean testing ) {
-        return getApplicationContext( testing, new String[] {} );
-    }
-
-    /**
      * Find the configuration file locations. The files must be in your class path for this to work.
      * 
      * @param testing - if true, it will use the test configuration.
@@ -105,6 +91,20 @@ public class SpringContextUtil {
         paths.add( "classpath*:gemma/gsec/acl/security-bean-baseconfig.xml" );
         paths.add( "classpath*:application-context.xml" );
         paths.add( "classpath*:applicationContext-security.xml" );
+    }
+
+    /**
+     * @param additionalConfigurationLocations
+     * @param paths
+     * @return
+     */
+    private static String[] addPaths( String[] additionalConfigurationLocations, String[] paths ) {
+        Object[] allPaths = ArrayUtils.addAll( paths, additionalConfigurationLocations );
+        paths = new String[allPaths.length];
+        for ( int i = 0; i < allPaths.length; i++ ) {
+            paths[i] = ( String ) allPaths[i];
+        }
+        return paths;
     }
 
     /**

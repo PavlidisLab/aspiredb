@@ -40,32 +40,16 @@ public class PhenotypeRestriction implements RestrictionExpression {
         this.uri = uri;
     }
 
-    public String getUri() {
-        return uri;
-    }
-
-    public void setUri( String uri ) {
-        this.uri = uri;
-    }
-
-    public void setName( String name ) {
-        this.name = name;
-    }
-
-    public void setValue( String value ) {
-        this.value = value;
-    }
-
     public String getName() {
         return this.name;
     }
 
-    public String getValue() {
-        return this.value;
+    public String getUri() {
+        return uri;
     }
 
-    public boolean isOntologyTerm() {
-        return this.uri != null;
+    public String getValue() {
+        return this.value;
     }
 
     public boolean isAbsent() {
@@ -78,11 +62,27 @@ public class PhenotypeRestriction implements RestrictionExpression {
                                                                 // for absent/present.
     }
 
+    public boolean isOntologyTerm() {
+        return this.uri != null;
+    }
+
     public boolean isPresent() {
         if ( this.value == null ) {
             return false;
         }
 
         return this.value.equals( PhenotypeUtil.VALUE_PRESENT ); // FIXME!
+    }
+
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    public void setUri( String uri ) {
+        this.uri = uri;
+    }
+
+    public void setValue( String value ) {
+        this.value = value;
     }
 }

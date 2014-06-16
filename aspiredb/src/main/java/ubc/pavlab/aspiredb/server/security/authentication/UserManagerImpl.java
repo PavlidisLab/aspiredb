@@ -164,6 +164,25 @@ public class UserManagerImpl implements UserManager {
         userCache.removeUserFromCache( username );
     }
 
+    @Override
+    @Secured("GROUP_ADMIN")
+    @Transactional
+    public void changePasswordForUser( String username, String newPassword ) throws AuthenticationException {
+
+        User u = userService.findByUserName( username );
+
+        if ( u == null ) {
+            throw new UsernameNotFoundException( "No user found with that username." );
+        }
+
+        logger.debug( "Changing password for user '" + username + "'" );
+
+        u.setPassword( newPassword );
+
+        userService.adminUpdate( u );
+
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -205,25 +224,6 @@ public class UserManagerImpl implements UserManager {
         userCache.removeUserFromCache( username );
 
         return u.getSignupToken();
-    }
-
-    @Override
-    @Secured("GROUP_ADMIN")
-    @Transactional
-    public void changePasswordForUser( String username, String newPassword ) throws AuthenticationException {
-
-        User u = userService.findByUserName( username );
-
-        if ( u == null ) {
-            throw new UsernameNotFoundException( "No user found with that username." );
-        }
-
-        logger.debug( "Changing password for user '" + username + "'" );
-
-        u.setPassword( newPassword );
-
-        userService.adminUpdate( u );
-
     }
 
     /*
@@ -297,6 +297,12 @@ public class UserManagerImpl implements UserManager {
          */
     }
 
+    @Override
+    public void deleteByUserName( String username ) {
+
+        userService.deleteByUserName( username );
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -322,12 +328,6 @@ public class UserManagerImpl implements UserManager {
 
         userService.delete( user );
         userCache.removeUserFromCache( username );
-    }
-
-    @Override
-    public void deleteByUserName( String username ) {
-
-        userService.deleteByUserName( username );
     }
 
     /*

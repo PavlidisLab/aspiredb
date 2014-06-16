@@ -43,36 +43,36 @@ public class ProjectOverlapFilterConfig extends CompoundRestrictionFilterConfig 
         this.projectIds = specialProjects;
     }
 
-    public Collection<Long> getProjectIds() {
-        return projectIds;
-    }
-
-    public void setProjectIds( Collection<Long> projectIds ) {
-        this.projectIds = projectIds;
+    public Boolean getInvert() {
+        return invert;
     }
 
     public Collection<Long> getOverlapProjectIds() {
         return overlapProjectIds;
     }
 
-    public void setOverlapProjectIds( Collection<Long> overlapProjectIds ) {
-        this.overlapProjectIds = overlapProjectIds;
-    }
-
     public PhenotypeRestriction getPhenotypeRestriction() {
         return phenotypeRestriction;
+    }
+
+    public Collection<Long> getProjectIds() {
+        return projectIds;
+    }
+
+    public void setInvert( Boolean invert ) {
+        this.invert = invert;
+    }
+
+    public void setOverlapProjectIds( Collection<Long> overlapProjectIds ) {
+        this.overlapProjectIds = overlapProjectIds;
     }
 
     public void setPhenotypeRestriction( PhenotypeRestriction phenotypeRestriction ) {
         this.phenotypeRestriction = phenotypeRestriction;
     }
 
-    public Boolean getInvert() {
-        return invert;
-    }
-
-    public void setInvert( Boolean invert ) {
-        this.invert = invert;
+    public void setProjectIds( Collection<Long> projectIds ) {
+        this.projectIds = projectIds;
     }
 
 }

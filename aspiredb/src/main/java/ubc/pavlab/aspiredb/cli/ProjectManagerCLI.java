@@ -83,19 +83,30 @@ public class ProjectManagerCLI extends AbstractCLI {
         }
     }
 
+    @Override
+    public String getShortDesc() {
+        return "Allow users access to projects";
+    }
+
     @SuppressWarnings("static-access")
     @Override
     protected void buildOptions() {
 
-        Option groupname = OptionBuilder.hasArg().withArgName( "group name" )
-                .withDescription( "The group to give permissions to" ).create( "groupname" );
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "group name" );
+        OptionBuilder.withDescription( "The group to give permissions to" );
+        Option groupname = OptionBuilder.create( "groupname" );
 
-        Option project = OptionBuilder.isRequired().hasArg().withArgName( "Project name" )
-                .withDescription( "The project that will be affected by these operations" ).create( "project" );
+        OptionBuilder.isRequired();
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "Project name" );
+        OptionBuilder.withDescription( "The project that will be affected by these operations" );
+        Option project = OptionBuilder.create( "project" );
 
-        Option projectOverlap = OptionBuilder.hasArg().withArgName( "Overlap Project name" )
-                .withDescription( "The project that the other project will have its overlaps calculated against" )
-                .create( "overlapProject" );
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "Overlap Project name" );
+        OptionBuilder.withDescription( "The project that the other project will have its overlaps calculated against" );
+        Option projectOverlap = OptionBuilder.create( "overlapProject" );
 
         addOption( "delete", false, "Using this option will delete the project" );
         addOption( "grant", false, "Using this option will grant the group read permissions on the project" );
@@ -212,11 +223,6 @@ public class ProjectManagerCLI extends AbstractCLI {
         }
 
         return null;
-    }
-
-    @Override
-    public String getShortDesc() {
-        return "Allow users access to projects";
     }
 
     @Override

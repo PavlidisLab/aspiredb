@@ -33,11 +33,8 @@ import ubc.pavlab.aspiredb.shared.ChromosomeBand;
 public class Chromosome implements Serializable {
     private static final long serialVersionUID = 471238175429963239L;
 
-    public Map<String, ChromosomeBand> getBands() {
-        return bands;
-    }
-
     private String name;
+
     private Map<String, ChromosomeBand> bands;
     private NavigableMap<Integer, ChromosomeBand> baseToBand;
     private int centromereLocation;
@@ -46,10 +43,6 @@ public class Chromosome implements Serializable {
         this.baseToBand = new TreeMap<Integer, ChromosomeBand>();
         this.bands = new HashMap<String, ChromosomeBand>();
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public void addBand( Integer start, Integer end, String bandName, String stainingAgent ) {
@@ -61,20 +54,28 @@ public class Chromosome implements Serializable {
         }
     }
 
-    public int getSize() {
-        ChromosomeBand lastBand = this.baseToBand.lastEntry().getValue();
-        return lastBand.getEnd();
+    public ChromosomeBand getBand( int baseCoordinate ) {
+        return baseToBand.floorEntry( baseCoordinate ).getValue();
     }
 
     public ChromosomeBand getBand( String bandName ) {
         return bands.get( bandName );
     }
 
-    public ChromosomeBand getBand( int baseCoordinate ) {
-        return baseToBand.floorEntry( baseCoordinate ).getValue();
+    public Map<String, ChromosomeBand> getBands() {
+        return bands;
     }
 
     public int getCentromereLocation() {
         return centromereLocation;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getSize() {
+        ChromosomeBand lastBand = this.baseToBand.lastEntry().getValue();
+        return lastBand.getEnd();
     }
 }

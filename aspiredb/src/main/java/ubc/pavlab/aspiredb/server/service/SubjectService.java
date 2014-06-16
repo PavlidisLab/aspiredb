@@ -41,23 +41,7 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
  */
 public interface SubjectService {
 
-    public SubjectValueObject getSubject( Long projectId, Long subjectId );
-
-    public Collection<SubjectValueObject> getSubjects( Long projectId, List<Long> subjectId );
-
-    public Collection<Property> suggestProperties();
-
-    public Collection<PropertyValue> suggestValues( Property property, SuggestionContext suggestionContext );
-
-    public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
-            throws ExternalDependencyException;
-
-    public Map<String, PhenotypeSummaryValueObject> getPhenotypeSummaryValueObjects( List<Long> subjectIds,
-            Collection<Long> projectIds ) throws NeurocartaServiceException;
-
-    public String getPhenotypeTextDownloadBySubjectIds( List<Long> subjectIds );
-
-    public List<Long> getVariantsSubjects( List<String> patientIds );
+    public LabelValueObject addLabel( Collection<Long> subjectIds, LabelValueObject label );
 
     /**
      * Rownames are Subject.patientId (e.g. 03_01) Colnames are PhenotypeValueUri:Name (e.g. HP_0001000:Abnormality of
@@ -69,13 +53,29 @@ public interface SubjectService {
      */
     public StringMatrix<String, String> getPhenotypeBySubjectIds( Collection<Long> subjectIds, boolean removeEmpty );
 
-    public LabelValueObject addLabel( Collection<Long> subjectIds, LabelValueObject label );
+    public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
+            throws ExternalDependencyException;
+
+    public Map<String, PhenotypeSummaryValueObject> getPhenotypeSummaryValueObjects( List<Long> subjectIds,
+            Collection<Long> projectIds ) throws NeurocartaServiceException;
+
+    public String getPhenotypeTextDownloadBySubjectIds( List<Long> subjectIds );
+
+    public SubjectValueObject getSubject( Long projectId, Long subjectId );
+
+    public Collection<SubjectValueObject> getSubjects( Long projectId, List<Long> subjectId );
+
+    public List<Long> getVariantsSubjects( List<String> patientIds );
 
     public void removeLabel( Collection<Long> subjectIds, LabelValueObject label );
 
     public void removeLabel( Long subjectId, LabelValueObject label );
 
     public List<LabelValueObject> suggestLabels( SuggestionContext suggestionContext );
+
+    public Collection<Property> suggestProperties();
+
+    public Collection<PropertyValue> suggestValues( Property property, SuggestionContext suggestionContext );
 
     Collection<Label> getSubjectLabels( Collection<Long> subjectIds );
 }

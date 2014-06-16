@@ -29,16 +29,6 @@ public abstract class SearchableEhcache<T> {
 
     private Ehcache cache;
 
-    public abstract Object getKey( T object );
-
-    public abstract String getCacheName();
-
-    @SuppressWarnings("unused")
-    @PostConstruct
-    private void initialize() {
-        this.cache = this.cacheManager.getCache( getCacheName() );
-    }
-
     public Collection<T> fetchByCriteria( Criteria criteria ) {
         net.sf.ehcache.search.Query query = this.cache.createQuery();
         query.includeValues();
@@ -55,6 +45,14 @@ public abstract class SearchableEhcache<T> {
         return genes;
     }
 
+    public abstract String getCacheName();
+
+    public abstract Object getKey( T object );
+
+    public Attribute<Object> getSearchAttribute( String attributeName ) {
+        return this.cache.getSearchAttribute( attributeName );
+    }
+
     public boolean hasExpired() {
         // Causes all elements stored in the Cache to be synchronously checked for expiry (every 5 minutues), and if
         // expired, evicted.
@@ -64,17 +62,19 @@ public abstract class SearchableEhcache<T> {
         return ( this.cache.getSize() <= 0 );
     }
 
+    public boolean isKeyInCache( Object key ) {
+        return this.cache.isKeyInCache( key );
+    }
+
     public void putAll( Collection<T> objects ) {
         for ( T object : objects ) {
             this.cache.putIfAbsent( new Element( getKey( object ), object ) );
         }
     }
 
-    public boolean isKeyInCache( Object key ) {
-        return this.cache.isKeyInCache( key );
-    }
-
-    public Attribute<Object> getSearchAttribute( String attributeName ) {
-        return this.cache.getSearchAttribute( attributeName );
+    @SuppressWarnings("unused")
+    @PostConstruct
+    private void initialize() {
+        this.cache = this.cacheManager.getCache( getCacheName() );
     }
 }

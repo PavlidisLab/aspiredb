@@ -29,17 +29,15 @@ import ubc.pavlab.aspiredb.shared.GenomicRange;
  */
 public interface BioMartQueryService {
 
-    public Collection<GeneValueObject> findGenes( String queryString ) throws BioMartServiceException;
-
     /**
-     * Get a list of genes using the given gene symbols or ensembl ids. The order of the returned list of genes is
-     * preserved. If a gene symbol or ensembl id is not valid, the returned gene will be null.
+     * Find genes by gene symbols.
      * 
-     * @param geneStrings gene symbols or ensembl ids
-     * @return a list of GeneValueObjects
+     * @param geneSymbols
+     * @return collection of genes
      * @throws BioMartServiceException
      */
-    public List<GeneValueObject> getGenes( List<String> geneStrings ) throws BioMartServiceException;
+    public Collection<GeneValueObject> fetchGenesByGeneSymbols( Collection<String> geneSymbols )
+            throws BioMartServiceException;
 
     /**
      * Find genes that are inside the specified region of the genome.
@@ -63,13 +61,15 @@ public interface BioMartQueryService {
     public Collection<GenomicRange> fetchGenomicRangesByGeneSymbols( Collection<String> geneSymbols )
             throws BioMartServiceException;
 
+    public Collection<GeneValueObject> findGenes( String queryString ) throws BioMartServiceException;
+
     /**
-     * Find genes by gene symbols.
+     * Get a list of genes using the given gene symbols or ensembl ids. The order of the returned list of genes is
+     * preserved. If a gene symbol or ensembl id is not valid, the returned gene will be null.
      * 
-     * @param geneSymbols
-     * @return collection of genes
+     * @param geneStrings gene symbols or ensembl ids
+     * @return a list of GeneValueObjects
      * @throws BioMartServiceException
      */
-    public Collection<GeneValueObject> fetchGenesByGeneSymbols( Collection<String> geneSymbols )
-            throws BioMartServiceException;
+    public List<GeneValueObject> getGenes( List<String> geneStrings ) throws BioMartServiceException;
 }
