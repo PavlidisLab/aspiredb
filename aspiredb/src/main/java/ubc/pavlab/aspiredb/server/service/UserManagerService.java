@@ -12,27 +12,28 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-
-package ubc.pavlab.aspiredb.server.security.authentication;
+package ubc.pavlab.aspiredb.server.service;
 
 import java.util.Collection;
 import java.util.List;
 
+import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 
+
 /**
- * @author paul
- * @version $Id: UserManager.java,v 1.5 2013/06/11 22:30:52 anton Exp $
+ * @author Gaya
  */
-
-public interface UserManager extends gemma.gsec.model.UserManager {
-
-    public void changePasswordForUser( String username, String newPassword );
-
-    public void deleteByUserName( String username );
+public interface UserManagerService {
 
     public String createUserGroup( String groupName );
-    
-    public List<UserGroup> loadUserGroups();
+
+    public List<UserGroup> loadUserEditableGroups();
+
+    public UserGroup findGroupByName( String name );
+
+    public User getCurrentUser();
+
+    public String getCurrentUsername();
 
 }
