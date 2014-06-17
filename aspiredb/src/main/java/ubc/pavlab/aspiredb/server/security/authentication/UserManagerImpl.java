@@ -15,6 +15,8 @@
 
 package ubc.pavlab.aspiredb.server.security.authentication;
 
+import gemma.gsec.SecurityService;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -50,6 +52,7 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserExistsException;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
+import ubc.pavlab.aspiredb.server.service.SubjectService;
 import ubc.pavlab.aspiredb.server.util.AuthorityConstants;
 
 /**
@@ -91,6 +94,12 @@ public class UserManagerImpl implements UserManager {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private SubjectService subjectService;
+    
+    @Autowired
+    private SecurityService securityService;
 
     /*
      * (non-Javadoc)
@@ -102,7 +111,7 @@ public class UserManagerImpl implements UserManager {
     @Transactional
     public void addGroupAuthority( String groupName, GrantedAuthority authority ) {
         UserGroup g = loadGroup( groupName );
-
+        
         for ( gemma.gsec.model.GroupAuthority ga : g.getAuthorities() ) {
             if ( ga.getAuthority().equals( authority.getAuthority() ) ) {
                 logger.warn( "Group already has authority" + authority.getAuthority() );
@@ -245,6 +254,33 @@ public class UserManagerImpl implements UserManager {
 
         userService.create( g );
 
+    }
+    
+    /**
+     * Create group using gsec
+     */
+    @Override
+    @Transactional
+    public String createUserGroup( String groupName ) {
+        try{
+        securityService.createGroup( groupName );
+        }catch(Exception exception){
+            return exception.toString();
+        }
+        return "Success";
+    }
+    
+    @Override
+    @Transactional
+    public List<UserGroup> loadUserGroups(){
+        
+        Collection<String> usergroups =securityService.getGroupsEditableBy( getCurrentUser() );        
+        List<UserGroup> UserGroup=new ArrayList<UserGroup>();
+        
+        for (String usergroup: usergroups){
+            UserGroup.add( userService.findGroupByName( usergroup ));
+        }
+        return UserGroup;
     }
 
     /*

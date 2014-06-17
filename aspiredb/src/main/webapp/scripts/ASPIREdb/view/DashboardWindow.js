@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'Ext.Window','ASPIREdb.view.UploadDataManagerWindow','ASPIREdb.view.ProjectManagerWindow'] );
+Ext.require( [ 'Ext.Window','ASPIREdb.view.UploadDataManagerWindow','ASPIREdb.view.ProjectManagerWindow','ASPIREdb.view.UserManagerWindow'] );
 
 Ext.define( 'ASPIREdb.view.DashboardWindow', {
    extend : 'Ext.Window',
@@ -193,6 +193,21 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
                   icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
                   handler : function() {
                      ASPIREdb.view.ProjectManagerWindow.initGridAndShow();
+          
+                  }
+               } );
+               
+ me.getDockedComponent( 'dashboardToolbar' ).add( '-' );
+               
+               //add project manager button
+               me.getDockedComponent( 'dashboardToolbar' ).add( {
+                  xtype : 'button',
+                  id : 'manageManager',
+                  text : 'Manage User',
+                  tooltip : 'Create groups and invite users to group',
+                  icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
+                  handler : function() {
+                     ASPIREdb.view.UserManagerWindow.initGridAndShow();
           
                   }
                } );

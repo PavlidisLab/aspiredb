@@ -809,5 +809,13 @@ public class ProjectServiceImpl implements ProjectService {
         return projectManager.createUserAndAssignToGroup( userName, password, groupName );
 
     }
+    
+    @Override
+    @Transactional
+    public List<UserGroup> loadUserGroups() {
+        return userManager.loadUserGroups();
+    }
+        
+  
 
 }

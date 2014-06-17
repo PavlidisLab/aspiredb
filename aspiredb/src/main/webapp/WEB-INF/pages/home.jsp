@@ -11,6 +11,7 @@
 <script src="dwr/interface/VariantService.js"></script>
 <script src="dwr/interface/GeneService.js"></script>
 <script src="dwr/interface/UserGeneSetService.js"></script>
+<script src="dwr/interface/UserManagerService.js"></script>
 <script src="dwr/interface/UCSCConnector.js"></script>
 <script src="dwr/dtoall.js"></script>
 <script src="dwr/interface/ConfigUtils.js"></script>
