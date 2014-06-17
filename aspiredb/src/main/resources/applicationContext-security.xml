@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop"
- xmlns:s="http://www.springframework.org/schema/security" xmlns:util="http://www.springframework.org/schema/util"
- xsi:schemaLocation="http://www.springframework.org/schema/beans 
+    xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:s="http://www.springframework.org/schema/security" xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
            http://www.springframework.org/schema/beans/spring-beans-3.2.xsd           
            http://www.springframework.org/schema/aop 
            http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
@@ -14,100 +14,101 @@
            http://www.springframework.org/schema/util/spring-util-3.2.xsd">
 
 
- <!-- Spring Security configuration -->
+    <!-- Spring Security configuration -->
 
- <s:http auto-config="true" access-decision-manager-ref="httpAccessDecisionManager">
-  <s:anonymous granted-authority="GROUP_ANONYMOUS" />
-  <s:intercept-url pattern="/**/*.html" access="IS_AUTHENTICATED_ANONYMOUSLY" />
-  <s:intercept-url pattern="/**/dwr/*" access="GROUP_USER" />
-  <s:intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
- 
+    <s:http auto-config="true" access-decision-manager-ref="httpAccessDecisionManager">
+        <s:anonymous granted-authority="GROUP_ANONYMOUS" />
+        <s:intercept-url pattern="/**/*.html" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <s:intercept-url pattern="/**/dwr/*" access="GROUP_USER" />
+        <s:intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
 
-    <s:intercept-url pattern="/j_spring_security_check" access="IS_AUTHENTICATED_ANONYMOUSLY"
-  requires-channel="https" />
+        <!-- TODO SSL Disabled for now until it works on sandbox -->
+        <!--
+        <s:intercept-url pattern="/j_spring_security_check" access="IS_AUTHENTICATED_ANONYMOUSLY"
+            requires-channel="https" />
+         -->
 
-  
-  <s:form-login authentication-success-handler-ref="ajaxAuthenticationSuccessHandler"
-   authentication-failure-handler-ref="ajaxAuthenticationFailureHandler" />
-
-
-
-  <s:logout logout-success-url="/login.html" />
-  <!-- <s:form-login login-page="/login.html" default-target-url="/" /> -->
- </s:http>
-
- <bean id="ajaxAuthenticationFailureHandler" class="ubc.pavlab.aspiredb.server.security.authentication.AjaxAuthenticationFailureHandler">
-    <property name="defaultFailureUrl" value="/login.html" />
- </bean>
-
- <bean id="ajaxAuthenticationSuccessHandler" class="ubc.pavlab.aspiredb.server.security.authentication.AjaxAuthenticationSuccessHandler">
-  <property name="alwaysUseDefaultTargetUrl" value="false"></property>
- </bean>
-
- <!-- works with the HttpSessionEventPublisher configured in web.xml -->
- <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
-
- <s:authentication-manager alias="authenticationManager">
-  <s:authentication-provider user-service-ref="userManager">
-
-   <s:password-encoder ref="passwordEncoder">
-    <s:salt-source user-property="username" />
-   </s:password-encoder>
-
-  </s:authentication-provider>
-  <s:authentication-provider ref="runAsAuthenticationProvider" />
- </s:authentication-manager>
+        <s:form-login authentication-success-handler-ref="ajaxAuthenticationSuccessHandler"
+            authentication-failure-handler-ref="ajaxAuthenticationFailureHandler" />
 
 
- <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder" />
 
- <bean id="runAsManager" class="org.springframework.security.access.intercept.RunAsManagerImpl">
-  <property name="rolePrefix" value="GROUP_" />
-  <property name="key" value="aspiredbrunaspassword" />
- </bean>
+        <s:logout logout-success-url="/login.html" />
+        <!-- <s:form-login login-page="/login.html" default-target-url="/" /> -->
+    </s:http>
 
- <bean id="runAsAuthenticationProvider" class="org.springframework.security.access.intercept.RunAsImplAuthenticationProvider">
-  <property name="key" value="aspiredbrunaspassword" />
- </bean>
+    <bean id="ajaxAuthenticationFailureHandler" class="ubc.pavlab.aspiredb.server.security.authentication.AjaxAuthenticationFailureHandler">
+        <property name="defaultFailureUrl" value="/login.html" />
+    </bean>
 
- <!--- global method security configuration -->
+    <bean id="ajaxAuthenticationSuccessHandler" class="ubc.pavlab.aspiredb.server.security.authentication.AjaxAuthenticationSuccessHandler">
+        <property name="alwaysUseDefaultTargetUrl" value="false"></property>
+    </bean>
 
- <s:global-method-security run-as-manager-ref="runAsManager" secured-annotations="enabled"
-  pre-post-annotations="enabled" access-decision-manager-ref="accessDecisionManager" order="1">
-  <s:expression-handler ref="securityExpressionHandler" />
+    <!-- works with the HttpSessionEventPublisher configured in web.xml -->
+    <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
 
-  <!-- these filters are declared here or in the security-bean-baseconfig.xml -->
-  <s:after-invocation-provider ref="afterAclReadQuiet" />
-  <s:after-invocation-provider ref="afterAclRead" />
-  <s:after-invocation-provider ref="afterAclCollectionRead" />
-  <s:after-invocation-provider ref="afterAclMyDataRead" />
-  <s:after-invocation-provider ref="afterAclMyPrivateDataRead" />
-  <s:after-invocation-provider ref="afterAclAllMyData" />
-  <s:after-invocation-provider ref="afterAclValueObjectCollection" />
-  <s:after-invocation-provider ref="afterAclValueObject" />
-  <s:after-invocation-provider ref="afterAclMapRead" />
-  <s:after-invocation-provider ref="afterAclMapValuesRead" />
-  <s:after-invocation-provider ref="postInvocationAdviceProvider" /><!-- for @Post... -->
- </s:global-method-security>
+    <s:authentication-manager alias="authenticationManager">
+        <s:authentication-provider user-service-ref="userManager">
 
- <!-- Aspect that adds ACLs for new entities, and deletes them for deleted entities. -->
- <aop:config>
-  <aop:aspect id="aclAspect" ref="aclAdvice" order="4">
-   <aop:after-returning method="doAclAdvice" pointcut="ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.modifier()"
-    returning="retValue" />
-  </aop:aspect>
- </aop:config>
+            <s:password-encoder ref="passwordEncoder">
+                <s:salt-source user-property="username" />
+            </s:password-encoder>
 
- <bean id="httpAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
-  <property name="allowIfAllAbstainDecisions" value="true" />
-  <property name="decisionVoters">
-   <list>
-    <bean class="org.springframework.security.web.access.expression.WebExpressionVoter" />
-    <ref local="roleHierarchyVoter" />
-    <bean class="org.springframework.security.access.vote.AuthenticatedVoter" />
-   </list>
-  </property>
- </bean>
+        </s:authentication-provider>
+        <s:authentication-provider ref="runAsAuthenticationProvider" />
+    </s:authentication-manager>
+
+
+    <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder" />
+
+    <bean id="runAsManager" class="org.springframework.security.access.intercept.RunAsManagerImpl">
+        <property name="rolePrefix" value="GROUP_" />
+        <property name="key" value="aspiredbrunaspassword" />
+    </bean>
+
+    <bean id="runAsAuthenticationProvider" class="org.springframework.security.access.intercept.RunAsImplAuthenticationProvider">
+        <property name="key" value="aspiredbrunaspassword" />
+    </bean>
+
+    <!--- global method security configuration -->
+
+    <s:global-method-security run-as-manager-ref="runAsManager" secured-annotations="enabled"
+        pre-post-annotations="enabled" access-decision-manager-ref="accessDecisionManager" order="1">
+        <s:expression-handler ref="securityExpressionHandler" />
+
+        <!-- these filters are declared here or in the security-bean-baseconfig.xml -->
+        <s:after-invocation-provider ref="afterAclReadQuiet" />
+        <s:after-invocation-provider ref="afterAclRead" />
+        <s:after-invocation-provider ref="afterAclCollectionRead" />
+        <s:after-invocation-provider ref="afterAclMyDataRead" />
+        <s:after-invocation-provider ref="afterAclMyPrivateDataRead" />
+        <s:after-invocation-provider ref="afterAclAllMyData" />
+        <s:after-invocation-provider ref="afterAclValueObjectCollection" />
+        <s:after-invocation-provider ref="afterAclValueObject" />
+        <s:after-invocation-provider ref="afterAclMapRead" />
+        <s:after-invocation-provider ref="afterAclMapValuesRead" />
+        <s:after-invocation-provider ref="postInvocationAdviceProvider" /><!-- for @Post... -->
+    </s:global-method-security>
+
+    <!-- Aspect that adds ACLs for new entities, and deletes them for deleted entities. -->
+    <aop:config>
+        <aop:aspect id="aclAspect" ref="aclAdvice" order="4">
+            <aop:after-returning method="doAclAdvice"
+                pointcut="ubc.pavlab.aspiredb.server.util.SystemArchitectureAspect.modifier()" returning="retValue" />
+        </aop:aspect>
+    </aop:config>
+
+    <bean id="httpAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+        <property name="allowIfAllAbstainDecisions" value="true" />
+        <property name="decisionVoters">
+            <list>
+                <bean class="org.springframework.security.web.access.expression.WebExpressionVoter" />
+                <ref local="roleHierarchyVoter" />
+                <bean class="org.springframework.security.access.vote.AuthenticatedVoter" />
+            </list>
+        </property>
+    </bean>
 
 
 </beans>

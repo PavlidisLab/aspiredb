@@ -41,10 +41,11 @@
          }
 
          // http to https
+         // TODO SSL Disabled for now until it works on sandbox
          //var DEFAULT_SSL_PORT = "8443";
-         if ( window.location.protocol != "https:" ) {
-            window.location.href = 'https://' + window.location.hostname + ':' + port + window.location.pathname;
-         }
+         //if ( window.location.protocol != "https:" ) {
+         //   window.location.href = 'https://' + window.location.hostname + ':' + port + window.location.pathname;
+         //}
 
          //var win = Ext.create();
          var viewport = Ext.create( 'ASPIREdb.view.LoginForm' );
