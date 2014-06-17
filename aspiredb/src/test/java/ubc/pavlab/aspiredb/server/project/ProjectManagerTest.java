@@ -169,7 +169,9 @@ public class ProjectManagerTest extends BaseSpringContextTest {
             fail( "projectManager.addSubjectVariantsToProject threw an exception " + e );
 
         }
-        
+
+        projectManager.alterGroupWritePermissions( projectId, groupName, true );
+
         TransactionTemplate tt = new TransactionTemplate( transactionManager );
         tt.execute( new TransactionCallbackWithoutResult() {
             @Override
@@ -186,7 +188,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
                 // now to test
                 List<Subject> subjects = project.getSubjects();
                 assertEquals( 1, subjects.size() );
-                
+
                 Subject subject = project.getSubjects().iterator().next();
 
                 aclTestUtils.checkHasAcl( subject );
@@ -195,7 +197,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
                 // equals to cnvList
                 assertEquals( 2, subject.getVariants().size() );
-                
+
                 Collection<Variant> variantCollection = variantDao.findBySubjectPatientId( patientId );
 
                 for ( Variant v : variantCollection ) {

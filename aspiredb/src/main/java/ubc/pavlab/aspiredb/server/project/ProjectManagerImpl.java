@@ -16,6 +16,8 @@
 package ubc.pavlab.aspiredb.server.project;
 
 import gemma.gsec.SecurityService;
+import gemma.gsec.acl.domain.AclObjectIdentity;
+import gemma.gsec.acl.domain.AclService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +30,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Acl;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
@@ -36,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.cli.InvalidDataException;
+import ubc.pavlab.aspiredb.server.dao.CharacteristicDao;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
@@ -96,6 +100,9 @@ public class ProjectManagerImpl implements ProjectManager {
     @Autowired
     VariantDao variantDao;
 
+    @Autowired
+    CharacteristicDao characteristicDao;
+
     SecurityService securityservice;
 
     @Autowired
@@ -115,6 +122,9 @@ public class ProjectManagerImpl implements ProjectManager {
 
     @Autowired
     QueryService queryService;
+
+    @Autowired
+    AclService aclService;
 
     ShaPasswordEncoder passwordEncoder = new ShaPasswordEncoder();
 
@@ -496,13 +506,18 @@ public class ProjectManagerImpl implements ProjectManager {
             v.setUserVariantId( getNewVariantId( patientId ) );
         }
 
+        // Characteristic inherits ACL from Variant
+        for ( Characteristic c : v.getCharacteristics() ) {
+            c.setSecurityOwner( v );
+        }
+
         v = variantDao.create( v );
         subject.addVariant( v );
 
         if ( newSubject ) {
             subject.getProjects().add( project );
         }
-        
+
         subjectDao.update( subject );
     }
 
@@ -516,12 +531,12 @@ public class ProjectManagerImpl implements ProjectManager {
         List<Subject> subjects = project.getSubjects();
 
         if ( grant ) {
+            Acl acl = aclService.readAclById( new AclObjectIdentity( project ) );
             securityService.makeWriteableByGroup( project, groupName );
         } else {
             securityService.makeUnreadableByGroup( project, groupName );
         }
 
-        // TODO labels? other stuff that has been added?
         for ( Subject s : subjects ) {
 
             if ( grant ) {

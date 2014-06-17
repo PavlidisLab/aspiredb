@@ -14,7 +14,8 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
-import gemma.gsec.model.SecuredNotChild;
+import gemma.gsec.model.Securable;
+import gemma.gsec.model.SecuredChild;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +25,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
 
@@ -33,7 +35,7 @@ import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
  */
 @Entity
 @Table(name = "CHARACTERISTIC")
-public class Characteristic implements SecuredNotChild {
+public class Characteristic implements SecuredChild {
 
     public static Collection<CharacteristicValueObject> toValueObjects( Collection<Characteristic> entityCharacteristics ) {
         Collection<CharacteristicValueObject> characteristicValueObjects = new ArrayList<CharacteristicValueObject>();
@@ -42,6 +44,9 @@ public class Characteristic implements SecuredNotChild {
         }
         return characteristicValueObjects;
     }
+
+    @Transient
+    Securable securityOwner;
 
     @Id
     @GeneratedValue
@@ -89,5 +94,14 @@ public class Characteristic implements SecuredNotChild {
 
     public CharacteristicValueObject toValueObject() {
         return new CharacteristicValueObject( id, key, value );
+    }
+
+    @Override
+    public Securable getSecurityOwner() {
+        return securityOwner;
+    }
+
+    public void setSecurityOwner( Securable securityOwner ) {
+        this.securityOwner = securityOwner;
     }
 }
