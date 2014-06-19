@@ -14,6 +14,8 @@
  */
 package ubc.pavlab.aspiredb.cli;
 
+import gemma.gsec.authentication.UserDetailsImpl;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +32,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 
 /**

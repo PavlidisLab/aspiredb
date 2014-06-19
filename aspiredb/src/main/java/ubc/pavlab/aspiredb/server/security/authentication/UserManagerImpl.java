@@ -16,6 +16,7 @@
 package ubc.pavlab.aspiredb.server.security.authentication;
 
 import gemma.gsec.SecurityService;
+import gemma.gsec.authentication.UserDetailsImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;

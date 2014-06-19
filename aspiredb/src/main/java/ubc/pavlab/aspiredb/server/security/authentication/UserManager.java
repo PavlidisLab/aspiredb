@@ -25,7 +25,7 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
  * @version $Id: UserManager.java,v 1.5 2013/06/11 22:30:52 anton Exp $
  */
 
-public interface UserManager extends gemma.gsec.model.UserManager {
+public interface UserManager extends gemma.gsec.authentication.UserManager {
 
     public void changePasswordForUser( String username, String newPassword );
 

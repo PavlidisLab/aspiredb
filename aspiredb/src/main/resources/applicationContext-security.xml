@@ -37,11 +37,11 @@
         <!-- <s:form-login login-page="/login.html" default-target-url="/" /> -->
     </s:http>
 
-    <bean id="ajaxAuthenticationFailureHandler" class="ubc.pavlab.aspiredb.server.security.authentication.AjaxAuthenticationFailureHandler">
+    <bean id="ajaxAuthenticationFailureHandler" class="gemma.gsec.authentication.AjaxAuthenticationFailureHandler">
         <property name="defaultFailureUrl" value="/login.html" />
     </bean>
 
-    <bean id="ajaxAuthenticationSuccessHandler" class="ubc.pavlab.aspiredb.server.security.authentication.AjaxAuthenticationSuccessHandler">
+    <bean id="ajaxAuthenticationSuccessHandler" class="gemma.gsec.authentication.AjaxAuthenticationSuccessHandler">
         <property name="alwaysUseDefaultTargetUrl" value="false"></property>
     </bean>
 

@@ -16,6 +16,7 @@
 package ubc.pavlab.aspiredb.server.dao;
 
 import static org.junit.Assert.assertEquals;
+import gemma.gsec.authentication.UserDetailsImpl;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,7 +40,6 @@ import ubc.pavlab.aspiredb.server.model.GenomicLocation;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
-import ubc.pavlab.aspiredb.server.security.authentication.UserDetailsImpl;
 import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
