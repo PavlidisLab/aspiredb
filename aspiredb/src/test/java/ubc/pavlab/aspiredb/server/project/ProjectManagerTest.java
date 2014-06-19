@@ -384,7 +384,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
     }
     
-   // @Test
+   @Test
    public void testCreateProject() {
 
         super.runAsAdmin();
