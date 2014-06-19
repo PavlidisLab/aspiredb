@@ -23,6 +23,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+import ubc.pavlab.aspiredb.server.util.ConfigUtils;
+
 /**
  * Generic command information for aspiredb. This doesn't do anything but print some help.
  * 
@@ -40,6 +42,7 @@ public class AspiredbCLI {
      */
     public static void main( String[] args ) {
         System.err.println( "============ ASPIREdb command line tools ============" );
+        System.err.print( "ASPIREdb version " + ConfigUtils.getAppVersion() + "\n\n");
 
         System.err
                 .print( "You've evoked the ASPIREdb CLI in a mode that doesn't do anything.\n"
