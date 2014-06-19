@@ -1,9 +1,12 @@
 package ubc.pavlab.aspiredb.server.controller;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.AbstractController;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import ubc.pavlab.aspiredb.server.model.ExtJSFormResult;
 import ubc.pavlab.aspiredb.server.model.FileUploadBean;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
@@ -73,6 +77,7 @@ public class FileUploadController {
         if(uploadItem.getFile().getSize()>0){                     
             try {      
                 SaveFileFromInputStream(uploadItem.getFile().getInputStream(),"uploadFile",uploadItem.getFile().getOriginalFilename());
+                
                 try {
                 Class.forName( "org.relique.jdbc.csv.CsvDriver" );
 
@@ -113,23 +118,74 @@ public class FileUploadController {
      * @param filename    
      * @throws IOException    
      */     
-    public void SaveFileFromInputStream(InputStream stream,String path,String filename) throws IOException      
-    {            
-     FileOutputStream fs=new FileOutputStream(path + "/"+ filename);  
-     byte[]  buffer=new byte[1024*1024];  
-     int bytesum = 0;      
-        int byteread = 0;   
-          while ((byteread=stream.read())!=-1)  
-          {  
-              bytesum+=byteread;  
-                
-                fs.write(buffer,0,byteread);      
-                fs.flush();      
-                
-          }  
-          fs.close();      
-          stream.close();      
+    public void SaveFileFromInputStream(InputStream stream,String path,String filename) throws IOException {
+                    
+        String csv = path+"/"+filename;
+       
+        CSVWriter writer = new CSVWriter( new FileWriter( csv ) );
+        String fileContent =getStringFromInputStream(stream);
+        
+        File f = new File(fileContent);
+        if(f.exists() && !f.isDirectory()) {
+
+            String[] Outresults = fileContent.split( "\n" );
+
+            for ( int i = 0; i < Outresults.length; i++ ) {
+              String[] passedCSVFile = Outresults[i].toString().split( "," );
+                writer.writeNext( passedCSVFile );
+            }
+
+            writer.close();
+            /** FileOutputStream fs=new FileOutputStream(path + "/"+ filename);  
+            byte[]  buffer=new byte[1024*1024];  
+            int bytesum = 0;      
+               int byteread = 0;   
+                 while ((byteread=stream.read())!=-1)  
+                 {  
+                     bytesum+=byteread;  
+                       
+                       fs.write(buffer,0,byteread);      
+                       fs.flush();      
+                       
+                 }  
+                 fs.close();      
+                 stream.close();    */  
+           
+        }
+      
+        
+   
     } 
+    
+ // convert InputStream to String
+    private static String getStringFromInputStream(InputStream is) {
+ 
+        BufferedReader br = null;
+        StringBuilder sb = new StringBuilder();
+ 
+        String line;
+        try {
+ 
+            br = new BufferedReader(new InputStreamReader(is));
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+ 
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+ 
+        return sb.toString();
+ 
+    }
     
     /**
      * Ajax. DWR can handle this.
