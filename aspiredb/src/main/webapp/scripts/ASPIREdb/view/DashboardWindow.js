@@ -16,7 +16,8 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'Ext.Window','ASPIREdb.view.UploadDataManagerWindow','ASPIREdb.view.ProjectManagerWindow','ASPIREdb.view.UserManagerWindow'] );
+Ext.require( [ 'Ext.Window', 'ASPIREdb.view.UploadDataManagerWindow', 'ASPIREdb.view.ProjectManagerWindow',
+              'ASPIREdb.view.UserManagerWindow' ] );
 
 Ext.define( 'ASPIREdb.view.DashboardWindow', {
    extend : 'Ext.Window',
@@ -154,8 +155,8 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
       } );
 
       this.add( okButton );
-      
-     ASPIREdb.EVENT_BUS.on( 'new_project_created', ref.refreshDashboardHandler, ref );
+
+      ASPIREdb.EVENT_BUS.on( 'new_project_created', ref.refreshDashboardHandler, ref );
 
    },
    /**
@@ -163,13 +164,13 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
     * 
     */
    enableToolbar : function() {
-      var me=this;
+      var me = this;
       this.getDockedComponent( 'dashboardToolbar' ).removeAll();
-      
-      LoginStatusService.isUserAdministrator({
+
+      LoginStatusService.isUserAdministrator( {
          callback : function(admin) {
-            if (admin){
-               //add upload project button
+            if ( admin ) {
+               // add upload project button
                me.getDockedComponent( 'dashboardToolbar' ).add( {
                   xtype : 'button',
                   id : 'createProject',
@@ -178,13 +179,13 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
                   icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
                   handler : function() {
                      ASPIREdb.view.UploadDataManagerWindow.initGridAndShow();
-          
+
                   }
                } );
-               
+
                me.getDockedComponent( 'dashboardToolbar' ).add( '-' );
-               
-               //add project manager button
+
+               // add project manager button
                me.getDockedComponent( 'dashboardToolbar' ).add( {
                   xtype : 'button',
                   id : 'manageProject',
@@ -193,13 +194,13 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
                   icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
                   handler : function() {
                      ASPIREdb.view.ProjectManagerWindow.initGridAndShow();
-          
+
                   }
                } );
-               
- me.getDockedComponent( 'dashboardToolbar' ).add( '-' );
-               
-               //add project manager button
+
+               me.getDockedComponent( 'dashboardToolbar' ).add( '-' );
+
+               // add project manager button
                me.getDockedComponent( 'dashboardToolbar' ).add( {
                   xtype : 'button',
                   id : 'manageManager',
@@ -208,29 +209,23 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
                   icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
                   handler : function() {
                      ASPIREdb.view.UserManagerWindow.initGridAndShow();
-          
+
                   }
                } );
-               
-               
-               
+
             }
-               
+
          }
-      });
-      
-      
-      
-      
+      } );
 
    },
    /**
     * Refresh the dash board
     */
-   refreshDashboardHandler : function(){
-     this.getView().refresh( true );
-    //  Ext.getCmp('projectField').store.load();
-      
+   refreshDashboardHandler : function() {
+      this.getView().refresh( true );
+      // Ext.getCmp('projectField').store.load();
+
    }
 
 } );
