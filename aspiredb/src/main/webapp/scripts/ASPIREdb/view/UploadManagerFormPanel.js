@@ -255,7 +255,7 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
 
          buttons : [ {
             id : 'uploadVariantFiles',
-            text : 'Uplaod Variants',
+            text : 'Upload Variants',
             handler : function() {
                var form = variantPanel;
                var me = this;
@@ -354,7 +354,7 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
          buttons : [ {
             // xtype : 'Upload',
             id : 'UploadPhenotypeFiles',
-            text : 'Uplaod Phenotypes',
+            text : 'Upload Phenotypes',
             handler : function() {
                var form = phenotypePanel;
                var me = this;

@@ -86,8 +86,7 @@ public class FileUploadController {
                 Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
                 String filename =uploadItem.getFile().getOriginalFilename().substring(0,uploadItem.getFile().getOriginalFilename().lastIndexOf('.'));
                 Statement stmt = conn.createStatement();
-                ResultSet results = stmt.executeQuery( "SELECT * FROM "+ filename);
-             //  addSubjectVariantsToExistingProject( filename, true, "test", "CNV" );
+                ResultSet results = stmt.executeQuery( "SELECT * FROM "+ filename);            
 
                 // clean up
                 results.close();
@@ -124,9 +123,7 @@ public class FileUploadController {
        
         CSVWriter writer = new CSVWriter( new FileWriter( csv ) );
         String fileContent =getStringFromInputStream(stream);
-        
-        File f = new File(fileContent);
-        if(f.exists() && !f.isDirectory()) {
+       
 
             String[] Outresults = fileContent.split( "\n" );
 
@@ -155,7 +152,7 @@ public class FileUploadController {
       
         
    
-    } 
+    
     
  // convert InputStream to String
     private static String getStringFromInputStream(InputStream is) {

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="12.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <type>com.umlet.element.SequenceDiagram</type>
+    <coordinates>
+      <x>0</x>
+      <y>30</y>
+      <w>1210</w>
+      <h>380</h>
+    </coordinates>
+    <panel_attributes>title: aspiredb main workflow
+_aspiredb:subjectGrid~id1_|_aspiredb:ideogram~id2_|_aspiredb:variantGrid~id3_|_aspiredb:geneGrid~id4_|_aspiredb:phenotypeGrid~id5_
+id1-&gt;&gt;id2:id1,id2
+id1-&gt;&gt;id3:id1,id3
+id1-&gt;&gt;id4:id1,id4
+id1-&gt;&gt;id5:id1,id5
+id5.&gt;id1:focus
+id2.&gt;id3:id2,id3:focus
+id3.&gt;id2:id3,id2:focus
+id2.&gt;id4:id2,id4:focus?
+id4.&gt;id2:id4,id2:focus?</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
