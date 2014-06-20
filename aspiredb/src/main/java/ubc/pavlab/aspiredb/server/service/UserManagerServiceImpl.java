@@ -119,7 +119,7 @@ public class UserManagerServiceImpl implements UserManagerService {
         List<UserGroup> UserGroup = new ArrayList<UserGroup>();
 
         for ( String usergroup : usergroups ) {
-            UserGroup.add( userService.findGroupByName( usergroup ) );
+            UserGroup.add( (ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup) userService.findGroupByName( usergroup ) );
         }
         return UserGroup;
     }
@@ -132,7 +132,7 @@ public class UserManagerServiceImpl implements UserManagerService {
     @Override
     @Transactional
     public UserGroup findGroupByName( String name ) {
-        return this.userService.findGroupByName( name );
+        return (ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup) this.userService.findGroupByName( name );
     }
 
 }

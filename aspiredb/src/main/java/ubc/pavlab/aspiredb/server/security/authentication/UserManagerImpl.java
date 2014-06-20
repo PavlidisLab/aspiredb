@@ -17,6 +17,10 @@ package ubc.pavlab.aspiredb.server.security.authentication;
 
 import gemma.gsec.SecurityService;
 import gemma.gsec.authentication.UserDetailsImpl;
+import gemma.gsec.authentication.UserExistsException;
+import gemma.gsec.model.GroupAuthority;
+import gemma.gsec.model.User;
+import gemma.gsec.model.UserGroup;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,11 +53,6 @@ import org.springframework.security.core.userdetails.cache.NullUserCache;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserExistsException;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
-import ubc.pavlab.aspiredb.server.service.SubjectService;
 import ubc.pavlab.aspiredb.server.util.AuthorityConstants;
 
 /**
@@ -95,10 +94,7 @@ public class UserManagerImpl implements UserManager {
 
     @Autowired
     private UserService userService;
-    
-    @Autowired
-    private SubjectService subjectService;
-    
+
     @Autowired
     private SecurityService securityService;
 
@@ -112,7 +108,7 @@ public class UserManagerImpl implements UserManager {
     @Transactional
     public void addGroupAuthority( String groupName, GrantedAuthority authority ) {
         UserGroup g = loadGroup( groupName );
-        
+
         for ( gemma.gsec.model.GroupAuthority ga : g.getAuthorities() ) {
             if ( ga.getAuthority().equals( authority.getAuthority() ) ) {
                 logger.warn( "Group already has authority" + authority.getAuthority() );
@@ -120,7 +116,7 @@ public class UserManagerImpl implements UserManager {
             }
         }
 
-        GroupAuthority auth = new GroupAuthority();
+        GroupAuthority auth = new ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority();
         auth.setAuthority( authority.getAuthority() );
 
         g.getAuthorities().add( auth );
@@ -189,7 +185,7 @@ public class UserManagerImpl implements UserManager {
 
         u.setPassword( newPassword );
 
-        userService.adminUpdate( u );
+        userService.adminUpdate( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) u );
 
     }
 
@@ -245,10 +241,10 @@ public class UserManagerImpl implements UserManager {
     @Transactional
     public void createGroup( String groupName, List<GrantedAuthority> authorities ) {
 
-        UserGroup g = new UserGroup();
+        UserGroup g = new ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup();
         g.setName( groupName );
         for ( GrantedAuthority ga : authorities ) {
-            GroupAuthority groupAuthority = new GroupAuthority();
+            GroupAuthority groupAuthority = new ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority();
             groupAuthority.setAuthority( ga.getAuthority() );
             g.getAuthorities().add( groupAuthority );
         }
@@ -256,30 +252,30 @@ public class UserManagerImpl implements UserManager {
         userService.create( g );
 
     }
-    
+
     /**
      * Create group using gsec
      */
     @Override
     @Transactional
     public String createUserGroup( String groupName ) {
-        try{
-        securityService.createGroup( groupName );
-        }catch(Exception exception){
+        try {
+            securityService.createGroup( groupName );
+        } catch ( Exception exception ) {
             return exception.toString();
         }
         return "Success";
     }
-    
+
     @Override
     @Transactional
-    public List<UserGroup> loadUserGroups(){
-        
-        Collection<String> usergroups =securityService.getGroupsEditableBy( getCurrentUser() );        
-        List<UserGroup> UserGroup=new ArrayList<UserGroup>();
-        
-        for (String usergroup: usergroups){
-            UserGroup.add( userService.findGroupByName( usergroup ));
+    public List<ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup> loadUserGroups() {
+
+        Collection<String> groupNames = securityService.getGroupsEditableBy( getCurrentUser() );
+        List<ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup> UserGroup = new ArrayList<ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup>();
+        for ( String usergroup : groupNames ) {
+            UserGroup.add( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) userService
+                    .findGroupByName( usergroup ) );
         }
         return UserGroup;
     }
@@ -304,7 +300,7 @@ public class UserManagerImpl implements UserManager {
 
         validateUserName( user.getUsername() );
 
-        User u = new User();
+        User u = new ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User();
         u.setUserName( user.getUsername() );
         u.setPassword( user.getPassword() );
         u.setEnabled( user.isEnabled() );

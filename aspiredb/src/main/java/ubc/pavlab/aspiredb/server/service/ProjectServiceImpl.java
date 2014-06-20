@@ -107,7 +107,7 @@ public class ProjectServiceImpl implements ProjectService {
         userNames = projectReadableBy( proj );
 
         for ( String userName : userNames ) {
-            User user = userService.findByUserName( userName );
+            User user = ( User ) userService.findByUserName( userName );
             userObject.add( user.getFirstName() );
         }
 
@@ -125,7 +125,7 @@ public class ProjectServiceImpl implements ProjectService {
         userNames = securityService.readableBy( proj );
 
         for ( String userName : userNames ) {
-            User user = ( User ) userManager.findByUserName( userName );
+            User user = (ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User) userManager.findByUserName( userName );
             userObject.add( user );
         }
 
@@ -162,8 +162,11 @@ public class ProjectServiceImpl implements ProjectService {
         for ( String userName : userNames ) {
 
             User user = ( User ) userManager.findByUserName( userName );
-            Collection<UserGroup> usergroups = userService.findGroupsForUser( user );
-            for ( UserGroup usergroup : usergroups ) {
+            Collection<gemma.gsec.model.UserGroup> usergroups = new ArrayList<>();
+            for ( gemma.gsec.model.UserGroup group : userService.findGroupsForUser( user )) {
+                usergroups.add(group);
+            }
+            for ( gemma.gsec.model.UserGroup usergroup : usergroups ) {
                 groupNames = groupNames + usergroup.getName() + ',';
 
             }
@@ -595,7 +598,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @RemoteMethod
     public UserGroup findGroupByName( String name ) {
-        return userService.findGroupByName( name );
+        return (ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup) userService.findGroupByName( name );
     }
 
     @Override
@@ -603,7 +606,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = true)
     public Collection<String> suggestUsers( SuggestionContext suggestionContext ) throws NotLoggedInException {
         Collection<String> userNames = new ArrayList<String>();
-        // Collection<User> users =userService.loadAll();
         Collection<User> users = userService.suggestUser( suggestionContext.getValuePrefix() );
         for ( User user : users ) {
             userNames.add( user.getFirstName() + " " + user.getLastName() );
@@ -616,7 +618,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = true)
     public boolean isUser( String userName ) throws NotLoggedInException {
 
-        User user = userService.findByUserName( userName );
+        User user = (ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User) userService.findByUserName( userName );
         if ( user != null ) return true;
         return false;
     }

@@ -1,24 +1,29 @@
 /*
-* The aspiredb project
-*
-* Copyright (c) 2012 University of British Columbia
-*
-* Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
-* the License. You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
-* an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
-* specific language governing permissions and limitations under the License.
-*/
+ * The aspiredb project
+ *
+ * Copyright (c) 2012 University of British Columbia
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 
 package ubc.pavlab.aspiredb.server.security.authentication;
 
 import gemma.gsec.SecurityService;
 import gemma.gsec.acl.domain.AclGrantedAuthoritySid;
 import gemma.gsec.acl.domain.AclService;
+import gemma.gsec.authentication.UserExistsException;
+import gemma.gsec.model.GroupAuthority;
+import gemma.gsec.model.User;
+import gemma.gsec.model.UserGroup;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,15 +34,11 @@ import org.springframework.stereotype.Service;
 
 import ubc.pavlab.aspiredb.server.dao.UserDao;
 import ubc.pavlab.aspiredb.server.dao.UserGroupDao;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.GroupAuthority;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserExistsException;
-import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 
 /**
-* @author pavlidis
-* @version $Id: UserServiceImpl.java,v 1.4 2013/06/11 22:30:52 anton Exp $
-*/
+ * @author pavlidis
+ * @version $Id: UserServiceImpl.java,v 1.4 2013/06/11 22:30:52 anton Exp $
+ */
 @Service("userService")
 public class UserServiceImpl implements UserService {
 
@@ -55,14 +56,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addGroupAuthority( UserGroup group, String authority ) {
-        this.userGroupDao.addAuthority( group, authority );
+        this.userGroupDao.addAuthority( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) group,
+                authority );
     }
 
     @Override
     public void addUserToGroup( UserGroup group, User user ) {
         // add user to list of members
         group.getGroupMembers().add( user );
-        this.userGroupDao.update( group );
+        this.userGroupDao.update( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) group );
 
         // FIXME: Maybe user registration should be a completely separate, isolated code path.
         // Or maybe call to makeReadableByGroup shouldn't be here in the first place.
@@ -76,33 +78,40 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserGroup create( UserGroup group ) {
-        return this.userGroupDao.create( group );
+        return this.userGroupDao.create( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) group );
     }
 
     @Override
-    public void delete( User user ) {
-        for ( UserGroup group : this.userDao.loadGroups( user ) ) {
+    public void delete( gemma.gsec.model.User user ) {
+        for ( UserGroup group : this.userDao
+                .loadGroups( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) user ) ) {
             group.getGroupMembers().remove( user );
-            this.userGroupDao.update( group );
+            this.userGroupDao.update( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) group );
         }
 
-        this.userDao.remove( user );
+        this.userDao.remove( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) user );
     }
-    
+
     @Override
-    public Collection<User> suggestUser( String queryString ){
-        return this.userDao.suggestUser( queryString );
+    public Collection<ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User> suggestUser( String queryString ) {
+        Collection<ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User> ret = new ArrayList<>();
+        for ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User user : this.userDao
+                .suggestUser( queryString ) ) {
+            ret.add( user );
+        }
+        return ret;
     }
 
     @Override
     public void deleteByUserName( String userName ) {
         User user = findByUserName( userName );
-        for ( UserGroup group : this.userDao.loadGroups( user ) ) {
+        for ( UserGroup group : this.userDao
+                .loadGroups( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) user ) ) {
             group.getGroupMembers().remove( user );
-            this.userGroupDao.update( group );
+            this.userGroupDao.update( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) group );
         }
 
-        this.userDao.remove( user );
+        this.userDao.remove( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) user );
     }
 
     @Override
@@ -114,8 +123,8 @@ public class UserServiceImpl implements UserService {
         }
 
         /*
-* make sure this isn't one of the special groups - Administrators, Users, Agents
-*/
+         * make sure this isn't one of the special groups - Administrators, Users, Agents
+         */
         if ( groupName.equalsIgnoreCase( "Administrator" ) || groupName.equalsIgnoreCase( "Users" )
                 || groupName.equalsIgnoreCase( "Agents" ) ) {
             throw new IllegalArgumentException( "Cannot delete that group, it is required for system operation." );
@@ -127,11 +136,11 @@ public class UserServiceImpl implements UserService {
 
         String authority = securityService.getGroupAuthorityNameFromGroupName( groupName );
 
-        this.userGroupDao.remove( group );
+        this.userGroupDao.remove( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) group );
 
         /*
-* clean up acls that use this group...do that last!
-*/
+         * clean up acls that use this group...do that last!
+         */
         try {
             aclService.deleteSid( new AclGrantedAuthoritySid( authority ) );
         } catch ( DataIntegrityViolationException div ) {
@@ -146,37 +155,52 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Collection<UserGroup> findGroupsForUser( User user ) {
-        return this.userGroupDao.findGroupsForUser( user );
+        Collection<UserGroup> ret = new ArrayList<>();
+        for ( UserGroup group : this.userGroupDao
+                .findGroupsForUser( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) user ) ) {
+            ret.add( group );
+        }
+        return ret;
     }
 
     @Override
     public Collection<UserGroup> listAvailableGroups() {
-        return ( Collection<UserGroup> ) this.userGroupDao.loadAll();
+        Collection<UserGroup> ret = new ArrayList<>();
+        for ( UserGroup group : this.userGroupDao.loadAll() ) {
+            ret.add( group );
+        }
+        return ret;
     }
 
     @Override
     public Collection<GroupAuthority> loadGroupAuthorities( User u ) {
-        return this.userDao.loadGroupAuthorities( u );
+        Collection<GroupAuthority> ret = new ArrayList<>();
+        for ( GroupAuthority groupAuthority : this.userDao
+                .loadGroupAuthorities( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) u ) ) {
+            ret.add( groupAuthority );
+        }
+        return ret;
     }
 
     @Override
     public void removeGroupAuthority( UserGroup group, String authority ) {
-        this.userGroupDao.removeAuthority( group, authority );
+        this.userGroupDao.removeAuthority(
+                ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) group, authority );
     }
 
     @Override
     public void removeUserFromGroup( User user, UserGroup group ) {
         group.getGroupMembers().remove( user );
-        this.userGroupDao.update( group );
+        this.userGroupDao.update( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) group );
 
         /*
-* TODO: if the group is empty, should we delete it? Not if it is GROUP_USER or ADMIN, but perhaps otherwise.
-*/
+         * TODO: if the group is empty, should we delete it? Not if it is GROUP_USER or ADMIN, but perhaps otherwise.
+         */
     }
 
     @Override
     public void update( UserGroup group ) {
-        this.userGroupDao.update( group );
+        this.userGroupDao.update( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) group );
     }
 
     @Override
@@ -185,8 +209,8 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-* @see ubic.gemma.security.authentication.UserService#create(ubic.gemma.model.common.auditAndSecurity.User)
-*/
+     * @see ubic.gemma.security.authentication.UserService#create(ubic.gemma.model.common.auditAndSecurity.User)
+     */
     @Override
     public User create( final User user ) throws UserExistsException {
 
@@ -203,7 +227,7 @@ public class UserServiceImpl implements UserService {
         }
 
         try {
-            return this.userDao.create( user );
+            return this.userDao.create( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) user );
         } catch ( DataIntegrityViolationException e ) {
             throw new UserExistsException( "User '" + user.getUserName() + "' already exists!" );
         } catch ( InvalidDataAccessResourceUsageException e ) {
@@ -214,8 +238,8 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-* @see ubic.gemma.security.authentication.UserService#findByEmail(java.lang.String)
-*/
+     * @see ubic.gemma.security.authentication.UserService#findByEmail(java.lang.String)
+     */
     @Override
     public User findByEmail( final String email ) {
         return this.userDao.findByEmail( email );
@@ -223,8 +247,8 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-* @see ubic.gemma.security.authentication.UserService#findByUserName(java.lang.String)
-*/
+     * @see ubic.gemma.security.authentication.UserService#findByUserName(java.lang.String)
+     */
     @Override
     public User findByUserName( final String userName ) {
         return this.userDao.findByUserName( userName );
@@ -232,8 +256,8 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-* @see ubic.gemma.security.authentication.UserService#load(java.lang.Long)
-*/
+     * @see ubic.gemma.security.authentication.UserService#load(java.lang.Long)
+     */
     @Override
     public User load( final Long id ) {
         return this.userDao.load( id );
@@ -241,29 +265,31 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-* @see ubic.gemma.security.authentication.UserService#loadAll()
-*/
+     * @see ubic.gemma.security.authentication.UserService#loadAll()
+     */
     @Override
     public java.util.Collection<User> loadAll() {
-        return ( Collection<User> ) this.userDao.loadAll();
+        Collection<User> ret = new ArrayList<>();
+        for ( User user : this.userDao.loadAll() ) {
+            ret.add( user );
+        }
+        return ret;
 
     }
 
     /**
-* @see ubic.gemma.security.authentication.UserService#update(ubic.gemma.model.common.auditAndSecurity.User)
-*/
+     * @see ubic.gemma.security.authentication.UserService#update(ubic.gemma.model.common.auditAndSecurity.User)
+     */
     @Override
     public void update( final User user ) {
 
-        this.userDao.update( user );
+        this.userDao.update( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) user );
 
     }
 
     @Override
-    public void adminUpdate( final User user ) {
-
+    public void adminUpdate( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User user ) {
         this.userDao.update( user );
-
     }
 
 }

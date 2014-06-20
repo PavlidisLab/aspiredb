@@ -125,7 +125,7 @@ public class UserGroupServiceTest extends BaseSpringContextTest {
         // grant read permission to group
         Subject ind = testObjectHelper
                 .createPersistentTestSubjectObjectWithCNV( RandomStringUtils.randomAlphabetic( 4 ) );
-        UserGroup group = this.userService.findGroupByName( this.groupName );
+        gemma.gsec.model.UserGroup group = this.userService.findGroupByName( this.groupName );
 
         this.securityService.makeOwnedByUser( ind, userName1 );
         this.securityService.makeOwnedByUser( group, userName1 );
@@ -165,7 +165,7 @@ public class UserGroupServiceTest extends BaseSpringContextTest {
         /*
          * Make sure user can see group (from bug 2822)
          */
-        UserGroup group = this.userService.findGroupByName( this.groupName );
+        gemma.gsec.model.UserGroup group = this.userService.findGroupByName( this.groupName );
         this.securityService.isViewableByUser( group, this.userName1 );
 
         /*
