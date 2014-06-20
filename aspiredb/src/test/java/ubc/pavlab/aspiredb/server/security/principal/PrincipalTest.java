@@ -56,21 +56,43 @@ public class PrincipalTest extends BaseSpringContextTest {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    private String email;
+
     @Before
     public void before() {
 
         pwd = randomName();
         username = randomName();
+        email = username + "@foo.foo";
 
         try {
             userManager.loadUserByUsername( username );
         } catch ( UsernameNotFoundException e ) {
 
             String encodedPassword = passwordEncoder.encodePassword( pwd, username );
-            UserDetailsImpl u = new UserDetailsImpl( encodedPassword, username, true, null, null, null, new Date() );
+            UserDetailsImpl u = new UserDetailsImpl( encodedPassword, username, true, null, email, null, new Date() );
 
             userManager.createUser( u );
         }
+    }
+
+    @Test
+    public final void testChangePassword() throws Exception {
+        String newpwd = randomName();
+        String encodedPassword = passwordEncoder.encodePassword( newpwd, username );
+
+        String token = userManager.changePasswordForUser( email, username, encodedPassword );
+
+        assertTrue( !userManager.loadUserByUsername( username ).isEnabled() );
+
+        /*
+         * User has to unlock the account, we mimic that:
+         */
+        assertTrue( userManager.validateSignupToken( username, token ) );
+
+        Authentication auth = new UsernamePasswordAuthenticationToken( username, newpwd );
+        Authentication authentication = ( ( ProviderManager ) authenticationManager ).authenticate( auth );
+        assertTrue( authentication.isAuthenticated() );
     }
 
     /**
