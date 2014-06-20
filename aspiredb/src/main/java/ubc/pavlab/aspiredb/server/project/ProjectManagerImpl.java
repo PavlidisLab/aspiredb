@@ -248,9 +248,9 @@ public class ProjectManagerImpl implements ProjectManager {
     @Override
     @Transactional
     public Project createProject( String name, String description ) throws Exception {
+        
         if ( projectDao.findByProjectName( name ) != null ) {
             throw new Exception( "project with that name already exists" );
-
         }
 
         Project p = new Project();
