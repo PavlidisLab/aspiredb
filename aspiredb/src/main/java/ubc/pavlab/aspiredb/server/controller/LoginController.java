@@ -1,5 +1,6 @@
 package ubc.pavlab.aspiredb.server.controller;
 
+import gemma.gsec.util.JSONUtil;
 import gemma.gsec.util.SecurityUtil;
 
 import java.io.IOException;
@@ -11,8 +12,6 @@ import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import ubc.pavlab.aspiredb.server.security.authentication.JSONUtil;
 
 @Controller
 @RemoteProxy

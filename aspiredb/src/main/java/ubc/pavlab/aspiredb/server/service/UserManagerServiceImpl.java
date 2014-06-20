@@ -15,14 +15,11 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import gemma.gsec.SecurityService;
-import gemma.gsec.model.UserManager;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,15 +33,10 @@ import org.springframework.security.core.userdetails.cache.NullUserCache;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
-import ubc.pavlab.aspiredb.server.dao.UserGeneSetDao;
-import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
-import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
+import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
-import ubc.pavlab.aspiredb.shared.GeneSetValueObject;
-import ubc.pavlab.aspiredb.shared.GeneValueObject;
 
 /**
  * User Gene Set Service DWR's Created to access the User Gene Set Mysql values for the client side development

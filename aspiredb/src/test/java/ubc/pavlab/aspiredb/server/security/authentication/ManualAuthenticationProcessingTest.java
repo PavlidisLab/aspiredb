@@ -16,6 +16,8 @@
 package ubc.pavlab.aspiredb.server.security.authentication;
 
 import static org.junit.Assert.fail;
+import gemma.gsec.authentication.ManualAuthenticationService;
+import gemma.gsec.authentication.UserDetailsImpl;
 
 import java.util.Date;
 

@@ -14,6 +14,8 @@
  */
 package ubc.pavlab.aspiredb.cli;
 
+import gemma.gsec.authentication.ManualAuthenticationService;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -45,7 +47,6 @@ import org.apache.log4j.PatternLayout;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import ubc.pavlab.aspiredb.server.security.authentication.ManualAuthenticationService;
 import ubc.pavlab.aspiredb.server.util.ConfigUtils;
 
 /**
