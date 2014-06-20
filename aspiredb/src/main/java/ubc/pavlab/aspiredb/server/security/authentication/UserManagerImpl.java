@@ -153,7 +153,7 @@ public class UserManagerImpl implements UserManager {
 
         String username = currentAuthentication.getName();
 
-        reauthenticate( username, oldPassword );
+        // reauthenticate( username, oldPassword );
 
         logger.debug( "Changing password for user '" + username + "'" );
 
@@ -631,7 +631,8 @@ public class UserManagerImpl implements UserManager {
          * authenticationManager.authenticate( new UsernamePasswordAuthenticationToken( username, password ) ); } else {
          * logger.debug( "No authentication manager set. Password won't be re-checked." ); }
          */
-        throw new RuntimeException( "Method not implemented" );
+     // Warning: Autowiring AuthenticationManager here can cause a circular reference error
+        logger.warn( "No authentication manager set. Password won't be re-checked." );
     }
 
     /*
