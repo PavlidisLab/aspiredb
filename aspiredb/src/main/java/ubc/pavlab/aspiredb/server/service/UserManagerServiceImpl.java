@@ -15,6 +15,7 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import gemma.gsec.SecurityService;
+import gemma.gsec.authentication.UserManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,7 +25,6 @@ import org.directwebremoting.annotations.RemoteProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserCache;
@@ -35,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
-import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
 
 /**
@@ -50,9 +49,6 @@ public class UserManagerServiceImpl implements UserManagerService {
 
     private static Logger log = LoggerFactory.getLogger( UserGeneSetServiceImpl.class );
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
     @Autowired(required = false)
     private UserCache userCache = new NullUserCache();
 
@@ -64,19 +60,19 @@ public class UserManagerServiceImpl implements UserManagerService {
 
     @Autowired
     private SecurityService securityService;
-    
+
     private UserManager userManager;
-    
+
     /*
      * (non-Javadoc)
      * 
      * @see ubic.gemma.security.authentication.UserManagerI#getCurrentUser()
      */
     @Override
-    public User getCurrentUser() {      
-        return ( User ) userManager.getCurrentUser();        
+    public User getCurrentUser() {
+        return ( User ) userManager.getCurrentUser();
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -102,7 +98,7 @@ public class UserManagerServiceImpl implements UserManagerService {
     @Override
     @Transactional
     public String createUserGroup( String groupName ) {
-        
+
         try {
             securityService.createGroup( groupName );
         } catch ( Exception exception ) {
@@ -114,12 +110,13 @@ public class UserManagerServiceImpl implements UserManagerService {
     @Override
     @Transactional
     public List<UserGroup> loadUserEditableGroups() {
-       
+
         Collection<String> usergroups = securityService.getGroupsEditableBy( getCurrentUser() );
         List<UserGroup> UserGroup = new ArrayList<UserGroup>();
 
         for ( String usergroup : usergroups ) {
-            UserGroup.add( (ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup) userService.findGroupByName( usergroup ) );
+            UserGroup.add( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) userService
+                    .findGroupByName( usergroup ) );
         }
         return UserGroup;
     }
@@ -132,7 +129,8 @@ public class UserManagerServiceImpl implements UserManagerService {
     @Override
     @Transactional
     public UserGroup findGroupByName( String name ) {
-        return (ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup) this.userService.findGroupByName( name );
+        return ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) this.userService
+                .findGroupByName( name );
     }
 
 }

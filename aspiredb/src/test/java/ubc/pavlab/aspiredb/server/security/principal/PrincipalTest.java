@@ -18,6 +18,7 @@ package ubc.pavlab.aspiredb.server.security.principal;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import gemma.gsec.authentication.UserDetailsImpl;
+import gemma.gsec.authentication.UserManager;
 
 import java.util.Date;
 
@@ -33,7 +34,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
-import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 
 /**
  * Test that we can log users in

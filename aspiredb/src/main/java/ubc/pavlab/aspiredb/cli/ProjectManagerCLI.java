@@ -14,6 +14,8 @@
  */
 package ubc.pavlab.aspiredb.cli;
 
+import gemma.gsec.authentication.UserManager;
+
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.log4j.ConsoleAppender;
@@ -25,7 +27,6 @@ import org.springframework.beans.factory.BeanFactory;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
-import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 
 /**
  * CLI to give groups read permissions to projects and delete projects

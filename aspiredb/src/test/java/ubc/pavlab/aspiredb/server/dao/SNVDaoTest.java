@@ -17,6 +17,7 @@ package ubc.pavlab.aspiredb.server.dao;
 
 import static org.junit.Assert.assertEquals;
 import gemma.gsec.authentication.UserDetailsImpl;
+import gemma.gsec.authentication.UserManager;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,7 +37,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
-import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
 public class SNVDaoTest extends BaseSpringContextTest {

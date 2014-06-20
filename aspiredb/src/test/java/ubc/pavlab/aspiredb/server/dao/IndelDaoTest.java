@@ -17,6 +17,7 @@ package ubc.pavlab.aspiredb.server.dao;
 
 import static org.junit.Assert.assertEquals;
 import gemma.gsec.authentication.UserDetailsImpl;
+import gemma.gsec.authentication.UserManager;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,7 +39,6 @@ import ubc.pavlab.aspiredb.server.model.Indel;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
-import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
 public class IndelDaoTest extends BaseSpringContextTest {

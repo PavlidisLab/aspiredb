@@ -15,6 +15,7 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import gemma.gsec.SecurityService;
+import gemma.gsec.authentication.UserManager;
 
 import java.io.FileWriter;
 import java.sql.Connection;
@@ -47,7 +48,6 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
-import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
@@ -811,13 +811,4 @@ public class ProjectServiceImpl implements ProjectService {
         return projectManager.createUserAndAssignToGroup( userName, password, groupName );
 
     }
-    
-    @Override
-    @Transactional
-    public List<UserGroup> loadUserGroups() {
-        return userManager.loadUserGroups();
-    }
-        
-  
-
 }

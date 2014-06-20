@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import gemma.gsec.SecurityService;
 import gemma.gsec.authentication.UserDetailsImpl;
+import gemma.gsec.authentication.UserManager;
 import gemma.gsec.util.SecurityUtil;
 
 import java.util.ArrayList;
@@ -53,7 +54,6 @@ import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
-import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.security.authorization.acl.AclTestUtils;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
