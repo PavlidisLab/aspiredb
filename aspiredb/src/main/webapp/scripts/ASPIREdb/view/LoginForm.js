@@ -48,7 +48,6 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
             itemId : 'username',
             fieldLabel : 'Username',
             allowBlank : false,
-            value : 'administrator',
             listeners : {
                specialkey : function(field, e) {
                   if ( e.getKey() == e.ENTER ) {
@@ -62,7 +61,6 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
             fieldLabel : 'Password',
             inputType : 'password',
             allowBlank : false,
-            value : 'changemeadmin',
             listeners : {
                specialkey : function(field, e) {
                   if ( e.getKey() == e.ENTER ) {
