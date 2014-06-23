@@ -16,6 +16,7 @@
 package ubc.pavlab.aspiredb.server.security.authentication;
 
 import gemma.gsec.SecurityService;
+import gemma.gsec.authentication.ManualAuthenticationService;
 import gemma.gsec.authentication.UserDetailsImpl;
 import gemma.gsec.authentication.UserExistsException;
 import gemma.gsec.authentication.UserManager;
@@ -95,6 +96,9 @@ public class UserManagerImpl implements UserManager {
     @Autowired
     private SecurityService securityService;
 
+    @Autowired
+    ManualAuthenticationService authenticationService;
+
     /*
      * (non-Javadoc)
      * 
@@ -138,6 +142,9 @@ public class UserManagerImpl implements UserManager {
      * (non-Javadoc)
      * 
      * @see ubic.gemma.security.authentication.UserManagerI#changePassword(java.lang.String, java.lang.String)
+     * 
+     * @param oldPassword current password (for re-authentication if required), decoded
+     * @param newPassword the password to change to, encoded
      */
     @Override
     @Secured({ "GROUP_USER" })
@@ -153,7 +160,7 @@ public class UserManagerImpl implements UserManager {
 
         String username = currentAuthentication.getName();
 
-        // reauthenticate( username, oldPassword );
+        reauthenticate( username, oldPassword );
 
         logger.debug( "Changing password for user '" + username + "'" );
 
@@ -230,7 +237,7 @@ public class UserManagerImpl implements UserManager {
         userService.create( g );
 
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -620,19 +627,21 @@ public class UserManagerImpl implements UserManager {
      * (non-Javadoc)
      * 
      * @see ubic.gemma.security.authentication.UserManagerI#reauthenticate(java.lang.String, java.lang.String)
+     * 
+     * @param oldPassword current password (for re-authentication if required), decoded
      */
     @Override
     public void reauthenticate( String username, String password ) {
         // If an authentication manager has been set, re-authenticate the user with the supplied password.
-        /*
-         * if ( authenticationManager != null ) { logger.debug( "Reauthenticating user '" + username +
-         * "' for password change request." );
-         * 
-         * authenticationManager.authenticate( new UsernamePasswordAuthenticationToken( username, password ) ); } else {
-         * logger.debug( "No authentication manager set. Password won't be re-checked." ); }
-         */
-     // Warning: Autowiring AuthenticationManager here can cause a circular reference error
-        logger.warn( "No authentication manager set. Password won't be re-checked." );
+
+        if ( authenticationService != null ) {
+            logger.debug( "Reauthenticating user '" + username + "' for password change request." );
+            authenticationService.attemptAuthentication( username, password );
+
+        } else {
+            logger.debug( "No authentication manager set. Password won't be re-checked." );
+        }
+
     }
 
     /*

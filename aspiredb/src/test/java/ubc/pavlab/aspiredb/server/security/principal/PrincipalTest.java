@@ -15,6 +15,7 @@
 
 package ubc.pavlab.aspiredb.server.security.principal;
 
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import gemma.gsec.authentication.UserDetailsImpl;
@@ -72,12 +73,16 @@ public class PrincipalTest extends BaseSpringContextTest {
             String encodedPassword = passwordEncoder.encodePassword( pwd, username );
             UserDetailsImpl u = new UserDetailsImpl( encodedPassword, username, true, null, email, null, new Date() );
 
+            log.error( "Encoded password old password " + pwd + " encoded is " + encodedPassword + " user is "
+                    + username );
+
             userManager.createUser( u );
         }
     }
 
     @Test
     public final void testChangePassword() throws Exception {
+        String oldpwd = userManager.findByUserName( username ).getPassword();
         String newpwd = randomName();
         String encodedPassword = passwordEncoder.encodePassword( newpwd, username );
 
@@ -90,8 +95,27 @@ public class PrincipalTest extends BaseSpringContextTest {
          */
         assertTrue( userManager.validateSignupToken( username, token ) );
 
+        assertTrue( userManager.loadUserByUsername( username ).isEnabled() );
+
         Authentication auth = new UsernamePasswordAuthenticationToken( username, newpwd );
         Authentication authentication = ( ( ProviderManager ) authenticationManager ).authenticate( auth );
+        assertTrue( authentication.isAuthenticated() );
+
+        assertNotSame( oldpwd, userManager.findByUserName( username ).getPassword() );
+
+        // Now that the account has been activated, try changing the password
+        oldpwd = newpwd;
+        newpwd = randomName();
+        encodedPassword = passwordEncoder.encodePassword( newpwd, username );
+
+        // Current user changing password
+        super.runAsUser( username );
+        userManager.changePassword( oldpwd, encodedPassword );
+
+        assertTrue( userManager.loadUserByUsername( username ).isEnabled() );
+        assertNotSame( oldpwd, userManager.findByUserName( username ).getPassword() );
+        auth = new UsernamePasswordAuthenticationToken( username, newpwd );
+        authentication = ( ( ProviderManager ) authenticationManager ).authenticate( auth );
         assertTrue( authentication.isAuthenticated() );
     }
 
