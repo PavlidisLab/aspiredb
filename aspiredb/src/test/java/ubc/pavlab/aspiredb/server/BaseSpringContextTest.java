@@ -16,6 +16,7 @@
 package ubc.pavlab.aspiredb.server;
 
 import gemma.gsec.AuthorityConstants;
+import gemma.gsec.authentication.UserManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,8 +48,6 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-
-import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 
 /**
  * subclass for tests that need the container and use the database

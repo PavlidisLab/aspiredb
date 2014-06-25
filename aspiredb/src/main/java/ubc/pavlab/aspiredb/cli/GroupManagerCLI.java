@@ -15,6 +15,7 @@
 package ubc.pavlab.aspiredb.cli;
 
 import gemma.gsec.authentication.UserDetailsImpl;
+import gemma.gsec.authentication.UserManager;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,8 +32,6 @@ import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 
 /**
  * cli for creating users
@@ -61,6 +60,8 @@ public class GroupManagerCLI extends AbstractCLI {
     private String groupName = null;
 
     private String aspireUserName = null;
+
+    private String aspireUserEmail = null;
 
     private String aspireUserPassword = null;
 
@@ -115,15 +116,21 @@ public class GroupManagerCLI extends AbstractCLI {
 
         OptionBuilder.hasArg();
         OptionBuilder.withArgName( "User password" );
-        OptionBuilder.withDescription( "The user to assign to a group" );
+        OptionBuilder.withDescription( "The user password" );
         Option aspireuserpassword = OptionBuilder.create( "aspireuserpassword" );
+
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "User e-mail" );
+        OptionBuilder.withDescription( "The user email" );
+        Option aspireuserEmail = OptionBuilder.create( "aspireuseremail" );
 
         addOption( groupname );
         addOption( aspireuser );
         addOption( aspireuserpassword );
+        addOption( aspireuserEmail );
 
         addOption( "createuser", false,
-                "Use this option to create the user, options -aspireuser and -aspireuserpassword required when using this option." );
+                "Use this option to create the user, options -aspireuser and -aspireuserpassword and -aspireuseremail required when using this option." );
         addOption( "deleteuser", false,
                 "Use this option to delete an existing user, option -aspireuser required when using this option." );
         addOption( "creategroup", false,
@@ -136,7 +143,7 @@ public class GroupManagerCLI extends AbstractCLI {
         addOption(
                 "changepassword",
                 false,
-                "Using this option will change an existing user's password, options -aspireuser and -aspireuserpassword required when using this option." );
+                "Using this option will change an existing user's password, options -aspireuser and -aspireuserpassword and -aspireuseremail required when using this option." );
     }
 
     @Override
@@ -149,8 +156,8 @@ public class GroupManagerCLI extends AbstractCLI {
 
         if ( createUser ) {
 
-            if ( aspireUserPassword == null || aspireUserName == null ) {
-                log.error( "missing -aspireuser or -aspireuserpassword options" );
+            if ( aspireUserPassword == null || aspireUserName == null || aspireUserEmail == null ) {
+                log.error( "missing -aspireuser or -aspireuserpassword or -aspireuseremail options" );
                 bail( AbstractCLI.ErrorCode.MISSING_OPTION );
             }
 
@@ -172,14 +179,14 @@ public class GroupManagerCLI extends AbstractCLI {
         } else if ( deleteUser ) {
 
             if ( aspireUserName == null ) {
-                log.error( "missing -aspireuser or -aspireuserpassword options" );
+                log.error( "missing -aspireuser options" );
                 bail( AbstractCLI.ErrorCode.MISSING_OPTION );
             }
 
             try {
 
                 userManager.loadUserByUsername( aspireUserName );
-                userManager.deleteByUserName( aspireUserName );
+                userManager.deleteUser( aspireUserName );
 
             } catch ( UsernameNotFoundException e ) {
 
@@ -190,14 +197,14 @@ public class GroupManagerCLI extends AbstractCLI {
 
         } else if ( changePassword ) {
 
-            if ( aspireUserName == null || aspireUserPassword == null ) {
+            if ( aspireUserName == null || aspireUserPassword == null || aspireUserEmail == null ) {
                 log.error( "missing -aspireuser or -aspireuserpassword" );
                 bail( AbstractCLI.ErrorCode.INVALID_OPTION );
             }
 
             try {
                 String encodedPassword = passwordEncoder.encodePassword( aspireUserPassword, aspireUserName );
-                userManager.changePasswordForUser( aspireUserName, encodedPassword );
+                userManager.changePasswordForUser( aspireUserEmail, aspireUserName, encodedPassword );
 
             } catch ( UsernameNotFoundException e ) {
                 log.error( "user does not exist" );
@@ -274,6 +281,9 @@ public class GroupManagerCLI extends AbstractCLI {
         }
         if ( this.hasOption( "aspireuserpassword" ) ) {
             aspireUserPassword = this.getOptionValue( "aspireuserpassword" );
+        }
+        if ( this.hasOption( "aspireuseremail" ) ) {
+            aspireUserEmail = this.getOptionValue( "aspireuseremail" );
         }
         if ( this.hasOption( "createuser" ) ) {
             createUser = true;

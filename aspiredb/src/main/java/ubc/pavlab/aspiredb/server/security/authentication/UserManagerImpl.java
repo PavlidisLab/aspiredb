@@ -16,8 +16,10 @@
 package ubc.pavlab.aspiredb.server.security.authentication;
 
 import gemma.gsec.SecurityService;
+import gemma.gsec.authentication.ManualAuthenticationService;
 import gemma.gsec.authentication.UserDetailsImpl;
 import gemma.gsec.authentication.UserExistsException;
+import gemma.gsec.authentication.UserManager;
 import gemma.gsec.model.GroupAuthority;
 import gemma.gsec.model.User;
 import gemma.gsec.model.UserGroup;
@@ -39,7 +41,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -71,9 +72,6 @@ public class UserManagerImpl implements UserManager {
 
     protected final Log logger = LogFactory.getLog( getClass() );
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
     /**
      * 
      */
@@ -97,6 +95,9 @@ public class UserManagerImpl implements UserManager {
 
     @Autowired
     private SecurityService securityService;
+
+    @Autowired
+    ManualAuthenticationService authenticationService;
 
     /*
      * (non-Javadoc)
@@ -141,6 +142,9 @@ public class UserManagerImpl implements UserManager {
      * (non-Javadoc)
      * 
      * @see ubic.gemma.security.authentication.UserManagerI#changePassword(java.lang.String, java.lang.String)
+     * 
+     * @param oldPassword current password (for re-authentication if required), decoded
+     * @param newPassword the password to change to, encoded
      */
     @Override
     @Secured({ "GROUP_USER" })
@@ -168,25 +172,6 @@ public class UserManagerImpl implements UserManager {
                 createNewAuthentication( currentAuthentication, newPassword ) );
 
         userCache.removeUserFromCache( username );
-    }
-
-    @Override
-    @Secured("GROUP_ADMIN")
-    @Transactional
-    public void changePasswordForUser( String username, String newPassword ) throws AuthenticationException {
-
-        User u = userService.findByUserName( username );
-
-        if ( u == null ) {
-            throw new UsernameNotFoundException( "No user found with that username." );
-        }
-
-        logger.debug( "Changing password for user '" + username + "'" );
-
-        u.setPassword( newPassword );
-
-        userService.adminUpdate( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) u );
-
     }
 
     /*
@@ -253,33 +238,6 @@ public class UserManagerImpl implements UserManager {
 
     }
 
-    /**
-     * Create group using gsec
-     */
-    @Override
-    @Transactional
-    public String createUserGroup( String groupName ) {
-        try {
-            securityService.createGroup( groupName );
-        } catch ( Exception exception ) {
-            return exception.toString();
-        }
-        return "Success";
-    }
-
-    @Override
-    @Transactional
-    public List<ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup> loadUserGroups() {
-
-        Collection<String> groupNames = securityService.getGroupsEditableBy( getCurrentUser() );
-        List<ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup> UserGroup = new ArrayList<ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup>();
-        for ( String usergroup : groupNames ) {
-            UserGroup.add( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) userService
-                    .findGroupByName( usergroup ) );
-        }
-        return UserGroup;
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -328,12 +286,6 @@ public class UserManagerImpl implements UserManager {
          * We don't log the user in automatically, because we require that new users click a confirmation link in an
          * email.
          */
-    }
-
-    @Override
-    public void deleteByUserName( String username ) {
-
-        userService.deleteByUserName( username );
     }
 
     /*
@@ -675,17 +627,21 @@ public class UserManagerImpl implements UserManager {
      * (non-Javadoc)
      * 
      * @see ubic.gemma.security.authentication.UserManagerI#reauthenticate(java.lang.String, java.lang.String)
+     * 
+     * @param oldPassword current password (for re-authentication if required), decoded
      */
     @Override
     public void reauthenticate( String username, String password ) {
         // If an authentication manager has been set, re-authenticate the user with the supplied password.
-        if ( authenticationManager != null ) {
-            logger.debug( "Reauthenticating user '" + username + "' for password change request." );
 
-            authenticationManager.authenticate( new UsernamePasswordAuthenticationToken( username, password ) );
+        if ( authenticationService != null ) {
+            logger.debug( "Reauthenticating user '" + username + "' for password change request." );
+            authenticationService.attemptAuthentication( username, password );
+
         } else {
             logger.debug( "No authentication manager set. Password won't be re-checked." );
         }
+
     }
 
     /*
@@ -739,13 +695,6 @@ public class UserManagerImpl implements UserManager {
 
         userService.update( group );
 
-    }
-
-    /**
-     * @param authenticationManager the authenticationManager to set
-     */
-    public void setAuthenticationManager( AuthenticationManager authenticationManager ) {
-        this.authenticationManager = authenticationManager;
     }
 
     /*

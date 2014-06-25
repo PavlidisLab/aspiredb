@@ -15,9 +15,11 @@
 
 package ubc.pavlab.aspiredb.server.security.principal;
 
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import gemma.gsec.authentication.UserDetailsImpl;
+import gemma.gsec.authentication.UserManager;
 
 import java.util.Date;
 
@@ -33,7 +35,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
-import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 
 /**
  * Test that we can log users in
@@ -56,21 +57,66 @@ public class PrincipalTest extends BaseSpringContextTest {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    private String email;
+
     @Before
     public void before() {
 
         pwd = randomName();
         username = randomName();
+        email = username + "@foo.foo";
 
         try {
             userManager.loadUserByUsername( username );
         } catch ( UsernameNotFoundException e ) {
 
             String encodedPassword = passwordEncoder.encodePassword( pwd, username );
-            UserDetailsImpl u = new UserDetailsImpl( encodedPassword, username, true, null, null, null, new Date() );
+            UserDetailsImpl u = new UserDetailsImpl( encodedPassword, username, true, null, email, null, new Date() );
+
+            log.error( "Encoded password old password " + pwd + " encoded is " + encodedPassword + " user is "
+                    + username );
 
             userManager.createUser( u );
         }
+    }
+
+    @Test
+    public final void testChangePassword() throws Exception {
+        String oldpwd = userManager.findByUserName( username ).getPassword();
+        String newpwd = randomName();
+        String encodedPassword = passwordEncoder.encodePassword( newpwd, username );
+
+        String token = userManager.changePasswordForUser( email, username, encodedPassword );
+
+        assertTrue( !userManager.loadUserByUsername( username ).isEnabled() );
+
+        /*
+         * User has to unlock the account, we mimic that:
+         */
+        assertTrue( userManager.validateSignupToken( username, token ) );
+
+        assertTrue( userManager.loadUserByUsername( username ).isEnabled() );
+
+        Authentication auth = new UsernamePasswordAuthenticationToken( username, newpwd );
+        Authentication authentication = ( ( ProviderManager ) authenticationManager ).authenticate( auth );
+        assertTrue( authentication.isAuthenticated() );
+
+        assertNotSame( oldpwd, userManager.findByUserName( username ).getPassword() );
+
+        // Now that the account has been activated, try changing the password
+        oldpwd = newpwd;
+        newpwd = randomName();
+        encodedPassword = passwordEncoder.encodePassword( newpwd, username );
+
+        // Current user changing password
+        super.runAsUser( username );
+        userManager.changePassword( oldpwd, encodedPassword );
+
+        assertTrue( userManager.loadUserByUsername( username ).isEnabled() );
+        assertNotSame( oldpwd, userManager.findByUserName( username ).getPassword() );
+        auth = new UsernamePasswordAuthenticationToken( username, newpwd );
+        authentication = ( ( ProviderManager ) authenticationManager ).authenticate( auth );
+        assertTrue( authentication.isAuthenticated() );
     }
 
     /**

@@ -14,14 +14,25 @@
 <%@page
     import="org.apache.commons.configuration.PropertiesConfiguration"%>
 <%@page import="org.apache.commons.configuration.CompositeConfiguration"%>
+<%@page import="org.apache.commons.configuration.io.FileHandler"%>
 
 <%
     String USER_CONFIGURATION = "aspiredb.properties";
     String DEFAULT_CONFIGURATION = "default.properties";
 
     CompositeConfiguration localConfig = new CompositeConfiguration();
-    localConfig.addConfiguration( new PropertiesConfiguration( USER_CONFIGURATION ) );
-    localConfig.addConfiguration( new PropertiesConfiguration( DEFAULT_CONFIGURATION ) );
+    
+    PropertiesConfiguration pc = new PropertiesConfiguration();
+    FileHandler handler = new FileHandler( pc );
+    handler.setFileName( USER_CONFIGURATION );
+    handler.load();
+    localConfig.addConfiguration( pc );
+    
+    pc = new PropertiesConfiguration();
+    handler = new FileHandler( pc );
+    handler.setFileName( DEFAULT_CONFIGURATION );
+    handler.load();
+    localConfig.addConfiguration( pc );
     
     System.setProperty( "aspiredb.sslPort", localConfig.getString( "aspiredb.sslPort" ) );
 %>

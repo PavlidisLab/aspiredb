@@ -30,6 +30,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.SystemConfiguration;
+import org.apache.commons.configuration.io.FileHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.directwebremoting.annotations.RemoteMethod;
@@ -69,6 +70,11 @@ public class ConfigUtils {
      */
     private static final String USER_CONFIGURATION = "aspiredb.properties";
 
+    /**
+     * The version of aspiredb.
+     */
+    private static final String VERSION_CONFIGURATION = "version.properties";
+    
     static {
 
         config = new CompositeConfiguration();
@@ -80,7 +86,11 @@ public class ConfigUtils {
          */
 
         try {
-            config.addConfiguration( new PropertiesConfiguration( USER_CONFIGURATION ) );
+            PropertiesConfiguration pc = new PropertiesConfiguration();
+            FileHandler handler = new FileHandler( pc );
+            handler.setFileName( USER_CONFIGURATION );
+            handler.load();
+            config.addConfiguration( pc );
         } catch ( ConfigurationException e ) {
             // hmm, this is pretty much required.
             log.warn( USER_CONFIGURATION + " not found" );
@@ -88,21 +98,33 @@ public class ConfigUtils {
 
         try {
             // Default comes first.
-            config.addConfiguration( new PropertiesConfiguration( DEFAULT_CONFIGURATION ) );
+            PropertiesConfiguration pc = new PropertiesConfiguration();
+            FileHandler handler = new FileHandler( pc );
+            handler.setFileName( DEFAULT_CONFIGURATION );
+            handler.load();
+            config.addConfiguration( pc );
         } catch ( ConfigurationException e ) {
             // hmm, this is pretty much required.
             log.warn( DEFAULT_CONFIGURATION + " not found" );
         }
 
         try {
-            config.addConfiguration( new PropertiesConfiguration( BUILTIN_CONFIGURATION ) );
+            PropertiesConfiguration pc = new PropertiesConfiguration();
+            FileHandler handler = new FileHandler( pc );
+            handler.setFileName( BUILTIN_CONFIGURATION );
+            handler.load();
+            config.addConfiguration( pc );
         } catch ( ConfigurationException e ) {
             // that's okay, but warn
             log.warn( BUILTIN_CONFIGURATION + " not found" );
         }
 
         try {
-            config.addConfiguration( new PropertiesConfiguration( "version.properties" ) );
+            PropertiesConfiguration pc = new PropertiesConfiguration();
+            FileHandler handler = new FileHandler( pc );
+            handler.setFileName( VERSION_CONFIGURATION );
+            handler.load();
+            config.addConfiguration( pc );
         } catch ( ConfigurationException e ) {
             log.debug( "version.properties not found" );
         }
@@ -450,7 +472,7 @@ public class ConfigUtils {
      * @return
      * @see org.apache.commons.configuration.CompositeConfiguration#getList(java.lang.String, java.util.List)
      */
-    public static List<?> getList( String key, List<?> defaultValue ) {
+    public static List<Object> getList( String key, List<Object> defaultValue ) {
         return config.getList( key, defaultValue );
     }
 

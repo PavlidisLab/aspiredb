@@ -19,6 +19,7 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import gemma.gsec.authentication.UserDetailsImpl;
+import gemma.gsec.authentication.UserManager;
 
 import java.util.Collection;
 import java.util.Date;
@@ -34,7 +35,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.model.Project;
-import ubc.pavlab.aspiredb.server.security.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
 /**
