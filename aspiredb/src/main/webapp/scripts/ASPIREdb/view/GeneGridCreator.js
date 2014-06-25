@@ -81,12 +81,11 @@ Ext.define( 'ASPIREdb.view.GeneGridCreator',
          var store = Ext.create( 'Ext.data.ArrayStore', {
             fields : fieldData,
             data : storeData,
-         // groupField : 'patientId'
+          groupField : 'patientId'
 
          } );
 
-         var columnHeaders = [ 'Patient Id', 'Gene Name', 'Genome Coordinates', '# Insertion', '# Deletion', '# Synonymous',
-                               '# NonSynonym', '# Loss', '# Gain', 'largest CNV', 'smallest CNV', '# Variants' ];
+         var columnHeaders = [ 'Patient Id', 'Gene Name', 'Genome Coordinates', '# Insertion', '# Deletion', '# Synonymous','# NonSynonym', '# Loss', '# Gain', 'largest CNV', 'smallest CNV', '# Variants' ];
          var columnConfig = [];
 
          columnConfig.push( {
@@ -192,20 +191,6 @@ Ext.define( 'ASPIREdb.view.GeneGridCreator',
          } );
 
 
-         for (var i = 0; i < characteristicNames.length; i++) {
-
-            var config = {};
-
-            config.text = characteristicNames[i];
-            config.flex = 1;
-            config.dataIndex = characteristicNames[i];
-            config.hidden = true;
-
-            columnConfig.push( config );
-
-            columnHeaders.push( characteristicNames[i] );
-
-         }
          Ext.state.Manager.setProvider( new Ext.state.CookieProvider( {
             expires : new Date( new Date().getTime() + (1000 * 60 * 60 * 24 * 7) )
          } ) );
