@@ -74,6 +74,7 @@ public class FileUploadController {
         System.err.println( "-------------------------------------------" );
         System.err.println( "Test upload: " + uploadItem.getFile().getOriginalFilename());
         System.err.println( "-------------------------------------------" );
+        
         if(uploadItem.getFile().getSize()>0){                     
             try {      
                 SaveFileFromInputStream(uploadItem.getFile().getInputStream(),"uploadFile",uploadItem.getFile().getOriginalFilename());
@@ -133,6 +134,7 @@ public class FileUploadController {
             }
 
             writer.close();
+            
             /** FileOutputStream fs=new FileOutputStream(path + "/"+ filename);  
             byte[]  buffer=new byte[1024*1024];  
             int bytesum = 0;      
@@ -166,6 +168,7 @@ public class FileUploadController {
             br = new BufferedReader(new InputStreamReader(is));
             while ((line = br.readLine()) != null) {
                 sb.append(line);
+                sb.append( "\n");
             }
  
         } catch (IOException e) {
