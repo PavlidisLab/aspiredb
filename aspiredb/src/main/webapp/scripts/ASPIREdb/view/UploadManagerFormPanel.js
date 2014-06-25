@@ -386,12 +386,16 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                   form.submit( {
 
                      method : 'POST',
-                     url : 'upload_action.html', // submitEmptyText : false,
+                     url : 'upload_action.html', 
+                     // submitEmptyText : false,
                      waitMsg : 'Uploading your phenotype file...',
                      headers : {
                         'Content-Type' : 'multipart/form-data;charset=UTF-8'
                      },
                      success : function(form, action) {
+                       // var phenotypeFile =form.getField('phenotypeFile');
+                    //    phenotypeFile.getFile();
+                        
                         var fReader = new FileReader();
                         fReader.readAsBinaryString( file );
 
@@ -427,11 +431,12 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                      .alert( 'Invalid Fields', 'The following fields are invalid: ' + fieldNames.join( ', ' ) );
                }
             }
+         //form.getFields('phenotypeFile').items[0].value= ref.PhenotypeFile;
          } ]
       } );
 
       this.add( phenotypePanel );
-
+ 
    },
 
 } );

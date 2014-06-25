@@ -19,7 +19,7 @@
 
 Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel',
               'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings',
-              'ASPIREdb.view.VariantGridCreator', 'ASPIREdb.IdeogramDownloadWindow', 'Ext.data.ArrayStore',
+              'ASPIREdb.view.VariantGridCreator', 'ASPIREdb.view.GeneGridCreator', 'ASPIREdb.IdeogramDownloadWindow', 'Ext.data.ArrayStore',
               'Ext.form.ComboBox', 'ASPIREdb.view.SubjectGrid' ] );
 
 /**
@@ -45,7 +45,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    items : [ {
       xtype : 'ideogram',
       itemId : 'ideogram'
-   } ],
+   }],
 
    config : {
       // selected subjects records in the grid
@@ -326,6 +326,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                ideogram.drawVariants( vvos );
 
                var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid( vvos, properties );
+               var grid2 = ASPIREdb.view.GeneGridCreator.createGeneGrid( vvos, properties );
                grid.on( 'itemcontextmenu', function(view, record, item, index, e) {
                   // Stop
                   // the
@@ -364,6 +365,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                } );
 
                ref.add( grid );
+               ref.add(grid2);
 
                var toolbar = ref.getDockedComponent( 'variantTabPanelToolbar' );
 
