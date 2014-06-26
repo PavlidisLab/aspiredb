@@ -369,7 +369,10 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
                var dataRowValue = "";
 
                for ( var char in vvo.characteristics) {
-                  if ( char == characteristicNames[j] ) {
+                  // make this comparison case insensitive since
+                  // it doesn't matter in the database
+                  // See Bug 4169
+                  if ( char.toLowerCase() == characteristicNames[j].toLowerCase() ) {
                      dataRowValue = vvo.characteristics[char].value;
                      break;
                   }
