@@ -309,6 +309,28 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
                var vvos = pageLoad.items;
                ref.loadedVariants = vvos;
+               var variantPatientIds=[];
+               
+               for(var i=0; i<vvos.length;i++){
+                  if (variantPatientIds.indexOf(vvos[i].patientId)== -1)
+                     variantPatientIds.push(VariantService.getSubjectVariants(vvos[i].patientId));                
+                  
+               }
+               ref.createUserGeneData(vvos);
+               
+          /**     for(var k=0; k < vvos.length;k++){
+                  variantIds.push( vvos[k].id );
+               }
+               
+               GeneService.getGenesInsideVariants(variantIds, {
+                  callback : function(gvos) {
+                     var geneValueObjects=gvos;
+                     
+                    console.log('variant gene value objects'+gvos);
+                  }
+               });*/
+               
+              // ref.createUserGeneData(vvos);
 
                ProjectService.numVariants( filterConfigs[0].projectIds, {
                   callback : function(NoOfVariants) {
@@ -327,6 +349,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
                var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid( vvos, properties );
                var grid2 = ASPIREdb.view.GeneGridCreator.createGeneGrid( vvos, properties );
+               
                grid.on( 'itemcontextmenu', function(view, record, item, index, e) {
                   // Stop
                   // the
@@ -394,6 +417,25 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       } );
 
    },
+   
+   /**
+    * Find the genes associated witht eh variants
+   */
+   createUserGeneData : function(vvos){
+      var variantIds=[];
+      for(var k=0; k < vvos.length;k++){
+         variantIds.push( vvos[k].id );
+      }
+      
+      GeneService.getGenesInsideVariants(variantIds, {
+         callback : function(gvos) {
+            var geneValueObjects=gvos;
+            
+           console.log('variant gene value objects'+gvos);
+         }
+      });
+   },
+   
 
    /**
     * Remove labels from variants in local store.
