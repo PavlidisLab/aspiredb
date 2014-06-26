@@ -216,12 +216,10 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
          width : 850,
          listeners : {
             cellclick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
-
                var subjectIdLength = record.raw.length;
                ref.selectedSubjectIds = record.raw[subjectIdLength - 1];
                if ( ref.selectedSubjectIds.length != 0 )
                   ref.makeLabelHandler();
-
             }
 
          // }

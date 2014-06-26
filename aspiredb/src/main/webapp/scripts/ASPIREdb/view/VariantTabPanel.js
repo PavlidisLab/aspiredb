@@ -19,7 +19,7 @@
 
 Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel',
               'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings',
-              'ASPIREdb.view.VariantGridCreator', 'ASPIREdb.IdeogramDownloadWindow', 'Ext.data.ArrayStore',
+              'ASPIREdb.view.VariantGridCreator', 'ASPIREdb.view.GeneGridCreator', 'ASPIREdb.IdeogramDownloadWindow', 'Ext.data.ArrayStore',
               'Ext.form.ComboBox', 'ASPIREdb.view.SubjectGrid' ] );
 
 /**
@@ -45,7 +45,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    items : [ {
       xtype : 'ideogram',
       itemId : 'ideogram'
-   } ],
+   }],
 
    config : {
       // selected subjects records in the grid
@@ -309,6 +309,28 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
                var vvos = pageLoad.items;
                ref.loadedVariants = vvos;
+               var variantPatientIds=[];
+               
+               for(var i=0; i<vvos.length;i++){
+                  if (variantPatientIds.indexOf(vvos[i].patientId)== -1)
+                     variantPatientIds.push(VariantService.getSubjectVariants(vvos[i].patientId));                
+                  
+               }
+               ref.createUserGeneData(vvos);
+               
+          /**     for(var k=0; k < vvos.length;k++){
+                  variantIds.push( vvos[k].id );
+               }
+               
+               GeneService.getGenesInsideVariants(variantIds, {
+                  callback : function(gvos) {
+                     var geneValueObjects=gvos;
+                     
+                    console.log('variant gene value objects'+gvos);
+                  }
+               });*/
+               
+              // ref.createUserGeneData(vvos);
 
                ProjectService.numVariants( filterConfigs[0].projectIds, {
                   callback : function(NoOfVariants) {
@@ -326,6 +348,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                ideogram.drawVariants( vvos );
 
                var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid( vvos, properties );
+               var grid2 = ASPIREdb.view.GeneGridCreator.createGeneGrid( vvos, properties );
+               
                grid.on( 'itemcontextmenu', function(view, record, item, index, e) {
                   // Stop
                   // the
@@ -351,6 +375,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                }, this );
 
                ref.remove( 'variantGrid', true );
+               ref.remove( 'geneGrid', true );
+               
                // when subjects are
                // selected
                grid.on( 'selectionchange', ref.selectionChangeHandler, ref );
@@ -364,6 +390,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                } );
 
                ref.add( grid );
+               ref.add(grid2);
 
                var toolbar = ref.getDockedComponent( 'variantTabPanelToolbar' );
 
@@ -392,6 +419,25 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       } );
 
    },
+   
+   /**
+    * Find the genes associated witht eh variants
+   */
+   createUserGeneData : function(vvos){
+      var variantIds=[];
+      for(var k=0; k < vvos.length;k++){
+         variantIds.push( vvos[k].id );
+      }
+      
+      GeneService.getGenesInsideVariants(variantIds, {
+         callback : function(gvos) {
+            var geneValueObjects=gvos;
+            
+           console.log('variant gene value objects'+gvos);
+         }
+      });
+   },
+   
 
    /**
     * Remove labels from variants in local store.

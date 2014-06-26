@@ -20,17 +20,16 @@ Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowMode
 // This grid is created dynamically based on 'suggested properties'( see VariantService.suggestProperties) this dynamic
 // nature is why this grid is constructed this way
 // TODO js documentation
-Ext.define( 'ASPIREdb.view.VariantGridCreator',
+Ext.define( 'ASPIREdb.view.GeneGridCreator',
    {
       /**
-       * @memberOf ASPIREdb.view.VariantGridCreator
+       * @memberOf ASPIREdb.view.GeneGridCreator
        */
       extend : 'Ext.util.Observable',
       singleton : true,
 
-      storeFields : [ 'id', 'patientId', 'variantType', 'genomeCoordinates', 'chromosome', 'baseStart', 'baseEnd',
-                     'labelIds', 'type', 'copyNumber', 'cnvLength', 'dbSNPID', 'observedBase', 'referenceBase',
-                     'indelLength' ],
+      storeFields : [ 'id', 'patientId', 'geneName', 'genomeCoordinates', 'noInsertion', 'noDeletion', 'noSynonymous',
+                     'noNonSynonym', 'NoLoss', 'NoGain', 'largestCNV', 'smallestCNV', 'NoVariants' ],
 
       initComponent : function() {
          this.callParent();
@@ -39,12 +38,12 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
       /**
        * @public
-       * @param {VariantValueObject[]}
+       * @param {GeneValueObject[]}
        *           vvos
        * @param {string[]}
        *           properties
        */
-      createVariantGrid : function(vvos, properties) {
+      createGeneGrid : function(vvos, properties) {
 
          var fieldData = [];
 
@@ -52,7 +51,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
          for (var i = 0; i < dataIndexes.length; i++) {
 
-            if ( dataIndexes[i] == 'baseStart' || dataIndexes[i] == 'baseEnd' || dataIndexes[i] == 'indelLength' ) {
+            if ( dataIndexes[i] == 'noInsertion' || dataIndexes[i] == 'noDeletion' || dataIndexes[i] == 'noSynonymous'|| dataIndexes[i]=='noNonSynonym'|| dataIndexes[i]=='noLoss'||dataIndexes[i]=='noGain' ||dataIndexes[i]=='noVariants') {
                fieldData.push( {
                   name : dataIndexes[i],
                   type : 'int'
@@ -77,17 +76,16 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
          }
 
          var visibleLabels = this.createVisibleLabels( vvos );
-         var storeData = this.constructVariantStoreData( vvos, characteristicNames, visibleLabels );
+         var storeData = this.constructGeneStoreData( vvos, characteristicNames, visibleLabels );
 
          var store = Ext.create( 'Ext.data.ArrayStore', {
             fields : fieldData,
             data : storeData,
-         // groupField : 'patientId'
+          groupField : 'patientId'
 
          } );
 
-         var columnHeaders = [ 'Patient Id', 'Type', 'Genome Coordinates', 'Copy Number', 'CNV Type', 'CNV Length',
-                              'DB SNP ID', 'Observed Base', 'Reference Base', 'Indel Length' ];
+         var columnHeaders = [ 'Patient Id', 'Gene Name', 'Genome Coordinates', '# Insertion', '# Deletion', '# Synonymous','# NonSynonym', '# Loss', '# Gain', 'largest CNV', 'smallest CNV', '# Variants' ];
          var columnConfig = [];
 
          columnConfig.push( {
@@ -97,9 +95,9 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
          } );
 
          columnConfig.push( {
-            text : 'Type',
+            text : 'Gene Name',
             flex : 1,
-            dataIndex : 'variantType'
+            dataIndex : 'geneName'
          } );
 
          columnConfig.push( {
@@ -109,27 +107,27 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
          } );
 
          columnConfig.push( {
-            text : 'Chromosome',
+            text : '# Insertion',
             flex : 1,
-            dataIndex : 'chromosome',
+            dataIndex : 'noInsertion',
             hidden : true
          } );
 
          columnConfig.push( {
-            text : 'Base Start',
+            text : '# Deletion',
             flex : 1,
-            dataIndex : 'baseStart',
+            dataIndex : 'noDeletion',
             hidden : true
          } );
 
          columnConfig.push( {
-            text : 'Base End',
+            text : '# Synonymous',
             flex : 1,
-            dataIndex : 'baseEnd',
+            dataIndex : 'noSynonymous',
             hidden : true
          } );
 
-         columnConfig.push( {
+       /**  columnConfig.push( {
             text : "Labels",
             dataIndex : 'labelIds',
             renderer : function(value) {
@@ -147,72 +145,52 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
                return ret;
             },
             flex : 1
-         } );
+         } );*/
 
          columnConfig.push( {
-            text : 'Copy Number',
+            text : '# NonSynonym',
             flex : 1,
-            dataIndex : 'copyNumber',
+            dataIndex : 'noNonSynonym',
             hidden : true
 
          } );
 
          columnConfig.push( {
-            text : 'CNV Type',
+            text : '# Loss',
             flex : 1,
-            dataIndex : 'type',
+            dataIndex : 'noLoss',
             hidden : true
          } );
 
          columnConfig.push( {
-            text : 'CNV Length',
+            text : '# Gain',
             flex : 1,
-            dataIndex : 'cnvLength',
+            dataIndex : 'noGain',
             hidden : true
          } );
 
          columnConfig.push( {
-            text : 'DB SNP ID',
+            text : 'largest CNV',
             flex : 1,
-            dataIndex : 'dbSNPID',
+            dataIndex : 'largestCNV',
             hidden : true
          } );
 
          columnConfig.push( {
-            text : 'Observed Base',
+            text : 'smallest CNV',
             flex : 1,
-            dataIndex : 'observedBase',
+            dataIndex : 'smallestCNV',
             hidden : true
          } );
 
          columnConfig.push( {
-            text : 'Reference Base',
+            text : '# Variants',
             flex : 1,
-            dataIndex : 'referenceBase',
+            dataIndex : 'noVariants',
             hidden : true
          } );
 
-         columnConfig.push( {
-            text : 'Indel Length',
-            flex : 1,
-            dataIndex : 'indelLength',
-            hidden : true
-         } );
 
-         for (var i = 0; i < characteristicNames.length; i++) {
-
-            var config = {};
-
-            config.text = characteristicNames[i];
-            config.flex = 1;
-            config.dataIndex = characteristicNames[i];
-            config.hidden = true;
-
-            columnConfig.push( config );
-
-            columnHeaders.push( characteristicNames[i] );
-
-         }
          Ext.state.Manager.setProvider( new Ext.state.CookieProvider( {
             expires : new Date( new Date().getTime() + (1000 * 60 * 60 * 24 * 7) )
          } ) );
@@ -220,7 +198,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
          // TODO styling
          grid = Ext.create( 'Ext.grid.Panel', {
             store : store,
-            itemId : 'variantGrid',
+            itemId : 'geneGrid',
             columns : columnConfig,
             columnHeaders : columnHeaders,
             // multiSelect : true,
@@ -242,7 +220,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             stripeRows : true,
             height : 180,
             width : 500,
-            title : 'Variant View',
+            title : 'Gene View',
 
             // known Extjs bug. Disabling for now until fixed. See Bug 4063
             // requires : [ 'Ext.grid.feature.Grouping' ],
@@ -300,13 +278,13 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
        *           visibleLabels
        * 
        */
-      constructVariantStoreData : function(vvos, characteristicNames, visibleLabels) {
+      constructGeneStoreData : function(vvos, characteristicNames, visibleLabels) {
 
          var storeData = [];
 
          for (var i = 0; i < vvos.length; i++) {
 
-            var vvo = vvos[i];
+        /**   var vvo = vvos[i];
 
             var dataRow = [];
 
@@ -369,10 +347,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
                var dataRowValue = "";
 
                for ( var char in vvo.characteristics) {
-                  // make this comparison case insensitive since
-                  // it doesn't matter in the database
-                  // See Bug 4169
-                  if ( char.toLowerCase() == characteristicNames[j].toLowerCase() ) {
+                  if ( char == characteristicNames[j] ) {
                      dataRowValue = vvo.characteristics[char].value;
                      break;
                   }
@@ -381,7 +356,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
                dataRow.push( dataRowValue );
             }
 
-            storeData.push( dataRow );
+            storeData.push( dataRow );*/
          }
 
          return storeData;

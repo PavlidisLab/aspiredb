@@ -26,7 +26,7 @@ Ext.define( 'ASPIREdb.view.UploadDataManagerWindow', {
    closable : true,
    closeAction : 'hide',
    width : 800,
-   height : 500,
+   height : 600,
    layout : 'fit',
    bodyStyle : 'padding: 5px;',
 
