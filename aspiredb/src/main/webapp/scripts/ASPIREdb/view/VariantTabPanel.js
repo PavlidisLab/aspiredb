@@ -375,6 +375,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                }, this );
 
                ref.remove( 'variantGrid', true );
+               ref.remove( 'geneGrid', true );
+               
                // when subjects are
                // selected
                grid.on( 'selectionchange', ref.selectionChangeHandler, ref );
