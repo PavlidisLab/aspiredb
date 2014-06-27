@@ -43,7 +43,7 @@ Ext.define( 'ASPIREdb.view.GeneGridCreator',
        * @param {string[]}
        *           properties
        */
-      createGeneGrid : function(vvos, properties) {
+      createGeneGrid : function(gvos, properties) {
 
          var fieldData = [];
 
@@ -74,14 +74,18 @@ Ext.define( 'ASPIREdb.view.GeneGridCreator',
             }
 
          }
-
-         var visibleLabels = this.createVisibleLabels( vvos );
-         var storeData = this.constructGeneStoreData( vvos, characteristicNames, visibleLabels );
+         var vos=[];
+         for (var key in gvos){
+            vos.push( gvos[key] );
+         }
+       //TODO:fix
+         var visibleLabels = this.createVisibleLabels( vos );
+         var storeData = this.constructGeneStoreData( gvos, characteristicNames, visibleLabels );
 
          var store = Ext.create( 'Ext.data.ArrayStore', {
             fields : fieldData,
             data : storeData,
-          groupField : 'patientId'
+            groupField : 'patientId'
 
          } );
 
@@ -242,15 +246,12 @@ Ext.define( 'ASPIREdb.view.GeneGridCreator',
        * 
        * @param visibleLabels
        */
-      createVisibleLabels : function(vvos) {
+      createVisibleLabels : function(gvos) {
          var visibleLabels = {};
 
-         for (var i = 0; i < vvos.length; i++) {
-            var labels = vvos[i].labels;
-            for (var j = 0; j < labels.length; j++) {
-               var label = labels[j];
-               visibleLabels[label.id] = label;
-            }
+         for (var i = 0; i < gvos.length; i++) {
+            var label = gvos[0][i].label;
+            visibleLabels[label.id] = label;           
          }
 
          return visibleLabels;
@@ -278,86 +279,51 @@ Ext.define( 'ASPIREdb.view.GeneGridCreator',
        *           visibleLabels
        * 
        */
-      constructGeneStoreData : function(vvos, characteristicNames, visibleLabels) {
-
+      constructGeneStoreData : function(gvos, characteristicNames, visibleLabels) {
+       
          var storeData = [];
+         var foundvvos=[];
 
-         for (var i = 0; i < vvos.length; i++) {
-
-        /**   var vvo = vvos[i];
+        // for (var i = 0; i < gvos.length; i++) {
+           for (var key in gvos){
+           var vvo = gvos[key];
+           if (foundvvos.indexOf(vvo)== -1){
+              foundvvos.push(vvo);
+           //for (var i = 0; i < vvo.length; i++) {
 
             var dataRow = [];
 
-            dataRow.push( vvo.id );
+            dataRow.push( vvo[0].id );
 
-            dataRow.push( vvo.patientId );
-
-            dataRow.push( vvo.variantType );
-            dataRow.push( vvo.genomicRange.chromosome + ":" + vvo.genomicRange.baseStart + "-"
-               + vvo.genomicRange.baseEnd );
-            dataRow.push( vvo.genomicRange.chromosome );
-            dataRow.push( vvo.genomicRange.baseStart );
-            dataRow.push( vvo.genomicRange.baseEnd );
+           // dataRow.push( vvo.patientId );
+            dataRow.push( key);
+            dataRow.push( vvo[0].name );
+            dataRow.push( vvo[0].genomicRange.chromosome + ":" + vvo[0].genomicRange.baseStart + "-"+ vvo[0].genomicRange.baseEnd );
+           // dataRow.push( vvo.genomicRange.chromosome );
+          //  dataRow.push( vvo.genomicRange.baseStart );
+           // dataRow.push( vvo.genomicRange.baseEnd );
 
             // create only one unique label instance
-            var labels = [];
-            for (var j = 0; j < vvo.labels.length; j++) {
-               var aLabel = visibleLabels[vvo.labels[j].id];
+        //    var labels = [];
+         //   for (var j = 0; j < vvo.labels.length; j++) {
+            //   var aLabel = visibleLabels[vvo.label.id];
 
                // this happens when a label has been assigned
                // by the admin and the user has no permissions
                // to modify the label
-               if ( aLabel == undefined ) {
-                  aLabel = vvo.labels[j];
-               }
+            //   if ( aLabel == undefined ) {
+            //      aLabel = vvo.label;
+            //   }
 
-               labels.push( aLabel.id );
-            }
+             //  labels.push( aLabel.id );
+           // }
 
-            dataRow.push( labels );
+           // dataRow.push( vvo.label );
 
-            if ( vvo.variantType == "CNV" ) {
-               dataRow.push( vvo.type );
-               dataRow.push( vvo.copyNumber );
-               dataRow.push( vvo.cnvLength );
-            } else {
-               dataRow.push( "" );
-               dataRow.push( "" );
-               dataRow.push( "" );
-            }
-
-            if ( vvo.variantType == "SNV" ) {
-               dataRow.push( vvo.dbSNPID );
-               dataRow.push( vvo.observedBase );
-               dataRow.push( vvo.referenceBase );
-            } else {
-               dataRow.push( "" );
-               dataRow.push( "" );
-               dataRow.push( "" );
-            }
-
-            if ( vvo.variantType == "INDEL" ) {
-               dataRow.push( vvo.length );
-            } else {
-               dataRow.push( "" );
-            }
-
-            for (var j = 0; j < characteristicNames.length; j++) {
-
-               var dataRowValue = "";
-
-               for ( var char in vvo.characteristics) {
-                  if ( char == characteristicNames[j] ) {
-                     dataRowValue = vvo.characteristics[char].value;
-                     break;
-                  }
-               }
-
-               dataRow.push( dataRowValue );
-            }
-
-            storeData.push( dataRow );*/
+           
+            storeData.push( dataRow );
          }
+      }
 
          return storeData;
 

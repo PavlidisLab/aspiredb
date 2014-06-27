@@ -78,6 +78,33 @@ public class GeneServiceImpl implements GeneService {
     }
 
     @Override
+    @RemoteMethod
+    public Map<String, List<GeneValueObject>> getGeneValueObjectsInsideVariants( Collection<Long> ids )
+            throws NotLoggedInException, BioMartServiceException {
+        
+        Map<String, List<GeneValueObject>> results = new HashMap<String, List<GeneValueObject>>();
+        
+        // Used to remove duplicates
+        HashMap<String, GeneValueObject> genes = new HashMap<String, GeneValueObject>();
+        for ( Long id : ids ) {
+            Variant variant = variantDao.load( id );
+            String patientId = variant.getSubject().getPatientId();
+            GenomicLocation location = variant.getLocation();
+            
+            Collection<GeneValueObject> genesInsideRange = this.bioMartQueryService.fetchGenesByLocation(
+                    String.valueOf( location.getChromosome() ), ( long ) location.getStart(),( long ) location.getEnd() );
+            
+            for ( GeneValueObject geneValueObject : genesInsideRange ) {
+                genes.put( geneValueObject.getEnsemblId(), geneValueObject );
+            }
+            List<GeneValueObject> gvos = new ArrayList<GeneValueObject>( genes.values() );
+            results.put( patientId, gvos);
+        }
+        
+        return results;
+    }
+
+    @Override
     @Transactional(readOnly = true)
     @RemoteMethod
     public List<GeneValueObject> getGenesInsideVariants( Collection<Long> ids ) throws NotLoggedInException,

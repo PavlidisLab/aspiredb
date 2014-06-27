@@ -45,4 +45,7 @@ public interface GeneService {
 
     public Long saveUserGeneSet( String geneName, List<GeneValueObject> genes );
 
+    public Map<String, List<GeneValueObject>> getGeneValueObjectsInsideVariants( Collection<Long> ids )
+            throws NotLoggedInException, BioMartServiceException;
+
 }
