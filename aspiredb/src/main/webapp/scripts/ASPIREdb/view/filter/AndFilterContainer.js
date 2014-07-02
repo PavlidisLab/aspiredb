@@ -88,7 +88,7 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 	}, {
 		xtype : 'button',
 		itemId : 'addButton',
-		text : 'Add'
+		text : 'AND'
 	} ],
 
 	getRestrictionExpression : function() {
