@@ -88,4 +88,8 @@ public interface ProjectService {
     public String addSubjectVariantsToProject( String filename, boolean createProject, String projectName, String variantType );
 
     public String addSubjectPhenotypeToProject( String filename, boolean createProject, String projectName );
+
+    public Map<String, String> addMultipleSubjectVariantsToProject( List<String> variantFiles, boolean createProject, String projectName );
+
+    
 }

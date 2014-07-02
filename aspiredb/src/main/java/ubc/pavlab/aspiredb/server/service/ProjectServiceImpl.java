@@ -223,6 +223,27 @@ public class ProjectServiceImpl implements ProjectService {
     
     /**
      * @author gaya
+     * @param list of variantFiles
+     * @param projectName
+     * @param createProject or not
+     * @return Error String
+     */
+    @Override
+    @RemoteMethod
+    public Map<String, String> addMultipleSubjectVariantsToProject(List<String> variantFiles, boolean createProject, String projectName) {
+        Map<String, String> returnString = new HashMap<String, String>();
+        
+        for(int i=0; i<variantFiles.size();i++){
+            String filename = variantFiles.get( 0 );
+            String filetype = variantFiles.get( 1 );
+            String results = addSubjectVariantsToProject(filename, createProject, projectName,filetype);
+            returnString.put( filename, results );
+        }
+        return returnString;
+    }
+    
+    /**
+     * @author gaya
      * @param fileContent
      * @param projectName
      * @param variantType

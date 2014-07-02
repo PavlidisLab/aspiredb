@@ -29,9 +29,11 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
    config : {
       variantSrc : null,
       VariantFile : '',
+      variantFiles:[],
       PhenotypeFile : '',
       variantType : '',
       counter :1,
+      variantFileList :[],
    },
    fieldDefaults : {
       labelWidth : 75,
@@ -70,10 +72,10 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
             values = form.getFieldValues();
             var projectName = values['projectName'];
             var projectDescription = values['projectDescription'];
-            var variantfilename = form.owner.VariantFile;
+          //  var variantfilename = form.owner.VariantFile;
             var phenotypefilename = form.owner.PhenotypeFile;
 
-            if ( variantfilename != '' ) {
+            if ( this.variantFileList.length >0 ) {
                var variantType = form.owner.variantType;
                // create project
                ProjectService.createUserProject( projectName, projectDescription, {
@@ -81,7 +83,7 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
 
                      if ( message == "Success" ) {
                         // add variants to the project
-                        ProjectService.addSubjectVariantsToProject( variantfilename, false, projectName, variantType, {
+                        ProjectService.addMultipleSubjectVariantsToProject( this.variantFileList, false, projectName, {
                            callback : function(errorMessage) {
                               if ( errorMessage == 'Success' ) {
                                  Ext.Msg.alert( 'Success', 'You have successfully uploaded variant file' );
@@ -198,6 +200,7 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                var variantType ='variantType'+ref.counter;
                var uploadVariantFiles ='uploadVariantFiles'+ref.counter;
                var variantID = 'id'+ref.counter;
+               ref.variantType =='variantType'+ref.counter;
                
                var variantPanel = Ext.create( 'Ext.form.Panel', {
                   id : panelName,
@@ -224,7 +227,7 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                      labelWidth : 100,
                      buttonText : 'Select',
                      handler : function() {
-                        console.log( 'file upload handler ' );
+                        console.log( 'file upload handler ' );                        
                      },
                      listeners : {
                         afterrender : function(el) {
@@ -265,6 +268,16 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                         } ]
                      } ),
                      labelWidth : 100,
+                     handler :function(){
+                        var form = variantPanel;
+                          values = form.getValues();
+                          ref.variantType = values[variantType+"-inputEl"].toUpperCase();
+                        
+                     },
+                     afterrender:function( combo, eOpts ){
+                        ref.variantType = combo.value();
+                     },
+                     
 
                   } ],
 
@@ -273,12 +286,13 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                      text : 'Upload Variants',
                      handler : function() {
                         var form = variantPanel;
-                    //    var me = this;
                         values = form.getValues();
                         
-                        ref.variantType = values[variantType+"-inputEl"].toUpperCase();
                         var file = Ext.getCmp( variantFile ).getEl().down( 'input[type=file]' ).dom.files[0];
-                        ref.VariantFile = file.name;                        
+                        var variantFileName= file.name;
+                        
+                        ref.VariantFile = variantFileName;
+                        ref.variantFileList.push(variantFileName,"");
 
                         if ( form.isValid() ) {
 
@@ -325,7 +339,10 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                               .alert( 'Invalid Fields', 'The following fields are invalid: ' + fieldNames.join( ', ' ) );
                         }
                      }
-                  } ]
+                  } ],
+                  handler : function(combo, e){
+                     ref.variantFileList(ref.VariantFile,ref.variantType);
+                  }
                } );
 
                ref.add( variantPanel );
