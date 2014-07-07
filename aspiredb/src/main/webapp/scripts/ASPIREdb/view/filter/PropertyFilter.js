@@ -296,7 +296,7 @@ Ext.define('ASPIREdb.view.filter.PropertyFilter', {
 			for (var i=0; i<records.length;i++){
 				properties.push(records[i].data.displayName);
 			}
-			//add Gene Set to the propterty list
+			//add Gene Set to the property list
 			properties.push('GeneSet');
 			var geneSetProperty= new Property();
 			geneSetProperty.displayName ='GeneSet';

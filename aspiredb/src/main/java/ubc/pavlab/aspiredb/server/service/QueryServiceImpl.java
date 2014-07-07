@@ -315,6 +315,83 @@ public class QueryServiceImpl implements QueryService {
 
     @Override
     @Transactional(readOnly = true)
+    @RemoteMethod
+    public Map<Integer, Integer> getSubjectGenes( Set<AspireDbFilterConfig> filters )
+            throws NotLoggedInException, ExternalDependencyException {
+
+        Map<Integer, Collection<Long>> svIds = new HashMap<Integer, Collection<Long>>();
+        Map<Integer, Integer> ret = new HashMap<Integer, Integer>();
+
+        Set<Long> svoIds = new HashSet<Long>();
+        Set<Long> vvoIds = new HashSet<Long>();
+
+        int subjectCount = 0;
+        int variantCount = 0;
+
+        Set<AspireDbFilterConfig> filtersTrimmed = new HashSet<AspireDbFilterConfig>();
+        Collection<Long> subjectPhenoIds = new HashSet<Long>();
+        Collection<Long> variantPhenoIds = new HashSet<Long>();
+
+        for ( AspireDbFilterConfig f : filters ) {
+
+            // treat PhenotypeFilters as a special case because calling this twice
+            // is both redundant and slow (see Bug #3892)
+            if ( f instanceof PhenotypeFilterConfig ) {
+                svIds = variantDao.getSubjectVariantIdsByPhenotype( ( PhenotypeFilterConfig ) f );
+
+                subjectPhenoIds = svIds.get( VariantDao.SUBJECT_IDS_KEY );
+                variantPhenoIds = svIds.get( VariantDao.VARIANT_IDS_KEY );
+
+            } else {
+                filtersTrimmed.add( f );
+            }
+        }
+
+        StopWatch timer = new StopWatch();
+        timer.start();
+        List<VariantValueObject> vvos = queryVariants( filtersTrimmed ).getItems();
+        timer.stop();
+        log.info( " query variants took " + timer );
+        for ( VariantValueObject v : vvos ) {
+            vvoIds.add( v.getId() );
+        }
+
+        // need a separate call for Subject and Variants because
+        // we can have a Subject without any Variants and those won't get counted!
+        if ( ConfigUtils.hasSubjectConfig( filters ) ) {
+            timer = new StopWatch();
+            timer.start();
+            List<SubjectValueObject> svos = querySubjects( filtersTrimmed ).getItems();
+            timer.stop();
+            log.info( " query subjects took " + timer );
+            for ( SubjectValueObject s : svos ) {
+                svoIds.add( s.getId() );
+            }
+        } else {
+            // if there's no Subject filter then we can just get it
+            // from Variant IDs! This saves us from executing redundant queries.
+            for ( VariantValueObject v : vvos ) {
+                svoIds.add( v.getSubjectId() );
+            }
+        }
+
+        // intersect PhenoIds with Ids from other filters
+        if ( !subjectPhenoIds.isEmpty() ) {
+            svoIds.retainAll( subjectPhenoIds );
+            vvoIds.retainAll( variantPhenoIds );
+        }
+
+        subjectCount = svoIds.size();
+        variantCount = vvoIds.size();
+
+        ret.put( VariantDao.SUBJECT_IDS_KEY, subjectCount );
+        ret.put( VariantDao.VARIANT_IDS_KEY, variantCount );
+
+        return ret;
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
     public List<String> getValuesForOntologyTerm( String ontologyTermUri ) {
         List<String> results = phenotypeDao.getExistingValues( ontologyTermUri );
         return results;

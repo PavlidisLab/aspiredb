@@ -24,17 +24,23 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
    extend : 'Ext.form.Panel',
    alias : 'widget.uploadManagerFormPanel',
    frame : true,
+   id : 'uploadManagerFormPanel',
    bodyStyle : 'padding:5px 5px 0',
    fileUpload : true,
    config : {
       variantSrc : null,
       VariantFile : '',
-      variantFiles:[],
+      variantFiles : [],
       PhenotypeFile : '',
       variantType : '',
-      counter :1,
-      variantFileList :[],
+      counter : 1,
+      variantFileList : {},
    },
+   dockedItems : [ {
+      xtype : 'toolbar',
+      itemId : 'uploadFilesToolbar',
+      dock : 'bottom'
+   } ],
    fieldDefaults : {
       labelWidth : 75,
       msgTarget : 'side'
@@ -57,7 +63,7 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
       itemId : 'projectDescription',
       value : '',
       labelWidth : 200,
-   }],
+   } ],
 
    buttons : [ {
       text : 'Submit',
@@ -72,10 +78,10 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
             values = form.getFieldValues();
             var projectName = values['projectName'];
             var projectDescription = values['projectDescription'];
-          //  var variantfilename = form.owner.VariantFile;
+            // var variantfilename = form.owner.VariantFile;
             var phenotypefilename = form.owner.PhenotypeFile;
 
-            if ( this.variantFileList.length >0 ) {
+            if ( form.variantFileList.length > 0 ) {
                var variantType = form.owner.variantType;
                // create project
                ProjectService.createUserProject( projectName, projectDescription, {
@@ -83,15 +89,15 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
 
                      if ( message == "Success" ) {
                         // add variants to the project
-                        ProjectService.addMultipleSubjectVariantsToProject( this.variantFileList, false, projectName, {
+                        ProjectService.addMultipleSubjectVariantsToProject( me.variantFileList, false, projectName, {
                            callback : function(errorMessage) {
                               if ( errorMessage == 'Success' ) {
                                  Ext.Msg.alert( 'Success', 'You have successfully uploaded variant file' );
                               } else
                                  Ext.Msg.alert( 'Server Reply', 'Uploading Variants  :' + errorMessage );
 
-                            //  Ext.getCmp( 'variantType' ).setValue( '' );
-                             // Ext.getCmp( 'variantFile' ).setRawValue( '' );
+                              // Ext.getCmp( 'variantType' ).setValue( '' );
+                              // Ext.getCmp( 'variantFile' ).setRawValue( '' );
 
                               if ( phenotypefilename != '' ) {
                                  // Uploading phenotypes to the created project
@@ -102,7 +108,7 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                                           Ext.Msg.alert( 'Success', 'You have successfully uploaded phenotype file' );
                                        } else
                                           Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :' + errorMessage );
-                                  //     Ext.getCmp( 'phenotypeFile' ).setRawValue( '' );
+                                       // Ext.getCmp( 'phenotypeFile' ).setRawValue( '' );
 
                                     },
                                     errorHandler : function(er, exception) {
@@ -112,8 +118,8 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                                  } );
 
                               }
-                          //    Ext.getCmp( 'projectName' ).setValue( '' );
-                          //    Ext.getCmp( 'projectDescription' ).setValue( '' );
+                              // Ext.getCmp( 'projectName' ).setValue( '' );
+                              // Ext.getCmp( 'projectDescription' ).setValue( '' );
 
                            },
                            errorHandler : function(er, exception) {
@@ -141,9 +147,9 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                         Ext.Msg.alert( 'Success', 'You have successfully uploaded phenotype file' );
                      } else
                         Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :' + errorMessage );
-                  //   Ext.getCmp( 'phenotypeFile' ).setRawValue( '' );
-                 //    Ext.getCmp( 'projectName' ).setValue( '' );
-                  //   Ext.getCmp( 'projectDescription' ).setValue( '' );
+                     // Ext.getCmp( 'phenotypeFile' ).setRawValue( '' );
+                     // Ext.getCmp( 'projectName' ).setValue( '' );
+                     // Ext.getCmp( 'projectDescription' ).setValue( '' );
                   },
                   errorHandler : function(er, exception) {
                      Ext.Msg.alert( "Upload phenotype Error", er + "\n" + exception.stack );
@@ -184,175 +190,178 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
     * init
     */
    initComponent : function() {
-      
+
       this.callParent();
       var ref = this;
-      
-      var item={
-            xtype : 'button',
-            text : 'Add Variants',
-            itemId : 'addVariantsButton',
-            width :50,
-            handler : function() {
-                     
-               var panelName = 'variantUploadForm'+ref.counter;
-               var variantFile ='variantFile'+ref.counter;
-               var variantType ='variantType'+ref.counter;
-               var uploadVariantFiles ='uploadVariantFiles'+ref.counter;
-               var variantID = 'id'+ref.counter;
-               ref.variantType =='variantType'+ref.counter;
-               
-               var variantPanel = Ext.create( 'Ext.form.Panel', {
-                  id : panelName,
-                  title : 'Upload Variants',
-                  width : '100%',
-                  bodyPadding : 5,
-                  padding : '10 10 10 10',
 
-                  layout : 'anchor',
-                  defaults : {
-                     anchor : '100%'
+      this.getDockedComponent( 'uploadFilesToolbar' ).removeAll();
+
+      var item = {
+         xtype : 'button',
+         text : 'Add Variants',
+         itemId : 'addVariantsButton',
+         width : 50,
+         handler : function() {
+
+            var panelName = 'variantUploadForm' + ref.counter;
+            var variantFile = 'variantFile' + ref.counter;
+            var variantType = 'variantType' + ref.counter;
+            var uploadVariantFiles = 'uploadVariantFiles' + ref.counter;
+            var variantID = 'id' + ref.counter;
+            ref.variantType == 'variantType' + ref.counter;
+
+            var variantPanel = Ext.create( 'Ext.form.Panel', {
+               id : panelName,
+               title : 'Upload Variants',
+               width : '100%',
+               bodyPadding : 5,
+               padding : '10 10 10 10',
+
+               layout : 'anchor',
+               defaults : {
+                  anchor : '100%'
+               },
+
+               // The fields
+               defaultType : 'textfield',
+               items : [ {
+                  xtype : 'filefield',
+                  id : variantFile,
+                  name : 'file',
+                  width : 400,
+                  allowBlanck : false,
+                  emptyText : 'Select variant file to upload',
+                  fieldLabel : 'File',
+                  labelWidth : 100,
+                  buttonText : 'Select',
+                  handler : function() {
+                     console.log( 'file upload handler ' );
+                  },
+                  listeners : {
+                     afterrender : function(el) {
+                        var element = el.fileInputEl;
+                        console.log( element );
+                        return element;
+                     },
+                     change : function(fld, value) {
+                        var newValue = value.replace( /C:\\fakepath\\/g, '' );
+                        fld.setRawValue( newValue );
+                     }
+                  }
+
+               }, {
+                  xtype : 'combobox',
+                  fieldLabel : 'variant Type',
+                  id : variantType,
+                  editable : false,
+                  displayField : 'variantType',
+                  valueField : variantID,
+                  store : Ext.create( 'Ext.data.Store', {
+                     fields : [ variantID, 'variantType' ],
+                     data : [ {
+                        variantID : 'cnv',
+                        variantType : 'CNV'
+                     }, {
+                        variantID : 'snv',
+                        variantType : 'SNV'
+                     }, {
+                        variantID : 'indel',
+                        variantType : 'INDEL'
+                     }, {
+                        variantID : 'inversion',
+                        variantType : 'INVERSION'
+                     }, {
+                        variantID : 'translocation',
+                        variantType : 'TRANSLOCATION'
+                     } ]
+                  } ),
+                  labelWidth : 100,
+                  handler : function() {
+                     var form = variantPanel;
+                     values = form.getValues();
+                     ref.variantType = values[variantType + "-inputEl"].toUpperCase();
+
+                  },
+                  afterrender : function(combo, eOpts) {
+                     ref.variantType = combo.value();
                   },
 
-                  // The fields
-                  defaultType : 'textfield',
-                  items : [ {
-                     xtype : 'filefield',
-                     id : variantFile,
-                     name : 'file',
-                     width : 400,
-                     allowBlanck : false,
-                     emptyText : 'Select variant file to upload',
-                     fieldLabel : 'File',
-                     labelWidth : 100,
-                     buttonText : 'Select',
-                     handler : function() {
-                        console.log( 'file upload handler ' );                        
-                     },
-                     listeners : {
-                        afterrender : function(el) {
-                           var element = el.fileInputEl;
-                           console.log( element );
-                           return element;
-                        },
-                        change : function(fld, value) {
-                           var newValue = value.replace( /C:\\fakepath\\/g, '' );
-                           fld.setRawValue( newValue );
-                        }
-                     }
+               } ],
 
-                  }, {
-                     xtype : 'combobox',
-                     fieldLabel : 'variant Type',
-                     id :variantType,
-                     editable : false,
-                     displayField : 'variantType',
-                     valueField : variantID,
-                     store : Ext.create( 'Ext.data.Store', {
-                        fields : [ variantID, 'variantType' ],
-                        data : [ {
-                           variantID : 'cnv',
-                           variantType : 'CNV'
-                        }, {
-                           variantID: 'snv',
-                           variantType : 'SNV'
-                        }, {
-                           variantID : 'indel',
-                           variantType : 'INDEL'
-                        }, {
-                           variantID : 'inversion',
-                           variantType : 'INVERSION'
-                        }, {
-                           variantID : 'translocation',
-                           variantType : 'TRANSLOCATION'
-                        } ]
-                     } ),
-                     labelWidth : 100,
-                     handler :function(){
-                        var form = variantPanel;
-                          values = form.getValues();
-                          ref.variantType = values[variantType+"-inputEl"].toUpperCase();
-                        
-                     },
-                     afterrender:function( combo, eOpts ){
-                        ref.variantType = combo.value();
-                     },
-                     
+               buttons : [ {
+                  id : uploadVariantFiles,
+                  text : 'Upload Variants',
+                  handler : function() {
+                     var form = variantPanel;
+                     values = form.getValues();
+                     ref.variantFileList.push( form.items.items[0].getValue(), form.items.items[1].rawValue );
 
-                  } ],
+                     var file = Ext.getCmp( variantFile ).getEl().down( 'input[type=file]' ).dom.files[0];
+                     var variantFileName = file.name;
 
-                  buttons : [ {
-                     id : uploadVariantFiles,
-                     text : 'Upload Variants',
-                     handler : function() {
-                        var form = variantPanel;
-                        values = form.getValues();
-                        
-                        var file = Ext.getCmp( variantFile ).getEl().down( 'input[type=file]' ).dom.files[0];
-                        var variantFileName= file.name;
-                        
-                        ref.VariantFile = variantFileName;
-                        ref.variantFileList.push(variantFileName,"");
+                     ref.VariantFile = variantFileName;
+                     // ref.variantFileList.push(variantFileName,"");
 
-                        if ( form.isValid() ) {
+                     if ( form.isValid() ) {
 
-                           form.submit( {
-                              method : 'POST',
-                              url : 'upload_action.html',
-                              waitMsg : 'Uploading your variant file...',
-                              headers : {
-                                 'Content-Type' : 'multipart/form-data;charset=UTF-8'
-                              },
-                              success : function(form, action) {
-                                 var fReader = new FileReader();
-                                 fReader.readAsBinaryString( file );
+                        form.submit( {
+                           method : 'POST',
+                           url : 'upload_action.html',
+                           waitMsg : 'Uploading your variant file...',
+                           headers : {
+                              'Content-Type' : 'multipart/form-data;charset=UTF-8'
+                           },
+                           success : function(form, action) {
+                              var fReader = new FileReader();
+                              fReader.readAsBinaryString( file );
 
-                                 fReader.onloadend = function(event) {
-                                    var variantSrc = event.target.result; 
-                                    var variantCount=variantSrc.split(/\r\n|\r|\n/).length;
-                                    variantCount=variantCount-2;
-                                    Ext.Msg.alert( 'Success', 'Your file has been uploaded </br></br> File Summary </br> Name : '
+                              fReader.onloadend = function(event) {
+                                 var variantSrc = event.target.result;
+                                 var variantCount = variantSrc.split( /\r\n|\r|\n/ ).length;
+                                 variantCount = variantCount - 2;
+                                 Ext.Msg.alert( 'Success',
+                                    'Your file has been uploaded </br></br> File Summary </br> Name : '
                                        + ref.VariantFile + '</br> Size : ' + file.size + '</br> Variant Type: '
                                        + ref.variantType + '</br> # Variants : ' + variantCount );
 
-                                 }
-
-                              },
-                              failure : function(form, action) {
-                                 Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' );
                               }
-                           } );
 
-                           ASPIREdb.EVENT_BUS.fireEvent( 'new_project_created' );
-
-                        } else {
-                           // Ext.Msg.alert( "Error!", "Your form is invalid!" );
-                           fieldNames = [];
-                           fields = form.getFields();
-                           for (var i = 0; i < fields.length; i++) {
-                              field = fields[i];
-                              if ( field == undefined )
-                                 fieldNames.push( field.getName() );
+                           },
+                           failure : function(form, action) {
+                              Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' );
                            }
-                           console.debug( fieldNames );
-                           Ext.MessageBox
-                              .alert( 'Invalid Fields', 'The following fields are invalid: ' + fieldNames.join( ', ' ) );
-                        }
-                     }
-                  } ],
-                  handler : function(combo, e){
-                     ref.variantFileList(ref.VariantFile,ref.variantType);
-                  }
-               } );
+                        } );
 
-               ref.add( variantPanel );
-               ref.counter++;
-           
-            },
-         };
-      
-      this.add( item );    
-      
+                        ASPIREdb.EVENT_BUS.fireEvent( 'new_project_created' );
+
+                     } else {
+                        // Ext.Msg.alert( "Error!", "Your form is invalid!" );
+                        fieldNames = [];
+                        fields = form.getFields();
+                        for (var i = 0; i < fields.length; i++) {
+                           field = fields[i];
+                           if ( field == undefined )
+                              fieldNames.push( field.getName() );
+                        }
+                        console.debug( fieldNames );
+                        Ext.MessageBox.alert( 'Invalid Fields', 'The following fields are invalid: '
+                           + fieldNames.join( ', ' ) );
+                     }
+                  }
+               } ],
+               handler : function(combo, e) {
+                  ref.variantFileList( ref.VariantFile, ref.variantType );
+               }
+            } );
+
+            ref.add( variantPanel );
+            ref.counter++;
+
+         },
+      };
+
+      this.add( item );
+
       var phenotypePanel = Ext.create( 'Ext.form.Panel', {
          id : 'phenotypeUploadForm',
          title : 'Upload phenotypes',
@@ -403,29 +412,30 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                   form.submit( {
 
                      method : 'POST',
-                     url : 'upload_action.html', 
+                     url : 'upload_action.html',
                      // submitEmptyText : false,
                      waitMsg : 'Uploading your phenotype file...',
                      headers : {
                         'Content-Type' : 'multipart/form-data;charset=UTF-8'
                      },
                      success : function(form, action) {
-                       // var phenotypeFile =form.getField('phenotypeFile');
-                    //    phenotypeFile.getFile();
-                        
+                        // var phenotypeFile =form.getField('phenotypeFile');
+                        // phenotypeFile.getFile();
+
                         var fReader = new FileReader();
                         fReader.readAsBinaryString( file );
 
                         fReader.onloadend = function(event) {
-                           var variantSrc = event.target.result; 
-                           var fileArray =variantSrc.split(/\r\n|\r|\n/);
-                           var pheneCount=fileArray[0].split(",").length;
-                           pheneCount=pheneCount-1;
-                           Ext.Msg.alert( 'Success', 'Your file has been uploaded </br></br> File Summary </br> Name : '
-                              + ref.PhenotypeFile + '</br> Size : ' + file.size + '</br> # Phenotypes : ' + pheneCount );
+                           var variantSrc = event.target.result;
+                           var fileArray = variantSrc.split( /\r\n|\r|\n/ );
+                           var pheneCount = fileArray[0].split( "," ).length;
+                           pheneCount = pheneCount - 1;
+                           Ext.Msg.alert( 'Success',
+                              'Your file has been uploaded </br></br> File Summary </br> Name : ' + ref.PhenotypeFile
+                                 + '</br> Size : ' + file.size + '</br> # Phenotypes : ' + pheneCount );
 
                         }
-                      
+
                      },
                      failure : function(form, action) {
                         Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' );
@@ -448,12 +458,12 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
                      .alert( 'Invalid Fields', 'The following fields are invalid: ' + fieldNames.join( ', ' ) );
                }
             }
-         //form.getFields('phenotypeFile').items[0].value= ref.PhenotypeFile;
+         // form.getFields('phenotypeFile').items[0].value= ref.PhenotypeFile;
          } ]
       } );
 
       this.add( phenotypePanel );
- 
+
    },
 
 } );

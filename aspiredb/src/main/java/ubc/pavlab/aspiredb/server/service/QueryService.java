@@ -101,6 +101,9 @@ public interface QueryService {
 
     Query getQuery( Long id );
 
+    Map<Integer, Integer> getSubjectGenes( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException,
+            ExternalDependencyException;
+
     // // TODO: To be removed
     // @Deprecated
     // public Collection<GeneValueObject> getGeneSuggestions(String query) throws BioMartServiceException;
