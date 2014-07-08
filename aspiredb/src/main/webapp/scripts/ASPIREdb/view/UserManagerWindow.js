@@ -63,7 +63,7 @@ Ext.define( 'ASPIREdb.view.UserManagerWindow', {
       grid.setLoading( true );
 
       ref.groupMemeberSize = []
-
+   
       UserManagerService.loadUserEditableGroups( {
          callback : function(ugs) { 
             console.log("user manager "+ugs);

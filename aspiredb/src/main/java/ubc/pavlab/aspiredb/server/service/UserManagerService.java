@@ -36,4 +36,6 @@ public interface UserManagerService {
 
     public String getCurrentUsername();
 
+    public List<String> findGroupMemebers( String groupName );
+
 }

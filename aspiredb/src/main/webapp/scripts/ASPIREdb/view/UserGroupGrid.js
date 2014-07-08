@@ -132,28 +132,29 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
 
       var me = this;
       this.selUserGroup = this.getSelectionModel().getSelection();
-      var userGroupName = this.selUserGroup[0].data.userGroupName;
+      var userGroupName = this.selUserGroup[0].data.groupName;
 
-      // TODO: This DWR is returning the null objects even though java is returning the correct objects
-      /**
-       * UserManager.loadUserUserGroup( { callback : function(ugs) {
-       * 
-       * me.populateGeneGrid( ugs ); } } );
-       */
+     //find members of the selected user group
+      UserManagerService.findGroupMemebers(userGroupName, {
+         callback : function(gms) { 
+            me.populateGeneGrid( gms );
+         }
+      });
+     
       ASPIREdb.EVENT_BUS.fireEvent( 'userGroup_selected', this.selUserGroup );
 
    },
 
    // Populate gens in gene grid
-   populateGeneGrid : function(ugs) {
+   populateGeneGrid : function(gms) {
 
       var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
       var grid = panel.down( '#groupMemberGrid' );
 
       var data = [];
-      for (var i = 0; i < ugs.length; i++) {
-         var ug = ugs[i];
-         var row = [ ug.symbol, '', ug.name, '' ];
+      for (var i = 0; i < gms.length; i++) {
+         var gm= gms[i];
+         var row = [ gm [i], '' ];
          data.push( row );
       }
 
