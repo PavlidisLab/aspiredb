@@ -14,6 +14,7 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
@@ -27,7 +28,7 @@ public interface UserManagerService {
 
     public String createUserGroup( String groupName );
 
-    public List<UserGroup> loadUserEditableGroups();
+    public Collection<String> loadUserEditableGroups();
 
     public UserGroup findGroupByName( String name );
 

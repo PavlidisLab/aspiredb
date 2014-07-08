@@ -4,7 +4,7 @@ Ext.define( 'ASPIREdb.view.filter.OrFilterContainer', {
    extend : 'ASPIREdb.view.filter.FilterPanel',
    alias : 'widget.filter_or',
    closable : true,
-   title : '',
+   title : 'OR Filter',
    width : 910,
    layout : {
       type : 'vbox'
@@ -108,7 +108,7 @@ Ext.define( 'ASPIREdb.view.filter.OrFilterContainer', {
          itemId : 'addButton',
          padding : '5 5 5 5',
         // icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
-         text : 'Add'
+         text : 'OR'
       } ];
 
       this.callParent();

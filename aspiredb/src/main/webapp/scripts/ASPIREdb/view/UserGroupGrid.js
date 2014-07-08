@@ -17,8 +17,7 @@
  *
  */
 
-Ext.require( [ /** 'ASPIREdb.store.UserGroupStore', */
-'ASPIREdb.TextDataDownloadWindow', 'Ext.grid.*', 'Ext.data.*', 'Ext.util.*', 'Ext.state.*', 'Ext.form.*' ] );
+Ext.require( [ 'ASPIREdb.store.UserGroupStore', 'ASPIREdb.TextDataDownloadWindow', 'Ext.grid.*', 'Ext.data.*', 'Ext.util.*', 'Ext.state.*', 'Ext.form.*' ] );
 
 var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
    // clicksToMoveEditor: 1,
@@ -33,7 +32,7 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
    emptyText : 'No user groups found',
    id : 'userGroupGrid',
    border : true,
-   // store : Ext.create( 'ASPIREdb.store.UserGroupStore' ),
+   store : Ext.create( 'ASPIREdb.store.UserGroupStore' ),
 
    config : {
       // collection of all the PhenotypeSummaryValueObject loaded
@@ -52,7 +51,7 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
    columns : [ {
 
       header : 'Name',
-      dataIndex : 'userGroupName',
+      dataIndex : 'groupName',
       flex : 1,
       editor : {
          // defaults to text field if no xtype is supplied
@@ -60,7 +59,7 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
       }
    }, {
       header : 'Description',
-      dataIndex : 'userGroupDescription',
+      dataIndex : 'groupDescription',
       flex : 1,
       editor : {
          // defaults to text field if no xtype is supplied
@@ -68,7 +67,7 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
       }
    }, {
       header : 'size',
-      dataIndex : 'userGroupSize',
+      dataIndex : 'groupSize',
       flex : 1,
 
    } ],

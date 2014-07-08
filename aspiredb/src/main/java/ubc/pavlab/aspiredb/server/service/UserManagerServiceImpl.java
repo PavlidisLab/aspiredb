@@ -109,16 +109,16 @@ public class UserManagerServiceImpl implements UserManagerService {
 
     @Override
     @Transactional
-    public List<UserGroup> loadUserEditableGroups() {
-
-        Collection<String> usergroups = securityService.getGroupsEditableBy( getCurrentUser() );
+    public Collection<String> loadUserEditableGroups() {
+        
+        Collection<String> usergroups = securityService.getGroupsUserCanEdit( getCurrentUsername() );
         List<UserGroup> UserGroup = new ArrayList<UserGroup>();
+  
 
         for ( String usergroup : usergroups ) {
-            UserGroup.add( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) userService
-                    .findGroupByName( usergroup ) );
+            UserGroup.add( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) userService.findGroupByName( usergroup ) );
         }
-        return UserGroup;
+        return usergroups;
     }
 
     /*
