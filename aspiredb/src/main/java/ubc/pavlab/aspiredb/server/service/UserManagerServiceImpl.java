@@ -19,6 +19,7 @@ import gemma.gsec.authentication.UserManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.directwebremoting.annotations.RemoteProxy;
@@ -33,6 +34,7 @@ import org.springframework.security.core.userdetails.cache.NullUserCache;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import antlr.StringUtils;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
@@ -60,7 +62,7 @@ public class UserManagerServiceImpl implements UserManagerService {
 
     @Autowired
     private SecurityService securityService;
-
+    @Autowired
     private UserManager userManager;
 
     /*
@@ -124,10 +126,17 @@ public class UserManagerServiceImpl implements UserManagerService {
     @Override
     @Transactional
     public List<String> findGroupMemebers( String groupName ) {
-        List<String> members = userManager.findUsersInGroup( groupName );
+        List<String> members=new ArrayList<String>();
+        
+        if (groupName == null){
+            return members;
+        }
+        
+        members =  userManager.findUsersInGroup( groupName );
         return members;
     }
-
+    
+  
     /*
      * (non-Javadoc)
      * 

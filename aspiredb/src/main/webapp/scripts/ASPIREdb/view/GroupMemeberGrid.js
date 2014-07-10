@@ -17,7 +17,7 @@
  *
  */
 
-Ext.require( [ 'Ext.grid.*', /**'ASPIREdb.store.GroupMemeberStore',*/ 'ASPIREdb.TextDataDownloadWindow', 'Ext.data.*', 'Ext.util.*',
+Ext.require( [ 'Ext.grid.*', 'ASPIREdb.store.GroupMemberStore', 'ASPIREdb.TextDataDownloadWindow', 'Ext.data.*', 'Ext.util.*',
               'Ext.state.*', 'Ext.form.*',/** 'ASPIREdb.GroupMemeberSuggestionStore', 'ASPIREdb.model.GroupMemeberProperty',*/
               'ASPIREdb.model.PropertyValue' ] );
 
@@ -36,7 +36,7 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
    emptyText : 'No groupMembers found',
    id : 'groupMemeberGrid',
    border : true,
-  // store : Ext.create( 'ASPIREdb.store.GroupMemeberStore' ),
+   store : Ext.create( 'ASPIREdb.store.GroupMemberStore' ),
 
    config : {
       // collection of all the PhenotypeSummaryValueObject loaded
@@ -57,7 +57,7 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
 
    columns : [ {
       header : 'Name',
-      dataIndex : 'name',
+      dataIndex : 'memberName',
       flex : 1,
       editor : {
          // defaults to textfield if no xtype is supplied
@@ -65,7 +65,7 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
       }
    }, {
       header : 'Email',
-      dataIndex : 'email',
+      dataIndex : 'memberEmail',
       flex : 1,
       editor : {
          // defaults to textfield if no xtype is supplied

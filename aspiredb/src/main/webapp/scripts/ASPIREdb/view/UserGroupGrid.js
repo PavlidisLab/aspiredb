@@ -148,13 +148,13 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
    // Populate gens in gene grid
    populateGeneGrid : function(gms) {
 
-      var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
-      var grid = panel.down( '#groupMemberGrid' );
+      var panel = ASPIREdb.view.UserManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
+      var grid = panel.down( '#groupMemeberGrid' );
 
       var data = [];
       for (var i = 0; i < gms.length; i++) {
          var gm= gms[i];
-         var row = [ gm [i], '' ];
+         var row = [ gm, '' ];
          data.push( row );
       }
 
@@ -196,9 +196,11 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
             geneValueObjects = [];
             geneValueObjects.push( new GeneValueObject() );
 
-            UserManager.createUserGroup( newUserGroupName, {
-               callback : function() {
-
+            UserManagerService.createUserGroup( newUserGroupName, {
+               callback : function(status) {
+                  if (status =="Success"){
+                     Ext.Msg.alert( 'Success','You have successfully created the group' );
+                  }
                }
             } );
             /**
