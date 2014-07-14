@@ -149,7 +149,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
          } ]
       } );
 
-      this.labelsButton = Ext.create( 'Ext.Button', {
+      this.labelsButton = Ext.create( 'Ext.button.Split', {
          text : '<b>Labels</b>',
          itemId : 'labelsButton',
          menu : this.labelsMenu

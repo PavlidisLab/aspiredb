@@ -17,7 +17,8 @@
  *
  */
 Ext.require( [ 'ASPIREdb.MainPanel', 'ASPIREdb.EVENT_BUS', 'ASPIREdb.view.filter.FilterWindow',
-              'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.DashboardWindow', 'ASPIREdb.view.GeneManagerWindow' ,'ASPIREdb.view.LabelManagerWindow'] );
+              'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.DashboardWindow', 'ASPIREdb.view.GeneManagerWindow',
+              'ASPIREdb.view.LabelManagerWindow' ] );
 
 /**
  * Main Panel which trigger the Main Panel after user's successful login Events: - login - logout
@@ -35,7 +36,7 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
       this.callParent();
 
       document.title = "ASPIREdb";
-      
+
       var aspireDbPanel = this;
 
       ConfigUtils.getAppVersion( {
@@ -112,7 +113,8 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
 
       LoginStatusService.getCurrentUsername( {
          callback : function(username) {
-            aspireDbPanel.down( '#message' ).setText( 'Hi! ' + username );
+            // aspireDbPanel.down( '#message' ).setText( 'Hi! ' + username );
+            aspireDbPanel.down( '#userBtn' ).setText( username );
          }
       } );
 
@@ -120,7 +122,7 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
 
          // todo :Add select the project to title bar
          var projecttitle = ASPIREdb.ActiveProjectSettings.getActiveProjectName();
-         //aspireDbPanel.down( '#projectTitle' ).setText( 'Active Project:  ' + projecttitle );
+         // aspireDbPanel.down( '#projectTitle' ).setText( 'Active Project: ' + projecttitle );
          document.title = "ASPIREdb Project " + projecttitle;
       } );
 
@@ -183,7 +185,7 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
       region : 'north',
       itemId : 'topToolbar',
       height : 50,
-      xtype : 'container',
+      xtype : 'toolbar',
       layout : 'hbox',
       items : [ {
          xtype : 'component',
@@ -266,13 +268,10 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          handler : function() {
             window.open( "http://aspiredb.sites.olt.ubc.ca/", "_blank", "" );
          }
-      }, {
-         xtype : 'label',
-         itemId : 'projectTitle',
-         style : 'vertical-align : middle; padding-top : 10px',
-         height : 30,
-         margin : '5 5 5 5',
-         flex : 1
+      /*
+       * }, { xtype : 'label', itemId : 'projectTitle', style : 'vertical-align : middle; padding-top : 10px', height :
+       * 30, margin : '5 5 5 5', flex : 1
+       */
       }, {
          xtype : 'label',
          itemId : 'filterActivated',
@@ -281,24 +280,16 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          margin : '5 5 5 5',
          flex : 1
       }, {
-         xtype : 'label',
-         itemId : 'message',
-         style : 'text-align: right; vertical-align : middle; padding-top : 10px',
-         height : 30,
-         width : 50,
-         margin : '5 5 5 5',
-         flex : 1
-      }, {
-         xtype : 'button',
-         text : 'Logout',
-         itemId : 'logoutButton',
-         height : 30,
-         margin : '5 5 5 5',
-         handler : function() {
-
-            window.location.href = 'j_spring_security_logout';
-
-         }
+         xtype : 'splitbutton',
+         itemId : 'userBtn',
+         text : 'anonymous',
+         menu : [ {
+            text : 'Log out',
+            tooltip : 'Log out of ASPIREdb',
+            handler : function() {
+               window.location.href = 'j_spring_security_logout';
+            }
+         } ]
       }, {
          xtype : 'container',
          itemId : 'logoutForm',

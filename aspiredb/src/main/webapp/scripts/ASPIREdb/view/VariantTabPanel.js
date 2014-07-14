@@ -90,7 +90,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          } ]
       } );
 
-      this.labelsButton = Ext.create( 'Ext.Button', {
+      this.labelsButton = Ext.create( 'Ext.button.Split', {
          text : '<b>Labels</b>',
          itemId : 'labelsButton',
          menu : this.labelsMenu
@@ -112,7 +112,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          } ]
       } );
 
-      this.actionsButton = Ext.create( 'Ext.Button', {
+      this.actionsButton = Ext.create( 'Ext.button.Split', {
          text : '<b>Actions</b>',
          itemId : 'actionsButton',
          menu : this.actionsMenu
