@@ -26,6 +26,9 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
    } ],
 
    initComponent : function() {
+      
+      document.title = "ASPIREdb";
+      
       this.callParent();
 
       var ref = this;

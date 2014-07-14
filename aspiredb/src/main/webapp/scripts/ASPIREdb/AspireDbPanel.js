@@ -34,6 +34,8 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
    initComponent : function() {
       this.callParent();
 
+      document.title = "ASPIREdb";
+      
       var aspireDbPanel = this;
 
       ConfigUtils.getAppVersion( {
@@ -110,7 +112,7 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
 
       LoginStatusService.getCurrentUsername( {
          callback : function(username) {
-            aspireDbPanel.down( '#message' ).setText( 'You are logged in as ' + username );
+            aspireDbPanel.down( '#message' ).setText( 'Hi! ' + username );
          }
       } );
 
@@ -118,7 +120,8 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
 
          // todo :Add select the project to title bar
          var projecttitle = ASPIREdb.ActiveProjectSettings.getActiveProjectName();
-         aspireDbPanel.down( '#projectTitle' ).setText( 'Active Project:  ' + projecttitle );
+         //aspireDbPanel.down( '#projectTitle' ).setText( 'Active Project:  ' + projecttitle );
+         document.title = "ASPIREdb Project " + projecttitle;
       } );
 
       ASPIREdb.EVENT_BUS.on( 'filter_submit', function(filterConfigs) {
@@ -282,6 +285,7 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          itemId : 'message',
          style : 'text-align: right; vertical-align : middle; padding-top : 10px',
          height : 30,
+         width : 50,
          margin : '5 5 5 5',
          flex : 1
       }, {
