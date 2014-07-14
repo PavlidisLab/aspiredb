@@ -5,7 +5,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
    extend : 'Ext.Container',
    alias : 'widget.filter_property',
    width : 875,
-   height : 35,
+   height : 38,
    layout : {
       type : 'hbox'
    },
