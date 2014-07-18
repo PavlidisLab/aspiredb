@@ -27,6 +27,8 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 public interface UserManagerService {
 
     public String createUserGroup( String groupName );
+    
+    public String deleteUserGroup( String groupName );
 
     public Collection<String> loadUserEditableGroups();
 

@@ -108,6 +108,22 @@ public class UserManagerServiceImpl implements UserManagerService {
         }
         return "Success";
     }
+    
+    /**
+     * Remove user from the group using gsec
+     */
+    @Override
+    @Transactional
+    public String deleteUserGroup( String groupName ) {
+
+        try {
+            securityService.removeUserFromGroup( getCurrentUsername(), groupName );
+        } catch ( Exception exception ) {
+            return exception.toString();
+        }
+        return "Success";
+    }
+   
 
     @Override
     @Transactional

@@ -196,7 +196,7 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
 
             geneValueObjects = [];
             geneValueObjects.push( new GeneValueObject() );
-
+/**
             UserManagerService.createUserGroup( newUserGroupName, {
                callback : function(status) {
                   if (status =="Success"){
@@ -224,7 +224,7 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
                      
                   }
                }
-            } );
+            } );*/
     
          }
       } );
@@ -237,15 +237,21 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
          icon : 'scripts/ASPIREdb/resources/images/icons/group_delete.png',
          handler : function() {
             // Delete user group
-            /**
-             * UserUserGroupService.deleteUserUserGroup( ref.selUserGroup[0].data.userGroupName, { callback : function() {
-             * var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_UserManagerpanel' ); var userGroupGrid =
-             * panel.down( '#userGroupGrid' ); var selection =
-             * userGroupGrid.getView().getSelectionModel().getSelection()[0]; if ( selection ) {
-             * userGroupGrid.store.remove( selection ); }
-             * 
-             * console.log( 'selected user group :' + ref.selUserGroup[0].data.userGroupName + ' deleted' ); } } );
-             */
+            UserManagerService.deleteUserGroup( ref.selGeneSet[0].data.geneSetName, {
+               callback : function() {
+                  var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
+                  var geneSetGrid = panel.down( '#geneSetGrid' );
+                  var selection = geneSetGrid.getView().getSelectionModel().getSelection()[0];
+                  if ( selection ) {
+                     geneSetGrid.store.remove( selection );
+                  }
+
+                  console.log( 'selected geneset :' + ref.selGeneSet[0].data.geneSetName + ' deleted' );
+               }
+            } );
+
+         
+     
 
          }
       } );
