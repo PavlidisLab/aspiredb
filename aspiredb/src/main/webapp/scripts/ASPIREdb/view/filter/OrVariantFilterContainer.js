@@ -1,10 +1,10 @@
-Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.filter.PropertyFilter' ] );
+Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.filter.VariantFilter' ] );
 
-Ext.define( 'ASPIREdb.view.filter.OrFilterContainer', {
+Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
    extend : 'ASPIREdb.view.filter.FilterPanel',
    alias : 'widget.filter_or',
    closable : true,
-   title : 'OR Filter',
+   title : 'OR Variant Filter',
    width : 910,
    layout : {
       type : 'vbox'
@@ -55,7 +55,7 @@ Ext.define( 'ASPIREdb.view.filter.OrFilterContainer', {
                   disjunction.restrictions[index].property.displayName = 'Gene';
                   disjunction.restrictions[index].values = disjunction.restrictions[index].values[index].object;
                }
-           
+             
             } );
 
             return disjunction;
@@ -69,7 +69,7 @@ Ext.define( 'ASPIREdb.view.filter.OrFilterContainer', {
 
                for (var i = 0; i < restriction.restrictions.length; i++) {
 
-                  var filter = Ext.create( 'ASPIREdb.view.filter.PropertyFilter', {
+                  var filter = Ext.create( 'ASPIREdb.view.filter.VariantFilter', {
                      propertyStore : me.getPropertyStore(),
                      suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
                   } );
@@ -82,7 +82,7 @@ Ext.define( 'ASPIREdb.view.filter.OrFilterContainer', {
 
             } else {
                // this else block probably never gets called
-               var filter = Ext.create( 'ASPIREdb.view.filter.PropertyFilter', {
+               var filter = Ext.create( 'ASPIREdb.view.filter.VariantFilter', {
                   propertyStore : me.getPropertyStore(),
                   suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
                } );
@@ -115,7 +115,7 @@ Ext.define( 'ASPIREdb.view.filter.OrFilterContainer', {
 
       me.getComponent( "addButton" ).on( 'click', function(button, event) {
          var filterContainer = me.getComponent( "filterContainer" );
-         filterContainer.add( Ext.create( 'ASPIREdb.view.filter.PropertyFilter', {
+         filterContainer.add( Ext.create( 'ASPIREdb.view.filter.VariantFilter', {
             propertyStore : me.getPropertyStore(),
             suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
          } ) );

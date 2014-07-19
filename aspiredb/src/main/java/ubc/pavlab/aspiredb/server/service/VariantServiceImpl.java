@@ -15,7 +15,10 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +51,7 @@ import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.TextValue;
 import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
+import ubc.pavlab.aspiredb.shared.query.CNVCharacteristicsProperty;
 import ubc.pavlab.aspiredb.shared.query.CNVTypeProperty;
 import ubc.pavlab.aspiredb.shared.query.CharacteristicProperty;
 import ubc.pavlab.aspiredb.shared.query.CnvLengthProperty;
@@ -57,6 +61,7 @@ import ubc.pavlab.aspiredb.shared.query.DoesOverlapWithXProperty;
 import ubc.pavlab.aspiredb.shared.query.GeneProperty;
 import ubc.pavlab.aspiredb.shared.query.GeneSetProperty;
 import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
+import ubc.pavlab.aspiredb.shared.query.IndelCharacteristicsProperty;
 import ubc.pavlab.aspiredb.shared.query.IndelLengthProperty;
 import ubc.pavlab.aspiredb.shared.query.LabelProperty;
 import ubc.pavlab.aspiredb.shared.query.MutualOverlapPercentageProperty;
@@ -68,10 +73,12 @@ import ubc.pavlab.aspiredb.shared.query.OverlapPercentageOtherVariantProperty;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.PropertyValue;
 import ubc.pavlab.aspiredb.shared.query.ReferenceBaseProperty;
+import ubc.pavlab.aspiredb.shared.query.SNVCharacteristicsProperty;
 import ubc.pavlab.aspiredb.shared.query.SupportValueProperty;
 import ubc.pavlab.aspiredb.shared.query.TextProperty;
 import ubc.pavlab.aspiredb.shared.query.TranslocationTypeProperty;
 import ubc.pavlab.aspiredb.shared.query.VariantLabelProperty;
+import ubc.pavlab.aspiredb.shared.query.VariantTypeProperty;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 import com.sencha.gxt.data.shared.SortInfo;
@@ -241,6 +248,7 @@ public class VariantServiceImpl implements VariantService {
         String query = suggestionContext.getValuePrefix();
         if ( query.length() >= 2 ) {
             final Collection<GeneValueObject> genes = bioMartQueryService.findGenes( query );
+    
             for ( GeneValueObject gene : genes ) {
                 GeneProperty geneProperty = new GeneProperty();
                 geneProperty.setName( gene.getName() );
@@ -397,10 +405,16 @@ public class VariantServiceImpl implements VariantService {
     public Collection<Property> suggestVariantLocationProperties() {
         Collection<Property> properties = new ArrayList<Property>();
 
-        properties.add( new GenomicLocationProperty() );
+        properties.add( new VariantTypeProperty() );
+        properties.add( new GenomicLocationProperty());
         properties.add( new GeneProperty() );
         properties.add( new GeneSetProperty() );
-        properties.add( new NeurocartaPhenotypeProperty() );
+        properties.add( new NeurocartaPhenotypeProperty());
+        properties.add( new CNVCharacteristicsProperty());
+        properties.add( new SNVCharacteristicsProperty());
+        properties.add( new IndelCharacteristicsProperty());
+        
+        
 
         return properties;
     }

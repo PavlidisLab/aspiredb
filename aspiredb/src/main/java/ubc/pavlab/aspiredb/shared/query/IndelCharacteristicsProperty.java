@@ -25,19 +25,16 @@ import org.directwebremoting.annotations.DataTransferObject;
 /**
  * author: gaya date: 07/18/14 Class is concrete because I couldn't get DWR to see it when it is abstract.
  */
-@DataTransferObject(javascript = "CNVCharacteristicsProperty")
+@DataTransferObject(javascript = "IndelCharacteristicsProperty")
 public class IndelCharacteristicsProperty extends TextProperty {
 
-   
     /**
      * generated the serializable id
      */
-    private static final long serialVersionUID = -6849102681487342527L;
+    private static final long serialVersionUID = -2124660825928667197L;
 
+    public IndelCharacteristicsProperty() {
+        super( "Indel Characteristics", "Indel", Arrays.asList( "Indel Length", "characteristics" ) );
+    }
 
-        public IndelCharacteristicsProperty() {
-            super( "Indel Characteristics", "Indel", Arrays.asList( "Indel Length","characteristics" ) );
-        }
-   
-    
 }

@@ -29,25 +29,5 @@ Ext.define('ASPIREdb.ProjectUserSuggestionStore', {
 
     suggestionContext: null,
     property: null,
-    /**
-    constructor: function (config) {
-        config.proxy = {
-            type: 'dwr',
-            dwrFunction: ProjectService.suggestProjectUserGroups,
-            reader: {
-                type: 'json',
-                root: 'data',
-                totalProperty: 'count'
-            }
-        };
-        this.callParent(arguments);
-    },
-      
-    load: function(options) {
-        this.suggestionContext = new SuggestionContext();
-        this.suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds() ;
-        this.suggestionContext.valuePrefix = options.params.query;
-        this.proxy.dwrParams = [this.suggestionContext];
-        this.callParent(options);
-    }*/
+  
 });

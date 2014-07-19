@@ -1,5 +1,5 @@
 Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.filter.AndFilterContainer',
-              'ASPIREdb.view.filter.OrFilterContainer', 'ASPIREdb.view.filter.FilterPanel' ] );
+              'ASPIREdb.view.filter.OrVariantFilterContainer', 'ASPIREdb.view.filter.FilterPanel' ] );
 
 Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
    extend : 'ASPIREdb.view.filter.FilterPanel',
@@ -10,9 +10,9 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
       xtype : 'filter_and',
       title : 'Variant Location:',
       itemId : 'locationFilterContainer',
-      filterItemType : 'ASPIREdb.view.filter.OrFilterContainer',
-      suggestValuesRemoteFunction : VariantService.suggestValues,
-      propertyStore : {
+      filterItemType : 'ASPIREdb.view.filter.OrVariantFilterContainer',
+      //suggestValuesRemoteFunction : VariantService.suggestValues,
+    /**  propertyStore : {
          // autoLoad: true,
          proxy : {
             type : 'dwr',
@@ -24,8 +24,8 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
                totalProperty : 'count'
             }
          }
-      }
-   }, {
+      },*/
+     },/** {
       xtype : 'label',
       text : 'Variant characteristics:',
       padding : '5 5 5 5',
@@ -172,7 +172,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
          },
          filterItemType : 'ASPIREdb.view.filter.PropertyFilter'
       }
-   } ],
+   }*/ ],
 
    getFilterConfig : function() {
       var cnvFilterPanel = this.getComponent( 'cnvFilterPanel' );
@@ -184,8 +184,9 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
 
       var locationConjunction = new Conjunction();
       locationConjunction.restrictions = [];
-
-      var locationFilterContainer = this.getComponent( 'locationFilterContainer' );
+                 
+      var locationFilterContainer = this.getComponent( 'locationFilterContainer' );    
+    
       conjunction.restrictions.push( locationFilterContainer.getRestrictionExpression() );
 
       var disjunction = new Disjunction();

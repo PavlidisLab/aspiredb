@@ -28,22 +28,13 @@ import org.directwebremoting.annotations.DataTransferObject;
 @DataTransferObject(javascript = "CNVCharacteristicsProperty")
 public class CNVCharacteristicsProperty extends TextProperty {
 
-   
     /**
      * generated the serializable id
      */
     private static final long serialVersionUID = -6849102681487342527L;
 
- /**   public CNVCharacteristicsProperty() {
-        this.displayName = "CNV Characteristics";
-        //this.exampleValues = "Gene Set Names - Examples: <b>geneset1</b>, <b>geneset2</b>, <b>geneset3</b>";
-       // this.operators = Arrays.asList( Operator.IS_IN_SET, Operator.IS_NOT_IN_SET );
-        this.supportsSuggestions = true;
-    }*/
+    public CNVCharacteristicsProperty() {
+        super( "CNV Characteristics", "CNV", Arrays.asList( "Copy Number", "CNV Type", "Length", "characteristics" ) );
+    }
 
-        public CNVCharacteristicsProperty() {
-            super( "CNV Characteristics", "CNV", Arrays.asList( "Copy Number", "CNV Type", "Length", "characteristics" ) );
-        }
-   
-    
 }

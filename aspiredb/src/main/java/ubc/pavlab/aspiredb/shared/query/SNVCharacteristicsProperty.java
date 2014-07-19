@@ -25,25 +25,18 @@ import org.directwebremoting.annotations.DataTransferObject;
 /**
  * author: gaya date: 07/18/14 Class is concrete because I couldn't get DWR to see it when it is abstract.
  */
-@DataTransferObject(javascript = "CNVCharacteristicsProperty")
+@DataTransferObject(javascript = "SNVCharacteristicsProperty")
 public class SNVCharacteristicsProperty extends TextProperty {
 
-   
     /**
      * generated the serializable id
      */
-    private static final long serialVersionUID = -6849102681487342527L;
 
- /**   public CNVCharacteristicsProperty() {
-        this.displayName = "CNV Characteristics";
-        //this.exampleValues = "Gene Set Names - Examples: <b>geneset1</b>, <b>geneset2</b>, <b>geneset3</b>";
-       // this.operators = Arrays.asList( Operator.IS_IN_SET, Operator.IS_NOT_IN_SET );
-        this.supportsSuggestions = true;
-    }*/
+    private static final long serialVersionUID = 6479179538387811142L;
 
-        public SNVCharacteristicsProperty() {
-            super( "SNV Characteristics", "SNV", Arrays.asList( "DB SNP ID", "Observed base", "Reference Base", "characteristics" ) );
-        }
-   
-    
+    public SNVCharacteristicsProperty() {
+        super( "SNV Characteristics", "SNV", Arrays.asList( "DB SNP ID", "Observed base", "Reference Base",
+                "characteristics" ) );
+    }
+
 }

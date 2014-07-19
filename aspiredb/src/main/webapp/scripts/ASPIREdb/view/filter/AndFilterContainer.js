@@ -31,9 +31,7 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 				var itemRestriction = item.getRestrictionExpression();
 
 				if (FilterUtil.isSimpleRestriction(itemRestriction)) {
-
 					if (FilterUtil.validateSimpleRestriction(itemRestriction)) {
-
 						conjunction.restrictions.push(itemRestriction);
 					}
 
@@ -50,9 +48,7 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 							var disjunctedRestriction = itemRestriction.restrictions[i];
 							
 							if (FilterUtil.isSimpleRestriction(disjunctedRestriction)) {
-
 								if (FilterUtil.validateSimpleRestriction(disjunctedRestriction)) {
-
 									nonEmptyRestrictionsArray.push(disjunctedRestriction);
 								}
 
