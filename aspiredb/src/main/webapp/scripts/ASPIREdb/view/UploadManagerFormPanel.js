@@ -58,7 +58,7 @@ Ext.define( 'ASPIREdb.view.uploadManagerFormPanel', {
       labelWidth : 200,
    }, {
       xtype : 'textfield',
-      fieldLabel : 'Project Decription',
+      fieldLabel : 'Project Description',
       name : 'projectDescription',
       itemId : 'projectDescription',
       value : '',

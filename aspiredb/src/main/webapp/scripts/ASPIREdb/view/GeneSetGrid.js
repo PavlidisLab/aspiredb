@@ -93,10 +93,10 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
          var me = this;
          UserGeneSetService.findUserGeneSet( me.selGeneSet[0].data.geneSetName, {
             callback : function(gsvo) {
-               console.log( 'found gene set name ' + gsvo.name + '  decription' + gsvo.description );
+               console.log( 'found gene set name ' + gsvo.name + '  description' + gsvo.description );
                gsvo.name = record.data.geneSetName;
                gsvo.description = record.data.geneDescription;
-               console.log( 'AFTER UPDATE - found gene set name ' + gsvo.name + '  decription' + ' to string '
+               console.log( 'AFTER UPDATE - found gene set name ' + gsvo.name + '  description' + ' to string '
                   + gsvo.description + gsvo.id );
 
                // ///////////////////////////////

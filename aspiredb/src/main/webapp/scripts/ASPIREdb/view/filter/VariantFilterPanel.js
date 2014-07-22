@@ -9,10 +9,10 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
    items : [ {
       xtype : 'filter_and',
       title : 'Variant Location:',
-      itemId : 'locationFilterContainer',
+      itemId : 'variantFilterContainer',
       filterItemType : 'ASPIREdb.view.filter.OrVariantFilterContainer',
-      //suggestValuesRemoteFunction : VariantService.suggestValues,
-    /**  propertyStore : {
+      // suggestValuesRemoteFunction : VariantService.suggestValues,
+      propertyStore : {
          // autoLoad: true,
          proxy : {
             type : 'dwr',
@@ -23,156 +23,80 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
                root : 'data',
                totalProperty : 'count'
             }
-         }
-      },*/
-     },/** {
-      xtype : 'label',
-      text : 'Variant characteristics:',
-      padding : '5 5 5 5',
-   }, {
-      xtype : 'panel',
-      itemId : 'cnvFilterPanel',
-      bodyStyle : 'background: #FFFFC2;',
-      title : 'CNV:',
-      collapsible : true,
-      collapsed : true,
-      animCollapse : false,
-      getRestrictionExpression : function() {
-         var filterContainer = this.getComponent( 'cnvCharacteristicFilterContainer' );
 
-         var cnvRestrictionExpression = filterContainer.getRestrictionExpression();
-
-         var variantRestriction = new VariantTypeRestriction();
-
-         variantRestriction.type = "CNV";
-
-         cnvRestrictionExpression.restrictions.push( variantRestriction );
-
-         return cnvRestrictionExpression;
-
-      },
-      setRestrictionExpression : function(restriction) {
-         // and filter container
-         var filterContainer = this.getComponent( 'cnvCharacteristicFilterContainer' );
-         filterContainer.setRestrictionExpression( restriction );
-      },
-      items : {
-         xtype : 'filter_and',
-         itemId : 'cnvCharacteristicFilterContainer',
-         suggestValuesRemoteFunction : VariantService.suggestValues,
-         propertyStore : {
-            // autoLoad : true,
-            proxy : {
-               type : 'dwr',
-               dwrFunction : VariantService.suggestPropertiesForVariantType,
-               dwrParams : [ 'CNV' ],
-               model : 'ASPIREdb.model.Property',
-               reader : {
-                  type : 'json',
-                  root : 'data',
-                  totalProperty : 'count'
-               }
-            }
          },
-         filterItemType : 'ASPIREdb.view.filter.PropertyFilter'
       }
-   }, {
-      xtype : 'panel',
-      itemId : 'indelFilterPanel',
-      bodyStyle : 'background: #FFFFC2;',
-      title : 'Indel:',
-      collapsible : true,
-      collapsed : true,
-      animCollapse : false,
-      getRestrictionExpression : function() {
-
-         var filterContainer = this.getComponent( 'indelCharacteristicFilterContainer' );
-
-         var indelRestrictionExpression = filterContainer.getRestrictionExpression();
-
-         var variantRestriction = new VariantTypeRestriction();
-
-         variantRestriction.type = "INDEL";
-
-         indelRestrictionExpression.restrictions.push( variantRestriction );
-
-         return indelRestrictionExpression;
+   }, /**
+       * { xtype : 'label', text : 'Variant characteristics:', padding : '5 5 5 5', }, { xtype : 'panel', itemId :
+       * 'cnvFilterPanel', bodyStyle : 'background: #FFFFC2;', title : 'CNV:', collapsible : true, collapsed : true,
+       * animCollapse : false, getRestrictionExpression : function() { var filterContainer = this.getComponent(
+       * 'cnvCharacteristicFilterContainer' );
+       * 
+       * var cnvRestrictionExpression = filterContainer.getRestrictionExpression();
+       * 
+       * var variantRestriction = new VariantTypeRestriction();
+       * 
+       * variantRestriction.type = "CNV";
+       * 
+       * cnvRestrictionExpression.restrictions.push( variantRestriction );
+       * 
+       * return cnvRestrictionExpression;
+       *  }, setRestrictionExpression : function(restriction) { // and filter container var filterContainer =
+       * this.getComponent( 'cnvCharacteristicFilterContainer' ); filterContainer.setRestrictionExpression( restriction ); },
+       * items : { xtype : 'filter_and', itemId : 'cnvCharacteristicFilterContainer', suggestValuesRemoteFunction :
+       * VariantService.suggestValues, propertyStore : { // autoLoad : true, proxy : { type : 'dwr', dwrFunction :
+       * VariantService.suggestPropertiesForVariantType, dwrParams : [ 'CNV' ], model : 'ASPIREdb.model.Property',
+       * reader : { type : 'json', root : 'data', totalProperty : 'count' } } }, filterItemType :
+       * 'ASPIREdb.view.filter.PropertyFilter' } }, { xtype : 'panel', itemId : 'indelFilterPanel', bodyStyle :
+       * 'background: #FFFFC2;', title : 'Indel:', collapsible : true, collapsed : true, animCollapse : false,
+       * getRestrictionExpression : function() {
+       * 
+       * var filterContainer = this.getComponent( 'indelCharacteristicFilterContainer' );
+       * 
+       * var indelRestrictionExpression = filterContainer.getRestrictionExpression();
+       * 
+       * var variantRestriction = new VariantTypeRestriction();
+       * 
+       * variantRestriction.type = "INDEL";
+       * 
+       * indelRestrictionExpression.restrictions.push( variantRestriction );
+       * 
+       * return indelRestrictionExpression;
+       *  }, setRestrictionExpression : function(restriction) { // and filter container var filterContainer =
+       * this.getComponent( 'indelCharacteristicFilterContainer' ); filterContainer.setRestrictionExpression(
+       * restriction ); }, items : { xtype : 'filter_and', itemId : 'indelCharacteristicFilterContainer',
+       * suggestValuesRemoteFunction : VariantService.suggestValues, propertyStore : { // autoLoad : true, proxy : {
+       * type : 'dwr', dwrFunction : VariantService.suggestPropertiesForVariantType, dwrParams : [ 'INDEL' ], model :
+       * 'ASPIREdb.model.Property', reader : { type : 'json', root : 'data', totalProperty : 'count' } } },
+       * filterItemType : 'ASPIREdb.view.filter.PropertyFilter' } }, { xtype : 'panel', itemId : 'snvFilterPanel',
+       * bodyStyle : 'background: #FFFFC2;', title : 'SNV:', collapsible : true, collapsed : true, animCollapse : false,
+       * getRestrictionExpression : function() {
+       * 
+       * var filterContainer = this.getComponent( 'snvCharacteristicFilterContainer' );
+       * 
+       * var snvRestrictionExpression = filterContainer.getRestrictionExpression();
+       * 
+       * var variantRestriction = new VariantTypeRestriction();
+       * 
+       * variantRestriction.type = "SNV";
+       * 
+       * snvRestrictionExpression.restrictions.push( variantRestriction );
+       * 
+       * return snvRestrictionExpression;
+       *  }, setRestrictionExpression : function(restriction) { // and filter container var filterContainer =
+       * this.getComponent( 'snvCharacteristicFilterContainer' ); filterContainer.setRestrictionExpression( restriction ); },
+       * items : { xtype : 'filter_and', itemId : 'snvCharacteristicFilterContainer', suggestValuesRemoteFunction :
+       * VariantService.suggestValues, propertyStore : { // autoLoad : true, proxy : { type : 'dwr', dwrFunction :
+       * VariantService.suggestPropertiesForVariantType, dwrParams : [ 'SNV' ], model : 'ASPIREdb.model.Property',
+       * reader : { type : 'json', root : 'data', totalProperty : 'count' } } }, filterItemType :
+       * 'ASPIREdb.view.filter.PropertyFilter' } }
+       */
+   ],
+   listeners : {
+      select : function() {
 
       },
-      setRestrictionExpression : function(restriction) {
-         // and filter container
-         var filterContainer = this.getComponent( 'indelCharacteristicFilterContainer' );
-         filterContainer.setRestrictionExpression( restriction );
-      },
-      items : {
-         xtype : 'filter_and',
-         itemId : 'indelCharacteristicFilterContainer',
-         suggestValuesRemoteFunction : VariantService.suggestValues,
-         propertyStore : {
-            // autoLoad : true,
-            proxy : {
-               type : 'dwr',
-               dwrFunction : VariantService.suggestPropertiesForVariantType,
-               dwrParams : [ 'INDEL' ],
-               model : 'ASPIREdb.model.Property',
-               reader : {
-                  type : 'json',
-                  root : 'data',
-                  totalProperty : 'count'
-               }
-            }
-         },
-         filterItemType : 'ASPIREdb.view.filter.PropertyFilter'
-      }
-   }, {
-      xtype : 'panel',
-      itemId : 'snvFilterPanel',
-      bodyStyle : 'background: #FFFFC2;',
-      title : 'SNV:',
-      collapsible : true,
-      collapsed : true,
-      animCollapse : false,
-      getRestrictionExpression : function() {
-
-         var filterContainer = this.getComponent( 'snvCharacteristicFilterContainer' );
-
-         var snvRestrictionExpression = filterContainer.getRestrictionExpression();
-
-         var variantRestriction = new VariantTypeRestriction();
-
-         variantRestriction.type = "SNV";
-
-         snvRestrictionExpression.restrictions.push( variantRestriction );
-
-         return snvRestrictionExpression;
-
-      },
-      setRestrictionExpression : function(restriction) {
-         // and filter container
-         var filterContainer = this.getComponent( 'snvCharacteristicFilterContainer' );
-         filterContainer.setRestrictionExpression( restriction );
-      },
-      items : {
-         xtype : 'filter_and',
-         itemId : 'snvCharacteristicFilterContainer',
-         suggestValuesRemoteFunction : VariantService.suggestValues,
-         propertyStore : {
-            // autoLoad : true,
-            proxy : {
-               type : 'dwr',
-               dwrFunction : VariantService.suggestPropertiesForVariantType,
-               dwrParams : [ 'SNV' ],
-               model : 'ASPIREdb.model.Property',
-               reader : {
-                  type : 'json',
-                  root : 'data',
-                  totalProperty : 'count'
-               }
-            }
-         },
-         filterItemType : 'ASPIREdb.view.filter.PropertyFilter'
-      }
-   }*/ ],
+   },
 
    getFilterConfig : function() {
       var cnvFilterPanel = this.getComponent( 'cnvFilterPanel' );
@@ -184,10 +108,10 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
 
       var locationConjunction = new Conjunction();
       locationConjunction.restrictions = [];
-                 
-      var locationFilterContainer = this.getComponent( 'locationFilterContainer' );    
-    
-      conjunction.restrictions.push( locationFilterContainer.getRestrictionExpression() );
+
+      var variantFilterContainer = this.getComponent( 'variantFilterContainer' );
+
+      conjunction.restrictions.push( variantFilterContainer.getRestrictionExpression() );
 
       var disjunction = new Disjunction();
       disjunction.restrictions = [];
@@ -209,7 +133,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
       var cnvFilterPanel = this.getComponent( 'cnvFilterPanel' );
       var indelFilterPanel = this.getComponent( 'indelFilterPanel' );
       var snvFilterPanel = this.getComponent( 'snvFilterPanel' );
-      var locationFilterContainer = this.getComponent( 'locationFilterContainer' );
+      var variantFilterContainer = this.getComponent( 'variantFilterContainer' );
 
       var locationRestrictions = new Conjunction();
       var conjunctions = [];
@@ -237,7 +161,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
 
       locationRestrictions.restrictions = conjunctions;
 
-      locationFilterContainer.setRestrictionExpression( locationRestrictions );
+      variantFilterContainer.setRestrictionExpression( locationRestrictions );
 
       cnvRestrictions.restrictions = this.separateVariantDisjunctions( variantTypeDisjunctions, "CNV" );
 

@@ -2,7 +2,7 @@ Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.filter.VariantFilter' ] 
 
 Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
    extend : 'ASPIREdb.view.filter.FilterPanel',
-   alias : 'widget.filter_or',
+   alias : 'widget.filter_or_variant',
    closable : true,
    title : 'OR Variant Filter',
    width : 910,

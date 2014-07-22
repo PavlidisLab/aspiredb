@@ -88,10 +88,10 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
 
          ProjectService.findUserProject( me.selProject[0].data.ProjectName, {
             callback : function(psvo) {
-               // console.log( 'found project name ' + psvo.name + ' decription' + psvo.description );
+               // console.log( 'found project name ' + psvo.name + ' description' + psvo.description );
                psvo.name = record.data.ProjectName;
                psvo.description = record.data.projectDescription;
-               // console.log( 'AFTER UPDATE - found project name ' + psvo.name + ' decription' + ' to string '
+               // console.log( 'AFTER UPDATE - found project name ' + psvo.name + ' description' + ' to string '
                // + psvo.description + psvo.id );
 
             },

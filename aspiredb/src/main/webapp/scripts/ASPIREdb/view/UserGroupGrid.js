@@ -94,9 +94,9 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
          var me = this;
          /**
           * UserUserGroupService.findUserUserGroup( me.selUserGroup[0].data.userGroupName, { callback : function(gsvo) {
-          * console.log( 'found user group name ' + gsvo.name + ' decription' + gsvo.description ); gsvo.name =
+          * console.log( 'found user group name ' + gsvo.name + ' description' + gsvo.description ); gsvo.name =
           * record.data.userGroupName; gsvo.description = record.data.geneDescription; console.log( 'AFTER UPDATE -
-          * found user group name ' + gsvo.name + ' decription' + ' to string ' + gsvo.description + gsvo.id );
+          * found user group name ' + gsvo.name + ' description' + ' to string ' + gsvo.description + gsvo.id );
           *  // /////////////////////////////// /** UserUserGroupService.updateUserUserGroup( ug, { callback :
           * function() { console.log('testing the update user user group**********'); // me.getView().refresh();
           * ASPIREdb.EVENT_BUS.fireEvent( 'geneset_updated' ); }, errorHandler : function(er, exception) {

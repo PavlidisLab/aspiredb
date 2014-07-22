@@ -67,7 +67,7 @@ Ext
                      value : '',
                      labelWidth : 100,
                   }, {
-                     fieldLabel : 'Project Decription',
+                     fieldLabel : 'Project Description',
                      name : 'projectDescription',
                      id : 'projectDescription',
                      value : '',

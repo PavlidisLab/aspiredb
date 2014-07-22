@@ -104,9 +104,9 @@ Ext.define( 'ASPIREdb.view.LabelGrid', {
          var me = this;
          /**
           * LabelService.findLabel( me.selLabel[0].data.labelName, { callback : function(gsvo) { console.log( 'found
-          * label set name ' + gsvo.name + ' decription' + gsvo.description ); gsvo.name = record.data.labelName;
+          * label set name ' + gsvo.name + ' description' + gsvo.description ); gsvo.name = record.data.labelName;
           * gsvo.description = record.data.labelDescription; console.log( 'AFTER UPDATE - found label set name ' +
-          * gsvo.name + ' decription' + ' to string ' + gsvo.description + gsvo.id );
+          * gsvo.name + ' description' + ' to string ' + gsvo.description + gsvo.id );
           * 
           *  }, errorHandler : function(er, exception) { Ext.Msg.alert( "find user label set Error", er + "\n" +
           * exception.stack ); console.log( exception.stack ); } } );
