@@ -566,8 +566,8 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
         String patientId = "testGetSubjectVariantCountsForLocation";
 
-        String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_219"; // colon cancer (~321 genes)
-        // String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_0060041"; // autism spectrum disorder (~853 genes)
+       // String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_219"; // colon cancer (~321 genes)
+         String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_0060041"; // autism spectrum disorder (~853 genes)
 
         // look at how many there are currently in the database
         Map<Integer, Integer> ret = getSubjectVariantCountForPhenocarta( phenotypeURI );

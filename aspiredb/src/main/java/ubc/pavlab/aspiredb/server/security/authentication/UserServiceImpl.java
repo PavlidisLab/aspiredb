@@ -62,6 +62,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addUserToGroup( UserGroup group, User user ) {
+   
         // add user to list of members
         group.getGroupMembers().add( user );
         this.userGroupDao.update( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) group );

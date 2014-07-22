@@ -110,7 +110,16 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 				
 
 			}
-		} else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer' || filterItemType == 'ASPIREdb.view.filter.OrPhenotypeFilterContainer' || filterItemType == 'ASPIREdb.view.filter.PropertyFilter'|| filterItemType == 'ASPIREdb.view.filter.ProjectOverlapPropertyFilter') {
+		} else if (filterItemType == 'ASPIREdb.view.filter.VariantFilter') {
+
+         filterContainer.removeAll();
+         for ( var i = 0; i < restriction.restrictions.length; i++) {
+
+            addMultiItemToContainer(restriction.restrictions[i], null, getNewItem);
+            
+
+         }
+      }else if (filterItemType == 'ASPIREdb.view.filter.OrFilterContainer' || filterItemType == 'ASPIREdb.view.filter.OrPhenotypeFilterContainer' || filterItemType == 'ASPIREdb.view.filter.OrVariantFilterContainer' || filterItemType == 'ASPIREdb.view.filter.PropertyFilter'|| filterItemType == 'ASPIREdb.view.filter.ProjectOverlapPropertyFilter') {
 			filterContainer.removeAll();
 
 			if (restriction.restrictions) {

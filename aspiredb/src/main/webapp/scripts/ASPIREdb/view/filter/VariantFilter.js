@@ -80,10 +80,10 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilter', {
 
       } );
 
-      var propertyComboBox = me.getComponent( "propertyComboBox" );
+      var propertyComboBoxV = me.getComponent( "propertyComboBoxV" );
 
       this.selectedProperty = restriction.property;
-      propertyComboBox.setValue( restriction.property.displayName );
+      propertyComboBoxV.setValue( restriction.property.displayName );
       operatorComboBox.setValue( restriction.operator );
 
       singleValueField.setValue( restriction.value.value );
@@ -99,13 +99,13 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilter', {
 
       var r = restriction;
 
-      var propertyComboBox = this.getComponent( "propertyComboBox" );
+      var propertyComboBoxV = this.getComponent( "propertyComboBoxV" );
       var operatorComboBox = this.getComponent( "operatorComboBox" );
       var multicombo_container = this.getComponent( "multicombo_container" );
       var multicombo = multicombo_container.getComponent( "multicombo" );
 
       this.selectedProperty = r.property;
-      propertyComboBox.setValue( r.property.displayName );
+      propertyComboBoxV.setValue( r.property.displayName );
       operatorComboBox.setValue( r.operator );
 
       // set property in combo store for dwr calls
@@ -155,7 +155,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilter', {
       var me = this;
       this.items = [ {
          xtype : 'combo',
-         itemId : 'propertyComboBox',
+         itemId : 'propertyComboBoxV',
          emptyText : 'name',
          width : 400,
          matchFieldWidth : false,
@@ -164,7 +164,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilter', {
          hideTrigger : true,
          displayField : 'displayName',
          store : Ext.create( 'ASPIREdb.VariantSuggestionStore', {
-            remoteFunction : VariantService.suggestVariantLocationProperties
+            remoteFunction : VariantService.suggestValues
          } ),
          listConfig : {
             loadingText : 'Searching...',
@@ -174,45 +174,12 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilter', {
             select : {
                fn : function( obj, records ) {
                   var record = records[0];
-             
-                  if (record.name ="CNV Characteristics"){
-                     
-                     /** else if ( disjunction.restrictions[index].property.displayName == 'CNV Characteristics' ) {
-                     var subValues=disjunction.restrictions[index].values[index].object;
-                     var subvaluesItems=[];
-                     for (var i=0;i<subValues.length;i++){
-                        subvaluesItems.push( '{text:'+subValues[i]+',scope:this},' );
-                     }
-                     var contextMenu = new Ext.menu.Menu( {
-                        items : subvaluesItems,
-                     } );
-
-                     contextMenu.showAt( 255,0);
-                  }*/
-                     var contextMenu = new Ext.menu.Menu( {
-                        items : [ {
-                           text : 'Vancouver',
-                          // handler : this.makeLabelHandler,
-                           scope : this,
-                        }, {
-                           text : 'Yellowknife',
-                       //   handler : this.labelManagerHandler,
-                           scope : this,
-                        },{
-                           text : 'Okanagan',
-                       //   handler : this.labelManagerHandler,
-                           scope : this,
-                        } ]
-                     } );
-
-                     contextMenu.showAt( 255,0);
-                  }
-           
-                //  var valueCombo = this.getComponent( 'valueCombo' );
-               //   valueCombo.clearValue();
-              //    valueCombo.lastQuery = null;
-               //   valueCombo.getStore().setProperty( record.raw );
-                //  ASPIREdb.EVENT_BUS.fireEvent( 'query_update' );
+                    
+                  var valueCombo = this.getComponent( 'valueCombo' );
+                  valueCombo.clearValue();
+                  valueCombo.lastQuery = null;
+                  valueCombo.getStore().setProperty( record.raw );
+                  ASPIREdb.EVENT_BUS.fireEvent( 'query_update' );
                },
                scope : this
             },
@@ -281,13 +248,33 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilter', {
       var multicombo = multicombo_container.getComponent( "multicombo" );
       var singleValueField = multicombo_container.getComponent( "singleValueField" );
       var example = multicombo_container.getComponent( "example" );
-      var propertyComboBox = me.getComponent( "propertyComboBox" );
+      var propertyComboBoxV = me.getComponent( "propertyComboBoxV" );
 
       var firstTime = true;
 
-      propertyComboBox.on( 'select', function(obj, records) {
+      propertyComboBoxV.on( 'select', function(obj, records) {
          var record = records[0];
+         var value = record.data.displayName;
+         if (value ="CNV Characteristics"){
+            var contextMenu = new Ext.menu.Menu( {
+               items : [ {
+                  text : 'Vancouver',
+                 // handler : this.makeLabelHandler,
+                  scope : this,
+               }, {
+                  text : 'Yellowknife',
+              //   handler : this.labelManagerHandler,
+                  scope : this,
+               },{
+                  text : 'Okanagan',
+              //   handler : this.labelManagerHandler,
+                  scope : this,
+               } ]
+            } );
 
+            contextMenu.showAt( 255,0);
+         }
+         
          // update examples
          var queryExample = record.data.exampleValues;
          console.log( "queryExample is " + queryExample );
@@ -343,7 +330,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilter', {
          ASPIREdb.view.filter.TextImportWindow.setPropertyFilterAndShow( me );
       } );
 
-      propertyComboBox.getStore().on( 'load', function(store, records, successful) {
+      propertyComboBoxV.getStore().on( 'load', function(store, records, successful) {
 
          var properties = [];
          for (var i = 0; i < records.length; i++) {
@@ -356,11 +343,11 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilter', {
          geneSetProperty.name = 'GeneSet';
          store.data.add( geneSetProperty );
 
-         propertyComboBox.select( store.getAt( 0 ) );
-         propertyComboBox.fireEvent( 'select', propertyComboBox, [ store.getAt( 0 ) ] );
+         propertyComboBoxV.select( store.getAt( 0 ) );
+         propertyComboBoxV.fireEvent( 'select', propertyComboBoxV, [ store.getAt( 0 ) ] );
       } );
 
-      propertyComboBox.getStore().on( 'datachanged', function(store, e0pts) {
+      propertyComboBoxV.getStore().on( 'datachanged', function(store, e0pts) {
          console.log( 'datachanged fired' );
 
       } );

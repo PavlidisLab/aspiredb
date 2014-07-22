@@ -4,6 +4,7 @@ Ext.require([
     'ASPIREdb.view.filter.OrFilterContainer',
     'ASPIREdb.view.filter.FilterPanel',
     'ASPIREdb.view.filter.PhenotypeFilter',
+    'ASPIREdb.view.filter.VariantFilter',
     'ASPIREdb.view.filter.ProjectOverlapFilterContainer'
 ]);
 

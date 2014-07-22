@@ -1,4 +1,4 @@
-Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.filter.VariantFilter' ] );
+Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.filter.PropertyFilter' ] );
 
 Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
    extend : 'ASPIREdb.view.filter.FilterPanel',

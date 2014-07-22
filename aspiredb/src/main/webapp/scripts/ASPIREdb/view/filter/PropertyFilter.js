@@ -68,10 +68,8 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
    setSimpleRestrictionExpression : function(restriction) {
 
       var operatorComboBox = this.getComponent( "operatorComboBox" );
-
       var multicombo_container = this.getComponent( "multicombo_container" );
       var multicombo = multicombo_container.getComponent( "multicombo" );
-
       var singleValueField = multicombo_container.getComponent( "singleValueField" );
 
       singleValueField.on( 'change', function() {
@@ -100,6 +98,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
       var r = restriction;
 
       var propertyComboBox = this.getComponent( "propertyComboBox" );
+      var subPropertyComboBox = this.getComponent( "subPropertyComboBox" );
       var operatorComboBox = this.getComponent( "operatorComboBox" );
       var multicombo_container = this.getComponent( "multicombo_container" );
       var multicombo = multicombo_container.getComponent( "multicombo" );
@@ -153,13 +152,44 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
 
    initComponent : function() {
       var me = this;
+      
       this.items = [ {
          xtype : 'combo',
          itemId : 'propertyComboBox',
          emptyText : 'name',
          store : me.getPropertyStore(),
-         displayField : 'displayName'
-      }, {
+         displayField : 'displayName',
+         listeners : {
+            select : {
+               fn : function(obj, records) {
+                  // ASPIREdb.EVENT_BUS.fireEvent('query_update');
+                  console.log('test');
+               },
+               scope : this,
+            }
+         },
+      },/**{
+         xtype : 'combo',
+         itemId : 'subPropertyComboBox',
+         emptyText : 'subname',
+         suggestValuesRemoteFunction : VariantService.suggestValues,
+         store : {
+            proxy : {
+               type : 'dwr',
+               dwrFunction : VariantService.suggestPropertiesForVariantType,
+               dwrParams : [ 'CNV' ],
+               model : 'ASPIREdb.model.Property',
+               reader : {
+                  type : 'json',
+                  root : 'data',
+                  totalProperty : 'count'
+               }
+            }
+         },         
+         displayField : 'displayName',
+         filterItemType : 'ASPIREdb.view.filter.PropertyFilter',
+       
+      },*/ {
          xtype : 'combo',
          itemId : 'operatorComboBox',
          emptyText : 'operator',
@@ -181,7 +211,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
          items : [ {
             xtype : 'multivalue_combo',
             itemId : 'multicombo',
-            width : 450,
+            width : 100,//450
             enableKeyEvents : false,
             suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
          }, {
@@ -223,11 +253,77 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
       var singleValueField = multicombo_container.getComponent( "singleValueField" );
       var example = multicombo_container.getComponent( "example" );
       var propertyComboBox = me.getComponent( "propertyComboBox" );
+      var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
+      
 
       var firstTime = true;
 
       propertyComboBox.on( 'select', function(obj, records) {
          var record = records[0];
+         var value = record.data.displayName;
+         
+         if (value =="CNV Characteristics"){
+            //combo box
+            var subCombo = Ext.create('Ext.form.ComboBox', {
+               itemId : 'subPropertyComboBox',
+               emptyText : 'subname',
+              // padding : '10 0 0 0',
+               suggestValuesRemoteFunction : VariantService.suggestValues,
+               store : {
+                  proxy : {
+                     type : 'dwr',
+                     dwrFunction : VariantService.suggestPropertiesForVariantType,
+                     dwrParams : [ 'CNV' ],
+                     model : 'ASPIREdb.model.Property',
+                     reader : {
+                        type : 'json',
+                        root : 'data',
+                        totalProperty : 'count'
+                     }
+                  }
+               },         
+               displayField : 'displayName',
+               filterItemType : 'ASPIREdb.view.filter.PropertyFilter',     
+             });
+           
+            me.add(subCombo);
+            
+            //context menu
+            VariantService.suggestPropertiesForVariantType( 'CNV', {
+               callback : function(Properties) {
+                  var menuItems=[];
+                  for (var i=0; i<Properties.length;i++){
+                     menuItems.push({text:Properties[i].displayName});
+                  }
+                  
+                  var contextMenu = new Ext.menu.Menu( {
+                     items : menuItems,
+                     /**[ {
+                        text : 'Vancouver',
+                       // handler : this.makeLabelHandler,
+                        scope : this,
+                     }, {
+                        text : 'Yellowknife',
+                    //   handler : this.labelManagerHandler,
+                        scope : this,
+                     },{
+                        text : 'Okanagan',
+                    //   handler : this.labelManagerHandler,
+                        scope : this,
+                     } ]*/
+                      
+                     
+                  } );
+
+                  contextMenu.showAt( 650,410);
+               }
+               });
+           
+                        
+           
+         }
+        
+         
 
          // update examples
          var queryExample = record.data.exampleValues;

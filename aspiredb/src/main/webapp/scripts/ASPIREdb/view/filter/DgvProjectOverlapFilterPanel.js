@@ -1,6 +1,6 @@
 Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.filter.AndFilterContainer',
               'ASPIREdb.view.filter.OrFilterContainer', 'ASPIREdb.view.filter.FilterPanel',
-              'ASPIREdb.view.filter.PhenotypeFilter', 'ASPIREdb.view.filter.DgvProjectOverlapFilterContainer' ] );
+              'ASPIREdb.view.filter.PhenotypeFilter', 'ASPIREdb.view.filter.VariantFilter','ASPIREdb.view.filter.DgvProjectOverlapFilterContainer' ] );
 
 Ext.define( 'ASPIREdb.view.filter.DgvProjectOverlapFilterPanel', {
    extend : 'ASPIREdb.view.filter.FilterPanel',

@@ -11,7 +11,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
       title : 'Variant Location:',
       itemId : 'variantFilterContainer',
       filterItemType : 'ASPIREdb.view.filter.OrVariantFilterContainer',
-      // suggestValuesRemoteFunction : VariantService.suggestValues,
+       suggestValuesRemoteFunction : VariantService.suggestValues,
       propertyStore : {
          // autoLoad: true,
          proxy : {
@@ -92,16 +92,13 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
        * 'ASPIREdb.view.filter.PropertyFilter' } }
        */
    ],
-   listeners : {
-      select : function() {
-
-      },
-   },
+   
+   
 
    getFilterConfig : function() {
-      var cnvFilterPanel = this.getComponent( 'cnvFilterPanel' );
-      var indelFilterPanel = this.getComponent( 'indelFilterPanel' );
-      var snvFilterPanel = this.getComponent( 'snvFilterPanel' );
+    //  var cnvFilterPanel = this.getComponent( 'cnvFilterPanel' );
+    //  var indelFilterPanel = this.getComponent( 'indelFilterPanel' );
+    //  var snvFilterPanel = this.getComponent( 'snvFilterPanel' );
       var config = new VariantFilterConfig();
       var conjunction = new Conjunction();
       conjunction.restrictions = [];
@@ -116,11 +113,11 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
       var disjunction = new Disjunction();
       disjunction.restrictions = [];
 
-      disjunction.restrictions.push( cnvFilterPanel.getRestrictionExpression() );
+     // disjunction.restrictions.push( cnvFilterPanel.getRestrictionExpression() );
 
-      disjunction.restrictions.push( indelFilterPanel.getRestrictionExpression() );
+    //  disjunction.restrictions.push( indelFilterPanel.getRestrictionExpression() );
 
-      disjunction.restrictions.push( snvFilterPanel.getRestrictionExpression() );
+     // disjunction.restrictions.push( snvFilterPanel.getRestrictionExpression() );
 
       conjunction.restrictions.push( disjunction );
 
@@ -130,17 +127,17 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
 
    setFilterConfig : function(config) {
 
-      var cnvFilterPanel = this.getComponent( 'cnvFilterPanel' );
-      var indelFilterPanel = this.getComponent( 'indelFilterPanel' );
-      var snvFilterPanel = this.getComponent( 'snvFilterPanel' );
+     // var cnvFilterPanel = this.getComponent( 'cnvFilterPanel' );
+     // var indelFilterPanel = this.getComponent( 'indelFilterPanel' );
+     // var snvFilterPanel = this.getComponent( 'snvFilterPanel' );
       var variantFilterContainer = this.getComponent( 'variantFilterContainer' );
 
       var locationRestrictions = new Conjunction();
       var conjunctions = [];
 
-      var cnvRestrictions = new Conjunction();
-      var indelRestrictions = new Conjunction();
-      var snvRestrictions = new Conjunction();
+   //   var cnvRestrictions = new Conjunction();
+   //   var indelRestrictions = new Conjunction();
+    //  var snvRestrictions = new Conjunction();
       var variantTypeDisjunctions = [];
 
       if ( config.restriction.restrictions ) {
@@ -163,7 +160,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
 
       variantFilterContainer.setRestrictionExpression( locationRestrictions );
 
-      cnvRestrictions.restrictions = this.separateVariantDisjunctions( variantTypeDisjunctions, "CNV" );
+    /**  cnvRestrictions.restrictions = this.separateVariantDisjunctions( variantTypeDisjunctions, "CNV" );
 
       if ( this.shouldExpandVariantTypeBox( cnvRestrictions ) ) {
          cnvFilterPanel.setRestrictionExpression( cnvRestrictions );
@@ -182,7 +179,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
       if ( this.shouldExpandVariantTypeBox( snvRestrictions ) ) {
          snvFilterPanel.setRestrictionExpression( snvRestrictions );
          snvFilterPanel.expand();
-      }
+      }*/
    },
 
    separateVariantDisjunctions : function(disjunctions, variantType) {
