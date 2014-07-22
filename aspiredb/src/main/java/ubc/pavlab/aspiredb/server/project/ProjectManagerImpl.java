@@ -23,6 +23,7 @@ import gemma.gsec.authentication.UserManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -92,41 +93,39 @@ public class ProjectManagerImpl implements ProjectManager {
     protected static Log log = LogFactory.getLog( ProjectManagerImpl.class );
 
     @Autowired
-    ProjectDao projectDao;
+    private ProjectDao projectDao;
 
     @Autowired
-    SubjectDao subjectDao;
+    private SubjectDao subjectDao;
 
     @Autowired
-    VariantDao variantDao;
+    private VariantDao variantDao;
 
     @Autowired
-    CharacteristicDao characteristicDao;
-
-    SecurityService securityservice;
+    private CharacteristicDao characteristicDao;
 
     @Autowired
-    Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
+    private Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
 
     @Autowired
-    PhenotypeDao phenotypeDao;
+    private PhenotypeDao phenotypeDao;
 
     @Autowired
-    PhenotypeUtil phenotypeService;
+    private PhenotypeUtil phenotypeService;
 
     @Autowired
-    SecurityService securityService;
+    private SecurityService securityService;
 
     @Autowired
-    UserManager userManager;
+    private UserManager userManager;
 
     @Autowired
-    QueryService queryService;
+    private QueryService queryService;
 
     @Autowired
-    AclService aclService;
+    private AclService aclService;
 
-    ShaPasswordEncoder passwordEncoder = new ShaPasswordEncoder();
+    private ShaPasswordEncoder passwordEncoder = new ShaPasswordEncoder();
 
     public static final String DGV_SUPPORT_CHARACTERISTIC_KEY = "pubmedid";
 
@@ -248,7 +247,7 @@ public class ProjectManagerImpl implements ProjectManager {
     @Override
     @Transactional
     public Project createProject( String name, String description ) throws Exception {
-        
+
         if ( projectDao.findByProjectName( name ) != null ) {
             throw new Exception( "project with that name already exists" );
         }
@@ -371,8 +370,8 @@ public class ProjectManagerImpl implements ProjectManager {
         Project project = projectDao.findByProjectName( projectName );
         if ( project != null ) {
             return project;
-        } else
-            return null;
+        }
+        return null;
 
     }
 
@@ -397,7 +396,8 @@ public class ProjectManagerImpl implements ProjectManager {
         if ( proj == null ) {
             returnString = "Project does not exist";
         }
-        Collection<Long> projectIds = new ArrayList<Long>();
+        Collection<Long> projectIds = new ArrayList<>();
+        // FIXME proj can be null!
         projectIds.add( proj.getId() );
 
         Collection<String> phenotypes = phenotypeDao.getExistingNames( projectIds );
@@ -421,7 +421,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
         ProjectFilterConfig projectToPopulateFilterConfig = getProjectFilterConfigById( projectToPopulate );
 
-        HashSet<AspireDbFilterConfig> projSet = new HashSet<AspireDbFilterConfig>();
+        Set<AspireDbFilterConfig> projSet = new HashSet<>();
         projSet.add( projectToPopulateFilterConfig );
 
         BoundedList<VariantValueObject> projToPopulateVvos = queryService.queryVariants( projSet );
@@ -429,7 +429,7 @@ public class ProjectManagerImpl implements ProjectManager {
         // This probably won't work for all variant types
         for ( VariantValueObject vvo : projToPopulateVvos.getItems() ) {
 
-            Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
+            Set<AspireDbFilterConfig> filters = new HashSet<>();
 
             filters.add( specialProjectFilterConfig );
             filters.add( getVariantFilterConfigForSingleVariant( vvo ) );
@@ -438,6 +438,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
             for ( VariantValueObject vvoOverlapped : overLappedVvos.getItems() ) {
 
+                // why is this check necessary? FIXME
                 if ( !vvo.getGenomicRange().getChromosome().equals( vvoOverlapped.getGenomicRange().getChromosome() ) ) {
                     continue;
                 }
@@ -448,7 +449,7 @@ public class ProjectManagerImpl implements ProjectManager {
                         .getBaseStart() );
                 int end = Math.min( vvo.getGenomicRange().getBaseEnd(), vvoOverlapped.getGenomicRange().getBaseEnd() );
 
-                // genius
+                // FIXME why is this check necessary, the call to queryVariants should make this unnecessary.
                 if ( start < end ) {
 
                     int overlap = end - start;
@@ -474,7 +475,7 @@ public class ProjectManagerImpl implements ProjectManager {
                     variant2SpecialVariantOverlapDao.create( overlapInfo );
 
                 } else {
-                    log.info( "No Overlap" );
+                    log.debug( "No Overlap" );
                 }
 
             }
@@ -730,10 +731,8 @@ public class ProjectManagerImpl implements ProjectManager {
 
     private GenomicLocation getGenomicLocation( VariantValueObject v ) {
 
-        GenomicLocation genomicLocation = new GenomicLocation();
-        genomicLocation.setChromosome( v.getGenomicRange().getChromosome() );
-        genomicLocation.setStart( v.getGenomicRange().getBaseStart() );
-        genomicLocation.setEnd( v.getGenomicRange().getBaseEnd() );
+        GenomicLocation genomicLocation = new GenomicLocation( v.getGenomicRange().getChromosome(), v.getGenomicRange()
+                .getBaseStart(), v.getGenomicRange().getBaseEnd() );
 
         return genomicLocation;
 
@@ -830,9 +829,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
         GenomicRange gr = v.getGenomicRange();
 
-        Set genomicRangeSet = new HashSet();
-
-        genomicRangeSet.add( gr );
+        Set genomicRangeSet = Collections.singleton( gr );
 
         genomicRangeRestriction.setValues( genomicRangeSet );
 

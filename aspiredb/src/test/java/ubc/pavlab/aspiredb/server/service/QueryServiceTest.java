@@ -59,6 +59,7 @@ import ubc.pavlab.aspiredb.server.model.Query;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.security.authorization.acl.AclTestUtils;
+import ubc.pavlab.aspiredb.server.util.GenomeBin;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.AspireDbPagingLoadConfig;
@@ -195,21 +196,21 @@ public class QueryServiceTest extends BaseSpringContextTest {
         queryService.deleteQuery( testname );
         boolean returnvalue = queryService.isQueryName( testname );
         assertFalse( returnvalue );
-        
+
         // Admin creates query
         super.runAsAdmin();
         Long queryId = queryService.saveQuery( testname, filters );
         Query queryObj = queryService.getQuery( queryId );
-        assertNotNull(queryObj);
+        assertNotNull( queryObj );
         returnvalue = queryService.isQueryName( testname );
         assertTrue( returnvalue );
-        log.debug("Query acl is " + aclUtils.getAcl( queryObj ));
-        
+        log.debug( "Query acl is " + aclUtils.getAcl( queryObj ) );
+
         // run as user to check whether the admin created query is accessble by the user
         super.runAsUser( this.username );
         returnvalue = queryService.isQueryName( testname );
         assertFalse( returnvalue );
-        
+
         tearDownPhenotypes();
     }
 
@@ -473,12 +474,18 @@ public class QueryServiceTest extends BaseSpringContextTest {
         simpleRe.setProperty( new GenomicLocationProperty() );
         simpleRe.setValue( new GenomicRange( chromosome ) );
 
-        Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
+        Set<AspireDbFilterConfig> filters = new HashSet<>();
         filters.add( new VariantFilterConfig( simpleRe ) );
         Map<Integer, Integer> ret = queryService.getSubjectVariantCounts( filters );
         return ret;
     }
 
+    /**
+     * @param phenotypeURI
+     * @return
+     * @throws NotLoggedInException
+     * @throws ExternalDependencyException
+     */
     private Map<Integer, Integer> getSubjectVariantCountForPhenocarta( String phenotypeURI )
             throws NotLoggedInException, ExternalDependencyException {
         SimpleRestriction simpleRe = new SimpleRestriction();
@@ -490,7 +497,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         vo.setGenes( gvo );
         simpleRe.setValue( vo );
 
-        Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
+        Set<AspireDbFilterConfig> filters = new HashSet<>();
         filters.add( new VariantFilterConfig( simpleRe ) );
         Map<Integer, Integer> ret = queryService.getSubjectVariantCounts( filters );
         return ret;
@@ -575,26 +582,34 @@ public class QueryServiceTest extends BaseSpringContextTest {
         int variantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
 
         // add some variants the would overlap
-        // 17:37885247-37885647
-        // 4:72247-5545043
+        // 17:37885247-37885647, bin
+        // 4:72247-5545043, bin
         Subject s = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
         CNV cnv1 = persistentTestObjectHelper.createPersistentTestCNVObject();
         cnv1.setSubject( s );
         cnv1.getLocation().setChromosome( "17" );
         cnv1.getLocation().setStart( 37885247 );
         cnv1.getLocation().setEnd( 37885647 );
+        cnv1.getLocation()
+                .setBin( GenomeBin.binFromRange( cnv1.getLocation().getStart(), cnv1.getLocation().getEnd() ) );
         cnvDao.update( cnv1 );
         CNV cnv2 = persistentTestObjectHelper.createPersistentTestCNVObject();
         cnv2.setSubject( s );
         cnv2.getLocation().setChromosome( "4" );
         cnv2.getLocation().setStart( 72247 );
         cnv2.getLocation().setEnd( 5545043 );
+        cnv2.getLocation()
+                .setBin( GenomeBin.binFromRange( cnv2.getLocation().getStart(), cnv2.getLocation().getEnd() ) );
+
         cnvDao.update( cnv2 );
         CNV cnv3 = persistentTestObjectHelper.createPersistentTestCNVObject(); // this one doesn't count
         cnv3.setSubject( s );
         cnv3.getLocation().setChromosome( "4" );
         cnv3.getLocation().setStart( 1 );
         cnv3.getLocation().setEnd( 2 );
+        cnv3.getLocation()
+                .setBin( GenomeBin.binFromRange( cnv3.getLocation().getStart(), cnv3.getLocation().getEnd() ) );
+
         cnvDao.update( cnv3 );
         s.addVariant( cnv1 );
         s.addVariant( cnv2 );

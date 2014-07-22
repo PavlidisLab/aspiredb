@@ -107,10 +107,8 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     @Override
     public SNV createDetachedTestSNVObject() {
 
-        GenomicLocation genomicLocation = new GenomicLocation();
-        genomicLocation.setChromosome( "X" );
-        genomicLocation.setStart( 56650362 );
-        genomicLocation.setEnd( 56729961 );
+        GenomicLocation genomicLocation = new GenomicLocation( "X", 56650362, 56729961 );
+
         SNV snv = new SNV();
         snv.setLocation( genomicLocation );
 
@@ -136,10 +134,8 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     @Override
     public Indel createDetachedTestIndelObject() {
 
-        GenomicLocation genomicLocation = new GenomicLocation();
-        genomicLocation.setChromosome( "X" );
-        genomicLocation.setStart( 56650362 );
-        genomicLocation.setEnd( 56729961 );
+        GenomicLocation genomicLocation = new GenomicLocation( "X", 56650362, 56729961 );
+
         Indel indel = new Indel();
         indel.setLocation( genomicLocation );
 
@@ -187,25 +183,17 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     @Override
     public CNV createDetachedTestCNVObject() {
 
-        GenomicLocation genomicLocation = new GenomicLocation();
-        genomicLocation.setChromosome( "X" );
-        genomicLocation.setStart( 56650362 );
-        genomicLocation.setEnd( 56729961 );
+        GenomicLocation genomicLocation = new GenomicLocation( "X", 56650362, 56729961 );
+
         CNV cnv = new CNV();
         cnv.setLocation( genomicLocation );
         cnv.setCopyNumber( 2 );
 
         List<GenomicLocation> targetLocations = new ArrayList<GenomicLocation>();
 
-        GenomicLocation targLocation = new GenomicLocation();
-        targLocation.setChromosome( "11" );
-        targLocation.setStart( 1123232 );
-        targLocation.setEnd( 23433443 );
+        GenomicLocation targLocation = new GenomicLocation( "11", 1123232, 23433443 );
 
-        GenomicLocation targLocation2 = new GenomicLocation();
-        targLocation.setChromosome( "12" );
-        targLocation.setStart( 12232 );
-        targLocation.setEnd( 134456 );
+        GenomicLocation targLocation2 = new GenomicLocation( "12", 12232, 134456 );
 
         targetLocations.add( targLocation );
         targetLocations.add( targLocation2 );
@@ -243,10 +231,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     public CNV createDetachedCNVObject() {
 
-        GenomicLocation genomicLocation = new GenomicLocation();
-        genomicLocation.setChromosome( "X" );
-        genomicLocation.setStart( 56650362 );
-        genomicLocation.setEnd( 56729961 );
+        GenomicLocation genomicLocation = new GenomicLocation( "X", 56650362, 56729961 );
 
         CNV cnv = new CNV();
         cnv.setLocation( genomicLocation );
@@ -254,10 +239,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
         List<GenomicLocation> targetLocations = new ArrayList<GenomicLocation>();
 
-        GenomicLocation targLocation = new GenomicLocation();
-        targLocation.setChromosome( "11" );
-        targLocation.setStart( 56650362 );
-        targLocation.setEnd( 56729961 );
+        GenomicLocation targLocation = new GenomicLocation( "11", 56650362, 56729961 );
 
         targetLocations.add( targLocation );
 

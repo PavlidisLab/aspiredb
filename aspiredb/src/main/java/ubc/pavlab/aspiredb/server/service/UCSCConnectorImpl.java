@@ -47,7 +47,6 @@ public class UCSCConnectorImpl implements UCSCConnector {
     @RemoteMethod
     @Transactional(readOnly = true)
     public String constructCustomTracksFile( GenomicRange range, Collection<Long> activeProjectIds ) {
-        // throwGwtExceptionIfNotLoggedIn();
 
         Collection<Variant> variants = variantDao.findByGenomicLocation( new GenomicRange( range.getChromosome() ),
                 activeProjectIds );

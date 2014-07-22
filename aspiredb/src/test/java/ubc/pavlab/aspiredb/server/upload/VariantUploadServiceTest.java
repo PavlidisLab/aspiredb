@@ -27,6 +27,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -257,9 +258,9 @@ public class VariantUploadServiceTest extends BaseSpringContextTest {
             qresults.close();
             qstmt.close();
             qconn.close();
-            ArrayList<VariantValueObject> vos = result.getVariantsToAdd();
+            List<VariantValueObject> vos = result.getVariantsToAdd();
             assertEquals( vos.size(), 3 );
-            HashMap<String, HashMap<Integer, Collection<SNVValueObject>>> chrMap = VariantUploadService
+            Map<String, Map<Integer, Collection<SNVValueObject>>> chrMap = VariantUploadService
                     .constructQuerySNVMap( vos );
             assertEquals( chrMap.keySet().size(), 3 );
 

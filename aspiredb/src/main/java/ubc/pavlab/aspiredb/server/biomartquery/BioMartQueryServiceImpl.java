@@ -205,8 +205,13 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
                 name = sourceIndex >= 0 ? name.substring( 0, sourceIndex ) : name;
 
                 GeneValueObject gene = new GeneValueObject( ensemblId, symbol, name, geneBiotype, "human" );
-                gene.setGenomicRange( new GenomicRange( chromosome, Integer.valueOf( start ), Integer.valueOf( end ) ) );
-
+                int startBase = Integer.valueOf( start );
+                int endBase = Integer.valueOf( end );
+                if ( startBase < endBase ) {
+                    gene.setGenomicRange( new GenomicRange( chromosome, startBase, endBase ) );
+                } else {
+                    gene.setGenomicRange( new GenomicRange( chromosome, endBase, startBase ) );
+                }
                 genes.add( gene );
             }
 

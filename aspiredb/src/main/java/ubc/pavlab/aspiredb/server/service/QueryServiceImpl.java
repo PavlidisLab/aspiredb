@@ -83,6 +83,11 @@ import com.sencha.gxt.data.shared.loader.PagingLoadResultBean;
 @RemoteProxy(name = "QueryService")
 public class QueryServiceImpl implements QueryService {
 
+    /**
+     * 
+     */
+    private static final int MAX_VARIANTS_PAGE = 20000;
+
     private static Logger log = LoggerFactory.getLogger( QueryServiceImpl.class );
 
     @Autowired
@@ -242,8 +247,8 @@ public class QueryServiceImpl implements QueryService {
     public Map<Integer, Integer> getSubjectVariantCounts( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException {
 
-        Map<Integer, Collection<Long>> svIds = new HashMap<Integer, Collection<Long>>();
-        Map<Integer, Integer> ret = new HashMap<Integer, Integer>();
+        Map<Integer, Collection<Long>> svIds = new HashMap<>();
+        Map<Integer, Integer> ret = new HashMap<>();
 
         Set<Long> svoIds = new HashSet<Long>();
         Set<Long> vvoIds = new HashSet<Long>();
@@ -251,9 +256,9 @@ public class QueryServiceImpl implements QueryService {
         int subjectCount = 0;
         int variantCount = 0;
 
-        Set<AspireDbFilterConfig> filtersTrimmed = new HashSet<AspireDbFilterConfig>();
-        Collection<Long> subjectPhenoIds = new HashSet<Long>();
-        Collection<Long> variantPhenoIds = new HashSet<Long>();
+        Set<AspireDbFilterConfig> filtersTrimmed = new HashSet<>();
+        Collection<Long> subjectPhenoIds = new HashSet<>();
+        Collection<Long> variantPhenoIds = new HashSet<>();
 
         for ( AspireDbFilterConfig f : filters ) {
 
@@ -316,21 +321,21 @@ public class QueryServiceImpl implements QueryService {
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
-    public Map<Integer, Integer> getSubjectGenes( Set<AspireDbFilterConfig> filters )
-            throws NotLoggedInException, ExternalDependencyException {
+    public Map<Integer, Integer> getSubjectGenes( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException,
+            ExternalDependencyException {
 
-        Map<Integer, Collection<Long>> svIds = new HashMap<Integer, Collection<Long>>();
-        Map<Integer, Integer> ret = new HashMap<Integer, Integer>();
+        Map<Integer, Collection<Long>> svIds = new HashMap<>();
+        Map<Integer, Integer> ret = new HashMap<>();
 
-        Set<Long> svoIds = new HashSet<Long>();
-        Set<Long> vvoIds = new HashSet<Long>();
+        Set<Long> svoIds = new HashSet<>();
+        Set<Long> vvoIds = new HashSet<>();
 
         int subjectCount = 0;
         int variantCount = 0;
 
-        Set<AspireDbFilterConfig> filtersTrimmed = new HashSet<AspireDbFilterConfig>();
-        Collection<Long> subjectPhenoIds = new HashSet<Long>();
-        Collection<Long> variantPhenoIds = new HashSet<Long>();
+        Set<AspireDbFilterConfig> filtersTrimmed = new HashSet<>();
+        Collection<Long> subjectPhenoIds = new HashSet<>();
+        Collection<Long> variantPhenoIds = new HashSet<>();
 
         for ( AspireDbFilterConfig f : filters ) {
 
@@ -389,7 +394,7 @@ public class QueryServiceImpl implements QueryService {
 
         return ret;
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<String> getValuesForOntologyTerm( String ontologyTermUri ) {
@@ -456,7 +461,6 @@ public class QueryServiceImpl implements QueryService {
 
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     @Transactional
     @RemoteMethod
@@ -527,13 +531,13 @@ public class QueryServiceImpl implements QueryService {
 
         StopWatch timer = new StopWatch();
         timer.start();
-        Page<? extends Variant> page = variantDao.loadPage( 0, 20000, sortProperty, sortDirection, filters );
+        Page<? extends Variant> page = variantDao.loadPage( 0, MAX_VARIANTS_PAGE, sortProperty, sortDirection, filters );
 
         if ( timer.getTime() > 100 ) {
             log.info( "loading variants took " + timer.getTime() + "ms" );
         }
 
-        Collection<Variant> variants = ( Collection<Variant> ) page;
+        Collection<? extends Variant> variants = ( Collection<Variant> ) page;
         page.getTotalCount();
 
         List<VariantValueObject> vos = convertToValueObjects( variants );
@@ -552,7 +556,7 @@ public class QueryServiceImpl implements QueryService {
         Query q = queryDao.load( id );
         return q;
     }
-    
+
     @Override
     @Transactional
     @RemoteMethod
@@ -570,9 +574,9 @@ public class QueryServiceImpl implements QueryService {
         } else {
             throw new IllegalStateException( "Found more than one saved query with same name belonging to one user." );
         }
-        
+
         securityService.makePrivate( savedQuery );
-        
+
         return savedQuery.getId();
     }
 
@@ -608,7 +612,7 @@ public class QueryServiceImpl implements QueryService {
         }
     }
 
-    private List<VariantValueObject> convertToValueObjects( Collection<Variant> variants ) {
+    private List<VariantValueObject> convertToValueObjects( Collection<? extends Variant> variants ) {
         List<VariantValueObject> variantValueObjects = new LinkedList<VariantValueObject>();
 
         for ( Variant variant : variants ) {

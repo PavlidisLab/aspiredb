@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.time.StopWatch;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
@@ -61,14 +59,10 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 /**
  * TODO Document Me
  * 
- * @author ??
- * @version $Id: VariantDaoBaseImpl.java,v 1.32 2013/07/02 18:20:21 anton Exp $
+ * @author anton
  */
-
 public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDaoBaseImpl<T> implements
         VariantDaoBase<T> {
-
-    private static Log log = LogFactory.getLog( VariantDaoBaseImpl.class.getName() );
 
     private Class<T> elementClass;
 
@@ -379,8 +373,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
     // - use Factory pattern with registration? to map config to appropriate filter subclass
     // FOR NOW: use getClass
-    private void addSingleFilter( AspireDbFilterConfig filter, Criteria criteria ) throws BioMartServiceException,
-            NeurocartaServiceException {
+    private void addSingleFilter( AspireDbFilterConfig filter, Criteria criteria ) {
         if ( filter.getClass() == VariantFilterConfig.class ) {
             VariantFilterConfig locationFilter = ( VariantFilterConfig ) filter;
             RestrictionExpression restriction = locationFilter.getRestriction();
@@ -410,8 +403,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         criteria.add( junction );
     }
 
-    private List<Long> findIds( AspireDbFilterConfig filter ) throws BioMartServiceException,
-            NeurocartaServiceException {
+    private List<Long> findIds( AspireDbFilterConfig filter ) {
         // Project overlap filter requires a little more data processing than the other filters and uses precalculated
         // database table
         // as it doesn't quite fit the same paradigm as the other filters I am breaking it off into its own method
@@ -441,8 +433,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         return criteria.list();
     }
 
-    private List<Long> getFilteredIds( Set<AspireDbFilterConfig> filters ) throws BioMartServiceException,
-            NeurocartaServiceException {
+    private List<Long> getFilteredIds( Set<AspireDbFilterConfig> filters ) {
         Iterator<AspireDbFilterConfig> iterator = filters.iterator();
         AspireDbFilterConfig filterConfig = iterator.next();
         // First iteration

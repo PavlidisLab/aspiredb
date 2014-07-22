@@ -18,6 +18,8 @@ import java.io.Serializable;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
+import ubc.pavlab.aspiredb.server.util.GenomeBin;
+
 /**
  * @author anton
  */
@@ -25,25 +27,26 @@ import org.directwebremoting.annotations.DataTransferObject;
 public class GenomicRange implements Displayable, Serializable, Comparable<GenomicRange> {
     private static final long serialVersionUID = 6917870790522866428L;
 
-    private String chromosome;
-    private int baseStart;
-    private int baseEnd;
-    private String bandStart;
     private String bandEnd;
-
+    private String bandStart;
     private String bandString;
+    private int baseEnd;
+    private int baseStart;
 
-    public GenomicRange() {
-    }
+    private int bin;
+
+    private String chromosome;
 
     public GenomicRange( String chromosome ) {
-        this( chromosome, 0, Integer.MAX_VALUE );
+        this( chromosome, 0, GenomeBin.BINRANGE_MAXEND_512M );
     }
 
     public GenomicRange( String chromosome, int start, int end ) {
+        assert start <= end;
         this.chromosome = chromosome;
         this.baseStart = Math.min( start, end );
         this.baseEnd = Math.max( start, end );
+        this.bin = GenomeBin.binFromRange( start, end );
     }
 
     public GenomicRange( String chromosome, String bandStart, String bandEnd ) {
@@ -52,15 +55,18 @@ public class GenomicRange implements Displayable, Serializable, Comparable<Genom
         this.bandEnd = bandEnd;
     }
 
+    GenomicRange() {
+    }
+
     @Override
     public int compareTo( GenomicRange genomicRange ) {
         int myChromosomeIndex = getChromosomeIndex( this.chromosome );
         int otherChromosomeIndex = getChromosomeIndex( genomicRange.getChromosome() );
         if ( myChromosomeIndex == otherChromosomeIndex ) {
             return this.baseStart - genomicRange.getBaseStart();
-        } else {
-            return myChromosomeIndex - otherChromosomeIndex;
         }
+        return myChromosomeIndex - otherChromosomeIndex;
+
     }
 
     public String getBandEnd() {
@@ -81,6 +87,10 @@ public class GenomicRange implements Displayable, Serializable, Comparable<Genom
 
     public int getBaseStart() {
         return baseStart;
+    }
+
+    public int getBin() {
+        return bin;
     }
 
     public String getChromosome() {
@@ -169,9 +179,9 @@ public class GenomicRange implements Displayable, Serializable, Comparable<Genom
     public String toString() {
         if ( this.bandStart != null ) {
             return toCytobandString();
-        } else {
-            return toBaseString();
         }
+        return toBaseString();
+
     }
 
     private int getChromosomeIndex( String chr ) {

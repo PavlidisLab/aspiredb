@@ -287,10 +287,8 @@ public class Project2SpecialProjectOverlapTest {// extends BaseSpringContextTest
 
         cnv.setUserVariantId( userVariantId );
 
-        GenomicRange gr = new GenomicRange();
-        gr.setChromosome( chrom );
-        gr.setBaseStart( baseStart );
-        gr.setBaseEnd( baseEnd );
+        GenomicRange gr = new GenomicRange( chrom, baseStart, baseEnd );
+
         cnv.setGenomicRange( gr );
 
         cnv.setPatientId( patientId );
