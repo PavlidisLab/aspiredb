@@ -56,6 +56,11 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 @DiscriminatorColumn(name = "discriminator", discriminatorType = DiscriminatorType.STRING)
 public abstract class Variant implements SecuredNotChild, ValueObjectConvertible<VariantValueObject> {
 
+    @Override
+    public String toString() {
+        return "Variant [id=" + id + ", subject=" + subject + ", location=" + location + "]";
+    }
+
     @Id
     @GeneratedValue
     @Column(name = "ID")

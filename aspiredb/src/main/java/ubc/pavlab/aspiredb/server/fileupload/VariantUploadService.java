@@ -48,6 +48,11 @@ import ubc.pavlab.aspiredb.shared.SNVValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
+/**
+ * TODO Document Me
+ * 
+ * @author ??
+ */
 public class VariantUploadService {
 
     public enum CommonVariantColumn {
@@ -142,9 +147,9 @@ public class VariantUploadService {
          * @param vos
          * @return HashMap< 'chr', HashMap< 'base start position', Collection<SNVValueObject> > >
          */
-    public static HashMap<String, HashMap<Integer, Collection<SNVValueObject>>> constructQuerySNVMap(
-            ArrayList<VariantValueObject> vos ) {
-        HashMap<String, HashMap<Integer, Collection<SNVValueObject>>> map = new HashMap<>();
+    public static Map<String, Map<Integer, Collection<SNVValueObject>>> constructQuerySNVMap(
+            List<VariantValueObject> vos ) {
+        Map<String, Map<Integer, Collection<SNVValueObject>>> map = new HashMap<>();
 
         // store variant positions in memory
         for ( VariantValueObject vvo : vos ) {
@@ -533,7 +538,7 @@ public class VariantUploadService {
      * @throws ClassNotFoundException
      * @throws IOException
      */
-    public static Collection<SNVValueObject> predictDbNsfpSNVFunction( ArrayList<VariantValueObject> vos )
+    public static Collection<SNVValueObject> predictDbNsfpSNVFunction( List<VariantValueObject> vos )
             throws ClassNotFoundException, IOException {
         final String[] chrs = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16",
                 "17", "18", "19", "20", "21", "22", "X", "Y" };
@@ -580,7 +585,7 @@ public class VariantUploadService {
         }
 
         // map.get('chr').get('position') = Collection<VariantValueObject>
-        HashMap<String, HashMap<Integer, Collection<SNVValueObject>>> map = constructQuerySNVMap( vos );
+        Map<String, Map<Integer, Collection<SNVValueObject>>> map = constructQuerySNVMap( vos );
 
         // search the database of functional predictions using our map of variants
         Class.forName( "org.relique.jdbc.csv.CsvDriver" );
@@ -604,7 +609,7 @@ public class VariantUploadService {
                 log.debug( "Target database=[" + connStr + "] query=[" + query + "]" );
 
                 try (ResultSet dbResults = stmt.executeQuery( query )) {
-                    HashMap<Integer, Collection<SNVValueObject>> chrMap = map.get( chr );
+                    Map<Integer, Collection<SNVValueObject>> chrMap = map.get( chr );
                     if ( chrMap == null ) {
                         continue;
                     }
@@ -640,7 +645,7 @@ public class VariantUploadService {
      * @throws NumberFormatException
      * @throws SQLException
      */
-    public static Collection<SNVValueObject> predictSNVFunction( HashMap<Integer, Collection<SNVValueObject>> chrMap,
+    public static Collection<SNVValueObject> predictSNVFunction( Map<Integer, Collection<SNVValueObject>> chrMap,
             ResultSet dbResults, String dbPredColname ) {
 
         Collection<SNVValueObject> matched = new ArrayList<>();
@@ -683,9 +688,8 @@ public class VariantUploadService {
 
                 if ( resultVoList == null ) {
                     continue;
-                } else {
-                    posFound++;
                 }
+                posFound++;
 
                 for ( SNVValueObject snvResultVo : resultVoList ) {
 
@@ -755,7 +759,6 @@ public class VariantUploadService {
     }
 
     private static GenomicRange getGenomicRangeFromResultSet( ResultSet results ) throws Exception {
-        GenomicRange gr = new GenomicRange();
 
         String chrom = results.getString( CommonVariantColumn.CHROM.key ).toUpperCase();
 
@@ -764,11 +767,9 @@ public class VariantUploadService {
             chrom = chrom.replace( "CHR", "" );
         }
 
-        gr.setChromosome( chrom );
-
+        GenomicRange gr = new GenomicRange( chrom, results.getInt( CommonVariantColumn.START.key ),
+                results.getInt( CommonVariantColumn.END.key ) );
         // Note that results.getInt return 0 if it is not a number
-        gr.setBaseStart( results.getInt( CommonVariantColumn.START.key ) );
-        gr.setBaseEnd( results.getInt( CommonVariantColumn.END.key ) );
 
         validateGenomicRange( gr );
 

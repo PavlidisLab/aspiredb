@@ -174,7 +174,7 @@ public class DGVVariantUploadCLI extends AbstractCLI {
 
                 System.out.println( "inserting " + result.getVariantsToAdd().size() + " value objects into database" );
 
-                ArrayList<VariantValueObject> variantsToAdd = result.getVariantsToAdd();
+                List<VariantValueObject> variantsToAdd = result.getVariantsToAdd();
 
                 int batchCount = 0;
 

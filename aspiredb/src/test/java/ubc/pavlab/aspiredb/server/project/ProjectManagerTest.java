@@ -87,7 +87,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
     String anotherGroupName = RandomStringUtils.randomAlphabetic( 5 );
 
     String projectName = RandomStringUtils.randomAlphabetic( 5 );
-    String projectDescription = RandomStringUtils.randomAlphabetic( 7);
+    String projectDescription = RandomStringUtils.randomAlphabetic( 7 );
     String anotherProjectName = RandomStringUtils.randomAlphabetic( 4 );
 
     @Before
@@ -142,10 +142,8 @@ public class ProjectManagerTest extends BaseSpringContextTest {
         cnv.setCharacteristics( charMap );
         cnv.setType( "GAIN" );
 
-        GenomicRange gr = new GenomicRange();
-        gr.setChromosome( "X" );
-        gr.setBaseStart( 3 );
-        gr.setBaseEnd( 234 );
+        GenomicRange gr = new GenomicRange( "X", 3, 234 );
+
         cnv.setGenomicRange( gr );
 
         cnv.setPatientId( patientId );
@@ -236,10 +234,8 @@ public class ProjectManagerTest extends BaseSpringContextTest {
         cnv.setCharacteristics( charMap );
         cnv.setType( "GAIN" );
 
-        GenomicRange gr = new GenomicRange();
-        gr.setChromosome( "X" );
-        gr.setBaseStart( 3 );
-        gr.setBaseEnd( 234 );
+        GenomicRange gr = new GenomicRange( "X", 3, 234 );
+
         cnv.setGenomicRange( gr );
 
         cnv.setPatientId( patientId );
@@ -383,24 +379,23 @@ public class ProjectManagerTest extends BaseSpringContextTest {
         assertTrue( vCollection3.isEmpty() );
 
     }
-    
-   @Test
-   public void testCreateProject() {
+
+    @Test
+    public void testCreateProject() {
 
         super.runAsAdmin();
 
         final String project_name = RandomStringUtils.randomAlphabetic( 5 );
-        final String project_description= RandomStringUtils.randomAlphabetic( 5 );
-  
+        final String project_description = RandomStringUtils.randomAlphabetic( 5 );
 
         try {
             Project p = projectManager.createProject( project_name, project_description );
             aclTestUtils.checkHasAcl( p );
         } catch ( Exception e ) {
-           // log.error( e.getMessage() );
+            // log.error( e.getMessage() );
             fail( "projectManager.createproject threw an exception" );
         }
-     
+
     }
 
     @Test
@@ -424,10 +419,8 @@ public class ProjectManagerTest extends BaseSpringContextTest {
         cnv.setCharacteristics( charMap );
         cnv.setType( "GAIN" );
 
-        GenomicRange gr = new GenomicRange();
-        gr.setChromosome( "X" );
-        gr.setBaseStart( 3 );
-        gr.setBaseEnd( 234 );
+        GenomicRange gr = new GenomicRange( "X", 3, 234 );
+
         cnv.setGenomicRange( gr );
 
         cnv.setPatientId( patientId );

@@ -20,43 +20,61 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import ubc.pavlab.aspiredb.server.util.GenomeBin;
+
 @Entity
 @Table(name = "GENOMIC_LOC")
 @org.hibernate.annotations.Table(appliesTo = "GENOMIC_LOC", indexes = {
-        @org.hibernate.annotations.Index(name = "index_START", columnNames = "START"),
-        @org.hibernate.annotations.Index(name = "index_END", columnNames = "END")
+        @org.hibernate.annotations.Index(name = "index_CHROMOSOME", columnNames = "CHROMOSOME"),
+        @org.hibernate.annotations.Index(name = "index_BIN", columnNames = "BIN")
 
 })
 public class GenomicLocation {
+
+    @Column(name = "ASSEMBLY_VERSION")
+    private String assemblyVersion;
+
+    @Column(name = "BIN")
+    private Integer bin;
+
+    @Column(name = "CHR_BAND")
+    private String chrBand;
+
+    @Column(name = "CHROMOSOME")
+    private String chromosome;
+
+    @Column(name = "END")
+    private int end;
 
     @Id
     @GeneratedValue
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "CHROMOSOME")
-    private String chromosome;
-
     @Column(name = "START")
     private int start;
-
-    @Column(name = "END")
-    private int end;
-
-    @Column(name = "ASSEMBLY_VERSION")
-    private String assemblyVersion;
 
     @Column(name = "STRAND")
     private String strand;
 
-    @Column(name = "CHR_BAND")
-    private String chrBand;
+    public GenomicLocation( String chromosome, Integer start, Integer end ) {
+        this();
+        assert end >= start;
+        this.chromosome = chromosome;
+        this.start = start;
+        this.end = end;
+        this.bin = GenomeBin.binFromRange( start, end );
+    }
 
-    public GenomicLocation() {
+    private GenomicLocation() {
     }
 
     public String getAssemblyVersion() {
         return assemblyVersion;
+    }
+
+    public Integer getBin() {
+        return bin;
     }
 
     public String getChrBand() {
@@ -87,6 +105,10 @@ public class GenomicLocation {
         this.assemblyVersion = assemblyVersion;
     }
 
+    public void setBin( Integer genomeBin ) {
+        this.bin = genomeBin;
+    }
+
     public void setChrBand( String chrBand ) {
         this.chrBand = chrBand;
     }
@@ -109,5 +131,10 @@ public class GenomicLocation {
 
     public void setStrand( String strand ) {
         this.strand = strand;
+    }
+
+    @Override
+    public String toString() {
+        return "GenomicLocation [chromosome=" + chromosome + ", start=" + start + ", end=" + end + ", bin=" + bin + "]";
     }
 }

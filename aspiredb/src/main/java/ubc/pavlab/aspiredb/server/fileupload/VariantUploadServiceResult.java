@@ -21,7 +21,7 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 public class VariantUploadServiceResult {
 
-    ArrayList<VariantValueObject> variantsToAdd;
+    List<VariantValueObject> variantsToAdd;
 
     List<String> errorMessages;
 
@@ -36,7 +36,7 @@ public class VariantUploadServiceResult {
         return errorMessages;
     }
 
-    public ArrayList<VariantValueObject> getVariantsToAdd() {
+    public List<VariantValueObject> getVariantsToAdd() {
         return variantsToAdd;
     }
 

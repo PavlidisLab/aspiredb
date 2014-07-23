@@ -82,10 +82,7 @@ public class CNVDaoTest extends BaseSpringContextTest {
                 String patientId = "test_patient";
                 individual.setPatientId( patientId );
 
-                GenomicLocation genomicLocation1 = new GenomicLocation();
-                genomicLocation1.setChromosome( "40" );
-                genomicLocation1.setStart( 50500000 );
-                genomicLocation1.setEnd( 54500000 );
+                GenomicLocation genomicLocation1 = new GenomicLocation( "40", 5050000, 5450000 );
 
                 cnv1 = new CNV();
                 cnv1.setLocation( genomicLocation1 );

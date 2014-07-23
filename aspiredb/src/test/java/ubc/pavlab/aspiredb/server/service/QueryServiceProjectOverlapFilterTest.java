@@ -711,7 +711,7 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
     private CNVValueObject getCNV( String chrom, int baseStart, int baseEnd, String userVariantId, String patientId ) {
 
         CharacteristicValueObject cvo = new CharacteristicValueObject();
-
+        
         cvo.setKey( "testChar" );
         cvo.setValue( "testcharvalue" );
 
@@ -725,10 +725,8 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
 
         cnv.setUserVariantId( userVariantId );
 
-        GenomicRange gr = new GenomicRange();
-        gr.setChromosome( chrom );
-        gr.setBaseStart( baseStart );
-        gr.setBaseEnd( baseEnd );
+        GenomicRange gr = new GenomicRange( chrom, baseStart, baseEnd );
+
         cnv.setGenomicRange( gr );
 
         cnv.setPatientId( patientId );

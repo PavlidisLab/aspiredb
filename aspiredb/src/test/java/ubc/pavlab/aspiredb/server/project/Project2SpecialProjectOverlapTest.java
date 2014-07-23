@@ -25,10 +25,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantOverlapDao;
@@ -46,7 +49,7 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
 
-public class Project2SpecialProjectOverlapTest {// extends BaseSpringContextTest {
+public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
     @Autowired
     private ProjectManager projectManager;
@@ -58,16 +61,16 @@ public class Project2SpecialProjectOverlapTest {// extends BaseSpringContextTest
     private Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
 
     @Autowired
-    ProjectDao projectDao;
+    private ProjectDao projectDao;
 
     @Autowired
-    VariantDao variantDao;
+    private VariantDao variantDao;
 
     @Autowired
-    SubjectDao subjectDao;
+    private SubjectDao subjectDao;
 
     @Autowired
-    PersistentTestObjectHelper helper;
+    private PersistentTestObjectHelper helper;
 
     final String patientId = RandomStringUtils.randomAlphabetic( 5 );
     final String projectName = RandomStringUtils.randomAlphabetic( 7 );
@@ -87,12 +90,10 @@ public class Project2SpecialProjectOverlapTest {// extends BaseSpringContextTest
     final String patientIdWithOverlap = RandomStringUtils.randomAlphabetic( 5 );
     final String projectNameWithOverlap = "DGV";
 
-    // @Test
+    @Test
     public void testPopulateSpecialProjectOverlap() {
 
-        // super.runAsAdmin();
-
-        ArrayList<VariantValueObject> cnvList = new ArrayList<VariantValueObject>();
+        List<VariantValueObject> cnvList = new ArrayList<>();
         cnvList.add( getCNV( "X", 3, 234, userVariantId, patientId ) );
 
         cnvList.add( getCNV( "X", 1, 5, userVariantId2, patientId ) );
@@ -110,7 +111,7 @@ public class Project2SpecialProjectOverlapTest {// extends BaseSpringContextTest
 
         }
 
-        ArrayList<VariantValueObject> cnvListWithOverlap = new ArrayList<VariantValueObject>();
+        List<VariantValueObject> cnvListWithOverlap = new ArrayList<>();
 
         // will overlap, by 231
         cnvListWithOverlap.add( getCNV( "X", 3, 234, overlapVariantId1, patientIdWithOverlap ) );
@@ -144,7 +145,7 @@ public class Project2SpecialProjectOverlapTest {// extends BaseSpringContextTest
         }
 
         Collection<Project> overlapProjects = projectDao.getSpecialOverlapProjects();
-        Collection<Long> overlapProjectIds = new ArrayList<Long>();
+        Collection<Long> overlapProjectIds = new ArrayList<>();
 
         for ( Project p : overlapProjects ) {
 
@@ -168,18 +169,15 @@ public class Project2SpecialProjectOverlapTest {// extends BaseSpringContextTest
 
         ProjectFilterConfig projectToPopulateFilterConfig = getProjectFilterConfigById( projectToPopulate );
 
-        HashSet<AspireDbFilterConfig> projSet = new HashSet<AspireDbFilterConfig>();
+        Set<AspireDbFilterConfig> projSet = new HashSet<AspireDbFilterConfig>();
         projSet.add( projectToPopulateFilterConfig );
 
         BoundedList<VariantValueObject> projToPopulateVvos = null;
 
         try {
-
             projToPopulateVvos = queryService.queryVariants( projSet );
         } catch ( Exception e ) {
-
             fail( "queryService.queryVariants threw an exception" );
-
         }
 
         assertEquals( 4, projToPopulateVvos.getItems().size() );
@@ -264,9 +262,8 @@ public class Project2SpecialProjectOverlapTest {// extends BaseSpringContextTest
         // genius
         if ( start < end ) {
             return true;
-        } else {
-            return false;
         }
+        return false;
 
     }
 
@@ -277,7 +274,7 @@ public class Project2SpecialProjectOverlapTest {// extends BaseSpringContextTest
         cvo.setKey( "testChar" );
         cvo.setValue( "testcharvalue" );
 
-        Map<String, CharacteristicValueObject> charMap = new HashMap<String, CharacteristicValueObject>();
+        Map<String, CharacteristicValueObject> charMap = new HashMap<>();
         charMap.put( cvo.getKey(), cvo );
 
         CNVValueObject cnv = new CNVValueObject();
@@ -287,10 +284,8 @@ public class Project2SpecialProjectOverlapTest {// extends BaseSpringContextTest
 
         cnv.setUserVariantId( userVariantId );
 
-        GenomicRange gr = new GenomicRange();
-        gr.setChromosome( chrom );
-        gr.setBaseStart( baseStart );
-        gr.setBaseEnd( baseEnd );
+        GenomicRange gr = new GenomicRange( chrom, baseStart, baseEnd );
+
         cnv.setGenomicRange( gr );
 
         cnv.setPatientId( patientId );
@@ -303,7 +298,7 @@ public class Project2SpecialProjectOverlapTest {// extends BaseSpringContextTest
 
         ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();
 
-        ArrayList<Long> projectIds = new ArrayList<Long>();
+        List<Long> projectIds = new ArrayList<>();
 
         projectIds.add( p.getId() );
 

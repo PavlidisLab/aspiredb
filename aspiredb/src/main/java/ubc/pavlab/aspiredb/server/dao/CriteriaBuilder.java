@@ -18,8 +18,10 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
+import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
@@ -31,6 +33,7 @@ import org.hibernate.criterion.Subqueries;
 import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
+import ubc.pavlab.aspiredb.server.util.GenomeBin;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
@@ -277,24 +280,47 @@ public class CriteriaBuilder {
         return propertyPrefix( filterTarget, propertyOf ) + property.getName();
     }
 
+    /**
+     * @param range
+     * @return
+     */
     private static Criterion overlapsGenomicRegionCriterion( GenomicRange range ) {
+
+        List<Integer> bins = GenomeBin.relevantBins( range.getBaseStart(), range.getBaseEnd() );
+
+        // debug code - generates native SQL to check things
+        // System.err.println( range + " " + " length=" + ( range.getBaseEnd() - range.getBaseStart() ) + " bins="
+        // + StringUtils.join( bins, "," ) );
+        // if ( range.getChromosome().equals( "17" ) || range.getChromosome().equals( "4" ) ) {
+        // System.err.println( String.format( "select distinct location1_.* from GENOMIC_LOC location1_ where "
+        // + "location1_.BIN in (%s) and location1_.CHROMOSOME='%s' and "
+        // + "( (location1_.START>=%d and location1_.END<=%d) "
+        // + "or (location1_.START<=%d and location1_.END>=%d) "
+        // + "or (location1_.START<=%d and location1_.END>=%d) ); ", StringUtils.join( bins, "," ),
+        // range.getChromosome(), range.getBaseStart(), range.getBaseEnd(), range.getBaseStart(),
+        // range.getBaseStart(), range.getBaseEnd(), range.getBaseEnd() ) );
+        // }
+
         Junction variantInsideRegion = Restrictions.conjunction()
-                .add( Restrictions.eq( "location.chromosome", range.getChromosome() ) )
                 .add( Restrictions.ge( "location.start", range.getBaseStart() ) )
                 .add( Restrictions.le( "location.end", range.getBaseEnd() ) );
 
         Junction variantHitsStartOfRegion = Restrictions.conjunction()
-                .add( Restrictions.eq( "location.chromosome", range.getChromosome() ) )
                 .add( Restrictions.le( "location.start", range.getBaseStart() ) )
                 .add( Restrictions.ge( "location.end", range.getBaseStart() ) );
 
         Junction variantHitsEndOfRegion = Restrictions.conjunction()
-                .add( Restrictions.eq( "location.chromosome", range.getChromosome() ) )
                 .add( Restrictions.le( "location.start", range.getBaseEnd() ) )
                 .add( Restrictions.ge( "location.end", range.getBaseEnd() ) );
 
-        Criterion rangeCriterion = Restrictions.disjunction().add( variantInsideRegion ).add( variantHitsStartOfRegion )
-                .add( variantHitsEndOfRegion );
+        // Note addition of bin restriction. We only care about variants that fall into one of the bins touched by the
+        // given range
+        Criterion rangeCriterion = Restrictions
+                .conjunction()
+                .add( Restrictions.in( "location.bin", bins ) )
+                .add( Restrictions.eq( "location.chromosome", range.getChromosome() ) )
+                .add( Restrictions.disjunction().add( variantInsideRegion ).add( variantHitsStartOfRegion )
+                        .add( variantHitsEndOfRegion ) );
 
         return rangeCriterion;
     }
@@ -444,9 +470,9 @@ public class CriteriaBuilder {
     private static Criterion processRestrictionExpression( VariantTypeRestriction restriction, EntityType target ) {
         if ( target == EntityType.SUBJECT ) {
             return Restrictions.eq( "variant.class", restriction.getType() );
-        } else {
-            return Restrictions.eq( "class", restriction.getType() );
         }
+        return Restrictions.eq( "class", restriction.getType() );
+
     }
 
     /**

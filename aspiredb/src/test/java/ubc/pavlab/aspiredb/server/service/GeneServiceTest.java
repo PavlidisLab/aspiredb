@@ -48,10 +48,8 @@ public class GeneServiceTest extends BaseSpringContextTest {
     @Before
     public void setup() throws Exception {
         Variant variant = new CNV();
-        GenomicLocation location = new GenomicLocation();
-        location.setChromosome( "Y" );
-        location.setStart( 1 );
-        location.setEnd( 100 );
+        GenomicLocation location = new GenomicLocation( "Y", 1, 100 );
+
         variant.setLocation( location );
 
         variantDaoMock = EasyMock.createMock( VariantDao.class );
