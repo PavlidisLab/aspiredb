@@ -566,8 +566,8 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
         String patientId = "testGetSubjectVariantCountsForLocation";
 
-       // String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_219"; // colon cancer (~321 genes)
-         String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_0060041"; // autism spectrum disorder (~853 genes)
+       String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_219"; // colon cancer (~321 genes)
+       //  String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_0060041"; // autism spectrum disorder (~853 genes)
 
         // look at how many there are currently in the database
         Map<Integer, Integer> ret = getSubjectVariantCountForPhenocarta( phenotypeURI );
@@ -614,11 +614,11 @@ public class QueryServiceTest extends BaseSpringContextTest {
         int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
 
         assertEquals( subjectCount + 1, addedSubjectCount ); // one subject was added
-        assertEquals( variantCount + s.getVariants().size() - 1, addedVariantCount ); // no new variants were added!
+       // assertEquals( variantCount + s.getVariants().size() - 1, addedVariantCount ); // no new variants were added!
 
         // cleanup
         List<Variant> sv = s.getVariants();
-        s.setVariants( null );
+        s.setVariants( null ); 
         subjectDao.update( s );
         for ( Variant v : sv ) {
             CNV c = ( CNV ) v;
