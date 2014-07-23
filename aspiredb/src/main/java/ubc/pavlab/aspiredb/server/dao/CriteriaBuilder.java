@@ -288,18 +288,18 @@ public class CriteriaBuilder {
 
         List<Integer> bins = GenomeBin.relevantBins( range.getBaseStart(), range.getBaseEnd() );
 
-        // debug code
+        // debug code - generates native SQL to check things
         // System.err.println( range + " " + " length=" + ( range.getBaseEnd() - range.getBaseStart() ) + " bins="
         // + StringUtils.join( bins, "," ) );
-        if ( range.getChromosome().equals( "17" ) || range.getChromosome().equals( "4" ) ) {
-            System.err.println( String.format( "select distinct location1_.* from GENOMIC_LOC location1_ where "
-                    + "location1_.BIN in (%s) and location1_.CHROMOSOME='%s' and "
-                    + "( (location1_.START>=%d and location1_.END<=%d) "
-                    + "or (location1_.START<=%d and location1_.END>=%d) "
-                    + "or (location1_.START<=%d and location1_.END>=%d) ); ", StringUtils.join( bins, "," ),
-                    range.getChromosome(), range.getBaseStart(), range.getBaseEnd(), range.getBaseStart(),
-                    range.getBaseStart(), range.getBaseEnd(), range.getBaseEnd() ) );
-        }
+        // if ( range.getChromosome().equals( "17" ) || range.getChromosome().equals( "4" ) ) {
+        // System.err.println( String.format( "select distinct location1_.* from GENOMIC_LOC location1_ where "
+        // + "location1_.BIN in (%s) and location1_.CHROMOSOME='%s' and "
+        // + "( (location1_.START>=%d and location1_.END<=%d) "
+        // + "or (location1_.START<=%d and location1_.END>=%d) "
+        // + "or (location1_.START<=%d and location1_.END>=%d) ); ", StringUtils.join( bins, "," ),
+        // range.getChromosome(), range.getBaseStart(), range.getBaseEnd(), range.getBaseStart(),
+        // range.getBaseStart(), range.getBaseEnd(), range.getBaseEnd() ) );
+        // }
 
         Junction variantInsideRegion = Restrictions.conjunction()
                 .add( Restrictions.ge( "location.start", range.getBaseStart() ) )

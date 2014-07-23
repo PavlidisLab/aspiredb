@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Map genomic locations to 'bins' to speed up range queries (based on Jim Kent's UCSC goldenpath code)
+ * Map genomic locations to 'bins' to speed up range queries (based on Jim Kent's UCSC goldenpath code). See
+ * http://genome.cshlp.org/content/12/6/996/F7.expansion.html and
+ * http://genomewiki.ucsc.edu/index.php/Bin_indexing_system.
  * 
  * @author paul
  */

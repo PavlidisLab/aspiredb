@@ -132,6 +132,10 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         return variants;
     }
 
+    /**
+     * @param overlapFilter
+     * @return
+     */
     public List<Long> getProjectOverlapVariantIds( ProjectOverlapFilterConfig overlapFilter ) {
 
         // overlapProjectIds are required for this method
@@ -146,7 +150,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         Boolean hasPhenotypeRestriction = phenRestriction != null && phenRestriction.getValue() != null
                 && phenRestriction.getName() != null;
 
-        List<Long> overlapProjsPhenoAssociatedVariantIds = new ArrayList<Long>();
+        List<Long> overlapProjsPhenoAssociatedVariantIds = new ArrayList<>();
 
         // Get variants in specified overlapping projects with specified phenotype for easier checking later
         if ( hasPhenotypeRestriction ) {
@@ -166,7 +170,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         Boolean hasTertiaryOverlapRestriction = validateOverlapRestriction( supportOfVariantsOverlapRestriction );
 
-        ArrayList<Long> variantIdsSatisfyingRestrictions = new ArrayList<Long>();
+        List<Long> variantIdsSatisfyingRestrictions = new ArrayList<>();
 
         log.info( "Iterating through variants in projectids:" + overlapFilter.getProjectIds()
                 + " for overlap with variants in projectids:" + overlapFilter.getOverlapProjectIds()
@@ -177,7 +181,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         // Iterate over all variants in active Projects to see if they meet the restriction criteria
         for ( Long vId : activeProjectsVariantIds ) {
 
-            Collection<Variant2SpecialVariantOverlap> infos = new ArrayList<Variant2SpecialVariantOverlap>();
+            Collection<Variant2SpecialVariantOverlap> infos = new ArrayList<>();
 
             if ( hasOverlapRestriction ) {
 
