@@ -98,7 +98,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
       var r = restriction;
 
       var propertyComboBox = this.getComponent( "propertyComboBox" );
-      //var subPropertyComboBox = this.getComponent( "subPropertyComboBox" );
+      // var subPropertyComboBox = this.getComponent( "subPropertyComboBox" );
       var operatorComboBox = this.getComponent( "operatorComboBox" );
       var multicombo_container = this.getComponent( "multicombo_container" );
       var multicombo = multicombo_container.getComponent( "multicombo" );
@@ -164,18 +164,34 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
                fn : function(obj, records) {
                   // ASPIREdb.EVENT_BUS.fireEvent('query_update');
                   console.log( 'test' );
+                  if (records[0].name == "GeneSet")
+                     this.setVisible(false);
                },
                scope : this,
             }
          },
-      }, /**
-          * { xtype : 'combo', itemId : 'subPropertyComboBox', emptyText : 'subname', suggestValuesRemoteFunction :
-          * VariantService.suggestValues, store : { proxy : { type : 'dwr', dwrFunction :
-          * VariantService.suggestPropertiesForVariantType, dwrParams : [ 'CNV' ], model : 'ASPIREdb.model.Property',
-          * reader : { type : 'json', root : 'data', totalProperty : 'count' } } }, displayField : 'displayName',
-          * filterItemType : 'ASPIREdb.view.filter.PropertyFilter',
-          *  },
-          */
+      }, {
+         xtype : 'combo',
+         itemId : 'subPropertyComboBox',
+         emptyText : 'subname',
+         suggestValuesRemoteFunction : VariantService.suggestValues,
+         store : {
+            proxy : {
+               type : 'dwr',
+               dwrFunction : VariantService.suggestPropertiesForVariantType,
+               dwrParams : [ 'CNV' ],
+               model : 'ASPIREdb.model.Property',
+               reader : {
+                  type : 'json',
+                  root : 'data',
+                  totalProperty : 'count'
+               }
+            }
+         },
+         displayField : 'displayName',
+         filterItemType : 'ASPIREdb.view.filter.PropertyFilter',
+      },
+
       {
          xtype : 'combo',
          itemId : 'operatorComboBox',
@@ -198,7 +214,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
          items : [ {
             xtype : 'multivalue_combo',
             itemId : 'multicombo',
-            width : 450,
+            width : 300, // 450,
             enableKeyEvents : false,
             suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
          }, {
@@ -240,9 +256,33 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
       var singleValueField = multicombo_container.getComponent( "singleValueField" );
       var example = multicombo_container.getComponent( "example" );
       var propertyComboBox = me.getComponent( "propertyComboBox" );
-      //var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
+      var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
 
       var firstTime = true;
+
+      subPropertyComboBox.on( 'select', function(obj, records) {
+         var record = records[0];
+
+         var property = record.raw;
+         if ( property.dataType instanceof NumericalDataType ) {
+            me.isMultiValue = false;
+            multicombo.hide();
+            singleValueField.reset();
+            singleValueField.show();
+         } else {
+            me.isMultiValue = true;
+            // update multicombobox
+            multicombo.setProperty( property );
+            multicombo.reset();
+            multicombo.show();
+            singleValueField.hide();
+         }
+
+         me.selectedProperty = property;
+
+         me.enableEnterList( property );
+
+      } );
 
       propertyComboBox.on( 'select', function(obj, records) {
          var record = records[0];
@@ -250,29 +290,15 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
 
          if ( value == "CNV Characteristics" ) {
             // combo box
-       /**     var subCombo = Ext.create( 'Ext.form.ComboBox', {
-               itemId : 'subPropertyComboBox',
-               emptyText : 'subname',
-               // padding : '10 0 0 0',
-               suggestValuesRemoteFunction : VariantService.suggestValues,
-               store : {
-                  proxy : {
-                     type : 'dwr',
-                     dwrFunction : VariantService.suggestPropertiesForVariantType,
-                     dwrParams : [ 'CNV' ],
-                     model : 'ASPIREdb.model.Property',
-                     reader : {
-                        type : 'json',
-                        root : 'data',
-                        totalProperty : 'count'
-                     }
-                  }
-               },
-               displayField : 'displayName',
-               filterItemType : 'ASPIREdb.view.filter.PropertyFilter',
-            } );
+            /**
+             * var subCombo = Ext.create( 'Ext.form.ComboBox', { itemId : 'subPropertyComboBox', emptyText : 'subname', //
+             * padding : '10 0 0 0', suggestValuesRemoteFunction : VariantService.suggestValues, store : { proxy : {
+             * type : 'dwr', dwrFunction : VariantService.suggestPropertiesForVariantType, dwrParams : [ 'CNV' ], model :
+             * 'ASPIREdb.model.Property', reader : { type : 'json', root : 'data', totalProperty : 'count' } } },
+             * displayField : 'displayName', filterItemType : 'ASPIREdb.view.filter.PropertyFilter', } );
+             */
 
-            me.add( subCombo );*/
+            me.add( subCombo );
 
             // context menu
             VariantService.suggestPropertiesForVariantType( 'CNV', {
@@ -282,7 +308,13 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
                   for (var i = 0; i < Properties.length; i++) {
                      menuItems.push( {
                         text : Properties[i].displayName,
-                        scope :me,
+                        scope : me,
+                        listeners : {
+                           itemclick : function(item) {
+                              alert( "selected item " + item.displayName );
+                              me.selectedProperty = item;
+                           }
+                        },
                         handler : me.contextMenuSelectionHandler,
                      } );
                   }
@@ -296,8 +328,8 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
                }
             } );
 
-         }else if ( value == "SNV Characteristics" ) {
-           
+         } else if ( value == "SNV Characteristics" ) {
+
             // context menu
             VariantService.suggestPropertiesForVariantType( 'SNV', {
                callback : function(Properties) {
@@ -306,7 +338,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
                   for (var i = 0; i < Properties.length; i++) {
                      menuItems.push( {
                         text : Properties[i].displayName,
-                        scope :me,
+                        scope : me,
                         handler : me.contextMenuSelectionHandler,
                      } );
                   }
@@ -319,8 +351,8 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
                   contextMenu.showAt( 650, 410 );
                }
             } );
-         }else if ( value == "INDEL Characteristics" ) {
-           
+         } else if ( value == "INDEL Characteristics" ) {
+
             // context menu
             VariantService.suggestPropertiesForVariantType( 'INDEL', {
                callback : function(Properties) {
@@ -329,7 +361,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
                   for (var i = 0; i < Properties.length; i++) {
                      menuItems.push( {
                         text : Properties[i].displayName,
-                        scope :me,
+                        scope : me,
                         handler : me.contextMenuSelectionHandler,
                      } );
                   }
@@ -362,24 +394,16 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
          store.add( operatorModels );
          operatorComboBox.select( store.getAt( 0 ) );
 
-         var property = record.raw;
-         if ( property.dataType instanceof NumericalDataType ) {
-            me.isMultiValue = false;
-            multicombo.hide();
-            singleValueField.reset();
-            singleValueField.show();
-         } else {
-            me.isMultiValue = true;
-            // update multicombobox
-            multicombo.setProperty( property );
-            multicombo.reset();
-            multicombo.show();
-            singleValueField.hide();
-         }
-
-         me.selectedProperty = property;
-
-         me.enableEnterList( property );
+         /**
+          * var property = record.raw; if ( property.dataType instanceof NumericalDataType ) { me.isMultiValue = false;
+          * multicombo.hide(); singleValueField.reset(); singleValueField.show(); } else { me.isMultiValue = true; //
+          * update multicombobox multicombo.setProperty( property ); multicombo.reset(); multicombo.show();
+          * singleValueField.hide(); }
+          * 
+          * me.selectedProperty = property;
+          * 
+          * me.enableEnterList( property );
+          */
 
       } );
 
@@ -421,23 +445,21 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
 
       } );
    },
-   
-   contextMenuSelectionHandler : function(selectedProperty){
-      
-      Ext.Msg.alert('Selected Sub-Property', selectedProperty.text+ '  selected');
+
+   contextMenuSelectionHandler : function(selProperty) {
+
+      Ext.Msg.alert( 'Selected Sub-Property', selProperty.displayName + '  selected' );
       var propertyComboBox = this.getComponent( "propertyComboBox" );
       var existingStore = propertyComboBox.getStore();
-      var newStore = Ext.create('Ext.data.Store', {
-         model: 'ASPIREdb.model.Property',
-         autoLoad :true,
+
+      var newStore = Ext.create( 'Ext.data.Store', {
+         model : 'ASPIREdb.model.Property',
+         autoLoad : true,
          displayField : 'displayName',
          filterItemType : 'ASPIREdb.view.filter.PropertyFilter',
-         });
-      newStore.add(selectedProperty.text);
-      for (var i=0;i<existingStore.data.length;i++){
-         newStore.add(existingStore.data.items[i]);
-      }
-      propertyComboBox.setStore(newStore);
+      } );
+
+      existingStore.add( me.selectedProperty );
       propertyComboBox.select( store.getAt( 0 ) );
    },
 
