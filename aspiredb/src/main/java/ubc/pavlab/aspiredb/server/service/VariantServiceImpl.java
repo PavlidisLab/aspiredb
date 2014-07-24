@@ -111,8 +111,6 @@ public class VariantServiceImpl implements VariantService {
     @Autowired
     private ChromosomeService chromosomeService;
 
-    private String patientId;
-
     @Override
     @RemoteMethod
     @Transactional
@@ -248,7 +246,7 @@ public class VariantServiceImpl implements VariantService {
         String query = suggestionContext.getValuePrefix();
         if ( query.length() >= 2 ) {
             final Collection<GeneValueObject> genes = bioMartQueryService.findGenes( query );
-    
+
             for ( GeneValueObject gene : genes ) {
                 GeneProperty geneProperty = new GeneProperty();
                 geneProperty.setName( gene.getName() );
@@ -406,15 +404,13 @@ public class VariantServiceImpl implements VariantService {
         Collection<Property> properties = new ArrayList<Property>();
 
         properties.add( new VariantTypeProperty() );
-        properties.add( new GenomicLocationProperty());
+        properties.add( new GenomicLocationProperty() );
         properties.add( new GeneProperty() );
         properties.add( new GeneSetProperty() );
-        properties.add( new NeurocartaPhenotypeProperty());
-        properties.add( new CNVCharacteristicsProperty());
-        properties.add( new SNVCharacteristicsProperty());
-        properties.add( new IndelCharacteristicsProperty());
-        
-        
+        properties.add( new NeurocartaPhenotypeProperty() );
+        properties.add( new CNVCharacteristicsProperty() );
+        properties.add( new SNVCharacteristicsProperty() );
+        properties.add( new IndelCharacteristicsProperty() );
 
         return properties;
     }
@@ -556,4 +552,5 @@ public class VariantServiceImpl implements VariantService {
         }
         return suggestions;
     }
+
 }

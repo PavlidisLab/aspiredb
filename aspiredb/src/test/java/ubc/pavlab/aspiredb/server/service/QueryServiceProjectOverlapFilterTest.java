@@ -49,7 +49,6 @@ import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.DoesOverlapWithXProperty;
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.OverlapBasesProperty;
-import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.ProjectOverlapFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 
@@ -177,7 +176,7 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
     }
 
     @Test
-    public void testProjectOverlapFilterWithOverlap() {
+    public void testProjectOverlapFilterWithOverlap() throws Exception {
 
         Project project = projectDao.findByProjectName( projectName );
 
@@ -198,21 +197,16 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
 
         set.add( overlapFilter );
 
-        try {
+        BoundedList<VariantValueObject> result = queryService.queryVariants( set );
 
-            BoundedList<VariantValueObject> result = queryService.queryVariants( set );
+        assertEquals( 2, result.getItems().size() );
 
-            assertEquals( 2, result.getItems().size() );
-
-            assertEquals( result.getItems().iterator().next().getUserVariantId(), userVariantId );
-        } catch ( Exception e ) {
-            fail( e.toString() );
-        }
+        assertEquals( result.getItems().iterator().next().getUserVariantId(), userVariantId );
 
     }
 
     @Test
-    public void testProjectOverlapFilterWithSecondaryGreaterThan() {
+    public void testProjectOverlapFilterWithSecondaryGreaterThan() throws Exception {
 
         Project project = projectDao.findByProjectName( projectName );
 
@@ -248,20 +242,13 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
 
         set.add( overlapFilter );
 
-        try {
-
-            result = queryService.queryVariants( set );
-
-        } catch ( Exception e ) {
-            fail( e.toString() );
-        }
-
+        result = queryService.queryVariants( set );
         assertEquals( 0, result.getItems().size() );
 
     }
 
     @Test
-    public void testProjectOverlapFilterWithSecondaryOverlapLessThan() {
+    public void testProjectOverlapFilterWithSecondaryOverlapLessThan() throws Exception {
 
         Project project = projectDao.findByProjectName( projectName );
 
@@ -297,20 +284,14 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
 
         set.add( overlapFilter );
 
-        try {
-
-            result = queryService.queryVariants( set );
-
-        } catch ( Exception e ) {
-            fail( e.toString() );
-        }
+        result = queryService.queryVariants( set );
 
         assertEquals( 4, result.getItems().size() );
 
     }
 
     @Test
-    public void testProjectOverlapFilterWithSpecificLessThanPlusSecondaryOverlapLessThan() {
+    public void testProjectOverlapFilterWithSpecificLessThanPlusSecondaryOverlapLessThan() throws Exception {
 
         Project project = projectDao.findByProjectName( projectName );
 
@@ -360,20 +341,14 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
 
         set.add( overlapFilter );
 
-        try {
-
-            result = queryService.queryVariants( set );
-
-        } catch ( Exception e ) {
-            fail( e.toString() );
-        }
+        result = queryService.queryVariants( set );
 
         assertEquals( 2, result.getItems().size() );
 
     }
 
     @Test
-    public void testProjectOverlapFilterWithSpecificOverlapGreaterThan() {
+    public void testProjectOverlapFilterWithSpecificOverlapGreaterThan() throws Exception {
 
         Project project = projectDao.findByProjectName( projectName );
 
@@ -422,7 +397,7 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
     }
 
     @Test
-    public void testProjectOverlapFilterWithSpecificOverlapGreaterThanAgain() {
+    public void testProjectOverlapFilterWithSpecificOverlapGreaterThanAgain() throws Exception {
 
         Project project = projectDao.findByProjectName( projectName );
 
@@ -456,20 +431,16 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
 
         set.add( overlapFilter );
 
-        try {
-            BoundedList<VariantValueObject> result = null;
+        BoundedList<VariantValueObject> result = null;
 
-            result = queryService.queryVariants( set );
-            assertEquals( 1, result.getItems().size() );
-
-        } catch ( Exception e ) {
-            fail( e.toString() );
-        }
+        result = queryService.queryVariants( set );
+        assertEquals( 1, result.getItems().size() );
 
     }
 
     @Test
-    public void testProjectOverlapFilterWithSpecificOverlapGreaterThanPlusSecondaryOverlapGreaterAgain() {
+    public void testProjectOverlapFilterWithSpecificOverlapGreaterThanPlusSecondaryOverlapGreaterAgain()
+            throws Exception {
 
         Project project = projectDao.findByProjectName( projectName );
 
@@ -518,13 +489,7 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
 
         set.add( overlapFilter );
 
-        try {
-
-            result = queryService.queryVariants( set );
-
-        } catch ( Exception e ) {
-            fail( e.toString() );
-        }
+        result = queryService.queryVariants( set );
 
         assertEquals( 1, result.getItems().size() );
 
@@ -532,7 +497,8 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
 
     @Test
     // great method name
-    public void testProjectOverlapFilterWithSpecificOverlapGreaterThanPlusSecondaryOverlapGreaterAgainOneMoreTime() {
+    public void testProjectOverlapFilterWithSpecificOverlapGreaterThanPlusSecondaryOverlapGreaterAgainOneMoreTime()
+            throws Exception {
 
         Project project = projectDao.findByProjectName( projectName );
 
@@ -582,20 +548,15 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
 
         set.add( overlapFilter );
 
-        try {
-
-            result = queryService.queryVariants( set );
-
-        } catch ( Exception e ) {
-            fail( e.toString() );
-        }
+        result = queryService.queryVariants( set );
 
         assertEquals( 2, result.getItems().size() );
 
     }
 
     @Test
-    public void testProjectOverlapFilterWithSpecificOverlapGreaterThanPlusSecondaryOverlapGreaterThan() {
+    public void testProjectOverlapFilterWithSpecificOverlapGreaterThanPlusSecondaryOverlapGreaterThan()
+            throws Exception {
 
         Project project = projectDao.findByProjectName( projectName );
 
@@ -645,20 +606,14 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
 
         set.add( overlapFilter );
 
-        try {
-
-            result = queryService.queryVariants( set );
-
-        } catch ( Exception e ) {
-            fail( e.toString() );
-        }
+        result = queryService.queryVariants( set );
 
         assertEquals( 1, result.getItems().size() );
 
     }
 
     @Test
-    public void testProjectOverlapFilterWithSpecificOverlapLessThan() {
+    public void testProjectOverlapFilterWithSpecificOverlapLessThan() throws Exception {
 
         Project project = projectDao.findByProjectName( projectName );
 
@@ -695,23 +650,16 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
 
         set.add( overlapFilter );
 
-        try {
-
-            result = queryService.queryVariants( set );
-
-        } catch ( Exception e ) {
-
-            fail( e.toString() );
-        }
+        result = queryService.queryVariants( set );
 
         assertEquals( 3, result.getItems().size() );
 
     }
 
-    private CNVValueObject getCNV( String chrom, int baseStart, int baseEnd, String userVariantId, String patientId ) {
+    private CNVValueObject getCNV( String chrom, int baseStart, int baseEnd, String varId, String patId ) {
 
         CharacteristicValueObject cvo = new CharacteristicValueObject();
-        
+
         cvo.setKey( "testChar" );
         cvo.setValue( "testcharvalue" );
 
@@ -723,30 +671,30 @@ public class QueryServiceProjectOverlapFilterTest extends BaseSpringContextTest 
         cnv.setCharacteristics( charMap );
         cnv.setType( "GAIN" );
 
-        cnv.setUserVariantId( userVariantId );
+        cnv.setUserVariantId( varId );
 
         GenomicRange gr = new GenomicRange( chrom, baseStart, baseEnd );
 
         cnv.setGenomicRange( gr );
 
-        cnv.setPatientId( patientId );
+        cnv.setPatientId( patId );
 
         return cnv;
 
     }
 
-    private ProjectFilterConfig getProjectFilterConfigById( Project p ) {
-
-        ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();
-
-        ArrayList<Long> projectIds = new ArrayList<Long>();
-
-        projectIds.add( p.getId() );
-
-        projectFilterConfig.setProjectIds( projectIds );
-
-        return projectFilterConfig;
-
-    }
+    // private ProjectFilterConfig getProjectFilterConfigById( Project p ) {
+    //
+    // ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();
+    //
+    // ArrayList<Long> projectIds = new ArrayList<Long>();
+    //
+    // projectIds.add( p.getId() );
+    //
+    // projectFilterConfig.setProjectIds( projectIds );
+    //
+    // return projectFilterConfig;
+    //
+    // }
 
 }

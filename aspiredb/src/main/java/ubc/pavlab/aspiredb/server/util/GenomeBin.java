@@ -22,6 +22,8 @@ package ubc.pavlab.aspiredb.server.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import ubc.pavlab.aspiredb.shared.GenomicRange;
+
 /**
  * Map genomic locations to 'bins' to speed up range queries (based on Jim Kent's UCSC goldenpath code). See
  * http://genome.cshlp.org/content/12/6/996/F7.expansion.html and
@@ -30,6 +32,12 @@ import java.util.List;
  * @author paul
  */
 public class GenomeBin {
+
+    /**
+     * 
+     */
+    private static final int HASH_INITIALIZER = 17;
+    private static final int HASH_MULTIPLIER = 31;
 
     private static int _binFirstShift = 17; /* How much to shift to get to finest bin. */
 
@@ -47,11 +55,32 @@ public class GenomeBin {
     /**
      * return bin that this start-end segment is in
      */
-    public static int binFromRange( int start, int end ) {
+    public static int binFromRange( String chromosome, int start, int end ) {
         assert end >= start;
         // if ( end <= BINRANGE_MAXEND_512M )
-        return binFromRangeStandard( start, end );
+        int baseBin = binFromRangeStandard( start, end );
+
+        // FIXME we could store the chromosome in a more significant bit along with the baseBin.
+        return hash( chromosome, baseBin );
+
         // return binFromRangeExtended( start, end );
+    }
+
+    /**
+     * @param range
+     * @return
+     */
+    public static int binFromRange( GenomicRange range ) {
+        return binFromRange( range.getChromosome(), range.getBaseStart(), range.getBaseEnd() );
+    }
+
+    /**
+     * @param chromosome
+     * @param baseBin
+     * @return
+     */
+    public static int hash( String chromosome, int baseBin ) {
+        return ( HASH_INITIALIZER * HASH_MULTIPLIER + chromosome.hashCode() ) * HASH_MULTIPLIER + baseBin;
     }
 
     /**
@@ -61,7 +90,7 @@ public class GenomeBin {
      * @param end
      * @return
      */
-    public static List<Integer> relevantBins( int start, int end ) {
+    public static List<Integer> relevantBins( String chromosome, int start, int end ) {
         assert end >= start;
 
         List<Integer> bins = new ArrayList<>();
@@ -74,7 +103,8 @@ public class GenomeBin {
 
             // add all the bins at this level
             for ( int j = startBin; j <= endBin; j++ ) {
-                bins.add( binOffsets[i] + j );
+                int baseBin = binOffsets[i] + j;
+                bins.add( hash( chromosome, baseBin ) );
             }
 
             startBin >>= _binNextShift;

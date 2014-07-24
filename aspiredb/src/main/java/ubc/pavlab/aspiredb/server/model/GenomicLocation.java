@@ -63,7 +63,7 @@ public class GenomicLocation {
         this.chromosome = chromosome;
         this.start = start;
         this.end = end;
-        this.bin = GenomeBin.binFromRange( start, end );
+        this.bin = GenomeBin.binFromRange( chromosome, start, end );
     }
 
     private GenomicLocation() {

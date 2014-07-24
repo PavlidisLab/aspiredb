@@ -146,4 +146,5 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
         return count.intValue();
 
     }
+
 }

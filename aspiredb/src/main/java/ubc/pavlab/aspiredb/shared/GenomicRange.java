@@ -46,7 +46,7 @@ public class GenomicRange implements Displayable, Serializable, Comparable<Genom
         this.chromosome = chromosome;
         this.baseStart = Math.min( start, end );
         this.baseEnd = Math.max( start, end );
-        this.bin = GenomeBin.binFromRange( start, end );
+        this.bin = GenomeBin.binFromRange( chromosome, start, end );
     }
 
     public GenomicRange( String chromosome, String bandStart, String bandEnd ) {

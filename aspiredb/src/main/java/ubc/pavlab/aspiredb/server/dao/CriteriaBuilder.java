@@ -286,19 +286,20 @@ public class CriteriaBuilder {
      */
     private static Criterion overlapsGenomicRegionCriterion( GenomicRange range ) {
 
-        List<Integer> bins = GenomeBin.relevantBins( range.getBaseStart(), range.getBaseEnd() );
+        List<Integer> bins = GenomeBin.relevantBins( range.getChromosome(), range.getBaseStart(), range.getBaseEnd() );
 
-        // debug code - generates native SQL to check things
+        // debug code - generates native SQL to check things relating to a test
         // System.err.println( range + " " + " length=" + ( range.getBaseEnd() - range.getBaseStart() ) + " bins="
         // + StringUtils.join( bins, "," ) );
-        // if ( range.getChromosome().equals( "17" ) || range.getChromosome().equals( "4" ) ) {
-        // System.err.println( String.format( "select distinct location1_.* from GENOMIC_LOC location1_ where "
-        // + "location1_.BIN in (%s) and location1_.CHROMOSOME='%s' and "
-        // + "( (location1_.START>=%d and location1_.END<=%d) "
+        // if ( range.getChromosome().equals( "17" ) ) {
+        // System.err.println( range
+        // + " >> "
+        // + String.format( "select distinct location1_.* from GENOMIC_LOC location1_ where "
+        // + "location1_.BIN in (%s)  and " + "( (location1_.START>=%d and location1_.END<=%d) "
         // + "or (location1_.START<=%d and location1_.END>=%d) "
         // + "or (location1_.START<=%d and location1_.END>=%d) ); ", StringUtils.join( bins, "," ),
-        // range.getChromosome(), range.getBaseStart(), range.getBaseEnd(), range.getBaseStart(),
-        // range.getBaseStart(), range.getBaseEnd(), range.getBaseEnd() ) );
+        // range.getBaseStart(), range.getBaseEnd(), range.getBaseStart(), range.getBaseStart(),
+        // range.getBaseEnd(), range.getBaseEnd() ) );
         // }
 
         Junction variantInsideRegion = Restrictions.conjunction()
@@ -315,10 +316,9 @@ public class CriteriaBuilder {
 
         // Note addition of bin restriction. We only care about variants that fall into one of the bins touched by the
         // given range
-        Criterion rangeCriterion = Restrictions
-                .conjunction()
+        Criterion rangeCriterion = Restrictions.conjunction()
                 .add( Restrictions.in( "location.bin", bins ) )
-                .add( Restrictions.eq( "location.chromosome", range.getChromosome() ) )
+                // .add( Restrictions.eq( "location.chromosome", range.getChromosome() ) ) // bin includes chromosome.
                 .add( Restrictions.disjunction().add( variantInsideRegion ).add( variantHitsStartOfRegion )
                         .add( variantHitsEndOfRegion ) );
 

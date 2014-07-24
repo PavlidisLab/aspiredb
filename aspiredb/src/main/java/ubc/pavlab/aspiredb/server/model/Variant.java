@@ -56,25 +56,6 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 @DiscriminatorColumn(name = "discriminator", discriminatorType = DiscriminatorType.STRING)
 public abstract class Variant implements SecuredNotChild, ValueObjectConvertible<VariantValueObject> {
 
-    @Override
-    public String toString() {
-        return "Variant [id=" + id + ", subject=" + subject + ", location=" + location + "]";
-    }
-
-    @Id
-    @GeneratedValue
-    @Column(name = "ID")
-    private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "PATIENT_ID")
-    private Subject subject;
-
-    @OneToOne(fetch = FetchType.EAGER)
-    @Cascade(CascadeType.SAVE_UPDATE)
-    @JoinColumn(name = "GENOMELOC_ID")
-    private GenomicLocation location;
-
     @OneToMany(cascade = javax.persistence.CascadeType.ALL)
     @JoinTable(name = "VARIANT_CHARACTERISTIC", joinColumns = { @JoinColumn(name = "VARIANT_FK") }, inverseJoinColumns = { @JoinColumn(name = "CHARACTERISTIC_FK") })
     protected List<Characteristic> characteristics;
@@ -83,18 +64,54 @@ public abstract class Variant implements SecuredNotChild, ValueObjectConvertible
     @JoinTable(name = "VARIANT_LABEL", joinColumns = { @JoinColumn(name = "VARIANT_FK", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "LABEL_FK", referencedColumnName = "ID") })
     protected Set<Label> labels = new HashSet<Label>();
 
-    @Column(name = "USERVARIANTID")
-    private String userVariantId;
-
     @Column(name = "DESCRIPTION")
     private String description;
 
     @Column(name = "EXTERNALID")
     private String externalId;
 
+    @Id
+    @GeneratedValue
+    @Column(name = "ID")
+    private Long id;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @Cascade(CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "GENOMELOC_ID")
+    private GenomicLocation location;
+
+    @ManyToOne
+    @JoinColumn(name = "PATIENT_ID")
+    private Subject subject;
+
+    @Column(name = "USERVARIANTID")
+    private String userVariantId;
+
     // TODO: has to be unique
     public void addLabel( Label label ) {
         this.labels.add( label );
+    }
+
+    @Override
+    public boolean equals( Object obj ) {
+        if ( this == obj ) {
+            return true;
+        }
+        if ( obj == null ) {
+            return false;
+        }
+        if ( getClass() != obj.getClass() ) {
+            return false;
+        }
+        Variant other = ( Variant ) obj;
+        if ( id == null ) {
+            if ( other.id != null ) {
+                return false;
+            }
+        } else if ( !id.equals( other.id ) ) {
+            return false;
+        }
+        return true;
     }
 
     public List<Characteristic> getCharacteristics() {
@@ -128,6 +145,14 @@ public abstract class Variant implements SecuredNotChild, ValueObjectConvertible
 
     public String getUserVariantId() {
         return userVariantId;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ( ( id == null ) ? 0 : id.hashCode() );
+        return result;
     }
 
     public void removeLabel( Label label ) {
@@ -164,5 +189,10 @@ public abstract class Variant implements SecuredNotChild, ValueObjectConvertible
 
     public void setUserVariantId( String userVariantId ) {
         this.userVariantId = userVariantId;
+    }
+
+    @Override
+    public String toString() {
+        return "Variant [id=" + id + ", subject=" + subject + ", location=" + location + "]";
     }
 }

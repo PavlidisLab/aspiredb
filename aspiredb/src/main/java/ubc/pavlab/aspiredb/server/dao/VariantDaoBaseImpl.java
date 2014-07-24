@@ -86,6 +86,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Collection<T> findByGenomicLocation( GenomicRange range, Collection<Long> activeProjectIds ) {
         SimpleRestriction restriction = new SimpleRestriction( new GenomicLocationProperty(), Operator.IS_IN_SET, range );
 
