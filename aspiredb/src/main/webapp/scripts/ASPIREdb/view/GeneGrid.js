@@ -158,7 +158,7 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
 
             // TODO: have to populate human taxon gene list auto complete features
             var genesymbol = ref.down( '#geneName' ).getValue();
-            console.log( 'added genes name  : ' + genesymbol );
+            //console.log( 'added genes name  : ' + genesymbol );
             var geneSetName = ref.selectedGeneSet[0].data.geneSetName;
             var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
             var grid = panel.down( '#geneGrid' );
@@ -166,7 +166,7 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
             UserGeneSetService.isGeneInGeneSet( geneSetName, genesymbol, {
                callback : function(gvoSta) {
                   if ( gvoSta ) {
-                     Ext.Msg.alert( 'Gen Set', 'Gene already exist in gene set' );
+                     Ext.Msg.alert( 'Gene Set', 'Gene already exist in gene set' );
                      grid.down( '#geneName' ).setValue( '' );
                   } else if ( ref.selectedGeneSet[0] != null ) {
                      UserGeneSetService.addGenes( geneSetName, genesymbol, {

@@ -19,6 +19,7 @@ import java.util.List;
 
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
+import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 
 /**
@@ -41,5 +42,9 @@ public interface UserManagerService {
     public List<String> findGroupMemebers( String groupName );
 
     public String deleteGroup( String groupName );
+
+    public void addUserToGroup( String groupName, String userName );
+
+    public Collection<User> suggestGroupMemebers( SuggestionContext suggestionContext, String groupName );
 
 }
