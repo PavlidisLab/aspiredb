@@ -196,6 +196,10 @@ public class UserDaoImpl extends DaoBaseImpl<User> implements UserDao {
     return this.getHibernateTemplate().findByNamedParam( "from User u where u.userName like '%"+queryString+"%", "userName", queryString );
     }
     
+    @Override
+    public Collection<User> suggestUserByEmail(final String queryString){
+    return this.getHibernateTemplate().findByNamedParam( "from User u where u.email like '%"+queryString+"%", "userName", queryString );
+    }
     
 
     @Override

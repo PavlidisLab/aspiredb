@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +36,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import antlr.StringUtils;
+import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
+import ubc.pavlab.aspiredb.shared.GeneValueObject;
+import ubc.pavlab.aspiredb.shared.query.GeneProperty;
+import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 /**
  * User Gene Set Service DWR's Created to access the User Gene Set Mysql values for the client side development
@@ -114,7 +120,7 @@ public class UserManagerServiceImpl implements UserManagerService {
      */
     @Override
     @Transactional
-    public String deleteUserGroup( String groupName ) {
+    public String deleteUserFromGroup( String groupName ) {
 
         try {
             securityService.removeUserFromGroup( getCurrentUsername(), groupName );
@@ -124,6 +130,17 @@ public class UserManagerServiceImpl implements UserManagerService {
         return "Success";
     }
    
+    @Override
+    @Transactional
+    public String deleteGroup( String groupName ) {
+
+        try {
+            userManager.deleteGroup( groupName );
+        } catch ( Exception exception ) {
+            return exception.toString();
+        }
+        return "Success";
+    }
 
     @Override
     @Transactional
@@ -152,7 +169,32 @@ public class UserManagerServiceImpl implements UserManagerService {
         return members;
     }
     
+    @Override
+    @Transactional
+    public void addUserToGroup( String groupName, String userName ) {
+        userManager.addUserToGroup( userName, groupName );
+    }
   
+    @Override
+    @RemoteMethod   
+    public Collection<User> suggestGroupMemebers( SuggestionContext suggestionContext , String groupName){
+
+        Collection<User> users = new ArrayList<User>();
+
+        String query = suggestionContext.getValuePrefix();
+        if ( query.length() >= 2 ) {
+            final Collection<String> userNames = findGroupMemebers( groupName );          
+            
+            for ( String username : userNames ) {
+                User user = new User();
+               // geneProperty.setName( gene.getName() );
+              //  geneProperty.setDisplayName( gene.getSymbol() );
+               // geneSymbols.add( geneProperty );
+            }
+        }
+
+        return users;
+    }
     /*
      * (non-Javadoc)
      * 
