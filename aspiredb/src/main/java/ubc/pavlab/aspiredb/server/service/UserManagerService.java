@@ -28,7 +28,7 @@ public interface UserManagerService {
 
     public String createUserGroup( String groupName );
     
-    public String deleteUserGroup( String groupName );
+    public String deleteUserFromGroup( String groupName );
 
     public Collection<String> loadUserEditableGroups();
 
@@ -39,5 +39,7 @@ public interface UserManagerService {
     public String getCurrentUsername();
 
     public List<String> findGroupMemebers( String groupName );
+
+    public String deleteGroup( String groupName );
 
 }

@@ -17,7 +17,8 @@
  *
  */
 
-Ext.require( [ 'ASPIREdb.store.UserGroupStore', 'ASPIREdb.TextDataDownloadWindow', 'Ext.grid.*', 'Ext.data.*', 'Ext.util.*', 'Ext.state.*', 'Ext.form.*' ] );
+Ext.require( [ 'ASPIREdb.store.UserGroupStore', 'ASPIREdb.TextDataDownloadWindow', 'Ext.grid.*', 'Ext.data.*',
+              'Ext.util.*', 'Ext.state.*', 'Ext.form.*' ] );
 
 var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
    // clicksToMoveEditor: 1,
@@ -35,7 +36,8 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
    store : Ext.create( 'ASPIREdb.store.UserGroupStore' ),
 
    config : {
-      // collection of all the PhenotypeSummaryValueObject loaded
+      // collection of all the PhenotypeSummaryValueObject
+      // loaded
       LoadedUserGroupNames : [],
       // collection of selected user group value objects
       selUserGroup : [],
@@ -96,9 +98,9 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
           * UserUserGroupService.findUserUserGroup( me.selUserGroup[0].data.userGroupName, { callback : function(gsvo) {
           * console.log( 'found user group name ' + gsvo.name + ' description' + gsvo.description ); gsvo.name =
           * record.data.userGroupName; gsvo.description = record.data.geneDescription; console.log( 'AFTER UPDATE -
-          * found user group name ' + gsvo.name + ' description' + ' to string ' + gsvo.description + gsvo.id );
-          *  // /////////////////////////////// /** UserUserGroupService.updateUserUserGroup( ug, { callback :
-          * function() { console.log('testing the update user user group**********'); // me.getView().refresh();
+          * found user group name ' + gsvo.name + ' description' + ' to string ' + gsvo.description + gsvo.id ); //
+          * /////////////////////////////// /** UserUserGroupService.updateUserUserGroup( ug, { callback : function() {
+          * console.log('testing the update user user group**********'); // me.getView().refresh();
           * ASPIREdb.EVENT_BUS.fireEvent( 'geneset_updated' ); }, errorHandler : function(er, exception) {
           * Ext.Msg.alert( "Update user user group Error", er + "\n" + exception.stack ); console.log( exception.stack ); } } );
           */
@@ -134,13 +136,13 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
       this.selUserGroup = this.getSelectionModel().getSelection();
       var userGroupName = this.selUserGroup[0].data.groupName;
 
-     //find members of the selected user group
-      UserManagerService.findGroupMemebers(userGroupName, {
-         callback : function(gms) { 
+      // find members of the selected user group
+      UserManagerService.findGroupMemebers( userGroupName, {
+         callback : function(gms) {
             me.populateGeneGrid( gms );
          }
-      });
-     
+      } );
+
       ASPIREdb.EVENT_BUS.fireEvent( 'userGroup_selected', this.selUserGroup );
 
    },
@@ -153,7 +155,7 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
 
       var data = [];
       for (var i = 0; i < gms.length; i++) {
-         var gm= gms[i];
+         var gm = gms[i];
          var row = [ gm, '' ];
          data.push( row );
       }
@@ -190,22 +192,35 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
          icon : 'scripts/ASPIREdb/resources/images/icons/group_add.png',
          // TODO: Need a better workaround
          handler : function() {
+            // var ref=this;
 
             var newUserGroupName = ref.down( '#userGroupName' ).getValue();
-            var ref=this; 
 
             geneValueObjects = [];
             geneValueObjects.push( new GeneValueObject() );
-/**
+
             UserManagerService.createUserGroup( newUserGroupName, {
                callback : function(status) {
-                  if (status =="Success"){
-                    // Ext.Msg.alert( 'Success','You have successfully created the group' );
-                     
+                  if ( status == "Success" ) {
+                     // Ext.Msg.alert(
+                     // 'Success','You
+                     // have
+                     // successfully
+                     // created
+                     // the
+                     // group'
+                     // );
+
                      var panel = ASPIREdb.view.UserManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
                      var userGroupGrid = panel.down( '#userGroupGrid' );
-                     
-                     // add gene set name to geneset grid
+
+                     // add
+                     // gene
+                     // set
+                     // name
+                     // to
+                     // geneset
+                     // grid
                      var data = [];
                      var row = [ newUserGroupName, '', 0 ];
                      data.push( row );
@@ -213,19 +228,27 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
                      userGroupGrid.getView().refresh( true );
                      userGroupGrid.setLoading( false );
 
-                     var panel = ASPIREdb.view.UserManagerWindow.down( '#ASPIREdb_UserManagerpanel' );;
+                     var panel = ASPIREdb.view.UserManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
+                     ;
                      var userGroupMemeberGrid = panel.down( '#groupMemeberGrid' );
-                     
+
                      userGroupMemeberGrid.store.removeAll( true );
                      ref.down( '#userGroupName' ).setValue( '' );
-                   //  console.log( 'returned gene value object : ' + gvoId );
+                     // console.log(
+                     // 'returned
+                     // gene
+                     // value
+                     // object
+                     // : '
+                     // +
+                     // gvoId
+                     // );
                      ASPIREdb.view.UserManagerWindow.fireEvent( 'new_user_group' );
-                     
-                     
+
                   }
                }
-            } );*/
-    
+            } );
+
          }
       } );
 
@@ -236,24 +259,26 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
          tooltip : 'Remove the selected user group',
          icon : 'scripts/ASPIREdb/resources/images/icons/group_delete.png',
          handler : function() {
-            // Delete user group
-            UserManagerService.deleteUserGroup( ref.selGeneSet[0].data.geneSetName, {
-               callback : function() {
-                  var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
-                  var geneSetGrid = panel.down( '#geneSetGrid' );
-                  var selection = geneSetGrid.getView().getSelectionModel().getSelection()[0];
-                  if ( selection ) {
-                     geneSetGrid.store.remove( selection );
-                  }
+            var test = ref.selUserGroup[0].data.groupName;
 
-                  console.log( 'selected geneset :' + ref.selGeneSet[0].data.geneSetName + ' deleted' );
+            // Delete user group
+            UserManagerService.deleteGroup( ref.selUserGroup[0].data.groupName, {
+               callback : function(status) {
+                  if ( status == "Success" ) {
+                     var panel = ASPIREdb.view.UserManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
+                     var userGroupGrid = panel.down( '#userGroupGrid' );
+
+                     var selection = userGroupGrid.getView().getSelectionModel().getSelection()[0];
+                     if ( selection ) {
+                        userGroupGrid.store.remove( selection );
+                     }
+
+                     console.log( 'selected user group :' + ref.selUserGroup[0].data.groupName + ' deleted' );
+                  }
                }
             } );
-
-         
-     
-
          }
+
       } );
 
    }

@@ -149,7 +149,7 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
 
       this.getDockedComponent( 'groupMemeberGridToolbar' ).add( {
          xtype : 'button',
-         id : 'addGroupMemebr',
+         id : 'addGroupMemeber',
          text : '',
          tooltip : 'Add group members to selected group',
          icon : 'scripts/ASPIREdb/resources/images/icons/user_add.png',
@@ -162,47 +162,18 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
             var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
             var grid = panel.down( '#groupMemeberGrid' );
 
-          /**  UserGeneSetService.isGeneInGeneSet( groupMemberSetName, groupMembersymbol, {
-               callback : function(gvoSta) {
-                  if ( gvoSta ) {
-                     Ext.Msg.alert( 'User Group', 'Group Memebr already exist in user group' );
-                     grid.down( '#groupMemberName' ).setValue( '' );
-                  } else if ( ref.selectedGeneSet[0] != null ) {
-                     UserGeneSetService.addGenes( groupMemberSetName, groupMembersymbol, {
-                        callback : function(gvo) {
+            UserManagerService.deleteUserFromGroup( ref.selGeneSet[0].data.geneSetName, {
+                callback : function() {
+                   var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
+                   var geneSetGrid = panel.down( '#geneSetGrid' );
+                   var selection = geneSetGrid.getView().getSelectionModel().getSelection()[0];
+                   if ( selection ) {
+                      geneSetGrid.store.remove( selection );
+                   }
 
-                           var data = [];
-                           var row = [ groupMembersymbol, gvo.groupMemberBioType, gvo.name, '' ];
-                           data.push( row );
-
-                           // TODO : refresh grid when loaded
-                           grid.store.add( data );
-                           grid.getView().refresh( true );
-                           grid.setLoading( false );
-                           grid.down( '#groupMemberName' ).setValue( '' );
-
-                           ASPIREdb.EVENT_BUS.fireEvent( 'groupMember_added', data );
-                           // update the groupMember set grid size
-                           var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
-                           var userGroupGrid = panel.down( '#userGroupGrid' );
-
-                           var selection = userGroupGrid.getView().getSelectionModel().getSelection()[0];
-                           if ( selection ) {
-                              var oldSize = selection.data.userGroupSize;
-                              selection.set( 'userGroupSize', parseInt( oldSize ) + 1 );
-                           }
-
-                        },
-                        errorHandler : function(er, exception) {
-                           Ext.Msg.alert( "Group Memeber Grid Error", er + "\n" + exception.stack );
-                           console.log( exception.stack );
-                        }
-                     } );
-                  } else
-                     Ext.Msg.alert( 'Error', 'select the Group Name to add Memebers ' );
-
-               }
-            } );*/
+                   console.log( 'selected geneset :' + ref.selGeneSet[0].data.geneSetName + ' deleted' );
+                }
+             } );
 
          }
       } );

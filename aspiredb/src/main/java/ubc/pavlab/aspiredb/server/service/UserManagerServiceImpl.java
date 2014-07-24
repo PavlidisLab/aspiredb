@@ -114,7 +114,7 @@ public class UserManagerServiceImpl implements UserManagerService {
      */
     @Override
     @Transactional
-    public String deleteUserGroup( String groupName ) {
+    public String deleteUserFromGroup( String groupName ) {
 
         try {
             securityService.removeUserFromGroup( getCurrentUsername(), groupName );
@@ -124,6 +124,17 @@ public class UserManagerServiceImpl implements UserManagerService {
         return "Success";
     }
    
+    @Override
+    @Transactional
+    public String deleteGroup( String groupName ) {
+
+        try {
+            userManager.deleteGroup( groupName );
+        } catch ( Exception exception ) {
+            return exception.toString();
+        }
+        return "Success";
+    }
 
     @Override
     @Transactional
