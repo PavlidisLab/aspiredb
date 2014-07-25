@@ -90,7 +90,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
     final String patientIdWithOverlap = RandomStringUtils.randomAlphabetic( 5 );
     final String projectNameWithOverlap = "DGV";
 
-    @Test
+    // @Test
     public void testPopulateSpecialProjectOverlap() {
 
         List<VariantValueObject> cnvList = new ArrayList<>();
