@@ -287,124 +287,97 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
       propertyComboBox.on( 'select', function(obj, records) {
          var record = records[0];
          var value = record.data.displayName;
-         
+
          if ( value == "CNV Characteristics" ) {
             var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
             subPropertyComboBox.setVisible( true );
-            // combo box
-            /**
-             * var subCombo = Ext.create( 'Ext.form.ComboBox', { itemId : 'subPropertyComboBox', emptyText : 'subname', //
-             * padding : '10 0 0 0', suggestValuesRemoteFunction : VariantService.suggestValues, store : { proxy : {
-             * type : 'dwr', dwrFunction : VariantService.suggestPropertiesForVariantType, dwrParams : [ 'CNV' ], model :
-             * 'ASPIREdb.model.Property', reader : { type : 'json', root : 'data', totalProperty : 'count' } } },
-             * displayField : 'displayName', filterItemType : 'ASPIREdb.view.filter.PropertyFilter', } );
-             */
+            subPropertyComboBox.store.proxy.dwrParams[0] = "CNV";
 
-            // me.add( subCombo );
-            
-            // context menu
-            VariantService.suggestPropertiesForVariantType( 'CNV', {
-               callback : function(Properties) {                  
-                                    
-                  var menuItems = [];
-                  // TODO: context menu handlers
-                  for (var i = 0; i < Properties.length; i++) {
-                     menuItems.push( {
-                        text : Properties[i].displayName,
-                        scope : me,
-                        listeners : {
-                           itemclick : function(item) {
-                              alert( "selected item " + item.displayName );
-                              me.selectedProperty = item;
-                           }
-                        },
-                        handler : me.contextMenuSelectionHandler,
-                     } );
+            var storeInstance = Ext.create( 'Ext.data.Store', {
+               proxy : {
+                  type : 'dwr',
+                  dwrFunction : VariantService.suggestPropertiesForVariantType,
+                  dwrParams : [ 'CNV' ],
+                  model : 'ASPIREdb.model.Property',
+                  reader : {
+                     type : 'json',
+                     root : 'data',
+                     totalProperty : 'count'
                   }
-
-                  var contextMenu = new Ext.menu.Menu( {
-                     items : menuItems,
-
-                  } );
-
-                  contextMenu.showAt( 650, 410 );
-               }
+               },
+               sortOnLoad : true,
+               autoLoad : true
             } );
+
+            subPropertyComboBox.store.reload( storeInstance );
+
+            // context menu
+            /**
+             * VariantService.suggestPropertiesForVariantType( 'CNV', { callback : function(Properties) {
+             * 
+             * 
+             * var menuItems = []; // TODO: context menu handlers for (var i = 0; i < Properties.length; i++) {
+             * menuItems.push( { text : Properties[i].displayName, scope : me, listeners : { itemclick : function(item) {
+             * alert( "selected item " + item.displayName ); me.selectedProperty = item; } }, handler :
+             * me.contextMenuSelectionHandler, } ); }
+             * 
+             * var contextMenu = new Ext.menu.Menu( { items : menuItems, } );
+             * 
+             * contextMenu.showAt( 650, 410 ); } } );
+             */
 
          } else if ( value == "SNV Characteristics" ) {
 
             var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
             subPropertyComboBox.setVisible( true );
-            //subPropertyComboBox.store.removeAll();
 
-            // context menu
-            VariantService.suggestPropertiesForVariantType( 'SNV', {
-               callback : function(Properties) {
-                //  subPropertyComboBox.store.loadRecords(Properties);               
-              /**    subPropertyComboBox.store=Ext.create('Ext.data.Store', {
-                     proxy : {
-                        type : 'dwr',
-                        dwrFunction : VariantService.suggestPropertiesForVariantType,
-                        dwrParams : [ 'SNV' ],
-                        model : 'ASPIREdb.model.Property',
-                        reader : {
-                           type : 'json',
-                           root : 'data',
-                           totalProperty : 'count'
-                        }
-                     },
-                     sortOnLoad: true,
-                     autoLoad: true
-                 });*/
-                  
-                  var menuItems = [];
-                  // TODO: context menu handlers
-                  for (var i = 0; i < Properties.length; i++) {
-                     menuItems.push( {
-                        text : Properties[i].displayName,
-                        scope : me,
-                        handler : me.contextMenuSelectionHandler,
-                     } );
+            subPropertyComboBox.store.proxy.dwrParams[0] = "SNV";
+            var storeInstance = Ext.create( 'Ext.data.Store', {
+               proxy : {
+                  type : 'dwr',
+                  dwrFunction : VariantService.suggestPropertiesForVariantType,
+                  dwrParams : [ 'SNV' ],
+                  model : 'ASPIREdb.model.Property',
+                  reader : {
+                     type : 'json',
+                     root : 'data',
+                     totalProperty : 'count'
                   }
-
-                  var contextMenu = new Ext.menu.Menu( {
-                     items : menuItems,
-
-                  } );
-
-                  contextMenu.showAt( 650, 410 );
-               }
+               },
+               sortOnLoad : true,
+               autoLoad : true
             } );
+
+            subPropertyComboBox.store.reload( storeInstance );
+
          } else if ( value == "Indel Characteristics" ) {
             var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
             subPropertyComboBox.setVisible( true );
-            
-            // context menu
-            VariantService.suggestPropertiesForVariantType( 'INDEL', {
-               callback : function(Properties) {
-                  
-                  
-                  subPropertyComboBox.removeAll();
-                  subPropertyComboBox.setStore(Properties);
-                  
-                  var menuItems = [];
-                  // TODO: context menu handlers
-                  for (var i = 0; i < Properties.length; i++) {
-                     menuItems.push( {
-                        text : Properties[i].displayName,
-                        scope : me,
-                        handler : me.contextMenuSelectionHandler,
-                     } );
+            // subPropertyComboBox.store.removeAll();
+            subPropertyComboBox.store.proxy.dwrParams[0] = "INDEL";
+
+            var storeInstance = Ext.create( 'Ext.data.Store', {
+               proxy : {
+                  type : 'dwr',
+                  dwrFunction : VariantService.suggestPropertiesForVariantType,
+                  dwrParams : [ 'INDEL' ],
+                  model : 'ASPIREdb.model.Property',
+                  reader : {
+                     type : 'json',
+                     root : 'data',
+                     totalProperty : 'count'
                   }
-
-                  var contextMenu = new Ext.menu.Menu( {
-                     items : menuItems,
-
-                  } );
-
-                  contextMenu.showAt( 650, 410 );
-               }
+               },
+               sortOnLoad : true,
+               autoLoad : true
             } );
+
+            subPropertyComboBox.store.reload( storeInstance );
+
+         }
+         else {
+            var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
+            subPropertyComboBox.setVisible( false);
          }
 
          // update examples
