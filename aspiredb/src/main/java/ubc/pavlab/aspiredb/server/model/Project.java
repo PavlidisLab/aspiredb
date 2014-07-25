@@ -47,23 +47,23 @@ public class Project implements Securable {
         return valueObject;
     }
 
+    @Column(name = "DESCRIPTION")
+    private String description;
+
     @Id
     @GeneratedValue
     @Column(name = "ID")
     private Long id;
 
-    @ManyToMany(mappedBy = "projects")
-    private List<Subject> subjects = new ArrayList<Subject>();
-
     @Column(name = "NAME", unique = true)
     private String name;
-
-    @Column(name = "DESCRIPTION")
-    private String description;
 
     // e.g. DECIPHER or DGV data
     @Column(name = "SPECIAL_DATA")
     private Boolean specialData;
+
+    @ManyToMany(mappedBy = "projects")
+    private List<Subject> subjects = new ArrayList<Subject>();
 
     // currently just for DGV data, the string referring to what characteristic will define the variants 'support', for
     // DGV 'pubmedid'
@@ -71,6 +71,28 @@ public class Project implements Securable {
     private String variantSupportCharacteristicKey;
 
     public Project() {
+    }
+
+    @Override
+    public boolean equals( Object obj ) {
+        if ( this == obj ) {
+            return true;
+        }
+        if ( obj == null ) {
+            return false;
+        }
+        if ( getClass() != obj.getClass() ) {
+            return false;
+        }
+        Project other = ( Project ) obj;
+        if ( id == null ) {
+            if ( other.id != null ) {
+                return false;
+            }
+        } else if ( !id.equals( other.id ) ) {
+            return false;
+        }
+        return true;
     }
 
     public String getDescription() {
@@ -98,6 +120,14 @@ public class Project implements Securable {
         return variantSupportCharacteristicKey;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ( ( id == null ) ? 0 : id.hashCode() );
+        return result;
+    }
+
     public void setDescription( String description ) {
         this.description = description;
     }
@@ -116,6 +146,11 @@ public class Project implements Securable {
 
     public void setVariantSupportCharacteristicKey( String variantSupportCharacteristicKey ) {
         this.variantSupportCharacteristicKey = variantSupportCharacteristicKey;
+    }
+
+    @Override
+    public String toString() {
+        return "Project [id=" + id + ", name=" + name + "]";
     }
 
 }

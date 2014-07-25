@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -70,10 +71,10 @@ public class Subject implements Serializable, Securable {
     @JoinTable(name = "SUBJECT_PROJECTS", joinColumns = { @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "PROJECT_ID", referencedColumnName = "ID") })
     private List<Project> projects = new ArrayList<Project>();
 
-    @OneToMany(mappedBy = "subject")
+    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = "subject")
     private Collection<Phenotype> phenotypes = new HashSet<Phenotype>();
 
-    @OneToMany
+    @OneToMany(cascade = { CascadeType.ALL })
     @JoinTable(name = "SUBJECT_VARIANT", joinColumns = { @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "VARIANT_ID", referencedColumnName = "ID") })
     private List<Variant> variants;
 

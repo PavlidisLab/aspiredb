@@ -18,6 +18,7 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -31,20 +32,22 @@ import javax.persistence.Table;
  * @version $Id:$
  */
 @Entity
-@Table(name = "VARIANT2SPECIAL_VARIANT_INFO")
-public class Variant2SpecialVariantOverlap implements Serializable {
+@Table(name = "VARIANT2VARIANTOVERLAP")
+public class Variant2VariantOverlap implements Serializable {
 
     /**
      * 
      */
     private static final long serialVersionUID = 6734779432249098068L;
 
-    // note this is a composite key with variantId and overlapSpecialVariantId
     @Id
+    @GeneratedValue
+    @Column(name = "ID")
+    private Long id;
+
     @Column(name = "VARIANTID")
     private Long variantId;
 
-    @Id
     @Column(name = "OVERLAPPED_VARIANTID")
     private Long overlapSpecialVariantId;
 
@@ -66,7 +69,7 @@ public class Variant2SpecialVariantOverlap implements Serializable {
     @Column(name = "PROJECTID")
     private Long projectId;
 
-    public Variant2SpecialVariantOverlap() {
+    public Variant2VariantOverlap() {
 
     }
 
@@ -81,7 +84,7 @@ public class Variant2SpecialVariantOverlap implements Serializable {
         if ( getClass() != obj.getClass() ) {
             return false;
         }
-        Variant2SpecialVariantOverlap other = ( Variant2SpecialVariantOverlap ) obj;
+        Variant2VariantOverlap other = ( Variant2VariantOverlap ) obj;
         if ( overlapSpecialVariantId == null ) {
             if ( other.overlapSpecialVariantId != null ) {
                 return false;

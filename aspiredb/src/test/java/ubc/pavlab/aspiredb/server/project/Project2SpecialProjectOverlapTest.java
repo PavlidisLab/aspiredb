@@ -38,7 +38,7 @@ import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantOverlapDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Variant;
-import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
+import ubc.pavlab.aspiredb.server.model.Variant2VariantOverlap;
 import ubc.pavlab.aspiredb.server.service.QueryService;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.shared.BoundedList;
@@ -90,8 +90,8 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
     final String patientIdWithOverlap = RandomStringUtils.randomAlphabetic( 5 );
     final String projectNameWithOverlap = "DGV";
 
-    // @Test
-    public void testPopulateSpecialProjectOverlap() {
+    @Test
+    public void testPopulateSpecialProjectOverlap() throws Exception {
 
         List<VariantValueObject> cnvList = new ArrayList<>();
         cnvList.add( getCNV( "X", 3, 234, userVariantId, patientId ) );
@@ -101,15 +101,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         cnvList.add( getCNV( "2", 123, 235, RandomStringUtils.randomAlphabetic( 5 ), patientId ) );
         cnvList.add( getCNV( "3", 12, 236, RandomStringUtils.randomAlphabetic( 5 ), patientId ) );
 
-        try {
-
-            projectManager.addSubjectVariantsToProject( projectName, true, cnvList );
-
-        } catch ( Exception e ) {
-
-            fail( "projectManager.addSubjectVariantsToProject threw an exception" );
-
-        }
+        projectManager.addSubjectVariantsToProject( projectName, true, cnvList );
 
         List<VariantValueObject> cnvListWithOverlap = new ArrayList<>();
 
@@ -132,36 +124,18 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         cnvListWithOverlap.add( getCNV( "Y", 3, 234, null, patientIdWithOverlap ) );
 
-        try {
+        helper.deleteProject( "DGV" );
 
-            helper.deleteProject( "DGV" );
-
-            projectManager.addSubjectVariantsToSpecialProject( projectNameWithOverlap, true, cnvListWithOverlap, false );
-
-        } catch ( Exception e ) {
-
-            fail( "projectManager.addSubjectVariantsToProject threw an exception" );
-
-        }
+        projectManager.addSubjectVariantsToSpecialProject( projectNameWithOverlap, true, cnvListWithOverlap, false );
 
         Collection<Project> overlapProjects = projectDao.getSpecialOverlapProjects();
         Collection<Long> overlapProjectIds = new ArrayList<>();
 
         for ( Project p : overlapProjects ) {
-
             overlapProjectIds.add( p.getId() );
-
         }
 
-        try {
-
-            projectManager.populateProjectToProjectOverlap( projectName, projectNameWithOverlap );
-
-        } catch ( Exception e ) {
-
-            fail( "projectManager.populateSpecialProjectOverlap threw an exception:" + e.toString() );
-
-        }
+        projectManager.populateProjectToProjectOverlap( projectName, projectNameWithOverlap );
 
         Project projectToPopulate = projectDao.findByProjectName( projectName );
 
@@ -169,7 +143,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         ProjectFilterConfig projectToPopulateFilterConfig = getProjectFilterConfigById( projectToPopulate );
 
-        Set<AspireDbFilterConfig> projSet = new HashSet<AspireDbFilterConfig>();
+        Set<AspireDbFilterConfig> projSet = new HashSet<>();
         projSet.add( projectToPopulateFilterConfig );
 
         BoundedList<VariantValueObject> projToPopulateVvos = null;
@@ -195,11 +169,11 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         }
 
-        List<Long> specialProjectList = new ArrayList<Long>();
+        List<Long> specialProjectList = new ArrayList<>();
 
         specialProjectList.add( specialProject.getId() );
 
-        Collection<Variant2SpecialVariantOverlap> infos = variant2SpecialVariantOverlapDao.loadByVariantId(
+        Collection<Variant2VariantOverlap> infos = variant2SpecialVariantOverlapDao.loadByVariantId(
                 vvo.getId(), specialProjectList );
 
         Variant v = variantDao.load( vvo.getId() );
@@ -210,7 +184,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         assertEquals( 5, infos.size() );
 
-        for ( Variant2SpecialVariantOverlap vInfo : infos ) {
+        for ( Variant2VariantOverlap vInfo : infos ) {
 
             Variant specialVariant = variantDao.load( vInfo.getOverlapSpecialVariantId() );
 
