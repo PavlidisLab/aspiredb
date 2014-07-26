@@ -61,7 +61,7 @@ import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
-import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
+import ubc.pavlab.aspiredb.server.model.Variant2VariantOverlap;
 import ubc.pavlab.aspiredb.server.service.QueryService;
 import ubc.pavlab.aspiredb.server.util.GenomeBin;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
@@ -444,7 +444,7 @@ public class ProjectManagerImpl implements ProjectManager {
                     continue;
                 }
 
-                Variant2SpecialVariantOverlap overlapInfo = new Variant2SpecialVariantOverlap();
+                Variant2VariantOverlap overlapInfo = new Variant2VariantOverlap();
 
                 int start = Math.max( vvo.getGenomicRange().getBaseStart(), vvoOverlapped.getGenomicRange()
                         .getBaseStart() );

@@ -63,43 +63,43 @@ import ubc.pavlab.aspiredb.shared.LabelValueObject;
 public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelper {
 
     @Autowired
-    IndelDao indelDao;
+    private IndelDao indelDao;
 
     @Autowired
-    LabelDao labelDao;
+    private LabelDao labelDao;
 
     @Autowired
-    TranslocationDao translocationDao;
+    private TranslocationDao translocationDao;
 
     @Autowired
-    CNVDao cnvDao;
+    private CNVDao cnvDao;
 
     @Autowired
-    SNVDao snvDao;
+    private SNVDao snvDao;
 
     @Autowired
-    InversionDao inversionDao;
+    private InversionDao inversionDao;
 
     @Autowired
-    SubjectDao subjectDao;
+    private SubjectDao subjectDao;
 
     @Autowired
-    SecurityService securityService;
+    private SecurityService securityService;
 
     @Autowired
-    ProjectDao projectDao;
+    private ProjectDao projectDao;
 
     @Autowired
-    Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
+    private Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
 
     @Autowired
-    PhenotypeDao phenotypeDao;
+    private PhenotypeDao phenotypeDao;
 
     @Autowired
-    PhenotypeUtil phenotypeUtil;
+    private PhenotypeUtil phenotypeUtil;
 
     @Autowired
-    VariantDao variantDao;
+    private VariantDao variantDao;
 
     public PersistentTestObjectHelperImpl() {
     }
@@ -386,14 +386,13 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
             try {
 
                 for ( Phenotype p : s.getPhenotypes() ) {
-                    phenotypeDao.remove( p );
+                    p.setSubject( null );
                 }
 
                 for ( Variant v : s.getVariants() ) {
-                    variantDao.remove( v );
+                    v.setSubject( null );
                 }
-                s.getPhenotypes().clear();
-                s.getVariants().clear();
+
                 subjectDao.remove( s );
 
             } catch ( Exception e ) {

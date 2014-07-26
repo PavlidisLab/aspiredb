@@ -26,7 +26,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.model.Project;
-import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
+import ubc.pavlab.aspiredb.server.model.Variant2VariantOverlap;
 
 @Repository("projectDao")
 public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements ProjectDao {
@@ -74,7 +74,7 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
 
             if ( p.getSpecialData() == null || !p.getSpecialData() ) {
 
-                Collection<Variant2SpecialVariantOverlap> overlaps = v2vOverlapDao.loadByProjectIdAndOverlapProjectId(
+                Collection<Variant2VariantOverlap> overlaps = v2vOverlapDao.loadByProjectIdAndOverlapProjectId(
                         activeProjectId, p.getId() );
 
                 if ( overlaps.size() > 0 ) {

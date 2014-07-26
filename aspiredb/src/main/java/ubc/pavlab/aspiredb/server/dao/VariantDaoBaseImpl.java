@@ -38,7 +38,7 @@ import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.model.Characteristic;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
-import ubc.pavlab.aspiredb.server.model.Variant2SpecialVariantOverlap;
+import ubc.pavlab.aspiredb.server.model.Variant2VariantOverlap;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.NumericValue;
@@ -182,7 +182,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         // Iterate over all variants in active Projects to see if they meet the restriction criteria
         for ( Long vId : activeProjectsVariantIds ) {
 
-            Collection<Variant2SpecialVariantOverlap> infos = new ArrayList<>();
+            Collection<Variant2VariantOverlap> infos = new ArrayList<>();
 
             if ( hasOverlapRestriction ) {
 
@@ -198,7 +198,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
                     // exist in the Variant2SpecialVariantOverlap table
                     if ( overlapRestriction1.getOperator().equals( Operator.NUMERIC_LESS_OR_EQUAL ) ) {
 
-                        Collection<Variant2SpecialVariantOverlap> allInfos = variant2SpecialVariantOverlapDao
+                        Collection<Variant2VariantOverlap> allInfos = variant2SpecialVariantOverlapDao
                                 .loadByVariantId( vId, overlapFilter.getOverlapProjectIds() );
 
                         // Further to the comment above, if the vId's overlapinfos returned by the restriction are zero,
@@ -268,7 +268,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
                 Boolean satisfiesPhenotypeRestriction = false;
 
-                for ( Variant2SpecialVariantOverlap info : infos ) {
+                for ( Variant2VariantOverlap info : infos ) {
 
                     // if the overlapped variant has the specified phenotype associated with it
                     if ( overlapProjsPhenoAssociatedVariantIds.contains( info.getOverlapSpecialVariantId() ) ) {
@@ -473,13 +473,13 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
     // however in the case of "GREATER THAN" we only return the overlaps that meet this restriction. (we don't require
     // that "ALL OF THE VARIANTS MUST MEET THE RESTRICTION)
     // so this means that it will either be all overlaps returned or no overlaps
-    private Collection<Variant2SpecialVariantOverlap> getOverlapsSatisfyingInitialOverlapRestriction( Long vId,
+    private Collection<Variant2VariantOverlap> getOverlapsSatisfyingInitialOverlapRestriction( Long vId,
             SimpleRestriction overlapRestriction, Collection<Long> overlapProjectIds ) {
 
-        Collection<Variant2SpecialVariantOverlap> allOverlaps = variant2SpecialVariantOverlapDao.loadByVariantId( vId,
+        Collection<Variant2VariantOverlap> allOverlaps = variant2SpecialVariantOverlapDao.loadByVariantId( vId,
                 overlapProjectIds );
 
-        Collection<Variant2SpecialVariantOverlap> overlapsMeetingRestriction = variant2SpecialVariantOverlapDao
+        Collection<Variant2VariantOverlap> overlapsMeetingRestriction = variant2SpecialVariantOverlapDao
                 .loadByVariantIdAndOverlap( vId, overlapRestriction, overlapProjectIds );
 
         if ( overlapRestriction.getOperator().equals( Operator.NUMERIC_LESS_OR_EQUAL )
@@ -494,7 +494,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         }
 
-        return new ArrayList<Variant2SpecialVariantOverlap>();
+        return new ArrayList<Variant2VariantOverlap>();
 
     }
 
@@ -552,7 +552,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
     // This will be the case where the user asks: show me variants that "do"/"do not" overlap with x number of variants
     // in DGV/DECIPHER
     private Boolean satisfiesSecondaryOverlapRestriction( SimpleRestriction overlapRestriction,
-            Collection<Variant2SpecialVariantOverlap> overlaps ) {
+            Collection<Variant2VariantOverlap> overlaps ) {
 
         Operator o = overlapRestriction.getOperator();
 
@@ -571,7 +571,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
     }
 
     private Boolean satisfiesTertiaryOverlapRestriction( SimpleRestriction overlapRestriction,
-            Collection<Variant2SpecialVariantOverlap> overlaps ) {
+            Collection<Variant2VariantOverlap> overlaps ) {
         // If this is a less than, we probably have to take into account the the variants with 0 overlap????
         Set<String> supportSet = new HashSet<String>();
 
@@ -584,7 +584,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         }
 
         // note all of these overlaps are associated with the same variantId
-        for ( Variant2SpecialVariantOverlap overlap : overlaps ) {
+        for ( Variant2VariantOverlap overlap : overlaps ) {
 
             Variant v = load( overlap.getOverlapSpecialVariantId() );
 
