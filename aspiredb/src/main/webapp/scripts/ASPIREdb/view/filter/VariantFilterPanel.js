@@ -17,6 +17,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
          proxy : {
             type : 'dwr',
             dwrFunction : VariantService.suggestVariantLocationProperties,
+            //dwrParam : ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0],
             model : 'ASPIREdb.model.Property',
             reader : {
                type : 'json',

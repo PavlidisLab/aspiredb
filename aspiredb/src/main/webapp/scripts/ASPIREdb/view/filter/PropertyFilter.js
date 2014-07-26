@@ -1,5 +1,5 @@
 Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.filter.multicombo.MultiValueCombobox',
-              'ASPIREdb.model.Operator', 'ASPIREdb.view.filter.TextImportWindow' ] );
+              'ASPIREdb.model.Operator', 'ASPIREdb.view.filter.TextImportWindow', 'ASPIREdb.ActiveProjectSettings' ] );
 
 Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
    extend : 'Ext.Container',
@@ -98,7 +98,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
       var r = restriction;
 
       var propertyComboBox = this.getComponent( "propertyComboBox" );
-      // var subPropertyComboBox = this.getComponent( "subPropertyComboBox" );
+
       var operatorComboBox = this.getComponent( "operatorComboBox" );
       var multicombo_container = this.getComponent( "multicombo_container" );
       var multicombo = multicombo_container.getComponent( "multicombo" );
@@ -330,8 +330,8 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
 
             var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
             subPropertyComboBox.setVisible( true );
-
             subPropertyComboBox.store.proxy.dwrParams[0] = "SNV";
+            
             var storeInstance = Ext.create( 'Ext.data.Store', {
                proxy : {
                   type : 'dwr',
@@ -347,13 +347,12 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
                sortOnLoad : true,
                autoLoad : true
             } );
-
+            
             subPropertyComboBox.store.reload( storeInstance );
 
          } else if ( value == "Indel Characteristics" ) {
             var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
             subPropertyComboBox.setVisible( true );
-            // subPropertyComboBox.store.removeAll();
             subPropertyComboBox.store.proxy.dwrParams[0] = "INDEL";
 
             var storeInstance = Ext.create( 'Ext.data.Store', {
@@ -374,10 +373,9 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
 
             subPropertyComboBox.store.reload( storeInstance );
 
-         }
-         else {
+         } else {
             var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
-            subPropertyComboBox.setVisible( false);
+            subPropertyComboBox.setVisible( false );
          }
 
          // update examples

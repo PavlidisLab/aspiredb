@@ -146,5 +146,26 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
         return count.intValue();
 
     }
+    
+    /**  @Override
+    @Transactional(readOnly = true)
+    public Collection<Long> getVariantTypesForProjects( Long projectId ) {
+        
+
+        Query query = this
+                .getSessionFactory()
+                .getCurrentSession()
+                .createQuery(
+                        "select count(*) from Variant v join v.subject subject join subject.projects projs where projs.id in(:ids )" );
+
+        query.setParameterList( "ids", projectIds );
+
+        Long count = ( Long ) query.uniqueResult();
+
+        return count.intValue();
+
+    }*/
+    
+    
 
 }
