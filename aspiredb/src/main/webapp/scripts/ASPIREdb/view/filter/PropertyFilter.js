@@ -216,7 +216,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
             itemId : 'multicombo',
             width : 300, // 450,
             enableKeyEvents : false,
-            suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
+            suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction(),
          }, {
             xtype : 'numberfield',
             itemId : 'singleValueField',
@@ -228,7 +228,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
             itemId : 'example',
             text : '',
             style : {
-               'margin-top' : '-25px',
+              // 'margin-top' : '-25px',
                'font-size' : 'smaller',
                'color' : 'gray'
             }
