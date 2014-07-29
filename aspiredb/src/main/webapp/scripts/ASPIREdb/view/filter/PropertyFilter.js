@@ -98,7 +98,6 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
       var r = restriction;
 
       var propertyComboBox = this.getComponent( "propertyComboBox" );
-
       var operatorComboBox = this.getComponent( "operatorComboBox" );
       var multicombo_container = this.getComponent( "multicombo_container" );
       var multicombo = multicombo_container.getComponent( "multicombo" );
@@ -173,7 +172,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
       }, {
          xtype : 'combo',
          itemId : 'subPropertyComboBox',
-         emptyText : 'subname',
+         emptyText : 'Type characteristics',
          suggestValuesRemoteFunction : VariantService.suggestValues,
          store : {
             proxy : {
@@ -292,6 +291,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
             var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
             subPropertyComboBox.setVisible( true );
             subPropertyComboBox.store.proxy.dwrParams[0] = "CNV";
+            subPropertyComboBox.emptyText = 'Type characteristics';
 
             var storeInstance = Ext.create( 'Ext.data.Store', {
                proxy : {
@@ -331,6 +331,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
             var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
             subPropertyComboBox.setVisible( true );
             subPropertyComboBox.store.proxy.dwrParams[0] = "SNV";
+            subPropertyComboBox.emptyText = 'Type characteristics';
             
             var storeInstance = Ext.create( 'Ext.data.Store', {
                proxy : {
@@ -351,9 +352,11 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
             subPropertyComboBox.store.reload( storeInstance );
 
          } else if ( value == "Indel Characteristics" ) {
+            
             var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
             subPropertyComboBox.setVisible( true );
             subPropertyComboBox.store.proxy.dwrParams[0] = "INDEL";
+            subPropertyComboBox.emptyText = 'Type characteristics';
 
             var storeInstance = Ext.create( 'Ext.data.Store', {
                proxy : {
