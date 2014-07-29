@@ -303,11 +303,6 @@
             <version>1.0.9</version>
         </dependency>
         <dependency>
-            <groupId>javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.12.1.GA</version>
-        </dependency>
-        <dependency>
             <groupId>com.sencha.gxt</groupId>
             <artifactId>gxt</artifactId>
             <version>3.0.1</version>
@@ -359,11 +354,6 @@
                 </configuration>
             </plugin>
             <plugin>
-            	<groupId>com.umlet</groupId>
-            	<artifactId>umlet</artifactId>
-            	<version>12.0</version>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-eclipse-plugin</artifactId>
                 <version>2.8</version>
@@ -382,29 +372,36 @@
                     </additionalProjectnatures>
                 </configuration>
             </plugin>
+
+            <!-- mvn clean compile hibernate3:hbm2ddl -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>hibernate3-maven-plugin</artifactId>
                 <version>2.2</version>
-                <!-- using v3.0 produces ant run error -->
-                <configuration>
-                    <components>
-                        <component>
-                            <name>hbm2ddl</name>
-                            <!-- if implementation is jpaconfiguration: use persistence.xml in src/main/resources/META-INF -->
-                            <!-- if implementation is annotationconfiguration: use hibernate.cfg.xml in src/main/resources -->
-                            <implementation>annotationconfiguration</implementation>
-                        </component>
-                    </components>
-                    <componentProperties>
-                        <configurationfile>src/main/resources/hibernate.cfg.xml</configurationfile>
-                        <drop>false</drop>
-                        <create>true</create>
-                        <format>true</format>
-                        <export>false</export>
-                        <outputfilename>schema.sql</outputfilename>
-                    </componentProperties>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-cli</id>
+                        <configuration>
+                            <echo message="******* Building DDL file *******" />
+                            <components>
+                                <component>
+                                    <name>hbm2ddl</name>
+                                    <!-- if implementation is jpaconfiguration: use persistence.xml in src/main/resources/META-INF -->
+                                    <!-- if implementation is annotationconfiguration: use hibernate.cfg.xml in src/main/resources -->
+                                    <implementation>annotationconfiguration</implementation>
+                                </component>
+                            </components>
+                            <componentProperties>
+                                <configurationfile>src/main/resources/hibernate.cfg.xml</configurationfile>
+                                <drop>false</drop>
+                                <create>true</create>
+                                <format>true</format>
+                                <export>false</export>
+                                <outputfilename>schema.sql</outputfilename>
+                            </componentProperties>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- Bug 3633: aspiredbCLI.jar -->
@@ -489,6 +486,7 @@
             </plugins>
         </pluginManagement>
     </build>
+
 
     <profiles>
         <profile>
@@ -702,7 +700,7 @@
                 <site>
                     <id>localDeploy</id>
                     <name>localDeploy</name>
-                    <url>file:///space/gemmaData/baseCode-site</url>
+                    <url>file:///space/aspiredbData</url>
                 </site>
                 <repository>
                     <id>repo</id>
