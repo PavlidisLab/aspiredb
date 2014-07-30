@@ -229,10 +229,10 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
                      userGroupGrid.setLoading( false );
 
                      var panel = ASPIREdb.view.UserManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
-                     ;
                      var userGroupMemeberGrid = panel.down( '#groupMemeberGrid' );
 
                      userGroupMemeberGrid.store.removeAll( true );
+                    // userGroupMemeberGrid.getView().refresh( true );
                      ref.down( '#userGroupName' ).setValue( '' );
                      // console.log(
                      // 'returned

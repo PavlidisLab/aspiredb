@@ -22,12 +22,15 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import jsx3.app.Settings;
+
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserCache;
@@ -123,10 +126,10 @@ public class UserManagerServiceImpl implements UserManagerService {
     @Override
     @Transactional
     @RemoteMethod   
-    public String deleteUserFromGroup( String groupName ) {
+    public String deleteUserFromGroup( String groupName, String userName ) {
 
         try {
-            securityService.removeUserFromGroup( getCurrentUsername(), groupName );
+            securityService.removeUserFromGroup( userName , groupName );
         } catch ( Exception exception ) {
             return exception.toString();
         }
@@ -185,8 +188,56 @@ public class UserManagerServiceImpl implements UserManagerService {
     @Override
     @Transactional
     @RemoteMethod   
-    public void addUserToGroup( String groupName, String userName ) {
-        userManager.addUserToGroup( userName, groupName );
+    public String addUserToGroup( String groupName, String userName ) {
+        
+        User userTakingAction = ( User ) userManager.getCurrentUser();
+
+        if ( userTakingAction == null ) {
+            throw new IllegalStateException( "Cannot add user to group when user is not logged in" );
+        }
+
+        User u;
+        if ( userManager.userExists( userName ) ) {
+            u = ( User ) userManager.findByUserName( userName );
+            if ( !u.getEnabled() ) {
+                throw new IllegalArgumentException( "Sorry, that user's account is not enabled." );
+            }
+
+            securityService.addUserToGroup( userName, groupName );
+        } else if ( userManager.userWithEmailExists( userName ) ) {
+            u = ( User ) userManager.findByEmail( userName );
+            if ( !u.getEnabled() ) {
+                throw new IllegalArgumentException( "Sorry, that user's account is not enabled." );
+            }
+
+            String uname = u.getUserName();
+            securityService.addUserToGroup( uname, groupName );
+        } else {
+           // throw new IllegalArgumentException( "Sorry, there is no matching user." );
+            return "Sorry, there is no matching user.";
+        }
+
+        /*
+         * send the user an email.
+         */
+ /**       String emailAddress = u.getEmail();
+        if ( StringUtils.isNotBlank( emailAddress ) ) {
+            log.debug( "Sending email notification to " + emailAddress );
+            SimpleMailMessage msg = new SimpleMailMessage();
+            msg.setTo( emailAddress );
+            msg.setFrom( Settings.getAdminEmailAddress() );
+            msg.setSubject( "You have been added to a group on Gemma" );
+
+            msg.setText( userTakingAction.getUserName() + " has added you to the group '" + groupName
+                    + "'.\nTo view groups you belong to, visit " + GROUP_MANAGER_URL
+                    + "\n\nIf you believe you received this email in error, contact " + Settings.getAdminEmailAddress()
+                    + "." );
+
+            mailEngine.send( msg );
+        }
+*/
+        return "Success";
+      
     }
   
     @Override

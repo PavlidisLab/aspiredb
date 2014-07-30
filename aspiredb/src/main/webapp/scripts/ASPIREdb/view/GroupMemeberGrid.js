@@ -47,7 +47,7 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
       // collection of selected groupMember value objects
       selectedUser : [],
       gvos : [],
-      selectedGeneGroup : [],
+      selectedGroup : [],
       suggestionContext : null,
 
    },
@@ -101,7 +101,7 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
     *           selGeneSet
     */
    groupMemberSelectHandler : function(selUserGroup) {
-      this.selectedGeneGroup = selUserGroup;
+      this.selectedGroup = selUserGroup;
    },
 
    /**
@@ -159,19 +159,28 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
          handler : function() {
 
             var groupMember = ref.down( '#groupMemberName' ).lastQuery;
-            var groupName = ref.selectedGeneGroup[0].data.groupMemberName;
+            var groupName = ref.selectedGroup[0].data.groupName;
 
-            UserManagerService.addUserToGroup( ref.selectedGeneGroup[0].data.groupMemberName, {
-               callback : function() {
-                  var panel = ASPIREdb.view.UserManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
-                  var groupMemberGrid = panel.down( '#groupMemeberGrid' );
+            UserManagerService.addUserToGroup( groupName,groupMember, {
+               callback : function(status) {
+                  if (status=="Success"){
+                     var panel = ASPIREdb.view.UserManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
+                     var groupMemberGrid = panel.down( '#groupMemeberGrid' );
 
-                  var selection = groupMemberGrid.getView().getSelectionModel().getSelection()[0];
-                  if ( selection ) {
-                     groupMemberGrid.store.remove( selection );
+                     var selection = ref.down( '#groupMemberName' ).lastQuery;
+                     if ( selection ) {
+                        var data = [];
+                        var row = [ selection, '' ];
+                        data.push( row );
+                        groupMemberGrid.store.add( data );
+                     }
+
+                     console.log( 'selected geneset :' + ref.selectedGeneGroup[0].data.groupName + ' deleted' );
+                     
+                  }else {
+                     Ext.Msg.alert( "Server Reply", status );
                   }
-
-                  console.log( 'selected geneset :' + ref.selectedGeneGroup[0].data.groupName + ' deleted' );
+                 
                }
             } );
 
@@ -185,14 +194,15 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
          tooltip : 'Remove the selected group member',
          icon : 'scripts/ASPIREdb/resources/images/icons/user_delete.png',
          handler : function() {
-            var groupMember = ref.down( '#groupMemberName' ).getValue();
-            var groupName = ref.selectedGeneGroup[0].data.groupMemberName;
+            var groupMember = ref.selectedUser[0].data.memberName;
+            var groupName = ref.selectedGroup[0].data.groupName;
 
-            UserManagerService.deleteUserFromGroup( ref.selectedGeneGroup[0].data.groupMemberName, {
-               callback : function() {
+            UserManagerService.deleteUserFromGroup( groupName,groupMember, {
+               callback : function(status) {
                   var panel = ASPIREdb.view.UserManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
                   var groupMemberGrid = panel.down( '#groupMemeberGrid' );
 
+                 // var selection = ref.selectedUser[0].data.memberName;
                   var selection = groupMemberGrid.getView().getSelectionModel().getSelection()[0];
                   if ( selection ) {
                      groupMemberGrid.store.remove( selection );

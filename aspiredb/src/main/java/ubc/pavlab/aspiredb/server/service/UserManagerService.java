@@ -29,8 +29,6 @@ public interface UserManagerService {
 
     public String createUserGroup( String groupName );
     
-    public String deleteUserFromGroup( String groupName );
-
     public Collection<String> loadUserEditableGroups();
 
     public UserGroup findGroupByName( String name );
@@ -43,8 +41,10 @@ public interface UserManagerService {
 
     public String deleteGroup( String groupName );
 
-    public void addUserToGroup( String groupName, String userName );
+    public String addUserToGroup( String groupName, String userName );
 
     public Collection<User> suggestGroupMemebers( SuggestionContext suggestionContext, String groupName );
+
+    public String deleteUserFromGroup( String groupName, String userName );
 
 }
