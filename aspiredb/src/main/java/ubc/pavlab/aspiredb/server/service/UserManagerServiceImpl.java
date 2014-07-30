@@ -27,6 +27,7 @@ import org.directwebremoting.annotations.RemoteProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserCache;
@@ -51,11 +52,11 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
  * @author Gaya Charath
  * @since: 11/03/14
  */
-@Service("userManagerService")
+@Service
 @RemoteProxy(name = "UserManagerService")
 public class UserManagerServiceImpl implements UserManagerService {
 
-    private static Logger log = LoggerFactory.getLogger( UserGeneSetServiceImpl.class );
+    private static Logger log = LoggerFactory.getLogger( UserManagerServiceImpl.class );
 
     @Autowired(required = false)
     private UserCache userCache = new NullUserCache();
@@ -105,6 +106,7 @@ public class UserManagerServiceImpl implements UserManagerService {
      */
     @Override
     @Transactional
+    @RemoteMethod   
     public String createUserGroup( String groupName ) {
 
         try {
@@ -120,6 +122,7 @@ public class UserManagerServiceImpl implements UserManagerService {
      */
     @Override
     @Transactional
+    @RemoteMethod   
     public String deleteUserFromGroup( String groupName ) {
 
         try {
@@ -132,32 +135,42 @@ public class UserManagerServiceImpl implements UserManagerService {
    
     @Override
     @Transactional
+    @RemoteMethod
     public String deleteGroup( String groupName ) {
-
+                        
+        if ( !securityService.getGroupsUserCanEdit( getCurrentUsername()).contains( groupName ) ) {
+            throw new IllegalArgumentException( "You don't have permission to modify that group" );
+        }
+        /*
+         * Additional checks for ability to delete group handled by ss.
+         */
         try {
             userManager.deleteGroup( groupName );
-        } catch ( Exception exception ) {
-            return exception.toString();
-        }
+        } catch ( DataIntegrityViolationException div ) {
+           // throw div;
+            return div.toString();
+        } 
         return "Success";
+        
     }
 
     @Override
     @Transactional
+    @RemoteMethod   
     public Collection<String> loadUserEditableGroups() {
 
         Collection<String> usergroups = securityService.getGroupsUserCanEdit( getCurrentUsername() );
         List<UserGroup> UserGroup = new ArrayList<UserGroup>();
 
         for ( String usergroup : usergroups ) {
-            UserGroup.add( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) userService
-                    .findGroupByName( usergroup ) );
+            UserGroup.add( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) userService.findGroupByName( usergroup ) );
         }
         return usergroups;
     }
 
     @Override
     @Transactional
+    @RemoteMethod   
     public List<String> findGroupMemebers( String groupName ) {
         List<String> members=new ArrayList<String>();
         
@@ -171,6 +184,7 @@ public class UserManagerServiceImpl implements UserManagerService {
     
     @Override
     @Transactional
+    @RemoteMethod   
     public void addUserToGroup( String groupName, String userName ) {
         userManager.addUserToGroup( userName, groupName );
     }

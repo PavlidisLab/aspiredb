@@ -185,6 +185,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
 
       var disjunction = new Disjunction();
       disjunction.restrictions = [];
+      disjunction.restrictions.push( variantFilterContainer.getRestrictionExpression() );
 
       // disjunction.restrictions.push( cnvFilterPanel.getRestrictionExpression() );
 
@@ -232,23 +233,28 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
       locationRestrictions.restrictions = conjunctions;
 
       variantFilterContainer.setRestrictionExpression( locationRestrictions );
-
-      /**
-       * cnvRestrictions.restrictions = this.separateVariantDisjunctions( variantTypeDisjunctions, "CNV" );
-       * 
-       * if ( this.shouldExpandVariantTypeBox( cnvRestrictions ) ) { cnvFilterPanel.setRestrictionExpression(
-       * cnvRestrictions ); cnvFilterPanel.expand(); }
-       * 
-       * indelRestrictions.restrictions = this.separateVariantDisjunctions( variantTypeDisjunctions, "INDEL" );
-       * 
-       * if ( this.shouldExpandVariantTypeBox( indelRestrictions ) ) { indelFilterPanel.setRestrictionExpression(
-       * indelRestrictions ); indelFilterPanel.expand(); }
-       * 
-       * snvRestrictions.restrictions = this.separateVariantDisjunctions( variantTypeDisjunctions, "SNV" );
-       * 
-       * if ( this.shouldExpandVariantTypeBox( snvRestrictions ) ) { snvFilterPanel.setRestrictionExpression(
-       * snvRestrictions ); snvFilterPanel.expand(); }
-       */
+           
+        cnvRestrictions.restrictions = this.separateVariantDisjunctions( variantTypeDisjunctions, "CNV" );
+        
+        if ( this.shouldExpandVariantTypeBox( cnvRestrictions ) ) { 
+           variantFilterContainer.setRestrictionExpression(cnvRestrictions ); 
+          // variantFilterContainer.expand(); 
+           }
+        
+        indelRestrictions.restrictions = this.separateVariantDisjunctions( variantTypeDisjunctions, "INDEL" );
+        
+        if ( this.shouldExpandVariantTypeBox( indelRestrictions ) ) {
+           variantFilterContainer.setRestrictionExpression(indelRestrictions ); 
+          // indelFilterPanel.expand(); 
+           }
+        
+        snvRestrictions.restrictions = this.separateVariantDisjunctions( variantTypeDisjunctions, "SNV" );
+        
+        if ( this.shouldExpandVariantTypeBox( snvRestrictions ) ) { 
+           variantFilterContainer.setRestrictionExpression(snvRestrictions ); 
+          // snvFilterPanel.expand(); 
+           }
+       
    },
 
    separateVariantDisjunctions : function(disjunctions, variantType) {

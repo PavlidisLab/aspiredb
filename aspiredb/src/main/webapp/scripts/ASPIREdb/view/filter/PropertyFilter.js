@@ -41,7 +41,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
       }
    },
 
-   // pass restriction to popukate the gene list in variant filter
+   // pass restriction to populate the gene list in variant filter
    setRestrictionExpression : function(restriction) {
 
       if ( restriction instanceof Conjunction || restriction instanceof Disjunction ) {
