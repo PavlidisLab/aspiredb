@@ -16,10 +16,13 @@ package ubc.pavlab.aspiredb.server.biomartquery;
 
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TimerTask;
 
 import javax.annotation.PostConstruct;
+import java.util.Timer;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -28,6 +31,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +40,7 @@ import org.springframework.stereotype.Service;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
+import ubic.basecode.ontology.model.OntologyTerm;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -169,7 +174,20 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
                 throw new BioMartServiceException( errorMessage );
             }
 
+            final StopWatch timer = new StopWatch();
+            timer.start();
+
+            Timer uploadCheckerTimer = new Timer( true );
+            uploadCheckerTimer.scheduleAtFixedRate( new TimerTask() {
+                public void run() {
+                    log.info( "Waiting for BioMart response ... " + timer.getTime() + " ms" );
+                }
+            }, 0, 10 * 1000 );
+
             String response = sendRequest( xmlQueryWriter.toString() );
+            log.info( "BioMart request to (" + BIO_MART_URL + ") took " + timer.getTime() + " ms" );
+
+            uploadCheckerTimer.cancel();
 
             String[] rows = StringUtils.split( response, "\n" );
 
