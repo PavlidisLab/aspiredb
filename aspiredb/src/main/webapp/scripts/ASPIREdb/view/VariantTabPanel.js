@@ -323,9 +323,9 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                   variantIds.push( vvos[k].id );
                }
 
-               GeneService.getGeneValueObjectsInsideVariants( variantIds, {
-                  callback : function(vos) {
-                     console.log( 'variant gene value objects' + vos );
+                //  GeneService.getGeneValueObjectsInsideVariants( variantIds, {
+                //  callback : function(vos) {
+                 //  console.log( 'variant gene value objects' + vos );
 
                      // ASPIREdb.view.GeneHitsByVariantWindow.getComponent( 'geneHitsByVariantGrid'
                      // ).setLodedvariantvalueObjects(vos );
@@ -348,10 +348,10 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                      ideogram.drawVariants( vvos );
 
                      var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid( vvos, properties );
-                     var grid2 = ASPIREdb.view.GeneGridCreator.createGeneGrid( vos, properties );
+                     //var grid2 = ASPIREdb.view.GeneGridCreator.createGeneGrid( vos, properties );
 
                      grid.on( 'itemcontextmenu', function(view, record, item, index, e) {
-                        /** Stop the browser getting the event*/
+                        // Stop the browser getting the event
                         e.preventDefault();
 
                         var contextMenu = new Ext.menu.Menu( {
@@ -368,7 +368,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
                         contextMenu.showAt( e.getX(), e.getY() );
                      }, this );
-
+               
                      ref.remove( 'variantGrid', true );
                      ref.remove( 'geneGrid', true );
 
@@ -384,8 +384,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                      } );
 
                      ref.add( grid );
-                     ref.add( grid2 );
-
+                     //ref.add( grid2 );
+                     
                      var toolbar = ref.getDockedComponent( 'variantTabPanelToolbar' );
 
                      toolbar.add( ref.actionsButton );
@@ -407,8 +407,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
                      ref.setLoading( false );
 
-                  }
-               } );
+             //     }
+           //    } );
             }
          } );
 
