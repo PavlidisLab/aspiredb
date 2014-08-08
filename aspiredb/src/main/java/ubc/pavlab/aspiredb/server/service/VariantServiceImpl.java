@@ -281,7 +281,7 @@ public class VariantServiceImpl implements VariantService {
             properties.addAll( suggestEntityProperties( type ) );
         }
 
-        properties.add( new VariantLabelProperty() );
+      //  properties.add( new VariantLabelProperty() );
 
         Collection<String> characteristics = characteristicDao.getKeysMatching( "" );
         for ( String characteristic : characteristics ) {
@@ -404,9 +404,10 @@ public class VariantServiceImpl implements VariantService {
         Collection<Property> properties = new ArrayList<Property>();
 
         properties.add( new VariantTypeProperty() );
+        properties.add(new VariantLabelProperty());
         properties.add( new GenomicLocationProperty() );
         properties.add( new GeneProperty() );
-        properties.add( new GeneSetProperty() );
+        properties.add( new GeneSetProperty());        
         properties.add( new NeurocartaPhenotypeProperty() );
         properties.add( new CNVCharacteristicsProperty() );
         properties.add( new SNVCharacteristicsProperty() );
