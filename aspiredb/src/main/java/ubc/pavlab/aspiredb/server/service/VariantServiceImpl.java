@@ -330,7 +330,7 @@ public class VariantServiceImpl implements VariantService {
     public Collection<Property> suggestPropertiesForVariantType( VariantType variantType ) {
         Collection<Property> properties = new ArrayList<Property>();
 
-        properties.add( new VariantLabelProperty() );
+        //properties.add( new VariantLabelProperty() );
 
         properties.addAll( suggestEntityProperties( variantType ) );
 
