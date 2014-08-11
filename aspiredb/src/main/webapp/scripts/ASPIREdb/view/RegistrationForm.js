@@ -1,8 +1,12 @@
 Ext.require( [ 'Ext.layout.container.*', 'Ext.form.*', 'Ext.Img', 'Ext.tip.QuickTipManager' ] );
 
-Ext.define('ASPIREdb.view.RegistrationForm', {
+Ext
+   .define(
+      'ASPIREdb.view.RegistrationForm',
+      {
          extend : 'Ext.container.Viewport',
          title : 'Please Register!.',
+         id : 'registerFormPanel',
          width : 1500,
          closable : false,
          resizable : false,
@@ -32,10 +36,7 @@ Ext.define('ASPIREdb.view.RegistrationForm', {
 
             var ref = this;
 
-            var textPanel = Ext
-               .create(
-                  'Ext.form.Panel',
-                  {
+            var textPanel = Ext.create('Ext.form.Panel',{
                      id : 'aspireRegistrationTextForm',
                      border : false,
 
@@ -45,11 +46,8 @@ Ext.define('ASPIREdb.view.RegistrationForm', {
                      },
 
                      // The fields
-                     items : [
-                              {
-                                 xtype : 'displayfield',
+                     items : [{  xtype : 'displayfield',
                                  fieldLabel : '',
-
                                  value : 'Register to use use features of ASPIREDB like data upload. You might want to review the Terms and conditions (which includes our privacy policy) before signing up. After submitting the form, you will be sent an email with your account details.',
                               }, ]
                   } );
@@ -68,8 +66,7 @@ Ext.define('ASPIREdb.view.RegistrationForm', {
 
                // The fields
                defaultType : 'textfield',
-               items : [
-                        {
+               items : [{
                            xtype : 'textfield',
                            name : 'username',
                            fieldLabel : 'User Name',
@@ -80,7 +77,7 @@ Ext.define('ASPIREdb.view.RegistrationForm', {
                         {
                            xtype : 'textfield',
                            name : 'email',
-                           fieldLabel : 'Email Address',
+                           fieldLabel : 'Email',
                            labelWidth : 200,
                            vtype : 'email',
                            allowBlank : false
@@ -110,31 +107,28 @@ Ext.define('ASPIREdb.view.RegistrationForm', {
                               var password1 = this.previousSibling( '[name=password1]' );
                               return (value === password1.getValue()) ? true : 'Passwords do not match.'
                            }
-                        },{
-                           xtype: 'panel',
-                           itemId: 'reCaptcha',
-                           border: true,
-                           width :420,
-                           height: 80,
-                           html: '<div id="recaptcha">adsf</div>',
-                           listeners:{
-                              afterrender:function() {
-                                 //  console.log(Ext.getDom(this.body));
-                                   Recaptcha.create("6Lf4KAkAAAAAADFjpOSiyfHhlQ1pkznapAnmIvyr",
-                                       Ext.getDom(this.body),
-                                       {
-                                           theme: "clean",
-                                           callback: Recaptcha.focus_response_field
-                                       }
-                                   );
-                                   
-                               }
+                        },
+                        {
+                           xtype : 'panel',
+                           itemId : 'reCaptcha',
+                           border : true,
+                           width : 420,
+                           height : 80,
+                           html : '<div id="recaptcha">adsf</div>',
+                           listeners : {
+                              afterrender : function() {
+                                 // console.log(Ext.getDom(this.body));
+                                 Recaptcha.create( "6Lf4KAkAAAAAADFjpOSiyfHhlQ1pkznapAnmIvyr", Ext.getDom( this.body ),
+                                    {
+                                       theme : "clean",
+                                       callback : Recaptcha.focus_response_field
+                                    } );
+                              }
                            }
-                       },
-                     
+                        },
+
                         /*
-                         *  { id : 'ajaxRegisterTrue', name : 'ajaxRegisterTrue', hidden : true, value : 'true'
-                         *  },
+                         * { id : 'ajaxRegisterTrue', name : 'ajaxRegisterTrue', hidden : true, value : 'true' },
                          */
 
                         /*
@@ -217,7 +211,8 @@ Ext.define('ASPIREdb.view.RegistrationForm', {
                   text : 'Login',
                   handler : ref.submitHandler,
                   scope : ref
-               } ]
+               } ],
+               
             } );
 
             this.add( panel );
@@ -227,8 +222,10 @@ Ext.define('ASPIREdb.view.RegistrationForm', {
          },
 
          submitHandler : function() {
-
+                      
             var me = this;
+          //  var form = this.up( 'registerFormPanel' ).getForm();
+            
             Ext.Ajax.request( {
                url : 'j_spring_security_check',
                method : 'POST',

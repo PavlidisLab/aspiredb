@@ -641,14 +641,11 @@ Ext
 
                            method : 'POST',
                            url : 'upload_action.html',
-                           // submitEmptyText : false,
-                           waitMsg : 'Uploading your phenotype file...',
+                            waitMsg : 'Uploading your phenotype file...',
                            headers : {
                               'Content-Type' : 'multipart/form-data;charset=UTF-8'
                            },
                            success : function(form, action) {
-                              // var phenotypeFile =form.getField('phenotypeFile');
-                              // phenotypeFile.getFile();
 
                               var fReader = new FileReader();
                               fReader.readAsBinaryString( file );

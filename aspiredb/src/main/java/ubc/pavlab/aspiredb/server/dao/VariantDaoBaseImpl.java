@@ -112,8 +112,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         Collection<Subject> subjects = subjectDao.findByPhenotype( filterConfig );
 
-        return this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
-                .add( Restrictions.in( "subject", subjects ) ).list();
+        return this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass ).add( Restrictions.in( "subject", subjects ) ).list();
 
     }
 
