@@ -154,7 +154,7 @@ public class ProjectManagerCLI extends AbstractCLI {
             Project proj = projectDao.findByProjectName( projectName );
 
             if ( proj == null ) {
-                log.error( "Project does not exist" );
+                log.error( "Project " + projectName + " does not exist" );
                 bail( ErrorCode.INVALID_OPTION );
             }
 

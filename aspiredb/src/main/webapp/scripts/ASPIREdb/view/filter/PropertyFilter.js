@@ -208,9 +208,6 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
          /* multi value vs single value */
          xtype : 'container',
          itemId : 'multicombo_container',
-         layout : {
-            type : 'vbox'
-         },
          items : [ {
             xtype : 'multivalue_combo',
             itemId : 'multicombo',
@@ -228,8 +225,8 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
             itemId : 'example',
             text : '',
             style : {
-              // 'margin-top' : '-25px',
-               'font-size' : 'smaller',
+               'top' : '25px',
+               'font-size' : '10px',
                'color' : 'gray'
             }
          } ]
