@@ -16,6 +16,9 @@
 <script src="dwr/dtoall.js"></script>
 <script src="dwr/interface/ConfigUtils.js"></script>
 
+<!-- DWR utils -->
+<script src="scripts/lib/util.js"></script>
+
 <script src="scripts/lib/ext-all-debug-w-comments.js"></script>
 <!-- <script type="text/javascript" src="scripts/lib/ext-theme-neptune.js"></script>-->
 
