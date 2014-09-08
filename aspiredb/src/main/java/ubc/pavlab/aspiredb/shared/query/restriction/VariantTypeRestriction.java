@@ -23,8 +23,10 @@ import org.directwebremoting.annotations.DataTransferObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
 
 /**
- * author: anton date: 07/05/13
+ * @deprecated Use VariantTypeProperty instead. See Bug 4173.
+ * @author: anton date: 07/05/13
  */
+@Deprecated
 @DataTransferObject(javascript = "VariantTypeRestriction")
 public class VariantTypeRestriction implements RestrictionExpression {
 

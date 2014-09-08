@@ -42,7 +42,6 @@ import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.NumericValue;
 import ubc.pavlab.aspiredb.shared.TextValue;
-import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.query.CNVTypeProperty;
 import ubc.pavlab.aspiredb.shared.query.CharacteristicProperty;
 import ubc.pavlab.aspiredb.shared.query.ExternalSubjectIdProperty;
@@ -394,12 +393,9 @@ public class CriteriaBuilder {
                 criteriaDisjunction.add( createCNVTypeCriterion( Operator.TEXT_EQUAL,
                         fullEntityPropertyName( target, propertyOf, property ), ( TextValue ) value ) );
             }
-            // FIXME
         } else if ( property instanceof VariantTypeProperty ) {
-            EntityType propertyOf = EntityType.VARIANT;
             for ( Object value : values ) {
-                criteriaDisjunction.add( createVariantTypeCriterion( Operator.TEXT_EQUAL,
-                        fullEntityPropertyName( target, propertyOf, property ), ( TextValue ) value ) );
+                criteriaDisjunction.add( createVariantTypeCriterion( target, ( TextValue ) value ) );
             }
         } else if ( property instanceof ExternalSubjectIdProperty ) {
             EntityType propertyOf = EntityType.SUBJECT;
@@ -447,12 +443,19 @@ public class CriteriaBuilder {
         }
     }
 
-    // FIXME
-    private static Criterion createVariantTypeCriterion( Operator operator, String property, TextValue value ) {
-        VariantType enumValue = VariantType.valueOf( value.toString() );
-        return createTextCriterion( operator, "discriminator", enumValue );
-        // return createTextCriterion( operator, property, enumValue );
-        // return Restrictions.eq( "variant.class", value.toString() );
+    /**
+     * Criteria for VariantTypes, e.g. CNV, SNV, ...
+     * 
+     * @param target
+     * @param value
+     * @return
+     */
+    private static Criterion createVariantTypeCriterion( EntityType target, TextValue value ) {
+        String type = value.toString();
+        if ( target == EntityType.SUBJECT ) {
+            return Restrictions.eq( "variant.class", type );
+        }
+        return Restrictions.eq( "class", type );
     }
 
     private static Criterion processRestrictionExpression( SimpleRestriction restriction, EntityType target ) {
@@ -471,11 +474,8 @@ public class CriteriaBuilder {
             EntityType propertyOf = EntityType.VARIANT;
             return createCNVTypeCriterion( operator, fullEntityPropertyName( target, propertyOf, property ),
                     ( TextValue ) value );
-            // FIXME
         } else if ( property instanceof VariantTypeProperty ) {
-            EntityType propertyOf = EntityType.VARIANT;
-            return createVariantTypeCriterion( operator, fullEntityPropertyName( target, propertyOf, property ),
-                    ( TextValue ) value );
+            return createVariantTypeCriterion( target, ( TextValue ) value );
         } else if ( property instanceof ExternalSubjectIdProperty ) {
             EntityType propertyOf = EntityType.SUBJECT;
             return createTextCriterion( operator, fullEntityPropertyName( target, propertyOf, property ),

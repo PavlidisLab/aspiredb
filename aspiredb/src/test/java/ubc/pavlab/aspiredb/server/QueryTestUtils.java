@@ -18,6 +18,7 @@
  */
 package ubc.pavlab.aspiredb.server;
 
+import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.NumericValue;
@@ -29,11 +30,11 @@ import ubc.pavlab.aspiredb.shared.query.CopyNumberProperty;
 import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.VariantLabelProperty;
+import ubc.pavlab.aspiredb.shared.query.VariantTypeProperty;
 import ubc.pavlab.aspiredb.shared.query.restriction.Conjunction;
 import ubc.pavlab.aspiredb.shared.query.restriction.RestrictionExpression;
 import ubc.pavlab.aspiredb.shared.query.restriction.SetRestriction;
 import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
-import ubc.pavlab.aspiredb.shared.query.restriction.VariantTypeRestriction;
 
 /**
  * author: anton date: 22/05/13
@@ -41,7 +42,9 @@ import ubc.pavlab.aspiredb.shared.query.restriction.VariantTypeRestriction;
 public class QueryTestUtils {
 
     public static RestrictionExpression makeTestVariantRestrictionExpression() {
-        RestrictionExpression type = new VariantTypeRestriction( VariantType.CNV );
+        // RestrictionExpression type = new VariantTypeRestriction( VariantType.CNV );
+        RestrictionExpression type = new SimpleRestriction( new VariantTypeProperty(), Operator.TEXT_EQUAL,
+                new TextValue( VariantType.CNV.toString() ) );
         RestrictionExpression copyNumber = new SimpleRestriction( new CopyNumberProperty(), Operator.NUMERIC_EQUAL,
                 new NumericValue( 2 ) );
         RestrictionExpression characteristic = new SimpleRestriction( new CharacteristicProperty( "BENIGN" ),
@@ -58,9 +61,13 @@ public class QueryTestUtils {
     public static RestrictionExpression makeTestVariantRestrictionExpression( Long labelId ) {
         RestrictionExpression location = new SimpleRestriction( new GenomicLocationProperty(), Operator.IS_IN_SET,
                 new GenomicRange( "X", 56600000, 56800000 ) );
-        RestrictionExpression type = new VariantTypeRestriction( VariantType.CNV );
+        // FIXME
+        // RestrictionExpression type = new VariantTypeRestriction( VariantType.CNV );
+        RestrictionExpression type = new SetRestriction( new VariantTypeProperty(), Operator.IS_IN_SET, new TextValue(
+                VariantType.CNV.toString() ) );
+
         RestrictionExpression cnvType = new SimpleRestriction( new CNVTypeProperty(), Operator.TEXT_EQUAL,
-                new TextValue( "LOSS" ) );
+                new TextValue( CnvType.LOSS.toString() ) );
         RestrictionExpression labelRestriction = new SimpleRestriction( new VariantLabelProperty(),
                 Operator.TEXT_EQUAL, new LabelValueObject( labelId, "CNV_TEST_LABEL" ) );
 
@@ -83,9 +90,13 @@ public class QueryTestUtils {
     public static RestrictionExpression makeTestVariantRestrictionExpressionWithSets( Long labelId ) {
         RestrictionExpression location = new SetRestriction( new GenomicLocationProperty(), Operator.IS_IN_SET,
                 new GenomicRange( "X", 56600000, 56800000 ) );
-        RestrictionExpression type = new VariantTypeRestriction( VariantType.CNV );
+        // FIXME
+        // RestrictionExpression type = new VariantTypeRestriction( VariantType.CNV );
+        RestrictionExpression type = new SetRestriction( new VariantTypeProperty(), Operator.IS_IN_SET, new TextValue(
+                VariantType.CNV.toString() ) );
+
         RestrictionExpression cnvType = new SetRestriction( new CNVTypeProperty(), Operator.IS_IN_SET, new TextValue(
-                "LOSS" ) );
+                CnvType.LOSS.toString() ) );
         RestrictionExpression labelRestriction = new SetRestriction( new VariantLabelProperty(), Operator.IS_IN_SET,
                 new LabelValueObject( labelId, "CNV_TEST_LABEL" ) );
 

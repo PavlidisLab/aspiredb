@@ -36,6 +36,7 @@ import ubc.pavlab.aspiredb.server.dao.Page;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
+import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
@@ -49,9 +50,9 @@ import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.CNVTypeProperty;
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.VariantTypeProperty;
 import ubc.pavlab.aspiredb.shared.query.restriction.Conjunction;
 import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
-import ubc.pavlab.aspiredb.shared.query.restriction.VariantTypeRestriction;
 
 //@RunWith(SpringJUnit4ClassRunner.class)
 public class SubjectServiceTest extends BaseSpringContextTest {
@@ -91,8 +92,11 @@ public class SubjectServiceTest extends BaseSpringContextTest {
     @Test
     public void findSubjectWithVariantFilter() throws NeurocartaServiceException, BioMartServiceException {
         Conjunction restriction = new Conjunction();
-        restriction.add( new VariantTypeRestriction( VariantType.CNV ) );
-        restriction.add( new SimpleRestriction( new CNVTypeProperty(), Operator.TEXT_EQUAL, new TextValue( "LOSS" ) ) );
+        // restriction.add( new VariantTypeRestriction( VariantType.CNV ) );
+        restriction.add( new SimpleRestriction( new VariantTypeProperty(), Operator.TEXT_EQUAL, new TextValue(
+                VariantType.CNV.toString() ) ) );
+        restriction.add( new SimpleRestriction( new CNVTypeProperty(), Operator.TEXT_EQUAL, new TextValue( CnvType.LOSS
+                .toString() ) ) );
 
         VariantFilterConfig filter = new VariantFilterConfig();
         filter.setRestriction( restriction );
