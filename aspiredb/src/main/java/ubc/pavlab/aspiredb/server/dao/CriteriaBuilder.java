@@ -506,7 +506,7 @@ public class CriteriaBuilder {
     }
 
     private static Criterion processRestrictionExpression( VariantTypeRestriction restriction, EntityType target ) {
-        if ( target == EntityType.VARIANT ) {
+        if ( target == EntityType.SUBJECT ) {
             return Restrictions.eq( "variant.class", restriction.getType() );
         }
         return Restrictions.eq( "class", restriction.getType() );
