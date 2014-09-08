@@ -14,13 +14,11 @@
  */
 package ubc.pavlab.aspiredb.shared;
 
-import org.directwebremoting.annotations.DataTransferObject;
 
 /**
  * @version $Id: VariantType.java,v 1.2 2013/05/29 20:02:37 cmcdonald Exp $
  */
 
-@DataTransferObject(type = "enum", javascript = "VariantType")
 public enum VariantType {
     // DGV and DECIPHER probably shouldn't be here,but using anyway just for the parsers
     CNV, SNV, INDEL, INVERSION, TRANSLOCATION, DECIPHER, DGV;

@@ -79,6 +79,7 @@ import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.SubjectFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
+import ubc.pavlab.aspiredb.shared.query.restriction.SetRestriction;
 import ubc.pavlab.aspiredb.shared.query.restriction.SimpleRestriction;
 
 /**
@@ -165,10 +166,11 @@ public class QueryServiceTest extends BaseSpringContextTest {
     public void testGetSubjectVariantCountsForLocation() throws Exception {
 
         String chr = "1";
+        int bin = 18441;
         String patientId = "testGetSubjectVariantCountsForLocation";
 
         // look at how many there are currently in the database
-        Map<Integer, Integer> ret = getSubjectVariantCountForChromosome( chr );
+        Map<Integer, Integer> ret = getSubjectVariantCountForChromosome( chr, bin );
         int subjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
         int variantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
 
@@ -178,21 +180,34 @@ public class QueryServiceTest extends BaseSpringContextTest {
         cnv.getLocation().setChromosome( chr );
         cnv.getLocation().setStart( 1 );
         cnv.getLocation().setEnd( 100 );
+        cnv.getLocation().setBin( bin );
+
+        CNV cnv2 = persistentTestObjectHelper.createDetachedTestCNVObject();
+        cnv2.getLocation().setChromosome( "2" );
+        cnv2.getLocation().setBin( bin );
+        s.addVariant( cnv2 );
+
+        persistentTestObjectHelper.updateSubject( s );
+
         cnvDao.update( cnv );
-        subjectDao.update( s );
+        cnvDao.update( cnv2 );
 
         // now there should be one more
-        ret = getSubjectVariantCountForChromosome( chr );
+        ret = getSubjectVariantCountForChromosome( chr, bin );
         int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
         int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
 
         assertEquals( subjectCount + 1, addedSubjectCount );
         assertEquals( variantCount + 1, addedVariantCount );
 
+        // test a different api using SetRestriction
+        Set<String> chrs = new HashSet<>();
+        chrs.add( "1" );
+        ret = getSubjectVariantCountForChromosomes( chrs, bin );
+        assertEquals( subjectCount + 1, ret.get( VariantDao.SUBJECT_IDS_KEY ).intValue() );
+        assertEquals( variantCount + 1, ret.get( VariantDao.VARIANT_IDS_KEY ).intValue() );
+
         // cleanup
-        s.getVariants().remove( cnv );
-        subjectDao.update( s );
-        persistentTestObjectHelper.removeVariant( cnv );
         persistentTestObjectHelper.removeSubject( s );
     }
 
@@ -227,7 +242,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
         String patientId = "testGetSubjectVariantCountsForLocation";
 
-        //String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_219"; // colon cancer (~321 genes)
+        // String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_219"; // colon cancer (~321 genes)
         String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_0060041"; // autism spectrum disorder (~853 genes)
 
         // look at how many there are currently in the database FIXME this should be cleaned up by the teardown.
@@ -596,15 +611,48 @@ public class QueryServiceTest extends BaseSpringContextTest {
         return subject;
     }
 
-    private Map<Integer, Integer> getSubjectVariantCountForChromosome( String chromosome ) throws NotLoggedInException,
-            ExternalDependencyException {
+    private Map<Integer, Integer> getSubjectVariantCountForChromosome( String chromosome, int bin )
+            throws NotLoggedInException, ExternalDependencyException {
         SimpleRestriction simpleRe = new SimpleRestriction();
         simpleRe.setOperator( Operator.IS_IN_SET );
         simpleRe.setProperty( new GenomicLocationProperty() );
-        simpleRe.setValue( new GenomicRange( chromosome ) );
+        GenomicRange range = new GenomicRange( chromosome );
+        range.setBin( bin );
+        simpleRe.setValue( range );
 
         Set<AspireDbFilterConfig> filters = new HashSet<>();
         filters.add( new VariantFilterConfig( simpleRe ) );
+        Map<Integer, Integer> ret = queryService.getSubjectVariantCounts( filters );
+        return ret;
+    }
+
+    /**
+     * Collection test
+     * 
+     * @param chromosomes
+     * @return
+     * @throws NotLoggedInException
+     * @throws ExternalDependencyException
+     */
+    private Map<Integer, Integer> getSubjectVariantCountForChromosomes( Set<String> chromosomes, int bin )
+            throws NotLoggedInException, ExternalDependencyException {
+
+        SetRestriction re = new SetRestriction();
+        re.setOperator( Operator.IS_IN_SET );
+        re.setProperty( new GenomicLocationProperty() );
+
+        // ( new GenomicRange( chromosome ) );
+        Set<Object> values = new HashSet<>();
+        for ( String chr : chromosomes ) {
+            GenomicRange range = new GenomicRange( chr );
+            values.add( range );
+            range.setBin( bin );
+        }
+
+        re.setValues( values );
+
+        Set<AspireDbFilterConfig> filters = new HashSet<>();
+        filters.add( new VariantFilterConfig( re ) );
         Map<Integer, Integer> ret = queryService.getSubjectVariantCounts( filters );
         return ret;
     }

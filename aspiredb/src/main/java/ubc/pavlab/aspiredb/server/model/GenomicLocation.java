@@ -35,7 +35,7 @@ public class GenomicLocation {
     private String assemblyVersion;
 
     @Column(name = "BIN")
-    private Integer bin;
+    private int bin;
 
     @Column(name = "CHR_BAND")
     private String chrBand;
@@ -57,7 +57,7 @@ public class GenomicLocation {
     @Column(name = "STRAND")
     private String strand;
 
-    public GenomicLocation( String chromosome, Integer start, Integer end ) {
+    public GenomicLocation( String chromosome, int start, int end ) {
         this();
         assert end >= start;
         this.chromosome = chromosome;
@@ -73,7 +73,7 @@ public class GenomicLocation {
         return assemblyVersion;
     }
 
-    public Integer getBin() {
+    public int getBin() {
         return bin;
     }
 
@@ -105,7 +105,7 @@ public class GenomicLocation {
         this.assemblyVersion = assemblyVersion;
     }
 
-    public void setBin( Integer genomeBin ) {
+    public void setBin( int genomeBin ) {
         this.bin = genomeBin;
     }
 

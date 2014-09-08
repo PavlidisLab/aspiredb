@@ -112,7 +112,8 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         Collection<Subject> subjects = subjectDao.findByPhenotype( filterConfig );
 
-        return this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass ).add( Restrictions.in( "subject", subjects ) ).list();
+        return this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
+                .add( Restrictions.in( "subject", subjects ) ).list();
 
     }
 
@@ -197,8 +198,8 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
                     // exist in the Variant2SpecialVariantOverlap table
                     if ( overlapRestriction1.getOperator().equals( Operator.NUMERIC_LESS_OR_EQUAL ) ) {
 
-                        Collection<Variant2VariantOverlap> allInfos = variant2SpecialVariantOverlapDao
-                                .loadByVariantId( vId, overlapFilter.getOverlapProjectIds() );
+                        Collection<Variant2VariantOverlap> allInfos = variant2SpecialVariantOverlapDao.loadByVariantId(
+                                vId, overlapFilter.getOverlapProjectIds() );
 
                         // Further to the comment above, if the vId's overlapinfos returned by the restriction are zero,
                         // but it has overlapinfo's,
@@ -432,8 +433,10 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         addSingleFilter( filter, criteria );
 
-        log.info( " criteria.list() in findIds" );
         criteria.setProjection( Projections.distinct( Projections.id() ) );
+
+        log.info( " criteria.list() in findIds " + criteria );
+
         return criteria.list();
     }
 

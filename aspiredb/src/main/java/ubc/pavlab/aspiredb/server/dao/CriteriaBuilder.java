@@ -21,7 +21,6 @@ package ubc.pavlab.aspiredb.server.dao;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
@@ -29,6 +28,9 @@ import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.server.model.Subject;
@@ -40,6 +42,7 @@ import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.NumericValue;
 import ubc.pavlab.aspiredb.shared.TextValue;
+import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.query.CNVTypeProperty;
 import ubc.pavlab.aspiredb.shared.query.CharacteristicProperty;
 import ubc.pavlab.aspiredb.shared.query.ExternalSubjectIdProperty;
@@ -53,6 +56,7 @@ import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.SubjectLabelProperty;
 import ubc.pavlab.aspiredb.shared.query.TextProperty;
 import ubc.pavlab.aspiredb.shared.query.VariantLabelProperty;
+import ubc.pavlab.aspiredb.shared.query.VariantTypeProperty;
 import ubc.pavlab.aspiredb.shared.query.restriction.Conjunction;
 import ubc.pavlab.aspiredb.shared.query.restriction.Disjunction;
 import ubc.pavlab.aspiredb.shared.query.restriction.PhenotypeRestriction;
@@ -70,6 +74,8 @@ import ubc.pavlab.aspiredb.shared.query.restriction.VariantTypeRestriction;
  */
 public class CriteriaBuilder {
 
+    private static Logger log = LoggerFactory.getLogger( CriteriaBuilder.class );
+
     public enum EntityType {
         SUBJECT(Subject.class), VARIANT(Variant.class);
 
@@ -86,6 +92,8 @@ public class CriteriaBuilder {
      * @return
      */
     public static Criterion buildCriteriaRestriction( RestrictionExpression restrictionExpression, EntityType target ) {
+        log.info( "RestrictionExpression=" + restrictionExpression + "; target=" + target );
+
         if ( restrictionExpression instanceof Disjunction ) {
             return processRestrictionExpression( ( Disjunction ) restrictionExpression, target );
         } else if ( restrictionExpression instanceof Conjunction ) {
@@ -316,11 +324,15 @@ public class CriteriaBuilder {
 
         // Note addition of bin restriction. We only care about variants that fall into one of the bins touched by the
         // given range
-        Criterion rangeCriterion = Restrictions.conjunction()
+        Criterion rangeCriterion = Restrictions
+                .conjunction()
                 .add( Restrictions.in( "location.bin", bins ) )
-                // .add( Restrictions.eq( "location.chromosome", range.getChromosome() ) ) // bin includes chromosome.
+                // the same bin may exist in different chromosomes
+                .add( Restrictions.eq( "location.chromosome", range.getChromosome() ) )
                 .add( Restrictions.disjunction().add( variantInsideRegion ).add( variantHitsStartOfRegion )
                         .add( variantHitsEndOfRegion ) );
+
+        log.info( "RangeCriterion=" + rangeCriterion );
 
         return rangeCriterion;
     }
@@ -359,6 +371,9 @@ public class CriteriaBuilder {
         Operator operator = setRestriction.getOperator();
         Set<Object> values = setRestriction.getValues();
 
+        log.info( "Property=" + property + "; operator=" + operator + "; values="
+                + StringUtils.collectionToCommaDelimitedString( values ) );
+
         DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
 
         Junction criteriaDisjunction = Restrictions.disjunction();
@@ -377,6 +392,13 @@ public class CriteriaBuilder {
             EntityType propertyOf = EntityType.VARIANT;
             for ( Object value : values ) {
                 criteriaDisjunction.add( createCNVTypeCriterion( Operator.TEXT_EQUAL,
+                        fullEntityPropertyName( target, propertyOf, property ), ( TextValue ) value ) );
+            }
+            // FIXME
+        } else if ( property instanceof VariantTypeProperty ) {
+            EntityType propertyOf = EntityType.VARIANT;
+            for ( Object value : values ) {
+                criteriaDisjunction.add( createVariantTypeCriterion( Operator.TEXT_EQUAL,
                         fullEntityPropertyName( target, propertyOf, property ), ( TextValue ) value ) );
             }
         } else if ( property instanceof ExternalSubjectIdProperty ) {
@@ -413,6 +435,7 @@ public class CriteriaBuilder {
 
         subquery.add( criteriaDisjunction );
         subquery.setProjection( Projections.distinct( Projections.id() ) );
+        log.info( "subquery = " + subquery );
 
         switch ( operator ) {
             case IS_IN_SET:
@@ -424,10 +447,20 @@ public class CriteriaBuilder {
         }
     }
 
+    // FIXME
+    private static Criterion createVariantTypeCriterion( Operator operator, String property, TextValue value ) {
+        VariantType enumValue = VariantType.valueOf( value.toString() );
+        return createTextCriterion( operator, "discriminator", enumValue );
+        // return createTextCriterion( operator, property, enumValue );
+        // return Restrictions.eq( "variant.class", value.toString() );
+    }
+
     private static Criterion processRestrictionExpression( SimpleRestriction restriction, EntityType target ) {
         Property property = restriction.getProperty();
         Operator operator = restriction.getOperator();
         Object value = restriction.getValue();
+
+        log.info( "Property=" + property + "; operator=" + operator + "; value=" + value );
 
         if ( property instanceof CharacteristicProperty ) {
             return createCharacteristicCriterion( ( CharacteristicProperty ) property, operator, ( TextValue ) value,
@@ -437,6 +470,11 @@ public class CriteriaBuilder {
         } else if ( property instanceof CNVTypeProperty ) {
             EntityType propertyOf = EntityType.VARIANT;
             return createCNVTypeCriterion( operator, fullEntityPropertyName( target, propertyOf, property ),
+                    ( TextValue ) value );
+            // FIXME
+        } else if ( property instanceof VariantTypeProperty ) {
+            EntityType propertyOf = EntityType.VARIANT;
+            return createVariantTypeCriterion( operator, fullEntityPropertyName( target, propertyOf, property ),
                     ( TextValue ) value );
         } else if ( property instanceof ExternalSubjectIdProperty ) {
             EntityType propertyOf = EntityType.SUBJECT;
@@ -468,7 +506,7 @@ public class CriteriaBuilder {
     }
 
     private static Criterion processRestrictionExpression( VariantTypeRestriction restriction, EntityType target ) {
-        if ( target == EntityType.SUBJECT ) {
+        if ( target == EntityType.VARIANT ) {
             return Restrictions.eq( "variant.class", restriction.getType() );
         }
         return Restrictions.eq( "class", restriction.getType() );

@@ -55,7 +55,7 @@ public class GenomicRange implements Displayable, Serializable, Comparable<Genom
         this.bandEnd = bandEnd;
     }
 
-    GenomicRange() {
+    public GenomicRange() {
     }
 
     @Override
@@ -143,6 +143,10 @@ public class GenomicRange implements Displayable, Serializable, Comparable<Genom
 
     public void setChromosome( String chromosome ) {
         this.chromosome = chromosome;
+    }
+
+    public void setBin( int bin ) {
+        this.bin = bin;
     }
 
     public String toBaseString() {

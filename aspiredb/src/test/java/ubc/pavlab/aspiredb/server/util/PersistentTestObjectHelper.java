@@ -88,4 +88,6 @@ public interface PersistentTestObjectHelper {
 
     void removeLabel( Label label );
 
+    public void updateSubject( Subject subject );
+
 }

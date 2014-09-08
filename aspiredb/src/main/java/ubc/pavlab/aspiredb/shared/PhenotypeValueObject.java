@@ -123,7 +123,11 @@ public class PhenotypeValueObject implements Comparable<PhenotypeValueObject>, S
 
     @Override
     public int hashCode() {
-        return this.getName().hashCode();
+        if ( this.getName() != null ) {
+            return this.getName().hashCode();
+        } else {
+            return super.hashCode();
+        }
     }
 
     public boolean isOntologyTerm() {
