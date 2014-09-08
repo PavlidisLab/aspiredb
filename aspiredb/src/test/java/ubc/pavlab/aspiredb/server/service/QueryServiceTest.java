@@ -38,6 +38,7 @@ import java.util.Set;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,6 +134,8 @@ public class QueryServiceTest extends BaseSpringContextTest {
     @Autowired
     private VariantDao variantDao;
 
+    private Subject subject;
+
     @Before
     public void setUp() {
         try {
@@ -144,6 +147,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
         // run save query as administrator in filter window
         super.runAsAdmin();
+
     }
 
     public void setUpPhenotypes() {
@@ -156,6 +160,35 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
     void tearDownPhenotypes() throws Exception {
         // noop?
+    }
+
+    @After
+    public void tearDown() {
+        super.runAsAdmin();
+        if ( subject != null ) {
+            persistentTestObjectHelper.removeSubject( subject );
+        }
+        if ( project != null ) {
+            persistentTestObjectHelper.deleteProject( project.getName() );
+        }
+    }
+
+    /**
+     * Variant types: CNV, SNV
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testGetSubjectVariantCountsForVariantType() throws Exception {
+        String patientId = "testGetSubjectVariantCountsForVariantType";
+
+        // look at how many there are currently in the database
+        // Map<Integer, Integer> ret = getSubjectVariantCountForChromosome( chr, bin );
+        // int subjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
+        // int variantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+
+        subject = persistentTestObjectHelper.createPersistentTestSubjectObjectWithCNV( patientId );
+
     }
 
     /**
@@ -175,8 +208,8 @@ public class QueryServiceTest extends BaseSpringContextTest {
         int variantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
 
         // add a variant in Chr 1
-        Subject s = persistentTestObjectHelper.createPersistentTestSubjectObjectWithCNV( patientId );
-        CNV cnv = ( CNV ) s.getVariants().iterator().next();
+        subject = persistentTestObjectHelper.createPersistentTestSubjectObjectWithCNV( patientId );
+        CNV cnv = ( CNV ) subject.getVariants().iterator().next();
         cnv.getLocation().setChromosome( chr );
         cnv.getLocation().setStart( 1 );
         cnv.getLocation().setEnd( 100 );
@@ -185,9 +218,9 @@ public class QueryServiceTest extends BaseSpringContextTest {
         CNV cnv2 = persistentTestObjectHelper.createDetachedTestCNVObject();
         cnv2.getLocation().setChromosome( "2" );
         cnv2.getLocation().setBin( bin );
-        s.addVariant( cnv2 );
+        subject.addVariant( cnv2 );
 
-        persistentTestObjectHelper.updateSubject( s );
+        persistentTestObjectHelper.updateSubject( subject );
 
         cnvDao.update( cnv );
         cnvDao.update( cnv2 );
@@ -208,7 +241,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         assertEquals( variantCount + 1, ret.get( VariantDao.VARIANT_IDS_KEY ).intValue() );
 
         // cleanup
-        persistentTestObjectHelper.removeSubject( s );
+        // persistentTestObjectHelper.removeSubject( subject );
     }
 
     @Test
@@ -221,9 +254,9 @@ public class QueryServiceTest extends BaseSpringContextTest {
         int subjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
         int variantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
         // add a subject
-        Subject s = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
+        subject = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
 
-        assertEquals( patientId, s.getPatientId() );
+        assertEquals( patientId, subject.getPatientId() );
 
         // now there should be one more
         ret = getSubjectVariantCountForPatientId( patientId );
@@ -234,7 +267,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         assertEquals( variantCount, addedVariantCount ); // no new variants were added!
 
         // cleanup
-        persistentTestObjectHelper.removeSubject( s );
+        // persistentTestObjectHelper.removeSubject( subject );
     }
 
     @Test
@@ -253,10 +286,10 @@ public class QueryServiceTest extends BaseSpringContextTest {
         // add some variants that overlap
         // 17:37885247-37885647
         // 4:72247-5545043, bin 17958.
-        Subject s = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
+        subject = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
 
         CNV cnv1 = persistentTestObjectHelper.createPersistentTestCNVObject();
-        cnv1.setSubject( s );
+        cnv1.setSubject( subject );
         cnv1.getLocation().setChromosome( "17" );
         cnv1.getLocation().setStart( 28521237 );
         cnv1.getLocation().setEnd( 28521437 );
@@ -266,7 +299,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         cnvDao.update( cnv1 );
 
         CNV cnv2 = persistentTestObjectHelper.createPersistentTestCNVObject();
-        cnv2.setSubject( s );
+        cnv2.setSubject( subject );
         cnv2.getLocation().setChromosome( "4" );
         cnv2.getLocation().setStart( 72247 );
         cnv2.getLocation().setEnd( 5545043 );
@@ -276,7 +309,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         cnvDao.update( cnv2 );
 
         CNV cnv3 = persistentTestObjectHelper.createPersistentTestCNVObject(); // this one doesn't overlap
-        cnv3.setSubject( s );
+        cnv3.setSubject( subject );
         cnv3.getLocation().setChromosome( "4" );
         cnv3.getLocation().setStart( 1 );
         cnv3.getLocation().setEnd( 2 );
@@ -285,13 +318,13 @@ public class QueryServiceTest extends BaseSpringContextTest {
                         .getLocation().getEnd() ) );
         cnvDao.update( cnv3 );
 
-        s.addVariant( cnv1 );
-        s.addVariant( cnv2 );
-        s.addVariant( cnv3 );
-        subjectDao.update( s );
+        subject.addVariant( cnv1 );
+        subject.addVariant( cnv2 );
+        subject.addVariant( cnv3 );
+        subjectDao.update( subject );
 
-        assertEquals( patientId, s.getPatientId() );
-        assertEquals( 3, s.getVariants().size() );
+        assertEquals( patientId, subject.getPatientId() );
+        assertEquals( 3, subject.getVariants().size() );
 
         ret = getSubjectVariantCountForPhenocarta( phenotypeURI );
 
@@ -302,16 +335,11 @@ public class QueryServiceTest extends BaseSpringContextTest {
         assertEquals( variantCount + 2, addedVariantCount ); // we added two that overlap
 
         // cleanup (this should be in a tearDown)
-        List<Variant> sv = s.getVariants();
-        s.setVariants( null );
-        subjectDao.update( s );
-        for ( Variant v : sv ) {
-            CNV c = ( CNV ) v;
-            c.setSubject( null );
-            cnvDao.update( c );
-            persistentTestObjectHelper.removeVariant( c );
-        }
-        persistentTestObjectHelper.removeSubject( s );
+        /*
+         * List<Variant> sv = subject.getVariants(); subject.setVariants( null ); subjectDao.update( subject ); for (
+         * Variant v : sv ) { CNV c = ( CNV ) v; c.setSubject( null ); cnvDao.update( c );
+         * persistentTestObjectHelper.removeVariant( c ); } persistentTestObjectHelper.removeSubject( subject );
+         */
 
     }
 
@@ -361,7 +389,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testOverlapQuery() {
-        Subject s = persistentTestObjectHelper.createPersistentTestIndividualObject( RandomStringUtils
+        subject = persistentTestObjectHelper.createPersistentTestIndividualObject( RandomStringUtils
                 .randomAlphabetic( 10 ) );
 
         if ( project == null ) {
@@ -369,11 +397,11 @@ public class QueryServiceTest extends BaseSpringContextTest {
             project.setName( RandomStringUtils.randomAlphabetic( 4 ) );
             project = persistentTestObjectHelper.createPersistentProject( project );
         }
-        s.setProjects( Collections.singletonList( project ) );
-        subjectDao.update( s );
+        subject.setProjects( Collections.singletonList( project ) );
+        subjectDao.update( subject );
 
         CNV cnv1 = persistentTestObjectHelper.createPersistentTestCNVObject();
-        cnv1.setSubject( s );
+        cnv1.setSubject( subject );
         cnv1.getLocation().setChromosome( "8" );
         cnv1.getLocation().setStart( 37885247 );
         cnv1.getLocation().setEnd( 37885647 );
@@ -383,7 +411,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         cnvDao.update( cnv1 );
 
         CNV cnv2 = persistentTestObjectHelper.createPersistentTestCNVObject();
-        cnv2.setSubject( s );
+        cnv2.setSubject( subject );
         cnv2.getLocation().setChromosome( "X" );
         cnv2.getLocation().setStart( 72247 );
         cnv2.getLocation().setEnd( 5545043 );
@@ -398,6 +426,10 @@ public class QueryServiceTest extends BaseSpringContextTest {
         vars = variantDao.findByGenomicLocation( new GenomicRange( "9", 37885255, 37890000 ),
                 Collections.singletonList( project.getId() ) );
         assertTrue( vars.isEmpty() );
+
+        // cleanup
+        persistentTestObjectHelper.removeVariant( cnv1 );
+        persistentTestObjectHelper.removeVariant( cnv2 );
 
     }
 
@@ -593,7 +625,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
             patientId += "_" + HP_NERVOUS + "=" + nervousPhenoValue;
         }
 
-        Subject subject = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
+        subject = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
         subject.setProjects( plist );
         subject.addPhenotype( phenoHead );
         subject.addPhenotype( phenoFace );
