@@ -321,8 +321,13 @@ Ext
 
                // Ext.getCmp('querymanager').enable();
 
+               // FIXME
                QueryService.loadQuery( combo.getValue(), {
                   callback : this.loadQueryHandler,
+                  errorHandler : function(message, exception) {
+                     console.log( message )
+                     console.log( dwr.util.toDescriptiveString(exception.stackTrace,3) )
+                  },
                   scope : this
                } );
 

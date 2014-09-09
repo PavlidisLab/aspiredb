@@ -115,7 +115,7 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
 
       me.getComponent( "addButton" ).on( 'click', function(button, event) {
          var filterContainer = me.getComponent( "filterContainer" );
-         filterContainer.add( Ext.create( 'ASPIREdb.view.filter.VariantFilter', {
+         filterContainer.add( Ext.create( 'ASPIREdb.view.filter.PropertyFilter', {
             propertyStore : me.getPropertyStore(),
             suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
          } ) );
