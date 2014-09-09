@@ -69,7 +69,7 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
 
                for (var i = 0; i < restriction.restrictions.length; i++) {
 
-                  var filter = Ext.create( 'ASPIREdb.view.filter.VariantFilter', {
+                  var filter = Ext.create( 'ASPIREdb.view.filter.PropertyFilter', {
                      propertyStore : me.getPropertyStore(),
                      suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
                   } );
@@ -82,7 +82,7 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
 
             } else {
                // this else block probably never gets called
-               var filter = Ext.create( 'ASPIREdb.view.filter.VariantFilter', {
+               var filter = Ext.create( 'ASPIREdb.view.filter.PropertyFilter', {
                   propertyStore : me.getPropertyStore(),
                   suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
                } );

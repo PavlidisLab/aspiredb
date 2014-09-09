@@ -124,18 +124,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
 
    setFilterConfig : function(config) {
 
-      // var cnvFilterPanel = this.getComponent( 'cnvFilterPanel' );
-      // var indelFilterPanel = this.getComponent( 'indelFilterPanel' );
-      // var snvFilterPanel = this.getComponent( 'snvFilterPanel' );
       var variantFilterContainer = this.getComponent( 'variantFilterContainer' );
-
-      var locationRestrictions = new Conjunction();
-      var conjunctions = [];
-
-      // var cnvRestrictions = new Conjunction();
-      // var indelRestrictions = new Conjunction();
-      // var snvRestrictions = new Conjunction();
-      var variantTypeDisjunctions = [];
 
       if ( config.restriction.restrictions ) {
 
@@ -143,39 +132,10 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
 
          for (var i = 0; i < restrictions.length; i++) {
 
-            if ( restrictions[i] instanceof Conjunction ) {
-               conjunctions.push( restrictions[i] );
-            } else if ( restrictions[i] instanceof Disjunction ) {
-               variantTypeDisjunctions.push( restrictions[i] );
-            }
+            variantFilterContainer.setRestrictionExpression(restrictions[i]);
 
          }
 
-      }
-
-      locationRestrictions.restrictions = conjunctions;
-
-      variantFilterContainer.setRestrictionExpression( locationRestrictions );
-
-      cnvRestrictions.restrictions = this.separateVariantDisjunctions( variantTypeDisjunctions, "CNV" );
-
-      if ( this.shouldExpandVariantTypeBox( cnvRestrictions ) ) {
-         variantFilterContainer.setRestrictionExpression( cnvRestrictions );
-         // variantFilterContainer.expand();
-      }
-
-      indelRestrictions.restrictions = this.separateVariantDisjunctions( variantTypeDisjunctions, "INDEL" );
-
-      if ( this.shouldExpandVariantTypeBox( indelRestrictions ) ) {
-         variantFilterContainer.setRestrictionExpression( indelRestrictions );
-         // indelFilterPanel.expand();
-      }
-
-      snvRestrictions.restrictions = this.separateVariantDisjunctions( variantTypeDisjunctions, "SNV" );
-
-      if ( this.shouldExpandVariantTypeBox( snvRestrictions ) ) {
-         variantFilterContainer.setRestrictionExpression( snvRestrictions );
-         // snvFilterPanel.expand();
       }
 
    },
@@ -187,11 +147,6 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
       var addVariantRestrictionToDisjunctions = function(innerRestriction, outerRestriction, somethingElseToDo) {
 
          if ( innerRestriction.type && innerRestriction.type == variantType ) {
-
-            // TODO FIXME
-            var variantRestriction = new VariantTypeRestriction();
-            variantRestriction.type = variantType;
-            outerRestriction.push( variantRestriction );
 
             separatedDisjunctions.push( outerRestriction );
 
