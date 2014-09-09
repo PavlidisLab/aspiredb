@@ -132,18 +132,30 @@ Ext
                                 items : [ {
                                    xtype : 'label',
                                    itemId : 'numberOfSubjectsLabel',
+                                   style: {
+                                      opacity: 0
+                                   }
                                 }, {
                                    xtype : 'label',
                                    text : ' subjects and ',
-                                   itemId : 'numberOfSubjectsLabelText'
+                                   itemId : 'numberOfSubjectsLabelText',
+                                      style: {
+                                         opacity: 0
+                                      }
                                 }, {
                                    xtype : 'label',
                                    itemId : 'numberOfVariantsLabel',
+                                   style: {
+                                      opacity: 0
+                                   }
 
                                 }, {
                                    xtype : 'label',
                                    text : ' variants will be returned.',
-                                   itemId : 'numberOfVariantsLabelText'
+                                   itemId : 'numberOfVariantsLabelText',
+                                   style: {
+                                      opacity: 0
+                                   }
                                 } ]
                              }, {
                                 xtype : 'container',
@@ -321,7 +333,6 @@ Ext
 
                // Ext.getCmp('querymanager').enable();
 
-               // FIXME
                QueryService.loadQuery( combo.getValue(), {
                   callback : this.loadQueryHandler,
                   errorHandler : function(message, exception) {
@@ -464,10 +475,10 @@ Ext
          invalidateResultCounts : function() {
 
             if ( this.down( '#numberOfSubjectsLabel' ).getEl() && this.down( '#numberOfVariantsLabel' ).getEl() ) {
-               this.down( '#numberOfSubjectsLabel' ).getEl().setOpacity( 0.5, true );
-               this.down( '#numberOfVariantsLabel' ).getEl().setOpacity( 0.5, true );
-               this.down( '#numberOfSubjectsLabelText' ).getEl().setOpacity( 0.5, true );
-               this.down( '#numberOfVariantsLabelText' ).getEl().setOpacity( 0.5, true );
+               this.down( '#numberOfSubjectsLabel' ).getEl().setOpacity( 0, true );
+               this.down( '#numberOfVariantsLabel' ).getEl().setOpacity( 0, true );
+               this.down( '#numberOfSubjectsLabelText' ).getEl().setOpacity( 0, true );
+               this.down( '#numberOfVariantsLabelText' ).getEl().setOpacity( 0, true );
             }
 
          },
