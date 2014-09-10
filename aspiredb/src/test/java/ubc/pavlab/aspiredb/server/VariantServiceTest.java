@@ -34,6 +34,7 @@ import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
+import ubc.pavlab.aspiredb.server.model.Characteristic;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.service.VariantService;
@@ -41,6 +42,7 @@ import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.CharacteristicProperty;
+import ubc.pavlab.aspiredb.shared.query.NumericalDataType;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.PropertyValue;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
@@ -95,8 +97,23 @@ public class VariantServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testSuggestProperties() throws NotLoggedInException {
+        final String cnvLength = "cnvLength";
+        new InlineTransaction() {
+            @Override
+            public void instructions() {
+                variant.getCharacteristics().add( new Characteristic( cnvLength, "100" ) );
+                variantDao.update( variant );
+            }
+        }.execute();
         Collection<Property> suggestions = variantService.suggestPropertiesForVariantType( VariantType.CNV );
-        assertTrue( suggestions.size() > 2 ); // TODO: test more thoroughly
+        assertTrue( suggestions.size() > 2 );
+        boolean found = false;
+        for ( Property prop : suggestions ) {
+            if ( prop.getName().equals( cnvLength ) && prop.getDataType() instanceof NumericalDataType ) {
+                found = true;
+            }
+        }
+        assertTrue( cnvLength + " not found", found );
     }
 
     @Test

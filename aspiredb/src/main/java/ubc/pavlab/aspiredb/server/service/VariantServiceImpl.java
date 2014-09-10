@@ -15,10 +15,7 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -278,15 +275,15 @@ public class VariantServiceImpl implements VariantService {
     public Collection<Property> suggestProperties() {
         Collection<Property> properties = new ArrayList<Property>();
         for ( VariantType type : VariantType.values() ) {
-            properties.addAll( suggestEntityProperties( type ) );
+            properties.addAll( suggestPropertiesForVariantType( type ) );
         }
 
-      //  properties.add( new VariantLabelProperty() );
+        // properties.add( new VariantLabelProperty() );
 
-        Collection<String> characteristics = characteristicDao.getKeysMatching( "" );
-        for ( String characteristic : characteristics ) {
-            properties.add( new CharacteristicProperty( characteristic ) );
-        }
+        // Collection<String> characteristics = characteristicDao.getKeysMatching( "" );
+        // for ( String characteristic : characteristics ) {
+        // properties.add( new CharacteristicProperty( characteristic ) );
+        // }
 
         return properties;
     }
@@ -330,7 +327,7 @@ public class VariantServiceImpl implements VariantService {
     public Collection<Property> suggestPropertiesForVariantType( VariantType variantType ) {
         Collection<Property> properties = new ArrayList<Property>();
 
-        //properties.add( new VariantLabelProperty() );
+        // properties.add( new VariantLabelProperty() );
 
         properties.addAll( suggestEntityProperties( variantType ) );
 
@@ -338,6 +335,7 @@ public class VariantServiceImpl implements VariantService {
         for ( String characteristic : characteristics ) {
             properties.add( new CharacteristicProperty( characteristic ) );
         }
+
         return properties;
     }
 
@@ -404,10 +402,10 @@ public class VariantServiceImpl implements VariantService {
         Collection<Property> properties = new ArrayList<Property>();
 
         properties.add( new VariantTypeProperty() );
-        properties.add(new VariantLabelProperty());
+        properties.add( new VariantLabelProperty() );
         properties.add( new GenomicLocationProperty() );
         properties.add( new GeneProperty() );
-        properties.add( new GeneSetProperty());        
+        properties.add( new GeneSetProperty() );
         properties.add( new NeurocartaPhenotypeProperty() );
         properties.add( new CNVCharacteristicsProperty() );
         properties.add( new SNVCharacteristicsProperty() );

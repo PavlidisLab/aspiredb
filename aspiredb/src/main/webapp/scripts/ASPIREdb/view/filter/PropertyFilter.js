@@ -149,6 +149,21 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
 
    },
 
+   updateOperators : function(operators) {
+      // update operators
+      var operatorComboBox = this.getComponent( "operatorComboBox" );
+      var operatorModels = Ext.Array.map( operators, function(x) {
+         return {
+            displayLabel : x,
+            operator : x
+         };
+      } );
+      var store = operatorComboBox.getStore();
+      store.removeAll();
+      store.add( operatorModels );
+      operatorComboBox.select( store.getAt( 0 ) );
+   },
+
    initComponent : function() {
       var me = this;
 
@@ -278,6 +293,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
          me.selectedProperty = property;
          me.enableEnterList( property );
 
+         me.updateOperators( record.data.operators );
       } );
 
       propertyComboBox.on( 'select', function(obj, records) {
@@ -329,7 +345,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
             subPropertyComboBox.setVisible( true );
             subPropertyComboBox.store.proxy.dwrParams[0] = "SNV";
             subPropertyComboBox.emptyText = 'Type characteristics';
-            
+
             var storeInstance = Ext.create( 'Ext.data.Store', {
                proxy : {
                   type : 'dwr',
@@ -345,11 +361,11 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
                sortOnLoad : true,
                autoLoad : true
             } );
-            
+
             subPropertyComboBox.store.reload( storeInstance );
 
          } else if ( value == "Indel Characteristics" ) {
-            
+
             var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
             subPropertyComboBox.setVisible( true );
             subPropertyComboBox.store.proxy.dwrParams[0] = "INDEL";
@@ -382,19 +398,6 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
          var queryExample = record.data.exampleValues;
          console.log( "queryExample is " + queryExample );
          example.setText( queryExample, false );
-
-         // update operators
-         var operators = record.data.operators;
-         var operatorModels = Ext.Array.map( operators, function(x) {
-            return {
-               displayLabel : x,
-               operator : x
-            };
-         } );
-         var store = operatorComboBox.getStore();
-         store.removeAll();
-         store.add( operatorModels );
-         operatorComboBox.select( store.getAt( 0 ) );
 
          var property = record.raw;
          if ( property.dataType instanceof NumericalDataType ) {
