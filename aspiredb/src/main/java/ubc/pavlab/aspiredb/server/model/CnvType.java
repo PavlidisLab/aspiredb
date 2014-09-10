@@ -14,12 +14,15 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 /**
  * TODO Document Me. This might need to be changed to VariantType and include CNVs, SNVs etc.
  * 
  * @author ??
  * @version $Id: CnvType.java,v 1.6 2013/06/11 22:55:58 anton Exp $
  */
+@DataTransferObject(type = "enum")
 public enum CnvType {
     LOSS, GAIN, GAINLOSS, UNKNOWN
 }
