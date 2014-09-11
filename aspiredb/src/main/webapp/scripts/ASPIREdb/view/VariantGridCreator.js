@@ -69,7 +69,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
          for (var i = 0; i < properties.length; i++) {
 
-            if ( properties[i].characteristic ) {
+            if ( properties[i].characteristic && fieldData.indexOf( properties[i].displayName ) == -1 ) {
                fieldData.push( properties[i].displayName );
                characteristicNames.push( properties[i].name );
             }
