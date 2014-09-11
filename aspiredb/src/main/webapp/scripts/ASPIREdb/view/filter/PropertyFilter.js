@@ -177,7 +177,6 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
             select : {
                fn : function(obj, records) {
                   // ASPIREdb.EVENT_BUS.fireEvent('query_update');
-                  console.log( 'test' );
                   if ( records[0].name == "CNV Characteristics" )
                      this.setVisible( false );
                },
@@ -396,8 +395,17 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
 
          // update examples
          var queryExample = record.data.exampleValues;
-         console.log( "queryExample is " + queryExample );
          example.setText( queryExample, false );
+
+         if ( !subPropertyComboBox.isVisible() ) {
+            me.updateOperators( record.data.operators );
+         } else {
+            // clear operator combobox
+            var operatorComboBox = me.getComponent( "operatorComboBox" );
+            var store = operatorComboBox.getStore();
+            store.removeAll();
+            operatorComboBox.select( null );
+         }
 
          var property = record.raw;
          if ( property.dataType instanceof NumericalDataType ) {
