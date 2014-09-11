@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,6 @@ import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.model.Variant2VariantOverlap;
 import ubc.pavlab.aspiredb.server.service.QueryService;
-import ubc.pavlab.aspiredb.server.util.GenomeBin;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.BoundedList;
 import ubc.pavlab.aspiredb.shared.CNVValueObject;
@@ -494,6 +494,9 @@ public class ProjectManagerImpl implements ProjectManager {
 
     private void addSubjectVariantToProject( Project project, String patientId, Variant v, Boolean specialProject ) {
 
+        StopWatch timer = new StopWatch();
+        timer.start();
+
         Subject subject = subjectDao.findByPatientId( project, patientId );
 
         boolean newSubject = false;
@@ -521,6 +524,8 @@ public class ProjectManagerImpl implements ProjectManager {
         }
 
         subjectDao.update( subject );
+
+        log.info( "Adding subject variant to subject took " + timer.getTime() + " ms" );
     }
 
     /**

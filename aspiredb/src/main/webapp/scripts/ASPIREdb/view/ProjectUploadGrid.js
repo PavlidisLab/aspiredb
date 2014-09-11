@@ -68,16 +68,17 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                ProjectService.addSubjectVariantsToProject( variantfilename, false, projectName, variantTypeEdit, {
                   callback : function(errorMessage) {
                      
-                     if ( errorMessage == 'Success' ) {
-                        Ext.Msg.alert( 'Success', 'You have successfully uploaded variant file' );
-                     } else
-                        Ext.Msg.alert( 'Server Reply', 'Uploading Variants  :' + errorMessage );
+                     alert(errorMessage);
+//                     if ( errorMessage == 'Success' ) {
+//                        Ext.Msg.alert( 'Success', 'You have successfully uploaded variant file' );
+//                     } else
+//                        Ext.Msg.alert( 'Server Reply', 'Uploading Variants  :' + errorMessage );
                      
                    //  Ext.getCmp( 'variantTypeEdit' ).setValue( '' );
                    //  Ext.getCmp( 'variantFileEdit' ).setRawValue( '' );
                   },
                   errorHandler : function(er, exception) {
-                     Ext.Msg.alert( "Upload variants Error", er + "\n" + exception.stack );
+                     alert( er + "\n" + exception.stack );
                      console.log( exception.stack );
                   }
                } );

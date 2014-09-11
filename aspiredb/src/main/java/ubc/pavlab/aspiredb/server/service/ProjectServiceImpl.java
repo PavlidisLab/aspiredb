@@ -17,6 +17,7 @@ package ubc.pavlab.aspiredb.server.service;
 import gemma.gsec.SecurityService;
 import gemma.gsec.authentication.UserManager;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -29,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.slf4j.Logger;
@@ -125,7 +127,8 @@ public class ProjectServiceImpl implements ProjectService {
         userNames = securityService.readableBy( proj );
 
         for ( String userName : userNames ) {
-            User user = (ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User) userManager.findByUserName( userName );
+            User user = ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) userManager
+                    .findByUserName( userName );
             userObject.add( user );
         }
 
@@ -163,8 +166,8 @@ public class ProjectServiceImpl implements ProjectService {
 
             User user = ( User ) userManager.findByUserName( userName );
             Collection<gemma.gsec.model.UserGroup> usergroups = new ArrayList<>();
-            for ( gemma.gsec.model.UserGroup group : userService.findGroupsForUser( user )) {
-                usergroups.add(group);
+            for ( gemma.gsec.model.UserGroup group : userService.findGroupsForUser( user ) ) {
+                usergroups.add( group );
             }
             for ( gemma.gsec.model.UserGroup usergroup : usergroups ) {
                 groupNames = groupNames + usergroup.getName() + ',';
@@ -199,7 +202,7 @@ public class ProjectServiceImpl implements ProjectService {
         try {
             projectManager.createProject( projectName, projectDescription );
         } catch ( Exception e ) {
-            log.error( e.getMessage() );
+            log.error( e.getMessage(), e );
             return e.getMessage();
         }
 
@@ -220,7 +223,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
         return pvo;
     }
-    
+
     /**
      * @author gaya
      * @param list of variantFiles
@@ -230,18 +233,19 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @RemoteMethod
-    public Map<String, String> addMultipleSubjectVariantsToProject(List<String> variantFiles, boolean createProject, String projectName) {
+    public Map<String, String> addMultipleSubjectVariantsToProject( List<String> variantFiles, boolean createProject,
+            String projectName ) {
         Map<String, String> returnString = new HashMap<String, String>();
-        
-        for(int i=0; i<variantFiles.size();i++){
+
+        for ( int i = 0; i < variantFiles.size(); i++ ) {
             String filename = variantFiles.get( 0 );
             String filetype = variantFiles.get( 1 );
-            String results = addSubjectVariantsToProject(filename, createProject, projectName,filetype);
+            String results = addSubjectVariantsToProject( filename, createProject, projectName, filetype );
             returnString.put( filename, results );
         }
         return returnString;
     }
-    
+
     /**
      * @author gaya
      * @param fileContent
@@ -251,27 +255,35 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @RemoteMethod
-    public String addSubjectVariantsToProject(String filename, boolean createProject, String projectName,
+    public String addSubjectVariantsToProject( String filepath, boolean createProject, String projectName,
             String variantType ) {
 
         String returnString = "";
 
         try {
-            
+
             Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-            
+
+            File file = new File( filepath );
+            String filename = file.getName();
+
+            if ( !file.exists() ) {
+                return "File " + filepath + " not found";
+            }
+
             if ( filename.endsWith( ".csv" ) ) {
-                filename = filename.substring( 0, filename.length() - 4 );
+                filename = filename.substring( 0, file.getName().length() - 4 );
             } else {
                 return "File not processed, file name must end with .csv";
             }
 
             // create a connection
             // arg[0] is the directory in which the .csv files are held
-            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
+            Connection conn = DriverManager
+                    .getConnection( "jdbc:relique:csv:" + file.getParentFile().getAbsolutePath() );
 
             Statement stmt = conn.createStatement();
-            ResultSet results = stmt.executeQuery( "SELECt * from "+filename );
+            ResultSet results = stmt.executeQuery( "SELECt * from " + filename );
 
             // check weather the project exist
             if ( createProject ) {
@@ -298,17 +310,28 @@ public class ProjectServiceImpl implements ProjectService {
             }
 
             if ( result.getErrorMessages().isEmpty() ) {
+                StopWatch timer = new StopWatch();
+                timer.start();
+
                 projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
-                returnString = "Success";
+
+                log.info( "Adding " + result.getVariantsToAdd().size() + " variants to project " + projectName
+                        + " took " + timer.getTime() + " ms" );
+
+                returnString = result.getVariantsToAdd().size() + " variants were added to " + projectName;
+
             } else {
                 for ( String errorMessage : result.getErrorMessages() ) {
-                    returnString = errorMessage;
+                    returnString += errorMessage + "\n";
                 }
 
             }
             // }
 
+            // TODO Should we delete the file???
+
         } catch ( Exception e ) {
+            log.error( e.getLocalizedMessage(), e );
             return e.toString();
         }
         return returnString;
@@ -482,7 +505,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         return returnString;
     }
-    
+
     /**
      * @author gaya
      * @param fileContent
@@ -510,7 +533,7 @@ public class ProjectServiceImpl implements ProjectService {
             }
 
             Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-            
+
             if ( filename.endsWith( ".csv" ) ) {
                 filename = filename.substring( 0, filename.length() - 4 );
             } else {
@@ -522,7 +545,7 @@ public class ProjectServiceImpl implements ProjectService {
             Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
 
             Statement stmt = conn.createStatement();
-            ResultSet results = stmt.executeQuery( "SELECT * FROM "+filename );
+            ResultSet results = stmt.executeQuery( "SELECT * FROM " + filename );
 
             if ( createProject ) {
                 if ( projectDao.findByProjectName( projectName ) != null ) {
@@ -556,7 +579,6 @@ public class ProjectServiceImpl implements ProjectService {
 
         return returnString;
     }
-
 
     @Override
     @RemoteMethod
@@ -619,7 +641,8 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @RemoteMethod
     public UserGroup findGroupByName( String name ) {
-        return (ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup) userService.findGroupByName( name );
+        return ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) userService
+                .findGroupByName( name );
     }
 
     @Override
@@ -639,7 +662,8 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = true)
     public boolean isUser( String userName ) throws NotLoggedInException {
 
-        User user = (ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User) userService.findByUserName( userName );
+        User user = ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) userService
+                .findByUserName( userName );
         if ( user != null ) return true;
         return false;
     }
