@@ -40,6 +40,12 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 @DiscriminatorValue("CNV")
 public class CNV extends Variant {
 
+    /**
+     * @deprecated use toValueObject()
+     * @param cnv
+     * @return
+     */
+    @Deprecated
     public static CNVValueObject getCNVValueObject( CNV cnv ) {
         CNVValueObject vo = new CNVValueObject();
         vo.setId( cnv.getId() );
@@ -113,6 +119,9 @@ public class CNV extends Variant {
 
         vo.setGenomicRange( new GenomicRange( this.getLocation().getChromosome(), this.getLocation().getStart(), this
                 .getLocation().getEnd() ) );
+
+        vo.setCnvLength( this.getCnvLength() );
+        vo.setCopyNumber( this.getCopyNumber() );
 
         vo.setType( this.getType().toString() );
         vo.setDetails( "Type: " + vo.getType() );
