@@ -207,31 +207,35 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
     private void updateCacheIfExpired() throws NeurocartaServiceException {
         if ( this.neurocartaCache.hasExpired() ) {
 
-            String result = sendRequest( LOAD_PHENOTYPES_URL_SUFFIX, new MultivaluedMapImpl() );
-
-            Collection<NeurocartaPhenotypeValueObject> neurocartaPhenotypes = new HashSet<NeurocartaPhenotypeValueObject>();
-
             try {
-                JSONArray jsonArray = new JSONArray( new JSONTokener( result ) );
+                String result = sendRequest( LOAD_PHENOTYPES_URL_SUFFIX, new MultivaluedMapImpl() );
 
-                for ( int i = 0; i < jsonArray.length(); i++ ) {
-                    JSONObject json = jsonArray.getJSONObject( i );
+                Collection<NeurocartaPhenotypeValueObject> neurocartaPhenotypes = new HashSet<NeurocartaPhenotypeValueObject>();
 
-                    NeurocartaPhenotypeValueObject neurocartaPhenotype = new NeurocartaPhenotypeValueObject();
-                    neurocartaPhenotype.setName( json.getString( "value" ) );
-                    neurocartaPhenotype.setUri( json.getString( "valueUri" ) );
-                    neurocartaPhenotype.setGeneCount( json.getInt( "publicGeneCount" ) );
+                try {
+                    JSONArray jsonArray = new JSONArray( new JSONTokener( result ) );
 
-                    neurocartaPhenotypes.add( neurocartaPhenotype );
+                    for ( int i = 0; i < jsonArray.length(); i++ ) {
+                        JSONObject json = jsonArray.getJSONObject( i );
+
+                        NeurocartaPhenotypeValueObject neurocartaPhenotype = new NeurocartaPhenotypeValueObject();
+                        neurocartaPhenotype.setName( json.getString( "value" ) );
+                        neurocartaPhenotype.setUri( json.getString( "valueUri" ) );
+                        neurocartaPhenotype.setGeneCount( json.getInt( "publicGeneCount" ) );
+
+                        neurocartaPhenotypes.add( neurocartaPhenotype );
+                    }
+                } catch ( JSONException e ) {
+                    String errorMessage = "Cannot initialize phenotypes from Neurocarta";
+                    log.error( errorMessage, e );
+
+                    throw new NeurocartaServiceException( errorMessage );
                 }
-            } catch ( JSONException e ) {
-                String errorMessage = "Cannot initialize phenotypes from Neurocarta";
-                log.error( errorMessage, e );
 
-                throw new NeurocartaServiceException( errorMessage );
+                this.neurocartaCache.putAll( neurocartaPhenotypes );
+            } catch ( Exception ex ) {
+                log.warn( ex.getLocalizedMessage(), ex );
             }
-
-            this.neurocartaCache.putAll( neurocartaPhenotypes );
         }
     }
 }
