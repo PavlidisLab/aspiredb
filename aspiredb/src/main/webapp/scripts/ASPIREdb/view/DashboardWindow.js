@@ -223,7 +223,9 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
     * Refresh the dash board
     */
    refreshDashboardHandler : function() {
-      this.getView().refresh( true );
+      // FIXME
+      console.log("refreshDashboardHandler called");
+      //this.getView().refresh( true );
       // Ext.getCmp('projectField').store.load();
 
    }

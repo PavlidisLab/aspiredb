@@ -33,6 +33,8 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
       variantFileEdit : '',
       phenotypeFileEdit : '',
       variantTypeEdit : '',
+      variantServerFilename : '',
+      phenotypeServerFilename : '',
    },
    fieldDefaults : {
       labelWidth : 75,
@@ -54,14 +56,15 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
          if ( form.isValid() ) {
             // getting the form values
             values = form.getFieldValues();
-            var variantfilename = form.owner.variantFileEdit;
-            var phenotypefilename = form.owner.phenotypeFileEdit;
+            var variantfilename = me.up("ProjectUploadGrid").variantServerFilename;
+            var phenotypefilename = me.up("ProjectUploadGrid").phenotypeServerFilename;
             var projectName = Ext.getCmp( 'ProjectUploadGrid' ).selectedProject[0].data.ProjectName;
 
             if ( variantfilename != '' ) {
                var variantTypeEdit = form.owner.variantTypeEdit;
                /** Uploading variants to the created project */
 
+               // FIXME
                ProjectService.addSubjectVariantsToProject( variantfilename, false, projectName, variantTypeEdit, {
                   callback : function(errorMessage) {
                      
@@ -263,6 +266,9 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                         var fReader = new FileReader();
                         fReader.readAsBinaryString( file );
 
+                        // cache the server file name
+                        me.up("ProjectUploadGrid").variantServerFilename = action.result.data.filePath;
+                        
                         fReader.onloadend = function(event) {
                            var variantSrc = event.target.result;
                            var variantCount = variantSrc.split( /\r\n|\r|\n/ ).length;
@@ -361,6 +367,10 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                         var fReader = new FileReader();
                         fReader.readAsBinaryString( file );
 
+                        // cache the uploaded file's absolute server file path
+                        me.up("ProjectUploadGrid").phenotypeServerFilename = action.result.data.filePath;
+                        
+                        
                         fReader.onloadend = function(event) {
                            var variantSrc = event.target.result;
                            var fileArray = variantSrc.split( /\r\n|\r|\n/ );

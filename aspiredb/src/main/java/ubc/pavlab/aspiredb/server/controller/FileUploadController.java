@@ -7,10 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -74,26 +70,29 @@ public class FileUploadController {
                 // .getOriginalFilename() );
                 serverFile = saveFileFromInputStream( uploadItem.getFile().getInputStream() );
 
-                Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-
-                // create a connection
-                // arg[0] is the directory in which the .csv files are held
-                Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + UPLOAD_PATH );
-                // String filename = uploadItem.getFile().getOriginalFilename()
-                // .substring( 0, uploadItem.getFile().getOriginalFilename().lastIndexOf( '.' ) );
-                String filename = serverFile.getName().substring( 0, serverFile.getName().lastIndexOf( FILE_SUFFIX ) );
-                Statement stmt = conn.createStatement();
-                ResultSet results = stmt.executeQuery( "SELECT * FROM " + filename );
-
-                // FIXME Create a new project
-
-                // clean up
-                results.close();
-                stmt.close();
-                conn.close();
+                // Class.forName( "org.relique.jdbc.csv.CsvDriver" );
+                //
+                // // create a connection
+                // // arg[0] is the directory in which the .csv files are held
+                // Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + UPLOAD_PATH );
+                // // String filename = uploadItem.getFile().getOriginalFilename()
+                // // .substring( 0, uploadItem.getFile().getOriginalFilename().lastIndexOf( '.' ) );
+                // String filename = serverFile.getName().substring( 0, serverFile.getName().lastIndexOf( FILE_SUFFIX )
+                // );
+                // Statement stmt = conn.createStatement();
+                // ResultSet results = stmt.executeQuery( "SELECT * FROM " + filename );
+                //
+                // // FIXME Create a new project
+                //
+                // // clean up
+                // results.close();
+                // stmt.close();
+                // conn.close();
 
                 // set extjs return - sucsess
                 extjsFormResult.setSuccess( true );
+                extjsFormResult.setData( "{ \"filePath\" : \"" + serverFile.getAbsolutePath() + "\" } " );
+                extjsFormResult.setMessage( "success" );
 
                 log.info( "Successfully saved " + uploadItem.getFile().getOriginalFilename() + " to "
                         + serverFile.getAbsolutePath() );
@@ -102,6 +101,7 @@ public class FileUploadController {
                 log.error( e.getLocalizedMessage(), e );
                 // set extjs return - sucsess
                 extjsFormResult.setSuccess( false );
+                extjsFormResult.setMessage( e.getLocalizedMessage() );
             }
         }
 
