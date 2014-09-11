@@ -53,6 +53,7 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
       this.enableToolbar();
       var ref = this;
       var projectStore = Ext.create( 'Ext.data.Store', {
+         id : 'projectStore',
          proxy : {
             type : 'dwr',
             dwrFunction : ProjectService.getProjects,
@@ -156,7 +157,7 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
 
       this.add( okButton );
 
-      ASPIREdb.EVENT_BUS.on( 'new_project_created', ref.refreshDashboardHandler, ref );
+      ASPIREdb.EVENT_BUS.on( 'project_list_updated', ref.refreshDashboardHandler, ref );
 
    },
    /**
@@ -223,11 +224,7 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
     * Refresh the dash board
     */
    refreshDashboardHandler : function() {
-      // FIXME
-      console.log("refreshDashboardHandler called");
-      //this.getView().refresh( true );
-      // Ext.getCmp('projectField').store.load();
-
+      Ext.getCmp('projectField').getStore().load();
    }
 
 } );

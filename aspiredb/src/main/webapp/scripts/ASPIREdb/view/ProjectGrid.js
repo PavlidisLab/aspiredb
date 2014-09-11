@@ -118,6 +118,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
    projectAddedHandler : function(pvo) {
       this.projectValueObjects.push( pvo );
 
+      ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated');
    },
 
    projectSelectHandler : function(ref, record, index, eOpts) {
@@ -203,8 +204,13 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
          // TODO: Need a better workaround
          handler : function() {
 
-            var newProjectName = ref.down( '#ProjectName' ).getValue();
+            var newProjectName = ref.down( '#ProjectName' ).getValue().trim();
 
+            if ( newProjectName.length == 0 ) {
+               alert("Please enter a valid project name");
+               return;
+            } 
+            
             ProjectService.createUserProject( newProjectName, '', {
                callback : function(message) {
                   if (message=="Success"){
@@ -221,7 +227,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
                   
                      ref.down( '#ProjectName' ).setValue( '' );
                     // console.log( 'returned project value object : ' + message );
-                     ASPIREdb.EVENT_BUS.fireEvent( 'new_project_saved' );
+                     ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated');
                   }else {
                      Ext.Msg.alert( 'Failure','fail to create project!' );
                   }
@@ -253,6 +259,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
                      }
 
                      console.log( 'selected Project :' + ref.selProject[0].data.ProjectName + ' deleted' );
+                     ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated');
                   }else {
                      Ext.Msg.alert( 'Failure','fail to remove project!' );
                   }

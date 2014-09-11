@@ -76,6 +76,9 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                      
                    //  Ext.getCmp( 'variantTypeEdit' ).setValue( '' );
                    //  Ext.getCmp( 'variantFileEdit' ).setRawValue( '' );
+                     
+
+                     ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
                   },
                   errorHandler : function(er, exception) {
                      alert( er + "\n" + exception.stack );
@@ -97,6 +100,9 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                         } else
                            Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :' + errorMessage );
                      //   Ext.getCmp( 'phenotypeFileEdit' ).setRawValue( '' );
+                        
+
+                        ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
                      },
                      errorHandler : function(er, exception) {
                         Ext.Msg.alert( "Upload phenotype Error", er + "\n" + exception.stack );
@@ -131,6 +137,9 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                         } else
                            Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :' + errorMessage );
                        // Ext.getCmp( 'phenotypeFileEdit' ).setRawValue( '' );
+                        
+
+                        ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
                      },
                      errorHandler : function(er, exception) {
                         Ext.Msg.alert( "Upload phenotype Error", er + "\n" + exception.stack );
@@ -141,7 +150,6 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
 
             }
 
-            ASPIREdb.EVENT_BUS.fireEvent( 'new_project_created' );
 
          } else {
             // Ext.Msg.alert( "Error!", "Your form
@@ -287,7 +295,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                      }
                   } );
 
-                  ASPIREdb.EVENT_BUS.fireEvent( 'new_project_created' );
+                  ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
 
                } else {
                   // Ext.Msg.alert( "Error!", "Your form is invalid!" );
@@ -389,7 +397,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                      }
                   } );
 
-                  ASPIREdb.EVENT_BUS.fireEvent( 'new_project_created' );
+                  ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
 
                } else {
                   // Ext.Msg.alert( "Error!", "Your form is invalid!" );

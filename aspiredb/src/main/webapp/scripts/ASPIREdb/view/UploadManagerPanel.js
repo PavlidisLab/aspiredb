@@ -389,7 +389,7 @@ Ext
                                 }
                              } );*/
 
-                             ASPIREdb.EVENT_BUS.fireEvent( 'new_project_created' );
+                             ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
 
                           } else {
                              // Ext.Msg.alert( "Error!", "Your form is invalid!" );
