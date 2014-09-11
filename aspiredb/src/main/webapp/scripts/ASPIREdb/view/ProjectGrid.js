@@ -78,7 +78,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
 
       this.callParent();
 
-      this.on( 'select', this.ProjectSelectHandler, this );
+      this.on( 'select', this.projectSelectHandler, this );
 
       ASPIREdb.EVENT_BUS.on( 'project_added', this.projectAddedHandler, this );
 
@@ -120,23 +120,23 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
 
    },
 
-   ProjectSelectHandler : function(ref, record, index, eOpts) {
+   projectSelectHandler : function(ref, record, index, eOpts) {
 
       var me = this;
       this.selProject = this.getSelectionModel().getSelection();
-      var ProjectName = this.selProject[0].data.ProjectName;
+      var projectName = this.selProject[0].data.ProjectName;
 
-      ProjectService.getProjectUserNames( ProjectName, {
+      ProjectService.getProjectUserNames( projectName, {
          callback : function(userNames) {
             console.log( 'project users :' + userNames );
-            me.populateProjectGrid( userNames, ProjectName );
+            me.populateProjectGrid( userNames, projectName );
          },
          errorHandler : function(er, exception) {
             Ext.Msg.alert( "Project Grid : get User Error", er + "\n" + exception.stack );
             console.log( exception.stack );
          }
       } );
-      ASPIREdb.EVENT_BUS.fireEvent( 'Project_selected', this.selProject );
+      ASPIREdb.EVENT_BUS.fireEvent( 'project_selected', this.selProject );
 
    },
 

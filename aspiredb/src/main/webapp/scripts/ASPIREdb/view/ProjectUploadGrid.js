@@ -211,7 +211,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
 
          }, {
             xtype : 'combobox',
-            fieldLabel : 'variant Type',
+            fieldLabel : 'Variant Type',
             id : 'variantTypeEdit',
             editable : false,
             displayField : 'variantTypeEdit',
@@ -241,7 +241,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
 
          buttons : [ {
             id : 'uploadVariantFilesEdit',
-            text : 'Uplaod Variants',
+            text : 'Upload Variants',
             handler : function() {
                var form = variantPanel;
                var me = this;
@@ -340,7 +340,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
          buttons : [ {
             // xtype : 'Upload',
             id : 'UploadPhenotypeFiles',
-            text : 'Uplaod Phenotypes',
+            text : 'Upload Phenotypes',
             handler : function() {
                var form = phenotypePanel;
                var me = this;

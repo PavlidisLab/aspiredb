@@ -279,7 +279,7 @@ Ext
 
                            }, {
                               xtype : 'combobox',
-                              fieldLabel : 'variant Type',
+                              fieldLabel : 'Variant Type',
                               id : variantType,
                               editable : false,
                               displayField : 'variantType',
