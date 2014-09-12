@@ -38,6 +38,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
@@ -52,6 +53,7 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
  */
 @Entity
 @Table(name = "VARIANT")
+@BatchSize(size = 10)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "discriminator", discriminatorType = DiscriminatorType.STRING)
 public abstract class Variant implements SecuredNotChild, ValueObjectConvertible<VariantValueObject> {

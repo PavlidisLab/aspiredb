@@ -51,4 +51,10 @@ public interface SubjectDao extends SecurableDaoBase<Subject>, RemotePaging<Subj
     public Collection<Subject> loadByVariantIds( List<Long> variantIds );
 
     public Collection<String> suggestValuesForEntityProperty( Property property, SuggestionContext suggestionContext );
+
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    public Collection<Subject> findByPatientIds( Project project, Collection<String> patientIds );
+
+    @Secured({ "GROUP_USER" })
+    public Collection<Subject> findOrCreateByPatientIds( Project project, Collection<String> patientIds );
 }

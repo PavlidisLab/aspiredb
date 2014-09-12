@@ -164,7 +164,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
             projectManager.addSubjectVariantsToProject( projectId, true, cnvList );
 
         } catch ( Exception e ) {
-
+            log.error( e.getLocalizedMessage(), e );
             fail( "projectManager.addSubjectVariantsToProject threw an exception " + e );
 
         }

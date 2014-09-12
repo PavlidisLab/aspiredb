@@ -46,6 +46,7 @@ import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.security.authorization.acl.AclTestUtils;
+import ubc.pavlab.aspiredb.server.service.SubjectService;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
 /**
@@ -58,6 +59,9 @@ public class SecurityServiceTest extends BaseSpringContextTest {
 
     @Autowired
     private SecurityService securityService;
+
+    @Autowired
+    private SubjectService subjectService;
 
     @Autowired
     private AclService aclService;
@@ -135,7 +139,7 @@ public class SecurityServiceTest extends BaseSpringContextTest {
     @Test
     public void testMakeIndividualReadWrite() throws Exception {
 
-        String indPatientId = RandomStringUtils.randomAlphabetic( 4 );
+        final String indPatientId = RandomStringUtils.randomAlphabetic( 4 );
 
         Subject ind = testObjectHelper.createPersistentTestSubjectObjectWithCNV( indPatientId );
         assertTrue( "This should be private because all data should be private, acl is " + aclTestUtils.getAcl( ind ),
@@ -168,12 +172,18 @@ public class SecurityServiceTest extends BaseSpringContextTest {
         /*
          * Now, log in as another user.
          */
+
         this.runAsUser( usertwo );
 
-        ind = individualDao.findByPatientId( indPatientId );
-        ind.setPatientId( RandomStringUtils.randomAlphabetic( 5 ) );
-        individualDao.update( ind );
-        // no exception == happy.
+        new InlineTransaction() {
+            @Override
+            public void instructions() {
+                Subject s = individualDao.findByPatientId( indPatientId );
+                s.setPatientId( RandomStringUtils.randomAlphabetic( 5 ) );
+                individualDao.update( s );
+                // no exception == happy.
+            }
+        }.execute();
 
         this.runAsUser( username );
         this.securityService.makeUnreadableByGroup( ind, groupName );
