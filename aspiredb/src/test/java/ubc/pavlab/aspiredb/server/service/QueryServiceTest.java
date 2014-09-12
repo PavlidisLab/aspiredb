@@ -136,6 +136,9 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
     private Subject subject;
 
+    @Autowired
+    private ProjectService projectService;
+
     @Before
     public void setUp() {
         try {
@@ -169,7 +172,12 @@ public class QueryServiceTest extends BaseSpringContextTest {
             persistentTestObjectHelper.removeSubject( subject );
         }
         if ( project != null ) {
-            persistentTestObjectHelper.deleteProject( project.getName() );
+            try {
+                projectService.deleteProject( project.getName() );
+            } catch ( NotLoggedInException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 

@@ -377,40 +377,4 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         return Label.toValueObjects( labelDao.getVariantLabelsByVariantId( variantId ) );
     }
 
-    @Override
-    @Transactional
-    public void deleteProject( String projectName ) {
-
-        Project project = projectDao.findByProjectName( projectName );
-
-        if ( project == null ) {
-            return;
-        }
-
-        variant2SpecialVariantOverlapDao.deleteByOverlapProjectId( project.getId() );
-        for ( Subject s : project.getSubjects() ) {
-            try {
-
-                for ( Phenotype p : s.getPhenotypes() ) {
-                    p.setSubject( null );
-                }
-
-                for ( Variant v : s.getVariants() ) {
-                    v.setSubject( null );
-                }
-
-                subjectDao.remove( s );
-
-            } catch ( Exception e ) {
-                // e.printStackTrace();
-            }
-        }
-
-        try {
-            projectDao.remove( project );
-        } catch ( Exception e ) {
-            // noop
-        }
-    }
-
 }

@@ -39,6 +39,7 @@ import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.model.Variant2VariantOverlap;
+import ubc.pavlab.aspiredb.server.service.ProjectService;
 import ubc.pavlab.aspiredb.server.service.QueryService;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.shared.BoundedList;
@@ -68,6 +69,9 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
     @Autowired
     private SubjectDao subjectDao;
+
+    @Autowired
+    private ProjectService projectService;
 
     @Autowired
     private PersistentTestObjectHelper helper;
@@ -124,7 +128,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         cnvListWithOverlap.add( getCNV( "Y", 3, 234, null, patientIdWithOverlap ) );
 
-        helper.deleteProject( "DGV" );
+        projectService.deleteProject( "DGV" );
 
         projectManager.addSubjectVariantsToSpecialProject( projectNameWithOverlap, true, cnvListWithOverlap, false );
 
@@ -173,8 +177,8 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         specialProjectList.add( specialProject.getId() );
 
-        Collection<Variant2VariantOverlap> infos = variant2SpecialVariantOverlapDao.loadByVariantId(
-                vvo.getId(), specialProjectList );
+        Collection<Variant2VariantOverlap> infos = variant2SpecialVariantOverlapDao.loadByVariantId( vvo.getId(),
+                specialProjectList );
 
         Variant v = variantDao.load( vvo.getId() );
 
@@ -219,8 +223,8 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         }
 
-        helper.deleteProject( projectName );
-        helper.deleteProject( projectNameWithOverlap );
+        projectService.deleteProject( projectName );
+        projectService.deleteProject( projectNameWithOverlap );
 
     }
 
