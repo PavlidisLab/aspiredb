@@ -55,6 +55,4 @@ public interface SubjectDao extends SecurableDaoBase<Subject>, RemotePaging<Subj
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<Subject> findByPatientIds( Project project, Collection<String> patientIds );
 
-    @Secured({ "GROUP_USER" })
-    public Collection<Subject> findOrCreateByPatientIds( Project project, Collection<String> patientIds );
 }

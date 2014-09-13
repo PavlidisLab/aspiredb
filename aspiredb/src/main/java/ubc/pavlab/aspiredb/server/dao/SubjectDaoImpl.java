@@ -349,25 +349,4 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
         return subjectIds;
     }
 
-    @Override
-    public Collection<Subject> findOrCreateByPatientIds( Project project, Collection<String> patientIds ) {
-        Collection<Subject> allEntities = new HashSet<>();
-        Collection<Subject> newEntities = new HashSet<>();
-        Collection<Subject> foundEntities = findByPatientIds( project, patientIds );
-        Collection<String> foundIds = new HashSet<>();
-        for ( Subject s : foundEntities ) {
-            foundIds.add( s.getPatientId() );
-        }
-        for ( String id : patientIds ) {
-            if ( !foundIds.contains( id ) ) {
-                Subject s = new Subject();
-                s.setPatientId( id );
-                newEntities.add( s );
-            }
-        }
-        allEntities.addAll( foundEntities );
-        allEntities.addAll( create( newEntities ) );
-        log.info( "foundEntities = " + foundEntities.size() + "; newEntities=" + newEntities.size() );
-        return allEntities;
-    }
 }

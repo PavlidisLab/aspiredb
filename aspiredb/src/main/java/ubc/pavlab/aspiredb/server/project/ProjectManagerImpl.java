@@ -494,8 +494,6 @@ public class ProjectManagerImpl implements ProjectManager {
 
     private void addSubjectVariantToProject( Project project, String patientId, Variant v, Boolean specialProject ) {
 
-        // FIXME
-
         StopWatch timer = new StopWatch();
         timer.start();
 
@@ -714,6 +712,27 @@ public class ProjectManagerImpl implements ProjectManager {
         createSubjectVariantsFromVariantValueObjects( project, voList, false );
     }
 
+    private Collection<Subject> findOrCreateByPatientIds( Project project, Collection<String> patientIds ) {
+        Collection<Subject> allEntities = new HashSet<>();
+        Collection<Subject> newEntities = new HashSet<>();
+        Collection<Subject> foundEntities = subjectDao.findByPatientIds( project, patientIds );
+        Collection<String> foundIds = new HashSet<>();
+        for ( Subject s : foundEntities ) {
+            foundIds.add( s.getPatientId() );
+        }
+        for ( String id : patientIds ) {
+            if ( !foundIds.contains( id ) ) {
+                Subject s = new Subject();
+                s.setPatientId( id );
+                s.getProjects().add( project );
+                newEntities.add( s );
+            }
+        }
+        allEntities.addAll( foundEntities );
+        allEntities.addAll( subjectDao.create( newEntities ) );
+        return allEntities;
+    }
+
     @Transactional
     private void createSubjectVariantsFromVariantValueObjects( Project project, List<VariantValueObject> voList,
             Boolean specialProject ) {
@@ -721,12 +740,9 @@ public class ProjectManagerImpl implements ProjectManager {
         int counter = 0;
 
         Collection<Variant> variants = new HashSet<>();
-        Collection<Subject> subjects = new HashSet<>();
 
-        // FIXME Bug 4195
-        // Collection<String> patientIds = extractPatientIds( voList );
-        // Collection<Subject> subjects = subjectDao.findOrCreateByPatientIds( project, patientIds );
-        // subjectDao.create( subjects );
+        Collection<String> patientIds = extractPatientIds( voList );
+        Collection<Subject> subjects = findOrCreateByPatientIds( project, patientIds );
 
         for ( VariantValueObject vo : voList ) {
 
@@ -795,8 +811,6 @@ public class ProjectManagerImpl implements ProjectManager {
     }
 
     private String getNewVariantId( String patientId ) {
-
-        // FIXME
 
         StopWatch timer = new StopWatch();
         timer.start();
