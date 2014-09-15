@@ -88,6 +88,7 @@
         <s:after-invocation-provider ref="afterAclValueObject" />
         <s:after-invocation-provider ref="afterAclMapRead" />
         <s:after-invocation-provider ref="afterAclMapValuesRead" />
+        <s:after-invocation-provider ref="afterAclCharacteristicCollectionRead"/>
         <s:after-invocation-provider ref="postInvocationAdviceProvider" /><!-- for @Post... -->
     </s:global-method-security>
 
@@ -111,4 +112,20 @@
     </bean>
 
 
+
+     <!-- After reading collection of vectors -->
+     <bean id="afterAclCharacteristicCollectionRead"
+         class="ubc.pavlab.aspiredb.server.security.authorization.acl.AclAfterCollectionCharacteristicByProjectFilter">
+         <constructor-arg ref="aclService" />
+         <constructor-arg>
+      <list>
+       <util:constant
+        static-field="org.springframework.security.acls.domain.BasePermission.ADMINISTRATION" />
+       <util:constant
+        static-field="org.springframework.security.acls.domain.BasePermission.READ" />
+      </list>
+      </constructor-arg>
+      <property name="sidRetrievalStrategy" ref="sidRetrievalStrategy" />
+     </bean>
+    
 </beans>
