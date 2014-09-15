@@ -494,9 +494,6 @@ public class ProjectManagerImpl implements ProjectManager {
 
     private void addSubjectVariantToProject( Project project, String patientId, Variant v, Boolean specialProject ) {
 
-        StopWatch timer = new StopWatch();
-        timer.start();
-
         if ( v == null || project == null ) {
             log.warn( "Variant or project is null" );
             return;
@@ -535,8 +532,6 @@ public class ProjectManagerImpl implements ProjectManager {
         }
 
         // subjectDao.update( subject );
-
-        log.info( "subjectDao update took " + timer.getTime() + " ms" );
     }
 
     /**
@@ -733,7 +728,10 @@ public class ProjectManagerImpl implements ProjectManager {
             }
         }
         allEntities.addAll( foundEntities );
+        StopWatch timer = new StopWatch();
+        timer.start();
         allEntities.addAll( subjectDao.create( newEntities ) );
+        log.info( "subjectDao create took " + timer.getTime() + " ms" );
         return allEntities;
     }
 
