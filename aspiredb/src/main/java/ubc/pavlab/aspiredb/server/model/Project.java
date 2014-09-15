@@ -14,7 +14,7 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
-import gemma.gsec.model.Securable;
+import gemma.gsec.model.SecuredNotChild;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ import ubc.pavlab.aspiredb.shared.ProjectValueObject;
  */
 @Entity
 @Table(name = "PROJECT")
-public class Project implements Securable {
+public class Project implements SecuredNotChild {
 
     public static ProjectValueObject convertToValueObject( Project project ) {
         ProjectValueObject valueObject = new ProjectValueObject();

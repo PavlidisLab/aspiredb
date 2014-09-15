@@ -525,11 +525,13 @@ public class ProjectManagerImpl implements ProjectManager {
         }
 
         // v = variantDao.create( v );
+        v.setSecurityOwner( project );
         v.setSubject( subject );
         subject.addVariant( v );
 
         if ( newSubject ) {
             subject.getProjects().add( project );
+            subject.setSecurityOwner( project );
         }
 
         // subjectDao.update( subject );
@@ -605,6 +607,7 @@ public class ProjectManagerImpl implements ProjectManager {
             p.setValue( vo.getDbValue() );
             p.setValueType( vo.getValueType() );
             p.setUri( vo.getUri() );
+            p.setSecurityOwner( project );
 
             phenotypeDao.create( p );
 
@@ -617,7 +620,7 @@ public class ProjectManagerImpl implements ProjectManager {
                 subject = subjectDao.create( subject );
                 subject.addPhenotype( p );
                 subject.getProjects().add( project );
-
+                subject.setSecurityOwner( project );
             } else {
                 log.info( "Adding phenotype to existing subject " + p.getUri() );
                 subject.addPhenotype( p );
@@ -725,6 +728,7 @@ public class ProjectManagerImpl implements ProjectManager {
                 Subject s = new Subject();
                 s.setPatientId( id );
                 s.getProjects().add( project );
+                s.setSecurityOwner( project );
                 newEntities.add( s );
             }
         }
@@ -811,10 +815,6 @@ public class ProjectManagerImpl implements ProjectManager {
     }
 
     private String getNewVariantId( String patientId ) {
-
-        StopWatch timer = new StopWatch();
-        timer.start();
-
         String userVariantId;
         int ridiculousnessCount = 0;
         do {
@@ -827,10 +827,7 @@ public class ProjectManagerImpl implements ProjectManager {
             }
         } while ( variantDao.findByUserVariantId( userVariantId, patientId ) != null );
 
-        log.info( " getNewVariantId took " + timer.getTime() + " ms" );
-
         return userVariantId;
-
     }
 
     private ProjectFilterConfig getProjectFilterConfigById( Project p ) {
