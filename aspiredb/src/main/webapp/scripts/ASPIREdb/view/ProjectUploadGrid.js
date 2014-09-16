@@ -62,12 +62,23 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                        var projectName = Ext.getCmp( 'ProjectUploadGrid' ).selectedProject[0].data.ProjectName;
 
                        if ( variantfilename.length == 0 && phenotypefilename.length == 0 ) {
-                          alert( "Either a variant and / or phenotype file is required." );
+                          Ext.Msg.alert( 'Invalid Fields', "Either a variant and / or phenotype file is required." );
+                          return;
+                       }
+
+                       if ( projectName.length == 0 ) {
+                          Ext.Msg.alert( 'Invalid Fields', "Please select a project name" );
                           return;
                        }
 
                        var variantTypeEdit = form.owner.variantTypeEdit;
                        /** Uploading variants to the created project */
+
+                       if ( variantfilename.length != 0 && variantTypeEdit.length == 0 ) {
+                          Ext.Msg.alert( 'Invalid Fields', "Please select a variant type" );
+                          return;
+
+                       }
 
                        me.up( "ProjectUploadGrid" ).setLoading( true );
 
@@ -76,13 +87,13 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                           projectName, variantTypeEdit, {
                              callback : function(errorMessage) {
 
-                                alert( errorMessage );
+                                Ext.Msg.alert( 'Result', errorMessage );
 
                                 ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
                                 me.up( "ProjectUploadGrid" ).setLoading( false );
                              },
                              errorHandler : function(er, exception) {
-                                alert( er + "\n" + exception.stack );
+                                Ext.Msg.alert( 'Error', er + "\n" + exception.stack );
                                 console.log( exception.stack );
                                 me.up( "ProjectUploadGrid" ).setLoading( false );
                              }
@@ -169,7 +180,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
             listeners : {
                afterrender : function() {
                   // select the first item by default
-                  this.setValue( this.getStore().getAt('0').get('id') );
+                  this.setValue( this.getStore().getAt( '0' ).get( 'id' ) );
                }
             },
             store : Ext.create( 'Ext.data.Store', {

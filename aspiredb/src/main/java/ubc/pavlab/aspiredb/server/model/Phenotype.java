@@ -26,6 +26,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.BatchSize;
+
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 
 /**
@@ -35,6 +37,7 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
  * @version $Id: Phenotype.java,v 1.15 2013/06/11 22:55:58 anton Exp $
  */
 @Entity
+@BatchSize(size = 10)
 @Table(name = "PHENOTYPE")
 public class Phenotype implements SecuredChild {
 

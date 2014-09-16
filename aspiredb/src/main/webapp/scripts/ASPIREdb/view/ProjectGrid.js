@@ -118,7 +118,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
    projectAddedHandler : function(pvo) {
       this.projectValueObjects.push( pvo );
 
-      ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated');
+      ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
    },
 
    projectSelectHandler : function(ref, record, index, eOpts) {
@@ -207,31 +207,33 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
             var newProjectName = ref.down( '#ProjectName' ).getValue().trim();
 
             if ( newProjectName.length == 0 ) {
-               alert("Please enter a valid project name");
+               alert( "Please enter a valid project name" );
                return;
-            } 
-            
+            }
+
             ProjectService.createUserProject( newProjectName, '', {
                callback : function(message) {
-                  if (message=="Success"){
+                  if ( message == "Success" ) {
                      var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
-                     var ProjectGrid = panel.down( '#ProjectGrid' );
+                     var projectGrid = panel.down( '#ProjectGrid' );
 
                      // add project name to Project grid
                      var data = [];
                      var row = [ newProjectName, '', 0 ];
                      data.push( row );
-                     ProjectGrid.store.add( data );
-                     ProjectGrid.getView().refresh( true );
-                     ProjectGrid.setLoading( false );
-                  
+                     // projectGrid.store.add( data );
+                     projectGrid.store.insert( 0, data );
+                     projectGrid.getView().refresh( true );
+                     projectGrid.setLoading( false );
+                     projectGrid.selModel.select( 0 );
+
                      ref.down( '#ProjectName' ).setValue( '' );
-                    // console.log( 'returned project value object : ' + message );
-                     ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated');
-                  }else {
-                     Ext.Msg.alert( 'Failure','fail to create project!' );
+                     // console.log( 'returned project value object : ' + message );
+                     ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
+                  } else {
+                     Ext.Msg.alert( 'Failure', 'fail to create project!' );
                   }
-                  
+
                }
             } );
 
@@ -245,11 +247,11 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
          tooltip : 'Remove the selected project',
          icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
          handler : function() {
-            var test =ref.selProject[0].data.ProjectName;
+            var test = ref.selProject[0].data.ProjectName;
             // Delete project
             ProjectService.deleteProject( ref.selProject[0].data.ProjectName, {
                callback : function(message) {
-                  if (message == "Success"){
+                  if ( message == "Success" ) {
                      var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
                      var ProjectGrid = panel.down( '#ProjectGrid' );
 
@@ -259,11 +261,11 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
                      }
 
                      console.log( 'selected Project :' + ref.selProject[0].data.ProjectName + ' deleted' );
-                     ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated');
-                  }else {
-                     Ext.Msg.alert( 'Failure','fail to remove project!' );
+                     ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
+                  } else {
+                     Ext.Msg.alert( 'Failure', 'fail to remove project!' );
                   }
-                 
+
                }
             } );
 
