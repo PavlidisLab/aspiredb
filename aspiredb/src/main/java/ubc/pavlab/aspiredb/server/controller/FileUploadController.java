@@ -91,7 +91,8 @@ public class FileUploadController {
 
                 // set extjs return - sucsess
                 extjsFormResult.setSuccess( true );
-                extjsFormResult.setData( "{ \"filePath\" : \"" + serverFile.getAbsolutePath() + "\" } " );
+                extjsFormResult.setData( "{ \"filePath\" : \"" + serverFile.getAbsolutePath().replace( '\\', '/' )
+                        + "\" } " );
                 extjsFormResult.setMessage( "success" );
 
                 log.info( "Successfully saved " + uploadItem.getFile().getOriginalFilename() + " to "

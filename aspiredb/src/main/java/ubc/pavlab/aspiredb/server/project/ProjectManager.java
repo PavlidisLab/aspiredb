@@ -28,7 +28,7 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
  */
 public interface ProjectManager {
 
-    @Secured({ "GROUP_ADMIN" })
+    @Secured({ "GROUP_USER" })
     public void addSubjectPhenotypesToProject( String projectName, boolean createproject,
             List<PhenotypeValueObject> voList ) throws Exception;
 
@@ -36,11 +36,11 @@ public interface ProjectManager {
     public void addSubjectPhenotypesToSpecialProject( String projectName, boolean deleteProject,
             List<PhenotypeValueObject> voList ) throws Exception;
 
-    @Secured({ "GROUP_ADMIN" })
+    @Secured({ "GROUP_USER" })
     public void addSubjectVariantsToProject( String projectName, boolean createproject, List<VariantValueObject> voList )
             throws Exception;
 
-    @Secured({ "GROUP_ADMIN" })
+    @Secured({ "GROUP_USER" })
     public void addSubjectVariantsToProjectForceCreate( String projectName, List<VariantValueObject> voList )
             throws Exception;
 

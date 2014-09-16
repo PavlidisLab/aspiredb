@@ -149,7 +149,11 @@ public class ProjectManagerImpl implements ProjectManager {
             }
         }
 
+        StopWatch timer = new StopWatch();
+        timer.start();
         createSubjectPhenotypesFromPhenotypeValueObjects( proj, voList );
+        log.info( "Added " + voList.size() + " phenotypes to " + proj.getName() + " which took " + timer.getTime()
+                + " ms" );
 
     }
 
@@ -911,5 +915,4 @@ public class ProjectManagerImpl implements ProjectManager {
 
         return variantFilterConfig;
     }
-
 }

@@ -515,7 +515,7 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @RemoteMethod
-    public String addSubjectPhenotypeToProject( String filename, boolean createProject, String projectName ) {
+    public String addSubjectPhenotypeToProject( String filepath, boolean createProject, String projectName ) {
 
         String returnString = "";
 
@@ -532,9 +532,13 @@ public class ProjectServiceImpl implements ProjectService {
                 }
             }
 
+            File f = new File( filepath );
+            String directory = f.getParent();
+            String filename = f.getName();
+
             Class.forName( "org.relique.jdbc.csv.CsvDriver" );
 
-            if ( filename.endsWith( ".csv" ) ) {
+            if ( filename.endsWith( ".csv" ) && f.exists() ) {
                 filename = filename.substring( 0, filename.length() - 4 );
             } else {
                 return "File not processed, file name must end with .csv";
@@ -542,7 +546,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             // create a connection
             // arg[0] is the directory in which the .csv files are held
-            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
+            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + directory );
 
             Statement stmt = conn.createStatement();
             ResultSet results = stmt.executeQuery( "SELECT * FROM " + filename );
@@ -855,5 +859,24 @@ public class ProjectServiceImpl implements ProjectService {
 
         return projectManager.createUserAndAssignToGroup( userName, password, groupName );
 
+    }
+
+    @Override
+    @RemoteMethod
+    public String addSubjectVariantsPhenotypeToProject( String variantFilename, String phenotypeFilename,
+            boolean createProject, String projectName, String variantType ) {
+
+        String returnMsg = "";
+
+        if ( variantFilename.length() > 0 ) {
+            returnMsg += addSubjectVariantsToProject( variantFilename, createProject, projectName, variantType );
+        }
+
+        if ( phenotypeFilename.length() > 0 ) {
+            returnMsg += returnMsg.length() > 0 ? ". " : "";
+            returnMsg += addSubjectPhenotypeToProject( phenotypeFilename, createProject, projectName );
+        }
+
+        return returnMsg;
     }
 }

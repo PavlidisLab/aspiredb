@@ -36,23 +36,23 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 public interface ProjectService {
 
     public List<ProjectValueObject> getProjects() throws NotLoggedInException;
-    
+
     public List<ProjectValueObject> getOverlapProjects( Collection<Long> projectIds );
 
     public ProjectValueObject getDgvProject();
 
     public ProjectValueObject getDecipherProject();
-    
+
     public User getCurrentUserName();
-    
-    public Collection<String> getProjectUserNames(String projectName);
-    
+
+    public Collection<String> getProjectUserNames( String projectName );
+
     public Collection<User> getProjectUsers( String projectName );
-    
+
     public Collection<String> projectReadableBy( Project project );
-    
+
     public Map<String, String> getProjectUserGroups( String projectName );
-    
+
     public Integer numSubjects( Collection<Long> projectIds ) throws NotLoggedInException;
 
     public Integer numVariants( Collection<Long> projectIds ) throws NotLoggedInException;
@@ -68,13 +68,14 @@ public interface ProjectService {
 
     public String createUserAndAssignToGroup( String userName, String password, String groupName )
             throws NotLoggedInException;
-    
-    public String createUserProject(String projectName, String projectDescription) throws NotLoggedInException;
-    
-    public ProjectValueObject findUserProject(String projectName) throws NotLoggedInException;
 
-    public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName, String variantType );
-    
+    public String createUserProject( String projectName, String projectDescription ) throws NotLoggedInException;
+
+    public ProjectValueObject findUserProject( String projectName ) throws NotLoggedInException;
+
+    public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName,
+            String variantType );
+
     public String addSubjectPhenotypeToExistingProject( String fileContent, boolean createProject, String projectName );
 
     public UserGroup findGroupByName( String name );
@@ -85,11 +86,15 @@ public interface ProjectService {
 
     public boolean isUser( String userName ) throws NotLoggedInException;
 
-    public String addSubjectVariantsToProject( String filename, boolean createProject, String projectName, String variantType );
+    public String addSubjectVariantsToProject( String filename, boolean createProject, String projectName,
+            String variantType );
 
     public String addSubjectPhenotypeToProject( String filename, boolean createProject, String projectName );
 
-    public Map<String, String> addMultipleSubjectVariantsToProject( List<String> variantFiles, boolean createProject, String projectName );
+    public Map<String, String> addMultipleSubjectVariantsToProject( List<String> variantFiles, boolean createProject,
+            String projectName );
 
-    
+    public String addSubjectVariantsPhenotypeToProject( String variantFilename, String phenotypeFilename,
+            boolean createProject, String projectName, String variantType );
+
 }

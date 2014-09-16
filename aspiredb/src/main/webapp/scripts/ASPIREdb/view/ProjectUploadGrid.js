@@ -60,12 +60,16 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
             var phenotypefilename = me.up("ProjectUploadGrid").phenotypeServerFilename;
             var projectName = Ext.getCmp( 'ProjectUploadGrid' ).selectedProject[0].data.ProjectName;
 
-            if ( variantfilename != '' ) {
+            if ( variantfilename.length == 0 && phenotypefilename.length == 0 ) {
+               alert("Either a variant and / or phenotype file is required.");
+               return;
+            }
+            
                var variantTypeEdit = form.owner.variantTypeEdit;
                /** Uploading variants to the created project */
 
                // FIXME
-               ProjectService.addSubjectVariantsToProject( variantfilename, false, projectName, variantTypeEdit, {
+               ProjectService.addSubjectVariantsPhenotypeToProject( variantfilename, phenotypefilename, false, projectName, variantTypeEdit, {
                   callback : function(errorMessage) {
                      
                      alert(errorMessage);
@@ -86,69 +90,71 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                   }
                } );
 
-               if ( phenotypefilename != '' ) {
-
-                  // Uploading
-                  // phenoypes
-                  // to the
-                  // created
-                  // project
-                  ProjectService.addSubjectPhenotypeToProject( phenotypefilename, false, projectName, {
-                     callback : function(errorMessage) {
-                        if ( errorMessage == "Success" ) {
-                           Ext.Msg.alert( 'Success', 'You have successfully uploaded phenotype file' );
-                        } else
-                           Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :' + errorMessage );
-                     //   Ext.getCmp( 'phenotypeFileEdit' ).setRawValue( '' );
-                        
-
-                        ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
-                     },
-                     errorHandler : function(er, exception) {
-                        Ext.Msg.alert( "Upload phenotype Error", er + "\n" + exception.stack );
-                        console.log( exception.stack );
-                     }
-                  } );
-
-               }
-
-            } else if ( phenotypefilename != '' ) {
-
-               // Uploading
-               // phenoypes
-               // to the
-               // created
-               // project
-               var fpReader = new FileReader();
-               fpReader.readAsBinaryString( phenotypeFileEdit );
-
-               fpReader.onloadend = function(event) {
-                  var variantSrc = event.target.result;
-
-                  // add
-                  // variants
-                  // to
-                  // the
-                  // project
-                  ProjectService.addSubjectPhenotypeToProject( phenotypefilename, false, projectName, {
-                     callback : function(errorMessage) {
-                        if ( errorMessage == "Success" ) {
-                           Ext.Msg.alert( 'Success', 'You have successfully uploaded phenotype file' );
-                        } else
-                           Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :' + errorMessage );
-                       // Ext.getCmp( 'phenotypeFileEdit' ).setRawValue( '' );
-                        
-
-                        ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
-                     },
-                     errorHandler : function(er, exception) {
-                        Ext.Msg.alert( "Upload phenotype Error", er + "\n" + exception.stack );
-                        console.log( exception.stack );
-                     }
-                  } );
-               };
-
-            }
+//               if ( phenotypefilename != '' ) {
+//
+//                  // Uploading
+//                  // phenoypes
+//                  // to the
+//                  // created
+//                  // project
+//                  ProjectService.addSubjectPhenotypeToProject( phenotypefilename, false, projectName, {
+//                     callback : function(errorMessage) {
+//                        if ( errorMessage == "Success" ) {
+//                           Ext.Msg.alert( 'Success', 'You have successfully uploaded phenotype file' );
+//                        } else
+//                           Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :' + errorMessage );
+//                     //   Ext.getCmp( 'phenotypeFileEdit' ).setRawValue( '' );
+//                        
+//
+//                        ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
+//                     },
+//                     errorHandler : function(er, exception) {
+//                        Ext.Msg.alert( "Upload phenotype Error", er + "\n" + exception.stack );
+//                        console.log( exception.stack );
+//                     }
+//                  } );
+//
+//               }
+//
+//            } 
+            
+//            else if ( phenotypefilename != '' ) {
+//
+//               // Uploading
+//               // phenoypes
+//               // to the
+//               // created
+//               // project
+//               var fpReader = new FileReader();
+//               fpReader.readAsBinaryString( phenotypeFileEdit );
+//
+//               fpReader.onloadend = function(event) {
+//                  var variantSrc = event.target.result;
+//
+//                  // add
+//                  // variants
+//                  // to
+//                  // the
+//                  // project
+//                  ProjectService.addSubjectPhenotypeToProject( phenotypefilename, false, projectName, {
+//                     callback : function(errorMessage) {
+//                        if ( errorMessage == "Success" ) {
+//                           Ext.Msg.alert( 'Success', 'You have successfully uploaded phenotype file' );
+//                        } else
+//                           Ext.Msg.alert( 'Server Reply', 'Uploading Phenotypes :' + errorMessage );
+//                       // Ext.getCmp( 'phenotypeFileEdit' ).setRawValue( '' );
+//                        
+//
+//                        ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
+//                     },
+//                     errorHandler : function(er, exception) {
+//                        Ext.Msg.alert( "Upload phenotype Error", er + "\n" + exception.stack );
+//                        console.log( exception.stack );
+//                     }
+//                  } );
+//               };
+//
+//            }
 
 
          } else {
