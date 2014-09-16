@@ -435,16 +435,16 @@ public class ProjectServiceImpl implements ProjectService {
 
         try {
 
-            os.getHumanPhenotypeOntologyService().startInitializationThread( true );
-            int c = 0;
-
-            while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
-                Thread.sleep( 10000 );
-                log.info( "Waiting for HumanPhenotypeOntology to load" );
-                if ( ++c > 10 ) {
-                    throw new Exception( "Ontology load timeout" );
-                }
-            }
+            // os.getHumanPhenotypeOntologyService().startInitializationThread( true );
+            // int c = 0;
+            //
+            // while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
+            // Thread.sleep( 10000 );
+            // log.info( "Waiting for HumanPhenotypeOntology to load" );
+            // if ( ++c > 10 ) {
+            // throw new Exception( "Ontology load timeout" );
+            // }
+            // }
 
             // create directory in system root access denied
             // boolean success = ( new File( "uploadFile" ) ).mkdirs();
@@ -573,9 +573,8 @@ public class ProjectServiceImpl implements ProjectService {
                 }
 
             } else {
-                returnString = "Success";
+                returnString = phenResult.getPhenotypesToAdd().size() + " phenotypes were added.";
             }
-            // }
 
         } catch ( Exception e ) {
             return e.toString();
