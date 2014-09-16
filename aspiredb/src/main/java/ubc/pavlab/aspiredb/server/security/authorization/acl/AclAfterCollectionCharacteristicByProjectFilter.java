@@ -26,8 +26,8 @@ import java.util.List;
 import org.springframework.security.acls.model.AclService;
 import org.springframework.security.acls.model.Permission;
 
+import ubc.pavlab.aspiredb.server.model.Characteristic;
 import ubc.pavlab.aspiredb.server.model.Project;
-import ubc.pavlab.aspiredb.server.model.Variant;
 
 /**
  * For this particular AfterInvocationProvider, characteristic authorization is determined based on the secured Project
@@ -56,8 +56,9 @@ public class AclAfterCollectionCharacteristicByProjectFilter extends ByAssociati
     @Override
     protected Project getAssociatedSecurable( Object targetDomainObject ) {
 
-        if ( Variant.class.isAssignableFrom( targetDomainObject.getClass() ) ) {
-            return ( ( Variant ) targetDomainObject ).getSubject().getProjects().iterator().next();
+        // TODO FIXME Not being used right now, not tested nor implemented yet
+        if ( Characteristic.class.isAssignableFrom( targetDomainObject.getClass() ) ) {
+            return ( Project ) ( ( Characteristic ) targetDomainObject ).getSecurityOwner();
         }
 
         throw new IllegalArgumentException( "Don't know how to filter a "
