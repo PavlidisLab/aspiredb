@@ -171,20 +171,21 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
       LoginStatusService.isUserAdministrator( {
          callback : function(admin) {
             if ( admin ) {
+               // this seems redundant since we already have a Project Manager
                // add upload project button
-               me.getDockedComponent( 'dashboardToolbar' ).add( {
-                  xtype : 'button',
-                  id : 'createProject',
-                  text : 'New Project',
-                  tooltip : 'Craete new Project',
-                  icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
-                  handler : function() {
-                     ASPIREdb.view.UploadDataManagerWindow.initGridAndShow();
-
-                  }
-               } );
-
-               me.getDockedComponent( 'dashboardToolbar' ).add( '-' );
+//               me.getDockedComponent( 'dashboardToolbar' ).add( {
+//                  xtype : 'button',
+//                  id : 'createProject',
+//                  text : 'New Project',
+//                  tooltip : 'Craete new Project',
+//                  icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
+//                  handler : function() {
+//                     ASPIREdb.view.UploadDataManagerWindow.initGridAndShow();
+//
+//                  }
+//               } );
+//
+//               me.getDockedComponent( 'dashboardToolbar' ).add( '-' );
 
                // add project manager button
                me.getDockedComponent( 'dashboardToolbar' ).add( {

@@ -82,12 +82,12 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
 
                        me.up( "ProjectUploadGrid" ).setLoading( true );
 
-                       // FIXME
                        ProjectService.addSubjectVariantsPhenotypeToProject( variantfilename, phenotypefilename, false,
                           projectName, variantTypeEdit, {
                              callback : function(errorMessage) {
 
-                                Ext.Msg.alert( 'Result', errorMessage );
+                                // this can be a long message, break it up with <br>
+                                Ext.Msg.alert( 'Result', errorMessage.replace("\n","<br>") );
 
                                 ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
                                 me.up( "ProjectUploadGrid" ).setLoading( false );

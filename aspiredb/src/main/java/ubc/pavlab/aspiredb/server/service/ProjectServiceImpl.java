@@ -318,11 +318,13 @@ public class ProjectServiceImpl implements ProjectService {
                 log.info( "Adding " + result.getVariantsToAdd().size() + " variants to project " + projectName
                         + " took " + timer.getTime() + " ms" );
 
-                returnString = result.getVariantsToAdd().size() + " variants were added to " + projectName;
+                returnString = "Added " + result.getVariantsToAdd().size() + " " + variantType + " to project "
+                        + projectName;
 
             } else {
                 for ( String errorMessage : result.getErrorMessages() ) {
                     returnString += errorMessage + "\n";
+                    log.error( errorMessage );
                 }
 
             }
@@ -408,13 +410,15 @@ public class ProjectServiceImpl implements ProjectService {
                 returnString = "Success";
             } else {
                 for ( String errorMessage : result.getErrorMessages() ) {
-                    returnString = errorMessage;
+                    returnString += errorMessage + "\n";
+                    log.error( errorMessage );
                 }
 
             }
             // }
 
         } catch ( Exception e ) {
+            log.error( e.getLocalizedMessage(), e );
             return e.toString();
         }
         return returnString;
@@ -435,16 +439,16 @@ public class ProjectServiceImpl implements ProjectService {
 
         try {
 
-            // os.getHumanPhenotypeOntologyService().startInitializationThread( true );
-            // int c = 0;
-            //
-            // while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
-            // Thread.sleep( 10000 );
-            // log.info( "Waiting for HumanPhenotypeOntology to load" );
-            // if ( ++c > 10 ) {
-            // throw new Exception( "Ontology load timeout" );
-            // }
-            // }
+            os.getHumanPhenotypeOntologyService().startInitializationThread( true );
+            int c = 0;
+
+            while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
+                Thread.sleep( 10000 );
+                log.info( "Waiting for HumanPhenotypeOntology to load" );
+                if ( ++c > 10 ) {
+                    throw new Exception( "Ontology load timeout" );
+                }
+            }
 
             // create directory in system root access denied
             // boolean success = ( new File( "uploadFile" ) ).mkdirs();
@@ -569,14 +573,17 @@ public class ProjectServiceImpl implements ProjectService {
 
             if ( !phenResult.getErrorMessages().isEmpty() ) {
                 for ( String errorMessage : phenResult.getErrorMessages() ) {
-                    returnString = errorMessage;
+                    returnString += errorMessage + "\n";
+                    log.error( errorMessage );
                 }
 
             } else {
-                returnString = phenResult.getPhenotypesToAdd().size() + " phenotypes were added.";
+                returnString = "Added " + phenResult.getPhenotypesToAdd().size() + " phenotypes to project "
+                        + projectName;
             }
 
         } catch ( Exception e ) {
+            log.error( e.getLocalizedMessage(), e );
             return e.toString();
         }
 
@@ -872,7 +879,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         if ( phenotypeFilename.length() > 0 ) {
-            returnMsg += returnMsg.length() > 0 ? ". " : "";
+            returnMsg += returnMsg.length() > 0 ? "\n" : "";
             returnMsg += addSubjectPhenotypeToProject( phenotypeFilename, createProject, projectName );
         }
 
