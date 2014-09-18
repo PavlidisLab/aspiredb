@@ -24,6 +24,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -38,6 +39,7 @@ import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
+import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 
 /**
@@ -65,6 +67,9 @@ public class ProjectServiceTest extends BaseSpringContextTest {
 
     @Autowired
     SubjectDao subjectDao;
+
+    @Autowired
+    PhenotypeService phenoService;
 
     final String projectName = RandomStringUtils.randomAlphabetic( 5 );
     final String testDir = "src/test/resources/data/";
@@ -132,6 +137,9 @@ public class ProjectServiceTest extends BaseSpringContextTest {
 
         assertEquals( 3, subjects.size() );
 
-        // FIXME Test for phenotypes added
+        for ( Subject s : subjects ) {
+            Map<String, PhenotypeValueObject> phenotypes = phenoService.getPhenotypes( s.getId() );
+            assertEquals( 5, phenotypes.size() );
+        }
     }
 }
