@@ -51,6 +51,7 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
+import ubc.pavlab.aspiredb.server.project.ProjectManagerImpl.SpecialProject;
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
@@ -292,9 +293,9 @@ public class ProjectServiceImpl implements ProjectService {
                 result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INDEL );
             } else if ( variantType.equalsIgnoreCase( "INVERSION" ) ) {
                 result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INVERSION );
-            } else if ( variantType.equalsIgnoreCase( "DECIPHER" ) ) {
+            } else if ( variantType.equalsIgnoreCase( SpecialProject.DECIPHER.toString() ) ) {
                 result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DECIPHER );
-            } else if ( variantType.equalsIgnoreCase( "DGV" ) ) {
+            } else if ( variantType.equalsIgnoreCase( SpecialProject.DGV.toString() ) ) {
                 result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DGV );
             }
 
@@ -865,6 +866,14 @@ public class ProjectServiceImpl implements ProjectService {
 
         if ( variantFilename.length() > 0 ) {
             returnMsg += addSubjectVariantsToProject( variantFilename, createProject, projectName, variantType );
+
+            // try {
+            // // FIXME auto-project overlap with DGV and DECIPHER?
+            // projectManager.populateProjectToProjectOverlap( projectName, SpecialProject.DECIPHER.toString() );
+            // } catch ( Exception e ) {
+            // log.error( e.getLocalizedMessage(), e );
+            // returnMsg += "\n" + e.getLocalizedMessage();
+            // }
         }
 
         if ( phenotypeFilename.length() > 0 ) {

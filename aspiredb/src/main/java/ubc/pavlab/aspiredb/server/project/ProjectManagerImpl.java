@@ -131,6 +131,10 @@ public class ProjectManagerImpl implements ProjectManager {
 
     public static final String DGV_SUPPORT_CHARACTERISTIC_KEY = "pubmedid";
 
+    public enum SpecialProject {
+        DGV, DECIPHER
+    }
+
     @Override
     @Transactional
     public void addSubjectPhenotypesToProject( String projectName, boolean createProject,
@@ -265,12 +269,16 @@ public class ProjectManagerImpl implements ProjectManager {
         return projectDao.create( p );
     }
 
+    public static boolean isSpecialProject( String name ) {
+        return name.equals( SpecialProject.DECIPHER.toString() ) || name.equals( SpecialProject.DGV.toString() );
+    }
+
     @Transactional
     public Project createSpecialProject( String name, boolean deleteProject ) throws Exception {
 
         name = name.toUpperCase();
 
-        if ( !name.equals( "DECIPHER" ) && !name.equals( "DGV" ) ) {
+        if ( !isSpecialProject( name ) ) {
             throw new Exception( "Special project names limited to 'DECIPHER' or 'DGV'" );
         }
 
@@ -290,7 +298,7 @@ public class ProjectManagerImpl implements ProjectManager {
         p.setName( name );
         p.setSpecialData( true );
 
-        if ( name.equals( "DGV" ) ) {
+        if ( name.equals( SpecialProject.DGV.toString() ) ) {
             p.setVariantSupportCharacteristicKey( DGV_SUPPORT_CHARACTERISTIC_KEY );
         }
 
@@ -342,6 +350,9 @@ public class ProjectManagerImpl implements ProjectManager {
     @Transactional
     public void deleteProject( String name ) throws Exception {
 
+        StopWatch timer = new StopWatch();
+        timer.start();
+
         Project project = projectDao.findByProjectName( name );
 
         if ( project == null ) {
@@ -349,26 +360,41 @@ public class ProjectManagerImpl implements ProjectManager {
             return;
         }
 
-        List<Subject> subjectsToRemove = new ArrayList<Subject>();
         List<Subject> subjects = project.getSubjects();
 
+        Collection<Characteristic> characteristics = new HashSet<>();
+        Collection<Variant> variants = new HashSet<>();
+        Collection<Phenotype> phenotypes = new HashSet<>();
+
         for ( Subject s : subjects ) {
-            s.getProjects().remove( project );
-            if ( s.getProjects().size() == 1 ) {
-                subjectsToRemove.add( s );
-            } else {
-                // this is when a subject has more than one project
+            for ( Phenotype p : s.getPhenotypes() ) {
+                phenotypes.add( p );
+            }
+            for ( Variant v : s.getVariants() ) {
+                variants.add( v );
+                // not required, removed by cascade
+                for ( Characteristic c : v.getCharacteristics() ) {
+                    characteristics.add( c );
+                }
+                v.getCharacteristics().removeAll( characteristics );
             }
         }
 
-        // might have to individually remove variants/labels/phenotypes etc. to get rid of acls
-        for ( Subject s : subjectsToRemove ) {
-
-            subjectDao.remove( s );
+        for ( Subject s : subjects ) {
+            s.getPhenotypes().removeAll( phenotypes );
+            s.getVariants().removeAll( variants );
+            s.getProjects().remove( project );
         }
 
+        project.getSubjects().removeAll( subjects );
+
+        // characteristicDao.remove( characteristics );
+        variantDao.remove( variants );
+        phenotypeDao.remove( phenotypes );
+        subjectDao.remove( subjects );
         projectDao.remove( project );
 
+        log.info( "Project " + project + " has been deleted which took " + timer.getTime() + " ms" );
     }
 
     @Override
@@ -420,6 +446,9 @@ public class ProjectManagerImpl implements ProjectManager {
     public void populateProjectToProjectOverlap( String projectName, String overlappingProjectName )
             throws ExternalDependencyException, NotLoggedInException {
 
+        StopWatch timer = new StopWatch();
+        timer.start();
+
         Project specialProject = projectDao.findByProjectName( overlappingProjectName );
 
         Project projectToPopulate = projectDao.findByProjectName( projectName );
@@ -432,6 +461,8 @@ public class ProjectManagerImpl implements ProjectManager {
         projSet.add( projectToPopulateFilterConfig );
 
         BoundedList<VariantValueObject> projToPopulateVvos = queryService.queryVariants( projSet );
+
+        Collection<Variant2VariantOverlap> overlapVos = new HashSet<>();
 
         // This probably won't work for all variant types
         for ( VariantValueObject vvo : projToPopulateVvos.getItems() ) {
@@ -479,7 +510,12 @@ public class ProjectManagerImpl implements ProjectManager {
                     overlapInfo.setOverlapProjectId( specialProject.getId() );
                     overlapInfo.setProjectId( projectToPopulate.getId() );
 
-                    variant2SpecialVariantOverlapDao.create( overlapInfo );
+                    // variant2SpecialVariantOverlapDao.create( overlapInfo );
+                    overlapVos.add( overlapInfo );
+
+                    if ( overlapVos.size() % 100 == 0 ) {
+                        log.info( "Computed " + overlapVos.size() + " overlaps" );
+                    }
 
                 } else {
                     log.debug( "No Overlap" );
@@ -488,6 +524,11 @@ public class ProjectManagerImpl implements ProjectManager {
             }
 
         }
+
+        variant2SpecialVariantOverlapDao.create( overlapVos );
+
+        log.info( "Computing variant overlap between " + projectName + " and " + overlappingProjectName + " took "
+                + timer.getTime() + " ms" );
 
     }
 

@@ -37,7 +37,7 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
  * @version $Id: Phenotype.java,v 1.15 2013/06/11 22:55:58 anton Exp $
  */
 @Entity
-@BatchSize(size = 10)
+@BatchSize(size = 50)
 @Table(name = "PHENOTYPE")
 public class Phenotype implements SecuredChild {
 

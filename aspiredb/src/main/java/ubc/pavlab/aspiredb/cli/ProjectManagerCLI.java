@@ -18,6 +18,7 @@ import gemma.gsec.authentication.UserManager;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -215,7 +216,11 @@ public class ProjectManagerCLI extends AbstractCLI {
             }
 
             try {
+                StopWatch timer = new StopWatch();
+                timer.start();
                 projectManager.populateProjectToProjectOverlap( projectName, overlapProjectName );
+                log.info( "Project to project overlap ( " + projectName + ", " + overlapProjectName + " ) took "
+                        + timer.getTime() + " ms" );
             } catch ( Exception e ) {
                 log.error( e.getMessage() );
                 return e;

@@ -446,6 +446,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
             projectManager.deleteProject( projectId );
 
         } catch ( Exception e ) {
+            log.error( e.getLocalizedMessage(), e );
             fail( "projectManager.deleteProject failed" );
 
         }
