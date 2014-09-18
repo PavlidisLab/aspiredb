@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -597,6 +598,14 @@ public class ProjectManagerImpl implements ProjectManager {
     // The PhenotypeValueObject class doesn't really fit well with this, using it anyway
     private void createSubjectPhenotypesFromPhenotypeValueObjects( Project project, List<PhenotypeValueObject> voList )
             throws InvalidDataException {
+
+        // gather all patient IDs and create new subjects first in bulk
+        Collection<String> patientIds = new HashSet<>();
+        for ( PhenotypeValueObject vo : voList ) {
+            patientIds.add( vo.getExternalSubjectId() );
+        }
+        HashMap<String, Subject> subjects = findOrCreateByPatientIds( project, patientIds );
+
         log.info( "Adding " + voList.size() + " valueobjects" );
         for ( PhenotypeValueObject vo : voList ) {
 
@@ -610,7 +619,8 @@ public class ProjectManagerImpl implements ProjectManager {
 
             phenotypeDao.create( p );
 
-            Subject subject = subjectDao.findByPatientId( project, vo.getExternalSubjectId() );
+            // Subject subject = subjectDao.findByPatientId( project, vo.getExternalSubjectId() );
+            Subject subject = subjects.get( vo.getExternalSubjectId() );
 
             if ( subject == null ) {
                 log.info( "Adding new Subject and phenotype" );
@@ -714,7 +724,7 @@ public class ProjectManagerImpl implements ProjectManager {
         createSubjectVariantsFromVariantValueObjects( project, voList, false );
     }
 
-    private Collection<Subject> findOrCreateByPatientIds( Project project, Collection<String> patientIds ) {
+    private HashMap<String, Subject> findOrCreateByPatientIds( Project project, Collection<String> patientIds ) {
         Collection<Subject> allEntities = new HashSet<>();
         Collection<Subject> newEntities = new HashSet<>();
         Collection<Subject> foundEntities = subjectDao.findByPatientIds( project, patientIds );
@@ -735,8 +745,14 @@ public class ProjectManagerImpl implements ProjectManager {
         StopWatch timer = new StopWatch();
         timer.start();
         allEntities.addAll( subjectDao.create( newEntities ) );
+
+        HashMap<String, Subject> map = new HashMap<>();
+        for ( Subject s : allEntities ) {
+            map.put( s.getPatientId(), s );
+        }
+
         log.info( "subjectDao create took " + timer.getTime() + " ms" );
-        return allEntities;
+        return map;
     }
 
     @Transactional
@@ -748,7 +764,7 @@ public class ProjectManagerImpl implements ProjectManager {
         Collection<Variant> variants = new HashSet<>();
 
         Collection<String> patientIds = extractPatientIds( voList );
-        Collection<Subject> subjects = findOrCreateByPatientIds( project, patientIds );
+        Collection<Subject> subjects = findOrCreateByPatientIds( project, patientIds ).values();
 
         for ( VariantValueObject vo : voList ) {
 
@@ -768,9 +784,6 @@ public class ProjectManagerImpl implements ProjectManager {
 
             if ( v != null ) {
                 variants.add( v );
-                if ( v.getSubject() != null ) {
-                    subjects.add( v.getSubject() );
-                }
             }
 
             counter++;

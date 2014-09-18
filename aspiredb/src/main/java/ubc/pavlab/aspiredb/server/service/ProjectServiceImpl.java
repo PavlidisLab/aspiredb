@@ -210,20 +210,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    @Override
-    public ProjectValueObject findUserProject( String projectName ) throws NotLoggedInException {
-        ProjectValueObject pvo = null;
-        log.info( " finding projectName:" + projectName );
-        try {
-            pvo.equals( projectManager.findProject( projectName ) );
-        } catch ( Exception e ) {
-            log.error( e.getMessage() );
-            // return e.getMessage();
-
-        }
-        return pvo;
-    }
-
     /**
      * @author gaya
      * @param list of variantFiles
@@ -289,6 +275,8 @@ public class ProjectServiceImpl implements ProjectService {
             if ( createProject ) {
                 if ( projectDao.findByProjectName( projectName ) != null ) {
                     returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
+                } else {
+                    projectManager.createProject( projectName, "" );
                 }
             }
 
