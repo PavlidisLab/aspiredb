@@ -877,6 +877,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Collection<Subject> getSubjects( String projectName ) throws Exception {
-        return projectDao.getSubjects( projectManager.findProject( projectName ).getId() );
+        Project project = projectManager.findProject( projectName );
+        if ( project == null ) {
+            log.error( "Project " + projectName + " not found" );
+            return new HashSet<>();
+        }
+        return projectDao.getSubjects( project.getId() );
     }
 }

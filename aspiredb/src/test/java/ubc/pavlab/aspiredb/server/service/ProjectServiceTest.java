@@ -113,20 +113,25 @@ public class ProjectServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testAddSubjectPhenotypeToProject() throws Exception {
-        // FIXME
-        // Project project = projectManager.findProject( projectName );
-        // if ( project != null ) {
-        // projectService.deleteProject( projectName );
-        // }
-        // String msg = projectService.addSubjectPhenotypeToProject( phenotypeFilename, true, projectName );
-        //
-        // project = projectManager.findProject( projectName );
-        //
-        // log.info( "Message = " + msg + ", project=" + project );
-        //
-        // assertNotNull( project );
-        //
-        // log.info( "Subjects = " + subjects.size() );
 
+        Project project = projectManager.findProject( projectName );
+        if ( project != null ) {
+            projectService.deleteProject( projectName );
+        }
+        String msg = projectService.addSubjectPhenotypeToProject( phenotypeFilename, true, projectName );
+        project = projectManager.findProject( projectName );
+        subjects = projectService.getSubjects( projectName );
+
+        assertNotNull( project );
+
+        Collection<Long> ids = new HashSet<>();
+        for ( Subject s : subjects ) {
+            ids.add( s.getId() );
+        }
+        subjects = subjectDao.load( ids );
+
+        assertEquals( 3, subjects.size() );
+
+        // FIXME Test for phenotypes added
     }
 }
