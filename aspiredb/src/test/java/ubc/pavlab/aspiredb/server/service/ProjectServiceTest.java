@@ -19,6 +19,7 @@
 
 package ubc.pavlab.aspiredb.server.service;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Collection;
@@ -35,9 +36,9 @@ import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
-import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
 
 /**
  * TODO Document Me
@@ -71,34 +72,21 @@ public class ProjectServiceTest extends BaseSpringContextTest {
     final String subjectFilename = testDir + "/testcnv.csv";
     private Set<AspireDbFilterConfig> projectFilter;
     private Project project;
+    private Collection<Subject> subjects;
 
     @Before
     public void setUp() throws Exception {
-
         project = projectManager.createProject( projectName, "" );
-
-        Collection<Long> projectIds = new HashSet<Long>();
-        projectIds.add( project.getId() );
-        ProjectFilterConfig projConfig = new ProjectFilterConfig();
-        projConfig.setProjectIds( projectIds );
-
-        // PhenotypeRestriction restriction = new PhenotypeRestriction();
-        // restriction.setName( "Abnormality of the head" );
-        // restriction.setValue( "1" );
-        //
-        // PhenotypeFilterConfig phenoConfig = new PhenotypeFilterConfig();
-        // phenoConfig.setRestriction( restriction );
-        // phenoConfig.setActiveProjectIds( activeProjectIds );
-
-        projectFilter = new HashSet<AspireDbFilterConfig>();
-        projectFilter.add( projConfig );
-
-        // filters.add( phenoConfig );
-
     }
 
     @After
     public void tearDown() throws Exception {
+        new InlineTransaction() {
+            @Override
+            public void instructions() {
+                subjectDao.remove( subjects );
+            }
+        }.execute();
         projectManager.deleteProject( projectName );
     }
 
@@ -109,21 +97,18 @@ public class ProjectServiceTest extends BaseSpringContextTest {
             projectService.deleteProject( projectName );
         }
         String msg = projectService.addSubjectVariantsToProject( subjectFilename, true, projectName, "CNV" );
-
         project = projectManager.findProject( projectName );
-
-        log.info( "Message = " + msg + ", project=" + project );
+        subjects = projectService.getSubjects( projectName );
 
         assertNotNull( project );
 
-        // filters.add( phenoConfig );
-        // FIXME
-        // List<SubjectValueObject> subjects = queryService.querySubjects( projectFilter ).getItems();
-        //
-        // log.info( "Subjects = " + subjects.size() );
-        //
-        // assertEquals( 3, subjects.size() );
+        Collection<Long> ids = new HashSet<>();
+        for ( Subject s : subjects ) {
+            ids.add( s.getId() );
+        }
+        subjects = subjectDao.load( ids );
 
+        assertEquals( 3, subjects.size() );
     }
 
     @Test

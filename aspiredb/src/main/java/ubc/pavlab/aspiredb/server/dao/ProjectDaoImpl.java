@@ -26,6 +26,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant2VariantOverlap;
 
 @Repository("projectDao")
@@ -146,26 +147,25 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
         return count.intValue();
 
     }
-    
-    /**  @Override
+
+    @Override
     @Transactional(readOnly = true)
-    public Collection<Long> getVariantTypesForProjects( Long projectId ) {
-        
+    public Collection<Subject> getSubjects( Long projectId ) {
+        Query query = this.getSessionFactory().getCurrentSession()
+                .createQuery( "select subject from Subject subject join subject.projects projs where projs.id = :id" );
 
-        Query query = this
-                .getSessionFactory()
-                .getCurrentSession()
-                .createQuery(
-                        "select count(*) from Variant v join v.subject subject join subject.projects projs where projs.id in(:ids )" );
+        query.setParameter( "id", projectId );
 
-        query.setParameterList( "ids", projectIds );
+        return query.list();
+    }
 
-        Long count = ( Long ) query.uniqueResult();
-
-        return count.intValue();
-
-    }*/
-    
-    
+    /**
+     * @Override
+     * @Transactional(readOnly = true) public Collection<Long> getVariantTypesForProjects( Long projectId ) { Query
+     *                         query = this .getSessionFactory() .getCurrentSession() .createQuery(
+     *                         "select count(*) from Variant v join v.subject subject join subject.projects projs where projs.id in(:ids )"
+     *                         ); query.setParameterList( "ids", projectIds ); Long count = ( Long )
+     *                         query.uniqueResult(); return count.intValue(); }
+     */
 
 }

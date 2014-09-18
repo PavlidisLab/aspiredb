@@ -20,6 +20,7 @@ import java.util.Collection;
 import org.springframework.security.access.annotation.Secured;
 
 import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.model.Subject;
 
 /**
  * TODO Document Me
@@ -31,6 +32,9 @@ public interface ProjectDao extends SecurableDaoBase<Project> {
 
     @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
     public Project findByProjectName( String projectName );
+
+    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
+    public Collection<Subject> getSubjects( Long projectId );
 
     @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
     public Collection<Project> getOverlapProjects( Collection<Long> projectIds );

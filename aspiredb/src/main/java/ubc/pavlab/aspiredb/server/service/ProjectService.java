@@ -20,6 +20,7 @@ import java.util.Map;
 
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
@@ -70,6 +71,8 @@ public interface ProjectService {
             throws NotLoggedInException;
 
     public String createUserProject( String projectName, String projectDescription ) throws NotLoggedInException;
+
+    public Collection<Subject> getSubjects( String projectName ) throws Exception;
 
     public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName,
             String variantType );

@@ -346,6 +346,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
         if ( project == null ) {
             log.error( "That project doesn't exist" );
+            return;
         }
 
         List<Subject> subjectsToRemove = new ArrayList<Subject>();
@@ -606,6 +607,8 @@ public class ProjectManagerImpl implements ProjectManager {
         }
         HashMap<String, Subject> subjects = findOrCreateByPatientIds( project, patientIds );
 
+        Collection<Phenotype> phenotypes = new HashSet<>();
+
         log.info( "Adding " + voList.size() + " valueobjects" );
         for ( PhenotypeValueObject vo : voList ) {
 
@@ -617,7 +620,8 @@ public class ProjectManagerImpl implements ProjectManager {
             p.setUri( vo.getUri() );
             p.setSecurityOwner( project );
 
-            phenotypeDao.create( p );
+            // phenotypeDao.create( p );
+            phenotypes.add( p );
 
             // Subject subject = subjectDao.findByPatientId( project, vo.getExternalSubjectId() );
             Subject subject = subjects.get( vo.getExternalSubjectId() );
@@ -635,6 +639,8 @@ public class ProjectManagerImpl implements ProjectManager {
                 subject.addPhenotype( p );
             }
         }
+
+        phenotypeDao.create( phenotypes );
     }
 
     @Transactional

@@ -46,6 +46,7 @@ import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadServiceResult;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadServiceResult;
 import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
@@ -872,5 +873,10 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return returnMsg;
+    }
+
+    @Override
+    public Collection<Subject> getSubjects( String projectName ) throws Exception {
+        return projectDao.getSubjects( projectManager.findProject( projectName ).getId() );
     }
 }
