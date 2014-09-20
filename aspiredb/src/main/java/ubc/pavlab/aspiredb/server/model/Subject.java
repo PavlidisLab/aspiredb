@@ -15,7 +15,7 @@
 package ubc.pavlab.aspiredb.server.model;
 
 import gemma.gsec.model.Securable;
-import gemma.gsec.model.SecuredChild;
+import gemma.gsec.model.SecuredNotChild;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -47,7 +47,7 @@ import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 @Entity
 @BatchSize(size = 50)
 @Table(name = "SUBJECT")
-public class Subject implements Serializable, SecuredChild {
+public class Subject implements Serializable, SecuredNotChild {
 
     private static final long serialVersionUID = -7549951725408353980L;
 
@@ -78,10 +78,10 @@ public class Subject implements Serializable, SecuredChild {
     @JoinTable(name = "SUBJECT_PROJECTS", joinColumns = { @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "PROJECT_ID", referencedColumnName = "ID") })
     private List<Project> projects = new ArrayList<Project>();
 
-    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = "subject")
+    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = "subject", orphanRemoval = true)
     private Collection<Phenotype> phenotypes = new HashSet<Phenotype>();
 
-    @OneToMany(cascade = { CascadeType.ALL })
+    @OneToMany(cascade = { CascadeType.ALL }, orphanRemoval = true)
     @JoinTable(name = "SUBJECT_VARIANT", joinColumns = { @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "VARIANT_ID", referencedColumnName = "ID") })
     private List<Variant> variants;
 
@@ -246,10 +246,10 @@ public class Subject implements Serializable, SecuredChild {
         return "id=" + id + " patientId=" + patientId;
     }
 
-    @Override
-    public Securable getSecurityOwner() {
-        return securityOwner;
-    }
+    // @Override
+    // public Securable getSecurityOwner() {
+    // return securityOwner;
+    // }
 
     public void setSecurityOwner( Securable securityOwner ) {
         this.securityOwner = securityOwner;
