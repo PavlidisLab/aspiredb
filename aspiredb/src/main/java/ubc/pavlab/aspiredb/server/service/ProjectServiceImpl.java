@@ -862,6 +862,9 @@ public class ProjectServiceImpl implements ProjectService {
     public String addSubjectVariantsPhenotypeToProject( String variantFilename, String phenotypeFilename,
             boolean createProject, String projectName, String variantType ) {
 
+        StopWatch timer = new StopWatch();
+        timer.start();
+
         String returnMsg = "";
 
         if ( variantFilename.length() > 0 ) {
@@ -880,6 +883,8 @@ public class ProjectServiceImpl implements ProjectService {
             returnMsg += returnMsg.length() > 0 ? "\n" : "";
             returnMsg += addSubjectPhenotypeToProject( phenotypeFilename, createProject, projectName );
         }
+
+        log.info( "Uploading took " + timer.getTime() + " ms" );
 
         return returnMsg;
     }
