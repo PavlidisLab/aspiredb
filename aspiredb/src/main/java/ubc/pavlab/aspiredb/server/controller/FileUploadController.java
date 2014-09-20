@@ -1,6 +1,7 @@
 package ubc.pavlab.aspiredb.server.controller;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import ubc.pavlab.aspiredb.server.model.ExtJSFormResult;
 import ubc.pavlab.aspiredb.server.model.FileUploadBean;
 import ubc.pavlab.aspiredb.server.service.ProjectService;
-import au.com.bytecode.opencsv.CSVWriter;
 
 import com.ibm.icu.text.SimpleDateFormat;
 
@@ -137,17 +137,29 @@ public class FileUploadController {
         // temp.getParentFile().getAbsolutePath(), temp.getName();
         // String csv = path + File.separator + filename;
 
-        CSVWriter writer = new CSVWriter( new FileWriter( serverFile ) );
-        String fileContent = getStringFromInputStream( stream );
+        BufferedReader in = null;
+        BufferedWriter out = null;
 
-        String[] Outresults = fileContent.split( "\n" );
-
-        for ( int i = 0; i < Outresults.length; i++ ) {
-            String[] passedCSVFile = Outresults[i].toString().split( "," );
-            writer.writeNext( passedCSVFile );
+        in = new BufferedReader( new InputStreamReader( stream ) );
+        out = new BufferedWriter( new FileWriter( serverFile ) );
+        String line;
+        while ( ( line = in.readLine() ) != null ) {
+            out.write( line + "\n" );
         }
+        in.close();
+        out.close();
 
-        writer.close();
+        // CSVWriter writer = new CSVWriter( new FileWriter( serverFile ) );
+        // String fileContent = getStringFromInputStream( stream );
+        //
+        // String[] Outresults = fileContent.split( "\n" );
+        //
+        // for ( int i = 0; i < Outresults.length; i++ ) {
+        // String[] passedCSVFile = Outresults[i].toString().split( "," );
+        // writer.writeNext( passedCSVFile );
+        // }
+        //
+        // writer.close();
 
         /**
          * FileOutputStream fs=new FileOutputStream(path + "/"+ filename); byte[] buffer=new byte[1024*1024]; int
