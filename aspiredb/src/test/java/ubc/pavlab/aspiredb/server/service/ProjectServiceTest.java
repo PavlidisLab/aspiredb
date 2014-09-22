@@ -135,13 +135,13 @@ public class ProjectServiceTest extends BaseSpringContextTest {
         subjects = projectService.getSubjects( projectName );
         assertEquals( 50, projectService.getSubjects( projectName ).size() );
         log.info( "variant upload time took " + timer.getTime() + " ms" );
-        assertTrue( timer.getTime() < 30000 );
+        assertTrue( timer.getTime() < 60000 );
 
         msg = projectService.addSubjectPhenotypeToProject( phenotypeFilenameWithManyPhenotypes, false, projectName );
         subjects = projectService.getSubjects( projectName );
 
         log.info( "variant and phenotype total upload time took " + timer.getTime() + " ms" );
         assertEquals( 50, subjects.size() );
-        assertTrue( timer.getTime() < 40000 );
+        assertTrue( timer.getTime() < 80000 );
     }
 }
