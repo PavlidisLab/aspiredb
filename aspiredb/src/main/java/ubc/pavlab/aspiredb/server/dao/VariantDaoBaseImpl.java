@@ -435,8 +435,6 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         criteria.setProjection( Projections.distinct( Projections.id() ) );
 
-        log.info( " criteria.list() in findIds " + criteria );
-
         return criteria.list();
     }
 
@@ -444,17 +442,11 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         Iterator<AspireDbFilterConfig> iterator = filters.iterator();
         AspireDbFilterConfig filterConfig = iterator.next();
         // First iteration
-
-        log.info( "findIds for filterconfig:" + filterConfig.getClass() );
         List<Long> variantIds = findIds( filterConfig );
-        log.info( "findIds finished for filterconfig:" + filterConfig.getClass() );
 
         while ( iterator.hasNext() ) {
             filterConfig = iterator.next();
-            log.info( "findIds for filterconfig:" + filterConfig.getClass() );
             List<Long> ids = findIds( filterConfig );
-
-            log.info( "findIds finished for filterconfig:" + filterConfig.getClass() );
 
             // intersect results
             variantIds.retainAll( ids );

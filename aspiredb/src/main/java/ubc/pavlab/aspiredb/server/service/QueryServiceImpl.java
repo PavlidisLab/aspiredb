@@ -537,12 +537,12 @@ public class QueryServiceImpl implements QueryService {
             log.info( "loading variants took " + timer.getTime() + "ms" );
         }
 
-        Collection<? extends Variant> variants = ( Collection<Variant> ) page;
+        Collection<? extends Variant> variants = page;
         page.getTotalCount();
 
         List<VariantValueObject> vos = convertToValueObjects( variants );
 
-        log.info( "returning " + vos.size() + " variants" );
+        log.debug( "returning " + vos.size() + " variants" );
 
         populateSubjectsIntoVariants( vos );
 

@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.time.StopWatch;
+import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -36,6 +38,7 @@ import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.Variant2SpecialVariantOverlapDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
+import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.model.Variant2VariantOverlap;
@@ -94,6 +97,48 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
     final String patientIdWithOverlap = RandomStringUtils.randomAlphabetic( 5 );
     final String projectNameWithOverlap = "DGV";
+
+    @After
+    public void tearDown() throws NotLoggedInException {
+        projectService.deleteProject( projectName );
+        projectService.deleteProject( projectNameWithOverlap );
+    }
+
+    @Test
+    public void testOverlapComputationSpeed() throws Exception {
+
+        // FIXME try with some really big numbers, this should be faster!
+        // create many variants
+        // 500 x 1000 takes ~11,094 ms
+
+        int variantsLimit = 500;
+        int specialVariantsLimit = 1000;
+        int variantLength = 100;
+
+        List<VariantValueObject> cnvList = new ArrayList<>();
+        for ( int i = 0; i < variantsLimit; i++ ) {
+            int start = 1000 + variantLength * i;
+            int end = 1000 + variantLength * i + variantLength;
+            cnvList.add( getCNV( "1", start, end, userVariantId + "_" + i, patientId ) );
+        }
+        projectManager.addSubjectVariantsToProject( projectName, true, cnvList );
+
+        List<VariantValueObject> cnvListWithOverlap = new ArrayList<>();
+        for ( int i = 0; i < specialVariantsLimit; i++ ) {
+            int start = 1000 + variantLength / 2 + variantLength * i;
+            int end = 1000 + variantLength / 2 + variantLength * i + variantLength;
+            cnvListWithOverlap.add( getCNV( "1", start, end, overlapVariantId1 + "_" + i, patientIdWithOverlap ) );
+        }
+        projectManager.addSubjectVariantsToSpecialProject( projectNameWithOverlap, true, cnvListWithOverlap, false );
+
+        // now do the overlap and see how long it takes
+        StopWatch timer = new StopWatch();
+        timer.start();
+        projectManager.populateProjectToProjectOverlap( projectName, projectNameWithOverlap );
+        log.info( "Project overlap between projects with " + cnvList.size() + " and " + cnvListWithOverlap.size()
+                + " variants took " + timer.getTime() + " ms" );
+        assertTrue( timer.getTime() < 15000 );
+    }
 
     @Test
     public void testPopulateSpecialProjectOverlap() throws Exception {
@@ -224,9 +269,6 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
             }
 
         }
-
-        projectService.deleteProject( projectName );
-        projectService.deleteProject( projectNameWithOverlap );
 
     }
 

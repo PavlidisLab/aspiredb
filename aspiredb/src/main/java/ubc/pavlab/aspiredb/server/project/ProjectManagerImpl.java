@@ -468,6 +468,7 @@ public class ProjectManagerImpl implements ProjectManager {
         Collection<Variant2VariantOverlap> overlapVos = new HashSet<>();
 
         // This probably won't work for all variant types
+        int i = 0;
         for ( VariantValueObject vvo : projToPopulateVvos.getItems() ) {
 
             Set<AspireDbFilterConfig> filters = new HashSet<>();
@@ -482,18 +483,23 @@ public class ProjectManagerImpl implements ProjectManager {
                 overlapVos.add( new Variant2VariantOverlap( vvo, vvoOverlapped, projectToPopulate.getId(),
                         specialProject.getId() ) );
 
-                if ( overlapVos.size() % 100 == 0 ) {
-                    log.info( "Computed " + overlapVos.size() + " overlaps" );
-                }
+                // if ( overlapVos.size() % 100 == 0 ) {
+                // log.info( "Computed " + overlapVos.size() + " overlaps" );
+                // }
 
             }
 
+            if ( ( 100.0 * ++i / projToPopulateVvos.getItems().size() ) % 10 == 0 ) {
+                log.info( " Processed " + i + "/" + projToPopulateVvos.getItems().size() + " ("
+                        + ( 100.0 * i / projToPopulateVvos.getItems().size() ) + "%) variants and found "
+                        + overlapVos.size() + " overlaps" );
+            }
         }
 
         variant2SpecialVariantOverlapDao.create( overlapVos );
 
-        log.info( "Computing variant overlap between " + projectName + " and " + overlappingProjectName + " took "
-                + timer.getTime() + " ms" );
+        log.info( "Found " + overlapVos.size() + " variant overlaps between " + projectName + " and "
+                + overlappingProjectName + " which took " + timer.getTime() + " ms" );
 
     }
 
@@ -633,7 +639,6 @@ public class ProjectManagerImpl implements ProjectManager {
             Subject subject = subjects.get( vo.getExternalSubjectId() );
 
             if ( subject == null ) {
-                log.info( "Adding new Subject and phenotype" );
                 subject = new Subject();
                 subject.setPatientId( vo.getExternalSubjectId() );
                 subject = subjectDao.create( subject );
@@ -641,8 +646,12 @@ public class ProjectManagerImpl implements ProjectManager {
                 subject.getProjects().add( project );
                 subject.setSecurityOwner( project );
             } else {
-                log.info( "Adding phenotype to existing subject " + p.getUri() );
+                log.debug( "Adding phenotype to existing subject " + p.getUri() );
                 subject.addPhenotype( p );
+            }
+
+            if ( phenotypes.size() % 500 == 0 ) {
+                log.info( "Processed " + phenotypes.size() + " phenotypes" );
             }
         }
 
@@ -801,7 +810,7 @@ public class ProjectManagerImpl implements ProjectManager {
             counter++;
 
             if ( counter % 500 == 0 ) {
-                log.info( "Added " + counter + " variant" );
+                log.info( "Added " + counter + " variants" );
             }
         }
 

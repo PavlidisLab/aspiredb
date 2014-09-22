@@ -130,6 +130,7 @@ public class ProjectServiceTest extends BaseSpringContextTest {
         StopWatch timer = new StopWatch();
         timer.start();
 
+        // variant upload
         String msg = projectService.addSubjectVariantsToProject( subjectFilenameWithManyCnvs, true, projectName, "CNV" );
         project = projectManager.findProject( projectName );
         subjects = projectService.getSubjects( projectName );
@@ -137,6 +138,7 @@ public class ProjectServiceTest extends BaseSpringContextTest {
         log.info( "variant upload time took " + timer.getTime() + " ms" );
         assertTrue( timer.getTime() < 60000 );
 
+        // phenotype upload
         msg = projectService.addSubjectPhenotypeToProject( phenotypeFilenameWithManyPhenotypes, false, projectName );
         subjects = projectService.getSubjects( projectName );
 
