@@ -31,11 +31,8 @@ import gemma.gsec.util.SecurityUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +47,6 @@ import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Label;
-import ubc.pavlab.aspiredb.server.model.Phenotype;
-import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
 import ubc.pavlab.aspiredb.server.security.authorization.acl.AclTestUtils;
@@ -103,29 +98,15 @@ public class LabelServiceTest extends BaseSpringContextTest {
     @Autowired
     AclTestUtils aclUtil;
 
-    private Project project;
-
-    private String HP_HEAD = "Abnormality of the head";
-    private String HP_FACE = "Abnormality of the face";
-    private String HP_MOUTH = "Abnormality of the mouth";
-    private String HP_NERVOUS = "Abnormality of the nervous system";
-
     private Long subjectId;
 
-    private static Log log = LogFactory.getLog( QueryServiceTest.class.getName() );
     String username = RandomStringUtils.randomAlphabetic( 6 );
     String testname = RandomStringUtils.randomAlphabetic( 6 );
 
     @Before
     public void setUp() {
-        Subject subject = createSubjectWithPhenotypes( "1", "0", "0", "0" );
-
+        Subject subject = persistentTestObjectHelper.createPersistentTestIndividualObject( username );
         subjectId = subject.getId();
-
-        createSubjectWithPhenotypes( "0", "1", "0", "0" );
-        createSubjectWithPhenotypes( "0", "0", "1", "0" );
-        createSubjectWithPhenotypes( "0", "0", "0", "1" );
-        createSubjectWithPhenotypes( "1", "0", "1", "0" );
 
         try {
             userManager.loadUserByUsername( username );
@@ -233,67 +214,6 @@ public class LabelServiceTest extends BaseSpringContextTest {
         lvos2 = persistentTestObjectHelper.getLabelsForVariant( v2.getId() );
         assertEquals( 0, lvos1.size() );
         assertEquals( 1, lvos2.size() );
-    }
-
-    private Subject createSubjectWithPhenotypes( String headPhenoValue, String facePhenoValue, String mouthPhenoValue,
-            String nervousPhenoValue ) {
-
-        if ( project == null ) {
-            project = new Project();
-            project.setName( RandomStringUtils.randomAlphabetic( 4 ) );
-            project = persistentTestObjectHelper.createPersistentProject( project );
-        }
-
-        List<Project> plist = new ArrayList<Project>();
-        plist.add( project );
-        Collection<Long> projectIds = new ArrayList<Long>();
-        projectIds.add( project.getId() );
-        Phenotype phenoHead = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_HEAD, "HP_0000234",
-                "HPONTOLOGY", headPhenoValue );
-        Phenotype phenoFace = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_FACE, "HP_0000271",
-                "HPONTOLOGY", facePhenoValue );
-        Phenotype phenoMouth = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_MOUTH, "HP_0000153",
-                "HPONTOLOGY", mouthPhenoValue );
-        Phenotype phenoNervous = persistentTestObjectHelper.createPersistentTestPhenotypeObject( HP_NERVOUS,
-                "HP_0000707", "HPONTOLOGY", nervousPhenoValue );
-
-        List<Subject> subjectList = project.getSubjects();
-        log.debug( "subjectList.size=" + subjectList.size() );
-        String patientId = "" + subjectList.size();
-
-        if ( headPhenoValue.equals( "1" ) ) {
-            patientId += "_" + HP_HEAD + "=" + headPhenoValue;
-        }
-
-        if ( facePhenoValue.equals( "1" ) ) {
-            patientId += "_" + HP_FACE + "=" + facePhenoValue;
-        }
-
-        if ( mouthPhenoValue.equals( "1" ) ) {
-            patientId += "_" + HP_MOUTH + "=" + mouthPhenoValue;
-        }
-
-        if ( nervousPhenoValue.equals( "1" ) ) {
-            patientId += "_" + HP_NERVOUS + "=" + nervousPhenoValue;
-        }
-
-        Subject subject = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
-
-        subject.setProjects( plist );
-        subject.addPhenotype( phenoHead );
-        subject.addPhenotype( phenoFace );
-        subject.addPhenotype( phenoMouth );
-        subject.addPhenotype( phenoNervous );
-        subjectList.add( subject );
-        persistentTestObjectHelper.updateSubject( subject );
-        phenotypeDao.update( phenoHead );
-        phenotypeDao.update( phenoFace );
-        phenotypeDao.update( phenoMouth );
-        phenotypeDao.update( phenoNervous );
-
-        projectDao.update( project );
-
-        return subject;
     }
 
 }
