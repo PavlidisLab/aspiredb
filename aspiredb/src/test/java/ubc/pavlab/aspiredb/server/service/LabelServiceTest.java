@@ -278,13 +278,14 @@ public class LabelServiceTest extends BaseSpringContextTest {
         }
 
         Subject subject = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
+
         subject.setProjects( plist );
         subject.addPhenotype( phenoHead );
         subject.addPhenotype( phenoFace );
         subject.addPhenotype( phenoMouth );
         subject.addPhenotype( phenoNervous );
         subjectList.add( subject );
-        subjectDao.update( subject );
+        persistentTestObjectHelper.updateSubject( subject );
         phenotypeDao.update( phenoHead );
         phenotypeDao.update( phenoFace );
         phenotypeDao.update( phenoMouth );
