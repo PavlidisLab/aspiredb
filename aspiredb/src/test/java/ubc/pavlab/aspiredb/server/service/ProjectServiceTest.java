@@ -20,12 +20,14 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.time.StopWatch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,6 +74,7 @@ public class ProjectServiceTest extends BaseSpringContextTest {
     final String testDir = "src/test/resources/data/";
     final String phenotypeFilename = testDir + "/testphenotype.csv";
     final String subjectFilename = testDir + "/testcnv.csv";
+    final String phenotypeFilenameWithManyPhenotypes = testDir + "/33-phenotypes.csv";
     private Project project;
     private Collection<Subject> subjects;
 
@@ -119,5 +122,19 @@ public class ProjectServiceTest extends BaseSpringContextTest {
             Map<String, PhenotypeValueObject> phenotypes = phenoService.getPhenotypes( s.getId() );
             assertEquals( 5, phenotypes.size() );
         }
+    }
+
+    @Test
+    public void testUploadTime() throws Exception {
+        StopWatch timer = new StopWatch();
+        timer.start();
+
+        String msg = projectService.addSubjectPhenotypeToProject( phenotypeFilenameWithManyPhenotypes, true,
+                projectName );
+        subjects = projectService.getSubjects( projectName );
+
+        assertEquals( 50, subjects.size() );
+        log.debug( "upload time took " + timer.getTime() + " ms" );
+        assertTrue( timer.getTime() < 50000 );
     }
 }
