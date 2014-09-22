@@ -388,13 +388,16 @@ public class ProjectManagerImpl implements ProjectManager {
 
         project.getSubjects().removeAll( subjects );
 
+        // We don't need to do this anymore because we use
+        // the hibernate annotation "orphanRemoval=true"
         // characteristicDao.remove( characteristics );
-        variantDao.remove( variants );
-        phenotypeDao.remove( phenotypes );
+        // variantDao.remove( variants );
+        // phenotypeDao.remove( phenotypes );
+
         subjectDao.remove( subjects );
         projectDao.remove( project );
 
-        log.info( "Project " + project + " has been deleted which took " + timer.getTime() + " ms" );
+        log.info( project + " has been deleted which took " + timer.getTime() + " ms" );
     }
 
     @Override

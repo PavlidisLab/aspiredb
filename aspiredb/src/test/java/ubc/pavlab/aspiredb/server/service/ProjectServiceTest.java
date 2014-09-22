@@ -75,6 +75,7 @@ public class ProjectServiceTest extends BaseSpringContextTest {
     final String phenotypeFilename = testDir + "/testphenotype.csv";
     final String subjectFilename = testDir + "/testcnv.csv";
     final String phenotypeFilenameWithManyPhenotypes = testDir + "/33-phenotypes.csv";
+    final String subjectFilenameWithManyCnvs = testDir + "/800-cnvs.csv";
     private Project project;
     private Collection<Subject> subjects;
 
@@ -129,12 +130,18 @@ public class ProjectServiceTest extends BaseSpringContextTest {
         StopWatch timer = new StopWatch();
         timer.start();
 
-        String msg = projectService.addSubjectPhenotypeToProject( phenotypeFilenameWithManyPhenotypes, true,
-                projectName );
+        String msg = projectService.addSubjectVariantsToProject( subjectFilenameWithManyCnvs, true, projectName, "CNV" );
+        project = projectManager.findProject( projectName );
+        subjects = projectService.getSubjects( projectName );
+        assertEquals( 50, projectService.getSubjects( projectName ).size() );
+        log.info( "variant upload time took " + timer.getTime() + " ms" );
+        assertTrue( timer.getTime() < 30000 );
+
+        msg = projectService.addSubjectPhenotypeToProject( phenotypeFilenameWithManyPhenotypes, false, projectName );
         subjects = projectService.getSubjects( projectName );
 
+        log.info( "variant and phenotype total upload time took " + timer.getTime() + " ms" );
         assertEquals( 50, subjects.size() );
-        log.debug( "upload time took " + timer.getTime() + " ms" );
-        assertTrue( timer.getTime() < 50000 );
+        assertTrue( timer.getTime() < 40000 );
     }
 }

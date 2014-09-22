@@ -41,6 +41,7 @@ import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.model.Variant2VariantOverlap;
 import ubc.pavlab.aspiredb.server.service.ProjectService;
 import ubc.pavlab.aspiredb.server.service.QueryService;
+import ubc.pavlab.aspiredb.server.util.ConfigUtilsTest;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 import ubc.pavlab.aspiredb.shared.BoundedList;
 import ubc.pavlab.aspiredb.shared.CNVValueObject;
@@ -145,7 +146,8 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
 
         Project specialProject = projectDao.findByProjectName( projectNameWithOverlap );
 
-        ProjectFilterConfig projectToPopulateFilterConfig = getProjectFilterConfigById( projectToPopulate );
+        ProjectFilterConfig projectToPopulateFilterConfig = ConfigUtilsTest
+                .getProjectFilterConfigById( projectToPopulate );
 
         Set<AspireDbFilterConfig> projSet = new HashSet<>();
         projSet.add( projectToPopulateFilterConfig );
@@ -269,20 +271,6 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         cnv.setPatientId( patientId );
 
         return cnv;
-
-    }
-
-    private ProjectFilterConfig getProjectFilterConfigById( Project p ) {
-
-        ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();
-
-        List<Long> projectIds = new ArrayList<>();
-
-        projectIds.add( p.getId() );
-
-        projectFilterConfig.setProjectIds( projectIds );
-
-        return projectFilterConfig;
 
     }
 

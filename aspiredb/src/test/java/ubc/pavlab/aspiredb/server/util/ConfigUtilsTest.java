@@ -22,13 +22,17 @@ package ubc.pavlab.aspiredb.server.util;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.SubjectFilterConfig;
 
 /**
@@ -50,6 +54,20 @@ public class ConfigUtilsTest {
         assertFalse( ConfigUtils.hasSubjectConfig( filters ) );
         filters.add( new SubjectFilterConfig() );
         assertTrue( ConfigUtils.hasSubjectConfig( filters ) );
+    }
+
+    public static ProjectFilterConfig getProjectFilterConfigById( Project p ) {
+
+        ProjectFilterConfig projectFilterConfig = new ProjectFilterConfig();
+
+        List<Long> projectIds = new ArrayList<>();
+
+        projectIds.add( p.getId() );
+
+        projectFilterConfig.setProjectIds( projectIds );
+
+        return projectFilterConfig;
+
     }
 
 }
