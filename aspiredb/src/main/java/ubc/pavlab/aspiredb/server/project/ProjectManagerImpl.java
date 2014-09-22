@@ -479,27 +479,11 @@ public class ProjectManagerImpl implements ProjectManager {
 
             for ( VariantValueObject vvoOverlapped : overLappedVvos.getItems() ) {
 
-                // why is this check necessary? FIXME
-                if ( !vvo.getGenomicRange().getChromosome().equals( vvoOverlapped.getGenomicRange().getChromosome() ) ) {
-                    continue;
-                }
+                overlapVos.add( new Variant2VariantOverlap( vvo, vvoOverlapped, projectToPopulate.getId(),
+                        specialProject.getId() ) );
 
-                int start = Math.max( vvo.getGenomicRange().getBaseStart(), vvoOverlapped.getGenomicRange()
-                        .getBaseStart() );
-                int end = Math.min( vvo.getGenomicRange().getBaseEnd(), vvoOverlapped.getGenomicRange().getBaseEnd() );
-
-                // FIXME why is this check necessary, the call to queryVariants should make this unnecessary.
-                if ( start < end ) {
-
-                    overlapVos.add( new Variant2VariantOverlap( vvo, vvoOverlapped, projectToPopulate.getId(),
-                            specialProject.getId() ) );
-
-                    if ( overlapVos.size() % 100 == 0 ) {
-                        log.info( "Computed " + overlapVos.size() + " overlaps" );
-                    }
-
-                } else {
-                    log.debug( "No Overlap" );
+                if ( overlapVos.size() % 100 == 0 ) {
+                    log.info( "Computed " + overlapVos.size() + " overlaps" );
                 }
 
             }
