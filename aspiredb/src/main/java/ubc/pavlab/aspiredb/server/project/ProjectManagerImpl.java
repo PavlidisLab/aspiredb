@@ -484,8 +484,6 @@ public class ProjectManagerImpl implements ProjectManager {
                     continue;
                 }
 
-                Variant2VariantOverlap overlapInfo = new Variant2VariantOverlap();
-
                 int start = Math.max( vvo.getGenomicRange().getBaseStart(), vvoOverlapped.getGenomicRange()
                         .getBaseStart() );
                 int end = Math.min( vvo.getGenomicRange().getBaseEnd(), vvoOverlapped.getGenomicRange().getBaseEnd() );
@@ -493,28 +491,8 @@ public class ProjectManagerImpl implements ProjectManager {
                 // FIXME why is this check necessary, the call to queryVariants should make this unnecessary.
                 if ( start < end ) {
 
-                    int overlap = end - start;
-
-                    float vvoSize = vvo.getGenomicRange().getBaseEnd() - vvo.getGenomicRange().getBaseStart();
-                    float vvoOverlappedSize = vvoOverlapped.getGenomicRange().getBaseEnd()
-                            - vvoOverlapped.getGenomicRange().getBaseStart();
-
-                    float vvoPercentageOverlap = overlap / vvoSize * 100;
-                    float vvoOverlappedPercentageOverlap = overlap / vvoOverlappedSize * 100;
-
-                    overlapInfo.setOverlap( overlap );
-                    overlapInfo.setOverlapPercentage( Math.round( vvoPercentageOverlap ) );
-                    // set the percentage overlap of the OverlapSpecialVariantId-variant, I realize that these method
-                    // and variable names kind of suck
-                    overlapInfo.setOverlappedOverlapPercentage( Math.round( vvoOverlappedPercentageOverlap ) );
-
-                    overlapInfo.setVariantId( vvo.getId() );
-                    overlapInfo.setOverlapSpecialVariantId( vvoOverlapped.getId() );
-                    overlapInfo.setOverlapProjectId( specialProject.getId() );
-                    overlapInfo.setProjectId( projectToPopulate.getId() );
-
-                    // variant2SpecialVariantOverlapDao.create( overlapInfo );
-                    overlapVos.add( overlapInfo );
+                    overlapVos.add( new Variant2VariantOverlap( vvo, vvoOverlapped, projectToPopulate.getId(),
+                            specialProject.getId() ) );
 
                     if ( overlapVos.size() % 100 == 0 ) {
                         log.info( "Computed " + overlapVos.size() + " overlaps" );

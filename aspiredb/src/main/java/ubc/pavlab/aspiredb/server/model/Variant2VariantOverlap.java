@@ -21,6 +21,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 /**
  * This table is used to hold data about overlap between two variants. Originally this was only to be used for overlap
@@ -39,6 +45,9 @@ public class Variant2VariantOverlap implements Serializable {
      * 
      */
     private static final long serialVersionUID = 6734779432249098068L;
+
+    @Transient
+    private static Logger log = LoggerFactory.getLogger( Variant2VariantOverlap.class );
 
     @Id
     @GeneratedValue
@@ -71,6 +80,17 @@ public class Variant2VariantOverlap implements Serializable {
 
     public Variant2VariantOverlap() {
 
+    }
+
+    public Variant2VariantOverlap( final VariantValueObject vvo, final VariantValueObject vvoOverlapped,
+            final Long projectId, final Long overlapProjectId ) {
+        this.projectId = projectId;
+        this.overlapProjectId = overlapProjectId;
+        if ( vvo == null || vvoOverlapped == null ) {
+            log.warn( "Both variants are required to compute overlap percentages" );
+            return;
+        }
+        computeOverlap( vvo, vvoOverlapped );
     }
 
     @Override
@@ -165,6 +185,29 @@ public class Variant2VariantOverlap implements Serializable {
 
     public void setVariantId( Long variantId ) {
         this.variantId = variantId;
+    }
+
+    private void computeOverlap( final VariantValueObject vvo, final VariantValueObject vvoOverlapped ) {
+        int start = Math.max( vvo.getGenomicRange().getBaseStart(), vvoOverlapped.getGenomicRange().getBaseStart() );
+        int end = Math.min( vvo.getGenomicRange().getBaseEnd(), vvoOverlapped.getGenomicRange().getBaseEnd() );
+
+        int overlap = end - start;
+
+        float vvoSize = vvo.getGenomicRange().getBaseEnd() - vvo.getGenomicRange().getBaseStart();
+        float vvoOverlappedSize = vvoOverlapped.getGenomicRange().getBaseEnd()
+                - vvoOverlapped.getGenomicRange().getBaseStart();
+
+        float vvoPercentageOverlap = overlap / vvoSize * 100;
+        float vvoOverlappedPercentageOverlap = overlap / vvoOverlappedSize * 100;
+
+        setOverlap( overlap );
+        setOverlapPercentage( Math.round( vvoPercentageOverlap ) );
+        // set the percentage overlap of the OverlapSpecialVariantId-variant, I realize that these method
+        // and variable names kind of suck
+        setOverlappedOverlapPercentage( Math.round( vvoOverlappedPercentageOverlap ) );
+
+        setVariantId( vvo.getId() );
+        setOverlapSpecialVariantId( vvoOverlapped.getId() );
     }
 
 }
