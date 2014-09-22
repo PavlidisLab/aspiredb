@@ -20,12 +20,10 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.After;
@@ -40,7 +38,6 @@ import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
-import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 
 /**
  * TODO Document Me
@@ -75,37 +72,26 @@ public class ProjectServiceTest extends BaseSpringContextTest {
     final String testDir = "src/test/resources/data/";
     final String phenotypeFilename = testDir + "/testphenotype.csv";
     final String subjectFilename = testDir + "/testcnv.csv";
-    private Set<AspireDbFilterConfig> projectFilter;
     private Project project;
     private Collection<Subject> subjects;
 
     @Before
     public void setUp() throws Exception {
-        project = projectManager.createProject( projectName, "" );
+        project = projectManager.findProject( projectName );
+        if ( project != null ) {
+            projectService.deleteProject( projectName );
+        }
     }
 
     @After
     public void tearDown() throws Exception {
-        new InlineTransaction() {
-            @Override
-            public void instructions() {
-                subjectDao.remove( subjects );
-            }
-        }.execute();
         projectManager.deleteProject( projectName );
     }
 
     @Test
     public void testAddSubjectVariantToProject() throws Exception {
-        Project project = projectManager.findProject( projectName );
-        if ( project != null ) {
-            projectService.deleteProject( projectName );
-        }
         String msg = projectService.addSubjectVariantsToProject( subjectFilename, true, projectName, "CNV" );
-        project = projectManager.findProject( projectName );
         subjects = projectService.getSubjects( projectName );
-
-        assertNotNull( project );
 
         Collection<Long> ids = new HashSet<>();
         for ( Subject s : subjects ) {
@@ -118,16 +104,8 @@ public class ProjectServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testAddSubjectPhenotypeToProject() throws Exception {
-
-        Project project = projectManager.findProject( projectName );
-        if ( project != null ) {
-            projectService.deleteProject( projectName );
-        }
         String msg = projectService.addSubjectPhenotypeToProject( phenotypeFilename, true, projectName );
-        project = projectManager.findProject( projectName );
         subjects = projectService.getSubjects( projectName );
-
-        assertNotNull( project );
 
         Collection<Long> ids = new HashSet<>();
         for ( Subject s : subjects ) {

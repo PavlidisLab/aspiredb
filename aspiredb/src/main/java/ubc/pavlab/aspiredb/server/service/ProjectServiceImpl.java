@@ -276,7 +276,11 @@ public class ProjectServiceImpl implements ProjectService {
             // check weather the project exist
             if ( createProject ) {
                 if ( projectDao.findByProjectName( projectName ) != null ) {
-                    returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
+                    returnString = "Project "
+                            + projectName
+                            + " already exists, choose a different project name or use existingproject option to add to this project.";
+                    log.error( returnString );
+                    return returnString;
                 } else {
                     projectManager.createProject( projectName, "" );
                 }
@@ -548,6 +552,8 @@ public class ProjectServiceImpl implements ProjectService {
             if ( createProject ) {
                 if ( projectDao.findByProjectName( projectName ) != null ) {
                     returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
+                    log.error( returnString );
+                    return returnString;
                 }
             }
 
