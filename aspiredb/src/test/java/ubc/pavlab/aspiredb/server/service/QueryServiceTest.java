@@ -640,7 +640,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         subject.addPhenotype( phenoMouth );
         subject.addPhenotype( phenoNervous );
         subjectList.add( subject );
-        subjectDao.update( subject );
+        persistentTestObjectHelper.updateSubject( subject );
         phenotypeDao.update( phenoHead );
         phenotypeDao.update( phenoFace );
         phenotypeDao.update( phenoMouth );
