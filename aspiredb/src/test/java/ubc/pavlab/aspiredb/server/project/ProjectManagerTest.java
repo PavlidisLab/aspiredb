@@ -17,6 +17,7 @@ package ubc.pavlab.aspiredb.server.project;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import gemma.gsec.SecurityService;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +45,9 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
+import ubc.pavlab.aspiredb.server.dao.CharacteristicDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
+import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.Characteristic;
 import ubc.pavlab.aspiredb.server.model.Project;
@@ -68,6 +72,12 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
     @Autowired
     private ProjectDao projectDao;
+
+    @Autowired
+    CharacteristicDao characteristicDao;
+
+    @Autowired
+    SubjectDao subjectDao;
 
     @Autowired
     VariantDao variantDao;
@@ -438,20 +448,52 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
         }
 
-        Project p = projectDao.findByProjectName( projectId );
-        aclTestUtils.checkHasAcl( p );
+        new InlineTransaction() {
+            @Override
+            public void instructions() {
 
-        try {
+                Project p = projectDao.findByProjectName( projectId );
+                aclTestUtils.checkHasAcl( p );
 
-            projectManager.deleteProject( projectId );
+                // collect Ids
+                Collection<Long> subjectIds = new HashSet<>();
+                Collection<Long> variantIds = new HashSet<>();
+                Collection<Long> characteristicIds = new HashSet<>();
+                for ( Subject s : p.getSubjects() ) {
+                    assertNotNull( s.getId() );
+                    subjectIds.add( s.getId() );
+                    for ( Variant v : s.getVariants() ) {
+                        assertNotNull( v.getId() );
+                        variantIds.add( v.getId() );
+                        for ( Characteristic c : v.getCharacteristics() ) {
+                            assertNotNull( c.getId() );
+                            characteristicIds.add( c.getId() );
+                        }
+                    }
+                }
+                assertTrue( subjectIds.size() > 0 );
+                assertTrue( variantIds.size() > 0 );
+                assertTrue( characteristicIds.size() > 0 );
 
-        } catch ( Exception e ) {
-            log.error( e.getLocalizedMessage(), e );
-            fail( "projectManager.deleteProject failed" );
+                try {
 
-        }
+                    projectManager.deleteProject( projectId );
 
-        aclTestUtils.checkDeletedAcl( p );
+                } catch ( Exception e ) {
+                    log.error( e.getLocalizedMessage(), e );
+                    fail( "projectManager.deleteProject failed" );
+
+                }
+
+                aclTestUtils.checkDeletedAcl( p );
+
+                // now let's try loading the ids that should have been removed!
+                assertEquals( null, projectDao.load( p.getId() ) );
+                assertEquals( 0, subjectDao.load( subjectIds ).size() );
+                assertEquals( 0, variantDao.load( variantIds ).size() );
+                assertEquals( 0, characteristicDao.load( characteristicIds ).size() );
+            }
+        }.execute();
 
     }
 

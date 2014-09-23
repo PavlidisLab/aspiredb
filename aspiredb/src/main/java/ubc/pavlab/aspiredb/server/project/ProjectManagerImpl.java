@@ -386,8 +386,6 @@ public class ProjectManagerImpl implements ProjectManager {
             s.getProjects().remove( project );
         }
 
-        project.getSubjects().removeAll( subjects );
-
         // We don't need to do this anymore because we use
         // the hibernate annotation "orphanRemoval=true"
         // characteristicDao.remove( characteristics );
