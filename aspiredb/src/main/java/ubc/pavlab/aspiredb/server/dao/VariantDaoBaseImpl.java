@@ -399,10 +399,10 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
     }
 
     private void addSingleVariantFilter( RestrictionExpression restrictionExpression, Criteria criteria ) {
-        criteria.createAlias( "location", "location" ).createAlias( "subject", "subject" )
+        criteria.createAlias( "location", "location" ).createAlias( "subject", "subject" );
         // .createAlias("subject.labels", "subject_label", CriteriaSpecification.LEFT_JOIN)
         // .createAlias("labels", "variant_label", CriteriaSpecification.LEFT_JOIN)
-                .createAlias( "characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN );
+        // .createAlias( "characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN );
         Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
                 CriteriaBuilder.EntityType.VARIANT );
         criteria.add( junction );

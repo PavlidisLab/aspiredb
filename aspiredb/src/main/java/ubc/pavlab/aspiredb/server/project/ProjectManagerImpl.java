@@ -474,17 +474,9 @@ public class ProjectManagerImpl implements ProjectManager {
             filters.add( specialProjectFilterConfig );
             filters.add( getVariantFilterConfigForSingleVariant( vvo ) );
 
-            // FIXME
-            log.info( "============= start queryVariants inside query variants ============= " );
-
-            StopWatch timer2 = new StopWatch();
-            timer2.start();
             // BoundedList<VariantValueObject> overLappedVvos = queryService.queryVariants( filters );
             Collection<Variant> overlappedVvos = variantDao.findByGenomicLocation( vvo.getGenomicRange(),
                     Collections.singletonList( specialProject.getId() ) );
-
-            log.info( "============= end queryVariants inside query variants took " + timer2.getTime()
-                    + " ms ============= " );
 
             for ( Variant v : overlappedVvos ) {
                 VariantValueObject vvoOverlapped = v.toValueObject();
