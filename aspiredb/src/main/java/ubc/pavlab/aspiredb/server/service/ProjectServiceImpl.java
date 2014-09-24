@@ -804,19 +804,19 @@ public class ProjectServiceImpl implements ProjectService {
     @RemoteMethod
     public String deleteProject( String projectName ) {
 
-        log.info( " In deleteProject projectName:" + projectName );
+        log.info( " Deleting project " + projectName );
 
         Project proj = projectDao.findByProjectName( projectName );
 
         if ( proj == null ) {
-            log.error( "Project does not exist" );
-            return "Project does not exist";
+            log.warn( "Project " + projectName + " does not exist" );
+            return "Project " + projectName + " does not exist";
         }
 
         try {
             projectManager.deleteProject( projectName );
         } catch ( Exception e ) {
-            log.error( e.getMessage() );
+            log.warn( e.getMessage() );
             return e.getMessage();
         }
 

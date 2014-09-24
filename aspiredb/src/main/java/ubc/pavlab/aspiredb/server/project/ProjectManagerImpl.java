@@ -356,7 +356,7 @@ public class ProjectManagerImpl implements ProjectManager {
         Project project = projectDao.findByProjectName( name );
 
         if ( project == null ) {
-            log.error( "That project doesn't exist" );
+            log.warn( "Project " + name + " doesn't exist" );
             return;
         }
 
@@ -474,9 +474,21 @@ public class ProjectManagerImpl implements ProjectManager {
             filters.add( specialProjectFilterConfig );
             filters.add( getVariantFilterConfigForSingleVariant( vvo ) );
 
-            BoundedList<VariantValueObject> overLappedVvos = queryService.queryVariants( filters );
+            // FIXME
+            log.info( "============= start queryVariants inside query variants ============= " );
 
-            for ( VariantValueObject vvoOverlapped : overLappedVvos.getItems() ) {
+            StopWatch timer2 = new StopWatch();
+            timer2.start();
+            // BoundedList<VariantValueObject> overLappedVvos = queryService.queryVariants( filters );
+            Collection<Variant> overlappedVvos = variantDao.findByGenomicLocation( vvo.getGenomicRange(),
+                    Collections.singletonList( specialProject.getId() ) );
+
+            log.info( "============= end queryVariants inside query variants took " + timer2.getTime()
+                    + " ms ============= " );
+
+            for ( Variant v : overlappedVvos ) {
+                VariantValueObject vvoOverlapped = v.toValueObject();
+                // for ( VariantValueObject vvoOverlapped : overLappedVvos.getItems() ) {
 
                 overlapVos.add( new Variant2VariantOverlap( vvo, vvoOverlapped, projectToPopulate.getId(),
                         specialProject.getId() ) );

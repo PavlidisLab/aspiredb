@@ -111,8 +111,8 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         // create many variants
         // 500 x 1000 takes ~11,094 ms
 
-        int variantsLimit = 500;
-        int specialVariantsLimit = 1000;
+        int variantsLimit = 5;
+        int specialVariantsLimit = 100;
         int variantLength = 100;
 
         List<VariantValueObject> cnvList = new ArrayList<>();
@@ -137,7 +137,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         projectManager.populateProjectToProjectOverlap( projectName, projectNameWithOverlap );
         log.info( "Project overlap between projects with " + cnvList.size() + " and " + cnvListWithOverlap.size()
                 + " variants took " + timer.getTime() + " ms" );
-        assertTrue( timer.getTime() < 15000 );
+        assertTrue( timer.getTime() < 1000 );
     }
 
     @Test

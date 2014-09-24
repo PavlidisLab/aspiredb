@@ -91,21 +91,24 @@ public class CriteriaBuilder {
      * @return
      */
     public static Criterion buildCriteriaRestriction( RestrictionExpression restrictionExpression, EntityType target ) {
+        Criterion result = null;
         if ( restrictionExpression instanceof Disjunction ) {
-            return processRestrictionExpression( ( Disjunction ) restrictionExpression, target );
+            result = processRestrictionExpression( ( Disjunction ) restrictionExpression, target );
         } else if ( restrictionExpression instanceof Conjunction ) {
-            return processRestrictionExpression( ( Conjunction ) restrictionExpression, target );
+            result = processRestrictionExpression( ( Conjunction ) restrictionExpression, target );
         } else if ( restrictionExpression instanceof SetRestriction ) {
-            return processRestrictionExpression( ( SetRestriction ) restrictionExpression, target );
+            result = processRestrictionExpression( ( SetRestriction ) restrictionExpression, target );
         } else if ( restrictionExpression instanceof PhenotypeRestriction ) {
-            return processRestrictionExpression( ( PhenotypeRestriction ) restrictionExpression, target );
+            result = processRestrictionExpression( ( PhenotypeRestriction ) restrictionExpression, target );
         } else if ( restrictionExpression instanceof SimpleRestriction ) {
-            return processRestrictionExpression( ( SimpleRestriction ) restrictionExpression, target );
+            result = processRestrictionExpression( ( SimpleRestriction ) restrictionExpression, target );
         } else if ( restrictionExpression instanceof VariantTypeRestriction ) {
-            return processRestrictionExpression( ( VariantTypeRestriction ) restrictionExpression, target );
+            result = processRestrictionExpression( ( VariantTypeRestriction ) restrictionExpression, target );
+        } else {
+            throw new IllegalArgumentException( "Restriction type " + restrictionExpression.getClass().getSimpleName()
+                    + " is not supported yet." );
         }
-        throw new IllegalArgumentException( "Restriction type " + restrictionExpression.getClass().getSimpleName()
-                + " is not supported yet." );
+        return result;
     }
 
     /**
@@ -329,7 +332,7 @@ public class CriteriaBuilder {
                 .add( Restrictions.disjunction().add( variantInsideRegion ).add( variantHitsStartOfRegion )
                         .add( variantHitsEndOfRegion ) );
 
-        log.debug( "RangeCriterion=" + rangeCriterion );
+        log.info( "RangeCriterion=" + rangeCriterion );
 
         return rangeCriterion;
     }
@@ -368,7 +371,7 @@ public class CriteriaBuilder {
         Operator operator = setRestriction.getOperator();
         Set<Object> values = setRestriction.getValues();
 
-        log.debug( "Property=" + property + "; operator=" + operator + "; values="
+        log.info( "Property=" + property + "; operator=" + operator + "; values="
                 + StringUtils.collectionToCommaDelimitedString( values ) );
 
         DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
@@ -461,7 +464,7 @@ public class CriteriaBuilder {
         Operator operator = restriction.getOperator();
         Object value = restriction.getValue();
 
-        log.debug( "Property=" + property + "; operator=" + operator + "; value=" + value );
+        log.info( "Property=" + property + "; operator=" + operator + "; value=" + value );
 
         if ( property instanceof CharacteristicProperty ) {
             return createCharacteristicCriterion( ( CharacteristicProperty ) property, operator, ( TextValue ) value,
