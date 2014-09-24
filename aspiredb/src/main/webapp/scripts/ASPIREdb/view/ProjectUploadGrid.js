@@ -215,6 +215,13 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                values = form.getValues();
                ref.variantTypeEdit = values['variantTypeEdit-inputEl'].toUpperCase();
                var file = Ext.getCmp( 'variantFileEdit' ).getEl().down( 'input[type=file]' ).dom.files[0];
+
+               if ( file == null ) {
+                  Ext.MessageBox
+                     .alert( 'Invalid Fields', 'File is required' );
+                  return;
+               }
+               
                ref.variantFileEdit = file.name;
 
                if ( form.isValid() ) {
@@ -249,8 +256,6 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                         Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' );
                      }
                   } );
-
-                  ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
 
                } else {
                   // Ext.Msg.alert( "Error!", "Your form is invalid!" );
@@ -315,6 +320,13 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                var form = phenotypePanel;
                var me = this;
                var file = Ext.getCmp( 'phenotypeFileEdit' ).getEl().down( 'input[type=file]' ).dom.files[0];
+               
+               if ( file == null ) {
+                  Ext.MessageBox
+                     .alert( 'Invalid Fields', 'File is required' );
+                  return;
+               }
+               
                ref.phenotypeFileEdit = file.name;
 
                if ( form.isValid() ) {
@@ -351,8 +363,6 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                         Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' );
                      }
                   } );
-
-                  ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
 
                } else {
                   // Ext.Msg.alert( "Error!", "Your form is invalid!" );
