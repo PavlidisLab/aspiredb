@@ -382,6 +382,13 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
       } );
 
       this.add( phenotypePanel );
+      
+
+      ASPIREdb.EVENT_BUS.on( 'project_manager_window_closed', function() {
+         // clear
+         ref.variantServerFilename = "";
+         ref.phenotypeServerFilename = "";
+      });
 
    },
 
