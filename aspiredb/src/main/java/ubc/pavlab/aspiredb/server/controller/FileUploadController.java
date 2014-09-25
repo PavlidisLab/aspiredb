@@ -3,7 +3,6 @@ package ubc.pavlab.aspiredb.server.controller;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -200,21 +199,6 @@ public class FileUploadController {
 
         return sb.toString();
 
-    }
-
-    /**
-     * Ajax. DWR can handle this.
-     * 
-     * @throws IOException
-     * @throws FileNotFoundException
-     */
-    public String addSubjectVariantsToExistingProject( String filename, boolean createProject, String projectName,
-            String variantType ) {
-
-        String result = "";
-        result = projectService.addSubjectVariantsToProject( filename, createProject, projectName, variantType );
-        System.err.println( "DWR Uploaded file!" );
-        return result;
     }
 
 }

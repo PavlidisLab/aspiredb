@@ -444,8 +444,8 @@ public class ProjectManagerImpl implements ProjectManager {
 
     @Override
     @Transactional
-    public void populateProjectToProjectOverlap( String projectName, String overlappingProjectName )
-            throws ExternalDependencyException, NotLoggedInException {
+    public Collection<Variant2VariantOverlap> populateProjectToProjectOverlap( String projectName,
+            String overlappingProjectName ) throws ExternalDependencyException, NotLoggedInException {
 
         StopWatch timer = new StopWatch();
         timer.start();
@@ -505,6 +505,7 @@ public class ProjectManagerImpl implements ProjectManager {
         log.info( "Found " + overlapVos.size() + " variant overlaps between " + projectName + " and "
                 + overlappingProjectName + " which took " + timer.getTime() + " ms" );
 
+        return overlapVos;
     }
 
     private void addCommonVariantData( Variant v, VariantValueObject vvo ) {

@@ -59,10 +59,6 @@ Ext.define( 'ASPIREdb.view.ProjectManagerWindow', {
       var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
       var grid = panel.down( '#ProjectGrid' );
 
-      ref.on('close', function() {
-         ASPIREdb.EVENT_BUS.fireEvent( 'project_manager_window_closed' );
-      });
-      
       ref.show();
       grid.setLoading( true );
 

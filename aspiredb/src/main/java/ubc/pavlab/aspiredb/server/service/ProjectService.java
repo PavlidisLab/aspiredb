@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
+import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadServiceResult;
+import ubc.pavlab.aspiredb.server.fileupload.VariantUploadServiceResult;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
@@ -87,10 +89,11 @@ public interface ProjectService {
 
     public boolean isUser( String userName ) throws NotLoggedInException;
 
-    public String addSubjectVariantsToProject( String filename, boolean createProject, String projectName,
-            String variantType );
+    public VariantUploadServiceResult addSubjectVariantsToProject( String filename, boolean createProject,
+            String projectName, String variantType ) throws Exception;
 
-    public String addSubjectPhenotypeToProject( String filename, boolean createProject, String projectName );
+    public PhenotypeUploadServiceResult addSubjectPhenotypeToProject( String filename, boolean createProject,
+            String projectName ) throws Exception;
 
     public Map<String, String> addMultipleSubjectVariantsToProject( List<String> variantFiles, boolean createProject,
             String projectName );

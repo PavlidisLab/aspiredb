@@ -47,6 +47,7 @@ import ubc.pavlab.aspiredb.server.fileupload.VariantUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadServiceResult;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.model.Variant2VariantOverlap;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
@@ -224,11 +225,19 @@ public class ProjectServiceImpl implements ProjectService {
     public Map<String, String> addMultipleSubjectVariantsToProject( List<String> variantFiles, boolean createProject,
             String projectName ) {
         Map<String, String> returnString = new HashMap<String, String>();
+        VariantUploadServiceResult variantResult = null;
 
         for ( int i = 0; i < variantFiles.size(); i++ ) {
             String filename = variantFiles.get( 0 );
             String filetype = variantFiles.get( 1 );
-            String results = addSubjectVariantsToProject( filename, createProject, projectName, filetype );
+            String results = "";
+            try {
+                variantResult = addSubjectVariantsToProject( filename, createProject, projectName, filetype );
+                results += "Number of Variants: " + variantResult.getVariantsToAdd().size() + "\n";
+            } catch ( Exception e ) {
+                log.error( e.getLocalizedMessage(), e );
+                results += e.getLocalizedMessage() + "\n";
+            }
             returnString.put( filename, results );
         }
         return returnString;
@@ -243,94 +252,74 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @RemoteMethod
-    public String addSubjectVariantsToProject( String filepath, boolean createProject, String projectName,
-            String variantType ) {
+    public VariantUploadServiceResult addSubjectVariantsToProject( String filepath, boolean createProject,
+            String projectName, String variantType ) throws Exception {
 
-        String returnString = "";
+        Class.forName( "org.relique.jdbc.csv.CsvDriver" );
 
-        try {
+        File file = new File( filepath );
+        String filename = file.getName();
 
-            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-
-            File file = new File( filepath );
-            String filename = file.getName();
-
-            if ( !file.exists() ) {
-                return "File " + filepath + " not found";
-            }
-
-            if ( filename.endsWith( ".csv" ) ) {
-                filename = filename.substring( 0, file.getName().length() - 4 );
-            } else {
-                return "File not processed, file name must end with .csv";
-            }
-
-            // create a connection
-            // arg[0] is the directory in which the .csv files are held
-            Connection conn = DriverManager
-                    .getConnection( "jdbc:relique:csv:" + file.getParentFile().getAbsolutePath() );
-
-            Statement stmt = conn.createStatement();
-            ResultSet results = stmt.executeQuery( "SELECt * from " + filename );
-
-            // check weather the project exist
-            if ( createProject ) {
-                if ( projectDao.findByProjectName( projectName ) != null ) {
-                    returnString = "Project "
-                            + projectName
-                            + " already exists, choose a different project name or use existingproject option to add to this project.";
-                    log.error( returnString );
-                    return returnString;
-                } else {
-                    projectManager.createProject( projectName, "" );
-                }
-            }
-
-            VariantType VariantType = null;
-            VariantUploadServiceResult result = null;
-
-            if ( variantType.equalsIgnoreCase( "CNV" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.CNV );
-            } else if ( variantType.equalsIgnoreCase( "SNV" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.SNV );
-            } else if ( variantType.equalsIgnoreCase( "INDEL" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INDEL );
-            } else if ( variantType.equalsIgnoreCase( "INVERSION" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INVERSION );
-            } else if ( variantType.equalsIgnoreCase( SpecialProject.DECIPHER.toString() ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DECIPHER );
-            } else if ( variantType.equalsIgnoreCase( SpecialProject.DGV.toString() ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DGV );
-            }
-
-            if ( result.getErrorMessages().isEmpty() ) {
-                StopWatch timer = new StopWatch();
-                timer.start();
-
-                projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
-
-                log.info( "Adding " + result.getVariantsToAdd().size() + " variants to project " + projectName
-                        + " took " + timer.getTime() + " ms" );
-
-                returnString = "Added " + result.getVariantsToAdd().size() + " " + variantType + " to project "
-                        + projectName;
-
-            } else {
-                for ( String errorMessage : result.getErrorMessages() ) {
-                    returnString += errorMessage + "\n";
-                    log.error( errorMessage );
-                }
-
-            }
-            // }
-
-            // TODO Should we delete the file???
-
-        } catch ( Exception e ) {
-            log.error( e.getLocalizedMessage(), e );
-            return e.toString();
+        if ( !file.exists() ) {
+            throw new IllegalArgumentException( "File " + filepath + " not found" );
         }
-        return returnString;
+
+        if ( filename.endsWith( ".csv" ) ) {
+            filename = filename.substring( 0, file.getName().length() - 4 );
+        } else {
+            throw new IllegalArgumentException( "File not processed, file name must end with .csv" );
+        }
+
+        // create a connection
+        // arg[0] is the directory in which the .csv files are held
+        Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + file.getParentFile().getAbsolutePath() );
+
+        Statement stmt = conn.createStatement();
+        ResultSet results = stmt.executeQuery( "SELECt * from " + filename );
+
+        // check weather the project exist
+        if ( createProject ) {
+            if ( projectDao.findByProjectName( projectName ) != null ) {
+                throw new IllegalArgumentException(
+                        "Project "
+                                + projectName
+                                + " already exists, choose a different project name or use existingproject option to add to this project." );
+            } else {
+                projectManager.createProject( projectName, "" );
+            }
+        }
+
+        VariantType VariantType = null;
+        VariantUploadServiceResult result = null;
+
+        if ( variantType.equalsIgnoreCase( "CNV" ) ) {
+            result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.CNV );
+        } else if ( variantType.equalsIgnoreCase( "SNV" ) ) {
+            result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.SNV );
+        } else if ( variantType.equalsIgnoreCase( "INDEL" ) ) {
+            result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INDEL );
+        } else if ( variantType.equalsIgnoreCase( "INVERSION" ) ) {
+            result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INVERSION );
+        } else if ( variantType.equalsIgnoreCase( SpecialProject.DECIPHER.toString() ) ) {
+            result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DECIPHER );
+        } else if ( variantType.equalsIgnoreCase( SpecialProject.DGV.toString() ) ) {
+            result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DGV );
+        }
+
+        if ( result.getErrorMessages().isEmpty() ) {
+            StopWatch timer = new StopWatch();
+            timer.start();
+
+            projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
+
+            log.info( "Adding " + result.getVariantsToAdd().size() + " variants to project " + projectName + " took "
+                    + timer.getTime() + " ms" );
+        }
+
+        // }
+
+        // TODO Should we delete the file???
+        return result;
     }
 
     /**
@@ -513,77 +502,60 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @RemoteMethod
-    public String addSubjectPhenotypeToProject( String filepath, boolean createProject, String projectName ) {
+    public PhenotypeUploadServiceResult addSubjectPhenotypeToProject( String filepath, boolean createProject,
+            String projectName ) throws Exception {
 
-        String returnString = "";
+        os.getHumanPhenotypeOntologyService().startInitializationThread( true );
+        int c = 0;
 
-        try {
-
-            os.getHumanPhenotypeOntologyService().startInitializationThread( true );
-            int c = 0;
-
-            while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
-                Thread.sleep( 10000 );
-                log.info( "Waiting for HumanPhenotypeOntology to load" );
-                if ( ++c > 10 ) {
-                    throw new Exception( "Ontology load timeout" );
-                }
+        while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
+            Thread.sleep( 10000 );
+            log.info( "Waiting for HumanPhenotypeOntology to load" );
+            if ( ++c > 10 ) {
+                throw new Exception( "Ontology load timeout" );
             }
-
-            File f = new File( filepath );
-            String directory = f.getParent();
-            String filename = f.getName();
-
-            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-
-            if ( filename.endsWith( ".csv" ) && f.exists() ) {
-                filename = filename.substring( 0, filename.length() - 4 );
-            } else {
-                return "File not processed, file name must end with .csv";
-            }
-
-            // create a connection
-            // arg[0] is the directory in which the .csv files are held
-            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + directory );
-
-            Statement stmt = conn.createStatement();
-            ResultSet results = stmt.executeQuery( "SELECT * FROM " + filename );
-
-            if ( createProject ) {
-                if ( projectDao.findByProjectName( projectName ) != null ) {
-                    returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
-                    log.error( returnString );
-                    return returnString;
-                }
-            }
-
-            PhenotypeUploadServiceResult phenResult = phenotypeUploadService
-                    .getPhenotypeValueObjectsFromResultSet( results );
-
-            // clean up
-            results.close();
-            stmt.close();
-            conn.close();
-
-            projectManager.addSubjectPhenotypesToProject( projectName, createProject, phenResult.getPhenotypesToAdd() );
-
-            if ( !phenResult.getErrorMessages().isEmpty() ) {
-                for ( String errorMessage : phenResult.getErrorMessages() ) {
-                    returnString += errorMessage + "\n";
-                    log.error( errorMessage );
-                }
-
-            } else {
-                returnString = "Added " + phenResult.getPhenotypesToAdd().size() + " phenotypes to project "
-                        + projectName;
-            }
-
-        } catch ( Exception e ) {
-            log.error( e.getLocalizedMessage(), e );
-            return e.toString();
         }
 
-        return returnString;
+        File f = new File( filepath );
+        String directory = f.getParent();
+        String filename = f.getName();
+
+        Class.forName( "org.relique.jdbc.csv.CsvDriver" );
+
+        if ( filename.endsWith( ".csv" ) && f.exists() ) {
+            filename = filename.substring( 0, filename.length() - 4 );
+        } else {
+            throw new IllegalArgumentException( "File not processed, file name must end with .csv" );
+        }
+
+        // create a connection
+        // arg[0] is the directory in which the .csv files are held
+        Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + directory );
+
+        Statement stmt = conn.createStatement();
+        ResultSet results = stmt.executeQuery( "SELECT * FROM " + filename );
+
+        if ( createProject ) {
+            if ( projectDao.findByProjectName( projectName ) != null ) {
+                throw new IllegalArgumentException(
+                        "Project name already exists, choose a different project name or use existingproject option to add to this project." );
+
+            }
+        }
+
+        PhenotypeUploadServiceResult phenResult = phenotypeUploadService
+                .getPhenotypeValueObjectsFromResultSet( results );
+
+        // clean up
+        results.close();
+        stmt.close();
+        conn.close();
+
+        projectManager.addSubjectPhenotypesToProject( projectName, createProject, phenResult.getPhenotypesToAdd() );
+
+        log.info( "Added " + phenResult.getPhenotypesToAdd().size() + " phenotypes to project " + projectName );
+
+        return phenResult;
     }
 
     @Override
@@ -871,29 +843,79 @@ public class ProjectServiceImpl implements ProjectService {
         StopWatch timer = new StopWatch();
         timer.start();
 
-        String returnMsg = "";
+        StringBuffer returnMsg = new StringBuffer();
+        StringBuffer errMsg = new StringBuffer();
+
+        VariantUploadServiceResult variantResult = null;
+        Collection<Variant2VariantOverlap> overlap = null;
+        PhenotypeUploadServiceResult phenResult = null;
+
+        final String STR_FMT = "%35s: %5s\n";
+
+        returnMsg.append( String.format( STR_FMT, "Project", projectName ) + "\n" );
 
         if ( variantFilename.length() > 0 ) {
-            returnMsg += addSubjectVariantsToProject( variantFilename, createProject, projectName, variantType );
 
-            for ( Project specialProject : projectDao.getSpecialOverlapProjects() ) {
-                try {
-                    projectManager.populateProjectToProjectOverlap( projectName, specialProject.getName() );
-                } catch ( Exception e ) {
-                    log.error( e.getLocalizedMessage(), e );
-                    returnMsg += "\n" + e.getLocalizedMessage();
+            try {
+                variantResult = addSubjectVariantsToProject( variantFilename, createProject, projectName, variantType );
+                returnMsg.append( String.format( STR_FMT, "Number of Subjects", getSubjects( projectName ).size() ) );
+                returnMsg.append( String
+                        .format( STR_FMT, "Number of Variants", variantResult.getVariantsToAdd().size() ) );
+                for ( String err : variantResult.getErrorMessages() ) {
+                    errMsg.append( err + "\n" );
                 }
+
+                for ( Project specialProject : projectDao.getSpecialOverlapProjects() ) {
+                    try {
+                        overlap = projectManager
+                                .populateProjectToProjectOverlap( projectName, specialProject.getName() );
+                        returnMsg.append( String.format( STR_FMT,
+                                "Number of Overlaps with " + specialProject.getName(), overlap.size() ) );
+                    } catch ( Exception e ) {
+                        log.error( e.getLocalizedMessage(), e );
+                        errMsg.append( e.getLocalizedMessage() + "\n" );
+                    }
+                }
+
+            } catch ( Exception e ) {
+                log.error( e.getLocalizedMessage(), e );
+                errMsg.append( e.getLocalizedMessage() + "\n" );
             }
         }
 
         if ( phenotypeFilename.length() > 0 ) {
-            returnMsg += returnMsg.length() > 0 ? "\n" : "";
-            returnMsg += addSubjectPhenotypeToProject( phenotypeFilename, createProject, projectName );
+            try {
+                phenResult = addSubjectPhenotypeToProject( phenotypeFilename, createProject, projectName );
+                if ( returnMsg.indexOf( "Number of Subjects" ) == -1 ) {
+                    returnMsg
+                            .append( String.format( STR_FMT, "Number of Subjects", getSubjects( projectName ).size() ) );
+                }
+                returnMsg.append( String.format( STR_FMT, "Number of Phenotypes", phenResult.getPhenotypesToAdd()
+                        .size() ) );
+                for ( String err : phenResult.getErrorMessages() ) {
+                    errMsg.append( err + "\n" );
+                }
+            } catch ( Exception e ) {
+                log.error( e.getLocalizedMessage(), e );
+                errMsg.append( e.getLocalizedMessage() + "\n" );
+            }
         }
 
         log.info( "Uploading took " + timer.getTime() + " ms" );
 
-        return returnMsg;
+        // trim errorMssage
+        final int ERRMSG_LIMIT = 500;
+        if ( errMsg.length() > ERRMSG_LIMIT ) {
+            errMsg.delete( ERRMSG_LIMIT, errMsg.length() - 1 );
+            errMsg.append( "\n...\n" );
+        }
+
+        String returnStr = returnMsg.toString();
+        returnStr += errMsg.length() > 0 ? "\nExceptions\n" + errMsg : "";
+
+        log.info( returnStr );
+
+        return returnStr;
     }
 
     @Override

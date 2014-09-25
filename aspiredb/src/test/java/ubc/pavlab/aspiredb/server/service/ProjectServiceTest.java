@@ -94,7 +94,7 @@ public class ProjectServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testAddSubjectVariantToProject() throws Exception {
-        String msg = projectService.addSubjectVariantsToProject( subjectFilename, true, projectName, "CNV" );
+        projectService.addSubjectVariantsToProject( subjectFilename, true, projectName, "CNV" );
         subjects = projectService.getSubjects( projectName );
 
         Collection<Long> ids = new HashSet<>();
@@ -108,7 +108,7 @@ public class ProjectServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testAddSubjectPhenotypeToProject() throws Exception {
-        String msg = projectService.addSubjectPhenotypeToProject( phenotypeFilename, true, projectName );
+        projectService.addSubjectPhenotypeToProject( phenotypeFilename, true, projectName );
         subjects = projectService.getSubjects( projectName );
 
         Collection<Long> ids = new HashSet<>();
@@ -131,7 +131,7 @@ public class ProjectServiceTest extends BaseSpringContextTest {
         timer.start();
 
         // variant upload
-        String msg = projectService.addSubjectVariantsToProject( subjectFilenameWithManyCnvs, true, projectName, "CNV" );
+        projectService.addSubjectVariantsToProject( subjectFilenameWithManyCnvs, true, projectName, "CNV" );
         project = projectManager.findProject( projectName );
         subjects = projectService.getSubjects( projectName );
         assertEquals( 50, projectService.getSubjects( projectName ).size() );
@@ -139,7 +139,7 @@ public class ProjectServiceTest extends BaseSpringContextTest {
         assertTrue( timer.getTime() < 60000 );
 
         // phenotype upload
-        msg = projectService.addSubjectPhenotypeToProject( phenotypeFilenameWithManyPhenotypes, false, projectName );
+        projectService.addSubjectPhenotypeToProject( phenotypeFilenameWithManyPhenotypes, false, projectName );
         subjects = projectService.getSubjects( projectName );
 
         log.info( "variant and phenotype total upload time took " + timer.getTime() + " ms" );

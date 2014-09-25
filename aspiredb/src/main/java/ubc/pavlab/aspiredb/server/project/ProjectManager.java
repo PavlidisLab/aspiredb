@@ -15,11 +15,13 @@
 
 package ubc.pavlab.aspiredb.server.project;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.security.access.annotation.Secured;
 
 import ubc.pavlab.aspiredb.server.model.Project;
+import ubc.pavlab.aspiredb.server.model.Variant2VariantOverlap;
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
@@ -71,7 +73,8 @@ public interface ProjectManager {
 
     public String isProjectHasSubjectPhenotypes( String projectName ) throws Exception;
 
-    @Secured({ "GROUP_ADMIN" })
-    public void populateProjectToProjectOverlap( String projectName, String specialProjectName ) throws Exception;
+    @Secured({ "GROUP_USER" })
+    public Collection<Variant2VariantOverlap> populateProjectToProjectOverlap( String projectName,
+            String specialProjectName ) throws Exception;
 
 }

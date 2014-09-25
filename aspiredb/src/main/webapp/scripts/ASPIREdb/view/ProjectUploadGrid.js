@@ -62,7 +62,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                        var projectName = Ext.getCmp( 'ProjectUploadGrid' ).selectedProject[0].data.ProjectName;
 
                        if ( variantfilename.length == 0 && phenotypefilename.length == 0 ) {
-                          Ext.Msg.alert( 'Invalid Fields', "Either a variant and / or phenotype file is required." );
+                          Ext.Msg.alert( 'Invalid Fields', "Either a variant and / or <br>phenotype file is required." );
                           return;
                        }
 
@@ -80,22 +80,33 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
 
                        }
 
+                       var clearFilenames = function() {
+                          me.up( "ProjectUploadGrid" ).variantServerFilename = "";
+                          me.up( "ProjectUploadGrid" ).phenotypeServerFilename = "";
+                       }
+                       
                        me.up( "ProjectUploadGrid" ).setLoading( true );
 
                        ProjectService.addSubjectVariantsPhenotypeToProject( variantfilename, phenotypefilename, false,
                           projectName, variantTypeEdit, {
-                             callback : function(errorMessage) {
+                             callback : function(message) {
 
                                 // this can be a long message, break it up with <br>
-                                Ext.Msg.alert( 'Result', errorMessage.replace("\n","<br>") );
+                                //Ext.Msg.alert( 'Result', message.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;') );
+                                console.log( message );
+                                Ext.Msg.alert( 'Result', '<pre>' + message + '</pre>' );
 
                                 ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
                                 me.up( "ProjectUploadGrid" ).setLoading( false );
+                                
+                                clearFilenames();
                              },
                              errorHandler : function(er, exception) {
                                 Ext.Msg.alert( 'Error', er + "\n" + exception.stack );
                                 console.log( exception.stack );
                                 me.up( "ProjectUploadGrid" ).setLoading( false );
+                                
+                                clearFilenames();
                              }
                           } );
 
@@ -382,13 +393,6 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
       } );
 
       this.add( phenotypePanel );
-      
-
-      ASPIREdb.EVENT_BUS.on( 'project_manager_window_closed', function() {
-         // clear
-         ref.variantServerFilename = "";
-         ref.phenotypeServerFilename = "";
-      });
 
    },
 
