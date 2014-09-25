@@ -26,7 +26,7 @@ Ext.define( 'ASPIREdb.ProjectManagerPanel', {
    alias : 'widget.ASPIREdb_projectmanagerpanel',
    layout : 'border',
    items : [ {
-      region : 'west',
+      region : 'center',
       xtype : 'ProjectGrid',
       id : 'ProjectGrid',
       width : '50%', //480,
@@ -39,16 +39,30 @@ Ext.define( 'ASPIREdb.ProjectManagerPanel', {
       id : 'ProjectUploadGrid',
       width : '100%', //480,
       title : 'Upload files to project'
-   }, {
-      region : 'east',
-      xtype : 'ProjectUserGrid',
-      id : 'ProjectUserGrid',
-      width : '50%', //480,
-      collapsible : true,
-      split : true,
-      title : 'Project Users'
-   }
+   }, 
 
    ],
 
+   initComponent : function() {
+      this.callParent();
+      
+      var me = this;
+      LoginStatusService.isUserAdministrator( {
+         callback : function(admin) {
+            if ( admin ) {
+               me.add({
+                  region : 'east',
+                  xtype : 'ProjectUserGrid',
+                  id : 'ProjectUserGrid',
+                  width : '50%', //480,
+                  collapsible : true,
+                  split : true,
+                  title : 'Project Users'
+               });
+               me.down("#ProjectGrid").doLayout();
+            }
+         }
+      });
+   },
+   
 } );

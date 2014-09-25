@@ -127,16 +127,23 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
       this.selProject = this.getSelectionModel().getSelection();
       var projectName = this.selProject[0].data.ProjectName;
 
-      ProjectService.getProjectUserNames( projectName, {
-         callback : function(userNames) {
-            console.log( 'project users :' + userNames );
-            me.populateProjectGrid( userNames, projectName );
-         },
-         errorHandler : function(er, exception) {
-            Ext.Msg.alert( "Project Grid : get User Error", er + "\n" + exception.stack );
-            console.log( exception.stack );
+      LoginStatusService.isUserAdministrator( {
+         callback : function(admin) {
+            if ( admin ) {
+               ProjectService.getProjectUserNames( projectName, {
+                  callback : function(userNames) {
+                     console.log( 'project users :' + userNames );
+                     me.populateProjectGrid( userNames, projectName );
+                  },
+                  errorHandler : function(er, exception) {
+                     Ext.Msg.alert( "Project Grid : get User Error", er + "\n" + exception.stack );
+                     console.log( exception.stack );
+                  }
+               } );
+            }
          }
-      } );
+      });
+      
       ASPIREdb.EVENT_BUS.fireEvent( 'project_selected', this.selProject );
 
    },

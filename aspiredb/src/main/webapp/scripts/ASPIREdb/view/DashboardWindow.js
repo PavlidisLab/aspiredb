@@ -168,6 +168,18 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
       var me = this;
       this.getDockedComponent( 'dashboardToolbar' ).removeAll();
 
+      me.getDockedComponent( 'dashboardToolbar' ).add( {
+         xtype : 'button',
+         id : 'manageProject',
+         text : 'Manage Project',
+         tooltip : 'Upload variants or upload phenotypes',
+         icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
+         handler : function() {
+            ASPIREdb.view.ProjectManagerWindow.initGridAndShow();
+
+         }
+      } );
+      
       LoginStatusService.isUserAdministrator( {
          callback : function(admin) {
             if ( admin ) {
@@ -188,17 +200,17 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
 //               me.getDockedComponent( 'dashboardToolbar' ).add( '-' );
 
                // add project manager button
-               me.getDockedComponent( 'dashboardToolbar' ).add( {
-                  xtype : 'button',
-                  id : 'manageProject',
-                  text : 'Manage Project',
-                  tooltip : 'Add users and upload variants or upload phenotypes',
-                  icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
-                  handler : function() {
-                     ASPIREdb.view.ProjectManagerWindow.initGridAndShow();
-
-                  }
-               } );
+//               me.getDockedComponent( 'dashboardToolbar' ).add( {
+//                  xtype : 'button',
+//                  id : 'manageProject',
+//                  text : 'Manage Project',
+//                  tooltip : 'Add users and upload variants or upload phenotypes',
+//                  icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
+//                  handler : function() {
+//                     ASPIREdb.view.ProjectManagerWindow.initGridAndShow();
+//
+//                  }
+//               } );
 
                me.getDockedComponent( 'dashboardToolbar' ).add( '-' );
 
