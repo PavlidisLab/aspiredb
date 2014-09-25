@@ -491,7 +491,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
             }
 
-            if ( ( 100.0 * ++i / projToPopulateVvos.getItems().size() ) % 10 == 0 ) {
+            if ( ( ++i % 100 ) == 0 ) {
                 log.info( " Processed " + i + "/" + projToPopulateVvos.getItems().size() + " ("
                         + ( 100.0 * i / projToPopulateVvos.getItems().size() ) + "%) variants and found "
                         + overlapVos.size() + " overlaps" );
