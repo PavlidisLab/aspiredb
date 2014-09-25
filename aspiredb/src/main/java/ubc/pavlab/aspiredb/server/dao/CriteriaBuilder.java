@@ -332,7 +332,7 @@ public class CriteriaBuilder {
                 .add( Restrictions.disjunction().add( variantInsideRegion ).add( variantHitsStartOfRegion )
                         .add( variantHitsEndOfRegion ) );
 
-        log.info( "RangeCriterion=" + rangeCriterion );
+        log.debug( "RangeCriterion=" + rangeCriterion );
 
         return rangeCriterion;
     }
@@ -371,7 +371,7 @@ public class CriteriaBuilder {
         Operator operator = setRestriction.getOperator();
         Set<Object> values = setRestriction.getValues();
 
-        log.info( "Property=" + property + "; operator=" + operator + "; values="
+        log.debug( "Property=" + property + "; operator=" + operator + "; values="
                 + StringUtils.collectionToCommaDelimitedString( values ) );
 
         DetachedCriteria subquery = DetachedCriteria.forClass( target.clazz );
@@ -464,7 +464,7 @@ public class CriteriaBuilder {
         Operator operator = restriction.getOperator();
         Object value = restriction.getValue();
 
-        log.info( "Property=" + property + "; operator=" + operator + "; value=" + value );
+        log.debug( "Property=" + property + "; operator=" + operator + "; value=" + value );
 
         if ( property instanceof CharacteristicProperty ) {
             return createCharacteristicCriterion( ( CharacteristicProperty ) property, operator, ( TextValue ) value,

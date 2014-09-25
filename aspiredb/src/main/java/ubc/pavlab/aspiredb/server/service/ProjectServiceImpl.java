@@ -876,12 +876,13 @@ public class ProjectServiceImpl implements ProjectService {
         if ( variantFilename.length() > 0 ) {
             returnMsg += addSubjectVariantsToProject( variantFilename, createProject, projectName, variantType );
 
-            try {
-                // FIXME auto-project overlap with DGV and DECIPHER?
-                projectManager.populateProjectToProjectOverlap( projectName, SpecialProject.DECIPHER.toString() );
-            } catch ( Exception e ) {
-                log.error( e.getLocalizedMessage(), e );
-                returnMsg += "\n" + e.getLocalizedMessage();
+            for ( Project specialProject : projectDao.getSpecialOverlapProjects() ) {
+                try {
+                    projectManager.populateProjectToProjectOverlap( projectName, specialProject.getName() );
+                } catch ( Exception e ) {
+                    log.error( e.getLocalizedMessage(), e );
+                    returnMsg += "\n" + e.getLocalizedMessage();
+                }
             }
         }
 
