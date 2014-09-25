@@ -62,7 +62,7 @@ public interface ProjectManager {
     // @Secured({ "GROUP_ADMIN" })
     // public Collection<String> getUsersForProject(String projectName);
 
-    @Secured("GROUP_ADMIN")
+    @Secured("GROUP_USER")
     public void deleteProject( String projectName ) throws Exception;
 
     @Secured("GROUP_USER")
