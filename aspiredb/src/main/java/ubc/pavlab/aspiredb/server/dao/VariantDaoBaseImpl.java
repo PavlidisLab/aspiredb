@@ -34,7 +34,6 @@ import org.hibernate.stat.SecondLevelCacheStatistics;
 import org.hibernate.stat.Statistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
@@ -94,9 +93,9 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         Statistics stats = this.getSessionFactory().getStatistics();
         SecondLevelCacheStatistics secondLevelStats = stats.getSecondLevelCacheStatistics( regionName );
         log.info( "SecondLevelCache:" + regionName + "," + secondLevelStats );
-        Map cacheEntries = secondLevelStats.getEntries();
-        log.info( "cacheEntries=" + cacheEntries.size() + ", keyset="
-                + StringUtils.collectionToCommaDelimitedString( cacheEntries.keySet() ) );
+        // Map cacheEntries = secondLevelStats.getEntries();
+        // log.info( "cacheEntries=" + cacheEntries.size() + ", keyset="
+        // + StringUtils.collectionToCommaDelimitedString( cacheEntries.keySet() ) );
     }
 
     @Override
