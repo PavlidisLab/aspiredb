@@ -53,7 +53,7 @@ public interface ProjectManager {
     @Secured("GROUP_ADMIN")
     public void alterGroupWritePermissions( String projectName, String groupName, boolean grant );
 
-    @Secured("GROUP_ADMIN")
+    @Secured("GROUP_USER")
     public Project createProject( String projectName, String description ) throws Exception;
 
     @Secured({ "GROUP_ADMIN" })
@@ -65,7 +65,7 @@ public interface ProjectManager {
     @Secured("GROUP_ADMIN")
     public void deleteProject( String projectName ) throws Exception;
 
-    @Secured("GROUP_ADMIN")
+    @Secured("GROUP_USER")
     public Project findProject( String projectName ) throws Exception;
 
     @Secured({ "GROUP_ADMIN" })
