@@ -30,8 +30,11 @@ import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.stat.SecondLevelCacheStatistics;
+import org.hibernate.stat.Statistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
@@ -86,6 +89,17 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
     }
 
     @Override
+    public void printCacheStatistics() {
+        String regionName = this.elementClass.getName();
+        Statistics stats = this.getSessionFactory().getStatistics();
+        SecondLevelCacheStatistics secondLevelStats = stats.getSecondLevelCacheStatistics( regionName );
+        log.info( "SecondLevelCache:" + regionName + "," + secondLevelStats );
+        Map cacheEntries = secondLevelStats.getEntries();
+        log.info( "cacheEntries=" + cacheEntries.size() + ", keyset="
+                + StringUtils.collectionToCommaDelimitedString( cacheEntries.keySet() ) );
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Collection<T> findByGenomicLocation( GenomicRange range, Collection<Long> activeProjectIds ) {
         SimpleRestriction restriction = new SimpleRestriction( new GenomicLocationProperty(), Operator.IS_IN_SET, range );
@@ -98,7 +112,16 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         criteria.add( CriteriaBuilder.buildCriteriaRestriction( restriction, CriteriaBuilder.EntityType.VARIANT ) );
 
-        List<T> variants = criteria.list();
+        criteria.setProjection( Projections.distinct( Projections.id() ) );
+        Collection<Long> variantIds = criteria.list();
+
+        // load from cache if it exists
+        Collection<T> variants = new HashSet<>();
+        for ( Long id : variantIds ) {
+            variants.add( ( T ) session.get( this.elementClass, id ) );
+        }
+
+        // List<T> variants = criteria.list();
         return variants;
     }
 
@@ -347,6 +370,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
         List<Long> variantIds = getFilteredIds( filters );
         List<T> variants = new ArrayList<T>( this.load( variantIds ) );
+        // List<T> variants = new ArrayList<T>( loadVariants( variantIds ) );
         if ( limit == 0 ) {
             limit = variants.size();
         }

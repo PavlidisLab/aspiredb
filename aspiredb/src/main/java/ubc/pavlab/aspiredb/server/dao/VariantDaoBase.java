@@ -39,4 +39,6 @@ public interface VariantDaoBase<T extends Variant> extends SecurableDaoBase<T>, 
 
     public Collection<String> suggestValuesForEntityProperty( Property property, SuggestionContext suggestionContext );
 
+    void printCacheStatistics();
+
 }

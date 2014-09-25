@@ -500,6 +500,8 @@ public class ProjectManagerImpl implements ProjectManager {
 
         variant2SpecialVariantOverlapDao.create( overlapVos );
 
+        variantDao.printCacheStatistics();
+
         log.info( "Found " + overlapVos.size() + " variant overlaps between " + projectName + " and "
                 + overlappingProjectName + " which took " + timer.getTime() + " ms" );
 

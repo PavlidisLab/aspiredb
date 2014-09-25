@@ -40,25 +40,26 @@
         </property>
 
         <property name="mappingLocations">
-         <list>
-          <value>classpath:gemma/gsec/model/AclEntry.hbm.xml</value>
-          <value>classpath:gemma/gsec/model/AclObjectIdentity.hbm.xml</value>
-          <value>classpath:gemma/gsec/model/AclSid.hbm.xml</value>
-         </list>
+            <list>
+                <value>classpath:gemma/gsec/model/AclEntry.hbm.xml</value>
+                <value>classpath:gemma/gsec/model/AclObjectIdentity.hbm.xml</value>
+                <value>classpath:gemma/gsec/model/AclSid.hbm.xml</value>
+            </list>
         </property>
-          
+
         <property name="hibernateProperties">
             <props>
                 <prop key="hibernate.dialect">${test.hibernate.dialect}
                 </prop>
                 <prop key="hibernate.show_sql">false</prop>
-                <prop key="hibernate.cache.use_query_cache">true</prop>
                 <prop key="hibernate.max_fetch_depth">4</prop>
                 <prop key="hibernate.cache.use_second_level_cache">true</prop>
-                <prop key="hibernate.cache.use_query_cache">true</prop>
+                <prop key="hibernate.cache.use_query_cache">false</prop>
+                <prop key="hibernate.generate_statistics">true</prop>
+                <prop key="hibernate.cache.use_structured_entries">true</prop>
             </props>
         </property>
-        
+
         <property name="cacheRegionFactory">
             <ref bean="externalCacheRegionFactory" />
         </property>

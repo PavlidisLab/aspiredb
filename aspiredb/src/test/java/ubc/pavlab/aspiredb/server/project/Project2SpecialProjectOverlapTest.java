@@ -115,14 +115,6 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         int specialVariantsLimit = 100;
         int variantLength = 100;
 
-        List<VariantValueObject> cnvList = new ArrayList<>();
-        for ( int i = 0; i < variantsLimit; i++ ) {
-            int start = 1000 + variantLength * i;
-            int end = 1000 + variantLength * i + variantLength;
-            cnvList.add( getCNV( "1", start, end, userVariantId + "_" + i, patientId ) );
-        }
-        projectManager.addSubjectVariantsToProject( projectName, true, cnvList );
-
         List<VariantValueObject> cnvListWithOverlap = new ArrayList<>();
         for ( int i = 0; i < specialVariantsLimit; i++ ) {
             int start = 1000 + variantLength / 2 + variantLength * i;
@@ -131,13 +123,26 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
         }
         projectManager.addSubjectVariantsToSpecialProject( projectNameWithOverlap, true, cnvListWithOverlap, false );
 
-        // now do the overlap and see how long it takes
-        StopWatch timer = new StopWatch();
-        timer.start();
-        projectManager.populateProjectToProjectOverlap( projectName, projectNameWithOverlap );
-        log.info( "Project overlap between projects with " + cnvList.size() + " and " + cnvListWithOverlap.size()
-                + " variants took " + timer.getTime() + " ms" );
-        assertTrue( timer.getTime() < 1000 );
+        for ( int run = 0; run < 2; run++ ) {
+            log.info( "=========== run " + run + " =========" );
+            List<VariantValueObject> cnvList = new ArrayList<>();
+            for ( int i = 0; i < variantsLimit; i++ ) {
+                int start = 1000 + variantLength * i;
+                int end = 1000 + variantLength * i + variantLength;
+                cnvList.add( getCNV( "1", start, end, userVariantId + "_" + i, patientId ) );
+            }
+            projectManager.addSubjectVariantsToProject( projectName, true, cnvList );
+
+            // now do the overlap and see how long it takes
+            StopWatch timer = new StopWatch();
+            timer.start();
+            projectManager.populateProjectToProjectOverlap( projectName, projectNameWithOverlap );
+            log.info( "Project overlap between projects with " + cnvList.size() + " and " + cnvListWithOverlap.size()
+                    + " variants took " + timer.getTime() + " ms" );
+            assertTrue( timer.getTime() < 1000 );
+
+            projectManager.deleteProject( projectName );
+        }
     }
 
     @Test
