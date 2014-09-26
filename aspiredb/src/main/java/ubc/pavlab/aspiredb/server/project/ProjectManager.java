@@ -73,7 +73,7 @@ public interface ProjectManager {
 
     public String isProjectHasSubjectPhenotypes( String projectName ) throws Exception;
 
-    @Secured({ "GROUP_USER" })
+    @Secured({ "GROUP_USER", "RUN_AS_ADMIN" })
     public Collection<Variant2VariantOverlap> populateProjectToProjectOverlap( String projectName,
             String specialProjectName ) throws Exception;
 
