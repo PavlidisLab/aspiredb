@@ -865,19 +865,17 @@ public class ProjectServiceImpl implements ProjectService {
                     errMsg.append( err + "\n" );
                 }
 
-                // TODO work out the use cases some more, can non-admin users run this? this requires read permissions
-                // for DGV and DECIPHER
-                // for ( Project specialProject : projectDao.getSpecialOverlapProjects() ) {
-                // try {
-                // overlap = projectManager
-                // .populateProjectToProjectOverlap( projectName, specialProject.getName() );
-                // returnMsg.append( String.format( STR_FMT,
-                // "Number of Overlaps with " + specialProject.getName(), overlap.size() ) );
-                // } catch ( Exception e ) {
-                // log.error( e.getLocalizedMessage(), e );
-                // errMsg.append( e.getLocalizedMessage() + "\n" );
-                // }
-                // }
+                for ( Project specialProject : projectDao.getSpecialOverlapProjects() ) {
+                    try {
+                        overlap = projectManager
+                                .populateProjectToProjectOverlap( projectName, specialProject.getName() );
+                        returnMsg.append( String.format( STR_FMT,
+                                "Number of Overlaps with " + specialProject.getName(), overlap.size() ) );
+                    } catch ( Exception e ) {
+                        log.error( e.getLocalizedMessage(), e );
+                        errMsg.append( e.getLocalizedMessage() + "\n" );
+                    }
+                }
 
             } catch ( Exception e ) {
                 log.error( e.getLocalizedMessage(), e );
