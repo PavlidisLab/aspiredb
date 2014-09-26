@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
@@ -41,6 +42,7 @@ import ubc.pavlab.aspiredb.server.model.Characteristic;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.model.Variant2VariantOverlap;
+import ubc.pavlab.aspiredb.server.util.GenomeBin;
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.NumericValue;
@@ -104,21 +106,32 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         SimpleRestriction restriction = new SimpleRestriction( new GenomicLocationProperty(), Operator.IS_IN_SET, range );
 
         Session session = this.getSessionFactory().getCurrentSession();
-        Criteria criteria = session.createCriteria( this.elementClass );
-        criteria.createAlias( "location", "location" );
-        criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
-                .add( Restrictions.in( "project.id", activeProjectIds ) );
 
-        criteria.add( CriteriaBuilder.buildCriteriaRestriction( restriction, CriteriaBuilder.EntityType.VARIANT ) );
+        // Criteria criteria = session.createCriteria( this.elementClass );
+        // criteria.createAlias( "location", "location" );
+        // criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
+        // .add( Restrictions.in( "project.id", activeProjectIds ) );
+        //
+        // criteria.add( CriteriaBuilder.buildCriteriaRestriction( restriction, CriteriaBuilder.EntityType.VARIANT ) );
+        //
+        // criteria.setProjection( Projections.distinct( Projections.id() ) );
+        // Collection<Long> variantIds = criteria.list();
+        //
+        // // load from cache if it exists
+        // Collection<T> variants = new HashSet<>();
+        // for ( Long id : variantIds ) {
+        // variants.add( ( T ) session.get( this.elementClass, id ) );
+        // }
 
-        criteria.setProjection( Projections.distinct( Projections.id() ) );
-        Collection<Long> variantIds = criteria.list();
-
-        // load from cache if it exists
-        Collection<T> variants = new HashSet<>();
-        for ( Long id : variantIds ) {
-            variants.add( ( T ) session.get( this.elementClass, id ) );
-        }
+        List<Integer> bins = GenomeBin.relevantBins( range.getChromosome(), range.getBaseStart(), range.getBaseEnd() );
+        String hql = "select distinct variant from Variant variant inner join variant.location as location inner join variant.subject.projects as projects WHERE :projectIds in projects.id and location.bin in (:bins) and location.chromosome=:chromosome and ((location.start>=:start and location.end<=:end) or (location.start<=:start and location.end>=:start) or (location.start<=:end and location.end>=:end))";
+        Query query = session.createQuery( hql );
+        query.setParameterList( "bins", bins );
+        query.setParameterList( "projectIds", activeProjectIds );
+        query.setParameter( "chromosome", range.getChromosome() );
+        query.setParameter( "start", range.getBaseStart() );
+        query.setParameter( "end", range.getBaseEnd() );
+        Collection<T> variants = query.list();
 
         // List<T> variants = criteria.list();
         return variants;
