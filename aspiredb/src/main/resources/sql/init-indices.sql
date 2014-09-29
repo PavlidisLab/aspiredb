@@ -12,3 +12,5 @@ alter table VARIANT add key patientidkey (PATIENT_ID);
 alter table VARIANT add unique key uservariant_patientid_key (USERVARIANTID,PATIENT_ID);
 
 alter table GENOMIC_LOC add key binchrstartend (BIN,CHROMOSOME,START,END);
+
+alter table VARIANT2VARIANTOVERLAP add key variantidprojid (VARIANTID,OVERLAP_PROJECTID);
