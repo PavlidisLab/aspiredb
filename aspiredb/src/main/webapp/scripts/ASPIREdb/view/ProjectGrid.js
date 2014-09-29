@@ -255,9 +255,11 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
          icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
          handler : function() {
             var test = ref.selProject[0].data.ProjectName;
+            ref.setLoading( true );
             // Delete project
             ProjectService.deleteProject( ref.selProject[0].data.ProjectName, {
                callback : function(message) {
+                  ref.setLoading( false );
                   if ( message == "Success" ) {
                      var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
                      var ProjectGrid = panel.down( '#ProjectGrid' );
