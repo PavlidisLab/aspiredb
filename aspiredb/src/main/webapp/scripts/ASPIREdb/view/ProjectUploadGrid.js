@@ -256,9 +256,9 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                            var variantCount = variantSrc.split( /\r\n|\r|\n/ ).length;
                            variantCount = variantCount - 2;
                            Ext.Msg.alert( 'Success',
-                              'Your file has been uploaded </br></br> File Summary </br> Name : ' + ref.variantFileEdit
-                                 + '</br> Size : ' + file.size + '</br> Variant Type: ' + ref.variantTypeEdit
-                                 + '</br> # Variants : ' + variantCount );
+                              'Your file has been uploaded <br/><br/> Name : ' + ref.variantFileEdit
+                                 + '<br/> Size : ' + file.size + '<br/> Variant Type: ' + ref.variantTypeEdit
+                                 + '<br/> # Variants : ' + variantCount + '<br/><br/>' );
 
                         }
 
@@ -363,9 +363,9 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                            var pheneCount = fileArray[0].split( "," ).length;
                            pheneCount = pheneCount - 1;
                            Ext.Msg.alert( 'Success',
-                              'Your file has been uploaded </br></br> File Summary </br> Name : '
-                                 + ref.phenotypeFileEdit + '</br> Size : ' + file.size + '</br> # Phenotypes : '
-                                 + pheneCount );
+                              'Your file has been uploaded <br/><br/> Name : '
+                                 + ref.phenotypeFileEdit + '<br/> Size : ' + file.size + '<br/> # Phenotypes : '
+                                 + pheneCount + '<br/><br/>');
 
                         }
 
