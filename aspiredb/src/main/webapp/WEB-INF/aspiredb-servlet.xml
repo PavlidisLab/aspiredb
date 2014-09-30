@@ -75,5 +75,15 @@
 	<dwr:annotation-scan base-package="ubc.pavlab.aspiredb"
 		scanDataTransferObject="true" scanRemoteProxy="true" />
 
-
+    <!-- ==================================================== -->
+    <!-- Make spring aware of our i18n support files -->
+    <!-- ==================================================== -->
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <value>messages</value>
+            </list>
+        </property>
+    </bean>
+    
 </beans>

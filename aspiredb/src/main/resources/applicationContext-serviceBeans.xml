@@ -8,16 +8,6 @@
    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
 
    <aop:aspectj-autoproxy />
-   
-   <!-- Message source for this context, loaded from localized "messages_xx" 
-      files -->
-   <bean id="messageSource"
-      class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
-      <property name="basename">
-         <value>messages</value>
-      </property>
-   </bean>
-
 
    <!-- configurationPropertyConfigurer allows you to use variables like ${mail.host} 
       in the spring bean definitions. Variables are listed in a resource. If the 
