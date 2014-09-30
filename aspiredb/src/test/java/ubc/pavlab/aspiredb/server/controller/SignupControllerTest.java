@@ -73,6 +73,7 @@ public class SignupControllerTest extends BaseSpringContextTest {
         final AtomicInteger c = new AtomicInteger( 0 );
         final AtomicBoolean failed = new AtomicBoolean( false );
         Collection<Thread> threads = new HashSet<Thread>();
+
         for ( int i = 0; i < numThreads; i++ ) {
 
             Thread k = new Thread( new Runnable() {
@@ -98,6 +99,7 @@ public class SignupControllerTest extends BaseSpringContextTest {
                             // Cleanup
                             assertNotNull( userManager.findByUserName( uname ) );
                             userManager.deleteUser( uname );
+                            // userService.delete( userService.findByUserName( uname ) );
 
                             c.incrementAndGet();
 
@@ -145,5 +147,6 @@ public class SignupControllerTest extends BaseSpringContextTest {
         } else {
             log.info( "TORTURE TEST PASSED!" );
         }
+
     }
 }

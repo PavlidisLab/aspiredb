@@ -90,10 +90,11 @@ public class UserServiceImpl implements UserService {
             this.userGroupDao.update( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) group );
         }
 
-        // this.userDao.remove( userDao.load( user.getId() ) );
-        this.userDao.remove( user.getId() );
-
-        // this.userDao.remove( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) user );
+        if ( user.getId() != null ) {
+            this.userDao.remove( user.getId() );
+        } else {
+            this.userDao.remove( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) user );
+        }
     }
 
     @Override
