@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addUserToGroup( UserGroup group, User user ) {
-   
+
         // add user to list of members
         group.getGroupMembers().add( user );
         this.userGroupDao.update( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) group );
@@ -90,7 +90,10 @@ public class UserServiceImpl implements UserService {
             this.userGroupDao.update( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) group );
         }
 
-        this.userDao.remove( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) user );
+        // this.userDao.remove( userDao.load( user.getId() ) );
+        this.userDao.remove( user.getId() );
+
+        // this.userDao.remove( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User ) user );
     }
 
     @Override

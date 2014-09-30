@@ -57,7 +57,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
  */
 @ContextConfiguration(locations = { "classpath:/test-data-source.xml",
         "classpath:gemma/gsec/acl/security-bean-baseconfig.xml", "classpath:/application-context.xml",
-        "classpath:/applicationContext-security.xml" })
+        "classpath:/applicationContext-security.xml", "classpath*:applicationContext-serviceBeans.xml" })
 public abstract class BaseSpringContextTest extends AbstractJUnit4SpringContextTests implements InitializingBean {
 
     protected abstract class InlineTransaction {

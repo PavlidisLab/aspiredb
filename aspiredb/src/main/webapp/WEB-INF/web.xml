@@ -15,7 +15,8 @@
             classpath*:gemma/gsec/acl/security-bean-baseconfig.xml,
             classpath*:application-context.xml,
             classpath*:applicationContext-security.xml,
-            classpath*:production-data-source.xml
+            classpath*:production-data-source.xml,
+            classpath*:applicationContext-serviceBeans.xml
         </param-value>
     </context-param>
 

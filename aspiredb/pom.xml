@@ -328,6 +328,23 @@
             <version>2.4</version>
         </dependency>
 
+        <!-- Used during user registration -->
+        <dependency>
+            <groupId>net.tanesha.recaptcha4j</groupId>
+            <artifactId>recaptcha4j</artifactId>
+            <version>0.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+            <version>1.7</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+        
         <!-- Jersey <dependency> <groupId>com.sun.jersey</groupId> <artifactId>jersey-server</artifactId> <version>1.8</version> 
             </dependency> <dependency> <groupId>com.sun.jersey</groupId> <artifactId>jersey-json</artifactId> <version>1.8</version> 
             </dependency> Jersey + Spring <dependency> <groupId>com.sun.jersey.contribs</groupId> <artifactId>jersey-spring</artifactId> 

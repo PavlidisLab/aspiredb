@@ -68,15 +68,15 @@ Ext
                defaultType : 'textfield',
                items : [{
                            xtype : 'textfield',
-                           name : 'username',
-                           fieldLabel : 'User Name',
+                           id : 'username',
+                           fieldLabel : 'Username',
                            labelWidth : 200,
                            allowBlank : false,
                            minLength : 6
                         },
                         {
                            xtype : 'textfield',
-                           name : 'email',
+                           id : 'email',
                            fieldLabel : 'Email',
                            labelWidth : 200,
                            vtype : 'email',
@@ -84,7 +84,7 @@ Ext
                         },
                         {
                            xtype : 'textfield',
-                           name : 'password1',
+                           id : 'password1',
                            fieldLabel : 'Password',
                            labelWidth : 200,
                            inputType : 'password',
@@ -94,7 +94,7 @@ Ext
                         },
                         {
                            xtype : 'textfield',
-                           name : 'password2',
+                           id : 'password2',
                            labelWidth : 200,
                            fieldLabel : 'Confirm Password',
                            inputType : 'password',
@@ -104,7 +104,7 @@ Ext
                             * password1 field.
                             */
                            validator : function(value) {
-                              var password1 = this.previousSibling( '[name=password1]' );
+                              var password1 = this.previousSibling( '[id=password1]' );
                               return (value === password1.getValue()) ? true : 'Passwords do not match.'
                            }
                         },
@@ -112,9 +112,9 @@ Ext
                            xtype : 'panel',
                            itemId : 'reCaptcha',
                            border : true,
-                           width : 420,
-                           height : 80,
-                           html : '<div id="recaptcha">adsf</div>',
+                           width : 440,
+                           height : 100,
+                           html : '<div id="recaptcha"></div>',
                            listeners : {
                               afterrender : function() {
                                  // console.log(Ext.getDom(this.body));
@@ -139,52 +139,53 @@ Ext
                          * to be submitted unless the user has checked the box. Ext does not have this type of
                          * validation built in for checkboxes, so we add a custom getErrors method implementation.
                          */
-                        {
-                           xtype : 'checkboxfield',
-                           name : 'acceptTerms',
-                           fieldLabel : 'Terms of Use',
-                           hideLabel : true,
-                           style : 'margin-top:15px',
-                           boxLabel : 'I have read and accept the <a href="" class="terms">Terms of Use</a>.',
-
-                           // Listener to open the Terms of Use page link in a modal window
-                           listeners : {
-                              click : {
-                                 element : 'boxLabelEl',
-                                 fn : function(e) {
-                                    var target = e.getTarget( '.terms' ), win;
-                                    if ( target ) {
-                                       win = Ext.widget( 'window', {
-                                          title : 'Terms of Use',
-                                          modal : true,
-                                          html : '<iframe src="' + target.href
-                                             + '" width="950" height="500" style="border:0"></iframe>',
-                                          buttons : [ {
-                                             text : 'Decline',
-                                             handler : function() {
-                                                this.up( 'window' ).close();
-                                                formPanel.down( '[name=acceptTerms]' ).setValue( false );
-                                             }
-                                          }, {
-                                             text : 'Accept',
-                                             handler : function() {
-                                                this.up( 'window' ).close();
-                                                formPanel.down( '[name=acceptTerms]' ).setValue( true );
-                                             }
-                                          } ]
-                                       } );
-                                       win.show();
-                                       e.preventDefault();
-                                    }
-                                 }
-                              }
-                           },
-
-                           // Custom validation logic - requires the checkbox to be checked
-                           getErrors : function() {
-                              return this.getValue() ? [] : [ 'You must accept the Terms of Use' ]
-                           }
-                        } ],
+//                        {
+//                           xtype : 'checkboxfield',
+//                           name : 'acceptTerms',
+//                           fieldLabel : 'Terms of Use',
+//                           hideLabel : true,
+//                           style : 'margin-top:15px',
+//                           boxLabel : 'I have read and accept the <a href="" class="terms">Terms of Use</a>.',
+//
+//                           // Listener to open the Terms of Use page link in a modal window
+//                           listeners : {
+//                              click : {
+//                                 element : 'boxLabelEl',
+//                                 fn : function(e) {
+//                                    var target = e.getTarget( '.terms' ), win;
+//                                    if ( target ) {
+//                                       win = Ext.widget( 'window', {
+//                                          title : 'Terms of Use',
+//                                          modal : true,
+//                                          html : '<iframe src="' + target.href
+//                                             + '" width="950" height="500" style="border:0"></iframe>',
+//                                          buttons : [ {
+//                                             text : 'Decline',
+//                                             handler : function() {
+//                                                this.up( 'window' ).close();
+//                                                formPanel.down( '[name=acceptTerms]' ).setValue( false );
+//                                             }
+//                                          }, {
+//                                             text : 'Accept',
+//                                             handler : function() {
+//                                                this.up( 'window' ).close();
+//                                                formPanel.down( '[name=acceptTerms]' ).setValue( true );
+//                                             }
+//                                          } ]
+//                                       } );
+//                                       win.show();
+//                                       e.preventDefault();
+//                                    }
+//                                 }
+//                              }
+//                           },
+//
+//                           // Custom validation logic - requires the checkbox to be checked
+//                           getErrors : function() {
+//                              return this.getValue() ? [] : [ 'You must accept the Terms of Use' ]
+//                           }
+//                        }
+            ],
 
                buttons : [ {
                   xtype : 'button',
@@ -195,21 +196,21 @@ Ext
                      window.open( "http://aspiredb.sites.olt.ubc.ca/", "_blank", "" );
                   }
                }, {
+//                  xtype : 'button',
+//                  itemId : 'clearButton',
+//                  text : 'Clear',
+//                  handler : function() {
+//                     var me = this.ownerCt.ownerCt;
+//                     me.getComponent( 'username' ).setValue( '' );
+//                     me.getComponent( 'password' ).setValue( '' );
+//                     me.getComponent( 'email' ).setValue( '' );
+//
+//                  }
+//               }, {
                   xtype : 'button',
-                  itemId : 'clearButton',
-                  text : 'Clear',
-                  handler : function() {
-                     var me = this.ownerCt.ownerCt;
-                     me.getComponent( 'username' ).setValue( '' );
-                     me.getComponent( 'password' ).setValue( '' );
-                     me.getComponent( 'email' ).setValue( '' );
-
-                  }
-               }, {
-                  xtype : 'button',
-                  itemId : 'loginButton',
-                  text : 'Login',
-                  handler : ref.submitHandler,
+                  itemId : 'registerButton',
+                  text : 'Register',
+                  handler : ref.registerHandler,
                   scope : ref
                } ],
                
@@ -221,44 +222,57 @@ Ext
 
          },
 
-         submitHandler : function() {
+         registerHandler : function() {
                       
             var me = this;
-          //  var form = this.up( 'registerFormPanel' ).getForm();
+            var form = me.down('#aspireRegistrationForm').getForm();
+            var recaptchaText = Recaptcha.get_response();
+            
+            if ( !form.isValid() || recaptchaText.length == 0 ) {
+               Ext.Msg.alert('Error', 'Form is not valid');
+               return;
+            }
             
             Ext.Ajax.request( {
-               url : 'j_spring_security_check',
+               url : 'signup.html',
                method : 'POST',
-               headers : {
-                  'Content-Type' : 'application/x-www-form-urlencoded'
-               },
+//               headers : {
+//                  'Content-Type' : 'text/html'
+//               },
                scope : me,
                params : Ext.Object.toQueryString( {
-                  'j_username' : me.down( '#username' ).getValue(),
-                  'j_password' : me.down( '#password' ).getValue(),
-                  'j_email' : me.down( '#email' ).getValue(),
+                  'username' : me.down('#username').value,
+                  'password' : me.down('#password1').value,
+                  'passwordConfirm' : me.down('#password2').value,
+                  'email' : me.down('#email').value,
+                  'recaptcha_challenge_field' : Recaptcha.get_challenge(),
+                  'recaptcha_response_field' : Recaptcha.get_response(),
                   'ajaxLoginTrue' : true
                } ),
                success : function(response) {
                   var messageLabel = me.down( '#message' );
                   var usernameTextfield = me.down( '#username' );
-                  var passwordTextfield = me.down( '#password' );
+                  var passwordTextfield = me.down( '#password1' );
                   var emailTextfield = me.down( '#email' );
 
                   usernameTextfield.reset();
                   passwordTextfield.reset();
                   emailTextfield.reset();
 
+                  Ext.Msg.alert('Response', response.responseText );
+                  
                   if ( response.responseText === 'success' ) {
                      window.location.href = "home.html";
-                     messageLabel.hide();
-                  } else {
-                     messageLabel.show();
+//                     messageLabel.hide();
                   }
+//                  } else {
+//                     messageLabel.show();
+//                  }
                },
                failure : function(response, opts) {
-                  var messageLabel = me.down( '#message' );
-                  messageLabel.show();
+//                  var messageLabel = me.down( '#message' );
+//                  messageLabel.show();
+                     Ext.Msg.alert('Error', response.responseText );
                }
             } );
 

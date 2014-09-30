@@ -17,6 +17,7 @@
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
+                <value>classpath:default.properties</value>
 				<value>classpath:database.properties</value>
 				<value>file:${user.home}/aspiredb.properties</value>
 			</list>		
@@ -72,5 +73,17 @@
             <ref bean="externalCacheRegionFactory" />
          </property>
 	</bean>
+    
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host">
+            <value>${mail.host}</value>
+        </property>
+        <property name="username">
+            <value>${mail.username}</value>
+        </property>
+        <property name="password">
+            <value>${mail.password}</value>
+        </property>
+    </bean>
     
 </beans>
