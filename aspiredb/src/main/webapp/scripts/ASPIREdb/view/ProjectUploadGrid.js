@@ -48,7 +48,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
               {
                  text : 'Submit',
                  id : 'uploadFilesEdit',
-                 disabled : true,
+                 disabled : false,
                  // formBind : true,
                  handler : function() {
                     var form = this.up( 'ProjectUploadGrid' ).getForm();
@@ -59,23 +59,26 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                        values = form.getFieldValues();
                        var variantfilename = me.up( "ProjectUploadGrid" ).variantServerFilename;
                        var phenotypefilename = me.up( "ProjectUploadGrid" ).phenotypeServerFilename;
+                       
+                       if ( Ext.getCmp( 'ProjectUploadGrid' ).selectedProject == null ) {
+                          Ext.Msg.alert( 'Error', "Please select a project name" );
+                          return;
+                       }
+                       
                        var projectName = Ext.getCmp( 'ProjectUploadGrid' ).selectedProject[0].data.ProjectName;
 
                        if ( variantfilename.length == 0 && phenotypefilename.length == 0 ) {
-                          Ext.Msg.alert( 'Invalid Fields', "Either a variant and / or <br>phenotype file is required." );
+                          Ext.Msg.alert( 'Error', "Either a variant and / or <br>phenotype file is required." );
                           return;
                        }
 
-                       if ( projectName.length == 0 ) {
-                          Ext.Msg.alert( 'Invalid Fields', "Please select a project name" );
-                          return;
-                       }
+                       
 
                        var variantTypeEdit = form.owner.variantTypeEdit;
                        /** Uploading variants to the created project */
 
                        if ( variantfilename.length != 0 && variantTypeEdit.length == 0 ) {
-                          Ext.Msg.alert( 'Invalid Fields', "Please select a variant type" );
+                          Ext.Msg.alert( 'Error', "Please select a variant type" );
                           return;
 
                        }

@@ -96,7 +96,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
 
             },
             errorHandler : function(er, exception) {
-               Ext.Msg.alert( "find user project Error", er + "\n" + exception.stack );
+               Ext.Msg.alert( "Error", er );
                console.log( exception.stack );
             }
          } );
@@ -194,7 +194,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
          text : '',
          scope : this,
          allowBlank : true,
-         emptyText : 'Type project Name',
+         emptyText : 'Type project name',
 
       } );
 
@@ -214,7 +214,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
             var newProjectName = ref.down( '#ProjectName' ).getValue().trim();
 
             if ( newProjectName.length == 0 ) {
-               alert( "Please enter a valid project name" );
+               Ext.Msg.alert( 'Error',"Please enter a valid project name" );
                return;
             }
 

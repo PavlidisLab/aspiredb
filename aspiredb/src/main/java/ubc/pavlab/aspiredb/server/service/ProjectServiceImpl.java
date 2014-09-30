@@ -865,15 +865,20 @@ public class ProjectServiceImpl implements ProjectService {
                     errMsg.append( err + "\n" );
                 }
 
-                for ( Project specialProject : projectDao.getSpecialOverlapProjects() ) {
-                    try {
-                        overlap = projectManager
-                                .populateProjectToProjectOverlap( projectName, specialProject.getName() );
-                        returnMsg.append( String.format( STR_FMT,
-                                "Number of Overlaps with " + specialProject.getName(), overlap.size() ) );
-                    } catch ( Exception e ) {
-                        log.error( e.getLocalizedMessage(), e );
-                        errMsg.append( e.getLocalizedMessage() + "\n" );
+                // only run SpecialProject overlap if projectName is not a special project
+                try {
+                    SpecialProject.valueOf( projectName );
+                } catch ( IllegalArgumentException argEx ) {
+                    for ( Project specialProject : projectDao.getSpecialOverlapProjects() ) {
+                        try {
+                            overlap = projectManager.populateProjectToProjectOverlap( projectName,
+                                    specialProject.getName() );
+                            returnMsg.append( String.format( STR_FMT,
+                                    "Number of Overlaps with " + specialProject.getName(), overlap.size() ) );
+                        } catch ( Exception e ) {
+                            log.error( e.getLocalizedMessage(), e );
+                            errMsg.append( e.getLocalizedMessage() + "\n" );
+                        }
                     }
                 }
 
