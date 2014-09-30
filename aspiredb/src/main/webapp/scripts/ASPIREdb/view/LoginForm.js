@@ -87,15 +87,22 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
             handler : function() {
                window.open( "http://aspiredb.sites.olt.ubc.ca/", "_blank", "" );
             }
+//         }, {
+//            xtype : 'button',
+//            itemId : 'clearButton',
+//            text : 'Clear',
+//            handler : function() {
+//               var me = this.ownerCt.ownerCt;
+//               me.getComponent( 'username' ).setValue( '' );
+//               me.getComponent( 'password' ).setValue( '' );
+//
+         // }
          }, {
             xtype : 'button',
-            itemId : 'clearButton',
-            text : 'Clear',
-            handler : function() {
-               var me = this.ownerCt.ownerCt;
-               me.getComponent( 'username' ).setValue( '' );
-               me.getComponent( 'password' ).setValue( '' );
-
+            itemId : 'registerButton',
+            text : 'Register',
+            handler : function(event) {
+               window.location.href = '/aspiredb/register.html';
             }
          }, {
             xtype : 'button',
@@ -103,30 +110,30 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
             text : 'Login',
             handler : ref.submitHandler,
             scope : ref
-         } ]
+         }]
       } );
 
       this.add( panel );
 
-      var textPanel = Ext.create( 'Ext.form.Panel', {
-         id : 'aspireRegistrationForm',
-         border : false,
-
-         layout : 'hbox',
-         defaults : {
-            anchor : '100%'
-         },
-
-         // The fields
-         items : [ {
-            xtype : 'panel',
-            padding : '5 5 30 20',
-            html : "Are you a new user? <a href ='/aspiredb/register.html'>Register</a> to become a user",
-
-         } ]
-      } );
-
-      this.add( textPanel );
+//      var textPanel = Ext.create( 'Ext.form.Panel', {
+//         id : 'aspireRegistrationForm',
+//         border : false,
+//
+//         layout : 'hbox',
+//         defaults : {
+//            anchor : '100%'
+//         },
+//
+//         // The fields
+//         items : [ {
+//            xtype : 'label',
+////            padding : '5 5 30 20',
+//            html : "Are you a new user? <a href ='/aspiredb/register.html'>Register</a> to become a user",
+//
+//         } ]
+//      } );
+//
+//      this.add( textPanel );
 
       this.doLayout();
 
