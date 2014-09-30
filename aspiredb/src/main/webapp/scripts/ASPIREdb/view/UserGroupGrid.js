@@ -156,7 +156,7 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
       var data = [];
       for (var i = 0; i < gms.length; i++) {
          var gm = gms[i];
-         var row = [ gm, '' ];
+         var row = [ gm ];
          data.push( row );
       }
 
@@ -176,7 +176,7 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
          text : '',
          scope : this,
          allowBlank : true,
-         emptyText : 'Type user group Name',
+         emptyText : 'Type user group name',
 
       } );
 

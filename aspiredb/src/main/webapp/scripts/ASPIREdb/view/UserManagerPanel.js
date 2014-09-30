@@ -45,7 +45,7 @@ Ext.define('ASPIREdb.UserManagerPanel',{
             width: 480,
             collapsible: true,
             split: true,
-            title:'Group Members'
+            title:'Users'
         }
     ],
 

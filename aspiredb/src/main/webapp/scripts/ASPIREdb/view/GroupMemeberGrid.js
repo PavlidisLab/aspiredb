@@ -66,15 +66,17 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
          // defaults to textfield if no xtype is supplied
          allowBlank : false
       }
-   }, {
-      header : 'Email',
-      dataIndex : 'memberEmail',
-      flex : 1,
-      editor : {
-         // defaults to textfield if no xtype is supplied
-         allowBlank : true
-      }
-   } ],
+   }, 
+//   {
+//      header : 'Email',
+//      dataIndex : 'memberEmail',
+//      flex : 1,
+//      editor : {
+//         // defaults to textfield if no xtype is supplied
+//         allowBlank : true
+//      }
+//   } 
+   ],
 
    plugins : [ rowEditing ],
    listeners : {
@@ -115,7 +117,7 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
       this.getDockedComponent( 'groupMemeberGridToolbar' ).add( {
          xtype : 'combo',
          id : 'groupMemberName',
-         emptyText : 'Type group memeber email',
+         emptyText : 'Type username',
          width : 200,
          displayField : 'displayName',
          triggerAction : 'query',
@@ -154,7 +156,7 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
          xtype : 'button',
          id : 'addGroupMemeber',
          text : '',
-         tooltip : 'Add group members to selected group',
+         tooltip : 'Add users to group',
          icon : 'scripts/ASPIREdb/resources/images/icons/user_add.png',
          handler : function() {
 
@@ -170,7 +172,7 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
                      var selection = ref.down( '#groupMemberName' ).lastQuery;
                      if ( selection ) {
                         var data = [];
-                        var row = [ selection, '' ];
+                        var row = [ selection ];
                         data.push( row );
                         groupMemberGrid.store.add( data );
                      }
@@ -191,7 +193,7 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
          xtype : 'button',
          id : 'removeGroupMemeber',
          text : '',
-         tooltip : 'Remove the selected group member',
+         tooltip : 'Remove the selected user',
          icon : 'scripts/ASPIREdb/resources/images/icons/user_delete.png',
          handler : function() {
             var groupMember = ref.selectedUser[0].data.memberName;

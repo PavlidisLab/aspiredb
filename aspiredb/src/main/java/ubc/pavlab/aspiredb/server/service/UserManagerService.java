@@ -21,14 +21,13 @@ import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
-
 /**
  * @author Gaya
  */
 public interface UserManagerService {
 
     public String createUserGroup( String groupName );
-    
+
     public Collection<String> loadUserEditableGroups();
 
     public UserGroup findGroupByName( String name );

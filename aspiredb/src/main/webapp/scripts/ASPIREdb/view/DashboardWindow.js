@@ -218,7 +218,7 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
                me.getDockedComponent( 'dashboardToolbar' ).add( {
                   xtype : 'button',
                   id : 'manageManager',
-                  text : 'Manage User',
+                  text : 'Manage User Groups',
                   tooltip : 'Create groups and invite users to group',
                   icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
                   handler : function() {

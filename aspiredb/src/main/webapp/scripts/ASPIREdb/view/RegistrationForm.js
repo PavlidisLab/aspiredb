@@ -24,10 +24,16 @@ Ext
                pack : 'center'
 
             },
+            listeners : {
+               render : function(c) {
+                  c.getEl().on( 'click', function() {
+                     window.location.href = 'home.html';
+                  }, c );
+               }
+            },
             autoEl : {
                tag : 'img',
-               src : 'scripts/ASPIREdb/resources/images/aspiredb-logo-smaller.png'
-
+               src : 'scripts/ASPIREdb/resources/images/aspiredb-logo-smaller.png',
             }
          } ],
 
@@ -85,6 +91,7 @@ Ext
                   fieldLabel : 'Username',
                   labelWidth : 200,
                   allowBlank : false,
+                  style : 'margin-top:15px',
                   minLength : 6
                }, {
                   xtype : 'textfield',
@@ -123,6 +130,7 @@ Ext
                   border : true,
                   width : 440,
                   height : 120,
+                  style : 'margin-top:15px',
                   html : '<div id="recaptcha"></div>',
                   listeners : {
                      afterrender : function() {
@@ -278,8 +286,11 @@ Ext
                   me.showCaptcha( reCaptcha.getEl() );
 
                   if ( json.success === 'success' ) {
-                     window.location.href = "home.html";
-                     messageLabel.hide();
+                     messageLabel.setText( json.message + "<br>You will now be redirected to the login page.", false );
+                     messageLabel.show();
+                     window.setTimeout( function() {
+                        window.location.href = "home.html";
+                     }, 6000 );
                   } else {
                      console.log( json.message );
                      messageLabel.setText( json.message );
