@@ -1,4 +1,4 @@
-Ext.require( [ 'Ext.layout.container.*' ] );
+Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.RegistrationForm' ] );
 
 Ext.define( 'ASPIREdb.view.LoginForm', {
    extend : 'Ext.container.Viewport',
@@ -26,9 +26,9 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
    } ],
 
    initComponent : function() {
-      
+
       document.title = "ASPIREdb";
-      
+
       this.callParent();
 
       var ref = this;
@@ -47,9 +47,16 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
          // The fields
          defaultType : 'textfield',
          items : [ {
+            xtype : 'label',
+            itemId : 'message',
+            style : 'font-family: sans-serif; color: red;',
+            text : 'Login failed. Username or password incorrect.',
+            hidden : true
+         }, {
             xtype : 'textfield',
             itemId : 'username',
             fieldLabel : 'Username',
+            style : 'margin-top:5px',
             allowBlank : false,
             listeners : {
                specialkey : function(field, e) {
@@ -73,10 +80,23 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
             }
          }, {
             xtype : 'label',
-            itemId : 'message',
-            style : 'font-family: sans-serif; font-size: 10px; color: red;',
-            text : 'Login failed. Username or password incorrect.',
-            hidden : true
+            // html : '<a href="/aspiredb/resetPassword.html">Forgot your password?</a>',
+            html : '<a href="#">Forgot your password?</a>',
+            style : 'font-size:12px',
+            listeners : {
+               render : function(obj) {
+                  obj.getEl().on( 'click', function() {
+                     var myForm = new Ext.form.Panel( {
+                        width : 500,
+                        height : 400,
+                        title : 'Foo',
+                        floating : true,
+                        closable : true
+                     } );
+                     myForm.show();
+                  }, this );
+               }
+            }
          } ],
 
          buttons : [ {
@@ -87,22 +107,26 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
             handler : function() {
                window.open( "http://aspiredb.sites.olt.ubc.ca/", "_blank", "" );
             }
-//         }, {
-//            xtype : 'button',
-//            itemId : 'clearButton',
-//            text : 'Clear',
-//            handler : function() {
-//               var me = this.ownerCt.ownerCt;
-//               me.getComponent( 'username' ).setValue( '' );
-//               me.getComponent( 'password' ).setValue( '' );
-//
+         // }, {
+         // xtype : 'button',
+         // itemId : 'clearButton',
+         // text : 'Clear',
+         // handler : function() {
+         // var me = this.ownerCt.ownerCt;
+         // me.getComponent( 'username' ).setValue( '' );
+         // me.getComponent( 'password' ).setValue( '' );
+         //
          // }
          }, {
             xtype : 'button',
             itemId : 'registerButton',
             text : 'Register',
-            handler : function(event) {
-               window.location.href = '/aspiredb/register.html';
+            handler : function(obj) {
+//               window.location.href = '/aspiredb/register.html';
+//               obj.getEl().on( 'click', function() {
+//                  var myForm = new ASPIREdb.view.RegistrationForm();
+               ASPIREdb.view.RegistrationForm.initAndShow();
+//               }, this);
             }
          }, {
             xtype : 'button',
@@ -110,30 +134,30 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
             text : 'Login',
             handler : ref.submitHandler,
             scope : ref
-         }]
+         } ]
       } );
 
       this.add( panel );
 
-//      var textPanel = Ext.create( 'Ext.form.Panel', {
-//         id : 'aspireRegistrationForm',
-//         border : false,
-//
-//         layout : 'hbox',
-//         defaults : {
-//            anchor : '100%'
-//         },
-//
-//         // The fields
-//         items : [ {
-//            xtype : 'label',
-////            padding : '5 5 30 20',
-//            html : "Are you a new user? <a href ='/aspiredb/register.html'>Register</a> to become a user",
-//
-//         } ]
-//      } );
-//
-//      this.add( textPanel );
+      // var textPanel = Ext.create( 'Ext.form.Panel', {
+      // id : 'aspireRegistrationForm',
+      // border : false,
+      //
+      // layout : 'hbox',
+      // defaults : {
+      // anchor : '100%'
+      // },
+      //
+      // // The fields
+      // items : [ {
+      // xtype : 'label',
+      // // padding : '5 5 30 20',
+      // html : "Are you a new user? <a href ='/aspiredb/register.html'>Register</a> to become a user",
+      //
+      // } ]
+      // } );
+      //
+      // this.add( textPanel );
 
       this.doLayout();
 
@@ -162,7 +186,7 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
             usernameTextfield.reset();
             passwordTextfield.reset();
 
-            if (response.responseText.indexOf("success:true") > 0) {
+            if ( response.responseText.indexOf( "success:true" ) > 0 ) {
                window.location.href = "home.html";
                messageLabel.hide();
             } else {

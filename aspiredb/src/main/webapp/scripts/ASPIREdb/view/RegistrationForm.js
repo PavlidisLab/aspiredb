@@ -4,12 +4,19 @@ Ext
    .define(
       'ASPIREdb.view.RegistrationForm',
       {
-         extend : 'Ext.container.Viewport',
+         // extend : 'Ext.container.Viewport',
+         extend : 'Ext.Window',
          title : 'Please Register!.',
          id : 'registerFormPanel',
-         width : 1500,
-         closable : false,
-         resizable : false,
+         // width : 1500,
+         // closable : false,
+         // resizable : false,
+
+         singleton : true,
+         title : 'User Registration Form',
+         closable : true,
+         closeAction : 'hide',
+
          layout : {
             type : 'vbox',
             padding : '5 5 5 5'
@@ -24,18 +31,22 @@ Ext
                pack : 'center'
 
             },
-            listeners : {
-               render : function(c) {
-                  c.getEl().on( 'click', function() {
-                     window.location.href = 'home.html';
-                  }, c );
-               }
-            },
-            autoEl : {
-               tag : 'img',
-               src : 'scripts/ASPIREdb/resources/images/aspiredb-logo-smaller.png',
-            }
+         // listeners : {
+         // render : function(c) {
+         // c.getEl().on( 'click', function() {
+         // window.location.href = 'home.html';
+         // }, c );
+         // }
+         // },
+         // autoEl : {
+         // tag : 'img',
+         // src : 'scripts/ASPIREdb/resources/images/aspiredb-logo-smaller.png',
+         // }
          } ],
+
+         initAndShow : function() {
+            this.show();
+         },
 
          initComponent : function() {
             this.callParent();
@@ -49,7 +60,7 @@ Ext
                      id : 'aspireRegistrationTextForm',
                      border : false,
 
-                     height : 300,
+                     // height : 300,
 
                      layout : 'hbox',
                      defaults : {
@@ -69,9 +80,9 @@ Ext
 
             var panel = Ext.create( 'Ext.form.Panel', {
                id : 'aspireRegistrationForm',
-               title : 'Registration Form',
-               bodyPadding : 5,
-               padding : '50 50 50 50',
+//               title : 'Registration Form',
+//               bodyPadding : 5,
+               // padding : '50 50 50 50',
                layout : 'anchor',
                defaults : {
                   anchor : '100%'
@@ -91,7 +102,7 @@ Ext
                   fieldLabel : 'Username',
                   labelWidth : 200,
                   allowBlank : false,
-                  style : 'margin-top:15px',
+                  style : 'margin-top:5px',
                   minLength : 6
                }, {
                   xtype : 'textfield',
@@ -130,7 +141,7 @@ Ext
                   border : true,
                   width : 440,
                   height : 120,
-                  style : 'margin-top:15px',
+                  style : 'margin-top:10px',
                   html : '<div id="recaptcha"></div>',
                   listeners : {
                      afterrender : function() {
@@ -250,7 +261,10 @@ Ext
             var recaptchaText = Recaptcha.get_response();
 
             if ( !form.isValid() || recaptchaText.length == 0 ) {
-               Ext.Msg.alert( 'Error', 'Form is not valid' );
+               // Ext.Msg.alert( 'Error', 'Form is not valid' );
+               var messageLabel = me.down( '#message' );
+               messageLabel.setText( 'Form contains missing or invalid fields', false );
+               messageLabel.show();
                return;
             }
 
@@ -286,11 +300,11 @@ Ext
                   me.showCaptcha( reCaptcha.getEl() );
 
                   if ( json.success === 'success' ) {
-                     messageLabel.setText( json.message + "<br>You will now be redirected to the login page.", false );
+                     messageLabel.setText( json.message, false );
                      messageLabel.show();
-                     window.setTimeout( function() {
-                        window.location.href = "home.html";
-                     }, 6000 );
+//                     window.setTimeout( function() {
+//                        window.location.href = "home.html";
+//                     }, 6000 );
                   } else {
                      console.log( json.message );
                      messageLabel.setText( json.message );
