@@ -74,7 +74,7 @@ public class ConfigUtils {
      * The version of aspiredb.
      */
     private static final String VERSION_CONFIGURATION = "version.properties";
-    
+
     static {
 
         config = new CompositeConfiguration();
@@ -166,7 +166,7 @@ public class ConfigUtils {
      * @return the configured base url (e.g., http://www.chibi.ubc.ca/aspiredb/). It will always end in a slash.
      */
     public static String getBaseUrl() {
-        String url = getString( "aspiredb.base.url", "http://www.chibi.ubc.ca/aspiredb/" );
+        String url = getString( "aspiredb.baseurl", "http://www.chibi.ubc.ca/aspiredb/" );
         if ( !url.endsWith( "/" ) ) {
             return url + "/";
         }
