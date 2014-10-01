@@ -40,6 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -97,6 +98,70 @@ public class SignupController extends BaseController {
             jsonUtil.writeToResponse( jsonText );
         }
 
+    }
+
+    /**
+     * Entry point for updates.
+     * 
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping("/editUser.html")
+    public void editUser( HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+        String password = request.getParameter( "password" );
+        String passwordConfirm = request.getParameter( "passwordConfirm" );
+        String oldPassword = request.getParameter( "oldPassword" );
+
+        String jsonText = null;
+        JSONUtil jsonUtil = new JSONUtil( request, response );
+
+        try {
+            /*
+             * Pulling username out of security context to ensure users are logged in and can only update themselves.
+             */
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+            if ( !SecurityContextHolder.getContext().getAuthentication().isAuthenticated() ) {
+                throw new RuntimeException( "You must be logged in to edit your profile." );
+            }
+
+            userManager.reauthenticate( username, oldPassword );
+
+            UserDetailsImpl user = ( UserDetailsImpl ) userManager.loadUserByUsername( username );
+
+            /*
+             * if ( StringUtils.isNotBlank( email ) && !user.getEmail().equals( email ) ) { if ( !email.matches(
+             * "/^(\\w+)([-+.][\\w]+)*@(\\w[-\\w]*\\.){1,5}([A-Za-z]){2,4}$/;" ) ) { // if (
+             * !EmailValidator.getInstance().isValid( email ) ) { jsonText =
+             * "{\"success\":false,\"message\":\"The email address does not look valid\"}"; jsonUtil.writeToResponse(
+             * jsonText ); return; } user.setEmail( email ); changed = true; }
+             */
+
+            if ( password.length() >= MIN_PASSWORD_LENGTH ) {
+                if ( !StringUtils.equals( password, passwordConfirm ) ) {
+                    throw new RuntimeException( "Passwords do not match." );
+                }
+                String encryptedPassword = passwordEncoder.encodePassword( password, username );
+                userManager.changePassword( oldPassword, encryptedPassword );
+            } else {
+                throw new RuntimeException( "Password must be at least " + MIN_PASSWORD_LENGTH
+                        + " characters in length." );
+            }
+
+            log.info( "user: (" + username + ") changed password" );
+            saveMessage( request, "Changes saved." );
+            jsonText = "{\"success\":true, \"message\":\"Changes saved.\"}";
+
+        } catch ( Exception e ) {
+            log.error( e.getLocalizedMessage(), e );
+            // jsonText = jsonUtil.getJSONErrorMessage( e );
+            jsonText = "{\"success\":false, \"message\":\"" + e.getLocalizedMessage() + "\"}";
+            log.info( jsonText );
+        } finally {
+            jsonUtil.writeToResponse( jsonText );
+        }
     }
 
     /**

@@ -120,7 +120,7 @@ Ext
                   inputType : 'password',
                   // style : 'margin-top:15px',
                   allowBlank : false,
-                  minLength : 8
+                  minLength : 6
                }, {
                   xtype : 'textfield',
                   id : 'password2',

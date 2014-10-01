@@ -18,7 +18,7 @@
  */
 Ext.require( [ 'ASPIREdb.MainPanel', 'ASPIREdb.EVENT_BUS', 'ASPIREdb.view.filter.FilterWindow',
               'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.DashboardWindow', 'ASPIREdb.view.GeneManagerWindow',
-              'ASPIREdb.view.LabelManagerWindow' ] );
+              'ASPIREdb.view.LabelManagerWindow', 'ASPIREdb.view.EditProfileForm' ] );
 
 /**
  * Main Panel which trigger the Main Panel after user's successful login Events: - login - logout
@@ -283,6 +283,12 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          itemId : 'userBtn',
          text : 'anonymous',
          menu : [ {
+            text : 'Edit your profile',
+            tooltip : 'Change profile details',
+            handler : function() {
+               ASPIREdb.view.EditProfileForm.initAndShow();
+            }
+         }, {
             text : 'Log out',
             tooltip : 'Log out of ASPIREdb',
             handler : function() {
