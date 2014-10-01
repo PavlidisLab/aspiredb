@@ -39,6 +39,7 @@ import ubc.pavlab.aspiredb.server.GenomeCoordinateConverter;
 import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
 import ubc.pavlab.aspiredb.server.dao.Page;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
+import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.QueryDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
@@ -47,6 +48,7 @@ import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
+import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Query;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
@@ -64,6 +66,7 @@ import ubc.pavlab.aspiredb.shared.query.GeneProperty;
 import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
 import ubc.pavlab.aspiredb.shared.query.NeurocartaPhenotypeProperty;
 import ubc.pavlab.aspiredb.shared.query.PhenotypeFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.restriction.Junction;
@@ -102,6 +105,9 @@ public class QueryServiceImpl implements QueryService {
 
     @Autowired
     private PhenotypeDao phenotypeDao;
+
+    @Autowired
+    private ProjectDao projectDao;
 
     @Autowired
     private QueryDao queryDao;
@@ -534,7 +540,7 @@ public class QueryServiceImpl implements QueryService {
         Page<? extends Variant> page = variantDao.loadPage( 0, MAX_VARIANTS_PAGE, sortProperty, sortDirection, filters );
 
         if ( timer.getTime() > 100 ) {
-            log.info( "loading variants took " + timer.getTime() + "ms" );
+            log.info( "loading " + page.getTotalCount() + " variants took " + timer.getTime() + "ms" );
         }
 
         Collection<? extends Variant> variants = page;
@@ -544,9 +550,25 @@ public class QueryServiceImpl implements QueryService {
 
         log.debug( "returning " + vos.size() + " variants" );
 
-        populateSubjectsIntoVariants( vos );
+        Project project = getProject( filters );
+
+        populateSubjectsIntoVariants( project, vos );
 
         return new BoundedList<VariantValueObject>( vos );
+    }
+
+    @Override
+    public Project getProject( Set<AspireDbFilterConfig> filters ) {
+        Project project = null;
+        for ( AspireDbFilterConfig filter : filters ) {
+            if ( filter instanceof ProjectFilterConfig ) {
+                ProjectFilterConfig projConfig = ( ProjectFilterConfig ) filter;
+                Long projId = projConfig.getProjectIds().iterator().next();
+                project = projectDao.load( projId );
+                break;
+            }
+        }
+        return project;
     }
 
     @Override
@@ -671,15 +693,22 @@ public class QueryServiceImpl implements QueryService {
      * adding subject value object to variants
      * 
      * @param vos
+     * @param project
      */
-    private void populateSubjectsIntoVariants( List<VariantValueObject> vos ) {
+    private void populateSubjectsIntoVariants( Project project, List<VariantValueObject> vos ) {
 
         Set<String> ids = new HashSet<String>();
         for ( VariantValueObject vvo : vos ) {
             ids.add( vvo.getPatientId() );
         }
 
-        Collection<Subject> subjects = subjectDao.findByPatientIds( ids );
+        Collection<Subject> subjects = null;
+        if ( project != null ) {
+            subjects = subjectDao.findByPatientIds( project, ids );
+        } else {
+            subjects = subjectDao.findByPatientIds( ids );
+        }
+
         Map<String, Subject> id2subject = new HashMap<String, Subject>();
         for ( Subject s : subjects ) {
             id2subject.put( s.getPatientId(), s );

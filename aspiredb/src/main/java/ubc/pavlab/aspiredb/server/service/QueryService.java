@@ -25,6 +25,7 @@ import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
+import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Query;
 import ubc.pavlab.aspiredb.shared.BoundedList;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
@@ -103,6 +104,14 @@ public interface QueryService {
 
     Map<Integer, Integer> getSubjectGenes( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException,
             ExternalDependencyException;
+
+    /**
+     * Returns an instance of the project from the filters if any.
+     * 
+     * @param filters
+     * @return
+     */
+    public Project getProject( Set<AspireDbFilterConfig> filters );
 
     // // TODO: To be removed
     // @Deprecated

@@ -123,7 +123,7 @@ public class SignupControllerTest extends BaseSpringContextTest {
         int expectedEventCount = numThreads * numsignupsperthread;
         while ( c.get() < expectedEventCount && !failed.get() ) {
             try {
-                Thread.sleep( 5000 );
+                Thread.sleep( 8000 );
             } catch ( InterruptedException e ) {
                 e.printStackTrace();
             }
