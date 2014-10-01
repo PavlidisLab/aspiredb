@@ -24,6 +24,7 @@ import gemma.gsec.authentication.UserManager;
 import gemma.gsec.util.JSONUtil;
 import gemma.gsec.util.SecurityUtil;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,8 +35,10 @@ import javax.servlet.http.HttpServletResponse;
 import net.tanesha.recaptcha.ReCaptchaImpl;
 import net.tanesha.recaptcha.ReCaptchaResponse;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -93,6 +96,106 @@ public class SignupController extends BaseController {
         } finally {
             jsonUtil.writeToResponse( jsonText );
         }
+
+    }
+
+    /**
+     * Resets the password to a random alphanumeric (of length MIN_PASSWORD_LENGTH).
+     * 
+     * @param request
+     * @param response
+     */
+    @RequestMapping("/resetPassword.html")
+    public void resetPassword( HttpServletRequest request, HttpServletResponse response ) {
+        if ( log.isDebugEnabled() ) {
+            log.debug( "entering 'resetPassword' method..." );
+        }
+
+        String email = request.getParameter( "resetPasswordEmail" );
+        String username = request.getParameter( "resetPasswordId" );
+
+        JSONUtil jsonUtil = new JSONUtil( request, response );
+        String txt = null;
+        String jsonText = null;
+
+        /* look up the user's information and reset password. */
+        try {
+
+            /* make sure the email and username has been sent */
+            if ( StringUtils.isEmpty( email ) || StringUtils.isEmpty( username ) ) {
+                txt = "Email or username not specified.  These are required fields.";
+                log.warn( txt );
+                throw new RuntimeException( txt );
+            }
+
+            /* Change the password. */
+            String pwd = RandomStringUtils.randomAlphanumeric( MIN_PASSWORD_LENGTH ).toLowerCase();
+
+            String token = userManager.changePasswordForUser( email, username,
+                    passwordEncoder.encodePassword( pwd, username ) );
+
+            String message = sendResetConfirmationEmail( request, token, username, pwd, email );
+
+            jsonText = "{\"success\":true,\"message\":\"" + message + "\"}";
+
+        } catch ( Exception e ) {
+            log.error( e, e );
+            // jsonText = jsonUtil.getJSONErrorMessage( e );
+            jsonText = "{\"success\":false,\"message\":\"" + e.getLocalizedMessage() + "\"}";
+        } finally {
+            try {
+                jsonUtil.writeToResponse( jsonText );
+            } catch ( IOException e ) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Send an email to request signup confirmation. FIXME this is very similar to code in SignupController.
+     * 
+     * @param request
+     * @param u
+     */
+    private String sendResetConfirmationEmail( HttpServletRequest request, String token, String username,
+            String password, String email ) {
+
+        String message = "";
+
+        // Send an account information e-mail
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setFrom( ConfigUtils.getAdminEmailAddress() );
+        mailMessage.setSubject( getText( "signup.email.subject", request.getLocale() ) );
+        try {
+            Map<String, Object> model = new HashMap<>();
+            model.put( "username", username );
+            model.put( "password", password );
+
+            /*
+             * FIXME: make this url configurable.
+             */
+            // String host = "www.chibi.ubc.ca";
+            // model.put( "confirmLink", "http://" + host + "/Gemma/confirmRegistration.html?key=" + token +
+            // "&username="
+            // + username );
+            model.put( "confirmLink", ConfigUtils.getBaseUrl() + "/confirmRegistration.html?key=" + token
+                    + "&username=" + username );
+            model.put( "message", getText( "login.passwordReset.emailMessage", request.getLocale() ) );
+
+            /*
+             * FIXME: make the template name configurable.
+             */
+            String templateName = "passwordReset.vm";
+            sendEmail( username, email, "Password reset", templateName, model );
+            message = getText( "login.passwordReset", new Object[] { username, email }, request.getLocale() );
+            saveMessage( request, message );
+
+        } catch ( Exception e ) {
+            message = "Couldn't send password change confirmation email to " + email;
+            throw new RuntimeException( message, e );
+        }
+
+        return message;
 
     }
 

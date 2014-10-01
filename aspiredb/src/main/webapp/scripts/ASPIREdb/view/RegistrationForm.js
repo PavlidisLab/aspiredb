@@ -13,8 +13,9 @@ Ext
          // resizable : false,
 
          singleton : true,
-         title : 'User Registration Form',
+         title : 'User Registration',
          closable : true,
+         resizable : false,
          closeAction : 'hide',
 
          layout : {
@@ -80,9 +81,9 @@ Ext
 
             var panel = Ext.create( 'Ext.form.Panel', {
                id : 'aspireRegistrationForm',
-//               title : 'Registration Form',
-//               bodyPadding : 5,
-               // padding : '50 50 50 50',
+               // title : 'Registration Form',
+               bodyPadding : 5,
+               padding : '5 5 5 5',
                layout : 'anchor',
                defaults : {
                   anchor : '100%'
@@ -302,19 +303,19 @@ Ext
                   if ( json.success === 'success' ) {
                      messageLabel.setText( json.message, false );
                      messageLabel.show();
-//                     window.setTimeout( function() {
-//                        window.location.href = "home.html";
-//                     }, 6000 );
+                     // window.setTimeout( function() {
+                     // window.location.href = "home.html";
+                     // }, 6000 );
                   } else {
                      console.log( json.message );
-                     messageLabel.setText( json.message );
+                     messageLabel.setText( json.message, false );
                      messageLabel.show();
                   }
                },
                failure : function(response, opts) {
                   var json = Ext.util.JSON.decode( response.responseText );
                   var messageLabel = me.down( '#message' );
-                  messageLabel.setValue( json.message );
+                  messageLabel.setValue( json.message, false );
                   messageLabel.show();
                   console.log( json.message );
                }

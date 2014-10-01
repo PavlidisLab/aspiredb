@@ -1,4 +1,4 @@
-Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.RegistrationForm' ] );
+Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.RegistrationForm', 'ASPIREdb.view.ResetPasswordForm' ] );
 
 Ext.define( 'ASPIREdb.view.LoginForm', {
    extend : 'Ext.container.Viewport',
@@ -81,19 +81,12 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
          }, {
             xtype : 'label',
             // html : '<a href="/aspiredb/resetPassword.html">Forgot your password?</a>',
-            html : '<a href="#">Forgot your password?</a>',
-            style : 'font-size:12px',
+            html : 'Forgot your password?',
+            style : 'font-size:12px; color: blue; text-decoration: underline; ',
             listeners : {
                render : function(obj) {
                   obj.getEl().on( 'click', function() {
-                     var myForm = new Ext.form.Panel( {
-                        width : 500,
-                        height : 400,
-                        title : 'Foo',
-                        floating : true,
-                        closable : true
-                     } );
-                     myForm.show();
+                     ASPIREdb.view.ResetPasswordForm.initAndShow();
                   }, this );
                }
             }
