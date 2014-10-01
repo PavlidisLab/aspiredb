@@ -74,10 +74,9 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
                         runner.destroy();
 
                         Ext.Msg.alert( "You have been logged out",
-                           "You have been logged out due to inactivity, please login again.", function() {
-                              location.href = "/aspiredb/home.html";
+                           "You have been logged out due to inactivity,<br> please login again.", function() {
+                              window.location.href = "/aspiredb/home.html";
                            } );
-
                      }
                   },
 
@@ -85,8 +84,8 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
                      runner.destroy();
 
                      Ext.Msg.alert( "You have been logged out",
-                        "You have been logged out due to inactivity, please login again.", function() {
-                           location.href = "/aspiredb/home.html";
+                        "You have been logged out due to inactivity,<br> please login again.", function() {
+                           window.location.href = "/aspiredb/home.html";
                         } );
                   }
                } );
