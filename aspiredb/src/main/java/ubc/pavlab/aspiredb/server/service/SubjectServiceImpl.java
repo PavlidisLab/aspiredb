@@ -37,7 +37,6 @@ import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Subject;
-import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
@@ -45,7 +44,6 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.StringMatrix;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.TextValue;
-import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.ExternalSubjectIdProperty;
 import ubc.pavlab.aspiredb.shared.query.LabelProperty;
 import ubc.pavlab.aspiredb.shared.query.Property;
@@ -97,7 +95,7 @@ public class SubjectServiceImpl implements SubjectService {
         }
 
         SubjectValueObject vo = subject.convertToValueObject();
-        Integer numVariants = cnvDao.findBySubjectPatientId( subject.getPatientId() ).size();
+        Integer numVariants = cnvDao.findBySubjectPatientId( projectId, subject.getPatientId() ).size();
         vo.setVariants( numVariants != null ? numVariants : 0 );
 
         return vo;
@@ -138,7 +136,7 @@ public class SubjectServiceImpl implements SubjectService {
         for ( Subject subject : subjects ) {
 
             SubjectValueObject vo = subject.convertToValueObject();
-            Integer numVariants = cnvDao.findBySubjectPatientId( subject.getPatientId() ).size();
+            Integer numVariants = cnvDao.findBySubjectPatientId( projectId, subject.getPatientId() ).size();
             vo.setVariants( numVariants != null ? numVariants : 0 );
             vos.add( vo );
         }

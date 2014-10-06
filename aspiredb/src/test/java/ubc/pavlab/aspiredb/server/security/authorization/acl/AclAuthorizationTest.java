@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.CNVDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
+import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.CNV;
+import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
+import ubc.pavlab.aspiredb.server.service.ProjectService;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
 /**
@@ -57,6 +61,9 @@ public class AclAuthorizationTest extends BaseSpringContextTest {
     private CNVDao cnvDao;
 
     @Autowired
+    private ProjectService projectService;
+
+    @Autowired
     private PersistentTestObjectHelper testObjectHelper;
 
     String ownerUsername = RandomStringUtils.randomAlphabetic( 6 );
@@ -64,6 +71,12 @@ public class AclAuthorizationTest extends BaseSpringContextTest {
     String aDifferentUsername = RandomStringUtils.randomAlphabetic( 5 );
 
     String patientId = RandomStringUtils.randomAlphabetic( 4 );
+
+    String projectName = RandomStringUtils.randomAlphabetic( 4 );
+
+    private Subject subject;
+
+    private Project project;
 
     @Before
     public void setup() throws Exception {
@@ -77,7 +90,13 @@ public class AclAuthorizationTest extends BaseSpringContextTest {
 
         super.runAsUser( this.ownerUsername );
 
-        testObjectHelper.createPersistentTestSubjectObjectWithCNV( patientId );
+        project = new Project();
+        project.setName( projectName );
+        project = testObjectHelper.createPersistentProject( project );
+
+        subject = testObjectHelper.createPersistentTestSubjectObjectWithCNV( patientId );
+        subject.getProjects().add( project );
+        subjectDao.update( subject );
 
         try {
             userManager.loadUserByUsername( aDifferentUsername );
@@ -86,6 +105,13 @@ public class AclAuthorizationTest extends BaseSpringContextTest {
                     .randomAlphabetic( 10 ) + "@gmail.com", "key", new Date() ) );
         }
 
+    }
+
+    @After
+    public void tearDown() throws NotLoggedInException {
+        super.runAsAdmin();
+
+        projectService.deleteProject( projectName );
     }
 
     @Test
@@ -158,7 +184,10 @@ public class AclAuthorizationTest extends BaseSpringContextTest {
 
         super.runAsUser( this.ownerUsername );
 
-        CNV cnv = cnvDao.findBySubjectPatientId( patientId ).iterator().next();
+        // CNV cnv = cnvDao.findBySubjectPatientId( patientId ).iterator().next();
+
+        CNV cnv = cnvDao.findBySubjectPatientId( subject.getProjects().iterator().next().getId(), patientId )
+                .iterator().next();
 
         assertTrue( "User should own the individual's cnvs", securityService.isOwnedByCurrentUser( cnv ) );
 

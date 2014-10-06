@@ -500,6 +500,8 @@ public class QueryServiceImpl implements QueryService {
 
         Page<Subject> subjects = ( Page<Subject> ) subjectDao.loadPage( 0, 20000, sortField, sortDir, filters );
 
+        Project project = getProject( filters );
+
         subjects.getTotalCount();
 
         List<SubjectValueObject> vos = new ArrayList<SubjectValueObject>();
@@ -508,7 +510,7 @@ public class QueryServiceImpl implements QueryService {
             // see all the subjects labels
             SubjectValueObject vo = subject.convertToValueObject();
 
-            Integer numVariants = variantDao.findBySubjectPatientId( subject.getPatientId() ).size();
+            Integer numVariants = variantDao.findBySubjectPatientId( project.getId(), subject.getPatientId() ).size();
             vo.setVariants( numVariants != null ? numVariants : 0 );
 
             // Integer phonetypetot=phenotypeDao.findBySubjectId( subject.getId() ).size();

@@ -34,8 +34,17 @@ public interface VariantDaoBase<T extends Variant> extends SecurableDaoBase<T>, 
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<T> findByGenomicLocation( GenomicRange range, Collection<Long> activeProjectIds );
 
+    /**
+     * @deprecated Use findBySubjectPatientId( Project project, String patientId ) instead.
+     * @param id
+     * @return
+     */
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    @Deprecated
     public Collection<T> findBySubjectPatientId( String id );
+
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    public Collection<T> findBySubjectPatientId( Long projectId, String patientId );
 
     public Collection<String> suggestValuesForEntityProperty( Property property, SuggestionContext suggestionContext );
 

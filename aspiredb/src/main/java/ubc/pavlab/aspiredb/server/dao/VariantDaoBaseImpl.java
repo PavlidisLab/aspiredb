@@ -154,6 +154,28 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
 
     @Override
     @Transactional(readOnly = true)
+    public Collection<T> findBySubjectPatientId( Long projectId, String id ) {
+        if ( projectId == null ) {
+            log.warn( "Project id is null, retrieving all variants with patient id " + id );
+            return findBySubjectPatientId( id );
+        }
+
+        List<Subject> subjects = this.getSessionFactory().getCurrentSession().createCriteria( Subject.class )
+                .add( Restrictions.eq( "patientId", id ) ).createAlias( "projects", "project" )
+                .add( Restrictions.eq( "project.id", projectId ) ).list();
+
+        if ( subjects.size() == 0 ) {
+            return new ArrayList<T>();
+        }
+
+        List<T> variants = this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
+                .add( Restrictions.in( "subject", subjects ) ).list();
+        return variants;
+    }
+
+    @Override
+    @Deprecated
+    @Transactional(readOnly = true)
     public Collection<T> findBySubjectPatientId( String id ) {
 
         List<Subject> subjects = this.getSessionFactory().getCurrentSession().createCriteria( Subject.class )
