@@ -510,7 +510,12 @@ public class QueryServiceImpl implements QueryService {
             // see all the subjects labels
             SubjectValueObject vo = subject.convertToValueObject();
 
-            Integer numVariants = variantDao.findBySubjectPatientId( project.getId(), subject.getPatientId() ).size();
+            Integer numVariants;
+            if ( project == null ) {
+                numVariants = variantDao.findBySubjectPatientId( subject.getPatientId() ).size();
+            } else {
+                numVariants = variantDao.findBySubjectPatientId( project.getId(), subject.getPatientId() ).size();
+            }
             vo.setVariants( numVariants != null ? numVariants : 0 );
 
             // Integer phonetypetot=phenotypeDao.findBySubjectId( subject.getId() ).size();
