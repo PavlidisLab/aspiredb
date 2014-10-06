@@ -19,8 +19,6 @@ import java.util.List;
 
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
-import ubc.pavlab.aspiredb.server.model.Variant;
-import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
@@ -42,9 +40,9 @@ public interface VariantService {
 
     public List<VariantValueObject> getSubjectsVariants( List<String> patientIds );
 
-    public List<VariantValueObject> getSubjectVariants( String patientId );
+    public List<VariantValueObject> getSubjectVariants( Long projectId, String patientId );
 
-    public Integer getTotalNoOfVariantsBySubjectId( String patientId );
+    // public Integer getTotalNoOfVariantsBySubjectId( String patientId );
 
     public VariantValueObject getVariant( Long variantId );
 
