@@ -858,7 +858,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Map<String, Object> model = new HashMap<>();
         model.put( "username", user.getUserName() );
-        model.put( "siteurl", ConfigUtils.getBaseUrl() );
+        model.put( "siteurl", ConfigUtils.getBaseUrl() + "home.html" );
         model.put( "projectName", projectName );
         model.put( "resultMessage", resultMessage );
 
