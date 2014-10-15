@@ -62,7 +62,6 @@
 			<props>
 				<prop key="/dwr/**/*">dwrController</prop>
 				<prop key="/home.html">homeController</prop>
-				<prop key="/register.html">homeController</prop>
                 <prop key="/signup.html">signupController</prop>
                 <prop key="/resetPassword.html">signupController</prop>
                 <prop key="/confirmRegistration.html">signupController</prop>
