@@ -240,16 +240,16 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
             ASPIREdb.view.GeneManagerWindow.initGridAndShow();
 
          }
-      }, {
-         xtype : 'button',
-         text : 'Label Manager',
-         itemId : 'labelManagerButton',
-         height : 30,
-         margin : '5 5 5 5',
-         handler : function() {
-            ASPIREdb.view.LabelManagerWindow.initGridAndShow();
-
-         }
+//      }, {
+//         xtype : 'button',
+//         text : 'Label Manager',
+//         itemId : 'labelManagerButton',
+//         height : 30,
+//         margin : '5 5 5 5',
+//         handler : function() {
+//            ASPIREdb.view.LabelManagerWindow.initGridAndShow();
+//
+//         }
       }, /**
           * { xtype : 'button', text : 'Subject Label Manager', itemId : 'subjectLabelManagerButton', height : 30,
           * margin : '5 5 5 5', handler : function() { var labelControlWindow = Ext.create(
