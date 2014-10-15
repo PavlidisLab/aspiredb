@@ -138,8 +138,8 @@ Ext
                success : function(response) {
                   var json = Ext.util.JSON.decode( response.responseText );
                   var messageLabel = me.down( '#message' );
-                  var usernameTextfield = me.down( '#username' );
-                  var emailTextfield = me.down( '#email' );
+                  var usernameTextfield = me.down( '#resetPasswordUsername' );
+                  var emailTextfield = me.down( '#resetPasswordEmail' );
 
                   usernameTextfield.reset();
                   emailTextfield.reset();
