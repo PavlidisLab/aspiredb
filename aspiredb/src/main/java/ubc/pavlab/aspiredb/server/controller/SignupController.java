@@ -39,8 +39,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -143,7 +143,7 @@ public class SignupController extends BaseController {
                 if ( !StringUtils.equals( password, passwordConfirm ) ) {
                     throw new RuntimeException( "Passwords do not match." );
                 }
-                String encryptedPassword = passwordEncoder.encodePassword( password, username );
+                String encryptedPassword = passwordEncoder.encode( password );
                 userManager.changePassword( oldPassword, encryptedPassword );
             } else {
                 throw new RuntimeException( "Password must be at least " + MIN_PASSWORD_LENGTH
@@ -196,8 +196,7 @@ public class SignupController extends BaseController {
             /* Change the password. */
             String pwd = RandomStringUtils.randomAlphanumeric( MIN_PASSWORD_LENGTH ).toLowerCase();
 
-            String token = userManager.changePasswordForUser( email, username,
-                    passwordEncoder.encodePassword( pwd, username ) );
+            String token = userManager.changePasswordForUser( email, username, passwordEncoder.encode( pwd ) );
 
             String message = sendResetConfirmationEmail( request, token, username, pwd, email );
 
@@ -243,8 +242,8 @@ public class SignupController extends BaseController {
             // model.put( "confirmLink", "http://" + host + "/Gemma/confirmRegistration.html?key=" + token +
             // "&username="
             // + username );
-            model.put( "confirmLink", ConfigUtils.getBaseUrl() + "/confirmRegistration.html?key=" + token
-                    + "&username=" + username );
+            model.put( "confirmLink", ConfigUtils.getBaseUrl() + "confirmRegistration.html?key=" + token + "&username="
+                    + username );
             model.put( "message", getText( "login.passwordReset.emailMessage", request.getLocale() ) );
 
             /*
@@ -314,13 +313,6 @@ public class SignupController extends BaseController {
     }
 
     /**
-     * @param passwordEncoder the passwordEncoder to set
-     */
-    public void setPasswordEncoder( PasswordEncoder passwordEncoder ) {
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    /**
      * @param userManager the userManager to set
      */
     public void setUserManager( UserManager userManager ) {
@@ -375,7 +367,7 @@ public class SignupController extends BaseController {
 
         String username = request.getParameter( "username" );
 
-        String encodedPassword = passwordEncoder.encodePassword( password, username );
+        String encodedPassword = passwordEncoder.encode( password );
 
         String email = request.getParameter( "email" );
 

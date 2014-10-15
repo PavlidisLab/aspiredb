@@ -36,10 +36,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Acl;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -127,7 +127,9 @@ public class ProjectManagerImpl implements ProjectManager {
     @Autowired
     private AclService aclService;
 
-    private ShaPasswordEncoder passwordEncoder = new ShaPasswordEncoder();
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    // private ShaPasswordEncoder passwordEncoder = new ShaPasswordEncoder();
 
     public static final String DGV_SUPPORT_CHARACTERISTIC_KEY = "pubmedid";
 
@@ -322,7 +324,8 @@ public class ProjectManagerImpl implements ProjectManager {
 
         } catch ( UsernameNotFoundException e ) {
 
-            String encodedPassword = passwordEncoder.encodePassword( password, userName );
+            // String encodedPassword = passwordEncoder.encodePassword( password, userName );
+            String encodedPassword = passwordEncoder.encode( password );
             UserDetailsImpl u = new UserDetailsImpl( encodedPassword, userName, true, null, null, null, new Date() );
 
             userManager.createUser( u );

@@ -28,10 +28,11 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * cli for creating users
@@ -43,7 +44,9 @@ public class GroupManagerCLI extends AbstractCLI {
 
     private static UserManager userManager;
 
-    ShaPasswordEncoder passwordEncoder = new ShaPasswordEncoder();
+    // ShaPasswordEncoder passwordEncoder = new ShaPasswordEncoder();
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private boolean createUser = false;
 
@@ -129,7 +132,9 @@ public class GroupManagerCLI extends AbstractCLI {
         addOption( aspireuserpassword );
         addOption( aspireuserEmail );
 
-        addOption( "createuser", false,
+        addOption(
+                "createuser",
+                false,
                 "Use this option to create the user, options -aspireuser and -aspireuserpassword and -aspireuseremail required when using this option." );
         addOption( "deleteuser", false,
                 "Use this option to delete an existing user, option -aspireuser required when using this option." );
@@ -168,7 +173,8 @@ public class GroupManagerCLI extends AbstractCLI {
                 bail( AbstractCLI.ErrorCode.INVALID_OPTION );
             } catch ( UsernameNotFoundException e ) {
 
-                String encodedPassword = passwordEncoder.encodePassword( aspireUserPassword, aspireUserName );
+                // String encodedPassword = passwordEncoder.encodePassword( aspireUserPassword, aspireUserName );
+                String encodedPassword = passwordEncoder.encode( aspireUserPassword );
                 UserDetailsImpl u = new UserDetailsImpl( encodedPassword, aspireUserName, true, null, null, null,
                         new Date() );
 
@@ -203,7 +209,8 @@ public class GroupManagerCLI extends AbstractCLI {
             }
 
             try {
-                String encodedPassword = passwordEncoder.encodePassword( aspireUserPassword, aspireUserName );
+                // String encodedPassword = passwordEncoder.encodePassword( aspireUserPassword, aspireUserName );
+                String encodedPassword = passwordEncoder.encode( aspireUserPassword );
                 userManager.changePasswordForUser( aspireUserEmail, aspireUserName, encodedPassword );
 
             } catch ( UsernameNotFoundException e ) {

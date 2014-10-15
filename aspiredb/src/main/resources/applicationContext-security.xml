@@ -60,7 +60,8 @@
     </s:authentication-manager>
 
 
-    <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder" />
+<!--     <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder" />  -->
+    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
 
     <bean id="runAsManager" class="org.springframework.security.access.intercept.RunAsManagerImpl">
         <property name="rolePrefix" value="GROUP_" />
