@@ -80,7 +80,7 @@ Ext
                   labelWidth : 200,
                   allowBlank : false,
                   style : 'margin-top:5px',
-                  minLength : 6
+                  minLength : 4
                }, {
                   xtype : 'textfield',
                   id : 'resetPasswordEmail',

@@ -1,0 +1,9 @@
+Dear ${username},
+
+Your project ($projectName) has been uploaded successfully to ASPIREdb with the following details:
+
+$resultMessage
+
+You may now view the project by logging in at ASPIREdb ($siteurl).
+
+Please feel free to contact us: aspiredb@chibi.ubc.ca

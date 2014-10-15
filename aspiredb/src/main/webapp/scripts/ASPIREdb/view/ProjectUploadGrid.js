@@ -55,6 +55,9 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                     var me = this;
 
                     if ( form.isValid() ) {
+                       
+                       Ext.MessageBox.alert( 'Success', 'Your project has been submitted.<br/>You will receive an e-mail once the upload is complete.<br/>' );
+                       
                        // getting the form values
                        values = form.getFieldValues();
                        var variantfilename = me.up( "ProjectUploadGrid" ).variantServerFilename;
@@ -88,11 +91,13 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                           me.up( "ProjectUploadGrid" ).phenotypeServerFilename = "";
                        }
                        
-                       me.up( "ProjectUploadGrid" ).setLoading( true );
+                       // commented out handlers so users can continue using ASPIREdb
+                       // an e-mail will be sent when the upload has finished.
 
+                       //me.up( "ProjectUploadGrid" ).setLoading( true );
                        ProjectService.addSubjectVariantsPhenotypeToProject( variantfilename, phenotypefilename, false,
-                          projectName, variantTypeEdit, {
-                             callback : function(message) {
+                          projectName, variantTypeEdit 
+                             /*,{ callback : function(message) {
 
                                 // this can be a long message, break it up with <br>
                                 //Ext.Msg.alert( 'Result', message.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;') );
@@ -102,16 +107,18 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                                 ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
                                 me.up( "ProjectUploadGrid" ).setLoading( false );
                                 
-                                clearFilenames();
                              },
                              errorHandler : function(er, exception) {
                                 Ext.Msg.alert( 'Error', er + "\n" + exception.stack );
                                 console.log( exception.stack );
                                 me.up( "ProjectUploadGrid" ).setLoading( false );
                                 
-                                clearFilenames();
-                             }
-                          } );
+                             }*/
+                    //      } 
+                    );
+                       
+                       ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
+                       clearFilenames();
 
                     } else {
                        // Ext.Msg.alert( "Error!", "Your form
@@ -240,6 +247,8 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
 
                if ( form.isValid() ) {
 
+                  Ext.MessageBox.alert( 'Success', 'Your project has been submitted<br/>. We will send you an e-mail once the upload is complete.<br/>' );
+                  
                   form.submit( {
                      method : 'POST',
                      url : 'upload_action.html',
@@ -247,6 +256,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                      headers : {
                         'Content-Type' : 'multipart/form-data;charset=UTF-8'
                      },
+                     
                      success : function(form, action) {
                         var fReader = new FileReader();
                         fReader.readAsBinaryString( file );
@@ -269,6 +279,7 @@ Ext.define( 'ASPIREdb.view.ProjectUploadGrid', {
                      failure : function(form, action) {
                         Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' );
                      }
+
                   } );
 
                } else {

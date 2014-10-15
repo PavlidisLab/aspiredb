@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang.time.StopWatch;
@@ -36,6 +37,8 @@ import org.directwebremoting.annotations.RemoteProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +57,9 @@ import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
 import ubc.pavlab.aspiredb.server.project.ProjectManagerImpl.SpecialProject;
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
+import ubc.pavlab.aspiredb.server.util.ConfigUtils;
+import ubc.pavlab.aspiredb.server.util.MailEngine;
+import ubc.pavlab.aspiredb.server.util.MessageUtil;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
@@ -64,6 +70,15 @@ import au.com.bytecode.opencsv.CSVWriter;
 public class ProjectServiceImpl implements ProjectService {
 
     private static Logger log = LoggerFactory.getLogger( ProjectService.class );
+
+    @Autowired
+    protected MailEngine mailEngine = null;
+
+    @Autowired
+    protected MessageSource messageSource;
+
+    @Autowired
+    private MessageUtil messageUtil;
 
     @Autowired
     ProjectDao projectDao;
@@ -835,6 +850,33 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
+    /**
+     * Send an e-mail to the user that their upload has finished.
+     */
+    private void emailUploadFinished( String projectName, String resultMessage ) {
+        gemma.gsec.model.User user = userManager.getCurrentUser();
+
+        Map<String, Object> model = new HashMap<>();
+        model.put( "username", user.getUserName() );
+        model.put( "siteurl", ConfigUtils.getBaseUrl() );
+        model.put( "projectName", projectName );
+        model.put( "resultMessage", resultMessage );
+
+        sendEmail( user.getUserName(), user.getEmail(), model );
+    }
+
+    private void sendEmail( String username, String email, Map<String, Object> model ) {
+        log.info( ", mailEngine=" + this.mailEngine + ", messageSource=" + this.messageSource );
+        String subject = this.messageUtil.getText( "projectUpload.email.subject", Locale.getDefault() );
+        String templateName = "projectUploaded.vm";
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setFrom( ConfigUtils.getAdminEmailAddress() );
+        mailMessage.setSubject( subject );
+        mailMessage.setTo( username + "<" + email + ">" );
+        mailEngine.sendMessage( mailMessage, templateName, model );
+    }
+
     @Override
     @RemoteMethod
     public String addSubjectVariantsPhenotypeToProject( String variantFilename, String phenotypeFilename,
@@ -919,6 +961,12 @@ public class ProjectServiceImpl implements ProjectService {
         returnStr += errMsg.length() > 0 ? "\nExceptions\n" + errMsg : "";
 
         log.info( returnStr );
+
+        // email users that the upload has finished
+
+        // if ( timer.getTime() > ConfigUtils.getLong( "aspiredb.uploadTimeThreshold", 60000 ) ) {
+        emailUploadFinished( projectName, returnStr );
+        // }
 
         return returnStr;
     }

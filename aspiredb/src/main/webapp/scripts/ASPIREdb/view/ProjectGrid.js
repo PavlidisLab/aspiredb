@@ -238,7 +238,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
                      // console.log( 'returned project value object : ' + message );
                      ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );
                   } else {
-                     Ext.Msg.alert( 'Failure', 'fail to create project!' );
+                     Ext.Msg.alert( 'Error', 'Failed to create project. ' + message + '<br/>' );
                   }
 
                }
