@@ -250,7 +250,8 @@ public class SignupController extends BaseController {
              * FIXME: make the template name configurable.
              */
             String templateName = "passwordReset.vm";
-            sendEmail( username, email, "Password reset", templateName, model );
+            sendEmail( username, email, getText( "login.passwordReset.emailSubject", request.getLocale() ),
+                    templateName, model );
             message = getText( "login.passwordReset", new Object[] { username, email }, request.getLocale() );
             saveMessage( request, message );
 
