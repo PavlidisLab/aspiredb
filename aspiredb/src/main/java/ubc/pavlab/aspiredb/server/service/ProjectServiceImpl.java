@@ -128,7 +128,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         for ( String userName : userNames ) {
             User user = ( User ) userService.findByUserName( userName );
-            userObject.add( user.getFirstName() );
+            userObject.add( user.getUserName() );
         }
 
         return userObject;
