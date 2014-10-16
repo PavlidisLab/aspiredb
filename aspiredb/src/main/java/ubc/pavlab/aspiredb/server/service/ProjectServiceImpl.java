@@ -866,7 +866,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private void sendEmail( String username, String email, Map<String, Object> model ) {
-        log.info( ", mailEngine=" + this.mailEngine + ", messageSource=" + this.messageSource );
         String subject = this.messageUtil.getText( "projectUpload.email.subject", Locale.getDefault() );
         String templateName = "projectUploaded.vm";
 
