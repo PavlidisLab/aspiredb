@@ -26,8 +26,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 
@@ -60,7 +60,7 @@ public class ManualAuthenticationProcessingTest extends BaseSpringContextTest {
             userManager.loadUserByUsername( username );
         } catch ( UsernameNotFoundException e ) {
 
-            String encodedPassword = passwordEncoder.encodePassword( pwd, username );
+            String encodedPassword = passwordEncoder.encode( pwd );
             UserDetailsImpl u = new UserDetailsImpl( encodedPassword, username, true, null, null, null, new Date() );
 
             userManager.createUser( u );

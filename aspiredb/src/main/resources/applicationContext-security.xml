@@ -52,7 +52,7 @@
         <s:authentication-provider user-service-ref="userManager">
 
             <s:password-encoder ref="passwordEncoder">
-                <s:salt-source user-property="username" />
+                <!--  <s:salt-source user-property="username" /> -->
             </s:password-encoder>
 
         </s:authentication-provider>

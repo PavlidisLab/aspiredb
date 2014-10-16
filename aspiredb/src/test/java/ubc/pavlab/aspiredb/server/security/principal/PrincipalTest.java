@@ -30,9 +30,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 
@@ -70,7 +70,7 @@ public class PrincipalTest extends BaseSpringContextTest {
             userManager.loadUserByUsername( username );
         } catch ( UsernameNotFoundException e ) {
 
-            String encodedPassword = passwordEncoder.encodePassword( pwd, username );
+            String encodedPassword = passwordEncoder.encode( pwd );
             UserDetailsImpl u = new UserDetailsImpl( encodedPassword, username, true, null, email, null, new Date() );
 
             log.error( "Encoded password old password " + pwd + " encoded is " + encodedPassword + " user is "
@@ -84,7 +84,7 @@ public class PrincipalTest extends BaseSpringContextTest {
     public final void testChangePassword() throws Exception {
         String oldpwd = userManager.findByUserName( username ).getPassword();
         String newpwd = randomName();
-        String encodedPassword = passwordEncoder.encodePassword( newpwd, username );
+        String encodedPassword = passwordEncoder.encode( newpwd );
 
         String token = userManager.changePasswordForUser( email, username, encodedPassword );
 
@@ -106,7 +106,7 @@ public class PrincipalTest extends BaseSpringContextTest {
         // Now that the account has been activated, try changing the password
         oldpwd = newpwd;
         newpwd = randomName();
-        encodedPassword = passwordEncoder.encodePassword( newpwd, username );
+        encodedPassword = passwordEncoder.encode( newpwd );
 
         // Current user changing password
         super.runAsUser( username );
