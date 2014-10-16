@@ -175,22 +175,23 @@ public class ProjectServiceImpl implements ProjectService {
         Map<String, String> userGroupObject = new HashMap<String, String>();
 
         Collection<String> userNames = new ArrayList<String>();
-        String groupNames = "";
 
         Project proj = projectDao.findByProjectName( projectName );
         userNames = securityService.readableBy( proj );
 
         for ( String userName : userNames ) {
-
             User user = ( User ) userManager.findByUserName( userName );
             Collection<gemma.gsec.model.UserGroup> usergroups = new ArrayList<>();
             for ( gemma.gsec.model.UserGroup group : userService.findGroupsForUser( user ) ) {
                 usergroups.add( group );
             }
+            String groupNames = "";
+            final String SEPARATOR = ", ";
             for ( gemma.gsec.model.UserGroup usergroup : usergroups ) {
-                groupNames = groupNames + usergroup.getName() + ',';
+                groupNames = groupNames + usergroup.getName() + SEPARATOR;
 
             }
+            groupNames = groupNames.substring( 0, groupNames.lastIndexOf( SEPARATOR ) );
             userGroupObject.put( userName, groupNames );
         }
 
