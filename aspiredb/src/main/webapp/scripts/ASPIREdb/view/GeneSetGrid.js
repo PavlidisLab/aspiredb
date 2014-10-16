@@ -109,7 +109,7 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
 
             },
             errorHandler : function(er, exception) {
-               Ext.Msg.alert( "find user gene set Error", er + "\n" + exception.stack );
+               Ext.Msg.alert( "Find user gene set error", er + "\n" + exception.stack );
                console.log( exception.stack );
             }
          } );

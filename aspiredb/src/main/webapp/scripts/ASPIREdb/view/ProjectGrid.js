@@ -67,12 +67,13 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
       }
    } ],
 
-   plugins : [ rowEditing ],
+// TODO Implement record update
+   /*plugins : [ rowEditing ], 
    listeners : {
       'selectionchange' : function(view, records) {
          this.down( '#removeProject' ).setDisabled( !records.length );
       }
-   },
+   },*/
 
    initComponent : function() {
 

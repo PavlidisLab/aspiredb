@@ -68,18 +68,19 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
          allowBlank : true
       }
    }, {
-      header : 'size',
+      header : 'Size',
       dataIndex : 'groupSize',
       flex : 1,
 
    } ],
 
-   plugins : [ rowEditing ],
+// TODO Implement record update
+   /*plugins : [ rowEditing ],
    listeners : {
       'selectionchange' : function(view, records) {
          this.down( '#removeUserGroup' ).setDisabled( !records.length );
       }
-   },
+   },*/
 
    initComponent : function() {
 
@@ -196,6 +197,11 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
 
             var newUserGroupName = ref.down( '#userGroupName' ).getValue();
 
+            if ( newUserGroupName == null || newUserGroupName.trim().length == 0 ) {
+               Ext.Msg.alert('Error','Enter a valid user group name');
+               return;
+            }
+               
             geneValueObjects = [];
             geneValueObjects.push( new GeneValueObject() );
 
@@ -256,13 +262,19 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
          xtype : 'button',
          id : 'removeUserGroup',
          text : '',
-         tooltip : 'Remove the selected user group',
+         tooltip : 'Remove the selected group',
          icon : 'scripts/ASPIREdb/resources/images/icons/group_delete.png',
          handler : function() {
-            var test = ref.selUserGroup[0].data.groupName;
-
+            
+            if ( ref.selUserGroup[0] == null ) {
+               Ext.Msg.alert('Error','Select a group name to delete');
+               return;
+            }
+            
+            var groupName = ref.selUserGroup[0].data.groupName;
+            
             // Delete user group
-            UserManagerService.deleteGroup( ref.selUserGroup[0].data.groupName, {
+            UserManagerService.deleteGroup( groupName, {
                callback : function(status) {
                   if ( status == "Success" ) {
                      var panel = ASPIREdb.view.UserManagerWindow.down( '#ASPIREdb_UserManagerpanel' );

@@ -78,14 +78,15 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
 //   } 
    ],
 
-   plugins : [ rowEditing ],
+// TODO Implement record update
+   /*plugins : [ rowEditing ],
    listeners : {
       'selectionchange' : function(view, records) {
          this.down( '#removeGroupMemeber' ).setDisabled( !records.length );
          this.selectedUser = this.getSelectionModel().getSelection();
 
       }
-   },
+   },*/
 
    initComponent : function() {
       this.callParent();
@@ -160,7 +161,17 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
          icon : 'scripts/ASPIREdb/resources/images/icons/user_add.png',
          handler : function() {
 
+            if ( ref.selectedGroup[0] == null ) {
+               Ext.Msg.alert('Error','Select a user group');
+               return;
+            }
+            
             var groupMember = ref.down( '#groupMemberName' ).lastQuery;
+            if ( groupMember == null || groupMember.trim().length == 0 ) {
+               Ext.Msg.alert('Error','Enter a valid user name');
+               return;
+            }
+               
             var groupName = ref.selectedGroup[0].data.groupName;
 
             UserManagerService.addUserToGroup( groupName,groupMember, {
@@ -196,10 +207,16 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
          tooltip : 'Remove the selected user',
          icon : 'scripts/ASPIREdb/resources/images/icons/user_delete.png',
          handler : function() {
+
+            if ( ref.selectedUser[0] == null ) {
+               Ext.Msg.alert('Error','Select a user name<br/>');
+               return;
+            }
+            
             var groupMember = ref.selectedUser[0].data.memberName;
             var groupName = ref.selectedGroup[0].data.groupName;
-
-            UserManagerService.deleteUserFromGroup( groupName,groupMember, {
+            
+            UserManagerService.deleteUserFromGroup( groupName, groupMember, {
                callback : function(status) {
                   var panel = ASPIREdb.view.UserManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
                   var groupMemberGrid = panel.down( '#groupMemeberGrid' );
@@ -210,7 +227,7 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
                      groupMemberGrid.store.remove( selection );
                   }
 
-                  console.log( 'selected geneset :' + ref.selectedGeneGroup[0].data.groupName + ' deleted' );
+                  console.log( 'selected user :' + ref.selectedGeneGroup[0].data.groupName + ' deleted' );
                }
             } );
          }

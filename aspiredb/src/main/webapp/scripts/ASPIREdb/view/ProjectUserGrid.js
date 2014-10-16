@@ -64,14 +64,15 @@ Ext.define( 'ASPIREdb.view.ProjectUserGrid', {
       }
    } ],
 
-   plugins : [ rowEditing ],
+// TODO Implement record update
+   /*plugins : [ rowEditing ], 
    listeners : {
       'selectionchange' : function(view, records) {
          this.down( '#removeProject' ).setDisabled( !records.length );
          this.selectedUser = this.getSelectionModel().getSelection();
 
       }
-   },
+   },*/
 
    initComponent : function() {
       this.callParent();
