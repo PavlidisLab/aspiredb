@@ -50,10 +50,15 @@ import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
+import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
+import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
 import ubc.pavlab.aspiredb.server.model.CNV;
+import ubc.pavlab.aspiredb.server.model.Characteristic;
+import ubc.pavlab.aspiredb.server.model.CnvType;
+import ubc.pavlab.aspiredb.server.model.GenomicLocation;
 import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Query;
@@ -137,6 +142,9 @@ public class QueryServiceTest extends BaseSpringContextTest {
     private Subject subject;
 
     @Autowired
+    private SubjectService subjectService;
+
+    @Autowired
     private ProjectService projectService;
 
     @Before
@@ -175,7 +183,6 @@ public class QueryServiceTest extends BaseSpringContextTest {
             try {
                 projectService.deleteProject( project.getName() );
             } catch ( NotLoggedInException e ) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -278,94 +285,66 @@ public class QueryServiceTest extends BaseSpringContextTest {
         // persistentTestObjectHelper.removeSubject( subject );
     }
 
-    // @Test
-    // FIXME
+    @Test
     public void testGetSubjectVariantCountsForPhenocarta() throws Exception {
 
-        String patientId = "testGetSubjectVariantCountsForLocation";
+        final String patientId = "testGetSubjectVariantCountsForLocation";
 
         // String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_219"; // colon cancer (~321 genes)
-        // String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_0060041"; // autism spectrum disorder (~853 genes)
-        String phenotypeURI = " http://purl.obolibrary.org/obo/DOID_12858"; // Huntington's disease, changes less than
-                                                                            // autism ...
+        // String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_0060041"; // autism spectrum disorder
+        // (~853 genes)
+        final String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_12858"; // Huntington's disease, (29 genes)
 
-        // look at how many there are currently in the database FIXME this should be cleaned up by the teardown.
-        Map<Integer, Integer> ret = getSubjectVariantCountForPhenocarta( phenotypeURI );
-        int subjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
-        int variantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+        new InlineTransaction() {
 
-        // add some variants that overlap
-        // 17:37885247-37885647
-        // 4:72247-5545043, bin 17958.
-        subject = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
+            @Override
+            public void instructions() {
+                subject = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
 
-        /*
-         * CNV cnv1 = persistentTestObjectHelper.createPersistentTestCNVObject(); cnv1.setSubject( subject );
-         * cnv1.getLocation().setChromosome( "17" ); cnv1.getLocation().setStart( 28521237 ); cnv1.getLocation().setEnd(
-         * 28521437 ); cnv1.getLocation().setBin( GenomeBin.binFromRange( cnv1.getLocation().getChromosome(),
-         * cnv1.getLocation().getStart(), cnv1 .getLocation().getEnd() ) ); cnvDao.update( cnv1 );
-         * 
-         * CNV cnv2 = persistentTestObjectHelper.createPersistentTestCNVObject(); cnv2.setSubject( subject );
-         * cnv2.getLocation().setChromosome( "4" ); cnv2.getLocation().setStart( 72247 ); cnv2.getLocation().setEnd(
-         * 5545043 ); cnv2.getLocation().setBin( GenomeBin.binFromRange( cnv2.getLocation().getChromosome(),
-         * cnv2.getLocation().getStart(), cnv2 .getLocation().getEnd() ) ); cnvDao.update( cnv2 );
-         */
+                CNV cnv1 = createCNV( "4", 3174681, 3174781 ); // overlaps with HTT gene
+                CNV cnv2 = createCNV( "4", 2174681, 3174681 ); // overlaps with HTT gene
+                CNV cnv3 = createCNV( "4", 1, 2 );
 
-        // HTT gene at GRCh37, 2:3074681:3243959:1
-        CNV cnv1 = persistentTestObjectHelper.createPersistentTestCNVObject();
-        cnv1.setSubject( subject );
-        cnv1.getLocation().setChromosome( "2" );
-        cnv1.getLocation().setStart( 3174681 );
-        cnv1.getLocation().setEnd( 3174781 );
-        cnv1.getLocation().setBin(
-                GenomeBin.binFromRange( cnv1.getLocation().getChromosome(), cnv1.getLocation().getStart(), cnv1
-                        .getLocation().getEnd() ) );
-        cnvDao.update( cnv1 );
-
-        // HTT gene
-        CNV cnv2 = persistentTestObjectHelper.createPersistentTestCNVObject();
-        cnv2.setSubject( subject );
-        cnv2.getLocation().setChromosome( "2" );
-        cnv2.getLocation().setStart( 2174681 );
-        cnv2.getLocation().setEnd( 3174681 );
-        cnv2.getLocation().setBin(
-                GenomeBin.binFromRange( cnv2.getLocation().getChromosome(), cnv2.getLocation().getStart(), cnv2
-                        .getLocation().getEnd() ) );
-        cnvDao.update( cnv2 );
-
-        CNV cnv3 = persistentTestObjectHelper.createPersistentTestCNVObject(); // this one doesn't overlap
-        cnv3.setSubject( subject );
-        cnv3.getLocation().setChromosome( "4" );
-        cnv3.getLocation().setStart( 1 );
-        cnv3.getLocation().setEnd( 2 );
-        cnv3.getLocation().setBin(
-                GenomeBin.binFromRange( cnv3.getLocation().getChromosome(), cnv3.getLocation().getStart(), cnv3
-                        .getLocation().getEnd() ) );
-        cnvDao.update( cnv3 );
-
-        subject.addVariant( cnv1 );
-        subject.addVariant( cnv2 );
-        subject.addVariant( cnv3 );
-        subjectDao.update( subject );
+                subject.addVariant( cnv1 );
+                subject.addVariant( cnv2 );
+                subject.addVariant( cnv3 );
+                subjectDao.update( subject );
+            }
+        }.execute();
 
         assertEquals( patientId, subject.getPatientId() );
         assertEquals( 3, subject.getVariants().size() );
 
-        ret = getSubjectVariantCountForPhenocarta( phenotypeURI );
+        Map<Integer, Integer> ret = null;
+        try {
+            ret = getSubjectVariantCountForPhenocarta( phenotypeURI, subject.getPatientId() );
+        } catch ( Exception e ) {
+
+            e.printStackTrace();
+            fail();
+        }
 
         int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
         int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
 
-        assertEquals( subjectCount + 1, addedSubjectCount ); // one subject was added
-        assertEquals( variantCount + 2, addedVariantCount ); // we added two that overlap
+        assertEquals( 1, addedSubjectCount ); // one subject was added
+        assertEquals( 2, addedVariantCount ); // we added two that overlap
 
-        // cleanup (this should be in a tearDown)
-        /*
-         * List<Variant> sv = subject.getVariants(); subject.setVariants( null ); subjectDao.update( subject ); for (
-         * Variant v : sv ) { CNV c = ( CNV ) v; c.setSubject( null ); cnvDao.update( c );
-         * persistentTestObjectHelper.removeVariant( c ); } persistentTestObjectHelper.removeSubject( subject );
-         */
+    }
 
+    private CNV createCNV( String chr, int start, int end ) {
+        CNV cnv = new CNV();
+        cnv.setSubject( subject );
+        cnv.setType( CnvType.valueOf( "LOSS" ) );
+        cnv.setLocation( new GenomicLocation( chr, start, end ) );
+        List<Characteristic> characteristics = new ArrayList<Characteristic>();
+        characteristics.add( new Characteristic( "BENIGN", "YES" ) );
+        cnv.setCharacteristics( characteristics );
+        cnv.getLocation().setBin(
+                GenomeBin.binFromRange( cnv.getLocation().getChromosome(), cnv.getLocation().getStart(), cnv
+                        .getLocation().getEnd() ) );
+        cnv.toValueObject();
+        return cnvDao.create( cnv );
     }
 
     @Test
@@ -714,12 +693,17 @@ public class QueryServiceTest extends BaseSpringContextTest {
         return ret;
     }
 
-    private Map<Integer, Integer> getSubjectVariantCountForPatientId( String patientId ) throws NotLoggedInException,
-            ExternalDependencyException {
+    private SimpleRestriction createSubjectVariantCountForPatientIdRestriction( String patientId ) {
         SimpleRestriction simpleRe = new SimpleRestriction();
         simpleRe.setOperator( Operator.TEXT_EQUAL );
         simpleRe.setProperty( new ExternalSubjectIdProperty() );
         simpleRe.setValue( new TextValue( patientId ) );
+        return simpleRe;
+    }
+
+    private Map<Integer, Integer> getSubjectVariantCountForPatientId( String patientId ) throws NotLoggedInException,
+            ExternalDependencyException {
+        SimpleRestriction simpleRe = createSubjectVariantCountForPatientIdRestriction( patientId );
 
         Set<AspireDbFilterConfig> filters = new HashSet<AspireDbFilterConfig>();
         filters.add( new SubjectFilterConfig( simpleRe ) );
@@ -730,25 +714,33 @@ public class QueryServiceTest extends BaseSpringContextTest {
         return ret;
     }
 
-    /**
-     * @param phenotypeURI
-     * @return
-     * @throws NotLoggedInException
-     * @throws ExternalDependencyException
-     */
-    private Map<Integer, Integer> getSubjectVariantCountForPhenocarta( String phenotypeURI )
-            throws NotLoggedInException, ExternalDependencyException {
+    private SimpleRestriction createSubjectVariantCountForPhenocarta( String phenotypeURI )
+            throws NeurocartaServiceException, BioMartServiceException {
         SimpleRestriction simpleRe = new SimpleRestriction();
         simpleRe.setOperator( Operator.IS_IN_SET );
         simpleRe.setProperty( new NeurocartaPhenotypeProperty() );
         NeurocartaPhenotypeValueObject vo = new NeurocartaPhenotypeValueObject();
         Collection<GeneValueObject> gvo = neurocartaQueryService.fetchGenesAssociatedWithPhenotype( phenotypeURI );
         log.info( gvo.size() + " genes found for URI " + phenotypeURI );
+        // for ( GeneValueObject g : gvo ) {
+        // log.info( "gene=" + g.getSymbol() + " at " + g.getGenomicRange() );
+        // }
         vo.setGenes( gvo );
         simpleRe.setValue( vo );
+        return simpleRe;
+    }
 
+    /**
+     * @param phenotypeURI
+     * @return
+     * @throws NotLoggedInException
+     * @throws ExternalDependencyException
+     */
+    private Map<Integer, Integer> getSubjectVariantCountForPhenocarta( String phenotypeURI, String patientId )
+            throws NotLoggedInException, ExternalDependencyException {
         Set<AspireDbFilterConfig> filters = new HashSet<>();
-        filters.add( new VariantFilterConfig( simpleRe ) );
+        filters.add( new VariantFilterConfig( createSubjectVariantCountForPhenocarta( phenotypeURI ) ) );
+        filters.add( new SubjectFilterConfig( createSubjectVariantCountForPatientIdRestriction( patientId ) ) );
         Map<Integer, Integer> ret = queryService.getSubjectVariantCounts( filters );
         return ret;
     }
