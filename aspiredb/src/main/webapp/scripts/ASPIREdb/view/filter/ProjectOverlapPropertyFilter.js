@@ -3,7 +3,7 @@ Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.filter.multicombo.MultiV
 
 Ext.define( 'ASPIREdb.view.filter.ProjectOverlapPropertyFilter', {
    extend : 'Ext.Container',
-   alias : 'widget.filter_property',
+   alias : 'widget.project_overlap_filter_property',
    width : 875,
    layout : {
       type : 'hbox'
