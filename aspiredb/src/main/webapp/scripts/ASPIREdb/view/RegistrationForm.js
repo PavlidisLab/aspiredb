@@ -45,6 +45,22 @@ Ext
          // }
          } ],
 
+         resetFields : function() {
+            var me = this;
+            var messageLabel = me.down( '#message' );
+            var usernameTextfield = me.down( '#username' );
+            var password1Textfield = me.down( '#password1' );
+            var password2Textfield = me.down( '#password2' );
+            var emailTextfield = me.down( '#email' );
+            var reCaptcha = me.down( '#reCaptcha' );
+
+            usernameTextfield.reset();
+            password1Textfield.reset();
+            password2Textfield.reset();
+            emailTextfield.reset();
+            me.showCaptcha( reCaptcha.getEl() );
+         },
+         
          initAndShow : function() {
             this.show();
          },
@@ -52,6 +68,8 @@ Ext
          initComponent : function() {
             this.callParent();
 
+            this.on('hide', this.resetFields);
+            
             var ref = this;
 
             var textPanel = Ext
@@ -242,7 +260,7 @@ Ext
             } );
 
             this.add( panel );
-
+            
             this.doLayout();
 
          },
@@ -254,7 +272,7 @@ Ext
                callback : Recaptcha.focus_response_field
             } );
          },
-
+         
          registerHandler : function() {
 
             var me = this;
@@ -293,12 +311,6 @@ Ext
                   var password2Textfield = me.down( '#password2' );
                   var emailTextfield = me.down( '#email' );
                   var reCaptcha = me.down( '#reCaptcha' );
-
-                  usernameTextfield.reset();
-                  password1Textfield.reset();
-                  password2Textfield.reset();
-                  emailTextfield.reset();
-                  me.showCaptcha( reCaptcha.getEl() );
 
                   if ( json.success === 'success' ) {
                      messageLabel.setText( json.message, false );
