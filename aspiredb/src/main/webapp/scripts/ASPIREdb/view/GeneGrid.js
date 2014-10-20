@@ -73,7 +73,7 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
       }
    } ],
 
-   plugins : [ rowEditing ],
+  // plugins : [ rowEditing ], // users should not be able to edit gene names!
    listeners : {
       'selectionchange' : function(view, records) {
          this.down( '#removeGene' ).setDisabled( !records.length );
