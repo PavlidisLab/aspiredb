@@ -20,7 +20,8 @@
 Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel',
               'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings',
               'ASPIREdb.view.VariantGridCreator', 'ASPIREdb.view.GeneGridCreator', 'ASPIREdb.IdeogramDownloadWindow',
-              'Ext.data.ArrayStore', 'Ext.form.ComboBox', 'ASPIREdb.view.SubjectGrid' ] );
+              'Ext.data.ArrayStore', 'Ext.form.ComboBox', 'ASPIREdb.view.SubjectGrid',
+              'ASPIREdb.view.report.VariantReport' ] );
 
 /**
  * Variant Tab Panel contains both Ideogram view and Variant table view
@@ -116,6 +117,14 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          text : '<b>Actions</b>',
          itemId : 'actionsButton',
          menu : this.actionsMenu
+      } );
+
+      this.reportButton = Ext.create( 'Ext.Button', {
+         itemId : 'reportButton',
+         text : 'Report',
+         disabled : false,
+         handler : this.showReportHandler,
+         scope : this
       } );
 
       this.selectAllButton = Ext.create( 'Ext.Button', {
@@ -311,113 +320,111 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                ref.loadedVariants = vvos;
                var variantPatientIds = [];
                var projectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
-               
+
                for (var i = 0; i < vvos.length; i++) {
                   if ( variantPatientIds.indexOf( vvos[i].patientId ) == -1 )
                      variantPatientIds.push( VariantService.getSubjectVariants( projectId, vvos[i].patientId ) );
 
                }
-       
+
                var variantIds = [];
 
                for (var k = 0; k < vvos.length; k++) {
                   variantIds.push( vvos[k].id );
                }
 
-                //  GeneService.getGeneValueObjectsInsideVariants( variantIds, {
-                //  callback : function(vos) {
-                 //  console.log( 'variant gene value objects' + vos );
+               // GeneService.getGeneValueObjectsInsideVariants( variantIds, {
+               // callback : function(vos) {
+               // console.log( 'variant gene value objects' + vos );
 
-                     // ASPIREdb.view.GeneHitsByVariantWindow.getComponent( 'geneHitsByVariantGrid'
-                     // ).setLodedvariantvalueObjects(vos );
-                     // ASPIREdb.view.GeneHitsByVariantWindow.populateGrid( vos );
+               // ASPIREdb.view.GeneHitsByVariantWindow.getComponent( 'geneHitsByVariantGrid'
+               // ).setLodedvariantvalueObjects(vos );
+               // ASPIREdb.view.GeneHitsByVariantWindow.populateGrid( vos );
 
-                     ProjectService.numVariants( filterConfigs[0].projectIds, {
-                        callback : function(NoOfVariants) {
-                           /*
-                            * if ( NoOfVariants > vvos.length ) { ref.setTitle( "Variant :" + vvos.length + " of " +
-                            * NoOfVariants + " filtered" ); } else if ( NoOfVariants == vvos.length ) ref.setTitle(
-                            * "Variant" );
-                            */
-                           ref.down( '#statusbar' ).update(
-                              ref.loadedVariants.length + " / " + NoOfVariants + " variants loaded" );
-                        }
-                     } );
+               ProjectService.numVariants( filterConfigs[0].projectIds, {
+                  callback : function(NoOfVariants) {
+                     /*
+                      * if ( NoOfVariants > vvos.length ) { ref.setTitle( "Variant :" + vvos.length + " of " +
+                      * NoOfVariants + " filtered" ); } else if ( NoOfVariants == vvos.length ) ref.setTitle( "Variant" );
+                      */
+                     ref.down( '#statusbar' ).update(
+                        ref.loadedVariants.length + " / " + NoOfVariants + " variants loaded" );
+                  }
+               } );
 
-                     var ideogram = ref.getComponent( 'ideogram' );
-                     ideogram.drawChromosomes();
-                     ideogram.drawVariants( vvos );
+               var ideogram = ref.getComponent( 'ideogram' );
+               ideogram.drawChromosomes();
+               ideogram.drawVariants( vvos );
 
-                     var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid( vvos, properties );
-                     //var grid2 = ASPIREdb.view.GeneGridCreator.createGeneGrid( vos, properties );
+               var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid( vvos, properties );
+               // var grid2 = ASPIREdb.view.GeneGridCreator.createGeneGrid( vos, properties );
 
-                     grid.on( 'itemcontextmenu', function(view, record, item, index, e) {
-                        // Stop the browser getting the event
-                        e.preventDefault();
+               grid.on( 'itemcontextmenu', function(view, record, item, index, e) {
+                  // Stop the browser getting the event
+                  e.preventDefault();
 
-                        var contextMenu = new Ext.menu.Menu( {
-                           items : [ {
-                              text : 'Make label',
-                              handler : ref.makeLabelHandler,
-                              scope : ref,
-                           }, {
-                              text : 'Label Manager',
-                              handler : ref.labelManagerHandler,
-                              scope : ref,
-                           } ]
-                        } );
+                  var contextMenu = new Ext.menu.Menu( {
+                     items : [ {
+                        text : 'Make label',
+                        handler : ref.makeLabelHandler,
+                        scope : ref,
+                     }, {
+                        text : 'Label Manager',
+                        handler : ref.labelManagerHandler,
+                        scope : ref,
+                     } ]
+                  } );
 
-                        contextMenu.showAt( e.getX(), e.getY() );
-                     }, this );
-               
-                     ref.remove( 'variantGrid', true );
-                     ref.remove( 'geneGrid', true );
+                  contextMenu.showAt( e.getX(), e.getY() );
+               }, this );
 
-                     // when subjects are
-                     // selected
-                     grid.on( 'selectionchange', ref.selectionChangeHandler, ref );
+               ref.remove( 'variantGrid', true );
+               ref.remove( 'geneGrid', true );
 
-                     grid.on( 'show', function() {
-                        if ( ref.newIdeogramLabel ) {
-                           grid.getView().refresh();
-                           ref.newIdeogramLabel = undefined;
-                        }
-                     } );
+               // when subjects are
+               // selected
+               grid.on( 'selectionchange', ref.selectionChangeHandler, ref );
 
-                     ref.add( grid );
-                     //ref.add( grid2 );
-                     
-                     var toolbar = ref.getDockedComponent( 'variantTabPanelToolbar' );
+               grid.on( 'show', function() {
+                  if ( ref.newIdeogramLabel ) {
+                     grid.getView().refresh();
+                     ref.newIdeogramLabel = undefined;
+                  }
+               } );
 
-                     toolbar.add( ref.actionsButton );
-                     toolbar.add( ref.labelsButton );
-                     toolbar.add( ref.selectAllButton );
-                     toolbar.add( ref.deselectAllButton );
-                     toolbar.add( ref.saveButton );
-                     toolbar.add( ref.exportButton );
-                     toolbar.add( ref.zoomInButton );
-                     toolbar.add( ref.zoomOutButton );
-                     toolbar.add( ref.colourVariantByCombo );
+               ref.add( grid );
+               // ref.add( grid2 );
 
-                     // refresh the legend (e.g. Variant Labels) in ideogram
-                     if ( legendProperty != null ) {
-                        ASPIREdb.EVENT_BUS.fireEvent( 'colorCoding_selected' );
-                        ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', legendProperty );
-                        ref.redrawIdeogram( legendProperty );
-                     }
+               var toolbar = ref.getDockedComponent( 'variantTabPanelToolbar' );
 
-                     ref.setLoading( false );
+               toolbar.add( ref.actionsButton );
+               toolbar.add( ref.labelsButton );
+               toolbar.add( ref.reportButton );
+               toolbar.add( ref.selectAllButton );
+               toolbar.add( ref.deselectAllButton );
+               toolbar.add( ref.saveButton );
+               toolbar.add( ref.exportButton );
+               toolbar.add( ref.zoomInButton );
+               toolbar.add( ref.zoomOutButton );
+               toolbar.add( ref.colourVariantByCombo );
 
-             //     }
-           //    } );
+               // refresh the legend (e.g. Variant Labels) in ideogram
+               if ( legendProperty != null ) {
+                  ASPIREdb.EVENT_BUS.fireEvent( 'colorCoding_selected' );
+                  ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', legendProperty );
+                  ref.redrawIdeogram( legendProperty );
+               }
+
+               ref.setLoading( false );
+
+               // }
+               // } );
             }
          } );
 
       } );
 
    },
-
-
 
    /**
     * Remove labels from variants in local store.
@@ -462,6 +469,25 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       // refresh the variant in grid
       me.down( '#variantGrid' ).getView().refresh();
 
+   },
+
+   /**
+    * Display a variant summary report as charts
+    */
+   showReportHandler : function() {
+      var reportWindow = Ext.create( 'Ext.Window', {
+         width : 950,
+         height : 500,
+         title : 'Variant Report',
+         layout : 'fit',
+         resizable : true
+      } );
+      var grid = this.down( '#variantGrid' );
+      var reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReport' );
+      reportPanel.createReport( grid );
+      reportWindow.add( reportPanel );
+      reportWindow.doLayout();
+      reportWindow.show();
    },
 
    /**
