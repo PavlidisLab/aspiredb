@@ -294,7 +294,7 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 
       // hack to fix known Extjs bug with tooltip width being too small
       // http://stackoverflow.com/questions/15834689/extjs-4-2-tooltips-not-wide-enough-to-see-contents
-      delete Ext.tip.Tip.prototype.minWidth;
+//      delete Ext.tip.Tip.prototype.minWidth;
 
       var t = new Ext.ToolTip( {
          floating : {
@@ -303,7 +303,8 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
          html : 'Events',
          hideDelay : 1,
          target : heatmap.el,
-         closable : false
+         closable : false,
+         width : 400,
       } );
       t.show();
 
