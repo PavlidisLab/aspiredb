@@ -21,6 +21,13 @@ Ext.require( [ 'ASPIREdb.MainPanel', 'ASPIREdb.EVENT_BUS', 'ASPIREdb.view.filter
               'ASPIREdb.view.LabelManagerWindow', 'ASPIREdb.view.EditProfileForm' ] );
 
 /**
+ * Tooltips are too small in Chrome
+ */
+if ( Ext.isChrome || Ext.IE ) {
+   Ext.tip.Tip.prototype.minWidth = 200;
+}
+
+/**
  * Main Panel which trigger the Main Panel after user's successful login Events: - login - logout
  */
 Ext.define( 'ASPIREdb.AspireDbPanel', {

@@ -19,11 +19,11 @@
 Ext.require( [] );
 
 /**
- * Create Gene Grid
+ * Create Variant Report Chart Panel
  */
-Ext.define( 'ASPIREdb.view.report.VariantReport', {
+Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    extend : 'Ext.Panel',
-   alias : 'widget.variantReport',
+   alias : 'widget.variantReportPanel',
    id : 'variantReport',
    xtype : 'clustered-column',
    resizable : true,
@@ -70,32 +70,20 @@ Ext.define( 'ASPIREdb.view.report.VariantReport', {
       // a collection of freq objects
       var data = [];
       map.each(function(key, value, length) {
-         console.log(key, value, length);
+//         console.log(key, value, length);
          var freq = {}
          freq[ columnName ] = key;
          freq[ countColumnName ] = value;
          data.push(freq);
       });
       
-      console.log("data=" + data);
-      
       // convert to Extjs Store
-      
-//      var fields = Ext.data.Record.create([
-//      {name:columnName, mapping:columnName},
-//      {name:countColumnName, mapping:countColumnName}
-//      ]);
-      
-//      var data = Ext.decode( freq ); // convert to JSON
-      
       var store = Ext.create('Ext.data.JsonStore', {
          storeId : 'reportStore',
          fields : fields,
          data : data,
          fieldValues : fieldValues,
       });
-      
-      console.log('store=' + store);
       
       return store;
    },

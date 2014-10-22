@@ -21,7 +21,7 @@ Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowMode
               'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings',
               'ASPIREdb.view.VariantGridCreator', 'ASPIREdb.view.GeneGridCreator', 'ASPIREdb.IdeogramDownloadWindow',
               'Ext.data.ArrayStore', 'Ext.form.ComboBox', 'ASPIREdb.view.SubjectGrid',
-              'ASPIREdb.view.report.VariantReport' ] );
+              'ASPIREdb.view.report.VariantReportWindow' ] );
 
 /**
  * Variant Tab Panel contains both Ideogram view and Variant table view
@@ -475,107 +475,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
     * Display a variant summary report as charts
     */
    showReportHandler : function() {
-      var me = this;
-      var grid = this.down( '#variantGrid' );
-      var reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReport' );
-      
-       var reportTypeStore = Ext.create( 'Ext.data.ArrayStore', {
-          fields : [ {
-             name : 'id',
-             type : 'string'
-          }, {
-             name : 'name',
-             type : 'string'
-          } ],
-          // TODO Add labels, Length
-          data : [ [ 'type', 'CNV type' ], [ 'variantType', 'Variant type' ], [ 'chromosome', 'Chromosome' ],
-                   [ 'inheritance', 'Inheritance' ], ['Array Platform', 'Array Platform'], 
-                   ['Array Report', 'Array Report'], ['Characteristics', 'Characteristics'] ],
-          autoLoad : true,
-          autoSync : true,
-       } );
-       
-       var reportType = reportTypeStore.getAt(0).data['id'];
-//      var reportType = 'type';
-//      var reportType = 'inheritance';
-//      var reportType = 'chromosome';
-      
-      reportPanel.createReport( grid.store, reportType );
-      var chart = reportPanel.down( "#variantChart" );
-
-      var reportWindow = Ext.create( 'Ext.Window', {
-         width : 950,
-         height : 500,
-         id : 'variantReportWindow',
-         title : 'Variant Report',
-         layout : 'fit',
-         resizable : true,
-         store : grid.store,
-         chart : chart,
-         tbar : [ {
-            xtype: 'combo', 
-            itemId : 'reportCombo',
-            fieldLabel : 'Data',
-            store : reportTypeStore,
-            displayField : 'name',
-            valueField : 'id',
-            queryMode : 'local',
-            editable : false,
-            forceSelection : true,
-            listeners : {
-               'select' : me.reportComboSelectHandler,
-            }
-         }, {
-            
-            xtype : 'button',
-            text : 'Save Chart',
-            listeners : {
-               'click' : me.saveChartHandler,
-            }
-//         }, {
-//            text : 'Save Chart',
-//            handler : function( ele ) {
-//               Ext.MessageBox.confirm( 'Confirm Download', 'Would you like to download the chart as an image?',
-//                  function(choice) {
-//                     if ( choice == 'yes' ) {
-//                        this.chart.save( {
-//                           type : 'image/png'
-//                        } );
-//                     }
-//                  } );
-//            }
-         } ],
-      } );
-      
-      reportWindow.add( reportPanel );
-      reportWindow.doLayout();
-      reportWindow.show();
-   },
-
-   saveChartHandler : function( e ) {
-      var me = this;
-      Ext.MessageBox.confirm( 'Confirm Download', 'Would you like to download the chart as an image?',
-       function(choice) {
-          if ( choice == 'yes' ) {
-             me.up('#variantReportWindow').chart.save( {
-                type : 'image/png'
-             } );
-          }
-      }); 
-   },
-   
-   reportComboSelectHandler : function( sel ) {
-      var reportType = sel.value;
-      var window = this.up('#variantReportWindow');
-      
-      var reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReport' );
-      reportPanel.createReport( window.store, reportType );
-      var chart = reportPanel.down( "#variantChart" );
-      
-      window.remove( window.down('#variantReport') );
-      window.add( reportPanel );
-      window.chart = chart;
-      window.doLayout();
+      var reportWindow = Ext.create( 'ASPIREdb.view.report.VariantReportWindow' );
+      reportWindow.createAndShow( this.down( '#variantGrid' ).store );
    },
    
    /**
