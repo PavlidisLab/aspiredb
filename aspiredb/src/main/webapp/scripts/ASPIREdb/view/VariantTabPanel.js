@@ -487,14 +487,16 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
              name : 'name',
              type : 'string'
           } ],
+          // TODO Add labels, Length
           data : [ [ 'type', 'CNV type' ], [ 'variantType', 'Variant type' ], [ 'chromosome', 'Chromosome' ],
-                   [ 'inheritance', 'Inheritance' ] ],
+                   [ 'inheritance', 'Inheritance' ], ['Array Platform', 'Array Platform'], 
+                   ['Array Report', 'Array Report'], ['Characteristics', 'Characteristics'] ],
           autoLoad : true,
           autoSync : true,
        } );
        
-      // TODO Make this selectable
-      var reportType = 'type';
+       var reportType = reportTypeStore.getAt(0).data['id'];
+//      var reportType = 'type';
 //      var reportType = 'inheritance';
 //      var reportType = 'chromosome';
       
