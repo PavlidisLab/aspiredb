@@ -32,15 +32,96 @@ Ext.define( 'ASPIREdb.view.report.VariantReport', {
    initComponent : function() {
       this.callParent();
    },
-
    
-   createReport : function( grid ) {
+   /**
+    * 
+    * 
+    * @param grid e.g. 'type'
+    * @param colmnName e.g. 'count'
+    * @returns e.g. { "type" : "LOSS", "count" : 5 }
+    */
+   calculateFrequencies : function( store, columnName, countColumnName ) {
+      var map = new Ext.util.HashMap();
+      var fieldValues = [];
+      var fields = [ columnName, countColumnName ];
+      
+      
+      for( i = 0; i < store.data.length; i++) {
+         
+            // extract values
+            var row = store.data.getAt(i).data;
+            var val = row[ columnName ];
+            if ( val == undefined ) {
+               console.log("Column '" + columnName + "' not found");
+               return;
+            }
+            
+            // now lets calculate and store it!
+            if ( map.get( val ) == undefined ) {
+               map.add( val, 1 );
+               fieldValues.push(val);
+            } else {
+               var count = map.get( val );
+               count++;
+               map.add(val, count);
+            }
+      }
+      
+      // a collection of freq objects
+      var data = [];
+      map.each(function(key, value, length) {
+         console.log(key, value, length);
+         var freq = {}
+         freq[ columnName ] = key;
+         freq[ countColumnName ] = value;
+         data.push(freq);
+      });
+      
+      console.log("data=" + data);
+      
+      // convert to Extjs Store
+      
+//      var fields = Ext.data.Record.create([
+//      {name:columnName, mapping:columnName},
+//      {name:countColumnName, mapping:countColumnName}
+//      ]);
+      
+//      var data = Ext.decode( freq ); // convert to JSON
+      
+      var store = Ext.create('Ext.data.JsonStore', {
+         fields : fields,
+         data : data,
+         fieldValues : fieldValues,
+      });
+      
+      console.log('store=' + store);
+      
+      return store;
+   },
+   
+   
+   createReport : function( store, columnName ) {
       
       var me = this;
 
+//      var columnName = 'type';
+      var countColumnName = 'count';
+      
+      this.myDataStore = this.calculateFrequencies(store, columnName,countColumnName);
+      
+      var title = ASPIREdb.ActiveProjectSettings.getActiveProjectName();
+      var xField = columnName;
+      var yField = countColumnName;
+         
+         
       // fix, convert grid to a summary store, something like this
       // data : [ { 'LOSS', frequency : 20 }, { 'GAIN', frequency : 30 }, { 'OTHER', frequency : 40 } ]
       
+      /*
+      //            title : [ 'IE', 'Firefox', 'Chrome', 'Safari' ], // fix
+//            xField : 'month',                                // fix
+//            yField : [ 'data1', 'data2', 'data3', 'data4' ], // fix
+            
       this.myDataStore = Ext.create('Ext.data.JsonStore', {
          fields: ['month', 'data1', 'data2', 'data3', 'data4' ],
          data: [
@@ -58,12 +139,13 @@ Ext.define( 'ASPIREdb.view.report.VariantReport', {
              { month: 'Dec', data1: 15, data2: 31, data3: 47, data4: 4 }
          ]
      });
+     */
       
       me.add( [ {
          xtype : 'chart',
          id : 'variantChart',
          width : '100%',
-         height : 410,
+//         height : 410,
          padding : '10 0 0 0',
          animate : true,
          resizable : true,
@@ -79,8 +161,8 @@ Ext.define( 'ASPIREdb.view.report.VariantReport', {
          insetPadding : 40,
          items : [ {
             type : 'text',
-            text : 'Column Charts - Clustered Columns',
-            font : '22px Helvetica',
+            text : title,
+            font : '20px Helvetica',
             width : 100,
             height : 30,
             x : 40, // the sprite x position
@@ -88,32 +170,31 @@ Ext.define( 'ASPIREdb.view.report.VariantReport', {
          // the sprite y position
          }, {
             type : 'text',
-            text : 'Data: Browser Stats 2012',
+            text : 'ASPIREdb',
             font : '10px Helvetica',
             x : 12,
             y : 380
-         }, {
-            type : 'text',
-            text : 'Source: http://www.w3schools.com/',
-            font : '10px Helvetica',
-            x : 12,
-            y : 390
-         } ],
+         }],
          axes : [ {
             type : 'numeric',
             position : 'left',
-            fields : 'data1',
+//            fields : 'data1',
+            fields : yField,
             grid : true,
             minimum : 0,
+            title : countColumnName,
             label : {
                renderer : function(v) {
-                  return v + '%';
+//                  return v + '%';
+                  return v;
                }
             }
          }, {
             type : 'category',
             position : 'bottom',
-            fields : 'month',
+//            fields : 'month',
+            fields : xField,
+            title : columnName,
             grid : true,
             label : {
                rotate : {
@@ -124,9 +205,15 @@ Ext.define( 'ASPIREdb.view.report.VariantReport', {
          series : [ {
             type : 'column',
             axis : 'left',
-            title : [ 'IE', 'Firefox', 'Chrome', 'Safari' ], // fix
-            xField : 'month',                                // fix
-            yField : [ 'data1', 'data2', 'data3', 'data4' ], // fix
+//            title : [ 'IE', 'Firefox', 'Chrome', 'Safari' ], // fix
+//            xField : 'month',                                // fix
+//            yField : [ 'data1', 'data2', 'data3', 'data4' ], // fix
+            
+//            title : title,
+            
+            xField : xField,
+            yField : yField,
+               
             style : {
                opacity : 0.80
             },
@@ -140,9 +227,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReport', {
                width : 150,
                style : 'background: #FFF',
                renderer : function(storeItem, item) {
-                  var browser = item.series.title[Ext.Array.indexOf( item.series.yField, item.yField )];
-                  var msg = browser + ' for ' + storeItem.get( 'month' ) + ': ' + storeItem.get( item.yField )
-                  + '%';
+                  var msg = storeItem.get( xField ) + ': ' + storeItem.get( item.yField );
                   this.update( msg );
                }
             }

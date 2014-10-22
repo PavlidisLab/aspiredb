@@ -475,16 +475,37 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
     * Display a variant summary report as charts
     */
    showReportHandler : function() {
+      var grid = this.down( '#variantGrid' );
+      var reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReport' );
+      
+      // TODO Make this selectable
+//      var reportType = 'type';
+//      var reportType = 'inheritance';
+//      var reportType = 'chromosome';
+      
+      reportPanel.createReport( grid.store, reportType );
+      var chart = reportPanel.down( "#variantChart" );
+
       var reportWindow = Ext.create( 'Ext.Window', {
          width : 950,
          height : 500,
          title : 'Variant Report',
          layout : 'fit',
-         resizable : true
+         resizable : true,
+         tbar : [ {
+            text : 'Save Chart',
+            handler : function() {
+               Ext.MessageBox.confirm( 'Confirm Download', 'Would you like to download the chart as an image?',
+                  function(choice) {
+                     if ( choice == 'yes' ) {
+                        chart.save( {
+                           type : 'image/png'
+                        } );
+                     }
+                  } );
+            }
+         } ],
       } );
-      var grid = this.down( '#variantGrid' );
-      var reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReport' );
-      reportPanel.createReport( grid );
       reportWindow.add( reportPanel );
       reportWindow.doLayout();
       reportWindow.show();
