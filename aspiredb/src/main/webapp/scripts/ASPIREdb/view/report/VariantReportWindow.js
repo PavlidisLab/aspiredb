@@ -52,7 +52,8 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          // TODO Add labels, Length
          data : [ [ 'type', 'CNV type' ], [ 'variantType', 'Variant type' ], [ 'chromosome', 'Chromosome' ],
                  [ 'inheritance', 'Inheritance' ], [ 'Array Platform', 'Array Platform' ],
-                 [ 'Array Report', 'Array Report' ], [ 'Characteristics', 'Characteristics' ] ],
+                 [ 'Array Report', 'Array Report' ], [ 'Characteristics', 'Characteristics' ],
+                 ['patientId', 'Patient ID'] ],
          autoLoad : true,
          autoSync : true,
       } );
