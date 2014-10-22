@@ -49,11 +49,11 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
             name : 'name',
             type : 'string'
          } ],
-         // TODO Add labels, Length
+         // TODO Add labels
          data : [ [ 'type', 'CNV type' ], [ 'variantType', 'Variant type' ], [ 'chromosome', 'Chromosome' ],
                  [ 'inheritance', 'Inheritance' ], [ 'Array Platform', 'Array Platform' ],
                  [ 'Array Report', 'Array Report' ], [ 'Characteristics', 'Characteristics' ],
-                 ['patientId', 'Patient ID'] ],
+                 [ 'cnvLength', 'CNV Length' ], [ 'patientId', 'Patient ID' ] ],
          autoLoad : true,
          autoSync : true,
       } );
@@ -84,9 +84,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
 
       me.variantStore = variantStore;
 
-      // var grid = this.down( '#variantGrid' );
       var reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReportPanel' );
-
       var reportType = me.reportTypeStore.getAt( 0 ).data['id'];
       // var reportType = 'type';
       // var reportType = 'inheritance';

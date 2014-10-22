@@ -28,113 +28,186 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    xtype : 'clustered-column',
    resizable : true,
    layout : 'fit',
-   
+
    initComponent : function() {
       this.callParent();
    },
-   
+
    /**
-    * 
-    * 
-    * @param grid e.g. 'type'
-    * @param colmnName e.g. 'count'
-    * @returns e.g. { "type" : "LOSS", "count" : 5 }
+    * Return the value where the bin is found
     */
-   calculateFrequencies : function( store, columnName, countColumnName ) {
-      var map = new Ext.util.HashMap();
-      var fieldValues = [];
-      var fields = [ columnName, countColumnName ];
-      
-      
-      for( i = 0; i < store.data.length; i++) {
-         
-            // extract values
-            var row = store.data.getAt(i).data;
-            var val = row[ columnName ];
-            if ( val == undefined ) {
-               console.log("Column '" + columnName + "' not found");
-               return;
-            }
-            
-            // now lets calculate and store it!
-            if ( map.get( val ) == undefined ) {
-               map.add( val, 1 );
-               fieldValues.push(val);
-            } else {
-               var count = map.get( val );
-               count++;
-               map.add(val, count);
-            }
+   findBin : function(val, BINS, BINS_TEXT) {
+      for (var i = 0; i < BINS.length; i++) {
+         if ( (BINS[i] - val) > 0 ) {
+            // console.log( val + " is in bin " + BINS_TEXT[i] );
+            return BINS_TEXT[i];
+         }
       }
-      
+
+      // it must be the last bin
+      // console.log( val + " is in bin " + BINS_TEXT[BINS_TEXT.length - 1] );
+      return BINS_TEXT[BINS_TEXT.length - 1];
+   },
+
+   /**
+    * Returns the textual representation of the bins for the chart axis, e.g. <100000, 20000-30000
+    */
+   bins2text : function(BINS) {
+      var BINS_TEXT = [];
+      for (var i = 0; i < BINS.length; i++) {
+         var bin = "";
+         if ( i == 0 ) {
+            bin = "<" + BINS[i];
+         } else if ( i == BINS.length - 1 ) {
+            bin = BINS[i - 1] + "-" + BINS[i];
+            BINS_TEXT.push( bin );
+            bin = ">=" + BINS[i];
+         } else {
+            bin = BINS[i - 1] + "-" + BINS[i];
+         }
+         BINS_TEXT.push( bin );
+      }
+      return BINS_TEXT;
+   },
+
+   /**
+    * Use for numerical data types, bin the data first and plot the frequencies
+    * 
+    */
+   calculateBinFrequencies : function(store, columnName, countColumnName) {
+
+      var map = new Ext.util.HashMap();
+      var fields = [ columnName, countColumnName ];
+
+      // setup bins
+      var BINS = Array.apply( 0, Array( 20 ) ).map( function(val, i) {
+         return 10000 * (i + 1);
+      } );
+      var BINS_TEXT = this.bins2text( BINS );
+
+      // initialize map with all the bins
+      for (var i = 0; i < BINS_TEXT.length; i++) {
+         map.add( BINS_TEXT[i], 0 );
+      }
+
+      for (var i = 0; i < store.data.length; i++) {
+
+         // extract values
+         var row = store.data.getAt( i ).data;
+         var val = row[columnName];
+         if ( val == undefined ) {
+            console.log( "Column '" + columnName + "' not found" );
+            return;
+         }
+
+         // bin the value
+         var bin = this.findBin( val, BINS, BINS_TEXT );
+
+         // now lets calculate and store it!
+         var count = map.get( bin );
+         count++;
+         map.add( bin, count );
+      }
+
       // a collection of freq objects
       var data = [];
-      map.each(function(key, value, length) {
-//         console.log(key, value, length);
+      map.each( function(key, value, length) {
+         console.log( key, value, length );
          var freq = {}
-         freq[ columnName ] = key;
-         freq[ countColumnName ] = value;
-         data.push(freq);
-      });
-      
+         freq[columnName] = key;
+         freq[countColumnName] = value;
+         data.push( freq );
+      } );
+
       // convert to Extjs Store
-      var store = Ext.create('Ext.data.JsonStore', {
+      var newStore = Ext.create( 'Ext.data.JsonStore', {
          storeId : 'reportStore',
          fields : fields,
          data : data,
-         fieldValues : fieldValues,
-      });
-      
-      return store;
+      } );
+
+      return newStore;
    },
-   
-   
-   createReport : function( store, columnName ) {
-      
+
+   /**
+    * @param store
+    *           Array of Variant objects,
+    * 
+    * e.g. [ Object{"id":"var1", "type":"LOSS" }, Object{"id":"var2", "type":"LOSS" }, ]
+    * 
+    * @param columnName
+    *           input column to extract, e.g. 'type'
+    * @param countColumnName
+    *           output column name to store the frequency in, e.g. 'count'
+    * @returns e.g. { "type" : "LOSS", "count" : 2 }
+    */
+   calculateFrequencies : function(store, columnName, countColumnName) {
+      var map = new Ext.util.HashMap();
+      var fields = [ columnName, countColumnName ];
+
+      for (var i = 0; i < store.data.length; i++) {
+
+         // extract values
+         var row = store.data.getAt( i ).data;
+         var val = row[columnName];
+         if ( val == undefined ) {
+            console.log( "Column '" + columnName + "' not found" );
+            return;
+         }
+
+         // now lets calculate and store it!
+         if ( map.get( val ) == undefined ) {
+            map.add( val, 1 );
+         } else {
+            var count = map.get( val );
+            count++;
+            map.add( val, count );
+         }
+      }
+
+      // a collection of freq objects
+      var data = [];
+      map.each( function(key, value, length) {
+         // console.log(key, value, length);
+         var freq = {}
+         freq[columnName] = key;
+         freq[countColumnName] = value;
+         data.push( freq );
+      } );
+
+      // convert to Extjs Store
+      var newStore = Ext.create( 'Ext.data.JsonStore', {
+         storeId : 'reportStore',
+         fields : fields,
+         data : data,
+      } );
+
+      return newStore;
+   },
+
+   createReport : function(store, columnName) {
+
       var me = this;
 
-//      var columnName = 'type';
+      // var columnName = 'type';
       var countColumnName = 'count';
-      
-      this.myDataStore = this.calculateFrequencies(store, columnName,countColumnName);
-      
       var title = ASPIREdb.ActiveProjectSettings.getActiveProjectName();
       var xField = columnName;
       var yField = countColumnName;
-         
-         
-      // fix, convert grid to a summary store, something like this
-      // data : [ { 'LOSS', frequency : 20 }, { 'GAIN', frequency : 30 }, { 'OTHER', frequency : 40 } ]
-      
-      /*
-      //            title : [ 'IE', 'Firefox', 'Chrome', 'Safari' ], // fix
-//            xField : 'month',                                // fix
-//            yField : [ 'data1', 'data2', 'data3', 'data4' ], // fix
-            
-      this.myDataStore = Ext.create('Ext.data.JsonStore', {
-         fields: ['month', 'data1', 'data2', 'data3', 'data4' ],
-         data: [
-             { month: 'Jan', data1: 20, data2: 37, data3: 35, data4: 4 },
-             { month: 'Feb', data1: 20, data2: 37, data3: 36, data4: 5 },
-             { month: 'Mar', data1: 19, data2: 36, data3: 37, data4: 4 },
-             { month: 'Apr', data1: 18, data2: 36, data3: 38, data4: 5 },
-             { month: 'May', data1: 18, data2: 35, data3: 39, data4: 4 },
-             { month: 'Jun', data1: 17, data2: 34, data3: 42, data4: 4 },
-             { month: 'Jul', data1: 16, data2: 34, data3: 43, data4: 4 },
-             { month: 'Aug', data1: 16, data2: 33, data3: 44, data4: 4 },
-             { month: 'Sep', data1: 16, data2: 32, data3: 44, data4: 4 },
-             { month: 'Oct', data1: 16, data2: 32, data3: 45, data4: 4 },
-             { month: 'Nov', data1: 15, data2: 31, data3: 46, data4: 4 },
-             { month: 'Dec', data1: 15, data2: 31, data3: 47, data4: 4 }
-         ]
-     });
-     */
-      
+
+      // columns that needs binning
+      var COLUMN_TYPE_BIN = [ "cnvLength" ];
+      if ( COLUMN_TYPE_BIN.indexOf( columnName ) != -1 ) {
+         this.myDataStore = this.calculateBinFrequencies( store, columnName, countColumnName );
+      } else {
+         this.myDataStore = this.calculateFrequencies( store, columnName, countColumnName );
+      }
+
       me.add( [ {
          xtype : 'chart',
          id : 'variantChart',
          width : '100%',
-//         height : 410,
+         // height : 410,
          padding : '10 0 0 0',
          animate : true,
          resizable : true,
@@ -163,25 +236,23 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
             font : '10px Helvetica',
             x : 12,
             y : 380
-         }],
+         } ],
          axes : [ {
             type : 'numeric',
             position : 'left',
-//            fields : 'data1',
             fields : yField,
             grid : true,
             minimum : 0,
             title : countColumnName,
             label : {
                renderer : function(v) {
-//                  return v + '%';
+                  // return v + '%';
                   return v;
                }
             }
          }, {
             type : 'category',
             position : 'bottom',
-//            fields : 'month',
             fields : xField,
             title : columnName,
             grid : true,
@@ -194,15 +265,8 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          series : [ {
             type : 'column',
             axis : 'left',
-//            title : [ 'IE', 'Firefox', 'Chrome', 'Safari' ], // fix
-//            xField : 'month',                                // fix
-//            yField : [ 'data1', 'data2', 'data3', 'data4' ], // fix
-            
-//            title : title,
-            
             xField : xField,
             yField : yField,
-               
             style : {
                opacity : 0.80
             },
