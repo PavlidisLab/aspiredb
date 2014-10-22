@@ -80,6 +80,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
          var storeData = this.constructVariantStoreData( vvos, characteristicNames, visibleLabels );
 
          var store = Ext.create( 'Ext.data.ArrayStore', {
+            storeId : 'variantGrid',
             fields : fieldData,
             data : storeData,
          // groupField : 'patientId'

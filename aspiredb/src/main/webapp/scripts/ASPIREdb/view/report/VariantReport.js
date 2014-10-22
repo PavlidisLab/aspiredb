@@ -89,6 +89,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReport', {
 //      var data = Ext.decode( freq ); // convert to JSON
       
       var store = Ext.create('Ext.data.JsonStore', {
+         storeId : 'reportStore',
          fields : fields,
          data : data,
          fieldValues : fieldValues,
