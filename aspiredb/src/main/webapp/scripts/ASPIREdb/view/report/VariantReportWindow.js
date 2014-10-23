@@ -30,11 +30,16 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
    layout : 'fit',
    resizable : true,
    tbar : [ {
+      itemId : 'saveTxtButton',
+      text : 'Save as TXT',
+      tooltip : 'Save as TXT',
+//      icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
+   }, {
       xtype : 'button',
-      itemId : 'saveChartButton',
-      text : '',
-      tooltip : 'Save chart as PNG',
-      icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
+      itemId : 'savePngButton',
+      text : 'Save as PNG',
+      tooltip : 'Save as PNG',
+//      icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
    } ],
 
    initComponent : function() {
@@ -72,28 +77,23 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          editable : false,
          forceSelection : true,
          listeners : {
-            'select' : this.reportComboSelectHandler,
+            'change' : this.reportComboSelectHandler,
+            afterrender : function(combo) {
+               var recordSelected = combo.getStore().getAt( 0 );
+               combo.setValue( recordSelected.get( 'id' ) );
+            }
          }
       } );
 
-      this.down( '#saveChartButton' ).on( 'click', this.saveChartHandler );
+      this.down( '#savePngButton' ).on( 'click', this.saveChartHandler );
+
    },
 
    createAndShow : function(variantStore) {
       var me = this;
 
       me.variantStore = variantStore;
-
-      var reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReportPanel' );
-      var reportType = me.reportTypeStore.getAt( 0 ).data['id'];
-      // var reportType = 'type';
-      // var reportType = 'inheritance';
-      // var reportType = 'chromosome';
-
-      reportPanel.createReport( variantStore, reportType );
-
-      me.chart = reportPanel.down( "#variantChart" );
-      me.add( reportPanel );
+      
       me.doLayout();
       me.show();
    },
@@ -117,6 +117,11 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       var reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReportPanel' );
       reportPanel.createReport( window.variantStore, reportType );
       var chart = reportPanel.down( "#variantChart" );
+
+      window.down( '#saveTxtButton' ).on( 'click', function() {
+         // When Save button is clicked open text data download
+         ASPIREdb.TextDataDownloadWindow.showChartDownload( Ext.getStore('reportStore') );
+      } );
 
       window.remove( window.down( '#variantReport' ) );
       window.add( reportPanel );

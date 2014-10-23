@@ -197,10 +197,11 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
 
       // columns that needs binning
       var COLUMN_TYPE_BIN = [ "cnvLength" ];
+      var myDataStore = null;
       if ( COLUMN_TYPE_BIN.indexOf( columnName ) != -1 ) {
-         this.myDataStore = this.calculateBinFrequencies( store, columnName, countColumnName );
+         myDataStore = this.calculateBinFrequencies( store, columnName, countColumnName );
       } else {
-         this.myDataStore = this.calculateFrequencies( store, columnName, countColumnName );
+         myDataStore = this.calculateFrequencies( store, columnName, countColumnName );
       }
 
       me.add( [ {
@@ -214,12 +215,12 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          shadow : false,
          layout : 'fit',
          style : 'background: #fff;',
-         legend : {
-            position : 'bottom',
-            boxStrokeWidth : 0,
-            labelFont : '12px Helvetica'
-         },
-         store : this.myDataStore,
+//         legend : {
+//            position : 'bottom',
+//            boxStrokeWidth : 0,
+//            labelFont : '12px Helvetica'
+//         },
+         store : myDataStore,
          insetPadding : 40,
          items : [ {
             type : 'text',
