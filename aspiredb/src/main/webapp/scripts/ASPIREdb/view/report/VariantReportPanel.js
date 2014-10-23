@@ -38,14 +38,14 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
     */
    findBin : function(val, BINS, BINS_TEXT) {
       for (var i = 0; i < BINS.length; i++) {
-         if ( (BINS[i] - val) > 0 ) {
-            // console.log( val + " is in bin " + BINS_TEXT[i] );
+         if ( (BINS[i] - val) >= 0 ) {
+//            console.log( val + " is in bin " + BINS_TEXT[i] );
             return BINS_TEXT[i];
          }
       }
 
       // it must be the last bin
-      // console.log( val + " is in bin " + BINS_TEXT[BINS_TEXT.length - 1] );
+//      console.log( val + " is in bin " + BINS_TEXT[BINS_TEXT.length - 1] );
       return BINS_TEXT[BINS_TEXT.length - 1];
    },
 
@@ -57,13 +57,13 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       for (var i = 0; i < BINS.length; i++) {
          var bin = "";
          if ( i == 0 ) {
-            bin = "<" + BINS[i];
+            bin = "<=" + BINS[i];
          } else if ( i == BINS.length - 1 ) {
-            bin = BINS[i - 1] + "-" + BINS[i];
+            bin = (BINS[i - 1] + 1) + "-" + BINS[i];
             BINS_TEXT.push( bin );
-            bin = ">=" + BINS[i];
+            bin = ">=" + ( BINS[i] + 1 );
          } else {
-            bin = BINS[i - 1] + "-" + BINS[i];
+            bin = (BINS[i - 1] + 1) + "-" + BINS[i];
          }
          BINS_TEXT.push( bin );
       }
@@ -112,7 +112,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       // a collection of freq objects
       var data = [];
       map.each( function(key, value, length) {
-         console.log( key, value, length );
+         // console.log( key, value, length );
          var freq = {}
          freq[columnName] = key;
          freq[countColumnName] = value;
@@ -215,11 +215,11 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          shadow : false,
          layout : 'fit',
          style : 'background: #fff;',
-//         legend : {
-//            position : 'bottom',
-//            boxStrokeWidth : 0,
-//            labelFont : '12px Helvetica'
-//         },
+         // legend : {
+         // position : 'bottom',
+         // boxStrokeWidth : 0,
+         // labelFont : '12px Helvetica'
+         // },
          store : myDataStore,
          insetPadding : 40,
          items : [ {

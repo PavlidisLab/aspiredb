@@ -90,7 +90,6 @@ Ext.define('ASPIREdb.TextDataDownloadWindow', {
 	      text = text.replace(/\t$/g,'\n');
 	   }
 
-	   console.log('text=' + text);
 	   this.populateText(text);
 	},
 	
