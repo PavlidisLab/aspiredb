@@ -80,7 +80,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       var fields = [ columnName, countColumnName ];
 
       // setup bins
-      var BINS = Array.apply( 0, Array( 100 ) ).map( function(val, i) {
+      var BINS = Array.apply( 0, Array( 20 ) ).map( function(val, i) {
          return 10000 * (i + 1);
       } );
       var BINS_TEXT = this.bins2text( BINS );
