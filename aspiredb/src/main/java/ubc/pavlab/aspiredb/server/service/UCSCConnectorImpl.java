@@ -46,12 +46,21 @@ public class UCSCConnectorImpl implements UCSCConnector {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public String constructCustomTracksFile( GenomicRange range, Collection<Long> activeProjectIds ) {
+    public String constructCustomTracksUrl( GenomicRange range, Collection<Long> activeProjectIds ) {
 
         Collection<Variant> variants = variantDao.findByGenomicLocation( new GenomicRange( range.getChromosome() ),
                 activeProjectIds );
 
-        return CnvToBed.create( variants, range.getChromosome(), range.getBaseStart(), range.getBaseEnd(),
-                ConfigUtils.getBaseUrl() );
+        // http://genome.ucsc.edu/cgi-bin/hgCustom?clade=mammal&org=Human&db=hg19
+        String baseUrl = ConfigUtils.getString( "aspiredb.ucsc.url", "http://genome.ucsc.edu/cgi-bin/hgCustom" );
+        String clade = ConfigUtils.getString( "aspiredb.ucsc.clade", "mammal" );
+        String db = ConfigUtils.getString( "aspiredb.ucsc.db", "hg19" );
+        String org = ConfigUtils.getString( "aspiredb.ucsc.org", "human" );
+        String ucscUrlPrefix = String.format( "%s?clade=%s&org=%s&db=%s", baseUrl, clade, org, db );
+
+        return ucscUrlPrefix
+                + "&hgct_customText="
+                + CnvToBed.create( variants, range.getChromosome(), range.getBaseStart(), range.getBaseEnd(),
+                        ConfigUtils.getBaseUrl() );
     }
 }

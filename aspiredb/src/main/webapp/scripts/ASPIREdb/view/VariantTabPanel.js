@@ -100,7 +100,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       this.actionsMenu = Ext.create( 'Ext.menu.Menu', {
          items : [ {
             itemId : 'viewInUCSC',
-            text : 'View in UCSC',
+            text : 'View in UCSC Genome Browser',
             disabled : true,
             handler : this.viewInUCSCHandler,
             scope : this
@@ -792,36 +792,12 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
    viewInUCSCHandler : function() {
 
-      UCSCConnector.constructCustomTracksFile( this.getSpanningGenomicRange( this.getVariantRecordSelection() ),
-         ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), function(searchPhrase) {
-
-            var ucscForm = Ext.create( 'Ext.form.Panel', {
-
-            } );
-
-            ucscForm.submit( {
-               target : '_blank',
-               url : "http://genome.ucsc.edu/cgi-bin/hgCustom",
-               standardSubmit : true,
-               method : "POST",
-               params : {
-                  clade : 'mammal',
-                  org : 'Human',
-                  db : 'hg19',
-                  hgct_customText : searchPhrase
-               },
-               success : function() {
-                  console.log( "ok" );
-               },
-               failure : function(response, opts) {
-                  console.log( "failed" );
-               },
-               headers : {
-                  'Content-Type' : 'multipart/form-data'
-               }
-            } );
-
-         } );
+      UCSCConnector.constructCustomTracksUrl( this.getSpanningGenomicRange( this.getVariantRecordSelection() ),
+         ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), function( ucscUrl ) {
+         
+         // opens a new popup
+         window.open( ucscUrl );
+      });
 
    },
 
