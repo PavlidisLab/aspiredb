@@ -113,8 +113,12 @@ public class CNV extends Variant {
         CNVValueObject vo = new CNVValueObject();
         vo.setId( this.getId() );
         vo.setVariantType( this.getClass().getSimpleName() );
-        vo.setPatientId( this.getSubject().getPatientId() );
-        vo.setSubjectId( this.getSubject().getId() );
+
+        if ( this.getSubject() != null ) {
+            vo.setPatientId( this.getSubject().getPatientId() );
+            vo.setSubjectId( this.getSubject().getId() );
+        }
+
         vo.setUserVariantId( this.getUserVariantId() );
 
         vo.setGenomicRange( new GenomicRange( this.getLocation().getChromosome(), this.getLocation().getStart(), this
@@ -123,15 +127,22 @@ public class CNV extends Variant {
         vo.setCnvLength( this.getCnvLength() );
         vo.setCopyNumber( this.getCopyNumber() );
 
-        vo.setType( this.getType().toString() );
-        vo.setDetails( "Type: " + vo.getType() );
-        Collection<CharacteristicValueObject> characteristicValueObjects = Characteristic.toValueObjects( this
-                .getCharacteristics() );
-        Map<String, CharacteristicValueObject> map = new HashMap<String, CharacteristicValueObject>();
-        for ( CharacteristicValueObject characteristicValueObject : characteristicValueObjects ) {
-            map.put( characteristicValueObject.getKey(), characteristicValueObject );
+        if ( this.getType() != null ) {
+            vo.setType( this.getType().toString() );
         }
-        vo.setCharacteristics( map );
+
+        vo.setDetails( "Type: " + vo.getType() );
+
+        if ( this.getCharacteristics() != null ) {
+            Collection<CharacteristicValueObject> characteristicValueObjects = Characteristic.toValueObjects( this
+                    .getCharacteristics() );
+            Map<String, CharacteristicValueObject> map = new HashMap<String, CharacteristicValueObject>();
+            for ( CharacteristicValueObject characteristicValueObject : characteristicValueObjects ) {
+                map.put( characteristicValueObject.getKey(), characteristicValueObject );
+            }
+            vo.setCharacteristics( map );
+        }
+
         vo.setLabels( Label.toValueObjects( this.getLabels() ) );
 
         return vo;

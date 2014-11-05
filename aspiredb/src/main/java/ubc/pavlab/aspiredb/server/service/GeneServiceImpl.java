@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -38,10 +39,10 @@ import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
-import ubc.pavlab.aspiredb.server.model.GenomicLocation;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
-import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
+import ubc.pavlab.aspiredb.shared.GenomicRange;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 /**
  * author: anton date: 01/05/13
@@ -78,52 +79,45 @@ public class GeneServiceImpl implements GeneService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @RemoteMethod
-    public Map<String, List<GeneValueObject>> getGeneValueObjectsInsideVariants( Collection<Long> ids )
+    public Map<VariantValueObject, List<GeneValueObject>> getGenesPerVariant( Collection<Long> ids )
             throws NotLoggedInException, BioMartServiceException {
-        
-        Map<String, List<GeneValueObject>> results = new HashMap<String, List<GeneValueObject>>();
-        
+
+        Map<VariantValueObject, List<GeneValueObject>> results = new HashMap<>();
+
         // Used to remove duplicates
         HashMap<String, GeneValueObject> genes = new HashMap<String, GeneValueObject>();
         for ( Long id : ids ) {
-            Variant variant = variantDao.load( id );
-            String patientId = variant.getSubject().getPatientId();
-            GenomicLocation location = variant.getLocation();
-            
+            VariantValueObject variant = variantDao.load( id ).toValueObject();
+            GenomicRange location = variant.getGenomicRange();
+
             Collection<GeneValueObject> genesInsideRange = this.bioMartQueryService.fetchGenesByLocation(
-                    String.valueOf( location.getChromosome() ), ( long ) location.getStart(),( long ) location.getEnd() );
-            
+                    String.valueOf( location.getChromosome() ), ( long ) location.getBaseStart(),
+                    ( long ) location.getBaseEnd() );
+
             for ( GeneValueObject geneValueObject : genesInsideRange ) {
                 genes.put( geneValueObject.getEnsemblId(), geneValueObject );
             }
             List<GeneValueObject> gvos = new ArrayList<GeneValueObject>( genes.values() );
-            results.put( patientId, gvos);
+            results.put( variant, gvos );
         }
-        
+
         return results;
     }
 
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
-    public List<GeneValueObject> getGenesInsideVariants( Collection<Long> ids ) throws NotLoggedInException,
+    public Collection<GeneValueObject> getGenesInsideVariants( Collection<Long> ids ) throws NotLoggedInException,
             BioMartServiceException {
 
-        // Used to remove duplicates
-        HashMap<String, GeneValueObject> genes = new HashMap<String, GeneValueObject>();
-        for ( Long id : ids ) {
-            Variant variant = variantDao.load( id );
-            GenomicLocation location = variant.getLocation();
-            Collection<GeneValueObject> genesInsideRange = this.bioMartQueryService.fetchGenesByLocation(
-                    String.valueOf( location.getChromosome() ), ( long ) location.getStart(),
-                    ( long ) location.getEnd() );
-            for ( GeneValueObject geneValueObject : genesInsideRange ) {
-                genes.put( geneValueObject.getEnsemblId(), geneValueObject );
-            }
+        Collection<GeneValueObject> result = new HashSet<>();
+        Map<VariantValueObject, List<GeneValueObject>> map = getGenesPerVariant( ids );
+        for ( List<GeneValueObject> genes : map.values() ) {
+            result.addAll( genes );
         }
-        List<GeneValueObject> results = new ArrayList<GeneValueObject>( genes.values() );
-        return results;
+        return result;
     }
 
     @Override

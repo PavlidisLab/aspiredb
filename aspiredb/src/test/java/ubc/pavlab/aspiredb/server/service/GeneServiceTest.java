@@ -21,7 +21,7 @@ package ubc.pavlab.aspiredb.server.service;
 import static junit.framework.Assert.assertEquals;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -33,6 +33,7 @@ import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.GenomicLocation;
+import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 
@@ -48,8 +49,13 @@ public class GeneServiceTest extends BaseSpringContextTest {
     @Before
     public void setup() throws Exception {
         Variant variant = new CNV();
-        GenomicLocation location = new GenomicLocation( "Y", 1, 100 );
 
+        Subject subject = new Subject();
+        subject.setPatientId( "GeneServiceSubject" );
+        variant.setSubject( subject );
+        subject.setId( 1L );
+
+        GenomicLocation location = new GenomicLocation( "Y", 1, 100 );
         variant.setLocation( location );
 
         variantDaoMock = EasyMock.createMock( VariantDao.class );
@@ -73,7 +79,7 @@ public class GeneServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testGetGenesInsideVariants() throws Exception {
-        List<GeneValueObject> genes = geneService.getGenesInsideVariants( Arrays.asList( 2L ) );
+        Collection<GeneValueObject> genes = geneService.getGenesInsideVariants( Arrays.asList( 2L ) );
 
         assertEquals( genes.size(), 1 );
         assertEquals( genes.iterator().next().getSymbol(), "HAIRCH" );
