@@ -46,6 +46,7 @@
             <searchAttribute name="genomicRangeChromosome" expression="value.getGenomicRange().getChromosome()" />
             <searchAttribute name="genomicRangeStart" expression="value.getGenomicRange().getBaseStart()" />
             <searchAttribute name="genomicRangeEnd" expression="value.getGenomicRange().getBaseEnd()" />
+            <searchAttribute name="genomicRangeBin" expression="value.getGenomicRange().getBin()" />
         </searchable>
     </cache>
 

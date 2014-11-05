@@ -25,6 +25,7 @@ import net.sf.ehcache.search.expression.Criteria;
 
 import org.springframework.stereotype.Component;
 
+import ubc.pavlab.aspiredb.server.util.GenomeBin;
 import ubc.pavlab.aspiredb.server.util.SearchableEhcache;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 
@@ -44,6 +45,7 @@ public class BioMartCacheImpl extends SearchableEhcache<GeneValueObject> impleme
     private static final String CHROMOSOME_SEARCH_ATTRIBUTE_NAME = "genomicRangeChromosome";
     private static final String START_SEARCH_ATTRIBUTE_NAME = "genomicRangeStart";
     private static final String END_SEARCH_ATTRIBUTE_NAME = "genomicRangeEnd";
+    private static final String BIN_SEARCH_ATTRIBUTE_NAME = "genomicRangeBin";
 
     private Attribute<Object> geneEnsemblIdAttribute;
     private Attribute<Object> geneNameAttribute;
@@ -51,6 +53,7 @@ public class BioMartCacheImpl extends SearchableEhcache<GeneValueObject> impleme
     private Attribute<Object> chromosomeAttribute;
     private Attribute<Object> startAttribute;
     private Attribute<Object> endAttribute;
+    private Attribute<Object> binAttribute;
 
     @Override
     public Collection<GeneValueObject> fetchGenesByGeneSymbols( Collection<String> geneSymbols ) {
@@ -66,11 +69,13 @@ public class BioMartCacheImpl extends SearchableEhcache<GeneValueObject> impleme
                 endAttribute.between( start.intValue(), end.intValue() ) );
         Criteria overlapsStart = startAttribute.le( start.intValue() ).and( endAttribute.ge( start.intValue() ) );
         Criteria overlapsEnd = startAttribute.le( end.intValue() ).and( endAttribute.ge( end.intValue() ) );
+        Criteria inRelevantBins = binAttribute.in( GenomeBin.relevantBins( chromosomeName, start.intValue(),
+                end.intValue() ) );
 
         Criteria hasName = geneSymbolAttribute.ne( "" );
 
         final Collection<GeneValueObject> geneValueObjects = fetchByCriteria( hasName.and( chromosomeCriteria
-                .and( insideVariant.or( overlapsStart ).or( overlapsEnd ) ) ) );
+                .and( inRelevantBins.and( insideVariant.or( overlapsStart ).or( overlapsEnd ) ) ) ) );
 
         return geneValueObjects;
     }
@@ -123,5 +128,6 @@ public class BioMartCacheImpl extends SearchableEhcache<GeneValueObject> impleme
         chromosomeAttribute = getSearchAttribute( CHROMOSOME_SEARCH_ATTRIBUTE_NAME );
         startAttribute = getSearchAttribute( START_SEARCH_ATTRIBUTE_NAME );
         endAttribute = getSearchAttribute( END_SEARCH_ATTRIBUTE_NAME );
+        binAttribute = getSearchAttribute( BIN_SEARCH_ATTRIBUTE_NAME );
     }
 }
