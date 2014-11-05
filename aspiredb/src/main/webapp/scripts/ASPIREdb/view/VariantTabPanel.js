@@ -278,14 +278,12 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
             currentlySelectedRecords = this.getIdeogramVariantRecordSelection();
             this.selectAllButton.disable();
-            this.ideogramSubjectSelection( this.selectedSubjects );
             ideogram.showColourLegend();
 
          } else {
             // newCard is the grid
             currentlySelectedRecords = this.selectedVariants;
             this.selectAllButton.enable();
-            this.gridPanelSubjectSelection( this.selectedSubjects );
             ideogram.hideColourLegend();
 
          }
