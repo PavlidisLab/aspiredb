@@ -123,7 +123,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                      width : 100,
                      flex : 1,
                      renderer : function(labelId, meta, rec, rowIndex, colIndex, store) {
-
+                        meta.tdAttr = 'data-qtip="Double-click to rename label"';
                         var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
                         var ret = label.htmlLabel;
                         return ret;
@@ -171,7 +171,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                         var ref = this;
                         var row = e.store.data.items[index].data;
                         var labelcolour = row.labelColour;
-                        var labename = row.labelName;
+                        var labelName = row.labelName;
                         var labelid = row.labelId;
 
                         Ext.define( 'ASPIREdb.view.CreateLabelWindowEdit', {
@@ -200,9 +200,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                               me.items = [ {
                                  xtype : 'textfield',
                                  id : 'labelName',
-                                 text : '',
-                                 value : labename,
-
+                                 text : labelName
                               }, {
                                  xtype : 'colorpicker',
                                  itemId : 'colorPicker',
@@ -244,11 +242,12 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                               LabelService.updateLabel( label, {
                                  callback : function() {
                                     ref.getView().refresh();
-                                    if ( ref.up( '#labelControlWindow' ).isSubjectLabel ) {
-                                       ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' );
-                                    } else {
-                                       ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' );
-                                    }
+//                                  commented out for performance, do this once the window is closed
+//                                    if ( ref.up( '#labelControlWindow' ).isSubjectLabel ) {
+//                                       ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' );
+//                                    } else {
+//                                       ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' );
+//                                    }
                                  },
                                  errorHandler : function(er, exception) {
                                     Ext.Msg.alert( "Update Label Error", er + "\n" + exception.stack );
