@@ -263,7 +263,7 @@ Ext
 
 								if (variant.labels.length > 0) {
 									value = variant.labels[0].name;
-									var color = variant.labels[0].colour;
+									var color = '#' + variant.labels[0].colour;
 									var pushvalue = "<font color='" + color
 											+ "'>" + value + "</font><br>\n";
 									var vtcmStat = 'No';
@@ -306,7 +306,7 @@ Ext
 
 								if (subject.labels.length > 0) {
 									value = subject.labels[0].name;
-									var color = subject.labels[0].colour;
+									var color = '#' + subject.labels[0].colour;
 									var pushvalue = "<font color='" + color
 											+ "'>" + value + "</font><br>\n";
 									var vtcmStat = 'No';
