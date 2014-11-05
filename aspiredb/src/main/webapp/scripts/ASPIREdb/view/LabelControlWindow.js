@@ -81,6 +81,15 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
       XValue : 0,
       YValue : 0,
    },
+   listeners : {
+     close : function() {
+        if ( this.isSubjectLabel ) {
+           ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' );
+        } else {
+           ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' );
+        }
+     } 
+   },
    constructor : function(cfg) {
       this.initConfig( cfg );
       this.callParent( arguments );
@@ -441,11 +450,12 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
       label.isShown = checked;
       LabelService.updateLabel( label, {
          callback : function() {
-            if ( me.isSubjectLabel ) {
-               ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' );
-            } else {
-               ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' );
-            }
+//            commented out for performance, do this once the window is closed
+//            if ( me.isSubjectLabel ) {
+//               ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' );
+//            } else {
+//               ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' );
+//            }
          }
       } );
    }
