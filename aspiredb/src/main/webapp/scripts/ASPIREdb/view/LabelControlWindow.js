@@ -200,7 +200,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                               me.items = [ {
                                  xtype : 'textfield',
                                  id : 'labelName',
-                                 text : labelName
+                                 value : labelName
                               }, {
                                  xtype : 'colorpicker',
                                  itemId : 'colorPicker',
