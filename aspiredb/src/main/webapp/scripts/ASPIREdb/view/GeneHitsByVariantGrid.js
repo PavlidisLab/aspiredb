@@ -18,9 +18,11 @@
  */
 
 Ext.require( [ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow',
-               'Ext.grid.plugin.BufferedRenderer'] );
+              'Ext.grid.plugin.BufferedRenderer' ] );
 
-// TODO js documentation
+/**
+ * Grid that shows which gene overlaps the selected variants
+ */
 Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
    extend : 'Ext.grid.Panel',
    alias : 'widget.geneHitsByVariantGrid',
@@ -31,9 +33,6 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
    config : {
       // collection of all the PhenotypeSummaryValueObject loaded
       LoadedVariantValueObjects : [],
-      // collection of selected gene value objects
-      selectedgenes : [],
-
    },
 
    dockedItems : [ {
@@ -49,9 +48,9 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
                  flex : 1
               },
               {
-                header : 'Variant Coordinate',
-                dataIndex : 'variantCoordinate',
-                flex : 1
+                 header : 'Variant Coordinate',
+                 dataIndex : 'variantCoordinate',
+                 flex : 1
               },
               {
                  header : 'Gene Symbol',
@@ -99,7 +98,7 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
    // BufferedRenderer configs
    loadMask : true,
    plugins : 'bufferedrenderer',
-   
+
    initComponent : function() {
       this.callParent();
       var me = this;
@@ -107,26 +106,39 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
 
    },
 
-   geneSelectHandler : function(ref, record, index, eOpts) {
-      var selGenes = this.getSelectionModel().getSelection();
-      this.selectedgenes = [];
+   /**
+    * Returns GeneValueObjects from the store records
+    * 
+    * @param records
+    *           a collection of records in the store, e.g. this.getSelectionModel().getSelection();
+    */
+   extractGenes : function(records) {
+
+      var genes = [];
+
       var geneSymbols = [];
-      for (var i = 0; i < selGenes.length; i++) {
-         
+      for (var i = 0; i < records.length; i++) {
+
+         // make a copy
+         var gene = JSON.parse( JSON.stringify( records[i].data ) );
+
          // delete non-gene value object fields, see GeneStore
-         delete selGenes[i].data.patientId;
-         delete selGenes[i].data.variantCoordinate;
-         delete selGenes[i].data.pheneName;
-         
+         delete gene.patientId;
+         delete gene.variantCoordinate;
+         delete gene.pheneName;
+
          // avoid adding duplicated genes
-         if ( geneSymbols.indexOf(selGenes[i].data.symbol) == -1 ) {
-            this.selectedgenes.push( selGenes[i].data );
-            geneSymbols.push( selGenes[i].data.symbol );
+         if ( geneSymbols.indexOf( gene.symbol ) == -1 ) {
+            genes.push( gene );
+            geneSymbols.push( gene.symbol );
          }
       }
 
-//      console.log('Selected ' + geneSymbols.length + ' unique genes');
-      
+      return genes;
+
+   },
+
+   geneSelectHandler : function(ref, record, index, eOpts) {
       // ASPIREdb.EVENT_BUS.fireEvent('new_geneSet_selected', this.selectedgenes);
       this.down( '#saveButtonGeneSet' ).enable();
    },
@@ -222,28 +234,27 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
 
       var ref = this;
 
-      this.getDockedComponent( 'geneHitsByVariantGridToolbar' ).add(
-         {
-            xtype : 'button',
-            id : 'saveButtonGeneHits',
-            text : '',
-            tooltip : 'Download table contents as text',
-            icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
-            handler : function() {
-               var colNames = [];
-               for ( var i = 0; i < ref.columns.length; i++ ) {
-                  // omitted columns
-                  if ( ref.columns[i].text === 'Phenotype Name' ) {
-                     continue;
-                  }
-                  if ( ref.columns[i].text === 'View in Gemma' ) {
-                     continue;
-                  }
-                  colNames.push(ref.columns[i].text);
+      this.getDockedComponent( 'geneHitsByVariantGridToolbar' ).add( {
+         xtype : 'button',
+         id : 'saveButtonGeneHits',
+         text : '',
+         tooltip : 'Download table contents as text',
+         icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
+         handler : function() {
+            var colNames = [];
+            for (var i = 0; i < ref.columns.length; i++) {
+               // omitted columns
+               if ( ref.columns[i].text === 'Phenotype Name' ) {
+                  continue;
                }
-               ASPIREdb.TextDataDownloadWindow.showGenesDownload( ref.getStore().getRange(), colNames );
+               if ( ref.columns[i].text === 'View in Gemma' ) {
+                  continue;
+               }
+               colNames.push( ref.columns[i].text );
             }
-         } );
+            ASPIREdb.TextDataDownloadWindow.showGenesDownload( ref.getStore().getRange(), colNames );
+         }
+      } );
 
       this.getDockedComponent( 'geneHitsByVariantGridToolbar' ).add( {
          xtype : 'button',
@@ -252,8 +263,10 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
          tooltip : 'Save Genes to User gene Set',
          disabled : true,
          handler : function() {
-            ASPIREdb.view.SaveUserGeneSetWindow.initAndShow( ref.selectedgenes );
+            var grid = this.up( '#geneHitsByVariantGrid' );
+            var genes = grid.extractGenes( grid.getSelectionModel().getSelection() );
 
+            ASPIREdb.view.SaveUserGeneSetWindow.initAndShow( genes );
          }
       } );
 
