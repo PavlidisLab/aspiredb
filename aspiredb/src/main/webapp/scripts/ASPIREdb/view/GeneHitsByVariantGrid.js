@@ -105,6 +105,7 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
    geneSelectHandler : function(ref, record, index, eOpts) {
       var selGenes = this.getSelectionModel().getSelection();
       this.selectedgenes = [];
+      var geneSymbols = [];
       for (var i = 0; i < selGenes.length; i++) {
          
          // delete non-gene value object fields, see GeneStore
@@ -112,9 +113,15 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
          delete selGenes[i].data.variantCoordinate;
          delete selGenes[i].data.pheneName;
          
-         this.selectedgenes.push( selGenes[i].data );
+         // avoid adding duplicated genes
+         if ( geneSymbols.indexOf(selGenes[i].data.symbol) == -1 ) {
+            this.selectedgenes.push( selGenes[i].data );
+            geneSymbols.push( selGenes[i].data.symbol );
+         }
       }
 
+//      console.log('Selected ' + geneSymbols.length + ' unique genes');
+      
       // ASPIREdb.EVENT_BUS.fireEvent('new_geneSet_selected', this.selectedgenes);
       this.down( '#saveButtonGeneSet' ).enable();
    },

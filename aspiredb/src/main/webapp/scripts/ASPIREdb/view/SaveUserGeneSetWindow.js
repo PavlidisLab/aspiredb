@@ -152,6 +152,7 @@ Ext.define( 'ASPIREdb.view.SaveUserGeneSetWindow', {
                UserGeneSetService.saveUserGeneSet( geneSetName, ref.geneSetValueobjects, {
                   callback : function(gvoId) {
 
+                     console.log('Successfully saved ' + ref.geneSetValueobjects.length + ' unique genes to gene set "' + geneSetName + '"');
                      ASPIREdb.view.SaveUserGeneSetWindow.down( '#geneSetName' ).setValue( '' );
                      ASPIREdb.view.SaveUserGeneSetWindow.close();
                      ASPIREdb.EVENT_BUS.fireEvent( 'new_geneSet_saved', geneSetName );
