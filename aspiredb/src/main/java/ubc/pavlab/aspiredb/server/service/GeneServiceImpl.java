@@ -81,10 +81,10 @@ public class GeneServiceImpl implements GeneService {
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
-    public Map<VariantValueObject, List<GeneValueObject>> getGenesPerVariant( Collection<Long> ids )
-            throws NotLoggedInException, BioMartServiceException {
+    public Map<Long, List<GeneValueObject>> getGenesPerVariant( Collection<Long> ids ) throws NotLoggedInException,
+            BioMartServiceException {
 
-        Map<VariantValueObject, List<GeneValueObject>> results = new HashMap<>();
+        Map<Long, List<GeneValueObject>> results = new HashMap<>();
 
         // Used to remove duplicates
         HashMap<String, GeneValueObject> genes = new HashMap<String, GeneValueObject>();
@@ -100,7 +100,7 @@ public class GeneServiceImpl implements GeneService {
                 genes.put( geneValueObject.getEnsemblId(), geneValueObject );
             }
             List<GeneValueObject> gvos = new ArrayList<GeneValueObject>( genes.values() );
-            results.put( variant, gvos );
+            results.put( variant.getId(), gvos );
         }
 
         return results;
@@ -113,7 +113,7 @@ public class GeneServiceImpl implements GeneService {
             BioMartServiceException {
 
         Collection<GeneValueObject> result = new HashSet<>();
-        Map<VariantValueObject, List<GeneValueObject>> map = getGenesPerVariant( ids );
+        Map<Long, List<GeneValueObject>> map = getGenesPerVariant( ids );
         for ( List<GeneValueObject> genes : map.values() ) {
             result.addAll( genes );
         }

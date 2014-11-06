@@ -43,6 +43,16 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
 
    columns : [
               {
+                 header : 'Patient Id',
+                 dataIndex : 'patientId',
+                 flex : 1
+              },
+              {
+                header : 'Variant Coordinate',
+                dataIndex : 'variantCoordinate',
+                flex : 1
+              },
+              {
                  header : 'Gene Symbol',
                  dataIndex : 'symbol',
                  flex : 1
@@ -96,7 +106,12 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
       var selGenes = this.getSelectionModel().getSelection();
       this.selectedgenes = [];
       for (var i = 0; i < selGenes.length; i++) {
+         
+         // delete non-gene value object fields, see GeneStore
+         delete selGenes[i].data.patientId;
+         delete selGenes[i].data.variantCoordinate;
          delete selGenes[i].data.pheneName;
+         
          this.selectedgenes.push( selGenes[i].data );
       }
 
@@ -203,9 +218,18 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
             tooltip : 'Download table contents as text',
             icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
             handler : function() {
-               ASPIREdb.TextDataDownloadWindow.showGenesDownload( ref.getStore().getRange(), [ 'Gene Symbol', 'Type',
-                                                                                              'Gene Name',
-                                                                                              'Genome coordinates' ] );
+               var colNames = [];
+               for ( var i = 0; i < ref.columns.length; i++ ) {
+                  // omitted columns
+                  if ( ref.columns[i].text === 'Phenotype Name' ) {
+                     continue;
+                  }
+                  if ( ref.columns[i].text === 'View in Gemma' ) {
+                     continue;
+                  }
+                  colNames.push(ref.columns[i].text);
+               }
+               ASPIREdb.TextDataDownloadWindow.showGenesDownload( ref.getStore().getRange(), colNames );
             }
          } );
 

@@ -24,6 +24,8 @@ Ext.define('ASPIREdb.store.GeneStore', {
     alias: 'store.geneStore',
         
     fields: [
+             {name: 'patientId', type: 'string'},
+             {name: 'variantCoordinate', type: 'string'},
              {name: 'symbol',   type: 'string'},
              {name: 'geneBioType',  type: 'string'},
              {name: 'name',  type: 'string'},

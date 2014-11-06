@@ -26,7 +26,6 @@ import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
-import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 /**
  * author: anton date: 01/05/13
@@ -46,7 +45,7 @@ public interface GeneService {
 
     public Long saveUserGeneSet( String geneName, List<GeneValueObject> genes );
 
-    public Map<VariantValueObject, List<GeneValueObject>> getGenesPerVariant( Collection<Long> ids )
-            throws NotLoggedInException, BioMartServiceException;
+    public Map<Long, List<GeneValueObject>> getGenesPerVariant( Collection<Long> ids ) throws NotLoggedInException,
+            BioMartServiceException;
 
 }

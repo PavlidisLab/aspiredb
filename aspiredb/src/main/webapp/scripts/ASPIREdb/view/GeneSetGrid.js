@@ -157,7 +157,8 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
       var data = [];
       for (var i = 0; i < gvos.length; i++) {
          var gvo = gvos[i];
-         var row = [ gvo.symbol, '', gvo.name, '' ];
+         // see GeneStore
+         var row = [ '', '', gvo.symbol, '', gvo.name, '' ];
          data.push( row );
       }
 

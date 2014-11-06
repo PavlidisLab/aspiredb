@@ -51,12 +51,12 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
       ref.show();
       grid.setLoading( true );
 
-      GeneService.getGenesInsideVariants( ids, {
-         callback : function(vos) {
+      GeneService.getGenesPerVariant( ids, {
+         callback : function(variantGenes) {
             ASPIREdb.view.GeneHitsByVariantWindow.getComponent( 'geneHitsByVariantGrid' ).setLodedvariantvalueObjects(
-               vos );
+               variantGenes );
 
-            ASPIREdb.view.GeneHitsByVariantWindow.populateGrid( vos );
+            ASPIREdb.view.GeneHitsByVariantWindow.populateGrid( variantGenes );
 
          }
       } );
@@ -64,23 +64,33 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
    },
 
    // VariantValueObject
-   populateGrid : function(vos) {
+   populateGrid : function(variantGenes) {
 
       var grid = ASPIREdb.view.GeneHitsByVariantWindow.getComponent( 'geneHitsByVariantGrid' );
 
+      var store = Ext.StoreManager.lookup('variantGrid');
+      
       var data = [];
-      for (var i = 0; i < vos.length; i++) {
-         var vo = vos[i];
+      var vos = [];
+      for( var variantId in variantGenes ) {
+            var genes = variantGenes[variantId];
+            for (var i = 0; i < genes.length; i++) {
+               var vo = genes[i];
+               vos.push(vo);
+               
+               var linkToGemma = "";
+               var phenName = "";
 
-         var linkToGemma = "";
-         var phenName = "";
 
-         if ( vo.geneBioType == "protein_coding" ) {
-            linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl( vo.symbol );
-            var row = [ vo.symbol, vo.geneBioType, vo.name, phenName, linkToGemma ];
-            data.push( row );
-         }
+               var variant = store.findRecord('id',variantId);
+               
+               if ( vo.geneBioType == "protein_coding" ) {
+                  linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl( vo.symbol );
+                  var row = [ variant.get('patientId'), variant.get('genomeCoordinates'), vo.symbol, vo.geneBioType, vo.name, phenName, linkToGemma ];
+                  data.push( row );
+               }
 
+            }
       }
 
       grid.store.loadData( data );
