@@ -102,8 +102,6 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
    initComponent : function() {
       this.callParent();
       var me = this;
-      this.on( 'select', me.geneSelectHandler, me );
-
    },
 
    /**
@@ -136,11 +134,6 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
 
       return genes;
 
-   },
-
-   geneSelectHandler : function(ref, record, index, eOpts) {
-      // ASPIREdb.EVENT_BUS.fireEvent('new_geneSet_selected', this.selectedgenes);
-      this.down( '#saveButtonGeneSet' ).enable();
    },
 
    setLodedvariantvalueObjects : function(vvo) {
@@ -261,11 +254,16 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
          id : 'saveButtonGeneSet',
          text : 'Save to Gene Lists',
          tooltip : 'Save Genes to User gene Set',
-         disabled : true,
+         disabled : false,
          handler : function() {
             var grid = this.up( '#geneHitsByVariantGrid' );
             var genes = grid.extractGenes( grid.getSelectionModel().getSelection() );
 
+            if ( genes.length == 0 ) {
+               Ext.Msg.alert('Error','No genes were selected');
+               return;
+            }
+            
             ASPIREdb.view.SaveUserGeneSetWindow.initAndShow( genes );
          }
       } );

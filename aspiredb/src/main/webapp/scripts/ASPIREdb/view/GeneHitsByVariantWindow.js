@@ -66,31 +66,45 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
    // VariantValueObject
    populateGrid : function(variantGenes) {
 
+      // in case there's too many rows to display
+      var ROW_LIMIT = 50000;
+
       var grid = ASPIREdb.view.GeneHitsByVariantWindow.getComponent( 'geneHitsByVariantGrid' );
 
-      var store = Ext.StoreManager.lookup('variantGrid');
-      
+      var store = Ext.StoreManager.lookup( 'variantGrid' );
+
       var data = [];
       var vos = [];
-      for( var variantId in variantGenes ) {
-            var genes = variantGenes[variantId];
-            for (var i = 0; i < genes.length; i++) {
-               var vo = genes[i];
-               vos.push(vo);
-               
-               var linkToGemma = "";
-               var phenName = "";
+      
+      for ( var variantId in variantGenes) {
+         
+         // there's a limit to how much the browser can handle
+         if ( data.length >= ROW_LIMIT ) {
+            var msg = 'Only the first ' + ROW_LIMIT + ' rows are displayed';
+            Ext.Msg.alert( 'Too many rows to display', msg );
+            console.log( msg );
+            break;
+         }
+         
+         var variant = store.findRecord( 'id', variantId );
 
+         var genes = variantGenes[variantId];
+         for (var i = 0; i < genes.length; i++) {
+            var vo = genes[i];
+            vos.push( vo );
 
-               var variant = store.findRecord('id',variantId);
-               
-               if ( vo.geneBioType == "protein_coding" ) {
-                  linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl( vo.symbol );
-                  var row = [ variant.get('patientId'), variant.get('genomeCoordinates'), vo.symbol, vo.geneBioType, vo.name, phenName, linkToGemma ];
-                  data.push( row );
-               }
+            var linkToGemma = "";
+            var phenName = "";
 
+            if ( vo.geneBioType == "protein_coding" ) {
+               linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl( vo.symbol );
+               var row = [ variant.get( 'patientId' ), variant.get( 'genomeCoordinates' ), vo.symbol, vo.geneBioType,
+                          vo.name, phenName, linkToGemma ];
+               data.push( row );
             }
+
+         }
+         
       }
 
       grid.store.loadData( data );
