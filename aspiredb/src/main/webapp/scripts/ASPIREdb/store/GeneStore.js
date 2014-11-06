@@ -22,7 +22,9 @@ Ext.require([ 'Ext.data.ArrayStore' ]);
 Ext.define('ASPIREdb.store.GeneStore', {
     extend: 'Ext.data.ArrayStore',
     alias: 'store.geneStore',
-        
+    
+    pageSize : 50,
+    
     fields: [
              {name: 'patientId', type: 'string'},
              {name: 'variantCoordinate', type: 'string'},

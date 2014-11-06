@@ -17,7 +17,8 @@
  *
  */
 
-Ext.require( [ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow' ] );
+Ext.require( [ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow',
+               'Ext.grid.plugin.BufferedRenderer'] );
 
 // TODO js documentation
 Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
@@ -95,6 +96,10 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
 
    store : Ext.create( 'ASPIREdb.store.GeneStore' ),
 
+   // BufferedRenderer configs
+   loadMask : true,
+   plugins : 'bufferedrenderer',
+   
    initComponent : function() {
       this.callParent();
       var me = this;
