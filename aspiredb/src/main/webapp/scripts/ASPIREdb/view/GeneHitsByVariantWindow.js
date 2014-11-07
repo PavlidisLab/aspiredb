@@ -58,6 +58,9 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
 
             ASPIREdb.view.GeneHitsByVariantWindow.populateGrid( variantGenes );
 
+            // by default, show just protein-coding genes
+            var grid = ASPIREdb.view.GeneHitsByVariantWindow.getComponent( 'geneHitsByVariantGrid' );
+            grid.store.filter('geneBioType', 'protein_coding');
          }
       } );
 
@@ -72,10 +75,6 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
          var genes = variantGenes[variantId];
          for (var i = 0; i < genes.length; i++) {
             var vo = genes[i];
-
-            if ( vo.geneBioType != "protein_coding" ) {
-               continue;
-            }
 
             if ( variantCounts[vo.symbol] != undefined ) {
                variantCounts[vo.symbol]++;
@@ -104,7 +103,6 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
       var variantCounts = geneInfo.variantCounts;
 
       var data = [];
-      var vos = [];
 
       for( var i = 0; i < geneVos.length; i++ ) {
          var vo = geneVos[i];
@@ -112,7 +110,6 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
          var linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl( vo.symbol );
          var row = [ vo.symbol, vo.geneBioType, vo.name, variantCounts[vo.symbol], phenName, linkToGemma ];
          data.push( row );
-         vos.push( vo );
       }
 
       // there's a limit to how much the browser can handle
@@ -127,7 +124,7 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
       }
 
       grid.setLoading( false );
-      grid.enableToolbar( vos );
+      grid.enableToolbar( data );
 
    },
 

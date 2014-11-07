@@ -173,57 +173,27 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
 
       this.getDockedComponent( 'geneHitsByVariantGridToolbar' ).add( '-' );
 
-      
-       
-      // FIXME, do this more elegantly, just apply a row filter ...
-      /*
       this.getDockedComponent( 'geneHitsByVariantGridToolbar' ).add( {
          xtype : 'checkbox',
          itemId : 'viewProteinCodingGeneOnlyCheckbox',
          defaultType : 'checkboxfield',
          fieldLabel : 'Protein-coding',
          checked : true,
-         uncheckedValue : '',
-         scope : this,
          handler : function() {
 
-            if ( this.uncheckedValue == 'unchecked' ) {
-               this.store.removeAll( true );
-               for (var i = 0; i < this.LoadedVariantValueObjects.length; i++) {
+            var grid = ASPIREdb.view.GeneHitsByVariantWindow.getComponent( 'geneHitsByVariantGrid' );
 
-                  var vvo = this.LoadedVariantValueObjects[i];
-
-                  if ( vvo.geneBioType == "protein_coding" ) {
-                     this.store.add( vvo );
-                  }
-                  // else this.store.remove(vvo);
-
-               }
-
-               this.getView().refresh( true );
-               this.setLoading( false );
-               this.uncheckedValue = '';
+            if ( this.value ) {
+               grid.store.filter( 'geneBioType', 'protein_coding' );
             } else {
-               for (var i = 0; i < this.LoadedVariantValueObjects.length; i++) {
-
-                  var vvo = this.LoadedVariantValueObjects[i];
-
-                  if ( vvo.geneBioType != "protein_coding" ) {
-                     this.store.add( vvo );
-                  }
-
-               }
-
-               this.getView().refresh( true );
-               this.setLoading( false );
-               this.uncheckedValue = 'unchecked';
+               grid.store.clearFilter();
             }
+            
+            grid.getView().refresh( true );
          }
-
       } );
-*/
-      this.getDockedComponent( 'geneHitsByVariantGridToolbar' ).add( '-' );
 
+      this.getDockedComponent( 'geneHitsByVariantGridToolbar' ).add( '-' );
 
       var ref = this;
 
@@ -260,10 +230,10 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
             var genes = grid.extractGenes( grid.getSelectionModel().getSelection() );
 
             if ( genes.length == 0 ) {
-               Ext.Msg.alert('Error','No genes were selected');
+               Ext.Msg.alert( 'Error', 'No genes were selected' );
                return;
             }
-            
+
             ASPIREdb.view.SaveUserGeneSetWindow.initAndShow( genes );
          }
       } );
