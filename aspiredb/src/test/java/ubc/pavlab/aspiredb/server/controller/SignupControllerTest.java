@@ -14,9 +14,7 @@
  */
 package ubc.pavlab.aspiredb.server.controller;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import gemma.gsec.authentication.UserManager;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -50,9 +48,6 @@ public class SignupControllerTest extends BaseSpringContextTest {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private UserManager userManager;
 
     @Before
     public void setup() {
@@ -97,9 +92,7 @@ public class SignupControllerTest extends BaseSpringContextTest {
                             suc.signup( req, new MockHttpServletResponse() );
 
                             // Cleanup
-                            assertNotNull( userManager.findByUserName( uname ) );
-                            userManager.deleteUser( uname );
-                            // userService.delete( userService.findByUserName( uname ) );
+                            userService.delete( userService.findByUserName( uname ) );
 
                             c.incrementAndGet();
 
