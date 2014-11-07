@@ -43,16 +43,6 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
 
    columns : [
               {
-                 header : 'Patient Id',
-                 dataIndex : 'patientId',
-                 flex : 1
-              },
-              {
-                 header : 'Variant Coordinate',
-                 dataIndex : 'variantCoordinate',
-                 flex : 1
-              },
-              {
                  header : 'Gene Symbol',
                  dataIndex : 'symbol',
                  flex : 1
@@ -65,6 +55,11 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
               {
                  header : 'Gene Name',
                  dataIndex : 'name',
+                 flex : 1
+              },
+              {
+                 header : 'Variant Count',
+                 dataIndex : 'variantCount',
                  flex : 1
               },
               {
@@ -178,6 +173,10 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
 
       this.getDockedComponent( 'geneHitsByVariantGridToolbar' ).add( '-' );
 
+      
+       
+      // FIXME, do this more elegantly, just apply a row filter ...
+      /*
       this.getDockedComponent( 'geneHitsByVariantGridToolbar' ).add( {
          xtype : 'checkbox',
          itemId : 'viewProteinCodingGeneOnlyCheckbox',
@@ -222,8 +221,9 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
          }
 
       } );
-
+*/
       this.getDockedComponent( 'geneHitsByVariantGridToolbar' ).add( '-' );
+
 
       var ref = this;
 

@@ -63,6 +63,34 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
 
    },
 
+   countVariantsPerGene : function(variantGenes) {
+      var variantCounts = {};
+      var geneVos = [];
+
+      for ( var variantId in variantGenes) {
+
+         var genes = variantGenes[variantId];
+         for (var i = 0; i < genes.length; i++) {
+            var vo = genes[i];
+
+            if ( vo.geneBioType != "protein_coding" ) {
+               continue;
+            }
+
+            if ( variantCounts[vo.symbol] != undefined ) {
+               variantCounts[vo.symbol]++;
+               continue;
+            }
+
+            variantCounts[vo.symbol] = 1;
+            geneVos.push(vo);
+
+         }
+
+      }
+      return { 'geneVos' : geneVos, 'variantCounts' : variantCounts }
+   },
+   
    // VariantValueObject
    populateGrid : function(variantGenes) {
 
@@ -71,45 +99,34 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
 
       var grid = ASPIREdb.view.GeneHitsByVariantWindow.getComponent( 'geneHitsByVariantGrid' );
 
-      var store = Ext.StoreManager.lookup( 'variantGrid' );
+      var geneInfo = this.countVariantsPerGene(variantGenes);
+      var geneVos = geneInfo.geneVos;
+      var variantCounts = geneInfo.variantCounts;
 
       var data = [];
       var vos = [];
-      
-      for ( var variantId in variantGenes) {
-         
-         // there's a limit to how much the browser can handle
-         if ( data.length >= ROW_LIMIT ) {
-            var msg = 'Only the first ' + ROW_LIMIT + ' rows are displayed';
-            Ext.Msg.alert( 'Too many rows to display', msg );
-            console.log( msg );
-            break;
-         }
-         
-         var variant = store.findRecord( 'id', variantId );
 
-         var genes = variantGenes[variantId];
-         for (var i = 0; i < genes.length; i++) {
-            var vo = genes[i];
-            vos.push( vo );
-
-            var linkToGemma = "";
-            var phenName = "";
-
-            if ( vo.geneBioType == "protein_coding" ) {
-               linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl( vo.symbol );
-               var row = [ variant.get( 'patientId' ), variant.get( 'genomeCoordinates' ), vo.symbol, vo.geneBioType,
-                          vo.name, phenName, linkToGemma ];
-               data.push( row );
-            }
-
-         }
-         
+      for( var i = 0; i < geneVos.length; i++ ) {
+         var vo = geneVos[i];
+         var phenName = "";
+         var linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl( vo.symbol );
+         var row = [ vo.symbol, vo.geneBioType, vo.name, variantCounts[vo.symbol], phenName, linkToGemma ];
+         data.push( row );
+         vos.push( vo );
       }
 
-      grid.store.loadData( data );
-      grid.setLoading( false );
+      // there's a limit to how much the browser can handle
+      if ( data.length >= ROW_LIMIT ) {
+         var msg = 'Only ' + ROW_LIMIT + 'out of ' + data.length + ' rows are displayed';
+         Ext.Msg.alert( 'Too many rows to display', msg );
+         console.log( msg );
+         grid.store.loadData( data.slice( 0, ROW_LIMIT ) );
+      } else {
+         console.log('Found ' + data.length + ' genes that overlapped');
+         grid.store.loadData( data );
+      }
 
+      grid.setLoading( false );
       grid.enableToolbar( vos );
 
    },

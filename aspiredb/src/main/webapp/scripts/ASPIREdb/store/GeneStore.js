@@ -26,11 +26,10 @@ Ext.define('ASPIREdb.store.GeneStore', {
     pageSize : 50,
     
     fields: [
-             {name: 'patientId', type: 'string'},
-             {name: 'variantCoordinate', type: 'string'},
              {name: 'symbol',   type: 'string'},
              {name: 'geneBioType',  type: 'string'},
              {name: 'name',  type: 'string'},
+             {name: 'variantCount',  type: 'string'},
              {name: 'pheneName',  type: 'string'},             
              {name: 'linkToGemma',  type: 'string'}
          ],         
