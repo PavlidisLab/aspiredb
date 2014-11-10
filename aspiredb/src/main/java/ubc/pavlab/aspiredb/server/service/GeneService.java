@@ -48,4 +48,7 @@ public interface GeneService {
     public Map<Long, List<GeneValueObject>> getGenesPerVariant( Collection<Long> ids ) throws NotLoggedInException,
             BioMartServiceException;
 
+    public Collection<Map<String, String>> getBurdenAnalysisPerSubject( Collection<Long> subjectIds )
+            throws NotLoggedInException, BioMartServiceException;
+
 }

@@ -119,12 +119,22 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          menu : this.actionsMenu
       } );
 
+      this.burdenAnalysisButton = Ext.create( 'Ext.Button', {
+         itemId : 'burdenAnalysisButton',
+         text : 'Burden Analysis',
+         disabled : true,
+         handler : this.burdenAnalysisHandler,
+         scope : this,
+         tip : 'Perform CNV Burden Analysis on the selected variants'
+      } );
+      
       this.reportButton = Ext.create( 'Ext.Button', {
          itemId : 'reportButton',
          text : 'Report',
          disabled : false,
          handler : this.showReportHandler,
-         scope : this
+         scope : this,
+         tip : 'Generate reports on the filtered variants'
       } );
 
       this.selectAllButton = Ext.create( 'Ext.Button', {
@@ -398,6 +408,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                toolbar.add( ref.actionsButton );
                toolbar.add( ref.labelsButton );
                toolbar.add( ref.reportButton );
+               toolbar.add( ref.burdenAnalysisButton );
                toolbar.add( ref.selectAllButton );
                toolbar.add( ref.deselectAllButton );
                toolbar.add( ref.saveButton );
@@ -477,6 +488,15 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       reportWindow.createAndShow( this.down( '#variantGrid' ).store );
    },
 
+   /**
+    * Display the burden analysis summary table which shows the number of genes affected by the variants
+    */
+   burdenAnalysisHandler : function() {
+      var reportWindow = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisWindow' );
+      reportWindow.createAndShow( this.getSelectedVariantIds( this
+         .getVariantRecordSelection() ) );
+   },
+   
    /**
     * Refresh the selected subjects in ideogram
     */
@@ -805,11 +825,13 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
          this.down( '#viewGenes' ).enable();
          this.down( '#makeLabel' ).enable();
+         this.down( '#burdenAnalysisButton' ).enable();
       } else {
 
          this.down( '#viewGenes' ).disable();
          this.down( '#viewInUCSC' ).disable();
          this.down( '#makeLabel' ).disable();
+         this.down( '#burdenAnalysisButton' ).disable();
          return;
       }
 

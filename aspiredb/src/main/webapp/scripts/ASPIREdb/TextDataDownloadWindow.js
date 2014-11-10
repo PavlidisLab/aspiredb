@@ -65,6 +65,35 @@ Ext.define('ASPIREdb.TextDataDownloadWindow', {
 
 	},
 
+	showBurdenAnalysisDownload : function(store) {
+	   
+	   var text = '';
+      
+      if ( store.getCount() == 0 ) {
+         console.log("no data to show");
+         this.populateText(text);
+         return;
+      }
+      
+      var rec = store.getAt(0).data;
+      var colNames = [];
+      for ( var p in rec ) {
+         colNames.push(p);
+         text += p + "\t";
+      }
+      text = text.replace(/\t$/g,'\n');
+      
+      for(var i = 0 ; i < store.getCount() ; i++) {
+         for(var j = 0; j < colNames.length; j++ ) {
+            rec = store.getAt(i).data;
+            text += rec[colNames[j]] + '\t';
+         }
+         text = text.replace(/\t$/g,'\n');
+      }
+
+      this.populateText(text);
+	},
+	
 	showChartDownload : function(store) {
       var text = '';
       
