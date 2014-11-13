@@ -74,9 +74,10 @@ public class LabelValueObject implements Displayable, Serializable {
 
     @Override
     public String getHtmlLabel() {
-        String fontcolor = ( Integer.parseInt( this.colour, 16 ) > 0xffffff / 2 ) ? "black" : "white";
+        // String fontcolor = ( Integer.parseInt( this.colour, 16 ) > 0xffffff / 2 ) ? "black" : "white";
+        String fontcolor = "white";
         return "<font color=" + fontcolor + "><span style='background-color: " + this.colour + "'>&nbsp&nbsp"
-                + this.name + "&nbsp</span></font>&nbsp&nbsp&nbsp";
+                + this.name + "&nbsp&nbsp</span></font>&nbsp&nbsp&nbsp";
     }
 
     public Long getId() {

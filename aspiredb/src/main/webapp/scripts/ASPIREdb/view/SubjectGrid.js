@@ -376,6 +376,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
       Ext.define( 'ASPIREdb.view.CreateLabelWindowSubject', {
          isSubjectLabel : true,
+         title : 'Create Subject Label',
          extend : 'ASPIREdb.view.CreateLabelWindow',
 
          // override

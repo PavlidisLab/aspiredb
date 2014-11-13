@@ -899,7 +899,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       Ext.define( 'ASPIREdb.view.CreateLabelWindowVariant', {
          isSubjectLabel : false,
-         title : 'Variant Label Manager',
+         title : 'Create Variant Label',
          extend : 'ASPIREdb.view.CreateLabelWindow',
 
          // override

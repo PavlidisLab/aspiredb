@@ -19,13 +19,11 @@
 Ext.require( [ 'Ext.Window', 'ASPIREdb.store.LabelStore', 'Ext.grid.column.Action', 'Ext.ux.CheckColumn',
               'Ext.form.field.*', 'Ext.picker.Color' ] );
 
-
-
- var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', { 
-// clicksToMoveEditor: 1, 
-clicksToEdit : 2, autoCancel :
- false } );
-
+var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
+   // clicksToMoveEditor: 1,
+   clicksToEdit : 2,
+   autoCancel : false
+} );
 
 var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
    // clicksToMoveEditor: 1,
@@ -82,19 +80,28 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
       YValue : 0,
    },
    listeners : {
-     close : function() {
-        if ( this.isSubjectLabel ) {
-           ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' );
-        } else {
-           ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' );
-        }
-     } 
+      close : function() {
+         if ( this.isSubjectLabel ) {
+            ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' );
+         } else {
+            ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' );
+         }
+      }
    },
    constructor : function(cfg) {
       this.initConfig( cfg );
       this.callParent( arguments );
    },
 
+   statics : {
+      getHtmlLabel : function(label) {
+         var fontColour = 'white';
+         var ret = "<font color=" + fontColour + "><span style='background-color: " + label.colour + "'>&nbsp&nbsp"
+            + label.name + "&nbsp&nbsp</span></font>&nbsp&nbsp&nbsp";
+         return ret;
+      },
+   },
+   
    /**
     * dockedItems : [ { xtype : 'colorpicker', itemId : 'colorPicker', value : '00FFFF', // default dock : 'right' } ],
     */
@@ -110,183 +117,116 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
          }
       },
 
-      items : [
-               {
-                  xtype : 'grid',
-                  flex : 1,
-                  region : 'center',
-                  itemId : 'labelSettingsGrid',
-                  store : Ext.create( 'ASPIREdb.store.LabelStore' ),
-                  columns : [ {
-                     header : 'Label',
-                     dataIndex : 'labelId',
-                     width : 100,
-                     flex : 1,
-                     renderer : function(labelId, meta, rec, rowIndex, colIndex, store) {
-                        meta.tdAttr = 'data-qtip="Double-click to rename label"';
-                        var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
-                        var ret = label.htmlLabel;
-                        return ret;
-                     },
+      items : [ {
+         xtype : 'grid',
+         flex : 1,
+         region : 'center',
+         itemId : 'labelSettingsGrid',
+         store : Ext.create( 'ASPIREdb.store.LabelStore' ),
+         columns : [ {
+            header : 'Label',
+            dataIndex : 'labelId',
+            width : 100,
+            flex : 1,
+            renderer : function(labelId, meta, rec, rowIndex, colIndex, store) {
+               meta.tdAttr = 'data-qtip="Double-click to rename label"';
+               var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
+               var ret = ASPIREdb.view.LabelControlWindow.getHtmlLabel( label );
+               return ret;
+            },
 
-                  }, {
-                     header : 'Name',
-                     dataIndex : 'labelName',
-                     width : 100,
-                     flex : 1,
-                     renderer : function(val, meta, rec, rowIndex, colIndex, store) {
-                        meta.tdAttr = 'data-qtip="Double-click to rename label"';
-                        return val;
-                     },
+         }, {
+            header : 'Name',
+            dataIndex : 'labelName',
+            width : 100,
+            flex : 1,
+            renderer : function(val, meta, rec, rowIndex, colIndex, store) {
+               meta.tdAttr = 'data-qtip="Double-click to rename label"';
+               return val;
+            },
 
-                  }, {
-                     header : 'Show',
-                     dataIndex : 'show',
-                     xtype : 'checkcolumn',
-                     id : 'labelShowColumn',
-                     width : 50,
-                     sortable : false
-                  }, {
-                     header : '',
-                     xtype : 'actioncolumn',
-                     id : 'labelActionColumn',
-                     handler : function(view, rowIndex, colIndex, item, e) {
-                        var action = 'removeLabel';
-                        this.fireEvent( 'itemclick', this, action, view, rowIndex, colIndex, item, e );
-                     },
+         }, {
+            header : 'Show',
+            dataIndex : 'show',
+            xtype : 'checkcolumn',
+            id : 'labelShowColumn',
+            width : 50,
+            sortable : false
+         }, {
+            header : '',
+            xtype : 'actioncolumn',
+            id : 'labelActionColumn',
+            handler : function(view, rowIndex, colIndex, item, e) {
+               var action = 'removeLabel';
+               this.fireEvent( 'itemclick', this, action, view, rowIndex, colIndex, item, e );
+            },
 
-                     width : 30,
-                     items : [ {
-                        icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
-                        tooltip : 'Remove label',
+            width : 30,
+            items : [ {
+               icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
+               tooltip : 'Remove label',
 
-                     } ]
-                  } ],
-                  // plugins : [ rowEditing ],
+            } ]
+         } ],
+         // plugins : [ rowEditing ],
 
-                  listeners : {
-                     itemdblclick : function(e, record, item, index) {
-                        // create edit label window
+         listeners : {
+            itemdblclick : function(e, record, item, index) {
+               // create edit label window
 
-                        var ref = this;
-                        var row = e.store.data.items[index].data;
-                        var labelcolour = row.labelColour;
-                        var labelName = row.labelName;
-                        var labelid = row.labelId;
+               var ref = this;
+               var row = e.store.data.items[index].data;
+               var labelcolour = row.labelColour;
+               var labelName = row.labelName;
+               var labelid = row.labelId;
 
-                        Ext.define( 'ASPIREdb.view.CreateLabelWindowEdit', {
-                           isSubjectLabel : true,
-                           extend : 'Ext.window.Window',
-                           title : 'Edit label',
-                           closable : true,
-                           closeAction : 'destroy',
-                           layout : 'border',
-                           bodyStyle : 'padding: 5px;',
-                           flex : 1,
+               Ext.define( 'ASPIREdb.view.CreateLabelWindowEdit', {
+                  isSubjectLabel : false,
+                  title : 'Edit Label Manager',
+                  extend : 'ASPIREdb.view.CreateLabelWindow',
+                  labelName : labelName,
+                  labelColour : labelcolour,
 
-                           layout : {
-                              type : 'hbox',
-                              defaultMargins : {
-                                 top : 5,
-                                 right : 5,
-                                 left : 5,
-                                 bottom : 5,
-                              },
-                           },
+                  // override
+                  onOkButtonClick : function() {
 
-                           initComponent : function() {
-                              var me = this;
+                     this.callParent();
 
-                              me.items = [ {
-                                 xtype : 'textfield',
-                                 id : 'labelName',
-                                 value : labelName
-                              }, {
-                                 xtype : 'colorpicker',
-                                 itemId : 'colorPicker',
-                                 value : labelcolour,
-                                 flex : 2,
-                              }, {
-                                 xtype : 'button',
-                                 itemId : 'okButton',
-                                 text : 'OK',
-                                 flex : 1,
-                                 handler : function() {
-                                    me.onOkButtonClick();
-                                 }
-                              }, {
-                                 xtype : 'button',
-                                 itemId : 'cancelButton',
-                                 text : 'Cancel',
-                                 flex : 1,
-                                 handler : function() {
-                                    me.hide();
-                                 }
-                              }, ], this.callParent();
-
-                           },
-
-                           // override
-                           onOkButtonClick : function() {
-
-                              var vo = this.getLabel();
-                              if ( vo == null ) {
-                                 return;
-                              }
-                              var label = ref.up( '#labelControlWindow' ).visibleLabels[labelid];
-                              label.name = vo.name;
-                              label.colour = vo.colour;
-                              label.htmlLabel = "<font color=black><span style='background-color:" + vo.colour
-                                 + "'>&nbsp&nbsp" + vo.name + "&nbsp</span></font>&nbsp&nbsp&nbsp";
-                              // TODO: subject label update
-                              LabelService.updateLabel( label, {
-                                 callback : function() {
-                                    ref.getView().refresh();
-//                                  commented out for performance, do this once the window is closed
-//                                    if ( ref.up( '#labelControlWindow' ).isSubjectLabel ) {
-//                                       ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' );
-//                                    } else {
-//                                       ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' );
-//                                    }
-                                 },
-                                 errorHandler : function(er, exception) {
-                                    Ext.Msg.alert( "Update Label Error", er + "\n" + exception.stack );
-                                    console.log( exception.stack );
-                                 }
-                              } );
-
-                              this.hide();
-
-                           },
-
-                           getLabel : function() {
-                              var editedColorPicker = this.down( "#colorPicker" );
-                              var editedLabelName = this.down( "#labelName" );
-
-                              // vo will be a ValueObject if it already exists
-                              // otherwise, it's just a name of type string
-                              var vo = editedLabelName.getValue();
-                              if ( vo == null || vo.length == "" ) {
-                                 return null;
-                              }
-                              if ( vo.id == undefined ) {
-                                 vo = new LabelValueObject();
-                                 vo.name = editedLabelName.getValue();
-                                 vo.colour = editedColorPicker.getValue();
-                              }
-                              vo.isShown = true;
-                              return vo;
-
-                           },
-
-                        } );
-
-                        var labelEditWindow = new ASPIREdb.view.CreateLabelWindowEdit();
-                        labelEditWindow.show();
-
+                     var vo = this.getLabel();
+                     if ( vo == null ) {
+                        return;
                      }
-                  }
-               },// end of grid
+                     var label = ref.up( '#labelControlWindow' ).visibleLabels[labelid];
+                     label.name = vo.name;
+                     label.colour = vo.colour;
+                     label.htmlLabel = ASPIREdb.view.LabelControlWindow.getHtmlLabel( label );
+
+                     LabelService.updateLabel( label, {
+                        callback : function() {
+                           // ref.getView().refresh();
+                           ref.getView().refresh();
+                           // commented out for performance, do this once the window is closed
+                           // if ( ref.up( '#labelControlWindow' ).isSubjectLabel ) {
+                           // ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' );
+                           // } else {
+                           // ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' );
+                           // }
+                        },
+                        errorHandler : function(er, exception) {
+                           Ext.Msg.alert( "Update Label Error", er + "\n" + exception.stack );
+                           console.log( exception.stack );
+                        }
+                     } );
+                  },
+
+               } );
+
+               var labelEditWindow = new ASPIREdb.view.CreateLabelWindowEdit();
+               labelEditWindow.show();
+
+            }
+         }
+      },// end of grid
       ]
    } ],
 
@@ -449,12 +389,12 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
       label.isShown = checked;
       LabelService.updateLabel( label, {
          callback : function() {
-//            commented out for performance, do this once the window is closed
-//            if ( me.isSubjectLabel ) {
-//               ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' );
-//            } else {
-//               ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' );
-//            }
+            // commented out for performance, do this once the window is closed
+            // if ( me.isSubjectLabel ) {
+            // ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' );
+            // } else {
+            // ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' );
+            // }
          }
       } );
    }
