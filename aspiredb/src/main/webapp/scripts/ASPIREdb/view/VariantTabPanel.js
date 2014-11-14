@@ -277,7 +277,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       this.getComponent( 'ideogram' ).on( 'GenomeRegionSelectionEvent', function(selection) {
          ref.ideogramSelectionChangeHandler( null, ref.getVariantRecordSelection() );
       } );
-
+      
       // activate/deactiveButtons based on activeTab
       this.on( 'beforetabchange', function(tabPanel, newCard, oldCard, eOpts) {
 
@@ -292,10 +292,10 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
          } else {
             // newCard is the grid
-            currentlySelectedRecords = this.selectedVariants;
+            currentlySelectedRecords = this.getSelectedVariants();
             this.selectAllButton.enable();
             ideogram.hideColourLegend();
-
+            
          }
 
          this.enableActionButtonsBySelectedRecords( currentlySelectedRecords );
@@ -303,6 +303,14 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       } );
 
    },
+   
+   getSelectedVariants : function() {
+      var grid = this.down( '#variantGrid' );
+      return grid.getSelectionModel().getSelection();
+   },
+   
+   
+   
    /**
     * Filter the variants of the subject selected. Initially it loads all the variants associated with all the subjects.
     * 
@@ -398,6 +406,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                      grid.getView().refresh();
                      ref.newIdeogramLabel = undefined;
                   }
+                  ref.focusSelectedVariants();
                } );
 
                ref.add( grid );
@@ -625,22 +634,12 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       this.selectedSubjects = subjectIds;
       var grid = this.down( '#variantGrid' );
-
-      // when variant table view is selected
-      if ( grid.isVisible() ) {
-         if ( unselectRows ) {
-            grid.getSelectionModel().deselectAll();
-            return;
-         }
-
-         this.gridPanelSubjectSelection( subjectIds );
-      }
-      // When Ideogram view selected
-      else {
-         console.log( "when the variant ideogram is selected" );
-         this.ideogramSubjectSelection( subjectIds );
-
-      }
+  
+      grid.getSelectionModel().deselectAll();
+      
+      this.gridPanelSubjectSelection( subjectIds );
+      this.ideogramSubjectSelection( subjectIds );
+      
       grid.getView().refresh();
    },
 
@@ -671,10 +670,30 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       } );
    },
 
+   focusSelectedVariants : function() {
+      
+      var grid = this.down('#variantGrid');
+      var selectedRecords = grid.getSelectionModel().getSelection();
+      
+      if ( selectedRecords.length > 0 ) {
+         grid.getView().focusRow( grid.store.indexOfId( selectedRecords[0].data.id ) );
+         // use just to make sure selected record is at the top
+         grid.getView().scrollBy( {
+            x : 0,
+            y : 1000
+         } );
+         grid.getView().focusRow( grid.store.indexOfId( selectedRecords[0].data.id ) );
+      }
+   },
+   
    gridPanelSubjectSelection : function(subjectIds) {
 
+      var me = this;
+      
       var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
 
+      var grid = this.down( '#variantGrid' );
+      
       if ( grid.features != null && grid.features.length > 0 ) {
          // collapse all the grids first - to open only the
          // selected one
@@ -716,17 +735,11 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                   } );
                }
 
+               me.selectedVariants = selectedRecords;
+               
                grid.selModel.select( selectedRecords );
-
-               if ( selectedRecords.length > 0 ) {
-                  grid.getView().focusRow( grid.store.indexOfId( selectedRecords[0].data.id ) );
-                  // use just to make sure selected record is at the top
-                  grid.getView().scrollBy( {
-                     x : 0,
-                     y : 1000
-                  } );
-                  grid.getView().focusRow( grid.store.indexOfId( selectedRecords[0].data.id ) );
-               }
+               
+               me.focusSelectedVariants();
 
             }
          } );
