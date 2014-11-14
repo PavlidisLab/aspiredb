@@ -122,7 +122,6 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       this.burdenAnalysisButton = Ext.create( 'Ext.Button', {
          itemId : 'burdenAnalysisButton',
          text : 'Burden Analysis',
-         disabled : true,
          handler : this.burdenAnalysisHandler,
          scope : this,
          tip : 'Perform CNV Burden Analysis on the selected variants'
@@ -140,9 +139,9 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       this.selectAllButton = Ext.create( 'Ext.Button', {
          itemId : 'selectAll',
          text : 'Select All',
-         disabled : true,
          handler : this.selectAllHandler,
-         scope : this
+         scope : this,
+         hidden : true,
       } );
 
       this.deselectAllButton = Ext.create( 'Ext.Button', {
@@ -150,7 +149,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          text : 'Clear All',
          disabled : false,
          handler : this.deselectAllHandler,
-         scope : this
+         scope : this,
+         hidden : true,
       } );
 
       this.saveButton = Ext.create( 'Ext.Button', {
@@ -287,13 +287,15 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          if ( newCard.itemId == 'ideogram' ) {
 
             currentlySelectedRecords = this.getIdeogramVariantRecordSelection();
-            this.selectAllButton.disable();
+            this.selectAllButton.hide();
+            this.deselectAllButton.hide();
             ideogram.showColourLegend();
 
          } else {
             // newCard is the grid
             currentlySelectedRecords = this.getSelectedVariants();
-            this.selectAllButton.enable();
+            this.selectAllButton.show();
+            this.deselectAllButton.show();
             ideogram.hideColourLegend();
             
          }
@@ -766,7 +768,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    },
 
    deselectAllHandler : function() {
-      this.subjectSelectionHandler( this.loadedSubjects, true );
+//      this.subjectSelectionHandler( this.loadedSubjects, true );
 
       this.getComponent( 'variantGrid' ).getSelectionModel().deselectAll();
    },
@@ -838,13 +840,11 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
          this.down( '#viewGenes' ).enable();
          this.down( '#makeLabel' ).enable();
-         this.down( '#burdenAnalysisButton' ).enable();
       } else {
 
          this.down( '#viewGenes' ).disable();
          this.down( '#viewInUCSC' ).disable();
          this.down( '#makeLabel' ).disable();
-         this.down( '#burdenAnalysisButton' ).disable();
          return;
       }
 
