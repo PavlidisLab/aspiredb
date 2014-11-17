@@ -155,7 +155,7 @@ public class GeneServiceImpl implements GeneService {
         }
 
         // Gene overlap
-        Map<Long, List<GeneValueObject>> genesPerVariant = getGenesPerVariant( variantIds );
+        Map<Long, Collection<GeneValueObject>> genesPerVariant = getGenesPerVariant( variantIds );
 
         // Calculate some statistics
         for ( Long variantId : genesPerVariant.keySet() ) {
@@ -165,7 +165,7 @@ public class GeneServiceImpl implements GeneService {
                 continue;
             }
 
-            List<GeneValueObject> genes = genesPerVariant.get( variantId );
+            Collection<GeneValueObject> genes = genesPerVariant.get( variantId );
 
             CNV cnv = ( CNV ) v;
 
@@ -220,13 +220,11 @@ public class GeneServiceImpl implements GeneService {
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
-    public Map<Long, List<GeneValueObject>> getGenesPerVariant( Collection<Long> variantIds )
+    public Map<Long, Collection<GeneValueObject>> getGenesPerVariant( Collection<Long> variantIds )
             throws NotLoggedInException, BioMartServiceException {
 
-        Map<Long, List<GeneValueObject>> results = new HashMap<>();
+        Map<Long, Collection<GeneValueObject>> results = new HashMap<>();
 
-        // Used to remove duplicates
-        HashMap<String, GeneValueObject> genes = new HashMap<String, GeneValueObject>();
         for ( Variant variant : variantDao.load( variantIds ) ) {
 
             GenomicLocation location = variant.getLocation();
@@ -235,11 +233,7 @@ public class GeneServiceImpl implements GeneService {
                     String.valueOf( location.getChromosome() ), ( long ) location.getStart(),
                     ( long ) location.getEnd() );
 
-            for ( GeneValueObject geneValueObject : genesInsideRange ) {
-                genes.put( geneValueObject.getEnsemblId(), geneValueObject );
-            }
-            List<GeneValueObject> gvos = new ArrayList<GeneValueObject>( genes.values() );
-            results.put( variant.getId(), gvos );
+            results.put( variant.getId(), genesInsideRange );
         }
 
         return results;
@@ -252,8 +246,8 @@ public class GeneServiceImpl implements GeneService {
             BioMartServiceException {
 
         Collection<GeneValueObject> result = new HashSet<>();
-        Map<Long, List<GeneValueObject>> map = getGenesPerVariant( ids );
-        for ( List<GeneValueObject> genes : map.values() ) {
+        Map<Long, Collection<GeneValueObject>> map = getGenesPerVariant( ids );
+        for ( Collection<GeneValueObject> genes : map.values() ) {
             result.addAll( genes );
         }
         return result;
