@@ -290,6 +290,11 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             this.selectAllButton.hide();
             this.deselectAllButton.hide();
             ideogram.showColourLegend();
+            this.colourVariantByCombo.show();
+            this.zoomOutButton.show();
+            this.zoomInButton.show();
+            this.exportButton.show();
+            this.saveButton.hide();
 
          } else {
             // newCard is the grid
@@ -297,7 +302,11 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             this.selectAllButton.show();
             this.deselectAllButton.show();
             ideogram.hideColourLegend();
-            
+            this.colourVariantByCombo.hide();
+            this.zoomOutButton.hide();
+            this.zoomInButton.hide();
+            this.exportButton.hide();
+            this.saveButton.show();
          }
 
          this.enableActionButtonsBySelectedRecords( currentlySelectedRecords );
