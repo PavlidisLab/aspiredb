@@ -209,6 +209,15 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             config.dataIndex = characteristicNames[i];
             config.hidden = true;
 
+            // construct links for those characteristics that contains http://
+            config.renderer = function(value) {
+               if ( value.indexOf('http://') == 0 ) {
+                  return '<a href="' + value + '" target="_blank">' + value + '</a>';
+               } else {
+                  return value;
+               }
+            };
+            
             columnConfig.push( config );
 
             columnHeaders.push( characteristicNames[i] );
