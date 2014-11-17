@@ -108,6 +108,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
    }, {
       text : "# of variants",
       dataIndex : 'varientNos',
+      tooltip : 'Total # of unfiltered variants',
       renderer : function(value) {
          return value;
       },
@@ -115,6 +116,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
    }, {
       text : "# of phenotypes",
       dataIndex : 'phenotypeNos',
+      tooltip : 'Total # of unfiltered phenotypes',
       flex : 1
    } ],
 
