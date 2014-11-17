@@ -19,6 +19,7 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import java.util.Collection;
+import java.util.Map;
 
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 
@@ -26,5 +27,5 @@ import ubc.pavlab.aspiredb.shared.GenomicRange;
  *
  */
 public interface UCSCConnector {
-    public String constructCustomTracksUrl( GenomicRange range, Collection<Long> activeProjectIds );
+    public Map<String, String> constructCustomTracksUrl( GenomicRange range, Collection<Long> activeProjectIds );
 }

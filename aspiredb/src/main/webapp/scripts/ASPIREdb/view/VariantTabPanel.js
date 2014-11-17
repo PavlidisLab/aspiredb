@@ -826,10 +826,34 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    viewInUCSCHandler : function() {
 
       UCSCConnector.constructCustomTracksUrl( this.getSpanningGenomicRange( this.getVariantRecordSelection() ),
-         ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), function( ucscUrl ) {
+         ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), function( ucscParams ) {
          
-         // opens a new popup
-         window.open( ucscUrl );
+         var ucscForm = Ext.create( 'Ext.form.Panel', {
+
+         } );
+
+         ucscForm.submit( {
+            target : '_blank',
+            url : ucscParams['url'],
+            standardSubmit : true,
+            method : "POST",
+            params : {
+               clade : ucscParams['clade'],
+               org : ucscParams['org'],
+               db : ucscParams['db'],
+               hgct_customText : ucscParams['hgct_customText']
+            },
+            success : function() {
+               console.log( "ok" );
+            },
+            failure : function(response, opts) {
+               console.log( "failed" );
+            },
+            headers : {
+               'Content-Type' : 'multipart/form-data'
+            }
+         } );
+
       });
 
    },
