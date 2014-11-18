@@ -16,13 +16,12 @@ package ubc.pavlab.aspiredb.server.biomartquery;
 
 import java.io.StringWriter;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.annotation.PostConstruct;
-import java.util.Timer;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -38,9 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
+import ubc.pavlab.aspiredb.server.util.ConfigUtils;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
-import ubic.basecode.ontology.model.OntologyTerm;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -55,7 +54,9 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
  */
 @Service
 public class BioMartQueryServiceImpl implements BioMartQueryService {
-    private static final String BIO_MART_URL = "http://www.biomart.org/biomart/martservice/results";
+
+    private static final String BIO_MART_URL = ConfigUtils.getString( "aspiredb.biomart.url",
+            "http://www.biomart.org/biomart/martservice/results" );
 
     private static Log log = LogFactory.getLog( BioMartQueryServiceImpl.class.getName() );
 
@@ -179,6 +180,7 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
 
             Timer uploadCheckerTimer = new Timer( true );
             uploadCheckerTimer.scheduleAtFixedRate( new TimerTask() {
+                @Override
                 public void run() {
                     log.info( "Waiting for BioMart response ... " + timer.getTime() + " ms" );
                 }
