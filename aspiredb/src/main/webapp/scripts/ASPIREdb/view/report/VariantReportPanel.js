@@ -26,7 +26,6 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    alias : 'widget.variantReportPanel',
    id : 'variantReport',
    xtype : 'clustered-column',
-   resizable : true,
    layout : 'fit',
 
    initComponent : function() {
@@ -211,7 +210,6 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          // height : 410,
          padding : '10 0 0 0',
          animate : true,
-         resizable : true,
          shadow : false,
          layout : 'fit',
          style : 'background: #fff;',
