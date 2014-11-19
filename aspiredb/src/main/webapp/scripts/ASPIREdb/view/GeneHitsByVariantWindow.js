@@ -103,12 +103,14 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
       var variantCounts = geneInfo.variantCounts;
 
       var data = [];
-
+      var geneSymbols = [];
+      
       for( var i = 0; i < geneVos.length; i++ ) {
          var vo = geneVos[i];
          var phenName = "";
          var linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl( vo.symbol );
          var row = [ vo.symbol, vo.geneBioType, vo.name, variantCounts[vo.symbol], phenName, linkToGemma ];
+         geneSymbols.push( vo.symbol );
          data.push( row );
       }
 
@@ -124,7 +126,7 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
       }
 
       grid.setLoading( false );
-      grid.enableToolbar( data );
+      grid.enableToolbar( geneSymbols );
 
    },
 

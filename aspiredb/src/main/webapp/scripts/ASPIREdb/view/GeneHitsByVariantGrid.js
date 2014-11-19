@@ -136,17 +136,10 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
       this.LoadedVariantValueObjects = vvo;
    },
 
-   enableToolbar : function(vos) {
+   enableToolbar : function(geneSymbols) {
 
-      if ( vos.length < 1 ) {
+      if ( geneSymbols.length < 1 ) {
          return;
-      }
-
-      var geneSymbols = [];
-
-      for (var i = 0; i < vos.length; i++) {
-         var vo = vos[i];
-         geneSymbols.push( vo.symbol );
       }
 
       var url = ASPIREdb.GemmaURLUtils.makeViewGeneNetworkInGemmaURL( geneSymbols );
