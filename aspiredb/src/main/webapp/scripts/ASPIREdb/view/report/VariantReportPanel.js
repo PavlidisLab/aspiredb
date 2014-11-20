@@ -257,7 +257,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
             grid : true,
             label : {
                rotate : {
-                  degrees : -45
+                  degrees : -90
                }
             }
          } ],
