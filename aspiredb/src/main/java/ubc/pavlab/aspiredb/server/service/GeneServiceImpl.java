@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
+import ubc.pavlab.aspiredb.server.dao.LabelDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.UserGeneSetDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
@@ -43,6 +44,8 @@ import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.server.model.GenomicLocation;
+import ubc.pavlab.aspiredb.server.model.Label;
+import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
@@ -55,9 +58,13 @@ import ubc.pavlab.aspiredb.shared.GeneValueObject;
 public class GeneServiceImpl implements GeneService {
 
     @Autowired
+    private SubjectService subjectService;
+    @Autowired
     private SubjectDao subjectDao;
     @Autowired
     private VariantDao variantDao;
+    @Autowired
+    private LabelDao labelDao;
     @Autowired
     private UserGeneSetDao userGeneSetDao;
     @Autowired
@@ -66,7 +73,7 @@ public class GeneServiceImpl implements GeneService {
     private NeurocartaQueryService neurocartaQueryService;
 
     enum CnvBurdenAnalysisPerSubject {
-        PATIENT_ID, NUM_DELETION, NUM_DUPLICATION, NUM_UNKNOWN, TOTAL, TOTAL_SIZE, AVG_SIZE, NUM_GENES, NUM_CNVS_WITH_GENE, AVG_GENES_PER_CNV
+        PATIENT_ID, LABEL_NAME, NUM_DELETION, NUM_DUPLICATION, NUM_UNKNOWN, TOTAL, TOTAL_SIZE, AVG_SIZE, NUM_GENES, NUM_CNVS_WITH_GENE, AVG_GENES_PER_CNV
     }
 
     @Override
@@ -95,11 +102,95 @@ public class GeneServiceImpl implements GeneService {
                 ret.put( key, String.format( "%.1f", stats.get( key ) ) );
             } else if ( key.equals( CnvBurdenAnalysisPerSubject.PATIENT_ID.toString() ) ) {
                 ret.put( key, String.format( "%s", stats.get( key ).toString() ) );
+            } else if ( key.equals( CnvBurdenAnalysisPerSubject.LABEL_NAME.toString() ) ) {
+                ret.put( key, String.format( "%s", stats.get( key ).toString() ) );
             } else {
                 ret.put( key, String.format( "%.0f", stats.get( key ) ) );
             }
         }
         return ret;
+    }
+
+    /**
+     * Returns the BurdenAnalysis per Subject label (See Bug 4129). Takes the average of all the per-sample metrics in a
+     * subject label.
+     * 
+     * @param subjectIds
+     * @return a map with the patientID as index, e.g. { LABEL_NAME : 'Control', NUM_DELETION : 2, NUM_DUPLICATION : 4,
+     *         }'
+     * @throws NotLoggedInException
+     * @throws BioMartServiceException
+     */
+    @Override
+    @RemoteMethod
+    public Collection<Map<String, String>> getBurdenAnalysisPerSubjectLabel( Collection<Long> variantIds )
+            throws NotLoggedInException, BioMartServiceException {
+        Collection<Map<String, String>> results = new ArrayList<>();
+
+        Map<Label, Collection<String>> labelPatientId = new HashMap<>();
+        Map<String, Collection<Long>> subjectVariants = new HashMap<>();
+        for ( Variant v : variantDao.load( variantIds ) ) {
+            Subject subject = subjectDao.load( v.getSubject().getId() );
+
+            // group variants by patient id
+            Collection<Long> variantsAdded = subjectVariants.get( subject.getPatientId() );
+            if ( variantsAdded == null ) {
+                variantsAdded = new ArrayList<>();
+                subjectVariants.put( subject.getPatientId(), variantsAdded );
+            }
+            variantsAdded.add( v.getId() );
+
+            // organize labels
+            for ( Label label : labelDao.getSubjectLabelsBySubjectId( subject.getId() ) ) {
+                if ( !labelPatientId.containsKey( label ) ) {
+                    labelPatientId.put( label, new HashSet<String>() );
+                }
+                labelPatientId.get( label ).add( subject.getPatientId() );
+            }
+        }
+
+        // store stats by patientId
+        Map<String, Map<String, Double>> patientIdStats = new HashMap<>();
+        for ( String patientId : subjectVariants.keySet() ) {
+            Map<String, Double> stats = getCnvBurdenAnalysisPerSubject( subjectVariants.get( patientId ) );
+            patientIdStats.put( patientId, stats );
+        }
+
+        // now aggregate patient stats by label by taking the average
+        for ( Label label : labelPatientId.keySet() ) {
+            Map<String, Double> perLabelStats = new HashMap<>();
+
+            // add all the values up for each patient
+            for ( String patientId : labelPatientId.get( label ) ) {
+                for ( String statName : patientIdStats.get( patientId ).keySet() ) {
+                    Double statVal = patientIdStats.get( patientId ).get( statName );
+                    if ( !perLabelStats.containsKey( statName ) ) {
+                        perLabelStats.put( statName, 0.0 );
+                    }
+                    perLabelStats.put( statName, perLabelStats.get( statName ) + statVal );
+                }
+            }
+
+            // nothing to do when there's no patients associated with this label
+            if ( labelPatientId.get( label ).size() == 0 ) {
+                continue;
+            }
+
+            // divide by the number of patients
+            for ( String statName : perLabelStats.keySet() ) {
+                perLabelStats.put( statName, perLabelStats.get( statName ) / labelPatientId.get( label ).size() );
+            }
+
+            // finally save the results
+            Map<String, String> statsStr = statsToString( perLabelStats );
+
+            // assume unique label name?
+            statsStr.put( CnvBurdenAnalysisPerSubject.LABEL_NAME.toString(), label.getName() );
+
+            results.add( statsStr );
+        }
+
+        return results;
     }
 
     /**
@@ -142,8 +233,10 @@ public class GeneServiceImpl implements GeneService {
     }
 
     /**
-     * @param subject
+     * @param variantIds
      * @return
+     * @throws NotLoggedInException
+     * @throws BioMartServiceException
      */
     private Map<String, Double> getCnvBurdenAnalysisPerSubject( Collection<Long> variantIds )
             throws NotLoggedInException, BioMartServiceException {
@@ -151,6 +244,11 @@ public class GeneServiceImpl implements GeneService {
         // Initialize
         Map<String, Double> results = new HashMap<>();
         for ( CnvBurdenAnalysisPerSubject ba : CnvBurdenAnalysisPerSubject.values() ) {
+            // don't add PATIENT_ID and LABEL_NAME
+            if ( ba.equals( CnvBurdenAnalysisPerSubject.PATIENT_ID )
+                    || ba.equals( CnvBurdenAnalysisPerSubject.LABEL_NAME ) ) {
+                continue;
+            }
             results.put( ba.toString(), 0.0 );
         }
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'ASPIREdb.view.report.BurdenAnalysisPerSubject' ] );
+Ext.require( [ 'ASPIREdb.view.report.BurdenAnalysisPerSubject', 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel' ] );
 
 /**
  * Create Burden Analysis Window
@@ -58,7 +58,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             name : 'name',
             type : 'string'
          } ],
-         data : [ [ 'perSubject', 'Per Subject' ], ], // TODO per group, gene-centric and locus-centric
+         data : [ [ 'perSubject', 'Per subject' ], [ 'perSubjectLabel', 'Per subject label'] ], // TODO gene-centric and locus-centric
          autoLoad : true,
          autoSync : true,
       } );
@@ -101,14 +101,16 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       var window = this.up( '#burdenAnalysisWindow' );
       var reportPanel = null;
 
-      if ( reportType !== 'perSubject' ) {
+      if ( reportType === 'perSubject' ) {
+         reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', { itemId : '#burdenAnalysisPanel' } );
+      } else if ( reportType === 'perSubjectLabel' ) {
+         reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', { itemId : '#burdenAnalysisPanel' } );
+      } else {
          Ext.Msg.alert( 'Error', 'Report ' + reportType + ' not implemented' );
          return;
       }
-
-      window.remove( window.down( '#burdenAnalysisPerSubject' ) );
-
-      reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubject' );
+      
+      window.remove( window.down( '#burdenAnalysisPanel' ) );
       window.add( reportPanel );
       window.doLayout();
 

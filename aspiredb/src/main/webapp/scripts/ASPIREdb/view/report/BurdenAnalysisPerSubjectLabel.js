@@ -19,9 +19,9 @@
 Ext.require( [] );
 
 /**
- * Create Burden Analysis Per Subject
+ * Create Burden Analysis Per Subject Label
  */
-Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', {
+Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
    extend : 'Ext.panel.Panel',
    layout : 'fit',
 
@@ -40,7 +40,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', {
          return;
       }
       for ( var field in data) {
-         if ( field === 'PATIENT_ID' ) {
+         if ( field === 'LABEL_NAME' ) {
             ret.push( field );
          } else {
             ret.push( {
@@ -74,8 +74,8 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', {
    createGrid : function(data) {
       var me = this;
       var columns = [ {
-         dataIndex : 'PATIENT_ID',
-         text : 'Patient ID',
+         dataIndex : 'LABEL_NAME',
+         text : 'Subject label',
       }, {
          dataIndex : 'NUM_DELETION',
          text : '# deletion',
@@ -114,7 +114,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', {
 
       var grid = Ext.create( 'Ext.grid.Panel', {
          store : me.createStore( data ),
-         itemId : 'burdenAnalysisPerSubjectGrid',
+         itemId : 'burdenAnalysisPerSubjectLabelGrid',
          columns : columns
       } );
 
@@ -128,7 +128,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', {
 
       var me = this;
 
-      GeneService.getBurdenAnalysisPerSubject( variantIds, {
+      GeneService.getBurdenAnalysisPerSubjectLabel( variantIds, {
          callback : function(results) {
             var grid = me.createGrid( results );
             me.add( grid );
@@ -139,7 +139,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', {
 
          },
          errorHandler : function(errorString, exception) {
-            var msg = 'Error calculating Burden Analysis Per Subject: ' + errorString;
+            var msg = 'Error calculating Burden Analysis Per Subject Label: ' + errorString;
             console.log( msg, exception );
             Ext.Msg.alert( 'Error', msg );
          }

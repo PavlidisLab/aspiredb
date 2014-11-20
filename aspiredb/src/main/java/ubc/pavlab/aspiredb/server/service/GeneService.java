@@ -45,10 +45,13 @@ public interface GeneService {
 
     public Long saveUserGeneSet( String geneName, List<GeneValueObject> genes );
 
-    public Map<Long, Collection<GeneValueObject>> getGenesPerVariant( Collection<Long> ids ) throws NotLoggedInException,
-            BioMartServiceException;
+    public Map<Long, Collection<GeneValueObject>> getGenesPerVariant( Collection<Long> ids )
+            throws NotLoggedInException, BioMartServiceException;
 
     public Collection<Map<String, String>> getBurdenAnalysisPerSubject( Collection<Long> subjectIds )
+            throws NotLoggedInException, BioMartServiceException;
+
+    public Collection<Map<String, String>> getBurdenAnalysisPerSubjectLabel( Collection<Long> variantIds )
             throws NotLoggedInException, BioMartServiceException;
 
 }
