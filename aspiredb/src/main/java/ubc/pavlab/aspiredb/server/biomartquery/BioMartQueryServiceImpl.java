@@ -187,8 +187,6 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
             }, 0, 10 * 1000 );
 
             String response = sendRequest( xmlQueryWriter.toString() );
-            log.info( "BioMart request to (" + BIO_MART_URL + ") took " + timer.getTime() + " ms" );
-
             uploadCheckerTimer.cancel();
 
             String[] rows = StringUtils.split( response, "\n" );
@@ -236,6 +234,10 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
             }
 
             this.bioMartCache.putAll( genes );
+
+            log.info( "BioMart request to (" + BIO_MART_URL + ") took " + timer.getTime() + " ms and loaded "
+                    + genes.size() + " genes" );
+
         }
     }
 }
