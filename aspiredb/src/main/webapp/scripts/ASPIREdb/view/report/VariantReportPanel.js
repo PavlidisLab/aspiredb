@@ -153,6 +153,11 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
             console.log( "Column '" + columnName + "' not found" );
             return;
          }
+         
+         // show NA for empty values
+         if ( val === "" ) {
+             val = "NA";
+         }
 
          // now lets calculate and store it!
          if ( map.get( val ) == undefined ) {
