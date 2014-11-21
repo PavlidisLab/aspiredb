@@ -32,6 +32,16 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       this.callParent();
    },
 
+   isVariantTypeAndReportFieldCompatible : function( columnName, variantType ) {
+      if ( variantType !== "CNV" ) {
+         if ( columnName === "type" || columnName === "cnvLength" ) {
+            return false;
+         }
+      }
+      
+      return true;
+   },
+   
    /**
     * Return the value where the bin is found
     */
@@ -99,6 +109,11 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
             return;
          }
 
+         // For CNV specific attributes like type and length, ignore SNVs
+         if ( !this.isVariantTypeAndReportFieldCompatible( columnName, row["variantType"] ) ) {
+            continue;
+         }
+         
          // bin the value
          var bin = this.findBin( val, BINS, BINS_TEXT );
 
@@ -145,13 +160,18 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       var fields = [ columnName, countColumnName ];
 
       for (var i = 0; i < store.data.length; i++) {
-
+         
          // extract values
          var row = store.data.getAt( i ).data;
          var val = row[columnName];
          if ( val == undefined ) {
             console.log( "Column '" + columnName + "' not found" );
             return;
+         }
+
+         // For CNV specific attributes like type and length, ignore SNVs
+         if ( !this.isVariantTypeAndReportFieldCompatible( columnName, row["variantType"] ) ) {
+            continue;
          }
          
          // show NA for empty values
