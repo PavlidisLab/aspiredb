@@ -30,7 +30,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
       storeFields : [ 'id', 'patientId', 'variantType', 'genomeCoordinates', 'chromosome', 'baseStart', 'baseEnd',
                      'labelIds', 'type', 'copyNumber', 'cnvLength', 'dbSNPID', 'observedBase', 'referenceBase',
-                     'indelLength' ],
+                     'indelLength', 'gene' ],
 
       initComponent : function() {
          this.callParent();
@@ -44,7 +44,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
        * @param {string[]}
        *           properties
        */
-      createVariantGrid : function(vvos, properties) {
+      createVariantGrid : function(vvos, properties, variantGenes) {
 
          var fieldData = [];
 
@@ -77,7 +77,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
          }
 
          var visibleLabels = this.createVisibleLabels( vvos );
-         var storeData = this.constructVariantStoreData( vvos, characteristicNames, visibleLabels );
+         var storeData = this.constructVariantStoreData( vvos, variantGenes, characteristicNames, visibleLabels );
 
          var store = Ext.create( 'Ext.data.ArrayStore', {
             storeId : 'variantGrid',
@@ -88,7 +88,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
          } );
 
          var columnHeaders = [ 'Patient Id', 'Type', 'Genome Coordinates', 'Copy Number', 'CNV Type', 'CNV Length',
-                              'DB SNP ID', 'Observed Base', 'Reference Base', 'Indel Length' ];
+                              'DB SNP ID', 'Observed Base', 'Reference Base', 'Indel Length', 'Gene' ];
          var columnConfig = [];
 
          columnConfig.push( {
@@ -200,6 +200,13 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             hidden : true
          } );
 
+         columnConfig.push( {
+            text : 'Gene',
+            flex : 1,
+            dataIndex : 'gene',
+            hidden : true
+         } );
+         
          for (var i = 0; i < characteristicNames.length; i++) {
 
             var config = {};
@@ -268,7 +275,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
          return grid;
       },
-
+      
       /**
        * Extract labels from value object
        * 
@@ -287,30 +294,20 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
          return visibleLabels;
       },
-      /**
-       * constructVariantCountStoreData : function(vvos, characteristicNames, subjectId){ var storeData = []; var
-       * countCNV=0; var countSNV=0; var countINDEL=0; var variantype =[];
-       * 
-       * for ( var i = 0; i < vvos.length; i++) {
-       * 
-       * var vvo = vvos[i];
-       * 
-       * if (vvo.patientId == subjectId){
-       * 
-       * switch (vvo.variantType){ case "CNV": countCNV++; break; case "SNV": countSNV++; break; case "INDEL":
-       * countINDEL++; break; } } } },
-       */
+      
       /**
        * @public
        * @param {VariantValueObject[]}
        *           vvos
+       * @param {GeneValueObject[]}
+       *           variantGenes
        * @param {string[]}
        *           characteristicNames
        * @param {string[]}
        *           visibleLabels
        * 
        */
-      constructVariantStoreData : function(vvos, characteristicNames, visibleLabels) {
+      constructVariantStoreData : function(vvos, variantGenes, characteristicNames, visibleLabels) {
 
          var storeData = [];
 
@@ -374,6 +371,16 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
                dataRow.push( "" );
             }
 
+            // Concatenate gene symbols
+            var geneSymbols = [];
+            for(var geneIdx = 0; geneIdx < variantGenes[vvo.id].length; geneIdx++) {
+               var g = variantGenes[vvo.id][geneIdx];
+               if ( g.geneBioType === "protein_coding" ) {
+                  geneSymbols.push( g.symbol );
+               }
+            }
+            dataRow.push( geneSymbols.join(',') );
+            
             for (var j = 0; j < characteristicNames.length; j++) {
 
                var dataRowValue = "";
@@ -396,6 +403,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
          return storeData;
 
-      }
+      },
+
 
    } );

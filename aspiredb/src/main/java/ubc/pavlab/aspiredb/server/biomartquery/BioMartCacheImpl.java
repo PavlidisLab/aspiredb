@@ -23,6 +23,9 @@ import javax.annotation.PostConstruct;
 import net.sf.ehcache.search.Attribute;
 import net.sf.ehcache.search.expression.Criteria;
 
+import org.apache.commons.lang.time.StopWatch;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Component;
 
 import ubc.pavlab.aspiredb.server.util.GenomeBin;
@@ -55,11 +58,26 @@ public class BioMartCacheImpl extends SearchableEhcache<GeneValueObject> impleme
     private Attribute<Object> endAttribute;
     private Attribute<Object> binAttribute;
 
+    protected static Log log = LogFactory.getLog( BioMartCacheImpl.class );
+
     @Override
     public Collection<GeneValueObject> fetchGenesByGeneSymbols( Collection<String> geneSymbols ) {
         Criteria symbolCriteria = geneSymbolAttribute.in( geneSymbols );
 
         return fetchByCriteria( symbolCriteria );
+    }
+
+    @Override
+    public Collection<GeneValueObject> fetchGenesByBin( int bin ) {
+
+        Criteria eqBin = binAttribute.eq( bin );
+
+        StopWatch timer = new StopWatch();
+        timer.start();
+        final Collection<GeneValueObject> geneValueObjects = fetchByCriteria( eqBin );
+        log.info( "Fetching " + geneValueObjects.size() + " genes took " + timer.getTime() + " ms" );
+
+        return geneValueObjects;
     }
 
     @Override

@@ -16,8 +16,10 @@ package ubc.pavlab.aspiredb.server.biomartquery;
 
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -86,6 +88,8 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
     @Autowired
     private BioMartCache bioMartCache;
 
+    private Map<Integer, Collection<GeneValueObject>> geneCache;
+
     @Override
     public Collection<GeneValueObject> fetchGenesByGeneSymbols( Collection<String> geneSymbols )
             throws BioMartServiceException {
@@ -100,6 +104,13 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
         updateCacheIfExpired();
 
         return bioMartCache.fetchGenesByLocation( chromosomeName, start, end );
+    }
+
+    @Override
+    public Collection<GeneValueObject> fetchGenesByBin( int bin ) throws BioMartServiceException {
+        updateCacheIfExpired();
+
+        return geneCache.get( bin );
     }
 
     @Override
@@ -143,6 +154,8 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
 
     private void updateCacheIfExpired() throws BioMartServiceException {
         if ( this.bioMartCache.hasExpired() ) {
+            geneCache = new HashMap<>();
+
             Dataset dataset = new Dataset( "hsapiens_gene_ensembl" );
 
             dataset.Filter.add( new Filter( "chromosome_name",
@@ -215,7 +228,8 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
                 String end = fields[index++];
 
                 // Ignore results that do not have required attributes.
-                if ( ensemblId.equals( "" ) || chromosome.equals( "" ) || start.equals( "" ) || end.equals( "" ) ) {
+                if ( ensemblId.equals( "" ) || symbol.equals( "" ) || chromosome.equals( "" ) || start.equals( "" )
+                        || end.equals( "" ) ) {
                     continue;
                 }
 
@@ -230,6 +244,14 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
                 } else {
                     gene.setGenomicRange( new GenomicRange( chromosome, endBase, startBase ) );
                 }
+
+                // organize genes by bin, this is for performance reasons, see Bug 4210
+                int bin = gene.getGenomicRange().getBin();
+                if ( !geneCache.containsKey( bin ) ) {
+                    geneCache.put( bin, new HashSet<GeneValueObject>() );
+                }
+                geneCache.get( bin ).add( gene );
+
                 genes.add( gene );
             }
 

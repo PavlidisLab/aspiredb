@@ -26,6 +26,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.time.StopWatch;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +51,9 @@ import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.server.model.Variant;
+import ubc.pavlab.aspiredb.server.util.GenomeBin;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
+import ubc.pavlab.aspiredb.shared.GenomicRange;
 
 /**
  * author: anton date: 01/05/13
@@ -75,6 +80,8 @@ public class GeneServiceImpl implements GeneService {
     enum CnvBurdenAnalysisPerSubject {
         PATIENT_ID, LABEL_NAME, NUM_DELETION, NUM_DUPLICATION, NUM_UNKNOWN, TOTAL, TOTAL_SIZE, AVG_SIZE, NUM_GENES, NUM_CNVS_WITH_GENE, AVG_GENES_PER_CNV
     }
+
+    protected static Log log = LogFactory.getLog( GeneServiceImpl.class );
 
     @Override
     @RemoteMethod
@@ -313,6 +320,38 @@ public class GeneServiceImpl implements GeneService {
     }
 
     /**
+     * @param location
+     * @param genes
+     * @return genes that overlap the location
+     */
+    private Collection<GeneValueObject> findGeneOverlap( GenomicLocation variantLoc, Collection<GeneValueObject> genes ) {
+        Collection<GeneValueObject> results = new ArrayList<>();
+
+        if ( variantLoc == null || genes == null ) {
+            log.debug( "Either variant " + variantLoc + " or genes " + genes + " is null!" );
+            return results;
+        }
+
+        for ( GeneValueObject gene : genes ) {
+            GenomicRange geneRange = gene.getGenomicRange();
+            boolean sameChromosome = geneRange.getChromosome().equals( variantLoc.getChromosome() );
+            boolean geneInsideRegion = ( variantLoc.getStart() <= geneRange.getBaseStart() )
+                    && ( variantLoc.getEnd() >= geneRange.getBaseEnd() );
+            boolean geneSurroundsRegion = ( variantLoc.getStart() >= geneRange.getBaseStart() )
+                    && ( variantLoc.getEnd() <= geneRange.getBaseEnd() );
+            boolean geneHitsEndOfRegion = ( variantLoc.getStart() <= geneRange.getBaseStart() )
+                    && ( variantLoc.getEnd() >= geneRange.getBaseStart() );
+            boolean geneHitsStartOfRegion = ( variantLoc.getStart() <= geneRange.getBaseEnd() )
+                    && ( variantLoc.getEnd() >= geneRange.getBaseEnd() );
+            if ( sameChromosome
+                    && ( geneInsideRegion || geneSurroundsRegion || geneHitsEndOfRegion || geneHitsStartOfRegion ) ) {
+                results.add( gene );
+            }
+        }
+        return results;
+    }
+
+    /**
      * Returns all the genes that overlap with the variantIds, including non-protein coding genes.
      */
     @Override
@@ -321,18 +360,55 @@ public class GeneServiceImpl implements GeneService {
     public Map<Long, Collection<GeneValueObject>> getGenesPerVariant( Collection<Long> variantIds )
             throws NotLoggedInException, BioMartServiceException {
 
+        int genesFound = 0;
+
+        StopWatch timer = new StopWatch();
+        timer.start();
+
         Map<Long, Collection<GeneValueObject>> results = new HashMap<>();
 
-        for ( Variant variant : variantDao.load( variantIds ) ) {
+        Map<Integer, Collection<Variant>> variantBin = new HashMap<>();
 
+        // group variants by bin
+        for ( Variant variant : variantDao.load( variantIds ) ) {
             GenomicLocation location = variant.getLocation();
 
-            Collection<GeneValueObject> genesInsideRange = this.bioMartQueryService.fetchGenesByLocation(
-                    String.valueOf( location.getChromosome() ), ( long ) location.getStart(),
-                    ( long ) location.getEnd() );
+            for ( int bin : GenomeBin.relevantBins( location.getChromosome(), location.getStart(), location.getEnd() ) ) {
 
-            results.put( variant.getId(), genesInsideRange );
+                if ( !variantBin.containsKey( bin ) ) {
+                    variantBin.put( bin, new ArrayList<Variant>() );
+                }
+                variantBin.get( bin ).add( variant );
+            }
         }
+
+        // for each bin, do a biomary query and get the list of genes
+        Map<Integer, Collection<GeneValueObject>> geneBin = new HashMap<>();
+        for ( int bin : variantBin.keySet() ) {
+            Collection<GeneValueObject> genesInsideRange = this.bioMartQueryService.fetchGenesByBin( bin );
+
+            if ( !geneBin.containsKey( bin ) ) {
+                geneBin.put( bin, genesInsideRange );
+            } else {
+                geneBin.get( bin ).addAll( genesInsideRange );
+            }
+        }
+
+        // for each gene, overlap with matching variant, fast computation
+        for ( int bin : variantBin.keySet() ) {
+            Collection<GeneValueObject> genesInsideBin = geneBin.get( bin );
+            for ( Variant variant : variantBin.get( bin ) ) {
+                Collection<GeneValueObject> genesInsideRange = findGeneOverlap( variant.getLocation(), genesInsideBin );
+                if ( !results.containsKey( variant.getId() ) ) {
+                    results.put( variant.getId(), new ArrayList<GeneValueObject>() );
+                }
+                results.get( variant.getId() ).addAll( genesInsideRange );
+                genesFound += genesInsideRange.size();
+            }
+        }
+
+        log.info( "Found " + genesFound + " genes that overlap " + results.size() + " variants (" + timer.getTime()
+                + " ms)" );
 
         return results;
     }

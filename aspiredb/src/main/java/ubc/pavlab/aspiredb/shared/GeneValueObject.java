@@ -17,6 +17,8 @@ package ubc.pavlab.aspiredb.shared;
 import java.io.Serializable;
 
 import org.directwebremoting.annotations.DataTransferObject;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * TODO Document Me
@@ -24,6 +26,7 @@ import org.directwebremoting.annotations.DataTransferObject;
  * @author Paul
  * @version $Id: GeneValueObject.java,v 1.10 2013/06/11 22:30:57 anton Exp $
  */
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @DataTransferObject(javascript = "GeneValueObject")
 public class GeneValueObject implements Displayable, Serializable {
     private static final long serialVersionUID = -7411514301896256147L;
@@ -98,6 +101,11 @@ public class GeneValueObject implements Displayable, Serializable {
             ret += " - " + this.genomicRange.toString();
         }
         return ret;
+    }
+
+    @Override
+    public String toString() {
+        return getTooltip();
     }
 
     public void setEnsemblId( String ensemblId ) {

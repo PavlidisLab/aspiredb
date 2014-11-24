@@ -20,6 +20,7 @@ package ubc.pavlab.aspiredb.server.service;
 
 import static junit.framework.Assert.assertEquals;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -35,7 +36,9 @@ import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.GenomicLocation;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
+import ubc.pavlab.aspiredb.server.util.GenomeBin;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
+import ubc.pavlab.aspiredb.shared.GenomicRange;
 
 /**
  * author: anton date: 22/05/13
@@ -45,6 +48,12 @@ public class GeneServiceTest extends BaseSpringContextTest {
     private BioMartQueryService bioMartQueryServiceMock;
     private VariantDao variantDaoMock;
     private GeneService geneService = new GeneServiceImpl();
+
+    private GeneValueObject createGene( String symbol, String chromosome, int start, int end ) {
+        GeneValueObject gene = new GeneValueObject( "ENSG1", symbol, "Gene desc " + symbol, "", "human" );
+        gene.setGenomicRange( new GenomicRange( chromosome, start, end ) );
+        return gene;
+    }
 
     @Before
     public void setup() throws Exception {
@@ -63,7 +72,35 @@ public class GeneServiceTest extends BaseSpringContextTest {
         EasyMock.expect( variantDaoMock.load( Arrays.asList( 2L ) ) ).andReturn( Arrays.asList( variant ) );
         EasyMock.replay( variantDaoMock );
 
+        GenomicRange geneRange = new GenomicRange( "Y", 1, 100 );
         bioMartQueryServiceMock = EasyMock.createMock( BioMartQueryService.class );
+        for ( int bin : GenomeBin.relevantBins( geneRange.getChromosome(), geneRange.getBaseStart(),
+                geneRange.getBaseEnd() ) ) {
+            if ( bin == GenomeBin.binFromRange( geneRange.getChromosome(), geneRange.getBaseStart(),
+                    geneRange.getBaseEnd() ) ) {
+
+                EasyMock.expect( bioMartQueryServiceMock.fetchGenesByBin( bin ) ).andReturn(
+                        Arrays.asList(
+                                createGene( "HAIRCH", geneRange.getChromosome(), geneRange.getBaseStart(),
+                                        geneRange.getBaseEnd() ),
+                                createGene( "GENE_INSIDE_VARIANT", geneRange.getChromosome(),
+                                        geneRange.getBaseStart() + 10, geneRange.getBaseEnd() - 10 ),
+                                createGene( "VARIANT_INSIDE_GENE", geneRange.getChromosome(),
+                                        geneRange.getBaseStart() - 1, geneRange.getBaseEnd() + 10 ),
+                                createGene( "OVERLAPEND", geneRange.getChromosome(), geneRange.getBaseStart() + 50,
+                                        geneRange.getBaseEnd() + 50 ),
+                                createGene( "OVERLAPSTART", geneRange.getChromosome(), geneRange.getBaseStart() - 1,
+                                        geneRange.getBaseEnd() - 50 ),
+                                createGene( "NOTOVERLAP_DIFFCHR", "22", geneRange.getBaseStart(),
+                                        geneRange.getBaseEnd() ),
+                                createGene( "NOTOVERLAP_DOWNSTREAM", geneRange.getChromosome(),
+                                        geneRange.getBaseStart() + 1000, geneRange.getBaseEnd() + 1000 ) ) );
+            } else {
+                EasyMock.expect( bioMartQueryServiceMock.fetchGenesByBin( bin ) ).andReturn(
+                        new ArrayList<GeneValueObject>() );
+            }
+        }
+
         EasyMock.expect( bioMartQueryServiceMock.fetchGenesByLocation( "Y", 1L, 100L ) ).andReturn(
                 Arrays.asList( new GeneValueObject( "1", "HAIRCH", "Hairy chest gene.", "", "human" ) ) );
         EasyMock.replay( bioMartQueryServiceMock );
@@ -82,7 +119,16 @@ public class GeneServiceTest extends BaseSpringContextTest {
     public void testGetGenesInsideVariants() throws Exception {
         Collection<GeneValueObject> genes = geneService.getGenesInsideVariants( Arrays.asList( 2L ) );
 
-        assertEquals( genes.size(), 1 );
-        assertEquals( genes.iterator().next().getSymbol(), "HAIRCH" );
+        assertEquals( genes.size(), 5 );
+        int found = 0;
+        for ( GeneValueObject gene : genes ) {
+            String symbol = gene.getSymbol();
+            if ( symbol.equals( "HAIRCH" ) || symbol.equals( "VARIANT_INSIDE_GENE" )
+                    || symbol.equals( "GENE_INSIDE_VARIANT" ) || symbol.equals( "OVERLAPEND" )
+                    || symbol.equals( "OVERLAPSTART" ) ) {
+                found++;
+            }
+        }
+        assertEquals( genes.size(), found );
     }
 }

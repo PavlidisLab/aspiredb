@@ -44,4 +44,6 @@ public interface BioMartCache {
     public boolean hasExpired();
 
     public void putAll( Collection<GeneValueObject> genes );
+
+    public Collection<GeneValueObject> fetchGenesByBin( int bin );
 }

@@ -320,7 +320,49 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       return grid.getSelectionModel().getSelection();
    },
    
-   
+   createVariantGrid : function( vvos, properties, variantGenes ) {
+      var ref = this;
+      
+      var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid( vvos, properties, variantGenes );
+      // var grid2 = ASPIREdb.view.GeneGridCreator.createGeneGrid( vos, properties );
+
+      grid.on( 'itemcontextmenu', function(view, record, item, index, e) {
+         // Stop the browser getting the event
+         e.preventDefault();
+
+         var contextMenu = new Ext.menu.Menu( {
+            items : [ {
+               text : 'Make label',
+               handler : ref.makeLabelHandler,
+               scope : ref,
+            }, {
+               text : 'Label Manager',
+               handler : ref.labelManagerHandler,
+               scope : ref,
+            } ]
+         } );
+
+         contextMenu.showAt( e.getX(), e.getY() );
+      }, this );
+
+      ref.remove( 'variantGrid', true );
+      ref.remove( 'geneGrid', true );
+
+      // when subjects are
+      // selected
+      grid.on( 'selectionchange', ref.selectionChangeHandler, ref );
+
+      grid.on( 'show', function() {
+         if ( ref.newIdeogramLabel ) {
+            grid.getView().refresh();
+            ref.newIdeogramLabel = undefined;
+         }
+         ref.focusSelectedVariants();
+      } );
+
+      ref.add( grid );
+      // ref.add( grid2 );
+   },
    
    /**
     * Filter the variants of the subject selected. Initially it loads all the variants associated with all the subjects.
@@ -383,45 +425,19 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                ideogram.drawChromosomes();
                ideogram.drawVariants( vvos );
 
-               var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid( vvos, properties );
-               // var grid2 = ASPIREdb.view.GeneGridCreator.createGeneGrid( vos, properties );
-
-               grid.on( 'itemcontextmenu', function(view, record, item, index, e) {
-                  // Stop the browser getting the event
-                  e.preventDefault();
-
-                  var contextMenu = new Ext.menu.Menu( {
-                     items : [ {
-                        text : 'Make label',
-                        handler : ref.makeLabelHandler,
-                        scope : ref,
-                     }, {
-                        text : 'Label Manager',
-                        handler : ref.labelManagerHandler,
-                        scope : ref,
-                     } ]
-                  } );
-
-                  contextMenu.showAt( e.getX(), e.getY() );
-               }, this );
-
-               ref.remove( 'variantGrid', true );
-               ref.remove( 'geneGrid', true );
-
-               // when subjects are
-               // selected
-               grid.on( 'selectionchange', ref.selectionChangeHandler, ref );
-
-               grid.on( 'show', function() {
-                  if ( ref.newIdeogramLabel ) {
-                     grid.getView().refresh();
-                     ref.newIdeogramLabel = undefined;
+               var d = new Date();
+               GeneService.getGenesPerVariant( variantIds, {
+                  callback : function( variantGenes ) {
+                     ref.createVariantGrid( vvos, properties, variantGenes )
+                     ref.setLoading( false );
+                     console.log('Getting genes for ' + variantIds.length + ' variants took ' + (new Date() - d) + ' ms')
+                  },
+                  errorHandler : function(message, exception) {
+                     Ext.Msg.alert( 'Error', message )
+                     console.log( message )
+                     console.log( dwr.util.toDescriptiveString(exception.stackTrace,3) )
                   }
-                  ref.focusSelectedVariants();
-               } );
-
-               ref.add( grid );
-               // ref.add( grid2 );
+               });
 
                var toolbar = ref.getDockedComponent( 'variantTabPanelToolbar' );
 
@@ -444,7 +460,6 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                   ref.redrawIdeogram( legendProperty );
                }
 
-               ref.setLoading( false );
 
                // }
                // } );

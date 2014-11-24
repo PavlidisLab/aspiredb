@@ -72,4 +72,13 @@ public interface BioMartQueryService {
      * @throws BioMartServiceException
      */
     public List<GeneValueObject> getGenes( List<String> geneStrings ) throws BioMartServiceException;
+
+    /**
+     * Get a list of genes that are located within the given genomic location bin
+     * 
+     * @param bin
+     * @return
+     * @throws BioMartServiceException
+     */
+    public Collection<GeneValueObject> fetchGenesByBin( int bin ) throws BioMartServiceException;
 }
