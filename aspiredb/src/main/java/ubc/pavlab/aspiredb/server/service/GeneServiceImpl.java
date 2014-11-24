@@ -335,6 +335,9 @@ public class GeneServiceImpl implements GeneService {
         for ( GeneValueObject gene : genes ) {
             GenomicRange geneRange = gene.getGenomicRange();
             boolean sameChromosome = geneRange.getChromosome().equals( variantLoc.getChromosome() );
+            if ( !sameChromosome ) {
+                continue;
+            }
             boolean geneInsideRegion = ( variantLoc.getStart() <= geneRange.getBaseStart() )
                     && ( variantLoc.getEnd() >= geneRange.getBaseEnd() );
             boolean geneSurroundsRegion = ( variantLoc.getStart() >= geneRange.getBaseStart() )
@@ -343,8 +346,7 @@ public class GeneServiceImpl implements GeneService {
                     && ( variantLoc.getEnd() >= geneRange.getBaseStart() );
             boolean geneHitsStartOfRegion = ( variantLoc.getStart() <= geneRange.getBaseEnd() )
                     && ( variantLoc.getEnd() >= geneRange.getBaseEnd() );
-            if ( sameChromosome
-                    && ( geneInsideRegion || geneSurroundsRegion || geneHitsEndOfRegion || geneHitsStartOfRegion ) ) {
+            if ( geneInsideRegion || geneSurroundsRegion || geneHitsEndOfRegion || geneHitsStartOfRegion ) {
                 results.add( gene );
             }
         }
@@ -382,21 +384,12 @@ public class GeneServiceImpl implements GeneService {
             }
         }
 
-        // for each bin, do a biomary query and get the list of genes
-        Map<Integer, Collection<GeneValueObject>> geneBin = new HashMap<>();
-        for ( int bin : variantBin.keySet() ) {
-            Collection<GeneValueObject> genesInsideRange = this.bioMartQueryService.fetchGenesByBin( bin );
-
-            if ( !geneBin.containsKey( bin ) ) {
-                geneBin.put( bin, genesInsideRange );
-            } else {
-                geneBin.get( bin ).addAll( genesInsideRange );
-            }
-        }
-
         // for each gene, overlap with matching variant, fast computation
         for ( int bin : variantBin.keySet() ) {
-            Collection<GeneValueObject> genesInsideBin = geneBin.get( bin );
+            Collection<GeneValueObject> genesInsideBin = this.bioMartQueryService.fetchGenesByBin( bin );
+            if ( genesInsideBin == null || genesInsideBin.size() == 0 ) {
+                continue;
+            }
             for ( Variant variant : variantBin.get( bin ) ) {
                 Collection<GeneValueObject> genesInsideRange = findGeneOverlap( variant.getLocation(), genesInsideBin );
                 if ( !results.containsKey( variant.getId() ) ) {
