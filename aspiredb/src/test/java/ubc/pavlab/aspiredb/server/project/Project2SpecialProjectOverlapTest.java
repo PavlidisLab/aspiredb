@@ -139,7 +139,7 @@ public class Project2SpecialProjectOverlapTest extends BaseSpringContextTest {
             projectManager.populateProjectToProjectOverlap( projectName, projectNameWithOverlap );
             log.info( "Project overlap between projects with " + cnvList.size() + " and " + cnvListWithOverlap.size()
                     + " variants took " + timer.getTime() + " ms" );
-            assertTrue( timer.getTime() < 1000 );
+            assertTrue( timer.getTime() < 2000 );
 
             projectManager.deleteProject( projectName );
         }
