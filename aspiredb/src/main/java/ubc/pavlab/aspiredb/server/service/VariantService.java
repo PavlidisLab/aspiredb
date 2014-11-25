@@ -16,6 +16,7 @@ package ubc.pavlab.aspiredb.server.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
@@ -80,4 +81,9 @@ public interface VariantService {
             SuggestionContext suggestionContext ) throws BioMartServiceException, NeurocartaServiceException,
             BioMartServiceException, NeurocartaServiceException;
 
+    /**
+     * @param variantIds
+     * @return map containing the VariantValueObjects that matched the variantIds grouped by Subject label names
+     */
+    public Map<String, Collection<VariantValueObject>> groupVariantsBySubjectLabels( Collection<Long> variantIds );
 }

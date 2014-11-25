@@ -16,6 +16,7 @@ package ubc.pavlab.aspiredb.server.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,12 +31,14 @@ import org.springframework.transaction.annotation.Transactional;
 import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
 import ubc.pavlab.aspiredb.server.dao.CharacteristicDao;
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
+import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.UserGeneSetDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
 import ubc.pavlab.aspiredb.server.model.Label;
+import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.ChromosomeBand;
@@ -93,6 +96,8 @@ public class VariantServiceImpl implements VariantService {
 
     private static Logger log = LoggerFactory.getLogger( VariantServiceImpl.class );
 
+    @Autowired
+    private SubjectDao subjectDao;
     @Autowired
     private VariantDao variantDao;
     @Autowired
@@ -550,6 +555,34 @@ public class VariantServiceImpl implements VariantService {
             }
         }
         return suggestions;
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Map<String, Collection<VariantValueObject>> groupVariantsBySubjectLabels( Collection<Long> variantIds ) {
+        final String NO_LABEL = "NO_LABEL";
+        Map<String, Collection<VariantValueObject>> result = new HashMap<>();
+
+        for ( Long id : variantIds ) {
+            Variant v = variantDao.load( id );
+            Subject subject = subjectDao.load( v.getSubject().getId() );
+            Collection<Label> labels = labelDao.getSubjectLabelsBySubjectId( subject.getId() );
+            if ( labels.size() > 0 ) {
+                for ( Label label : labels ) {
+                    if ( !result.containsKey( label.getName() ) ) {
+                        result.put( label.getName(), new ArrayList<VariantValueObject>() );
+                    }
+                    result.get( label.getName() ).add( v.toValueObject() );
+                }
+            } else {
+                if ( !result.containsKey( NO_LABEL ) ) {
+                    result.put( NO_LABEL, new ArrayList<VariantValueObject>() );
+                }
+                result.get( NO_LABEL ).add( v.toValueObject() );
+            }
+        }
+        return result;
     }
 
 }

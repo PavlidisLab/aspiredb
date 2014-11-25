@@ -83,10 +83,9 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
     * Use for numerical data types, bin the data first and plot the frequencies
     * 
     */
-   calculateBinFrequencies : function(store, columnName, countColumnName) {
+   calculateBinFrequencies : function(data, columnName, countColumnName) {
 
       var map = new Ext.util.HashMap();
-      var fields = [ columnName, countColumnName ];
 
       // setup bins
       var BINS = Array.apply( 0, Array( 20 ) ).map( function(val, i) {
@@ -99,20 +98,9 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          map.add( BINS_TEXT[i], 0 );
       }
 
-      for (var i = 0; i < store.data.length; i++) {
+      for (var i = 0; i < data.length; i++) {
 
-         // extract values
-         var row = store.data.getAt( i ).data;
-         var val = row[columnName];
-         if ( val == undefined ) {
-            console.log( "Column '" + columnName + "' not found" );
-            return;
-         }
-
-         // For CNV specific attributes like type and length, ignore SNVs
-         if ( !this.isVariantTypeAndReportFieldCompatible( columnName, row["variantType"] ) ) {
-            continue;
-         }
+         var val = data[i];
          
          // bin the value
          var bin = this.findBin( val, BINS, BINS_TEXT );
@@ -133,14 +121,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          data.push( freq );
       } );
 
-      // convert to Extjs Store
-      var newStore = Ext.create( 'Ext.data.JsonStore', {
-         storeId : 'reportStore',
-         fields : fields,
-         data : data,
-      } );
-
-      return newStore;
+      return data;
    },
 
    /**
@@ -155,30 +136,13 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
     *           output column name to store the frequency in, e.g. 'count'
     * @returns e.g. { "type" : "LOSS", "count" : 2 }
     */
-   calculateFrequencies : function(store, columnName, countColumnName) {
+   calculateFrequencies : function(data, columnName, countColumnName) {
       var map = new Ext.util.HashMap();
-      var fields = [ columnName, countColumnName ];
 
-      for (var i = 0; i < store.data.length; i++) {
+      for (var i = 0; i < data.length; i++) {
+
+         var val = data[i];
          
-         // extract values
-         var row = store.data.getAt( i ).data;
-         var val = row[columnName];
-         if ( val == undefined ) {
-            console.log( "Column '" + columnName + "' not found" );
-            return;
-         }
-
-         // For CNV specific attributes like type and length, ignore SNVs
-         if ( !this.isVariantTypeAndReportFieldCompatible( columnName, row["variantType"] ) ) {
-            continue;
-         }
-         
-         // show NA for empty values
-         if ( val === "" ) {
-             val = "NA";
-         }
-
          // now lets calculate and store it!
          if ( map.get( val ) == undefined ) {
             map.add( val, 1 );
@@ -199,35 +163,92 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          data.push( freq );
       } );
 
-      // convert to Extjs Store
-      var newStore = Ext.create( 'Ext.data.JsonStore', {
-         storeId : 'reportStore',
-         fields : fields,
-         data : data,
-      } );
-
-      return newStore;
+      return data;
    },
 
-   createReport : function(store, columnName) {
-
+   getColumnDataFromArray : function(data, columnName) {
+      var result = [];
+      for (var i = 0; i < data.length; i++) {
+         
+         // extract values
+         var row = data[i];
+         var val = row[columnName];
+         
+         if ( val == undefined ) {
+            console.log("Error " + val);
+            continue;
+         }
+         
+         // For CNV specific attributes like type and length, ignore SNVs
+         if ( !this.isVariantTypeAndReportFieldCompatible( columnName, row["variantType"] ) ) {
+            continue;
+         }
+         
+         // show NA for empty values
+         if ( val === "" ) {
+             val = "NA";
+         }
+         
+         result.push( val );
+      }
+      return result;
+   },
+   
+   getColumnDataFromStore : function(store, columnName) {
+      var result = [];
+      for (var i = 0; i < store.data.length; i++) {
+         
+         // extract values
+         var row = store.data.getAt( i ).data;
+         var val = row[columnName];
+         
+         if ( val == undefined ) {
+            console.log("Error " + val);
+            continue;
+         }
+         
+      // For CNV specific attributes like type and length, ignore SNVs
+         if ( !this.isVariantTypeAndReportFieldCompatible( columnName, row["variantType"] ) ) {
+            continue;
+         }
+         
+         // show NA for empty values
+         if ( val === "" ) {
+             val = "NA";
+         }
+         
+         result.push( val );
+      }
+      return result;
+   },
+   
+   /**
+    * Display the data in a column chart series
+    * 
+    * mergedFreqData = '[{"type":"LOSS","asd1":136, "asd2":200},{"type":"GAIN","asd1":97, "asd2":100}]'
+    * columnName = "type"
+    * labelNames = ["asd1","asd2"]
+    */
+   createLabelReport : function(mergedFreqData, columnName, labelNames) {
       var me = this;
-
-      // var columnName = 'type';
+      
       var countColumnName = 'count';
+      
+      var seriesTitle = labelNames;
+      
       var title = ASPIREdb.ActiveProjectSettings.getActiveProjectName();
       var xField = columnName;
-      var yField = countColumnName;
-
-      // columns that needs binning
-      var COLUMN_TYPE_BIN = [ "cnvLength" ];
-      var myDataStore = null;
-      if ( COLUMN_TYPE_BIN.indexOf( columnName ) != -1 ) {
-         myDataStore = this.calculateBinFrequencies( store, columnName, countColumnName );
-      } else {
-         myDataStore = this.calculateFrequencies( store, columnName, countColumnName );
-      }
-
+      var yField = seriesTitle;
+      
+      var fields = [columnName].concat(seriesTitle); // insert "type" into the first position
+     
+     // convert to Extjs Store
+     var myDataStore = Ext.create( 'Ext.data.JsonStore', {
+        storeId : 'reportStore',
+        fields : fields,
+        data : mergedFreqData,
+     } );
+     
       me.add( [ {
          xtype : 'chart',
          id : 'variantChart',
@@ -238,11 +259,11 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          shadow : false,
          layout : 'fit',
          style : 'background: #fff;',
-         // legend : {
-         // position : 'bottom',
-         // boxStrokeWidth : 0,
-         // labelFont : '12px Helvetica'
-         // },
+         legend : {
+             position : 'bottom',
+             boxStrokeWidth : 0,
+             labelFont : '12px Helvetica'
+         },
          store : myDataStore,
          insetPadding : 40,
          items : [ {
@@ -291,6 +312,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
             axis : 'left',
             xField : xField,
             yField : yField,
+            title : seriesTitle,
             style : {
                opacity : 0.80
             },
@@ -304,7 +326,8 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
                width : 150,
                style : 'background: #FFF',
                renderer : function(storeItem, item) {
-                  var msg = storeItem.get( xField ) + ': ' + storeItem.get( item.yField );
+                  var label = item.series.title[Ext.Array.indexOf(item.series.yField, item.yField)];
+                  var msg = label + " " +  storeItem.get( xField ) + ': ' + storeItem.get( item.yField );
                   this.update( msg );
                }
             }
@@ -314,6 +337,82 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       me.doLayout();
       me.show();
 
+   },
+   
+   /**
+    * Adds the contents of freqData to mergedFreqData
+    * 
+    * freqData = "[{"type":"LOSS","withVar":68},{"type":"GAIN","withVar":48}]"
+    * freqData = "[{"type":"LOSS","label2":20},{"type":"GAIN","label2":10}]"
+    * 
+    * mergedFreqData = "[{"type":"LOSS","withVar":68,"label2":20},{"type":"GAIN","withVar":48,"label2":10}]"
+    */
+   addFreqData : function( freqData, mergedFreqData ) {
+      for ( var i = 0; i < freqData.length; i++ ) {
+         var ele = freqData[i];
+         var mEle = mergedFreqData[i];
+         
+         if ( mEle == undefined ) {
+            mergedFreqData.push(ele);
+            continue;
+         }
+         
+         for ( var attr in ele ) {
+            var val = ele[attr];
+            
+            var mVal = mEle[attr];
+            
+            if ( mVal == undefined) {
+               mEle[attr] = val;
+            }
+         }
+      }
+      
+      return mergedFreqData;
+   },
+   
+   createReport : function(store, columnName) {
+
+      var me = this;
+      
+      
+      // get a list of variants grouped by Subject labels
+      var variantIds = this.getColumnDataFromStore( store, 'id' );
+      VariantService.groupVariantsBySubjectLabels(variantIds,{
+         callback: function(variantsByLabel) {
+            
+            var mergedFreqData = [];
+            var labelNames = [];
+            for ( var labelName in variantsByLabel ) {
+                labelNames.push(labelName);
+                var data = variantsByLabel[labelName];
+                var rawData = me.getColumnDataFromArray( data, columnName );
+                
+                // columns that needs binning
+                var COLUMN_TYPE_BIN = [ "cnvLength" ];
+                
+                var countColumnName = labelName;
+                
+                var freqData = null;
+                if ( COLUMN_TYPE_BIN.indexOf( columnName ) != -1 ) {
+                   freqData = me.calculateBinFrequencies( rawData, columnName, countColumnName );
+                } else {
+                   freqData = me.calculateFrequencies( rawData, columnName, countColumnName );
+                }
+                
+                me.addFreqData(freqData, mergedFreqData);
+                
+            }
+            
+            me.createLabelReport(mergedFreqData, columnName, labelNames);
+         },
+         errorHandler : function(message, exception) {
+            Ext.Msg.alert( 'Error', message )
+            console.log( message )
+            console.log( dwr.util.toDescriptiveString(exception.stackTrace,3) )
+         }
+      });
+      
    },
 
 } );
