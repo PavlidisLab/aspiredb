@@ -53,6 +53,11 @@ public abstract class SearchableEhcache<T> {
         return this.cache.getSearchAttribute( attributeName );
     }
 
+    /**
+     * Evicts expired elements in the cache. Warning: Introduces a performance hit (~8-10ms per call).
+     * 
+     * @return
+     */
     public boolean hasExpired() {
         // Causes all elements stored in the Cache to be synchronously checked for expiry (every 5 minutues), and if
         // expired, evicted.

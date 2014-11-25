@@ -38,7 +38,7 @@
     <cache name="loadBySubjectIds" maxElementsInMemory="20000" eternal="false" timeToIdleSeconds="86400"
         timeToLiveSeconds="432000" overflowToDisk="false" />
 
-    <cache name="BioMartCache" maxElementsInMemory="0" statistics="true" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false">
+    <cache name="BioMartCache" maxElementsInMemory="0" statistics="true" eternal="true" overflowToDisk="false">
         <searchable>
             <searchAttribute name="ensemblId" />
             <searchAttribute name="name" />

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 import javax.ws.rs.core.MediaType;
@@ -33,6 +34,7 @@ import javax.xml.bind.Marshaller;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +63,23 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
             "http://www.biomart.org/biomart/martservice/results" );
 
     private static Log log = LogFactory.getLog( BioMartQueryServiceImpl.class.getName() );
+
+    protected AtomicBoolean cacheReady = new AtomicBoolean( false );
+
+    private BioMartQueryServiceInitializationThread initializationThread;
+
+    protected class BioMartQueryServiceInitializationThread extends Thread {
+
+        @Override
+        public void run() {
+            try {
+                updateCache();
+                cacheReady.set( true );
+            } catch ( BioMartServiceException e ) {
+                log.error( "Error initializing BioMartQueryServiceInitializationThread", e );
+            }
+        }
+    }
 
     private static String sendRequest( String xmlQueryString ) throws BioMartServiceException {
         Client client = Client.create();
@@ -93,7 +112,7 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
     @Override
     public Collection<GeneValueObject> fetchGenesByGeneSymbols( Collection<String> geneSymbols )
             throws BioMartServiceException {
-        updateCacheIfExpired();
+        updateCache();
 
         return bioMartCache.fetchGenesByGeneSymbols( geneSymbols );
     }
@@ -101,14 +120,14 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
     @Override
     public Collection<GeneValueObject> fetchGenesByLocation( String chromosomeName, Long start, Long end )
             throws BioMartServiceException {
-        updateCacheIfExpired();
+        updateCache();
 
         return bioMartCache.fetchGenesByLocation( chromosomeName, start, end );
     }
 
     @Override
     public Collection<GeneValueObject> fetchGenesByBin( int bin ) throws BioMartServiceException {
-        updateCacheIfExpired();
+        updateCache();
 
         return geneCache.get( bin );
     }
@@ -128,7 +147,7 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
 
     @Override
     public Collection<GeneValueObject> findGenes( String queryString ) throws BioMartServiceException {
-        updateCacheIfExpired();
+        updateCache();
 
         return bioMartCache.findGenes( queryString );
     }
@@ -141,7 +160,7 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
      */
     @Override
     public List<GeneValueObject> getGenes( List<String> geneStrings ) throws BioMartServiceException {
-        updateCacheIfExpired();
+        updateCache();
 
         return bioMartCache.getGenes( geneStrings );
     }
@@ -149,12 +168,23 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
     @SuppressWarnings("unused")
     @PostConstruct
     private void initialize() throws BioMartServiceException {
-        // updateCacheIfExpired();
+        initializationThread = new BioMartQueryServiceInitializationThread();
+        initializationThread.setName( this.getClass().getName() + "_load_thread_"
+                + RandomStringUtils.randomAlphanumeric( 5 ) );
+        // To prevent VM from waiting on this thread to shutdown (if shutting down).
+        initializationThread.setDaemon( true );
+        initializationThread.start();
     }
 
-    private void updateCacheIfExpired() throws BioMartServiceException {
-        if ( this.bioMartCache.hasExpired() ) {
-            geneCache = new HashMap<>();
+    private void updateCache() throws BioMartServiceException {
+
+        /**
+         * Commented out code to check if cache hasExpired() because it takes ~8-10ms everytime this method is called.
+         * Assuming cache never expires.
+         */
+        // if ( this.bioMartCache.hasExpired() ) {
+
+        if ( geneCache == null ) {
 
             Dataset dataset = new Dataset( "hsapiens_gene_ensembl" );
 
@@ -214,6 +244,8 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
 
                 throw new BioMartServiceException( errorMessage );
             }
+
+            geneCache = new HashMap<>( rowsLength );
 
             for ( String row : rows ) {
                 String[] fields = row.split( "\t" );

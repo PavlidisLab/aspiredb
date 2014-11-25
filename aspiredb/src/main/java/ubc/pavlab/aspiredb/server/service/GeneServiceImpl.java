@@ -340,14 +340,27 @@ public class GeneServiceImpl implements GeneService {
             }
             boolean geneInsideRegion = ( variantLoc.getStart() <= geneRange.getBaseStart() )
                     && ( variantLoc.getEnd() >= geneRange.getBaseEnd() );
+            if ( geneInsideRegion ) {
+                results.add( gene );
+                continue;
+            }
             boolean geneSurroundsRegion = ( variantLoc.getStart() >= geneRange.getBaseStart() )
                     && ( variantLoc.getEnd() <= geneRange.getBaseEnd() );
+            if ( geneSurroundsRegion ) {
+                results.add( gene );
+                continue;
+            }
             boolean geneHitsEndOfRegion = ( variantLoc.getStart() <= geneRange.getBaseStart() )
                     && ( variantLoc.getEnd() >= geneRange.getBaseStart() );
+            if ( geneHitsEndOfRegion ) {
+                results.add( gene );
+                continue;
+            }
             boolean geneHitsStartOfRegion = ( variantLoc.getStart() <= geneRange.getBaseEnd() )
                     && ( variantLoc.getEnd() >= geneRange.getBaseEnd() );
-            if ( geneInsideRegion || geneSurroundsRegion || geneHitsEndOfRegion || geneHitsStartOfRegion ) {
+            if ( geneHitsStartOfRegion ) {
                 results.add( gene );
+                continue;
             }
         }
         return results;
@@ -390,6 +403,7 @@ public class GeneServiceImpl implements GeneService {
             if ( genesInsideBin == null || genesInsideBin.size() == 0 ) {
                 continue;
             }
+
             for ( Variant variant : variantBin.get( bin ) ) {
                 Collection<GeneValueObject> genesInsideRange = findGeneOverlap( variant.getLocation(), genesInsideBin );
                 if ( !results.containsKey( variant.getId() ) ) {
@@ -400,8 +414,8 @@ public class GeneServiceImpl implements GeneService {
             }
         }
 
-        log.info( "Found " + genesFound + " genes that overlap " + results.size() + " variants (" + timer.getTime()
-                + " ms)" );
+        log.info( "Found " + genesFound + " genes that overlap " + results.size() + " variants in "
+                + variantBin.keySet().size() + " bins (" + timer.getTime() + " ms)" );
 
         return results;
     }
