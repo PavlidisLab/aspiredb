@@ -174,9 +174,22 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          var row = data[i];
          var val = row[columnName];
          
+         // special case for VariantValueObjects
+         if ( columnName === "chromosome" ) {
+            val = row['genomicRange'][columnName];
+         } 
+         
          if ( val == undefined ) {
-            console.log("Error " + val);
-            continue;
+            
+            // possibly a characteristic ..., special case for VariantValueObject
+            var characteristic = row['characteristics'][columnName];
+            
+            if ( characteristic == undefined ) {
+               console.log("Error: Attribute '" + columnName + "' not found in " + row );
+               continue;
+            } else {
+               val = characteristic['value'];
+            }
          }
          
          // For CNV specific attributes like type and length, ignore SNVs
@@ -374,7 +387,9 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    createReport : function(store, columnName) {
 
       var me = this;
+      var reportWindow = me.up('#variantReportWindow');
       
+      reportWindow.setLoading(true);
       
       // get a list of variants grouped by Subject labels
       var variantIds = this.getColumnDataFromStore( store, 'id' );
@@ -387,6 +402,11 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
                 labelNames.push(labelName);
                 var data = variantsByLabel[labelName];
                 var rawData = me.getColumnDataFromArray( data, columnName );
+                
+                if ( rawData.length == 0 ) {
+                   console.log("Could not extract '" + columnName + "' from data")
+                   continue;
+                }
                 
                 // columns that needs binning
                 var COLUMN_TYPE_BIN = [ "cnvLength" ];
@@ -405,11 +425,15 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
             }
             
             me.createLabelReport(mergedFreqData, columnName, labelNames);
+            
+            reportWindow.setLoading(false);
          },
          errorHandler : function(message, exception) {
             Ext.Msg.alert( 'Error', message )
             console.log( message )
             console.log( dwr.util.toDescriptiveString(exception.stackTrace,3) )
+            
+            reportWindow.setLoading(false);
          }
       });
       

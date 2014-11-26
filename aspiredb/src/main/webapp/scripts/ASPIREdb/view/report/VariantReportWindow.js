@@ -54,11 +54,11 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
             name : 'name',
             type : 'string'
          } ],
-         // TODO Add labels
-         data : [ [ 'type', 'CNV type' ], [ 'variantType', 'Variant type' ], [ 'chromosome', 'Chromosome' ],
-                 [ 'inheritance', 'Inheritance' ], [ 'Array Platform', 'Array Platform' ],
+         // [ VariantValueObjectPropertyName : DisplayValue ]
+         data : [ [ 'patientId', 'Patient ID' ], [ 'type', 'CNV type' ], [ 'variantType', 'Variant type' ], [ 'chromosome', 'Chromosome' ],
+                 [ 'Inheritance', 'Inheritance' ], [ 'Array Platform', 'Array Platform' ],
                  [ 'Array Report', 'Array Report' ], [ 'Characteristics', 'Characteristics' ],
-                 [ 'cnvLength', 'CNV Length' ], [ 'patientId', 'Patient ID' ] ],
+                 [ 'cnvLength', 'CNV Length' ] ],
          autoLoad : true,
          autoSync : true,
       } );
@@ -111,13 +111,11 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
    },
 
    reportComboSelectHandler : function(sel) {
-      var reportType = sel.value;
+      var selReportType = sel.value;
       var window = this.up( '#variantReportWindow' );
 
       var reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReportPanel' );
-      reportPanel.createReport( window.variantStore, reportType );
-      var chart = reportPanel.down( "#variantChart" );
-
+      
       window.down( '#saveTxtButton' ).on( 'click', function() {
          // When Save button is clicked open text data download
          ASPIREdb.TextDataDownloadWindow.showChartDownload( Ext.getStore('reportStore') );
@@ -125,8 +123,10 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
 
       window.remove( window.down( '#variantReport' ) );
       window.add( reportPanel );
-      window.chart = chart;
+      window.chart = reportPanel.down( "#variantChart" );
       window.doLayout();
+
+      reportPanel.createReport( window.variantStore, selReportType );
    },
 
 } );
