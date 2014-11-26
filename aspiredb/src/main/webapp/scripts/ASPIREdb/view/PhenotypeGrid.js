@@ -65,19 +65,14 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
          disabled : 'true',
          itemId : 'analyzeButton',
          tooltip : 'Report the phenotype that is enriched for the list of filtered subjects',
-
-      }, {
-         itemId : 'saveButton',
-         xtype : 'button',
-         text : '',
-         tooltip : 'Download table contents as text',
-         icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
+         tooltipType : 'title',
 
       }, {
          xtype : 'button',
          text : 'Heatmap',
          itemId : 'heatmapButton',
          tooltip : 'View subject-phenotype heatmap',
+         tooltipType : 'title',
 
       }, {
          xtype : 'button',
@@ -85,7 +80,17 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
          disabled : 'true',
          itemId : 'contingencyTableButton',
          tooltip : 'View subject-phenotype labels',
-
+         tooltipType : 'title',
+      }, {
+         xtype : 'tbfill',
+      }, {
+         itemId : 'saveButton',
+         xtype : 'button',
+         text : '',
+         tooltip : 'Download table contents as text',
+         tooltipType : 'title',
+         icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
+         
       } ]
 
    } ],
@@ -116,7 +121,8 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
                     var ret = value.name + " " + image;
                     return ret;
                  },
-                 width : 350,
+//                 width : 350,
+                 flex : 1
               },
 
               {
@@ -124,7 +130,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
                  text : '',
                  dataIndex : 'selectedPhenotype',
                  hidden : true,
-                 width : 80,
+//                 width : 80,
                  renderer : function(value) {
 
                     var phenSummary = value.selectedPhenotype;
@@ -182,6 +188,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
                  text : 'Select Subject values',
                  hidden : true,
                  dataIndex : 'phenoSummaryMap',
+                 width : 60,
                  renderer : function(value, metadata, record) {
 
                     var phenSummary = value.phenoSummaryMapSelectedSubjects;
@@ -196,8 +203,11 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
                  },
 
               },
+              
               {
-                 text : 'Value (subject count)',
+                 text : 'Value',
+                 tooltip : 'Number of subjects for each phenotype value',
+                 tooltipType : 'title',
                  dataIndex : 'allPhenoSummaryMap',
                  renderer : function(value, metadata, record) {
                     var phenSummary = value.phenoSummaryMap;
@@ -210,7 +220,8 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
                     } else
                        return "";
                  },
-                 flex : 1
+                 width : 60,
+//                 flex : 1
               } ],
    listeners : {
       sortchange : function(phenotypeGrid, sortinfo) {

@@ -173,6 +173,7 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
          id : 'manageProject',
          text : 'Manage Project',
          tooltip : 'Upload variants or upload phenotypes',
+         tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
          handler : function() {
             ASPIREdb.view.ProjectManagerWindow.initGridAndShow();

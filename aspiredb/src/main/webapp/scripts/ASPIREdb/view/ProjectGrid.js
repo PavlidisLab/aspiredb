@@ -208,6 +208,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
          id : 'addProject',
          text : '',
          tooltip : 'Add new project',
+         tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
          // TODO: Need a better workaround
          handler : function() {
@@ -253,6 +254,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
          id : 'removeProject',
          text : '',
          tooltip : 'Remove the selected project',
+         tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
          handler : function() {
             var test = ref.selProject[0].data.ProjectName;

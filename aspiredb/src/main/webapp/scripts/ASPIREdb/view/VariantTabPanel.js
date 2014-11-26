@@ -149,14 +149,16 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          id : 'saveButton',
          text : '',
          tooltip : 'Download table contents as text',
-         icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
-
+         tooltipType : 'title',
+         icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
+         hidden : true,
       } );
 
       this.exportButton = Ext.create( 'Ext.Button', {
          id : 'exportButton',
          text : '',
          tooltip : 'Download ideogram as png',
+         tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/export.png'
 
       } );
@@ -165,6 +167,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          id : 'zoomOutButton',
          text : '',
          tooltip : 'Zoom out ideogram',
+         tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/zoom_in.png'
 
       } );
@@ -174,6 +177,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          text : '',
          hidden : true,
          tooltip : 'Zoom in ideogram',
+         tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/zoom_out.png'
 
       } );
@@ -436,13 +440,20 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                toolbar.add( ref.actionsButton );
                toolbar.add( ref.labelsButton );
                toolbar.add( ref.reportButton );
+               toolbar.add( Ext.create( 'Ext.toolbar.Separator' ) );
+               
                toolbar.add( ref.selectAllButton );
                toolbar.add( ref.deselectAllButton );
-               toolbar.add( ref.saveButton );
-               toolbar.add( ref.exportButton );
+               
+               toolbar.add( ref.colourVariantByCombo );
+               toolbar.add( Ext.create('Ext.toolbar.Spacer') );
+               
                toolbar.add( ref.zoomInButton );
                toolbar.add( ref.zoomOutButton );
-               toolbar.add( ref.colourVariantByCombo );
+               
+               toolbar.add( Ext.create( 'Ext.toolbar.Fill' ) );
+               toolbar.add( ref.saveButton );
+               toolbar.add( ref.exportButton );
 
                // refresh the legend (e.g. Variant Labels) in ideogram
                if ( legendProperty != null ) {

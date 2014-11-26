@@ -95,11 +95,27 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
             type : 'string'
          } ],
          // [ VariantValueObjectPropertyName : DisplayValue ]
-         data : [ [ 'patientId', 'Patient ID' ], [ 'type', 'CNV type' ], [ 'variantType', 'Variant type' ], [ 'chromosome', 'Chromosome' ],
-                 [ 'Inheritance', 'Inheritance' ], [ 'Array Platform', 'Array platform' ],
-                 [ 'Array Report', 'Array report' ], [ 'Characteristics', 'Characteristics' ],
+         data : [
+                 // gene summary tables
+                 [ 'genesPerSubject', 'Genes per subject' ], 
+                 [ 'genesPerSubjectLabel', 'Genes per subject label' ], 
+                 
+                 // commonly used reports
+                 [ 'chromosome', 'Chromosome' ],
+                 [ 'patientId', 'Patient ID' ], 
+                 [ 'variantType', 'Variant type' ], 
+                 
+                 // cnv specific
+                 [ 'type', 'CNV type' ], 
                  [ 'cnvLength', 'CNV length' ], 
-                 [ 'genesPerSubject', 'Genes per subject' ], [ 'genesPerSubjectLabel', 'Genes per subject label' ] ],
+                 
+                 // characteristics
+                 [ 'Array Platform', 'Array platform' ],
+                 [ 'Array Report', 'Array report' ], 
+                 [ 'Characteristics', 'Characteristics' ],
+                 [ 'Inheritance', 'Inheritance' ], 
+                 
+                  ],
          autoLoad : true,
          autoSync : true,
       } );

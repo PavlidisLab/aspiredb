@@ -85,7 +85,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
    columns : [ {
       text : "Subject Id",
       dataIndex : 'patientId',
-      flex : 1
+//      flex : 1
    }, {
       text : "Labels",
       dataIndex : 'labelIds',
@@ -109,6 +109,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       text : "# of variants",
       dataIndex : 'varientNos',
       tooltip : 'Total # of unfiltered variants',
+      tooltipType : 'title',
       renderer : function(value) {
          return value;
       },
@@ -117,6 +118,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       text : "# of phenotypes",
       dataIndex : 'phenotypeNos',
       tooltip : 'Total # of unfiltered phenotypes',
+      tooltipType : 'title',
       flex : 1
    } ],
 

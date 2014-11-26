@@ -93,25 +93,30 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
          columnConfig.push( {
             text : 'Patient Id',
-            flex : 1,
+//            flex : 1,
             dataIndex : 'patientId'
          } );
 
          columnConfig.push( {
             text : 'Type',
-            flex : 1,
+            width : 50,
+//            flex : 1,
             dataIndex : 'variantType'
          } );
 
          columnConfig.push( {
             text : 'Genome Coordinates',
             flex : 1,
-            dataIndex : 'genomeCoordinates'
+            dataIndex : 'genomeCoordinates',
+            renderer : function(value) {
+               
+               return "<a href='http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg19&position=chr" + value + "' target='_blank'>" + value + "</a>";
+            },
          } );
 
          columnConfig.push( {
             text : 'Chromosome',
-            flex : 1,
+//            flex : 1,
             dataIndex : 'chromosome',
             hidden : true
          } );
@@ -202,9 +207,9 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
          columnConfig.push( {
             text : 'Gene',
-            flex : 1,
+            flex : 2,
             dataIndex : 'gene',
-            hidden : true
+            hidden : false
          } );
          
          for (var i = 0; i < characteristicNames.length; i++) {

@@ -42,12 +42,13 @@ Ext.define('ASPIREdb.MainPanel',{
         {
             region: 'center',
             xtype: 'variantTabPanel',
-            title:'Variant'
+            title:'Variant',
+            flex : 1
         },
         {
             region: 'east',
             xtype:'phenotypeGrid',
-            width: 700,
+            width: 350,
             collapsible: true,
             split: true,
             title:'Phenotype'

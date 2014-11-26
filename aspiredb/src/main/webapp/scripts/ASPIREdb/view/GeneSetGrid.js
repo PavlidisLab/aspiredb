@@ -201,6 +201,7 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
          id : 'addGeneset',
          text : '',
          tooltip : 'Add new gene set',
+         tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
          // TODO: Need a better workaround
          handler : function() {
@@ -238,6 +239,7 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
          id : 'removeGeneset',
          text : '',
          tooltip : 'Remove the selected gene set',
+         tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
          handler : function() {
             // Delete gene set
