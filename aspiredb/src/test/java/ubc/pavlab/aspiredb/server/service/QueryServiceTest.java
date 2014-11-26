@@ -295,6 +295,19 @@ public class QueryServiceTest extends BaseSpringContextTest {
         // (~853 genes)
         final String phenotypeURI = "http://purl.obolibrary.org/obo/DOID_12858"; // Huntington's disease, (29 genes)
 
+        // check the counts before adding to the db
+        Map<Integer, Integer> ret = null;
+        try {
+            ret = getSubjectVariantCountForPhenocarta( phenotypeURI, patientId );
+        } catch ( Exception e ) {
+            e.printStackTrace();
+            fail();
+        }
+        // these should be 0 but just in case ...
+        int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
+        int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+
+        // add variants to the db
         new InlineTransaction() {
 
             @Override
@@ -315,7 +328,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         assertEquals( patientId, subject.getPatientId() );
         assertEquals( 3, subject.getVariants().size() );
 
-        Map<Integer, Integer> ret = null;
+        // check the overlaps
         try {
             ret = getSubjectVariantCountForPhenocarta( phenotypeURI, subject.getPatientId() );
         } catch ( Exception e ) {
@@ -323,12 +336,8 @@ public class QueryServiceTest extends BaseSpringContextTest {
             e.printStackTrace();
             fail();
         }
-
-        int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
-        int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
-
-        assertEquals( 1, addedSubjectCount ); // one subject was added
-        assertEquals( 2, addedVariantCount ); // we added two that overlap
+        assertEquals( 1, ret.get( VariantDao.SUBJECT_IDS_KEY ) - addedSubjectCount ); // one subject was added
+        assertEquals( 2, ret.get( VariantDao.VARIANT_IDS_KEY ) - addedVariantCount ); // we added two that overlap
 
     }
 
