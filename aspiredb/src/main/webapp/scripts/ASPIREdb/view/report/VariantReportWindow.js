@@ -85,8 +85,6 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          }
       } );
 
-      this.down( '#savePngButton' ).on( 'click', this.saveChartHandler );
-
    },
 
    createAndShow : function(variantStore) {
@@ -98,35 +96,34 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       me.show();
    },
 
-   saveChartHandler : function(e) {
-      var me = this;
-      Ext.MessageBox.confirm( 'Confirm Download', 'Would you like to download the chart as an image?',
-         function(choice) {
-            if ( choice == 'yes' ) {
-               me.up( '#variantReportWindow' ).chart.save( {
-                  type : 'image/png'
-               } );
-            }
-         } );
-   },
-
    reportComboSelectHandler : function(sel) {
+      var me = this;
       var selReportType = sel.value;
       var window = this.up( '#variantReportWindow' );
 
       var reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReportPanel' );
       
-      window.down( '#saveTxtButton' ).on( 'click', function() {
+      window.down( '#saveTxtButton' ).on( 'click', function(e) {
          // When Save button is clicked open text data download
          ASPIREdb.TextDataDownloadWindow.showChartDownload( Ext.getStore('reportStore') );
       } );
 
+      window.down( '#savePngButton' ).on( 'click', function(e) {
+         var me = this;
+         Ext.MessageBox.confirm( 'Confirm Download', 'Would you like to download the chart as an image?',
+            function(choice) {
+               if ( choice == 'yes' ) {
+                  reportPanel.saveAsPNG();
+               }
+            } );
+      } );
+
       window.remove( window.down( '#variantReport' ) );
       window.add( reportPanel );
-      window.chart = reportPanel.down( "#variantChart" );
-      window.doLayout();
-
+      
       reportPanel.createReport( window.variantStore, selReportType );
+      
+      window.doLayout();
    },
 
 } );

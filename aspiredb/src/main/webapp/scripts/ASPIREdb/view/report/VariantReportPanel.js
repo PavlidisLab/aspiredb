@@ -235,6 +235,12 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       return result;
    },
    
+   saveAsPNG : function() {
+      this.down( '#variantChart' ).save( {
+         type : 'image/png'
+      } ); 
+   },
+   
    /**
     * Display the data in a column chart series
     * 
