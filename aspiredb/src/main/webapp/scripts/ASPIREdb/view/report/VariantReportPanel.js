@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [] );
+Ext.require( [  ] );
 
 /**
  * Create Variant Report Chart Panel
@@ -32,29 +32,19 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       this.callParent();
    },
 
-   isVariantTypeAndReportFieldCompatible : function( columnName, variantType ) {
-      if ( variantType !== "CNV" ) {
-         if ( columnName === "type" || columnName === "cnvLength" ) {
-            return false;
-         }
-      }
-      
-      return true;
-   },
-   
    /**
     * Return the value where the bin is found
     */
    findBin : function(val, BINS, BINS_TEXT) {
       for (var i = 0; i < BINS.length; i++) {
          if ( (BINS[i] - val) >= 0 ) {
-//            console.log( val + " is in bin " + BINS_TEXT[i] );
+            // console.log( val + " is in bin " + BINS_TEXT[i] );
             return BINS_TEXT[i];
          }
       }
 
       // it must be the last bin
-//      console.log( val + " is in bin " + BINS_TEXT[BINS_TEXT.length - 1] );
+      // console.log( val + " is in bin " + BINS_TEXT[BINS_TEXT.length - 1] );
       return BINS_TEXT[BINS_TEXT.length - 1];
    },
 
@@ -70,7 +60,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          } else if ( i == BINS.length - 1 ) {
             bin = (BINS[i - 1] + 1) + "-" + BINS[i];
             BINS_TEXT.push( bin );
-            bin = ">=" + ( BINS[i] + 1 );
+            bin = ">=" + (BINS[i] + 1);
          } else {
             bin = (BINS[i - 1] + 1) + "-" + BINS[i];
          }
@@ -101,7 +91,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       for (var i = 0; i < data.length; i++) {
 
          var val = data[i];
-         
+
          // bin the value
          var bin = this.findBin( val, BINS, BINS_TEXT );
 
@@ -142,7 +132,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       for (var i = 0; i < data.length; i++) {
 
          var val = data[i];
-         
+
          // now lets calculate and store it!
          if ( map.get( val ) == undefined ) {
             map.add( val, 1 );
@@ -169,105 +159,76 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    getColumnDataFromArray : function(data, columnName) {
       var result = [];
       for (var i = 0; i < data.length; i++) {
-         
+
          // extract values
          var row = data[i];
          var val = row[columnName];
-         
+
          // special case for VariantValueObjects
          if ( columnName === "chromosome" ) {
             val = row['genomicRange'][columnName];
-         } 
-         
+         }
+
          if ( val == undefined ) {
-            
+
             // possibly a characteristic ..., special case for VariantValueObject
             var characteristic = row['characteristics'][columnName];
-            
+
             if ( characteristic == undefined ) {
-               console.log("Error: Attribute '" + columnName + "' not found in " + row );
+               console.log( "Error: Attribute '" + columnName + "' not found in " + row );
                continue;
             } else {
                val = characteristic['value'];
             }
          }
-         
+
          // For CNV specific attributes like type and length, ignore SNVs
-         if ( !this.isVariantTypeAndReportFieldCompatible( columnName, row["variantType"] ) ) {
+         if ( !ASPIREdb.view.report.VariantReportWindow.isVariantTypeAndReportFieldCompatible( columnName, row["variantType"] ) ) {
             continue;
          }
-         
+
          // show NA for empty values
          if ( val === "" ) {
-             val = "NA";
+            val = "NA";
          }
-         
+
          result.push( val );
       }
       return result;
    },
-   
-   getColumnDataFromStore : function(store, columnName) {
-      var result = [];
-      for (var i = 0; i < store.data.length; i++) {
-         
-         // extract values
-         var row = store.data.getAt( i ).data;
-         var val = row[columnName];
-         
-         if ( val == undefined ) {
-            console.log("Error " + val);
-            continue;
-         }
-         
-      // For CNV specific attributes like type and length, ignore SNVs
-         if ( !this.isVariantTypeAndReportFieldCompatible( columnName, row["variantType"] ) ) {
-            continue;
-         }
-         
-         // show NA for empty values
-         if ( val === "" ) {
-             val = "NA";
-         }
-         
-         result.push( val );
-      }
-      return result;
-   },
-   
+
    saveAsPNG : function() {
       this.down( '#variantChart' ).save( {
          type : 'image/png'
-      } ); 
+      } );
    },
-   
+
    /**
     * Display the data in a column chart series
     * 
-    * mergedFreqData = '[{"type":"LOSS","asd1":136, "asd2":200},{"type":"GAIN","asd1":97, "asd2":100}]'
-    * columnName = "type"
-    * labelNames = ["asd1","asd2"]
+    * mergedFreqData = '[{"type":"LOSS","asd1":136, "asd2":200},{"type":"GAIN","asd1":97, "asd2":100}]' columnName =
+    * "type" labelNames = ["asd1","asd2"]
     */
    createLabelReport : function(mergedFreqData, columnName, labelNames) {
       var me = this;
-      
+
       var countColumnName = 'count';
-      
+
       var seriesTitle = labelNames;
-      
+
       var title = ASPIREdb.ActiveProjectSettings.getActiveProjectName();
       var xField = columnName;
       var yField = seriesTitle;
-      
-      var fields = [columnName].concat(seriesTitle); // insert "type" into the first position
-     
-     // convert to Extjs Store
-     var myDataStore = Ext.create( 'Ext.data.JsonStore', {
-        storeId : 'reportStore',
-        fields : fields,
-        data : mergedFreqData,
-     } );
-     
+
+      var fields = [ columnName ].concat( seriesTitle ); // insert "type" into the first position
+
+      // convert to Extjs Store
+      var myDataStore = Ext.create( 'Ext.data.JsonStore', {
+         storeId : 'reportStore',
+         fields : fields,
+         data : mergedFreqData,
+      } );
+
       me.add( [ {
          xtype : 'chart',
          id : 'variantChart',
@@ -279,9 +240,9 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          layout : 'fit',
          style : 'background: #fff;',
          legend : {
-             position : 'bottom',
-             boxStrokeWidth : 0,
-             labelFont : '12px Helvetica'
+            position : 'bottom',
+            boxStrokeWidth : 0,
+            labelFont : '12px Helvetica'
          },
          store : myDataStore,
          insetPadding : 40,
@@ -345,8 +306,8 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
                width : 150,
                style : 'background: #FFF',
                renderer : function(storeItem, item) {
-                  var label = item.series.title[Ext.Array.indexOf(item.series.yField, item.yField)];
-                  var msg = label + " " +  storeItem.get( xField ) + ': ' + storeItem.get( item.yField );
+                  var label = item.series.title[Ext.Array.indexOf( item.series.yField, item.yField )];
+                  var msg = label + " " + storeItem.get( xField ) + ': ' + storeItem.get( item.yField );
                   this.update( msg );
                }
             }
@@ -357,92 +318,98 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       me.show();
 
    },
+
+   saveAsTXT : function() {
+      ASPIREdb.TextDataDownloadWindow.showChartDownload( Ext.getStore('reportStore') );
+   },
    
    /**
     * Adds the contents of freqData to mergedFreqData
     * 
-    * freqData = "[{"type":"LOSS","withVar":68},{"type":"GAIN","withVar":48}]"
-    * freqData = "[{"type":"LOSS","label2":20},{"type":"GAIN","label2":10}]"
+    * freqData = "[{"type":"LOSS","withVar":68},{"type":"GAIN","withVar":48}]" freqData =
+    * "[{"type":"LOSS","label2":20},{"type":"GAIN","label2":10}]"
     * 
     * mergedFreqData = "[{"type":"LOSS","withVar":68,"label2":20},{"type":"GAIN","withVar":48,"label2":10}]"
     */
-   addFreqData : function( freqData, mergedFreqData ) {
-      for ( var i = 0; i < freqData.length; i++ ) {
+   addFreqData : function(freqData, mergedFreqData) {
+      for (var i = 0; i < freqData.length; i++) {
          var ele = freqData[i];
          var mEle = mergedFreqData[i];
-         
+
          if ( mEle == undefined ) {
-            mergedFreqData.push(ele);
+            mergedFreqData.push( ele );
             continue;
          }
-         
-         for ( var attr in ele ) {
+
+         for ( var attr in ele) {
             var val = ele[attr];
-            
+
             var mVal = mEle[attr];
-            
-            if ( mVal == undefined) {
+
+            if ( mVal == undefined ) {
                mEle[attr] = val;
             }
          }
       }
-      
+
       return mergedFreqData;
    },
-   
+
    createReport : function(store, columnName) {
 
       var me = this;
-      var reportWindow = me.up('#variantReportWindow');
-      
-      reportWindow.setLoading(true);
-      
+      var reportWindow = me.up( '#variantReportWindow' );
+
+      reportWindow.setLoading( true );
+
       // get a list of variants grouped by Subject labels
-      var variantIds = this.getColumnDataFromStore( store, 'id' );
-      VariantService.groupVariantsBySubjectLabels(variantIds,{
-         callback: function(variantsByLabel) {
-            
+      // var variantIds = this.getColumnDataFromStore( store, 'id' );
+      var variantIds = ASPIREdb.view.report.VariantReportWindow.getColumnDataFromStore( store, 'id' );
+
+      VariantService.groupVariantsBySubjectLabels( variantIds, {
+         callback : function(variantsByLabel) {
+
             var mergedFreqData = [];
             var labelNames = [];
-            for ( var labelName in variantsByLabel ) {
-                labelNames.push(labelName);
-                var data = variantsByLabel[labelName];
-                var rawData = me.getColumnDataFromArray( data, columnName );
-                
-                if ( rawData.length == 0 ) {
-                   console.log("Could not extract '" + columnName + "' from data")
-                   continue;
-                }
-                
-                // columns that needs binning
-                var COLUMN_TYPE_BIN = [ "cnvLength" ];
-                
-                var countColumnName = labelName;
-                
-                var freqData = null;
-                if ( COLUMN_TYPE_BIN.indexOf( columnName ) != -1 ) {
-                   freqData = me.calculateBinFrequencies( rawData, columnName, countColumnName );
-                } else {
-                   freqData = me.calculateFrequencies( rawData, columnName, countColumnName );
-                }
-                
-                me.addFreqData(freqData, mergedFreqData);
-                
+            for ( var labelName in variantsByLabel) {
+               labelNames.push( labelName );
+               var data = variantsByLabel[labelName];
+               var rawData = me.getColumnDataFromArray( data, columnName );
+
+               if ( rawData.length == 0 ) {
+                  console.log( "Could not extract '" + columnName + "' from data" )
+                  continue;
+               }
+
+               // columns that needs binning
+               var COLUMN_TYPE_BIN = [ "cnvLength" ];
+
+               var countColumnName = labelName;
+
+               var freqData = null;
+               if ( COLUMN_TYPE_BIN.indexOf( columnName ) != -1 ) {
+                  freqData = me.calculateBinFrequencies( rawData, columnName, countColumnName );
+               } else {
+                  freqData = me.calculateFrequencies( rawData, columnName, countColumnName );
+               }
+
+               me.addFreqData( freqData, mergedFreqData );
+
             }
-            
-            me.createLabelReport(mergedFreqData, columnName, labelNames);
-            
-            reportWindow.setLoading(false);
+
+            me.createLabelReport( mergedFreqData, columnName, labelNames );
+
+            reportWindow.setLoading( false );
          },
          errorHandler : function(message, exception) {
             Ext.Msg.alert( 'Error', message )
             console.log( message )
-            console.log( dwr.util.toDescriptiveString(exception.stackTrace,3) )
-            
-            reportWindow.setLoading(false);
+            console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
+
+            reportWindow.setLoading( false );
          }
-      });
-      
+      } );
+
    },
 
 } );

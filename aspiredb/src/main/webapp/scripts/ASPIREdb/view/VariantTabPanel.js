@@ -118,14 +118,6 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          itemId : 'actionsButton',
          menu : this.actionsMenu
       } );
-
-      this.burdenAnalysisButton = Ext.create( 'Ext.Button', {
-         itemId : 'burdenAnalysisButton',
-         text : 'Burden Analysis',
-         handler : this.burdenAnalysisHandler,
-         scope : this,
-         tip : 'Perform CNV Burden Analysis on the selected variants'
-      } );
       
       this.reportButton = Ext.create( 'Ext.Button', {
          itemId : 'reportButton',
@@ -444,7 +436,6 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                toolbar.add( ref.actionsButton );
                toolbar.add( ref.labelsButton );
                toolbar.add( ref.reportButton );
-               toolbar.add( ref.burdenAnalysisButton );
                toolbar.add( ref.selectAllButton );
                toolbar.add( ref.deselectAllButton );
                toolbar.add( ref.saveButton );
@@ -521,15 +512,6 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    showReportHandler : function() {
       var reportWindow = Ext.create( 'ASPIREdb.view.report.VariantReportWindow' );
       reportWindow.createAndShow( this.down( '#variantGrid' ).store );
-   },
-
-   /**
-    * Display the burden analysis summary table which shows the number of genes affected by the variants
-    */
-   burdenAnalysisHandler : function() {
-      var reportWindow = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisWindow' );
-      reportWindow.createAndShow( this.getSelectedVariantIds( this
-         .getVariantRecordSelection() ) );
    },
    
    /**

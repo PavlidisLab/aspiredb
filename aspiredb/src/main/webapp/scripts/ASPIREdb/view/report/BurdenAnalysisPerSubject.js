@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [] );
+Ext.require( [  ] );
 
 /**
  * Create Burden Analysis Per Subject
@@ -28,9 +28,8 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', {
    /**
     * Display table contents as plain text for downloading to a TSV
     */
-   saveText : function(store) {
-      // When Save button is clicked open text data download
-      ASPIREdb.TextDataDownloadWindow.showBurdenAnalysisDownload( store );
+   saveAsTXT : function() {
+      ASPIREdb.TextDataDownloadWindow.showBurdenAnalysisDownload( Ext.getStore( 'burdenAnalysisPerSubjectStore' ) );
    },
 
    extractFields : function(data) {
@@ -132,7 +131,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', {
          callback : function(results) {
             var grid = me.createGrid( results );
             me.add( grid );
-            var window = me.up( '#burdenAnalysisWindow' );
+            var window = me.up( '#variantReportWindow' );
             if ( window != null ) {
                window.setLoading( false );
             }
@@ -147,11 +146,13 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', {
 
    },
 
-   createReport : function(variantIds) {
+   createReport : function(store) {
 
       var me = this;
-
-      var window = me.up( '#burdenAnalysisWindow' );
+      
+      var variantIds = ASPIREdb.view.report.VariantReportWindow.getColumnDataFromStore(store, 'id');
+      
+      var window = me.up( '#variantReportWindow' );
       if ( window != null ) {
          window.setLoading( true );
       }

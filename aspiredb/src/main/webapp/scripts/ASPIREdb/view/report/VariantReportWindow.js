@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'ASPIREdb.view.report.VariantReportPanel' ] );
+Ext.require( [ 'ASPIREdb.view.report.VariantReportPanel', 'ASPIREdb.view.report.BurdenAnalysisPerSubject','ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel' ] );
 
 /**
  * Create Variant Report Window
@@ -42,6 +42,46 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
 //      icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
    } ],
 
+   statics : {
+      getColumnDataFromStore : function(store, columnName) {
+         var result = [];
+         for (var i = 0; i < store.data.length; i++) {
+            
+            // extract values
+            var row = store.data.getAt( i ).data;
+            var val = row[columnName];
+            
+            if ( val == undefined ) {
+               console.log("Error " + val);
+               continue;
+            }
+            
+         // For CNV specific attributes like type and length, ignore SNVs
+            if ( !this.isVariantTypeAndReportFieldCompatible( columnName, row["variantType"] ) ) {
+               continue;
+            }
+            
+            // show NA for empty values
+            if ( val === "" ) {
+                val = "NA";
+            }
+            
+            result.push( val );
+         }
+         return result;
+      },
+      
+      isVariantTypeAndReportFieldCompatible : function( columnName, variantType ) {
+         if ( variantType !== "CNV" ) {
+            if ( columnName === "type" || columnName === "cnvLength" ) {
+               return false;
+            }
+         }
+         
+         return true;
+      },
+   },
+
    initComponent : function() {
 
       this.callParent();
@@ -56,9 +96,10 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          } ],
          // [ VariantValueObjectPropertyName : DisplayValue ]
          data : [ [ 'patientId', 'Patient ID' ], [ 'type', 'CNV type' ], [ 'variantType', 'Variant type' ], [ 'chromosome', 'Chromosome' ],
-                 [ 'Inheritance', 'Inheritance' ], [ 'Array Platform', 'Array Platform' ],
-                 [ 'Array Report', 'Array Report' ], [ 'Characteristics', 'Characteristics' ],
-                 [ 'cnvLength', 'CNV Length' ] ],
+                 [ 'Inheritance', 'Inheritance' ], [ 'Array Platform', 'Array platform' ],
+                 [ 'Array Report', 'Array report' ], [ 'Characteristics', 'Characteristics' ],
+                 [ 'cnvLength', 'CNV length' ], 
+                 [ 'genesPerSubject', 'Genes per subject' ], [ 'genesPerSubjectLabel', 'Genes per subject label' ] ],
          autoLoad : true,
          autoSync : true,
       } );
@@ -76,6 +117,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          queryMode : 'local',
          editable : false,
          forceSelection : true,
+         width : 300,
          listeners : {
             'change' : this.reportComboSelectHandler,
             afterrender : function(combo) {
@@ -100,13 +142,26 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       var me = this;
       var selReportType = sel.value;
       var window = this.up( '#variantReportWindow' );
-
-      var reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReportPanel' );
       
-      window.down( '#saveTxtButton' ).on( 'click', function(e) {
-         // When Save button is clicked open text data download
-         ASPIREdb.TextDataDownloadWindow.showChartDownload( Ext.getStore('reportStore') );
-      } );
+      var reportPanel = window.down( '#variantReport' );
+      if ( reportPanel != null ) {
+         window.remove( reportPanel );
+         reportPanel.destroy();
+      }
+      
+      var saveTextHandler = null;
+      if ( selReportType === "genesPerSubject") {
+         window.down( '#savePngButton' ).hide();
+         reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', { id : 'variantReport' } );
+      } else if ( selReportType === "genesPerSubjectLabel" ) {
+         window.down( '#savePngButton' ).hide();
+         reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', { id : 'variantReport' } );
+      } else {
+         window.down( '#savePngButton' ).show();
+         reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReportPanel' );
+      }
+      
+      window.down( '#saveTxtButton' ).on( 'click', reportPanel.saveAsTXT );
 
       window.down( '#savePngButton' ).on( 'click', function(e) {
          var me = this;
@@ -118,7 +173,6 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
             } );
       } );
 
-      window.remove( window.down( '#variantReport' ) );
       window.add( reportPanel );
       
       reportPanel.createReport( window.variantStore, selReportType );
