@@ -29,10 +29,13 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentGrid', {
 		itemId : 'phenotypeEnrichmentGridToolbar',
 		dock : 'top',
 		items : [ {
+		   xtype : 'tbfill',
+		}, {
 			xtype : 'button',
 			itemId : 'saveButton',
 			text : '',
 			tooltip : 'Download table contents as text',
+			tooltipType : 'title',
 			icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
 		} ]
 
