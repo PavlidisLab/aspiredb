@@ -144,7 +144,13 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          scope : this,
          hidden : true,
       } );
-
+      
+      this.tbSeparator = Ext.create( 'Ext.toolbar.Separator' );
+      
+      this.tbSpacer = Ext.create( 'Ext.toolbar.Spacer' );
+      
+      this.tbFill =  Ext.create( 'Ext.toolbar.Fill' );
+      
       this.saveButton = Ext.create( 'Ext.Button', {
          id : 'saveButton',
          text : '',
@@ -440,18 +446,18 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                toolbar.add( ref.actionsButton );
                toolbar.add( ref.labelsButton );
                toolbar.add( ref.reportButton );
-               toolbar.add( Ext.create( 'Ext.toolbar.Separator' ) );
+               toolbar.add( ref.tbSeparator );
                
                toolbar.add( ref.selectAllButton );
                toolbar.add( ref.deselectAllButton );
                
                toolbar.add( ref.colourVariantByCombo );
-               toolbar.add( Ext.create('Ext.toolbar.Spacer') );
+               toolbar.add( ref.tbSpacer );
                
                toolbar.add( ref.zoomInButton );
                toolbar.add( ref.zoomOutButton );
                
-               toolbar.add( Ext.create( 'Ext.toolbar.Fill' ) );
+               toolbar.add( ref.tbFill );
                toolbar.add( ref.saveButton );
                toolbar.add( ref.exportButton );
 
