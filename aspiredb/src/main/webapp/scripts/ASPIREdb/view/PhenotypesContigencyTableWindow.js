@@ -175,18 +175,16 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
                   header : columnNames[i],
                   dataIndex : columnNames[i],
                   width : 100,
-                  tooltip: 'subject counts for multiple phenotypes',
+                  tooltip: 'Subject counts for multiple phenotypes',
+                  tooltipType : 'title',
                   renderer : function(value, metadata, record) {
                      var src = 'scripts/ASPIREdb/resources/images/icons/tag.png';
                      var tooltip = "subject counts for multiple phenotype ";
 
-                     var ahrefurl = '<a onclick=' + ref.makeLabelHandler + 'href=#>';
-
-                     image = Ext.String.format( ahrefurl + "<i class='fa fa-tags'></i> </a>", src, tooltip );
-                     // <img src='{0}' alt='{1}' >
+                     image = Ext.String.format(  "<i class='fa fa-tags'></i> ", src, tooltip );
 
                      var ret = value.length + '&nbsp&nbsp' + image;
-                     metadata.tdAttr = 'data-qtip="subject counts for multiple phenotypes"';
+                     metadata.tdAttr = 'data-qtip="Click to assign a subject label" data-qwidth="200"';
                      if ( value.length == 0 )
                         ret = value.length + '&nbsp&nbsp';
                      return ret;
