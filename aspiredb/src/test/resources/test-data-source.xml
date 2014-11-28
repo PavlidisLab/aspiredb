@@ -22,13 +22,24 @@
         </property>
     </bean>
 
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="${test.jdbc.driverClassName}" />
-        <property name="url" value="${test.jdbc.url}" />
-        <property name="username" value="${test.jdbc.username}" />
-        <property name="password" value="${test.jdbc.password}" />
-    </bean>
-
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+          <property name="driverClassName">
+             <value>com.mysql.jdbc.Driver</value>
+          </property>
+          <property name="username">
+             <value>${test.jdbc.username}</value>
+          </property>
+          <property name="password">
+             <value>${test.jdbc.password}</value>
+          </property>
+          <property name="url">
+             <value>${test.jdbc.url}</value>
+          </property>
+          <property name="maxActive">
+             <value>20</value>
+          </property>       
+       </bean>
+       
     <!-- Hibernate session factory -->
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 
