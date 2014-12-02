@@ -16,7 +16,9 @@ package ubc.pavlab.aspiredb.server.controller;
 
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -63,11 +65,12 @@ public class SignupControllerTest extends BaseSpringContextTest {
     public void testSignup() throws Exception {
 
         int numThreads = 10; // too high and we run out of connections, which is not what we're testing.
-        final int numsignupsperthread = 20;
+        final int numsignupsperthread = 10;
         final Random random = new Random();
         final AtomicInteger c = new AtomicInteger( 0 );
         final AtomicBoolean failed = new AtomicBoolean( false );
         Collection<Thread> threads = new HashSet<Thread>();
+        final Collection<String> unames = Collections.synchronizedList( new ArrayList<String>() );
 
         for ( int i = 0; i < numThreads; i++ ) {
 
@@ -80,6 +83,11 @@ public class SignupControllerTest extends BaseSpringContextTest {
                             Thread.sleep( random.nextInt( 50 ) );
                             req = new MockHttpServletRequest( "POST", "/signup.html" );
                             final String uname = RandomStringUtils.randomAlphabetic( 10 );
+
+                            synchronized ( unames ) {
+                                unames.add( uname );
+                            }
+
                             // log.info( "Signingup: " + uname + " (" + c.get() + ")" );
 
                             String password = RandomStringUtils.randomAlphabetic( 40 );
@@ -92,7 +100,7 @@ public class SignupControllerTest extends BaseSpringContextTest {
                             suc.signup( req, new MockHttpServletResponse() );
 
                             // Cleanup
-                            userService.delete( userService.findByUserName( uname ) );
+                            // userService.delete( userService.findByUserName( uname ) );
 
                             c.incrementAndGet();
 
@@ -127,6 +135,11 @@ public class SignupControllerTest extends BaseSpringContextTest {
                 }
                 fail( "Multithreaded failure: timed out." );
             }
+        }
+
+        // cleanup
+        for ( String uname : unames ) {
+            userService.delete( userService.findByUserName( uname ) );
         }
 
         log.debug( " &&&&& DONE &&&&&" );
