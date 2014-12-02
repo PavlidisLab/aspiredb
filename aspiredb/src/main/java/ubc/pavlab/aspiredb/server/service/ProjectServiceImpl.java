@@ -32,6 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.slf4j.Logger;
@@ -39,6 +40,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -879,96 +882,123 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @RemoteMethod
-    public String addSubjectVariantsPhenotypeToProject( String variantFilename, String phenotypeFilename,
-            boolean createProject, String projectName, String variantType ) {
+    public String addSubjectVariantsPhenotypeToProject( final String variantFilename, final String phenotypeFilename,
+            final boolean createProject, final String projectName, final String variantType ) {
 
-        StopWatch timer = new StopWatch();
-        timer.start();
+        // Run the upload task on a separate thread so we don't block the current thread and return a proxy error on the
+        // front end
+        class ProjectUploadThread extends Thread {
 
-        StringBuffer returnMsg = new StringBuffer();
-        StringBuffer errMsg = new StringBuffer();
+            SecurityContext context;
 
-        VariantUploadServiceResult variantResult = null;
-        Collection<Variant2VariantOverlap> overlap = null;
-        PhenotypeUploadServiceResult phenResult = null;
+            public ProjectUploadThread( SecurityContext context ) {
+                this.context = context;
+            }
 
-        final String STR_FMT = "%35s: %5s\n";
+            @Override
+            public void run() {
 
-        returnMsg.append( String.format( STR_FMT, "Project", projectName ) + "\n" );
+                SecurityContextHolder.setContext( this.context );
 
-        if ( variantFilename.length() > 0 ) {
+                StopWatch timer = new StopWatch();
+                timer.start();
 
-            try {
-                variantResult = addSubjectVariantsToProject( variantFilename, createProject, projectName, variantType );
-                returnMsg.append( String.format( STR_FMT, "Number of Subjects", getSubjects( projectName ).size() ) );
-                returnMsg.append( String
-                        .format( STR_FMT, "Number of Variants", variantResult.getVariantsToAdd().size() ) );
-                for ( String err : variantResult.getErrorMessages() ) {
-                    errMsg.append( err + "\n" );
-                }
+                StringBuffer returnMsg = new StringBuffer();
+                StringBuffer errMsg = new StringBuffer();
 
-                // only run SpecialProject overlap if projectName is not a special project
-                try {
-                    SpecialProject.valueOf( projectName );
-                } catch ( IllegalArgumentException argEx ) {
-                    for ( Project specialProject : projectDao.getSpecialOverlapProjects() ) {
-                        try {
-                            overlap = projectManager.populateProjectToProjectOverlap( projectName,
-                                    specialProject.getName() );
-                            returnMsg.append( String.format( STR_FMT,
-                                    "Number of Overlaps with " + specialProject.getName(), overlap.size() ) );
-                        } catch ( Exception e ) {
-                            log.error( e.getLocalizedMessage(), e );
-                            errMsg.append( e.getLocalizedMessage() + "\n" );
+                VariantUploadServiceResult variantResult = null;
+                Collection<Variant2VariantOverlap> overlap = null;
+                PhenotypeUploadServiceResult phenResult = null;
+
+                final String STR_FMT = "%35s: %5s\n";
+
+                returnMsg.append( String.format( STR_FMT, "Project", projectName ) + "\n" );
+
+                if ( variantFilename.length() > 0 ) {
+
+                    try {
+                        variantResult = addSubjectVariantsToProject( variantFilename, createProject, projectName,
+                                variantType );
+                        returnMsg.append( String.format( STR_FMT, "Number of Subjects", getSubjects( projectName )
+                                .size() ) );
+                        returnMsg.append( String.format( STR_FMT, "Number of Variants", variantResult
+                                .getVariantsToAdd().size() ) );
+                        for ( String err : variantResult.getErrorMessages() ) {
+                            errMsg.append( err + "\n" );
                         }
+
+                        // only run SpecialProject overlap if projectName is not a special project
+                        try {
+                            SpecialProject.valueOf( projectName );
+                        } catch ( IllegalArgumentException argEx ) {
+                            for ( Project specialProject : projectDao.getSpecialOverlapProjects() ) {
+                                try {
+                                    overlap = projectManager.populateProjectToProjectOverlap( projectName,
+                                            specialProject.getName() );
+                                    returnMsg.append( String.format( STR_FMT, "Number of Overlaps with "
+                                            + specialProject.getName(), overlap.size() ) );
+                                } catch ( Exception e ) {
+                                    log.error( e.getLocalizedMessage(), e );
+                                    errMsg.append( e.getLocalizedMessage() + "\n" );
+                                }
+                            }
+                        }
+
+                    } catch ( Exception e ) {
+                        log.error( e.getLocalizedMessage(), e );
+                        errMsg.append( e.getLocalizedMessage() + "\n" );
                     }
                 }
 
-            } catch ( Exception e ) {
-                log.error( e.getLocalizedMessage(), e );
-                errMsg.append( e.getLocalizedMessage() + "\n" );
+                if ( phenotypeFilename.length() > 0 ) {
+                    try {
+                        phenResult = addSubjectPhenotypeToProject( phenotypeFilename, createProject, projectName );
+                        if ( returnMsg.indexOf( "Number of Subjects" ) == -1 ) {
+                            returnMsg.append( String.format( STR_FMT, "Number of Subjects", getSubjects( projectName )
+                                    .size() ) );
+                        }
+                        returnMsg.append( String.format( STR_FMT, "Number of Phenotypes", phenResult
+                                .getPhenotypesToAdd().size() ) );
+                        for ( String err : phenResult.getErrorMessages() ) {
+                            errMsg.append( err + "\n" );
+                        }
+                    } catch ( Exception e ) {
+                        log.error( e.getLocalizedMessage(), e );
+                        errMsg.append( e.getLocalizedMessage() + "\n" );
+                    }
+                }
+
+                log.info( "Uploading took " + timer.getTime() + " ms" );
+
+                // trim errorMssage
+                final int ERRMSG_LIMIT = 500;
+                if ( errMsg.length() > ERRMSG_LIMIT ) {
+                    errMsg.delete( ERRMSG_LIMIT, errMsg.length() - 1 );
+                    errMsg.append( "\n...\n" );
+                }
+
+                String returnStr = returnMsg.toString();
+                returnStr += errMsg.length() > 0 ? "\nExceptions\n" + errMsg : "";
+
+                log.info( returnStr );
+
+                // email users that the upload has finished
+
+                // if ( timer.getTime() > ConfigUtils.getLong( "aspiredb.uploadTimeThreshold", 60000 ) ) {
+                emailUploadFinished( projectName, returnStr );
+                // }
+
             }
         }
 
-        if ( phenotypeFilename.length() > 0 ) {
-            try {
-                phenResult = addSubjectPhenotypeToProject( phenotypeFilename, createProject, projectName );
-                if ( returnMsg.indexOf( "Number of Subjects" ) == -1 ) {
-                    returnMsg
-                            .append( String.format( STR_FMT, "Number of Subjects", getSubjects( projectName ).size() ) );
-                }
-                returnMsg.append( String.format( STR_FMT, "Number of Phenotypes", phenResult.getPhenotypesToAdd()
-                        .size() ) );
-                for ( String err : phenResult.getErrorMessages() ) {
-                    errMsg.append( err + "\n" );
-                }
-            } catch ( Exception e ) {
-                log.error( e.getLocalizedMessage(), e );
-                errMsg.append( e.getLocalizedMessage() + "\n" );
-            }
-        }
+        ProjectUploadThread thread = new ProjectUploadThread( SecurityContextHolder.getContext() );
+        thread.setName( ProjectUploadThread.class.getName() + "_" + projectName + "_load_thread_"
+                + RandomStringUtils.randomAlphanumeric( 5 ) );
+        // To prevent VM from waiting on this thread to shutdown (if shutting down).
+        thread.setDaemon( true );
+        thread.start();
 
-        log.info( "Uploading took " + timer.getTime() + " ms" );
-
-        // trim errorMssage
-        final int ERRMSG_LIMIT = 500;
-        if ( errMsg.length() > ERRMSG_LIMIT ) {
-            errMsg.delete( ERRMSG_LIMIT, errMsg.length() - 1 );
-            errMsg.append( "\n...\n" );
-        }
-
-        String returnStr = returnMsg.toString();
-        returnStr += errMsg.length() > 0 ? "\nExceptions\n" + errMsg : "";
-
-        log.info( returnStr );
-
-        // email users that the upload has finished
-
-        // if ( timer.getTime() > ConfigUtils.getLong( "aspiredb.uploadTimeThreshold", 60000 ) ) {
-        emailUploadFinished( projectName, returnStr );
-        // }
-
-        return returnStr;
+        return thread.getName();
     }
 
     @Override

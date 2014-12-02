@@ -64,10 +64,13 @@ Ext
 
                           if ( form.isValid() ) {
 
-                             Ext.MessageBox
-                                .alert( 'Success',
-                                   'Your project has been submitted.<br/>You will receive an e-mail once the upload is complete.<br/>' );
-
+                             Ext.Msg.show({
+                                title      : '',
+                                msg        : 'Your project has been submitted.<br/>You will receive an e-mail once the upload is complete.<br/>',
+                                width      : 400,
+                                buttons    : Ext.MessageBox.OK,
+                             })
+                             
                              // getting the form values
                              values = form.getFieldValues();
                              var variantfilename = me.up( "ProjectUploadGrid" ).variantServerFilename;
