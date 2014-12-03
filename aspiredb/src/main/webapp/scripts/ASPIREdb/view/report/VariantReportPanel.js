@@ -355,6 +355,34 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       return mergedFreqData;
    },
 
+   createFreqData : function(variantsByLabel, labelName, columnName) {
+      var me = this;
+
+
+      var data = variantsByLabel[labelName];
+      
+      var freqData = null;
+      var rawData = me.getColumnDataFromArray( data, columnName );
+
+      if ( rawData.length == 0 ) {
+         console.log( "Could not extract '" + columnName + "' from data" )
+         return null;
+      }
+
+      // columns that needs binning
+      var COLUMN_TYPE_BIN = [ "cnvLength" ];
+
+      var countColumnName = labelName;
+      
+      if ( COLUMN_TYPE_BIN.indexOf( columnName ) != -1 ) {
+         freqData = me.calculateBinFrequencies( rawData, columnName, countColumnName );
+      } else {
+         freqData = me.calculateFrequencies( rawData, columnName, countColumnName );
+      }
+   
+      return freqData;
+   },
+   
    createReport : function(store, columnName) {
 
       var me = this;
@@ -373,28 +401,13 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
             var labelNames = [];
             for ( var labelName in variantsByLabel) {
                labelNames.push( labelName );
-               var data = variantsByLabel[labelName];
-               var rawData = me.getColumnDataFromArray( data, columnName );
-
-               if ( rawData.length == 0 ) {
-                  console.log( "Could not extract '" + columnName + "' from data" )
+               
+               var freqData = me.createFreqData( variantsByLabel, labelName, columnName );
+               if ( freqData == null ) {
                   continue;
                }
 
-               // columns that needs binning
-               var COLUMN_TYPE_BIN = [ "cnvLength" ];
-
-               var countColumnName = labelName;
-
-               var freqData = null;
-               if ( COLUMN_TYPE_BIN.indexOf( columnName ) != -1 ) {
-                  freqData = me.calculateBinFrequencies( rawData, columnName, countColumnName );
-               } else {
-                  freqData = me.calculateFrequencies( rawData, columnName, countColumnName );
-               }
-
                me.addFreqData( freqData, mergedFreqData );
-
             }
 
             me.createLabelReport( mergedFreqData, columnName, labelNames );
