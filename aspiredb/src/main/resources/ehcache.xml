@@ -32,13 +32,13 @@
     <cache name="org.hibernate.cache.UpdateTimestampsCache" maxElementsOnDisk="10000" maxElementsInMemory="5000"
         eternal="true" overflowToDisk="false" />
 
-    <cache name="ubc.pavlab.aspiredb.server.model.Variant" statistics="true" maxElementsInMemory="300000" eternal="true"
+    <cache name="ubc.pavlab.aspiredb.server.model.Variant" statistics="false" maxElementsInMemory="300000" eternal="true"
         overflowToDisk="false" />
         
     <cache name="loadBySubjectIds" maxElementsInMemory="20000" eternal="false" timeToIdleSeconds="86400"
         timeToLiveSeconds="432000" overflowToDisk="false" />
 
-    <cache name="BioMartCache" maxElementsInMemory="0" statistics="true" eternal="true" overflowToDisk="false">
+    <cache name="BioMartCache" maxElementsInMemory="0" statistics="false" eternal="true" overflowToDisk="false">
         <searchable>
             <searchAttribute name="ensemblId" />
             <searchAttribute name="name" />
