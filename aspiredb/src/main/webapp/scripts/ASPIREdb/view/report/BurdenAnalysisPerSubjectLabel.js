@@ -83,7 +83,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
          text : '# duplication',
       }, {
          dataIndex : 'NUM_UNKNOWN',
-         text : '# uknown',
+         text : '# unknown',
       }, {
          dataIndex : 'TOTAL',
          text : 'Total # of CNVs',
