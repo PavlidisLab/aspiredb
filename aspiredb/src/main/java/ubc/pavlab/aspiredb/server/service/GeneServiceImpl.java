@@ -414,8 +414,8 @@ public class GeneServiceImpl implements GeneService {
             }
         }
 
-        log.info( "Found " + genesFound + " genes that overlap " + results.size() + " variants in "
-                + variantBin.keySet().size() + " bins (" + timer.getTime() + " ms)" );
+        // log.info( "Found " + genesFound + " genes that overlap " + results.size() + " variants in "
+        // + variantBin.keySet().size() + " bins (" + timer.getTime() + " ms)" );
 
         return results;
     }
