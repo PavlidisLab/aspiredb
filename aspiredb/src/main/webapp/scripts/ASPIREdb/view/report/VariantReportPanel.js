@@ -42,7 +42,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    findBin : function(val, BINS, BINS_TEXT) {
       for (var i = 0; i < BINS.length; i++) {
          if ( (BINS[i] - val) >= 0 ) {
-//             console.log( val + " is in bin " + BINS_TEXT[i] );
+            // console.log( val + " is in bin " + BINS_TEXT[i] );
             return BINS_TEXT[i];
          }
       }
@@ -68,13 +68,13 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          }
 
          if ( i == 0 ) {
-            bin = "<=" + this.formatNumberComma(val);
+            bin = "<=" + this.formatNumberComma( val );
          } else if ( i == BINS.length - 1 ) {
-            bin = this.formatNumberComma(prevVal + 1) + "-" + this.formatNumberComma(val);
+            bin = this.formatNumberComma( prevVal + 1 ) + "-" + this.formatNumberComma( val );
             BINS_TEXT.push( bin );
-            bin = ">=" + this.formatNumberComma(val + 1);
+            bin = ">=" + this.formatNumberComma( val + 1 );
          } else {
-            bin = this.formatNumberComma(prevVal + 1) + "-" + this.formatNumberComma(val);
+            bin = this.formatNumberComma( prevVal + 1 ) + "-" + this.formatNumberComma( val );
          }
          BINS_TEXT.push( bin );
       }
@@ -82,23 +82,23 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    },
 
    formatNumberComma : function(num) {
-      return Ext.util.Format.number(num, "0,000");
+      return Ext.util.Format.number( num, "0,000" );
    },
-   
+
    /**
     * Use for numerical data types, bin the data first and plot the frequencies
     * 
     */
-   calculateBinFrequencies : function(data, columnName, countColumnName, logTransform) {
+   calculateBinFrequencies : function(data, columnName, countColumnName, logTransform, bins) {
 
       var map = new Ext.util.HashMap();
 
       var BINS_TEXT = [];
       var BINS = [];
-      
-//      var logbase = 10;
+
+      // var logbase = 10;
       var logbase = 2;
-      
+
       // log10
       if ( logTransform ) {
 
@@ -119,15 +119,19 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          BINS = Array.apply( start, Array( 20 ) ).map( function(val, i) {
             return start + i;
          } );
-         
+
          BINS.forEach( function(x) {
             BINS_TEXT.push( Math.pow( logbase, x ) )
          } );
          BINS_TEXT = this.bins2text( BINS_TEXT );
       } else {
-         BINS = Array.apply( 0, Array( 20 ) ).map( function(val, i) {
-            return 10000 * (i + 1);
-         } );
+         if ( bins == null ) {
+            BINS = Array.apply( 0, Array( 20 ) ).map( function(val, i) {
+               return 10000 * (i + 1);
+            } );
+         } else {
+            BINS = bins;
+         }
          BINS_TEXT = this.bins2text( BINS );
       }
 
@@ -261,11 +265,29 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    createLabelReport : function(mergedFreqData, columnName, labelNames) {
       var me = this;
 
-      var countColumnName = 'count';
+      var countColumnName = '# of variants';
 
       var seriesTitle = labelNames;
 
-      var title = ASPIREdb.ActiveProjectSettings.getActiveProjectName();
+      // get total counts for each label
+      var totals = {};
+      mergedFreqData.forEach( function(o) {
+         for ( var label in o) {
+            if ( label === columnName ) {
+               continue;
+            }
+            if ( totals[label] == undefined ) {
+               totals[label] = o[label]
+            } else {
+               totals[label] += o[label]
+            }
+         }
+      } )
+
+      var title = 'Project: '
+         + ASPIREdb.ActiveProjectSettings.getActiveProjectName();
+      var varCountsText = "# of variants: " + Ext.util.JSON.encode( totals ).replace( '{', '' ).replace( '}', '' ).replace( /,/g, ', ' )
+            .replace( /"/g, '' ).replace(/:/g,' ');
       var xField = columnName;
       var yField = seriesTitle;
 
@@ -283,33 +305,40 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          id : 'variantChart',
          width : '100%',
          // height : 410,
-         padding : '10 0 0 0',
+         padding : '10 0 0 0', // (top, right, bottom, left).
          animate : true,
          shadow : false,
          layout : 'fit',
          style : 'background: #fff;',
          legend : {
+            padding : 0,
             position : 'bottom',
             boxStrokeWidth : 0,
-            labelFont : '12px Helvetica'
+            labelFont : '11px Helvetica'
          },
          store : myDataStore,
-         insetPadding : 40,
+         insetPadding : 50,
          items : [ {
             type : 'text',
             text : title,
-            font : '20px Helvetica',
+            font : '18px Helvetica',
             width : 100,
-            height : 30,
+            height : 100,
             x : 40, // the sprite x position
-            y : 12
+            y : 10
          // the sprite y position
          }, {
             type : 'text',
             text : 'ASPIREdb',
-            font : '10px Helvetica',
+            font : '12px Helvetica',
             x : 12,
             y : 380
+         }, {
+            type : 'text',
+            text : varCountsText,
+            font : '12px Helvetica',
+            x : 40,
+            y : 340
          } ],
          axes : [ {
             type : 'numeric',
@@ -404,7 +433,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       return mergedFreqData;
    },
 
-   createFreqData : function(variantsByLabel, labelName, columnName ) {
+   createFreqData : function(variantsByLabel, labelName, columnName, bins) {
       var me = this;
 
       var data = variantsByLabel[labelName];
@@ -417,19 +446,48 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          return null;
       }
 
-      // columns that needs binning
-      var COLUMN_TYPE_BIN = [ "cnvLength" ];
-
       var countColumnName = labelName;
 
-      if ( COLUMN_TYPE_BIN.indexOf( columnName ) != -1 ) {
-         freqData = me.calculateBinFrequencies( rawData, columnName, countColumnName, me.logTransform );
+      if ( me.isHistogramType( columnName ) ) {
+         freqData = me.calculateBinFrequencies( rawData, columnName, countColumnName, me.logTransform, bins );
       } else {
 
          freqData = me.calculateFrequencies( rawData, columnName, countColumnName );
       }
 
       return freqData;
+   },
+
+   isHistogramType : function(type) {
+      // columns that needs binning
+      var COLUMN_TYPE_BIN = [ "cnvLength" ];
+
+      return (COLUMN_TYPE_BIN.indexOf( type ) != -1)
+   },
+
+   generateBins : function(data) {
+      var binSize = 21
+      var bins = Array( binSize )
+      var data = data.sort( function(a, b) {
+         return a - b
+      } )
+      var unique = [];
+      data.forEach( function(e) {
+         if ( unique.indexOf( e ) == -1 && e != undefined )
+            unique.push( e )
+      } );
+      data = unique;
+      var dataMid = data[Math.floor( (data.length - 1) / 2 )]
+      var binWidth = (data[data.length - 1] - dataMid) / data.length
+
+      for (var i = 0; i < binSize; i++) {
+         bins[i] = i - Math.floor( binSize / 2 )
+      }
+
+      bins.forEach( function(e, i) {
+         bins[i] = i * binWidth + dataMid / 10
+      } )
+      return bins
    },
 
    createReport : function(store, columnName) {
@@ -448,10 +506,26 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
 
             var mergedFreqData = [];
             var labelNames = [];
+
+            // special case for histogram, gather all data and generate bins
+            var allData = [];
+            var bins = null;
+            if ( me.isHistogramType( columnName ) && !me.logTransform ) {
+               Object.keys( variantsByLabel ).forEach( function(labelName) {
+                  for (var j = 0; j < variantsByLabel[labelName].length; j++) {
+                     var val = variantsByLabel[labelName][j][columnName];
+                     if ( val != undefined ) {
+                        allData.push( val )
+                     }
+                  }
+               } )
+               bins = me.generateBins( allData );
+            }
+
             for ( var labelName in variantsByLabel) {
                labelNames.push( labelName );
 
-               var freqData = me.createFreqData( variantsByLabel, labelName, columnName );
+               var freqData = me.createFreqData( variantsByLabel, labelName, columnName, bins );
                if ( freqData == null ) {
                   continue;
                }
