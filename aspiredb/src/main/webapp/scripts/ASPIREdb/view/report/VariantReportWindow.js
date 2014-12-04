@@ -150,7 +150,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          itemId : 'logTransformCheckbox',
          hidden : true,
          value : true,
-         boxLabel: 'Log10 transform? ',
+         boxLabel: 'Log2 transform? ',
       } );
       this.down( 'toolbar' ).insert( 3, {
          xtype : 'tbfill'

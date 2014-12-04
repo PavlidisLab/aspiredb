@@ -96,21 +96,32 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       var BINS_TEXT = [];
       var BINS = [];
       
+//      var logbase = 10;
+      var logbase = 2;
+      
       // log10
       if ( logTransform ) {
 
-         // transform rawData to log10()
-         var rawDataLog10 = []
+         // transform rawData to log()
+         var dataLogged = []
          data.forEach( function(e) {
-            rawDataLog10.push( Math.log10( e ) )
+            var fun = null;
+            if ( logbase == 10 ) {
+               fun = Math.log10
+            } else {
+               fun = Math.log2
+            }
+            dataLogged.push( fun( e ) )
          } )
-         data = rawDataLog10
+         data = dataLogged
 
-         BINS = Array.apply( 1, Array( 10 ) ).map( function(val, i) {
-            return i;
+         var start = 5;
+         BINS = Array.apply( start, Array( 20 ) ).map( function(val, i) {
+            return start + i;
          } );
+         
          BINS.forEach( function(x) {
-            BINS_TEXT.push( Math.pow( 10, x ) )
+            BINS_TEXT.push( Math.pow( logbase, x ) )
          } );
          BINS_TEXT = this.bins2text( BINS_TEXT );
       } else {
