@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [  ] );
+Ext.require( [] );
 
 /**
  * Create Variant Report Chart Panel
@@ -28,6 +28,10 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    xtype : 'clustered-column',
    layout : 'fit',
 
+   config : {
+      logTransform : true
+   },
+
    initComponent : function() {
       this.callParent();
    },
@@ -38,7 +42,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    findBin : function(val, BINS, BINS_TEXT) {
       for (var i = 0; i < BINS.length; i++) {
          if ( (BINS[i] - val) >= 0 ) {
-            // console.log( val + " is in bin " + BINS_TEXT[i] );
+//             console.log( val + " is in bin " + BINS_TEXT[i] );
             return BINS_TEXT[i];
          }
       }
@@ -53,35 +57,68 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
     */
    bins2text : function(BINS) {
       var BINS_TEXT = [];
+
       for (var i = 0; i < BINS.length; i++) {
          var bin = "";
+         var val = BINS[i];
+         var prevVal = "";
+
+         if ( i > 0 ) {
+            prevVal = BINS[i - 1];
+         }
+
          if ( i == 0 ) {
-            bin = "<=" + BINS[i];
+            bin = "<=" + this.formatNumberComma(val);
          } else if ( i == BINS.length - 1 ) {
-            bin = (BINS[i - 1] + 1) + "-" + BINS[i];
+            bin = this.formatNumberComma(prevVal + 1) + "-" + this.formatNumberComma(val);
             BINS_TEXT.push( bin );
-            bin = ">=" + (BINS[i] + 1);
+            bin = ">=" + this.formatNumberComma(val + 1);
          } else {
-            bin = (BINS[i - 1] + 1) + "-" + BINS[i];
+            bin = this.formatNumberComma(prevVal + 1) + "-" + this.formatNumberComma(val);
          }
          BINS_TEXT.push( bin );
       }
       return BINS_TEXT;
    },
 
+   formatNumberComma : function(num) {
+      return Ext.util.Format.number(num, "0,000");
+   },
+   
    /**
     * Use for numerical data types, bin the data first and plot the frequencies
     * 
     */
-   calculateBinFrequencies : function(data, columnName, countColumnName) {
+   calculateBinFrequencies : function(data, columnName, countColumnName, logTransform) {
 
       var map = new Ext.util.HashMap();
 
-      // setup bins
-      var BINS = Array.apply( 0, Array( 20 ) ).map( function(val, i) {
-         return 10000 * (i + 1);
-      } );
-      var BINS_TEXT = this.bins2text( BINS );
+      var BINS_TEXT = [];
+      var BINS = [];
+      
+      // log10
+      if ( logTransform ) {
+
+         // transform rawData to log10()
+         var rawDataLog10 = []
+         data.forEach( function(e) {
+            rawDataLog10.push( Math.log10( e ) )
+         } )
+         data = rawDataLog10
+
+         BINS = Array.apply( 1, Array( 10 ) ).map( function(val, i) {
+            return i;
+         } );
+         BINS.forEach( function(x) {
+            BINS_TEXT.push( Math.pow( 10, x ) )
+         } );
+         BINS_TEXT = this.bins2text( BINS_TEXT );
+      } else {
+         BINS = Array.apply( 0, Array( 20 ) ).map( function(val, i) {
+            return 10000 * (i + 1);
+         } );
+         BINS_TEXT = this.bins2text( BINS );
+      }
 
       // initialize map with all the bins
       for (var i = 0; i < BINS_TEXT.length; i++) {
@@ -183,7 +220,8 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          }
 
          // For CNV specific attributes like type and length, ignore SNVs
-         if ( !ASPIREdb.view.report.VariantReportWindow.isVariantTypeAndReportFieldCompatible( columnName, row["variantType"] ) ) {
+         if ( !ASPIREdb.view.report.VariantReportWindow.isVariantTypeAndReportFieldCompatible( columnName,
+            row["variantType"] ) ) {
             continue;
          }
 
@@ -320,9 +358,9 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    },
 
    saveAsTXT : function() {
-      ASPIREdb.TextDataDownloadWindow.showChartDownload( Ext.getStore('reportStore') );
+      ASPIREdb.TextDataDownloadWindow.showChartDownload( Ext.getStore( 'reportStore' ) );
    },
-   
+
    /**
     * Adds the contents of freqData to mergedFreqData
     * 
@@ -355,12 +393,11 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       return mergedFreqData;
    },
 
-   createFreqData : function(variantsByLabel, labelName, columnName) {
+   createFreqData : function(variantsByLabel, labelName, columnName ) {
       var me = this;
 
-
       var data = variantsByLabel[labelName];
-      
+
       var freqData = null;
       var rawData = me.getColumnDataFromArray( data, columnName );
 
@@ -373,16 +410,17 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       var COLUMN_TYPE_BIN = [ "cnvLength" ];
 
       var countColumnName = labelName;
-      
+
       if ( COLUMN_TYPE_BIN.indexOf( columnName ) != -1 ) {
-         freqData = me.calculateBinFrequencies( rawData, columnName, countColumnName );
+         freqData = me.calculateBinFrequencies( rawData, columnName, countColumnName, me.logTransform );
       } else {
+
          freqData = me.calculateFrequencies( rawData, columnName, countColumnName );
       }
-   
+
       return freqData;
    },
-   
+
    createReport : function(store, columnName) {
 
       var me = this;
@@ -401,7 +439,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
             var labelNames = [];
             for ( var labelName in variantsByLabel) {
                labelNames.push( labelName );
-               
+
                var freqData = me.createFreqData( variantsByLabel, labelName, columnName );
                if ( freqData == null ) {
                   continue;

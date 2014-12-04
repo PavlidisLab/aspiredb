@@ -84,6 +84,8 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
 
    initComponent : function() {
 
+      var me = this;
+      
       this.callParent();
 
       this.reportTypeStore = Ext.create( 'Ext.data.ArrayStore', {
@@ -120,9 +122,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          autoSync : true,
       } );
 
-      this.down( 'toolbar' ).insert( 0, {
-         xtype : 'tbfill'
-      } );
+
       this.down( 'toolbar' ).insert( 0, {
          xtype : 'combo',
          itemId : 'reportCombo',
@@ -142,7 +142,23 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
             }
          }
       } );
+      this.down( 'toolbar' ).insert( 1, {
+         xtype : 'tbspacer'
+      } );
+      this.down( 'toolbar' ).insert( 2, {
+         xtype : 'checkbox',
+         itemId : 'logTransformCheckbox',
+         hidden : true,
+         value : true,
+         boxLabel: 'Log10 transform? ',
+      } );
+      this.down( 'toolbar' ).insert( 3, {
+         xtype : 'tbfill'
+      } );
 
+      
+      this.down( "#logTransformCheckbox" ).on( 'change', me.reportComboSelectHandler); 
+         
    },
 
    createAndShow : function(variantStore) {
@@ -154,9 +170,10 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       me.show();
    },
 
-   reportComboSelectHandler : function(sel) {
+   reportComboSelectHandler : function() {
       var me = this;
-      var selReportType = sel.value;
+      
+      var selReportType = me.up('#variantReportWindow').down('#reportCombo').value
       var window = this.up( '#variantReportWindow' );
       
       var reportPanel = window.down( '#variantReport' );
@@ -165,6 +182,10 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          reportPanel.destroy();
       }
       
+      var logTransformCheckbox = window.down( "#logTransformCheckbox" );
+      
+      logTransformCheckbox.hide();
+      
       var saveTextHandler = null;
       if ( selReportType === "genesPerSubject") {
          window.down( '#savePngButton' ).hide();
@@ -172,7 +193,10 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       } else if ( selReportType === "genesPerSubjectLabel" ) {
          window.down( '#savePngButton' ).hide();
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', { id : 'variantReport' } );
-      } else {
+      } else if (selReportType === "cnvLength") {
+         logTransformCheckbox.show();
+         reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReportPanel', { logTransform : logTransformCheckbox.value } );
+      }else {
          window.down( '#savePngButton' ).show();
          reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReportPanel' );
       }

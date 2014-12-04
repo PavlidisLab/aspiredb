@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.directwebremoting.annotations.RemoteMethod;
+import org.directwebremoting.annotations.RemoteProxy;
 
 import ubic.basecode.dataStructure.matrix.RCDoubleMatrix1D;
 import ubic.basecode.math.distribution.Histogram;
@@ -34,6 +35,7 @@ import cern.colt.matrix.DoubleMatrix1D;
  * @author ptan
  * @version $Id$
  */
+@RemoteProxy(name = "MathUtils")
 public class MathUtils {
 
     @RemoteMethod
