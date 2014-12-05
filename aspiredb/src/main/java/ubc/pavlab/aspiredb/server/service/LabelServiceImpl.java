@@ -72,6 +72,28 @@ public class LabelServiceImpl implements LabelService {
     @Override
     @Transactional
     @RemoteMethod
+    public Collection<LabelValueObject> getSubjectLabels() {
+        Collection<LabelValueObject> result = new ArrayList<>();
+        for ( Label label : labelDao.getSubjectLabels() ) {
+            result.add( label.toValueObject() );
+        }
+        return result;
+    }
+
+    @Override
+    @Transactional
+    @RemoteMethod
+    public Collection<LabelValueObject> getVariantLabels() {
+        Collection<LabelValueObject> result = new ArrayList<>();
+        for ( Label label : labelDao.getVariantLabels() ) {
+            result.add( label.toValueObject() );
+        }
+        return result;
+    }
+
+    @Override
+    @Transactional
+    @RemoteMethod
     public void deleteSubjectLabels( Collection<LabelValueObject> labels ) {
         for ( LabelValueObject lvo : labels ) {
             deleteSubjectLabel( lvo );

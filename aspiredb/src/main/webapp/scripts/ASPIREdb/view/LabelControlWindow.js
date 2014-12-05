@@ -267,16 +267,43 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
       } else {
          me.service = VariantService;
       }
-
-      var loadData = [];
-      for (labelId in me.visibleLabels) {
-         var label = me.visibleLabels[labelId];
-         loadData.push( [ label.id, label.name, label.colour, label.isShown ] );
+      
+      // make sure to only show those labels which we have write permissions
+      if ( me.isSubjectLabel ) {
+         LabelService.getSubjectLabels({
+            callback : function(labels) {
+               me.loadLabels(labels)
+            },
+            errorHandler : function(message, exception) {
+               console.log( message )
+               console.log( dwr.util.toDescriptiveString(exception.stackTrace,3) )
+            },
+         })
+      } else {
+         LabelService.getVariantLabels({
+            callback : function(labels) {
+               me.loadLabels(labels)
+            },
+            errorHandler : function(message, exception) {
+               console.log( message )
+               console.log( dwr.util.toDescriptiveString(exception.stackTrace,3) )
+            },
+         })
       }
-      me.down( '#labelSettingsGrid' ).store.loadData( loadData );
-
+      
    },
 
+   loadLabels : function( labels ) {
+      var me = this;
+      var loadData = [];
+      for ( var i = 0; i < labels.length ; i++ ) {
+         var label = labels[i]
+         loadData.push( [ label.id, label.name, label.colour, label.isShown ] );
+      }
+      
+      me.down( '#labelSettingsGrid' ).store.loadData( loadData );
+   },
+   
    labelColorHandler : function(selColor) {
 
    },

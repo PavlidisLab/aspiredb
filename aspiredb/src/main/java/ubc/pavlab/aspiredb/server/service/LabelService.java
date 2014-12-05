@@ -43,4 +43,8 @@ public interface LabelService {
 
     public void updateSubjectLabel( LabelValueObject label );
 
+    public Collection<LabelValueObject> getSubjectLabels();
+
+    public Collection<LabelValueObject> getVariantLabels();
+
 }
