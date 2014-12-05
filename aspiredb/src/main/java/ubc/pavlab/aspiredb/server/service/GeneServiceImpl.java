@@ -235,6 +235,12 @@ public class GeneServiceImpl implements GeneService {
         // group variants by patient id
         Map<String, Collection<Long>> subjectVariants = new HashMap<>();
         for ( Variant v : variantDao.load( variantIds ) ) {
+
+            // skip non-CNV
+            if ( !( v instanceof CNV ) ) {
+                continue;
+            }
+
             Collection<Long> variantsAdded = subjectVariants.get( v.getSubject().getPatientId() );
             if ( variantsAdded == null ) {
                 variantsAdded = new ArrayList<>();
@@ -283,6 +289,8 @@ public class GeneServiceImpl implements GeneService {
         for ( Long variantId : genesPerVariant.keySet() ) {
 
             Variant v = variantDao.load( variantId );
+
+            // skip non-CNV
             if ( !( v instanceof CNV ) ) {
                 continue;
             }
