@@ -157,6 +157,14 @@ public class GeneServiceImpl implements GeneService {
                 }
                 labelPatientId.get( label.getName() ).add( subject.getPatientId() );
             }
+            // create a fake label to capture those Subjects with no labels
+            if ( svo.getLabels().size() == 0 ) {
+                String labelName = "NO_LABEL";
+                if ( !labelPatientId.containsKey( labelName ) ) {
+                    labelPatientId.put( labelName, new HashSet<String>() );
+                }
+                labelPatientId.get( labelName ).add( subject.getPatientId() );
+            }
         }
 
         // store stats by patientId
