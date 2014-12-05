@@ -47,13 +47,14 @@ import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.server.model.GenomicLocation;
-import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.util.GenomeBin;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
+import ubc.pavlab.aspiredb.shared.LabelValueObject;
+import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 
 /**
  * author: anton date: 01/05/13
@@ -130,14 +131,16 @@ public class GeneServiceImpl implements GeneService {
      */
     @Override
     @RemoteMethod
+    @Transactional(readOnly = true)
     public Collection<Map<String, String>> getBurdenAnalysisPerSubjectLabel( Collection<Long> variantIds )
             throws NotLoggedInException, BioMartServiceException {
         Collection<Map<String, String>> results = new ArrayList<>();
 
-        Map<Label, Collection<String>> labelPatientId = new HashMap<>();
+        Map<String, Collection<String>> labelPatientId = new HashMap<>();
         Map<String, Collection<Long>> subjectVariants = new HashMap<>();
         for ( Variant v : variantDao.load( variantIds ) ) {
             Subject subject = subjectDao.load( v.getSubject().getId() );
+            SubjectValueObject svo = subject.convertToValueObject();
 
             // group variants by patient id
             Collection<Long> variantsAdded = subjectVariants.get( subject.getPatientId() );
@@ -148,11 +151,11 @@ public class GeneServiceImpl implements GeneService {
             variantsAdded.add( v.getId() );
 
             // organize labels
-            for ( Label label : labelDao.getSubjectLabelsBySubjectId( subject.getId() ) ) {
-                if ( !labelPatientId.containsKey( label ) ) {
-                    labelPatientId.put( label, new HashSet<String>() );
+            for ( LabelValueObject label : svo.getLabels() ) {
+                if ( !labelPatientId.containsKey( label.getName() ) ) {
+                    labelPatientId.put( label.getName(), new HashSet<String>() );
                 }
-                labelPatientId.get( label ).add( subject.getPatientId() );
+                labelPatientId.get( label.getName() ).add( subject.getPatientId() );
             }
         }
 
@@ -164,7 +167,7 @@ public class GeneServiceImpl implements GeneService {
         }
 
         // now aggregate patient stats by label by taking the average
-        for ( Label label : labelPatientId.keySet() ) {
+        for ( String label : labelPatientId.keySet() ) {
             Map<String, Double> perLabelStats = new HashMap<>();
 
             // add all the values up for each patient
@@ -183,16 +186,22 @@ public class GeneServiceImpl implements GeneService {
                 continue;
             }
 
-            // divide by the number of patients
-            for ( String statName : perLabelStats.keySet() ) {
-                perLabelStats.put( statName, perLabelStats.get( statName ) / labelPatientId.get( label ).size() );
-            }
+            // compute aggregate stats
+            perLabelStats.put(
+                    CnvBurdenAnalysisPerSubject.AVG_SIZE.toString(),
+                    perLabelStats.get( CnvBurdenAnalysisPerSubject.TOTAL_SIZE.toString() )
+                            / perLabelStats.get( CnvBurdenAnalysisPerSubject.TOTAL.toString() ) * 1.0 );
+
+            perLabelStats.put(
+                    CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV.toString(),
+                    perLabelStats.get( CnvBurdenAnalysisPerSubject.NUM_GENES.toString() )
+                            / perLabelStats.get( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE.toString() ) * 1.0 );
 
             // finally save the results
             Map<String, String> statsStr = statsToString( perLabelStats );
 
             // assume unique label name?
-            statsStr.put( CnvBurdenAnalysisPerSubject.LABEL_NAME.toString(), label.getName() );
+            statsStr.put( CnvBurdenAnalysisPerSubject.LABEL_NAME.toString(), label );
 
             results.add( statsStr );
         }

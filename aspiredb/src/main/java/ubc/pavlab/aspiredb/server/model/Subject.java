@@ -162,7 +162,7 @@ public class Subject implements Serializable, SecuredNotChild {
         return id;
     }
 
-    @Secured({ "GROUP_USER", "AFTER_ACL_READ" })
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<Label> getLabels() {
         return labels;
     }

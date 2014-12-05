@@ -99,8 +99,8 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          // [ VariantValueObjectPropertyName : DisplayValue ]
          data : [
                  // gene summary tables
-                 [ 'genesPerSubject', 'Genes per subject' ], 
-                 [ 'genesPerSubjectLabel', 'Genes per subject label' ], 
+                 [ 'genesPerSubject', 'CNV summary per subject' ], 
+                 [ 'genesPerSubjectLabel', 'CNV summary per subject label' ], 
                  
                  // commonly used reports
                  [ 'chromosome', 'Chromosome' ],
@@ -133,7 +133,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          queryMode : 'local',
          editable : false,
          forceSelection : true,
-         width : 300,
+         width : 350,
          listeners : {
             'change' : this.reportComboSelectHandler,
             afterrender : function(combo) {

@@ -567,7 +567,7 @@ public class VariantServiceImpl implements VariantService {
         for ( Long id : variantIds ) {
             Variant v = variantDao.load( id );
             Subject subject = subjectDao.load( v.getSubject().getId() );
-            Collection<Label> labels = labelDao.getSubjectLabelsBySubjectId( subject.getId() );
+            Collection<Label> labels = subject.getLabels();
             if ( labels.size() > 0 ) {
                 for ( Label label : labels ) {
                     if ( !result.containsKey( label.getName() ) ) {
