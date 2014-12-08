@@ -181,7 +181,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
             } else if ( cnvOnlyData.indexOf(record.get('id')) != -1 ) {
                return variantStore.collect('variantType').indexOf('CNV') != -1;;
             } else if ( record.get('id') === "Inheritance" ) {
-               return variantStore.collect('Inheritance').length > 0;
+               return variantStore.collect('inheritance').length > 0;
             } else if ( record.get('id') === "Characteristics" ) {
                return variantStore.collect('Characteristics').length > 0;
             }
