@@ -98,18 +98,18 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          } ],
          // [ VariantValueObjectPropertyName : DisplayValue ]
          data : [
-                 // gene summary tables
+                 // gene summary tables, cnv specific
                  [ 'genesPerSubject', 'CNV summary per subject' ], 
                  [ 'genesPerSubjectLabel', 'CNV summary per subject label' ], 
+
+                 // cnv specific
+                 [ 'type', 'CNV type' ], 
+                 [ 'cnvLength', 'CNV length' ], 
                  
                  // commonly used reports
                  [ 'chromosome', 'Chromosome' ],
                  [ 'patientId', 'Patient ID' ], 
-                 [ 'variantType', 'Variant type' ], 
-                 
-                 // cnv specific
-                 [ 'type', 'CNV type' ], 
-                 [ 'cnvLength', 'CNV length' ], 
+                 [ 'variantType', 'Variant type' ],
                  
                  // characteristics
                  [ 'Array Platform', 'Array platform' ],
@@ -122,6 +122,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          autoSync : true,
       } );
 
+      
 
       this.down( 'toolbar' ).insert( 0, {
          xtype : 'combo',
@@ -160,12 +161,43 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       this.down( "#logTransformCheckbox" ).on( 'change', me.reportComboSelectHandler); 
          
    },
+   
+   /**
+    * Hides report types that are not found in variantStore
+    */
+   filterReportCombo : function(variantStore) {
+      var me = this;
+      
+      var cnvOnlyData = ['genesPerSubject','genesPerSubjectLabel','type','cnvLength'];
+      
+      var reportCombo = me.down('#reportCombo');
+      
+      reportCombo.store.filter([{
+         fn : function(record) {
+            if ( record.get('id') === "Array Platform" ) {
+               return variantStore.collect('Array Platform').length > 0;
+            } else if ( record.get('id') === "Array Report" ) {
+               return variantStore.collect('Array Report').length > 0;
+            } else if ( cnvOnlyData.indexOf(record.get('id')) != -1 ) {
+               return variantStore.collect('variantType').indexOf('CNV') != -1;;
+            } else if ( record.get('id') === "Inheritance" ) {
+               return variantStore.collect('Inheritance').length > 0;
+            } else if ( record.get('id') === "Characteristics" ) {
+               return variantStore.collect('Characteristics').length > 0;
+            }
+            return true; 
+         }
+      }])
+      
+   },
 
    createAndShow : function(variantStore) {
       var me = this;
 
       me.variantStore = variantStore;
-      
+
+      me.filterReportCombo(variantStore);
+            
       me.doLayout();
       me.show();
    },
@@ -173,8 +205,11 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
    reportComboSelectHandler : function() {
       var me = this;
       
-      var selReportType = me.up('#variantReportWindow').down('#reportCombo').value
       var window = this.up( '#variantReportWindow' );
+      
+      var reportCombo = window.down('#reportCombo');
+      
+      var selReportType = reportCombo.value
       
       var reportPanel = window.down( '#variantReport' );
       if ( reportPanel != null ) {
