@@ -87,20 +87,41 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
          } );
 
-         var columnHeaders = [ 'Patient Id', 'Type', 'Genome Coordinates', 'Copy Number', 'CNV Type', 'CNV Length',
-                              'DB SNP ID', 'Observed Base', 'Reference Base', 'Indel Length', 'Gene' ];
+         var columnHeaders = [ 'Action', 'Patient Id', 'Type', 'Genome Coordinates', 'Copy Number', 'CNV Type',
+                              'CNV Length', 'DB SNP ID', 'Observed Base', 'Reference Base', 'Indel Length', 'Gene' ];
          var columnConfig = [];
 
          columnConfig.push( {
+            xtype : 'actioncolumn',
+            width : 30,
+            items : [ {
+               icon : 'scripts/ASPIREdb/resources/images/icons/zoom.png',
+               tooltip : 'View phenotype',
+               handler : function(grid, rowIndex, colIndex) {
+                  var rec = grid.getStore().getAt( rowIndex );
+                  var patientId = rec.get('patientId');
+                  var subjectStore = Ext.getStore('subjectStore')
+                  var subjectId = subjectStore.getAt(subjectStore.findExact('patientId',patientId)).get('id')
+                  ASPIREdb.EVENT_BUS.fireEvent('subject_selected',[subjectId]);
+               }
+            } ]
+         } );
+
+         columnConfig.push( {
             text : 'Patient Id',
-//            flex : 1,
-            dataIndex : 'patientId'
+            // flex : 1,
+            dataIndex : 'patientId',
+            renderer : function(value) {
+
+               return "<a href='http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg19&position=chr" + value
+                  + "' target='_blank'>" + value + "</a>";
+            },
          } );
 
          columnConfig.push( {
             text : 'Type',
             width : 50,
-//            flex : 1,
+            // flex : 1,
             dataIndex : 'variantType'
          } );
 
@@ -109,14 +130,15 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             flex : 1,
             dataIndex : 'genomeCoordinates',
             renderer : function(value) {
-               
-               return "<a href='http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg19&position=chr" + value + "' target='_blank'>" + value + "</a>";
+
+               return "<a href='http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg19&position=chr" + value
+                  + "' target='_blank'>" + value + "</a>";
             },
          } );
 
          columnConfig.push( {
             text : 'Chromosome',
-//            flex : 1,
+            // flex : 1,
             dataIndex : 'chromosome',
             hidden : true
          } );
@@ -211,7 +233,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             dataIndex : 'gene',
             hidden : false
          } );
-         
+
          for (var i = 0; i < characteristicNames.length; i++) {
 
             var config = {};
@@ -223,13 +245,13 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
             // construct links for those characteristics that contains http://
             config.renderer = function(value) {
-               if ( value.indexOf('http://') == 0 ) {
+               if ( value.indexOf( 'http://' ) == 0 ) {
                   return '<a href="' + value + '" target="_blank">' + value + '</a>';
                } else {
                   return value;
                }
             };
-            
+
             columnConfig.push( config );
 
             columnHeaders.push( characteristicNames[i] );
@@ -280,7 +302,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
          return grid;
       },
-      
+
       /**
        * Extract labels from value object
        * 
@@ -299,7 +321,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
          return visibleLabels;
       },
-      
+
       /**
        * @public
        * @param {VariantValueObject[]}
@@ -378,14 +400,14 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
             // Concatenate gene symbols
             var geneSymbols = [];
-            for(var geneIdx = 0; geneIdx < variantGenes[vvo.id].length; geneIdx++) {
+            for (var geneIdx = 0; geneIdx < variantGenes[vvo.id].length; geneIdx++) {
                var g = variantGenes[vvo.id][geneIdx];
                if ( g.geneBioType === "protein_coding" ) {
                   geneSymbols.push( g.symbol );
                }
             }
-            dataRow.push( geneSymbols.join(',') );
-            
+            dataRow.push( geneSymbols.join( ',' ) );
+
             for (var j = 0; j < characteristicNames.length; j++) {
 
                var dataRowValue = "";
@@ -409,6 +431,5 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
          return storeData;
 
       },
-
 
    } );
