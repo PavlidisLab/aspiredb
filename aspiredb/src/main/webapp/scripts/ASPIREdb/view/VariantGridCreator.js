@@ -102,7 +102,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
                   var patientId = rec.get('patientId');
                   var subjectStore = Ext.getStore('subjectStore')
                   var subjectId = subjectStore.getAt(subjectStore.findExact('patientId',patientId)).get('id')
-                  ASPIREdb.EVENT_BUS.fireEvent('subject_selected',[subjectId]);
+                  ASPIREdb.EVENT_BUS.fireEvent('view_phenotype',[subjectId]);
                }
             } ]
          } );

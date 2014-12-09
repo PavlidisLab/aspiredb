@@ -323,6 +323,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
          SubjectService.getPhenotypeTextDownloadBySubjectIds( ref.currentSubjectIds, ref.saveButtonHandler );
       } );
 
+      ASPIREdb.EVENT_BUS.on( 'view_phenotype', this.subjectSelectHandler, this );
       ASPIREdb.EVENT_BUS.on( 'subject_selected', this.subjectSelectHandler, this );
       ASPIREdb.EVENT_BUS.on( 'allPhenoSummary_sorted', this.sortAllPhenoSummary, this );
       ASPIREdb.EVENT_BUS.on( 'selectedPhenoSummary_sorted', this.sortSelectedPhenoSummary, this );
