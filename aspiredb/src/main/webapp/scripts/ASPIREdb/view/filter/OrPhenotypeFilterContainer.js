@@ -51,7 +51,10 @@ Ext.define( 'ASPIREdb.view.filter.OrPhenotypeFilterContainer', {
          getRestrictionExpression : function() {
             var disjunction = new Disjunction();
             disjunction.restrictions = [];
-            this.items.each( function(item, index, length) {
+            this.items.items[0].items.each( function(item, index, length) {
+               if ( item.xtype === "button" ) {
+                   return;
+               }
                disjunction.restrictions.push( item.getRestrictionExpression() );
             } );
             return disjunction;
