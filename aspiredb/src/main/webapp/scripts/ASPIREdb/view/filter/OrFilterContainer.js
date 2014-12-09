@@ -55,7 +55,7 @@ Ext.define( 'ASPIREdb.view.filter.OrFilterContainer', {
                   disjunction.restrictions[index].property.displayName = 'Gene';
                   disjunction.restrictions[index].values = disjunction.restrictions[index].values[index].object;
                }
-           
+
             } );
 
             return disjunction;
@@ -98,22 +98,36 @@ Ext.define( 'ASPIREdb.view.filter.OrFilterContainer', {
          },
 
          items : [ {
-            xtype : 'filter_property',
-            itemId : 'filterProperty',
-            propertyStore : me.getPropertyStore(),
-            suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
+            xtype : 'panel',
+            border : 0,
+            layout : {
+               type : 'hbox',
+               defaultMargins : {
+                  // top : 5,
+                  right : 5,
+               // left : 5,
+               // bottom : 5
+               }
+            },
+            items : [ {
+               xtype : 'filter_property',
+               itemId : 'filterProperty',
+               propertyStore : me.getPropertyStore(),
+               suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
+            }, {
+               xtype : 'button',
+               itemId : 'addButton',
+               // padding : '5 5 5 5',
+               // icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
+               text : 'OR'
+            } ]
          } ]
-      }, {
-         xtype : 'button',
-         itemId : 'addButton',
-         padding : '5 5 5 5',
-        // icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
-         text : 'OR'
-      } ];
+
+      }, ];
 
       this.callParent();
 
-      me.getComponent( "addButton" ).on( 'click', function(button, event) {
+      me.down( "#addButton" ).on( 'click', function(button, event) {
          var filterContainer = me.getComponent( "filterContainer" );
          filterContainer.add( Ext.create( 'ASPIREdb.view.filter.PropertyFilter', {
             propertyStore : me.getPropertyStore(),

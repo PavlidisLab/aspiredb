@@ -4,7 +4,7 @@ Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.filter.multicombo.MultiV
 Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
    extend : 'Ext.Container',
    alias : 'widget.filter_property',
-   width : 875,
+//   width : 875,
    height : 38,
    layout : {
       type : 'hbox'

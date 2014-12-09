@@ -3,7 +3,7 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
    alias : 'widget.filter_phenotype_property',
 
    layout : 'hbox',
-   width : 850,
+//   width : 850,
    /**
     * @private
     * @override
