@@ -25,15 +25,15 @@ Ext.define( 'ASPIREdb.view.filter.FilterPanel', {
          },
          items : [ {
             xtype : 'label',
-            width : 900,
             text : this.title,
-            padding : '2 2 0 2' // top, right, bottom, left
+            padding : '2 0 0 2' // top, right, bottom, left
+         }, {
+            xtype : 'tbspacer',
+            flex : 1,
          }, {
             xtype : 'image',
             itemId : 'closeImage',
-            margin : '5 5 5 5',
-            cls : 'margin-right:auto',
-
+            margin : '2 2 2 2',
             src : 'scripts/ASPIREdb/resources/images/icons/cross.png',
             listeners : {
                render : function(c) {

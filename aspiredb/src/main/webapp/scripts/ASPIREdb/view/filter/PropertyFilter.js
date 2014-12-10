@@ -19,7 +19,6 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
    config : {
       propertyStore : null, /* property suggestions */
       suggestValuesRemoteFunction : null,
-      isSubject : false,
    },
    constructor : function(cfg) {
       this.initConfig( cfg );
@@ -270,14 +269,8 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
          hidden : true
       }, {
          xtype : 'label',
-         itemId : 'orLabel',
-         text : 'OR',
-         hidden : true,
-      },  {
-         xtype : 'label',
-         itemId : 'andLabel',
-         text : 'AND',
-         hidden : true,
+         itemId : 'operationLabel',
+         text : ''
       }, ];
 
       this.callParent();
@@ -290,14 +283,6 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
       var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
       var andLabel = me.getComponent( "andLabel" );
       var orLabel = me.getComponent( "orLabel" );
-
-      if ( this.getIsSubject() ) {
-         andLabel.setVisible(true)
-         orLabel.setVisible(false)
-      } else {
-         andLabel.setVisible(false)
-         orLabel.setVisible(true)
-      }
 
       var firstTime = true;
 
@@ -527,5 +512,10 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
          this.getComponent( "enterListButton" ).hide();
       }
 
+   },
+   
+   setOperationLabel : function( operation ) {
+      this.down('#operationLabel').setText( operation );
    }
+   
 } );

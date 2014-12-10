@@ -111,6 +111,15 @@ Ext.define( 'ASPIREdb.view.filter.OrPhenotypeFilterContainer', {
       
       
       this.callParent();
+      
+   // Adds the 'OR' text after each variant filter property
+      me.down("#filterContainer").on('add', function( ref, component, index, opts) {
+         if ( index == 0 ) {
+            return;
+         }
+         var filterProperty = ref.items.items[index-1];
+         filterProperty.setOperationLabel( 'OR' );
+      });
 
       me.down( "#addButton" ).on( 'click', function(button, event) {
          var filterContainer = me.getComponent( "filterContainer" );

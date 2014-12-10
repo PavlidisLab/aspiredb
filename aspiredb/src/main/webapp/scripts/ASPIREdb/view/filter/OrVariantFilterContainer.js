@@ -98,13 +98,12 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
             filterContainer.doLayout();
 
          },
-
+         
          items : [ {
             xtype : 'filter_property',
             itemId : 'filterProperty',
             propertyStore : me.getPropertyStore(),
             suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction(),
-            isSubject : false,
          } ]
       }
    },
@@ -136,12 +135,20 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
 
       this.callParent();
 
+      // Adds the 'OR' text after each variant filter property
+      me.down("#filterContainer").on('add', function( ref, component, index, opts) {
+         if ( index == 0 ) {
+            return;
+         }
+         var filterProperty = ref.items.items[index-1];
+         filterProperty.setOperationLabel( 'OR' );
+      });
+      
       me.down( "#addButton" ).on( 'click', function(button, event) {
          var filterContainer = me.getComponent( "filterContainer" );
          filterContainer.add( Ext.create( 'ASPIREdb.view.filter.PropertyFilter', {
             propertyStore : me.getPropertyStore(),
             suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction(),
-            isSubject : false,
          } ) );
          filterContainer.doLayout();
       } );

@@ -76,7 +76,8 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
          text : 'X'
       }, {
          xtype : 'label',
-         text : 'OR'
+         itemId : 'operationLabel',
+         text : ''
       } ];
 
       this.callParent();
@@ -111,5 +112,10 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
       var valueCombo = this.getComponent( "valueCombo" );
       nameCombo.setValue( phenotypeRestriction.name );
       valueCombo.setValue( phenotypeRestriction.value );
+   },
+   
+   setOperationLabel : function( operation ) {
+      this.down('#operationLabel').setText( operation );
    }
+   
 } );

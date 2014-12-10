@@ -16,7 +16,6 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 		propertyStore : null,
 		suggestValuesRemoteFunction : null,
 		filterItemType : null,
-		isSubject : false
 	},
 	constructor : function(cfg) {
       this.initConfig( cfg );
@@ -191,14 +190,12 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 		var filterTypeItem = this.getFilterItemType();
 		var propertyStore = this.getPropertyStore();
 		var suggestValuesRemoteFunction = this.getSuggestValuesRemoteFunction();
-		var isSubject = this.getIsSubject();
 		
 		var getNewItem = function() {
 
 			return Ext.create(filterTypeItem, {
 				propertyStore : propertyStore,
 				suggestValuesRemoteFunction : suggestValuesRemoteFunction,
-				isSubject : isSubject
 			});
 
 		};
@@ -218,6 +215,15 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 		// Add first item.
 		filterContainer.insert(0, item);
 
+		// Adds the 'OR' text after each variant filter property
+      me.down("#filterContainer").on('add', function( ref, component, index, opts) {
+         if ( index == 0 ) {
+            return;
+         }
+         var filterProperty = ref.items.items[index-1];
+         filterProperty.setOperationLabel( 'AND' );
+      });
+      
 		// Attach button listener
 		me.getComponent("addButton").on('click', function(button, event) {
 			filterContainer.add(getNewItem());

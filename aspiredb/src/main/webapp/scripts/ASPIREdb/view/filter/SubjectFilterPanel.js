@@ -10,7 +10,6 @@ Ext.define( 'ASPIREdb.view.filter.SubjectFilterPanel', {
       xtype : 'filter_and',
       itemId : 'subjectFilterContainer',
       filterItemType : 'ASPIREdb.view.filter.PropertyFilter',
-      isSubject : true,
       suggestValuesRemoteFunction : SubjectService.suggestValues,
       propertyStore : {
          autoLoad : false,
