@@ -223,6 +223,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
          emptyText : 'operator',
          displayField : 'displayLabel',
          queryMode : 'local',
+         width : 100,
          store : {
             proxy : {
                type : 'memory'
