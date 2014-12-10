@@ -2,7 +2,12 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
    extend : 'Ext.Container',
    alias : 'widget.filter_phenotype_property',
 
-   layout : 'hbox',
+   layout : {
+      type : 'hbox',
+      defaultMargins : {
+         right : 2,
+      }
+   },
 //   width : 850,
    /**
     * @private
@@ -69,6 +74,9 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
          xtype : 'button',
          itemId : 'removeButton',
          text : 'X'
+      }, {
+         xtype : 'label',
+         text : 'OR'
       } ];
 
       this.callParent();

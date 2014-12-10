@@ -7,13 +7,25 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
    width : 875,
    height : 36,
    layout : {
-      type : 'hbox'
+      type : 'hbox',
+
+      defaultMargins : {
+         // top : 5,
+         right : 5,
+      // left : 5,
+      // bottom : 5
+      }
    },
    config : {
       propertyStore : null, /* property suggestions */
-      suggestValuesRemoteFunction : null
+      suggestValuesRemoteFunction : null,
+      isSubject : false,
    },
-
+   constructor : function(cfg) {
+      this.initConfig( cfg );
+      this.callParent( arguments );
+   },
+   
    isMultiValue : true,
    selectedProperty : null,
 
@@ -248,9 +260,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
          xtype : 'button',
          itemId : 'removeButton',
          text : 'X'
-      },
-
-      {
+      }, {
          itemId : 'enterListButton',
          xtype : 'button',
          text : '',
@@ -258,7 +268,17 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
          icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
          disabled : true,
          hidden : true
-      } ];
+      }, {
+         xtype : 'label',
+         itemId : 'orLabel',
+         text : 'OR',
+         hidden : true,
+      },  {
+         xtype : 'label',
+         itemId : 'andLabel',
+         text : 'AND',
+         hidden : true,
+      }, ];
 
       this.callParent();
       var multicombo_container = me.getComponent( "multicombo_container" );
@@ -268,6 +288,16 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
       var example = multicombo_container.getComponent( "example" );
       var propertyComboBox = me.getComponent( "propertyComboBox" );
       var subPropertyComboBox = me.getComponent( "subPropertyComboBox" );
+      var andLabel = me.getComponent( "andLabel" );
+      var orLabel = me.getComponent( "orLabel" );
+
+      if ( this.getIsSubject() ) {
+         andLabel.setVisible(true)
+         orLabel.setVisible(false)
+      } else {
+         andLabel.setVisible(false)
+         orLabel.setVisible(true)
+      }
 
       var firstTime = true;
 

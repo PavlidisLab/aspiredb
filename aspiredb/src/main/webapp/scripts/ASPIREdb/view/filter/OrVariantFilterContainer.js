@@ -4,7 +4,8 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
    extend : 'ASPIREdb.view.filter.FilterPanel',
    alias : 'widget.filter_or_variant',
    closable : true,
-   title : 'OR Variant Filter',
+//   title : 'OR Variant Filter',
+   title : 'AND',
    width : 910,
    // layout : {
    // type : 'vbox'
@@ -102,7 +103,8 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
             xtype : 'filter_property',
             itemId : 'filterProperty',
             propertyStore : me.getPropertyStore(),
-            suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
+            suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction(),
+            isSubject : false,
          } ]
       }
    },
@@ -138,7 +140,8 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
          var filterContainer = me.getComponent( "filterContainer" );
          filterContainer.add( Ext.create( 'ASPIREdb.view.filter.PropertyFilter', {
             propertyStore : me.getPropertyStore(),
-            suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
+            suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction(),
+            isSubject : false,
          } ) );
          filterContainer.doLayout();
       } );
