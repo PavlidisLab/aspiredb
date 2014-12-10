@@ -48,10 +48,7 @@ Ext.define( 'ASPIREdb.view.filter.OrFilterContainer', {
          getRestrictionExpression : function() {
             var disjunction = new Disjunction();
             disjunction.restrictions = [];
-            this.items.items[0].items.each( function(item, index, length) {
-                if ( item.xtype === "button" ) {
-                   return;
-                }
+            this.items.each( function(item, index, length) {
                disjunction.restrictions.push( item.getRestrictionExpression() );
                if ( disjunction.restrictions[index].property.displayName == 'GeneSet' ) {
                   disjunction.restrictions[index].property = new GeneProperty();

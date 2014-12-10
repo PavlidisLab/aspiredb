@@ -4,7 +4,13 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 	extend : 'Ext.Container',
 	alias : 'widget.filter_and',
 	layout : {
-		type : 'vbox'
+		type : 'vbox',
+      defaultMargins : {
+//         top : 5,
+         right : 5,
+         left : 5,
+         bottom : 2
+      }
 	},
 	config : {
 		propertyStore : null,
@@ -16,12 +22,12 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 		itemId : 'filterContainer',
 		layout : {
 			type : 'vbox',
-			defaultMargins : {
-				top : 5,
-				right : 5,
-				left : 5,
-				bottom : 5
-			}
+//			defaultMargins : {
+//				top : 5,
+//				right : 5,
+//				left : 5,
+//				bottom : 5
+//			}
 		},
 		getRestrictionExpression : function() {
 			var conjunction = new Conjunction();
@@ -84,7 +90,7 @@ Ext.define('ASPIREdb.view.filter.AndFilterContainer', {
 	}, {
 		xtype : 'button',
 		itemId : 'addButton',
-		text : 'AND'
+		text : 'AND',
 	} ],
 
 	getRestrictionExpression : function() {

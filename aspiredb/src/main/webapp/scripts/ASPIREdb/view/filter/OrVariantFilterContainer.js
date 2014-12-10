@@ -6,9 +6,9 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
    closable : true,
    title : 'OR Variant Filter',
    width : 910,
-   layout : {
-      type : 'vbox'
-   },
+   // layout : {
+   // type : 'vbox'
+   // },
    config : {
       propertyStore : null,
       suggestValuesRemoteFunction : null
@@ -31,27 +31,25 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
 
    },
 
-   initComponent : function() {
+   createFilterContainer : function() {
       var me = this;
-      this.items = [ {
+
+      return {
          xtype : 'container',
          itemId : 'filterContainer',
          layout : {
             type : 'vbox',
             defaultMargins : {
-               top : 5,
+//               top : 5,
                right : 5,
                left : 5,
-               bottom : 5
+               bottom : 2
             }
          },
          getRestrictionExpression : function() {
             var disjunction = new Disjunction();
             disjunction.restrictions = [];
-            this.items.items[0].items.each( function(item, index, length) {
-                if ( item.xtype === "button" ) {
-                   return;
-                }
+            this.items.each( function(item, index, length) {
                disjunction.restrictions.push( item.getRestrictionExpression() );
                if ( disjunction.restrictions[index].property.displayName == 'GeneSet' ) {
                   disjunction.restrictions[index].property = new GeneProperty();
@@ -63,9 +61,6 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
 
             return disjunction;
          },
-         
-         
-         
 
          setRestrictionExpression : function(restriction) {
 
@@ -104,32 +99,38 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
          },
 
          items : [ {
-            xtype : 'panel',
-            border : 0,
-            layout : {
-               type : 'hbox',
-               defaultMargins : {
-//                  top : 5,
-                  right : 5,
-//                  left : 5,
-//                  bottom : 5
-               }
-            },
-            items : [ {
-               xtype : 'filter_property',
-               itemId : 'filterProperty',
-               propertyStore : me.getPropertyStore(),
-               suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
-            }, {
-               xtype : 'button',
-               itemId : 'addButton',
-               // padding : '5 5 5 5',
-               // icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
-               text : 'OR'
-            } ]
+            xtype : 'filter_property',
+            itemId : 'filterProperty',
+            propertyStore : me.getPropertyStore(),
+            suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction()
          } ]
+      }
+   },
 
-      }, ];
+   initComponent : function() {
+      var me = this;
+      this.items = [ {
+         xtype : 'container',
+         layout : {
+            type : 'hbox',
+            defaultMargins : {
+//             top : 5,
+             right : 10,
+//             left : 5,
+//             bottom : 5
+          }
+         },
+         items : [ {
+            xtype : 'tbspacer',
+            flex : 1,
+         }, {
+            xtype : 'button',
+            itemId : 'addButton',
+//            padding : '5 5 5 5',
+            // icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
+            text : 'OR'
+         } ]
+      }, me.createFilterContainer() ];
 
       this.callParent();
 

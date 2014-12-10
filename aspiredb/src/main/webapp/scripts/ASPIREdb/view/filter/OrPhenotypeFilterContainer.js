@@ -13,9 +13,9 @@ Ext.define( 'ASPIREdb.view.filter.OrPhenotypeFilterContainer', {
    closable : true,
    title : 'OR Filter',
    width : 910,
-   layout : {
-      type : 'vbox'
-   },
+//   layout : {
+//      type : 'vbox'
+//   },
 
    /*
     * border: 1, style: { border: "1px solid lightgray" },
@@ -34,15 +34,15 @@ Ext.define( 'ASPIREdb.view.filter.OrPhenotypeFilterContainer', {
 
    },
 
-   initComponent : function() {
+   createFilterContainer : function() {
       var me = this;
-      this.items = [ {
+      return {
          xtype : 'container',
          itemId : 'filterContainer',
          layout : {
             type : 'vbox',
             defaultMargins : {
-               top : 5,
+//               top : 5,
                right : 5,
                left : 5,
                bottom : 5
@@ -51,10 +51,7 @@ Ext.define( 'ASPIREdb.view.filter.OrPhenotypeFilterContainer', {
          getRestrictionExpression : function() {
             var disjunction = new Disjunction();
             disjunction.restrictions = [];
-            this.items.items[0].items.each( function(item, index, length) {
-               if ( item.xtype === "button" ) {
-                   return;
-               }
+            this.items.each( function(item, index, length) {
                disjunction.restrictions.push( item.getRestrictionExpression() );
             } );
             return disjunction;
@@ -79,30 +76,39 @@ Ext.define( 'ASPIREdb.view.filter.OrPhenotypeFilterContainer', {
             }
 
          },
-
+         
+         
+         items : [ Ext.create( 'ASPIREdb.view.filter.PhenotypeFilter' ) ]
+      }
+   },
+   
+   initComponent : function() {
+      var me = this;
+      this.items = [ {
+         xtype : 'container',
+         layout : {
+            type : 'hbox',
+            defaultMargins : {
+//               top : 5,
+               right : 10,
+//               left : 5,
+//               bottom : 5
+            }
+         },
          items : [ {
-            xtype : 'panel',
-            border : 0,
-            layout : {
-               type : 'hbox',
-               defaultMargins : {
-                  // top : 5,
-                  right : 5,
-               // left : 5,
-               // bottom : 5
-               }
-            },
-            items : [ Ext.create( 'ASPIREdb.view.filter.PhenotypeFilter' ), {
-               xtype : 'button',
-               itemId : 'addButton',
-               // padding : '5 5 5 5',
-               // icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
-               text : 'OR'
-            } ]
+            xtype : 'tbspacer',
+            flex : 1,
+         }, {
+            xtype : 'button',
+            itemId : 'addButton',
+//            padding : '5 5 5 5',
+            // icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
+            text : 'OR'
          } ]
+      }, me.createFilterContainer() ];
 
-      } ];
-
+      
+      
       this.callParent();
 
       me.down( "#addButton" ).on( 'click', function(button, event) {
