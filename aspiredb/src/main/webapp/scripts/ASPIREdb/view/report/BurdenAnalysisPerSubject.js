@@ -101,7 +101,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', {
          text : '# genes',
       }, {
          dataIndex : 'NUM_CNVS_WITH_GENE',
-         text : '# gene-disrupting CNVs',
+         text : '# genes overlapped by CNVs',
          // width : 130,
          flex : 3,
       }, {

@@ -110,12 +110,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
          columnConfig.push( {
             text : 'Patient Id',
             // flex : 1,
-            dataIndex : 'patientId',
-            renderer : function(value) {
-
-               return "<a href='http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg19&position=chr" + value
-                  + "' target='_blank'>" + value + "</a>";
-            },
+            dataIndex : 'patientId'
          } );
 
          columnConfig.push( {
