@@ -516,7 +516,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       property.displayName = 'Variant Labels';
 
       var me = this;
-      me.filterSubmitHandler( me.filterConfigs, property );
+//      me.filterSubmitHandler( me.filterConfigs, property );
 
       // refresh the variant in grid
       me.down( '#variantGrid' ).getView().refresh();
@@ -535,7 +535,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
     * Refresh the selected subjects in ideogram
     */
    subjectLabelUpdateHandler : function() {
-      this.filterSubmitHandler( this.filterConfigs );
+//      this.filterSubmitHandler( this.filterConfigs );
       var ideogram = this.getComponent( 'ideogram' );
 
       if ( ideogram.colourLegend.isVisible() ) {
