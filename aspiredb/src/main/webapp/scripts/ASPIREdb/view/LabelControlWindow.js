@@ -96,12 +96,14 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    statics : {
       getHtmlLabel : function(label) {
          var fontColour = 'white';
-         var ret = "<font color=" + fontColour + "><span style='background-color: " + label.colour + "'>&nbsp&nbsp"
-            + label.name + "&nbsp&nbsp</span></font>&nbsp&nbsp&nbsp";
+         // var ret = "<font color=" + fontColour + "><span style='background-color: " + label.colour + "'>&nbsp&nbsp"
+         // + label.name + "&nbsp&nbsp</span></font>&nbsp&nbsp&nbsp";
+         var ret = "<font color=" + fontColour + "><span style='background-color: " + label.labelColour
+            + "'>&nbsp&nbsp" + label.labelName + "&nbsp&nbsp</span></font>&nbsp&nbsp&nbsp";
          return ret;
       },
    },
-   
+
    /**
     * dockedItems : [ { xtype : 'colorpicker', itemId : 'colorPicker', value : '00FFFF', // default dock : 'right' } ],
     */
@@ -130,8 +132,9 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
             flex : 1,
             renderer : function(labelId, meta, rec, rowIndex, colIndex, store) {
                meta.tdAttr = 'data-qtip="Double-click to rename label"';
-               var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
-               var ret = ASPIREdb.view.LabelControlWindow.getHtmlLabel( label );
+//               var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
+//               var ret = ASPIREdb.view.LabelControlWindow.getHtmlLabel( label );
+               var ret = ASPIREdb.view.LabelControlWindow.getHtmlLabel( rec.data );
                return ret;
             },
 
@@ -267,43 +270,43 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
       } else {
          me.service = VariantService;
       }
-      
+
       // make sure to only show those labels which we have write permissions
       if ( me.isSubjectLabel ) {
-         LabelService.getSubjectLabels({
+         LabelService.getSubjectLabels( {
             callback : function(labels) {
-               me.loadLabels(labels)
+               me.loadLabels( labels )
             },
             errorHandler : function(message, exception) {
                console.log( message )
-               console.log( dwr.util.toDescriptiveString(exception.stackTrace,3) )
+               console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
             },
-         })
+         } )
       } else {
-         LabelService.getVariantLabels({
+         LabelService.getVariantLabels( {
             callback : function(labels) {
-               me.loadLabels(labels)
+               me.loadLabels( labels )
             },
             errorHandler : function(message, exception) {
                console.log( message )
-               console.log( dwr.util.toDescriptiveString(exception.stackTrace,3) )
+               console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
             },
-         })
+         } )
       }
-      
+
    },
 
-   loadLabels : function( labels ) {
+   loadLabels : function(labels) {
       var me = this;
       var loadData = [];
-      for ( var i = 0; i < labels.length ; i++ ) {
+      for (var i = 0; i < labels.length; i++) {
          var label = labels[i]
          loadData.push( [ label.id, label.name, label.colour, label.isShown ] );
       }
-      
+
       me.down( '#labelSettingsGrid' ).store.loadData( loadData );
    },
-   
+
    labelColorHandler : function(selColor) {
 
    },
@@ -335,6 +338,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                   LabelService.removeLabelsFromSubjects( labels, me.selectedOwnerIds, {
                      callback : function() {
                         ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_removed', me.selectedOwnerIds, labels );
+                        me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
                      }
                   } );
                }
@@ -365,6 +369,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                   LabelService.removeLabelsFromVariants( labels, me.selectedOwnerIds, {
                      callback : function() {
                         ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_removed', me.selectedOwnerIds, labels );
+                        me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
                      }
                   } );
                }
