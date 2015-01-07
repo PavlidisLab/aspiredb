@@ -210,7 +210,8 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       ASPIREdb.EVENT_BUS.on( 'filter_submit', this.filterSubmitHandler, this );
 
       // when subject selected
-      this.on( 'selectionchange', me.selectionChangeHandler, me );
+      //this.on( 'selectionchange', me.selectionChangeHandler, me );
+      this.on( 'cellclick', me.selectionChangeHandler, me );   
 
       // when subject label is removed
       ASPIREdb.EVENT_BUS.on( 'subject_label_removed', this.labelRemovedHandler, this );
@@ -218,6 +219,8 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       // when subject label is removed
       ASPIREdb.EVENT_BUS.on( 'subject_label_updated', this.labelUpdateHandler, this );
 
+      ASPIREdb.EVENT_BUS.on( 'select_subject_from_variant_grid', this.selectSubjectHandler, this);
+      
       // when subject label is shown
       ASPIREdb.EVENT_BUS.on( 'subject_label_changed', function() {
 
@@ -226,6 +229,18 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       }, this );
    },
 
+   selectSubjectHandler : function( subjectIds ) {
+
+      var grid = this;
+  
+      grid.getSelectionModel().deselectAll();
+      
+      grid.selModel.select( grid.store.find('id',subjectIds[0]) );
+      
+      grid.getView().refresh();
+      
+   },
+   
    /**
     * Load subject labels created by the user
     * 

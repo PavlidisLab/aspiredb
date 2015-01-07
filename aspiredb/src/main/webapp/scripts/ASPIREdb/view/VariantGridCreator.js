@@ -96,13 +96,13 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             width : 30,
             items : [ {
                icon : 'scripts/ASPIREdb/resources/images/icons/zoom.png',
-               tooltip : 'View phenotype',
+               tooltip : 'View subject',
                handler : function(grid, rowIndex, colIndex) {
                   var rec = grid.getStore().getAt( rowIndex );
                   var patientId = rec.get('patientId');
                   var subjectStore = Ext.getStore('subjectStore')
                   var subjectId = subjectStore.getAt(subjectStore.findExact('patientId',patientId)).get('id')
-                  ASPIREdb.EVENT_BUS.fireEvent('view_phenotype',[subjectId]);
+                  ASPIREdb.EVENT_BUS.fireEvent('select_subject_from_variant_grid', [subjectId] );
                }
             } ]
          } );
