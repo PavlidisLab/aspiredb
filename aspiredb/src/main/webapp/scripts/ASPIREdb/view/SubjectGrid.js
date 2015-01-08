@@ -237,7 +237,12 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       
       grid.selModel.select( grid.store.find('id',subjectIds[0]) );
       
-      grid.getView().refresh();
+      // use just to make sure selected record is at the top
+      grid.getView().scrollBy( {
+         x : 0,
+         y : 1000
+      } );
+      grid.getView().focusRow( grid.store.find('id',subjectIds[0]) );
       
    },
    
