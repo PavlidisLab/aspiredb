@@ -494,4 +494,57 @@ public class GeneServiceImpl implements GeneService {
         return savedUserGeneSet.getId();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    @RemoteMethod
+    public Map<Long, Collection<GeneValueObject>> getCompoundHeterozygotes( Collection<Long> variantIds )
+            throws NotLoggedInException, BioMartServiceException {
+
+        Map<Long, Collection<GeneValueObject>> result = new HashMap<>();
+
+        Map<Long, Collection<GeneValueObject>> map = getGenesPerVariant( variantIds );
+
+        Collection<Variant> variants = variantDao.load( variantIds );
+
+        // transform data to patientId-geneSymbol pairs
+        Map<String, Map<GeneValueObject, Boolean>> seen = new HashMap();
+        for ( Variant variant : variants ) {
+
+            Long id = variant.getId();
+            String patientId = variant.getSubject().getPatientId();
+
+            Collection<GeneValueObject> geneList = map.get( id );
+            if ( geneList == null || geneList.size() == 0 ) {
+                continue;
+            }
+
+            for ( GeneValueObject gene : geneList ) {
+                Map<GeneValueObject, Boolean> geneMap = seen.get( patientId );
+                if ( geneMap == null ) {
+                    geneMap = new HashMap<>();
+                    seen.put( patientId, geneMap );
+                    geneMap.put( gene, true );
+                    continue;
+                }
+
+                if ( geneMap.get( gene ) == null ) {
+                    geneMap.put( gene, true );
+                } else {
+
+                    // so we have found a compound heterozygote because this gene already exists in the patient
+                    log.info( "Patient " + patientId + " potentially has a compound heterozygote gene " + gene );
+
+                    if ( result.get( id ) == null ) {
+                        Collection<GeneValueObject> newGeneList = new ArrayList<>();
+                        result.put( id, newGeneList );
+                    }
+
+                    result.get( id ).add( gene );
+                }
+
+            }
+        }
+
+        return result;
+    }
 }

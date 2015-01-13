@@ -54,4 +54,16 @@ public interface GeneService {
     public Collection<Map<String, String>> getBurdenAnalysisPerSubjectLabel( Collection<Long> variantIds )
             throws NotLoggedInException, BioMartServiceException;
 
+    /**
+     * Returns a list of <variant ID, GeneValueObject> pairs which occurs more than once, i.e. a patient has two
+     * variants that overlap the same gene. We say "potentially" compound heterozygote because parent data is not
+     * available.
+     * 
+     * @param variantIds
+     * @return
+     * @throws NotLoggedInException
+     * @throws BioMartServiceException
+     */
+    public Map<Long, Collection<GeneValueObject>> getCompoundHeterozygotes( Collection<Long> variantIds )
+            throws NotLoggedInException, BioMartServiceException;
 }

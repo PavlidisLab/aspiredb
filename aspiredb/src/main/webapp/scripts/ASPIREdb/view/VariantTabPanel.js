@@ -441,6 +441,20 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                   }
                });
 
+               
+               var d = new Date();
+               GeneService.getCompoundHeterozygotes( variantIds, {
+                 callback : function( variantGenes ) {
+                    ref.setLoading( false );
+                    console.log('Found ' + variantGenes.length + ' potiential compound heterozygotes for ' + variantIds.length + ' variants took ' + (new Date() - d) + ' ms')
+                 },
+                 errorHandler : function(message, exception) {
+                    Ext.Msg.alert( 'Error', message )
+                    console.log( message )
+                    console.log( dwr.util.toDescriptiveString(exception.stackTrace,3) )
+                 }
+              });
+               
                var toolbar = ref.getDockedComponent( 'variantTabPanelToolbar' );
 
                toolbar.add( ref.actionsButton );
