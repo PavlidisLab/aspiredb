@@ -507,7 +507,7 @@ public class GeneServiceImpl implements GeneService {
         Collection<Variant> variants = variantDao.load( variantIds );
 
         // transform data to patientId-geneSymbol pairs
-        Map<String, Map<GeneValueObject, Boolean>> seen = new HashMap();
+        Map<String, Map<GeneValueObject, Collection<Long>>> seen = new HashMap();
         for ( Variant variant : variants ) {
 
             Long id = variant.getId();
@@ -519,27 +519,46 @@ public class GeneServiceImpl implements GeneService {
             }
 
             for ( GeneValueObject gene : geneList ) {
-                Map<GeneValueObject, Boolean> geneMap = seen.get( patientId );
+                Map<GeneValueObject, Collection<Long>> geneMap = seen.get( patientId );
                 if ( geneMap == null ) {
                     geneMap = new HashMap<>();
                     seen.put( patientId, geneMap );
-                    geneMap.put( gene, true );
+                    Collection<Long> varIdList = new ArrayList<>();
+                    geneMap.put( gene, varIdList );
+                    varIdList.add( id );
                     continue;
                 }
 
                 if ( geneMap.get( gene ) == null ) {
-                    geneMap.put( gene, true );
+                    Collection<Long> varIdList = new ArrayList<>();
+                    geneMap.put( gene, varIdList );
+                    varIdList.add( id );
                 } else {
 
                     // so we have found a compound heterozygote because this gene already exists in the patient
-                    log.info( "Patient " + patientId + " potentially has a compound heterozygote gene " + gene );
 
                     if ( result.get( id ) == null ) {
                         Collection<GeneValueObject> newGeneList = new ArrayList<>();
                         result.put( id, newGeneList );
                     }
-
                     result.get( id ).add( gene );
+
+                    // don't forget to add the previous variant that first overlapped this gene
+                    String varIdStr = "" + id;
+
+                    for ( Long varId : geneMap.get( gene ) ) {
+                        if ( result.get( varId ) == null ) {
+                            Collection<GeneValueObject> newGeneList = new ArrayList<>();
+                            result.put( varId, newGeneList );
+                        }
+                        result.get( varId ).add( gene );
+
+                        varIdStr += "," + varId;
+                    }
+
+                    // log.debug( "Patient " + patientId + " with variants " + varIdStr
+                    // + " potentially has a compound heterozygote gene " + gene );
+
                 }
 
             }

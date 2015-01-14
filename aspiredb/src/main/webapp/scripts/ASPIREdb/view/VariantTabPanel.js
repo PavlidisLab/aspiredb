@@ -446,7 +446,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                GeneService.getCompoundHeterozygotes( variantIds, {
                  callback : function( variantGenes ) {
                     ref.setLoading( false );
-                    console.log('Found ' + variantGenes.length + ' potiential compound heterozygotes for ' + variantIds.length + ' variants took ' + (new Date() - d) + ' ms')
+                    console.log('Found ' + variantGenes.length + ' potential compound heterozygotes for ' + variantIds.length + ' variants took ' + (new Date() - d) + ' ms')
                  },
                  errorHandler : function(message, exception) {
                     Ext.Msg.alert( 'Error', message )

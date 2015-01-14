@@ -19,10 +19,14 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -58,6 +62,7 @@ public class GeneServiceTest extends BaseSpringContextTest {
     @Before
     public void setup() throws Exception {
         Variant variant = new CNV();
+        variant.setId( 2L );
 
         Subject subject = new Subject();
         subject.setPatientId( "GeneServiceSubject" );
@@ -67,9 +72,16 @@ public class GeneServiceTest extends BaseSpringContextTest {
         GenomicLocation location = new GenomicLocation( "Y", 1, 100 );
         variant.setLocation( location );
 
+        Variant variant2 = new CNV();
+        variant2.setId( 3L );
+        variant2.setSubject( subject );
+        variant2.setLocation( new GenomicLocation( "Y", 101, 105 ) );
+
         variantDaoMock = EasyMock.createMock( VariantDao.class );
         // EasyMock.expect( variantDaoMock.load( 2L ) ).andReturn( variant );
-        EasyMock.expect( variantDaoMock.load( Arrays.asList( 2L ) ) ).andReturn( Arrays.asList( variant ) );
+        EasyMock.expect( variantDaoMock.load( Arrays.asList( 2L ) ) ).andReturn( Arrays.asList( variant ) ).times( 2 );
+        EasyMock.expect( variantDaoMock.load( Arrays.asList( 2L, 3L ) ) )
+                .andReturn( Arrays.asList( variant, variant2 ) ).times( 2 );
         EasyMock.replay( variantDaoMock );
 
         GenomicRange geneRange = new GenomicRange( "Y", 1, 100 );
@@ -79,25 +91,27 @@ public class GeneServiceTest extends BaseSpringContextTest {
             if ( bin == GenomeBin.binFromRange( geneRange.getChromosome(), geneRange.getBaseStart(),
                     geneRange.getBaseEnd() ) ) {
 
-                EasyMock.expect( bioMartQueryServiceMock.fetchGenesByBin( bin ) ).andReturn(
-                        Arrays.asList(
-                                createGene( "HAIRCH", geneRange.getChromosome(), geneRange.getBaseStart(),
-                                        geneRange.getBaseEnd() ),
-                                createGene( "GENE_INSIDE_VARIANT", geneRange.getChromosome(),
-                                        geneRange.getBaseStart() + 10, geneRange.getBaseEnd() - 10 ),
-                                createGene( "VARIANT_INSIDE_GENE", geneRange.getChromosome(),
-                                        geneRange.getBaseStart() - 1, geneRange.getBaseEnd() + 10 ),
-                                createGene( "OVERLAPEND", geneRange.getChromosome(), geneRange.getBaseStart() + 50,
-                                        geneRange.getBaseEnd() + 50 ),
-                                createGene( "OVERLAPSTART", geneRange.getChromosome(), geneRange.getBaseStart() - 1,
-                                        geneRange.getBaseEnd() - 50 ),
-                                createGene( "NOTOVERLAP_DIFFCHR", "22", geneRange.getBaseStart(),
-                                        geneRange.getBaseEnd() ),
-                                createGene( "NOTOVERLAP_DOWNSTREAM", geneRange.getChromosome(),
-                                        geneRange.getBaseStart() + 1000, geneRange.getBaseEnd() + 1000 ) ) );
+                EasyMock.expect( bioMartQueryServiceMock.fetchGenesByBin( bin ) )
+                        .andReturn(
+                                Arrays.asList(
+                                        createGene( "HAIRCH", geneRange.getChromosome(), geneRange.getBaseStart(),
+                                                geneRange.getBaseEnd() ),
+                                        createGene( "GENE_INSIDE_VARIANT", geneRange.getChromosome(),
+                                                geneRange.getBaseStart() + 10, geneRange.getBaseEnd() - 10 ),
+                                        createGene( "VARIANT_INSIDE_GENE", geneRange.getChromosome(),
+                                                geneRange.getBaseStart() - 1, geneRange.getBaseEnd() + 10 ),
+                                        createGene( "OVERLAPEND", geneRange.getChromosome(),
+                                                geneRange.getBaseStart() + 50, geneRange.getBaseEnd() + 50 ),
+                                        createGene( "OVERLAPSTART", geneRange.getChromosome(),
+                                                geneRange.getBaseStart() - 1, geneRange.getBaseEnd() - 50 ),
+                                        createGene( "NOTOVERLAP_DIFFCHR", "22", geneRange.getBaseStart(),
+                                                geneRange.getBaseEnd() ),
+                                        createGene( "NOTOVERLAP_DOWNSTREAM", geneRange.getChromosome(),
+                                                geneRange.getBaseStart() + 1000, geneRange.getBaseEnd() + 1000 ) ) )
+                        .times( 2 );
             } else {
-                EasyMock.expect( bioMartQueryServiceMock.fetchGenesByBin( bin ) ).andReturn(
-                        new ArrayList<GeneValueObject>() );
+                EasyMock.expect( bioMartQueryServiceMock.fetchGenesByBin( bin ) )
+                        .andReturn( new ArrayList<GeneValueObject>() ).times( 2 );
             }
         }
 
@@ -130,5 +144,19 @@ public class GeneServiceTest extends BaseSpringContextTest {
             }
         }
         assertEquals( genes.size(), found );
+    }
+
+    @Test
+    public void testGetCompoundHeterozygotes() throws Exception {
+        Map<Long, Collection<GeneValueObject>> output = geneService.getCompoundHeterozygotes( Arrays.asList( 2L ) );
+        assertEquals( output.keySet().size(), 0 );
+
+        // now let's try adding a variant that hits the same gene
+        List<Long> varIds = Arrays.asList( 2L, 3L );
+        output = geneService.getCompoundHeterozygotes( varIds );
+        Set<Long> actuals = output.keySet();
+        assertTrue( actuals.contains( 2L ) );
+        assertTrue( actuals.contains( 3L ) );
+
     }
 }
