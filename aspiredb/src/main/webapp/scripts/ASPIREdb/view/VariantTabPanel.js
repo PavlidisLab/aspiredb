@@ -258,6 +258,15 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             return;
          }
          
+         // update the label store cache for rendering
+         var grid = ref.down( '#variantGrid' );
+         var existingLab = grid.visibleLabels[addedLabel.id];
+         if ( existingLab == undefined ) {
+            grid.visibleLabels[addedLabel.id] = addedLabel;
+         } else {
+            existingLab.isShown = true;
+         }
+         
          var currentlySelectedRecords = ref.getVariantRecordSelection();
          for (var i = 0; i < currentlySelectedRecords.length; i++) {
             var labelIds = currentlySelectedRecords[i].get( 'labelIds' );
