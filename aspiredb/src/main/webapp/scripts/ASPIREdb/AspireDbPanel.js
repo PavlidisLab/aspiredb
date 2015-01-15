@@ -32,7 +32,7 @@ if ( Ext.isChrome || Ext.IE ) {
  * Main Panel which trigger the Main Panel after user's successful login Events: - login - logout
  */
 Ext.define( 'ASPIREdb.AspireDbPanel', {
-   itemId : 'aspireDbPanel',
+   id : 'aspireDbPanel',
    extend : 'Ext.container.Viewport',
    layout : 'border',
 
@@ -235,7 +235,7 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          height : 30,
          margin : '5 5 5 5',
          handler : function() {
-            this.up( '#aspireDbPanel' ).disableToolbarButtonsForDashboard( true );
+            Ext.getCmp('aspireDbPanel').disableToolbarButtonsForDashboard( true );
             ASPIREdb.view.DashboardWindow.show();
          }
       }, {

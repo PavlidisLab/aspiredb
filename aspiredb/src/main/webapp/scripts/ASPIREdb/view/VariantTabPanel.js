@@ -21,7 +21,7 @@ Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowMode
               'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings',
               'ASPIREdb.view.VariantGridCreator', 'ASPIREdb.view.GeneGridCreator', 'ASPIREdb.IdeogramDownloadWindow',
               'Ext.data.ArrayStore', 'Ext.form.ComboBox', 'ASPIREdb.view.SubjectGrid',
-              'ASPIREdb.view.report.VariantReportWindow' ] );
+              'ASPIREdb.view.report.VariantReportWindow', 'ASPIREdb.view.LabelApplyGrid' ] );
 
 /**
  * Variant Tab Panel contains both Ideogram view and Variant table view
@@ -106,9 +106,15 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             scope : this
          }, {
             itemId : 'viewGenes',
-            text : 'View Genes',
+            text : 'View genes',
             disabled : true,
             handler : this.viewGenesHandler,
+            scope : this
+         }, {
+            itemId : 'viewCompoundHeterozygotes',
+            text : 'View compound heterozygotes',
+            disabled : false,
+            handler : this.viewCompoundHeterozygotes,
             scope : this
          } ]
       } );
@@ -244,6 +250,27 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       // when variant label removed
       ASPIREdb.EVENT_BUS.on( 'subject_label_removed', this.subjectLabelUpdateHandler, this );
+
+      // update local store
+      ASPIREdb.EVENT_BUS.on( 'variant_label_updated', function(selectedIds, addedLabel) {
+         
+         if ( selectedIds == undefined || addedLabel == undefined ) {
+            return;
+         }
+         
+         var currentlySelectedRecords = ref.getVariantRecordSelection();
+         for (var i = 0; i < currentlySelectedRecords.length; i++) {
+            var labelIds = currentlySelectedRecords[i].get( 'labelIds' );
+//            console.log('labelIds = ' + Ext.JSON.encode(labelIds) + " rec = " + currentlySelectedRecords[i].get( 'id' ));
+            labelIds.push( addedLabel.id );
+         }
+
+         if ( ref.getActiveTab().itemId == 'ideogram' ) {
+            ref.newIdeogramLabel = true;
+         }
+
+         ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_created' );
+      } );
 
       ASPIREdb.EVENT_BUS.on( 'property_changed', function(property) {
          ref.property = [];
@@ -895,6 +922,48 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
    },
 
+   // TODO
+   viewCompoundHeterozygotes : function() {
+      var records = this.getVariantRecordSelection();
+      var data = [ [ 'row1', 'first row' ], [ 'row2', 'second row' ] ];
+      var fields = [ 'id', 'field2' ];
+      var store = Ext.create( 'Ext.data.ArrayStore', {
+         fields : fields,
+         data : data,
+         autoLoad : true,
+         autoSync : true,
+         storeId : '#cmpHetStore',
+      } );
+      var columns = [ {
+         header : 'id',
+         dataIndex : 1,
+         flex : 1,
+         renderer : function(value, meta, rec, rowIndex, colIndex, store) {
+            meta.tdAttr = 'data-qtip="Click to apply a label"';
+            return value + "&nbsp;&nbsp; <i class='fa fa-tags'></i>";
+         }
+         
+      }, {
+         header : 'field2',
+         dataIndex : 2,
+         flex : 1,
+      } ];
+      var grid = Ext.create( 'ASPIREdb.view.LabelApplyGrid', {
+         store : store,
+         columns : columns
+      } );
+      var myWin = Ext.create( "Ext.Window", {
+         layout : 'fit',
+         title : 'Potential compound heterozygote variants',
+         width : 400,
+         height : 300,
+         closable : true,
+         items : [ grid ],
+         modal : true
+      } );
+      myWin.show();
+   },
+   
    enableActionButtonsBySelectedRecords : function(records) {
 
       if ( records.length > 0 ) {
@@ -971,6 +1040,19 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       var me = this;
 
+      var labelWin = Ext.create( 'ASPIREdb.view.CreateLabelWindow', {
+         isSubjectLabel : false,
+         title : 'Create Variant Label',
+         extend : 'ASPIREdb.view.CreateLabelWindow',
+         selectedIds : me.getSelectedVariantIds( me.getVariantRecordSelection() ),
+      });
+      labelWin.show();
+      
+      
+      
+      
+            
+      /*
       Ext.define( 'ASPIREdb.view.CreateLabelWindowVariant', {
          isSubjectLabel : false,
          title : 'Create Variant Label',
@@ -1052,6 +1134,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       var labelWindow = new ASPIREdb.view.CreateLabelWindowVariant();
       labelWindow.show();
+      */
    },
 
    updateVisibleLabelsFromStore : function() {
