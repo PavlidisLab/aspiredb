@@ -68,16 +68,6 @@ Ext.define( 'ASPIREdb.view.LabelApplyGrid', {
 
    initComponent : function() {
       this.callParent();
-      
-      ASPIREdb.EVENT_BUS.on('subject_label_updated', this.addLabelsToSelected);
-      ASPIREdb.EVENT_BUS.on('variant_label_updated', this.addLabelsToSelected);
-   },
-
-   addLabelsToSelected : function(selectedIds, addedLabel ) {
-      var me = this;
-      for (var i = 0; i < me.selSubjects.length; i++) {
-         me.selSubjects[i].labels.push( addedLabel );
-      }   
    },
 
 } );
