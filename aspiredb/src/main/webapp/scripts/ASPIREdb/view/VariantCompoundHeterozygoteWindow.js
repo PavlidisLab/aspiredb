@@ -24,7 +24,7 @@ Ext.define( "ASPIREdb.view.VariantCompoundHeterozygoteWindow", {
    layout : 'fit',
    itemId : 'variantCompoundHeterozygoteWindow',
    title : 'Potential compound heterozygote variants',
-   width : 500,
+   width : 530,
    height : 400,
    closable : true,
    modal : true,
@@ -60,15 +60,16 @@ Ext.define( "ASPIREdb.view.VariantCompoundHeterozygoteWindow", {
       var columns = [ {
          header : 'Patient Id',
          dataIndex : 'patientId',
-         flex : 1,
+         flex : 0.7,
       }, {
          header : 'Gene',
          dataIndex : 'gene',
-         flex : 1,
-      // renderer : function(value, meta, rec, rowIndex, colIndex, store) {
-      // meta.tdAttr = 'data-qtip="Click to apply a variant label"';
-      // return value + "&nbsp;&nbsp; <i class='fa fa-tags'></i>";
-      // }
+         flex : 1.5,
+         renderer : function(value, meta, rec, rowIndex, colIndex, store) {
+            meta.tdAttr = 'data-qtip="Right-click to apply variant labels"';
+            // return value + "&nbsp;&nbsp; <i class='fa fa-tags'></i>";
+            return value;
+         }
       }, {
          header : 'Genome Coordinates',
          dataIndex : 'variants',
