@@ -87,25 +87,25 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
          } );
 
-         var columnHeaders = [ 'Action', 'Patient Id', 'Type', 'Genome Coordinates', 'Copy Number', 'CNV Type',
+         var columnHeaders = [ 'Patient Id', 'Type', 'Genome Coordinates', 'Copy Number', 'CNV Type',
                               'CNV Length', 'DB SNP ID', 'Observed Base', 'Reference Base', 'Indel Length', 'Gene' ];
          var columnConfig = [];
 
-         columnConfig.push( {
-            xtype : 'actioncolumn',
-            width : 30,
-            items : [ {
-               icon : 'scripts/ASPIREdb/resources/images/icons/zoom.png',
-               tooltip : 'View subject',
-               handler : function(grid, rowIndex, colIndex) {
-                  var rec = grid.getStore().getAt( rowIndex );
-                  var patientId = rec.get('patientId');
-                  var subjectStore = Ext.getStore('subjectStore')
-                  var subjectId = subjectStore.getAt(subjectStore.findExact('patientId',patientId)).get('id')
-                  ASPIREdb.EVENT_BUS.fireEvent('select_subject_from_variant_grid', [subjectId] );
-               }
-            } ]
-         } );
+//         columnConfig.push( {
+//            xtype : 'actioncolumn',
+//            width : 30,
+//            items : [ {
+//               icon : 'scripts/ASPIREdb/resources/images/icons/zoom.png',
+//               tooltip : 'View subject',
+//               handler : function(grid, rowIndex, colIndex) {
+//                  var rec = grid.getStore().getAt( rowIndex );
+//                  var patientId = rec.get('patientId');
+//                  var subjectStore = Ext.getStore('subjectStore')
+//                  var subjectId = subjectStore.getAt(subjectStore.findExact('patientId',patientId)).get('id')
+//                  ASPIREdb.EVENT_BUS.fireEvent('select_subject_from_variant_grid', [subjectId] );
+//               }
+//            } ]
+//         } );
 
          columnConfig.push( {
             text : 'Patient Id',
@@ -264,12 +264,16 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             columnHeaders : columnHeaders,
             // multiSelect : true,
 
-            // listeners : {
-            // cellclick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
-            //
-            // this.selModel.select( record.index, false, false );
-            // }
-            // },
+             listeners : {
+               cellclick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+
+                  var rec = grid.getStore().getAt( rowIndex );
+                  var patientId = rec.get( 'patientId' );
+                  var subjectStore = Ext.getStore( 'subjectStore' )
+                  var subjectId = subjectStore.getAt( subjectStore.findExact( 'patientId', patientId ) ).get( 'id' )
+                  ASPIREdb.EVENT_BUS.fireEvent( 'select_subject_from_variant_grid', [ subjectId ] );
+               }
+            },
 
             // selModel : Ext.create( 'Ext.selection.CellModel', {
             selModel : Ext.create( 'Ext.selection.RowModel', {
