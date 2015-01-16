@@ -26,6 +26,7 @@ import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 /**
  * author: anton date: 01/05/13
@@ -55,15 +56,14 @@ public interface GeneService {
             throws NotLoggedInException, BioMartServiceException;
 
     /**
-     * Returns a list of <variant ID, GeneValueObject> pairs which occurs more than once, i.e. a patient has two
-     * variants that overlap the same gene. We say "potentially" compound heterozygote because parent data is not
-     * available.
+     * Returns a list of "potential" compound heterozygote variants, i.e. a patient has two variants (different alleles)
+     * that overlap the same gene. We say "potential" because parent data is not available.
      * 
      * @param variantIds
      * @return
      * @throws NotLoggedInException
      * @throws BioMartServiceException
      */
-    public Map<Long, Collection<GeneValueObject>> getCompoundHeterozygotes( Collection<Long> variantIds )
-            throws NotLoggedInException, BioMartServiceException;
+    public Map<String, Map<GeneValueObject, Collection<VariantValueObject>>> getCompoundHeterozygotes(
+            Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException;
 }

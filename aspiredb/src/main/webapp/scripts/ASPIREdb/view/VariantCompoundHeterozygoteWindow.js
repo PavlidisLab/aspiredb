@@ -24,8 +24,8 @@ Ext.define( "ASPIREdb.view.VariantCompoundHeterozygoteWindow", {
    layout : 'fit',
    itemId : 'variantCompoundHeterozygoteWindow',
    title : 'Potential compound heterozygote variants',
-   width : 400,
-   height : 300,
+   width : 500,
+   height : 400,
    closable : true,
    modal : true,
 
@@ -33,28 +33,26 @@ Ext.define( "ASPIREdb.view.VariantCompoundHeterozygoteWindow", {
       this.callParent();
    },
 
+   // variantGenes = Map<String.PatientId, Map<GeneValueObject, Collection<VariantValueObject>>>
    constructData : function(variantStore, variantGenes) {
       var data = [];
 
-      for (id in variantGenes) {
-         var genes = variantGenes[id];
+      for (patientId in variantGenes) {
+         for (gene in variantGenes[patientId]) { // dwr converted gene to a string
 
-         for (i = 0; i < genes.length; i++) {
-            var gene = genes[i];
-            var varRec = variantStore.findRecord( 'id', id );
+            var variantList = variantGenes[patientId][gene];
 
-            data.push( [ id, varRec.get( 'patientId' ), varRec.get( 'variantType' ), varRec.get( 'genomeCoordinates' ),
-                        gene['symbol'] ] );
+            data.push( [ patientId, gene, variantList ] );
          }
 
       }
 
-//      console.log( Ext.JSON.encode( data ) );
+      console.log( Ext.JSON.encode( data ) );
       return data;
    },
 
    constructFields : function() {
-      var fields = [ 'id', 'patientId', 'variantType', 'genomeCoordinates', 'gene' ];
+      var fields = [ 'patientId', 'gene', 'variants', ];
       return fields;
    },
 
@@ -64,24 +62,53 @@ Ext.define( "ASPIREdb.view.VariantCompoundHeterozygoteWindow", {
          dataIndex : 'patientId',
          flex : 1,
       }, {
-         header : 'Type',
-         dataIndex : 'variantType',
-         flex : 1,
-      }, {
-         header : 'Genome Coordinates',
-         dataIndex : 'genomeCoordinates',
-         flex : 1,
-      }, {
          header : 'Gene',
          dataIndex : 'gene',
          flex : 1,
-         renderer : function(value, meta, rec, rowIndex, colIndex, store) {
-            meta.tdAttr = 'data-qtip="Click to apply a label"';
-            return value + "&nbsp;&nbsp; <i class='fa fa-tags'></i>";
+      // renderer : function(value, meta, rec, rowIndex, colIndex, store) {
+      // meta.tdAttr = 'data-qtip="Click to apply a variant label"';
+      // return value + "&nbsp;&nbsp; <i class='fa fa-tags'></i>";
+      // }
+      }, {
+         header : 'Genome Coordinates',
+         dataIndex : 'variants',
+         flex : 1,
+         renderer : function(variantList, meta, rec, rowIndex, colIndex, store) {
+            var coords = [];
+            for (i = 0; i < variantList.length; i++) {
+               coords.push( variantList[i]['genomeCoordinates'] );
+            }
+            return coords.join( '<br/>' );
          }
-      } ];
+      }, ];
 
       return columns;
+   },
+
+   getSelectedIds : function(index) {
+
+      if ( index == null ) {
+         console.log( 'Warning index is null!' )
+         return;
+      }
+
+      var store = Ext.StoreManager.lookup( '#cmpHetStore' );
+
+      var variants = store.getAt( index ).get( 'variants' )
+
+      if ( variants.length == 0 ) {
+         return;
+      }
+
+      var ids = [];
+
+      for (var i = 0; i < variants.length; i++) {
+         ids.push( variants[i].id );
+      }
+
+      // console.log( 'return selected ids from VariantCompound! ' + Ext.JSON.encode( ids ) );
+
+      return ids;
    },
 
    initGridAndShow : function(variantStore, variantGenes) {
@@ -102,7 +129,11 @@ Ext.define( "ASPIREdb.view.VariantCompoundHeterozygoteWindow", {
 
       var grid = Ext.create( 'ASPIREdb.view.LabelApplyGrid', {
          store : store,
-         columns : columns
+         columns : columns,
+         getSelectedIds : me.getSelectedIds,
+         isSubjectLabel : false,
+         itemId : '#cmpHetGrid',
+         scope : me,
       } );
 
       me.add( grid );

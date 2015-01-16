@@ -931,14 +931,17 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       
       var d = new Date();
       GeneService.getCompoundHeterozygotes( variantIds, {
+         
+         // variantGenes = Map<String.PatientId, Map<GeneValueObject, Collection<VariantValueObject>>>
          callback : function( variantGenes ) {
+            
             ref.setLoading( false );
             
             var myWin = Ext.create( "ASPIREdb.view.VariantCompoundHeterozygoteWindow" );
             
             myWin.initGridAndShow( variantStore, variantGenes );
             
-            console.log('Found ' + variantGenes.length + ' potential compound heterozygotes for ' + variantIds.length + ' variants took ' + (new Date() - d) + ' ms')
+            console.log('Found ' + variantGenes.length + ' subjects with potential compound heterozygotes which took ' + (new Date() - d) + ' ms')
          },
          errorHandler : function(message, exception) {
             Ext.Msg.alert( 'Error', message )

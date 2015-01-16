@@ -85,6 +85,6 @@ public class CNVValueObject extends VariantValueObject {
 
     @Override
     public String toString() {
-        return patientId + ": Type: " + type;
+        return "id=" + id + " patient=" + patientId + " loc=" + getGenomeCoordinates() + " type=" + type;
     }
 }

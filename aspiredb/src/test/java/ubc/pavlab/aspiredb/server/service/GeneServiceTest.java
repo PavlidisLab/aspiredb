@@ -19,14 +19,12 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -43,6 +41,7 @@ import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.util.GenomeBin;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 /**
  * author: anton date: 22/05/13
@@ -52,6 +51,13 @@ public class GeneServiceTest extends BaseSpringContextTest {
     private BioMartQueryService bioMartQueryServiceMock;
     private VariantDao variantDaoMock;
     private GeneService geneService = new GeneServiceImpl();
+    private final String PATIENT_ID = "patient-01";
+    private final String GENE_INSIDE_VARIANT = "GENE_INSIDE_VARIANT";
+    private final String VARIANT_INSIDE_GENE = "VARIANT_INSIDE_GENE";
+    private final String OVERLAPEND = "OVERLAPEND";
+    private final String OVERLAPSTART = "OVERLAPSTART";
+    private final String NOTOVERLAP_DIFFCHR = "NOTOVERLAP_DIFFCHR";
+    private final String NOTOVERLAP_DOWNSTREAM = "NOTOVERLAP_DOWNSTREAM";
 
     private GeneValueObject createGene( String symbol, String chromosome, int start, int end ) {
         GeneValueObject gene = new GeneValueObject( "ENSG1", symbol, "Gene desc " + symbol, "", "human" );
@@ -65,7 +71,7 @@ public class GeneServiceTest extends BaseSpringContextTest {
         variant.setId( 2L );
 
         Subject subject = new Subject();
-        subject.setPatientId( "GeneServiceSubject" );
+        subject.setPatientId( PATIENT_ID );
         variant.setSubject( subject );
         subject.setId( 1L );
 
@@ -96,17 +102,17 @@ public class GeneServiceTest extends BaseSpringContextTest {
                                 Arrays.asList(
                                         createGene( "HAIRCH", geneRange.getChromosome(), geneRange.getBaseStart(),
                                                 geneRange.getBaseEnd() ),
-                                        createGene( "GENE_INSIDE_VARIANT", geneRange.getChromosome(),
+                                        createGene( this.GENE_INSIDE_VARIANT, geneRange.getChromosome(),
                                                 geneRange.getBaseStart() + 10, geneRange.getBaseEnd() - 10 ),
-                                        createGene( "VARIANT_INSIDE_GENE", geneRange.getChromosome(),
+                                        createGene( this.VARIANT_INSIDE_GENE, geneRange.getChromosome(),
                                                 geneRange.getBaseStart() - 1, geneRange.getBaseEnd() + 10 ),
-                                        createGene( "OVERLAPEND", geneRange.getChromosome(),
+                                        createGene( this.OVERLAPEND, geneRange.getChromosome(),
                                                 geneRange.getBaseStart() + 50, geneRange.getBaseEnd() + 50 ),
-                                        createGene( "OVERLAPSTART", geneRange.getChromosome(),
+                                        createGene( this.OVERLAPSTART, geneRange.getChromosome(),
                                                 geneRange.getBaseStart() - 1, geneRange.getBaseEnd() - 50 ),
-                                        createGene( "NOTOVERLAP_DIFFCHR", "22", geneRange.getBaseStart(),
+                                        createGene( this.NOTOVERLAP_DIFFCHR, "22", geneRange.getBaseStart(),
                                                 geneRange.getBaseEnd() ),
-                                        createGene( "NOTOVERLAP_DOWNSTREAM", geneRange.getChromosome(),
+                                        createGene( this.NOTOVERLAP_DOWNSTREAM, geneRange.getChromosome(),
                                                 geneRange.getBaseStart() + 1000, geneRange.getBaseEnd() + 1000 ) ) )
                         .times( 2 );
             } else {
@@ -137,9 +143,9 @@ public class GeneServiceTest extends BaseSpringContextTest {
         int found = 0;
         for ( GeneValueObject gene : genes ) {
             String symbol = gene.getSymbol();
-            if ( symbol.equals( "HAIRCH" ) || symbol.equals( "VARIANT_INSIDE_GENE" )
-                    || symbol.equals( "GENE_INSIDE_VARIANT" ) || symbol.equals( "OVERLAPEND" )
-                    || symbol.equals( "OVERLAPSTART" ) ) {
+            if ( symbol.equals( "HAIRCH" ) || symbol.equals( this.VARIANT_INSIDE_GENE )
+                    || symbol.equals( this.GENE_INSIDE_VARIANT ) || symbol.equals( this.OVERLAPEND )
+                    || symbol.equals( this.OVERLAPSTART ) ) {
                 found++;
             }
         }
@@ -148,15 +154,28 @@ public class GeneServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testGetCompoundHeterozygotes() throws Exception {
-        Map<Long, Collection<GeneValueObject>> output = geneService.getCompoundHeterozygotes( Arrays.asList( 2L ) );
+        Map<String, Map<GeneValueObject, Collection<VariantValueObject>>> output = geneService
+                .getCompoundHeterozygotes( Arrays.asList( 2L ) );
         assertEquals( output.keySet().size(), 0 );
 
         // now let's try adding a variant that hits the same gene
         List<Long> varIds = Arrays.asList( 2L, 3L );
         output = geneService.getCompoundHeterozygotes( varIds );
-        Set<Long> actuals = output.keySet();
-        assertTrue( actuals.contains( 2L ) );
-        assertTrue( actuals.contains( 3L ) );
+        assertEquals( output.keySet().size(), 1 );
+        Map<GeneValueObject, Collection<VariantValueObject>> actuals = output.get( this.PATIENT_ID );
+        assertEquals( actuals.keySet().size(), 2 );
+        int found = 0;
+        for ( GeneValueObject gene : actuals.keySet() ) {
+            if ( gene.getSymbol().equals( this.VARIANT_INSIDE_GENE ) || gene.getSymbol().equals( this.OVERLAPEND ) ) {
+                assertEquals( 2, actuals.get( gene ).size() ); // 2 variants
+                for ( VariantValueObject variant : actuals.get( gene ) ) {
+                    if ( variant.getId() == 2L || variant.getId() == 3L ) {
+                        found++;
+                    }
+                }
 
+            }
+        }
+        assertEquals( 4, found );
     }
 }

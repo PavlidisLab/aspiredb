@@ -18,53 +18,82 @@
  */
 
 /**
- * Grid that prompts the user to apply a label to the selected rows when clicked. 
+ * Grid that displays a Make Label context menu when right-clicked
  */
 Ext.define( 'ASPIREdb.view.LabelApplyGrid', {
    extend : 'Ext.grid.Panel',
    alias : 'widget.LabelApplyGrid',
    id : 'labelApplyGrid',
-   
+
    config : {
       selectedSubjectIds : [],
       selSubjects : [],
       visibleLabels : [],
       gridPanelName : '',
+      isSubjectLabel : false,
    },
-   
+
    constructor : function(cfg) {
       this.initConfig( cfg );
       this.callParent( arguments );
    },
 
-   
    listeners : {
-      cellclick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
-         var rows = this.getSelectionModel().getSelection();
-         if ( rows.length == 0 ) {
-            return;
-         }
-         
-         var ids = [];
 
-         for (var i = 0; i < rows.length; i++) {
-            ids.push( rows[i].data.id );
-         }
-         
+      itemcontextmenu : function(view, record, item, index, e) {
+         // Stop the browser getting the event
+         e.preventDefault();
 
-         console.log('rec=' + Ext.JSON.encode(ids))
-         
-         var labelWin = Ext.create( 'ASPIREdb.view.CreateLabelWindow', {
-            isSubjectLabel : true,
-            selectedIds : ids, 
-         });
-         labelWin.show();
+         var me = this;
+
+         var contextMenu = new Ext.menu.Menu( {
+            items : [ {
+               text : 'Make label',
+               handler : function() {
+                  me.makeLabelHandler( index );
+               },
+               scope : me,
+            } ]
+         } );
+
+         contextMenu.showAt( e.getX(), e.getY() );
       }
    },
 
    selModel : Ext.create( 'Ext.selection.RowModel', {
       mode : 'MULTI',
    } ),
+
+   /**
+    * Override as necessary
+    */
+   getSelectedIds : function() {
+      var rows = this.getSelectionModel().getSelection();
+      if ( rows.length == 0 ) {
+         return;
+      }
+
+      var ids = [];
+
+      for (var i = 0; i < rows.length; i++) {
+         ids.push( rows[i].data.id );
+      }
+
+      return ids;
+   },
+
+   makeLabelHandler : function(index) {
+
+      var ids = this.getSelectedIds( index );
+
+      // console.log( 'index=' + index + 'rec=' + Ext.JSON.encode( ids ) )
+
+      var labelWin = Ext.create( 'ASPIREdb.view.CreateLabelWindow', {
+         isSubjectLabel : this.isSubjectLabel,
+         selectedIds : ids,
+      } );
+      labelWin.show();
+   },
 
    initComponent : function() {
       this.callParent();

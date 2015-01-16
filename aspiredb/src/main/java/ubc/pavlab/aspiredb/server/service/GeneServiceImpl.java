@@ -55,6 +55,7 @@ import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 /**
  * author: anton date: 01/05/13
@@ -501,10 +502,10 @@ public class GeneServiceImpl implements GeneService {
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
-    public Map<Long, Collection<GeneValueObject>> getCompoundHeterozygotes( Collection<Long> variantIds )
-            throws NotLoggedInException, BioMartServiceException {
+    public Map<String, Map<GeneValueObject, Collection<VariantValueObject>>> getCompoundHeterozygotes(
+            Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException {
 
-        Map<Long, Collection<GeneValueObject>> result = new HashMap<>();
+        Map<String, Map<GeneValueObject, Collection<VariantValueObject>>> result = new HashMap();
 
         Map<Long, Collection<GeneValueObject>> map = getGenesPerVariant( variantIds );
 
@@ -512,7 +513,7 @@ public class GeneServiceImpl implements GeneService {
         Collection<Variant> variants = variantDao.load( variantIds );
 
         // transform data to patientId-geneSymbol pairs
-        Map<String, Map<GeneValueObject, Collection<Long>>> seen = new HashMap();
+        Map<String, Map<GeneValueObject, Collection<VariantValueObject>>> seen = new HashMap();
         for ( Variant variant : variants ) {
 
             // not interested in CNV gains
@@ -525,6 +526,7 @@ public class GeneServiceImpl implements GeneService {
             }
 
             Long id = variant.getId();
+
             String patientId = variant.getSubject().getPatientId();
 
             Collection<GeneValueObject> geneList = map.get( id );
@@ -533,52 +535,45 @@ public class GeneServiceImpl implements GeneService {
             }
 
             for ( GeneValueObject gene : geneList ) {
-                Map<GeneValueObject, Collection<Long>> geneMap = seen.get( patientId );
+                Map<GeneValueObject, Collection<VariantValueObject>> geneMap = seen.get( patientId );
                 if ( geneMap == null ) {
                     geneMap = new HashMap<>();
                     seen.put( patientId, geneMap );
-                    Collection<Long> varIdList = new ArrayList<>();
-                    geneMap.put( gene, varIdList );
-                    varIdList.add( id );
-                    continue;
                 }
 
                 if ( geneMap.get( gene ) == null ) {
-                    Collection<Long> varIdList = new ArrayList<>();
+                    Collection<VariantValueObject> varIdList = new HashSet<>();
                     geneMap.put( gene, varIdList );
-                    varIdList.add( id );
-                } else {
-
-                    // so we have found a compound heterozygote because this gene already exists in the patient
-
-                    if ( result.get( id ) == null ) {
-                        Collection<GeneValueObject> newGeneList = new HashSet<>();
-                        result.put( id, newGeneList );
-                    }
-
-                    result.get( id ).add( gene );
-
-                    // don't forget to add the previous variant that first overlapped this gene
-                    String varIdStr = "" + id;
-
-                    for ( Long varId : geneMap.get( gene ) ) {
-                        if ( result.get( varId ) == null ) {
-                            Collection<GeneValueObject> newGeneList = new HashSet<>();
-                            result.put( varId, newGeneList );
-                        }
-                        result.get( varId ).add( gene );
-
-                        varIdStr += "," + varId;
-                    }
-
-                    // log.debug( "Patient " + patientId + " with variants " + varIdStr
-                    // + " potentially has a compound heterozygote gene " + gene );
-
                 }
+
+                geneMap.get( gene ).add( variant.toValueObject() );
 
             }
         }
 
+        // filter
+        for ( String patientId : seen.keySet() ) {
+            for ( GeneValueObject gene : seen.get( patientId ).keySet() ) {
+                if ( seen.get( patientId ).get( gene ).size() <= 1 ) {
+                    continue;
+                }
+                for ( VariantValueObject variant : seen.get( patientId ).get( gene ) ) {
+                    // log.info( String.format( "Patient %s Gene %s Variant %s", patientId, gene, variant ) );
+
+                    if ( result.get( patientId ) == null ) {
+                        HashMap<GeneValueObject, Collection<VariantValueObject>> geneMap = new HashMap<>();
+                        result.put( patientId, geneMap );
+                    }
+
+                    if ( result.get( patientId ).get( gene ) == null ) {
+                        Collection<VariantValueObject> variantList = new HashSet<>();
+                        result.get( patientId ).put( gene, variantList );
+                    }
+
+                    result.get( patientId ).get( gene ).add( variant );
+                }
+            }
+        }
         return result;
     }
 }

@@ -26,6 +26,7 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
    alias : 'widget.createLabelWindow',
    title : 'Make label',
    closable : true,
+   modal : true,
    closeAction : 'destroy',
    bodyStyle : 'padding: 5px;',
    layout : {
