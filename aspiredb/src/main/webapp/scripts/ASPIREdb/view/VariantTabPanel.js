@@ -124,7 +124,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          itemId : 'actionsButton',
          menu : this.actionsMenu
       } );
-      
+
       this.reportButton = Ext.create( 'Ext.Button', {
          itemId : 'reportButton',
          text : 'Report',
@@ -150,13 +150,13 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          scope : this,
          hidden : true,
       } );
-      
+
       this.tbSeparator = Ext.create( 'Ext.toolbar.Separator' );
-      
+
       this.tbSpacer = Ext.create( 'Ext.toolbar.Spacer' );
-      
-      this.tbFill =  Ext.create( 'Ext.toolbar.Fill' );
-      
+
+      this.tbFill = Ext.create( 'Ext.toolbar.Fill' );
+
       this.saveButton = Ext.create( 'Ext.Button', {
          id : 'saveButton',
          text : '',
@@ -253,11 +253,11 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       // update local store
       ASPIREdb.EVENT_BUS.on( 'variant_label_updated', function(selectedIds, addedLabel) {
-         
+
          if ( selectedIds == undefined || addedLabel == undefined ) {
             return;
          }
-         
+
          // update the label store cache for rendering
          var grid = ref.down( '#variantGrid' );
          var existingLab = grid.visibleLabels[addedLabel.id];
@@ -266,13 +266,17 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          } else {
             existingLab.isShown = true;
          }
-         
-         var currentlySelectedRecords = ref.getVariantRecordSelection();
-         for (var i = 0; i < currentlySelectedRecords.length; i++) {
-            var labelIds = currentlySelectedRecords[i].get( 'labelIds' );
-//            console.log('labelIds = ' + Ext.JSON.encode(labelIds) + " rec = " + currentlySelectedRecords[i].get( 'id' ));
-            labelIds.push( addedLabel.id );
+
+         for (var i = 0; i < selectedIds.length; i++) {
+            var labelIds = grid.store.findRecord( 'id', selectedIds[i] ).data.labelIds;
+            labelIds.push( addedLabel.id )
          }
+         /*
+          * var currentlySelectedRecords = ref.getVariantRecordSelection(); for (var i = 0; i <
+          * currentlySelectedRecords.length; i++) { var labelIds = currentlySelectedRecords[i].get( 'labelIds' ); //
+          * console.log('labelIds = ' + Ext.JSON.encode(labelIds) + " rec = " + currentlySelectedRecords[i].get( 'id' //
+          * )); labelIds.push( addedLabel.id ); }
+          */
 
          if ( ref.getActiveTab().itemId == 'ideogram' ) {
             ref.newIdeogramLabel = true;
@@ -315,7 +319,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       this.getComponent( 'ideogram' ).on( 'GenomeRegionSelectionEvent', function(selection) {
          ref.ideogramSelectionChangeHandler( null, ref.getVariantRecordSelection() );
       } );
-      
+
       // activate/deactiveButtons based on activeTab
       this.on( 'beforetabchange', function(tabPanel, newCard, oldCard, eOpts) {
 
@@ -352,15 +356,15 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       } );
 
    },
-   
+
    getSelectedVariants : function() {
       var grid = this.down( '#variantGrid' );
       return grid.getSelectionModel().getSelection();
    },
-   
-   createVariantGrid : function( vvos, properties, variantGenes ) {
+
+   createVariantGrid : function(vvos, properties, variantGenes) {
       var ref = this;
-      
+
       var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid( vvos, properties, variantGenes );
       // var grid2 = ASPIREdb.view.GeneGridCreator.createGeneGrid( vos, properties );
 
@@ -401,7 +405,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       ref.add( grid );
       // ref.add( grid2 );
    },
-   
+
    /**
     * Filter the variants of the subject selected. Initially it loads all the variants associated with all the subjects.
     * 
@@ -465,34 +469,35 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
                var d = new Date();
                GeneService.getGenesPerVariant( variantIds, {
-                  callback : function( variantGenes ) {
+                  callback : function(variantGenes) {
                      ref.createVariantGrid( vvos, properties, variantGenes )
                      ref.setLoading( false );
-                     console.log('Getting genes for ' + variantIds.length + ' variants took ' + (new Date() - d) + ' ms')
+                     console.log( 'Getting genes for ' + variantIds.length + ' variants took ' + (new Date() - d)
+                        + ' ms' )
                   },
                   errorHandler : function(message, exception) {
                      Ext.Msg.alert( 'Error', message )
                      console.log( message )
-                     console.log( dwr.util.toDescriptiveString(exception.stackTrace,3) )
+                     console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
                   }
-               });
-               
+               } );
+
                var toolbar = ref.getDockedComponent( 'variantTabPanelToolbar' );
 
                toolbar.add( ref.actionsButton );
                toolbar.add( ref.labelsButton );
                toolbar.add( ref.reportButton );
                toolbar.add( ref.tbSeparator );
-               
+
                toolbar.add( ref.selectAllButton );
                toolbar.add( ref.deselectAllButton );
-               
+
                toolbar.add( ref.colourVariantByCombo );
                toolbar.add( ref.tbSpacer );
-               
+
                toolbar.add( ref.zoomInButton );
                toolbar.add( ref.zoomOutButton );
-               
+
                toolbar.add( ref.tbFill );
                toolbar.add( ref.saveButton );
                toolbar.add( ref.exportButton );
@@ -503,7 +508,6 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                   ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', legendProperty );
                   ref.redrawIdeogram( legendProperty );
                }
-
 
                // }
                // } );
@@ -552,7 +556,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       property.displayName = 'Variant Labels';
 
       var me = this;
-//      me.filterSubmitHandler( me.filterConfigs, property );
+      // me.filterSubmitHandler( me.filterConfigs, property );
 
       // refresh the variant in grid
       me.down( '#variantGrid' ).getView().refresh();
@@ -566,12 +570,12 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       var reportWindow = Ext.create( 'ASPIREdb.view.report.VariantReportWindow' );
       reportWindow.createAndShow( this.down( '#variantGrid' ).store );
    },
-   
+
    /**
     * Refresh the selected subjects in ideogram
     */
    subjectLabelUpdateHandler : function() {
-//      this.filterSubmitHandler( this.filterConfigs );
+      // this.filterSubmitHandler( this.filterConfigs );
       var ideogram = this.getComponent( 'ideogram' );
 
       if ( ideogram.colourLegend.isVisible() ) {
@@ -695,12 +699,12 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       this.selectedSubjects = subjectIds;
       var grid = this.down( '#variantGrid' );
-  
+
       grid.getSelectionModel().deselectAll();
-      
+
       this.gridPanelSubjectSelection( subjectIds );
       this.ideogramSubjectSelection( subjectIds );
-      
+
       grid.getView().refresh();
    },
 
@@ -732,10 +736,10 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    },
 
    focusSelectedVariants : function() {
-      
-      var grid = this.down('#variantGrid');
+
+      var grid = this.down( '#variantGrid' );
       var selectedRecords = grid.getSelectionModel().getSelection();
-      
+
       if ( selectedRecords.length > 0 ) {
          grid.getView().focusRow( grid.store.indexOfId( selectedRecords[0].data.id ) );
          // use just to make sure selected record is at the top
@@ -746,15 +750,15 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          grid.getView().focusRow( grid.store.indexOfId( selectedRecords[0].data.id ) );
       }
    },
-   
+
    gridPanelSubjectSelection : function(subjectIds) {
 
       var me = this;
-      
+
       var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
 
       var grid = this.down( '#variantGrid' );
-      
+
       if ( grid.features != null && grid.features.length > 0 ) {
          // collapse all the grids first - to open only the
          // selected one
@@ -797,9 +801,9 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                }
 
                me.selectedVariants = selectedRecords;
-               
+
                grid.selModel.select( selectedRecords );
-               
+
                me.focusSelectedVariants();
 
             }
@@ -827,7 +831,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    },
 
    deselectAllHandler : function() {
-//      this.subjectSelectionHandler( this.loadedSubjects, true );
+      // this.subjectSelectionHandler( this.loadedSubjects, true );
 
       this.getComponent( 'variantGrid' ).getSelectionModel().deselectAll();
    },
@@ -885,74 +889,74 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    viewInUCSCHandler : function() {
 
       UCSCConnector.constructCustomTracksUrl( this.getSpanningGenomicRange( this.getVariantRecordSelection() ),
-         ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), function( ucscParams ) {
-         
-         var ucscForm = Ext.create( 'Ext.form.Panel', {
+         ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), function(ucscParams) {
+
+            var ucscForm = Ext.create( 'Ext.form.Panel', {
+
+            } );
+
+            ucscForm.submit( {
+               target : '_blank',
+               url : ucscParams['url'],
+               standardSubmit : true,
+               method : "POST",
+               params : {
+                  clade : ucscParams['clade'],
+                  org : ucscParams['org'],
+                  db : ucscParams['db'],
+                  hgct_customText : ucscParams['hgct_customText']
+               },
+               success : function() {
+                  console.log( "ok" );
+               },
+               failure : function(response, opts) {
+                  console.log( "failed" );
+               },
+               headers : {
+                  'Content-Type' : 'multipart/form-data'
+               }
+            } );
 
          } );
-
-         ucscForm.submit( {
-            target : '_blank',
-            url : ucscParams['url'],
-            standardSubmit : true,
-            method : "POST",
-            params : {
-               clade : ucscParams['clade'],
-               org : ucscParams['org'],
-               db : ucscParams['db'],
-               hgct_customText : ucscParams['hgct_customText']
-            },
-            success : function() {
-               console.log( "ok" );
-            },
-            failure : function(response, opts) {
-               console.log( "failed" );
-            },
-            headers : {
-               'Content-Type' : 'multipart/form-data'
-            }
-         } );
-
-      });
 
    },
 
    viewCompoundHeterozygotes : function() {
-      
+
       var ref = this;
       ref.setLoading( true );
-      
+
       var variantStore = ref.down( '#variantGrid' ).store;
-      
+
       var variantIds = ref.getSelectedVariantIds( ref.getVariantRecordSelection() );
       if ( variantIds.length == 0 ) {
-         variantIds = grid.store.collect('id');
+         variantIds = grid.store.collect( 'id' );
       }
-      
+
       var d = new Date();
       GeneService.getCompoundHeterozygotes( variantIds, {
-         
+
          // variantGenes = Map<String.PatientId, Map<GeneValueObject, Collection<VariantValueObject>>>
-         callback : function( variantGenes ) {
-            
+         callback : function(variantGenes) {
+
             ref.setLoading( false );
-            
+
             var myWin = Ext.create( "ASPIREdb.view.VariantCompoundHeterozygoteWindow" );
-            
+
             myWin.initGridAndShow( variantStore, variantGenes );
-            
-            console.log('Found ' + variantGenes.length + ' subjects with potential compound heterozygotes which took ' + (new Date() - d) + ' ms')
+
+            console.log( 'Found ' + variantGenes.length + ' subjects with potential compound heterozygotes which took '
+               + (new Date() - d) + ' ms' )
          },
          errorHandler : function(message, exception) {
             Ext.Msg.alert( 'Error', message )
             console.log( message )
-            console.log( dwr.util.toDescriptiveString(exception.stackTrace,3) )
+            console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
          }
-      });
-      
-      
+      } );
+
    },
-   
+
    enableActionButtonsBySelectedRecords : function(records) {
 
       if ( records.length > 0 ) {
@@ -1034,7 +1038,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          title : 'Create Variant Label',
          extend : 'ASPIREdb.view.CreateLabelWindow',
          selectedIds : me.getSelectedVariantIds( me.getVariantRecordSelection() ),
-      });
+      } );
       labelWin.show();
    },
 
