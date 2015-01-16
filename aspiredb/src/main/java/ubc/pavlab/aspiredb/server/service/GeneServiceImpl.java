@@ -344,6 +344,30 @@ public class GeneServiceImpl implements GeneService {
         return results;
     }
 
+    private boolean isOverlapping( GenomicLocation loc1, GenomicLocation loc2 ) {
+        boolean sameChromosome = loc2.getChromosome().equals( loc1.getChromosome() );
+        if ( !sameChromosome ) {
+            return false;
+        }
+        boolean geneInsideRegion = ( loc1.getStart() <= loc2.getStart() ) && ( loc1.getEnd() >= loc2.getEnd() );
+        if ( geneInsideRegion ) {
+            return true;
+        }
+        boolean geneSurroundsRegion = ( loc1.getStart() >= loc2.getStart() ) && ( loc1.getEnd() <= loc2.getEnd() );
+        if ( geneSurroundsRegion ) {
+            return true;
+        }
+        boolean geneHitsEndOfRegion = ( loc1.getStart() <= loc2.getStart() ) && ( loc1.getEnd() >= loc2.getStart() );
+        if ( geneHitsEndOfRegion ) {
+            return true;
+        }
+        boolean geneHitsStartOfRegion = ( loc1.getStart() <= loc2.getEnd() ) && ( loc1.getEnd() >= loc2.getEnd() );
+        if ( geneHitsStartOfRegion ) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @param location
      * @param genes
@@ -359,31 +383,11 @@ public class GeneServiceImpl implements GeneService {
 
         for ( GeneValueObject gene : genes ) {
             GenomicRange geneRange = gene.getGenomicRange();
-            boolean sameChromosome = geneRange.getChromosome().equals( variantLoc.getChromosome() );
-            if ( !sameChromosome ) {
-                continue;
-            }
-            boolean geneInsideRegion = ( variantLoc.getStart() <= geneRange.getBaseStart() )
-                    && ( variantLoc.getEnd() >= geneRange.getBaseEnd() );
-            if ( geneInsideRegion ) {
-                results.add( gene );
-                continue;
-            }
-            boolean geneSurroundsRegion = ( variantLoc.getStart() >= geneRange.getBaseStart() )
-                    && ( variantLoc.getEnd() <= geneRange.getBaseEnd() );
-            if ( geneSurroundsRegion ) {
-                results.add( gene );
-                continue;
-            }
-            boolean geneHitsEndOfRegion = ( variantLoc.getStart() <= geneRange.getBaseStart() )
-                    && ( variantLoc.getEnd() >= geneRange.getBaseStart() );
-            if ( geneHitsEndOfRegion ) {
-                results.add( gene );
-                continue;
-            }
-            boolean geneHitsStartOfRegion = ( variantLoc.getStart() <= geneRange.getBaseEnd() )
-                    && ( variantLoc.getEnd() >= geneRange.getBaseEnd() );
-            if ( geneHitsStartOfRegion ) {
+
+            GenomicLocation geneLoc = new GenomicLocation( geneRange.getChromosome(), geneRange.getBaseStart(),
+                    geneRange.getBaseEnd() );
+
+            if ( isOverlapping( variantLoc, geneLoc ) ) {
                 results.add( gene );
                 continue;
             }
@@ -504,11 +508,21 @@ public class GeneServiceImpl implements GeneService {
 
         Map<Long, Collection<GeneValueObject>> map = getGenesPerVariant( variantIds );
 
+        // assume that each variant is a different allele, ie. unique position
         Collection<Variant> variants = variantDao.load( variantIds );
 
         // transform data to patientId-geneSymbol pairs
         Map<String, Map<GeneValueObject, Collection<Long>>> seen = new HashMap();
         for ( Variant variant : variants ) {
+
+            // not interested in CNV gains
+            // TODO more filtering needed for other special cases?
+            if ( variant instanceof CNV ) {
+                CNV cnv = ( ( CNV ) variant );
+                if ( cnv.getType() == CnvType.GAIN ) {
+                    continue;
+                }
+            }
 
             Long id = variant.getId();
             String patientId = variant.getSubject().getPatientId();
@@ -538,9 +552,10 @@ public class GeneServiceImpl implements GeneService {
                     // so we have found a compound heterozygote because this gene already exists in the patient
 
                     if ( result.get( id ) == null ) {
-                        Collection<GeneValueObject> newGeneList = new ArrayList<>();
+                        Collection<GeneValueObject> newGeneList = new HashSet<>();
                         result.put( id, newGeneList );
                     }
+
                     result.get( id ).add( gene );
 
                     // don't forget to add the previous variant that first overlapped this gene
@@ -548,7 +563,7 @@ public class GeneServiceImpl implements GeneService {
 
                     for ( Long varId : geneMap.get( gene ) ) {
                         if ( result.get( varId ) == null ) {
-                            Collection<GeneValueObject> newGeneList = new ArrayList<>();
+                            Collection<GeneValueObject> newGeneList = new HashSet<>();
                             result.put( varId, newGeneList );
                         }
                         result.get( varId ).add( gene );
