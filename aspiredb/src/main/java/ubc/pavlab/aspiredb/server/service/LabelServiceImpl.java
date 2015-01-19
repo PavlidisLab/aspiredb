@@ -72,6 +72,28 @@ public class LabelServiceImpl implements LabelService {
     @Override
     @Transactional
     @RemoteMethod
+    public Collection<LabelValueObject> getSubjectLabelsByProjectId( Long projectId ) {
+        Collection<LabelValueObject> result = new ArrayList<>();
+        for ( Label label : labelDao.getSubjectLabelsByProjectId( projectId ) ) {
+            result.add( label.toValueObject() );
+        }
+        return result;
+    }
+
+    @Override
+    @Transactional
+    @RemoteMethod
+    public Collection<LabelValueObject> getVariantLabelsByProjectId( Long projectId ) {
+        Collection<LabelValueObject> result = new ArrayList<>();
+        for ( Label label : labelDao.getVariantLabelsByProjectId( projectId ) ) {
+            result.add( label.toValueObject() );
+        }
+        return result;
+    }
+
+    @Override
+    @Transactional
+    @RemoteMethod
     public Collection<LabelValueObject> getSubjectLabels() {
         Collection<LabelValueObject> result = new ArrayList<>();
         for ( Label label : labelDao.getSubjectLabels() ) {

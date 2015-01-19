@@ -132,8 +132,8 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
             flex : 1,
             renderer : function(labelId, meta, rec, rowIndex, colIndex, store) {
                meta.tdAttr = 'data-qtip="Double-click to rename label"';
-//               var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
-//               var ret = ASPIREdb.view.LabelControlWindow.getHtmlLabel( label );
+               // var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
+               // var ret = ASPIREdb.view.LabelControlWindow.getHtmlLabel( label );
                var ret = ASPIREdb.view.LabelControlWindow.getHtmlLabel( rec.data );
                return ret;
             },
@@ -271,9 +271,11 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
          me.service = VariantService;
       }
 
+      var projectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
+
       // make sure to only show those labels which we have write permissions
       if ( me.isSubjectLabel ) {
-         LabelService.getSubjectLabels( {
+         LabelService.getSubjectLabelsByProjectId( projectId, {
             callback : function(labels) {
                me.loadLabels( labels )
             },
@@ -283,7 +285,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
             },
          } )
       } else {
-         LabelService.getVariantLabels( {
+         LabelService.getVariantLabelsByProjectId( projectId, {
             callback : function(labels) {
                me.loadLabels( labels )
             },

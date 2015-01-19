@@ -94,6 +94,23 @@ public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDa
 
     @Override
     @Transactional(readOnly = true)
+    public Collection<Label> getVariantLabelsByProjectId( Long projectId ) {
+
+        String sqlString = "select distinct LABEL_FK from VARIANT_LABEL vl, SUBJECT_PROJECTS sp, SUBJECT s, VARIANT v WHERE vl.VARIANT_FK = v.ID AND v.PATIENT_ID = s.ID AND sp.SUBJECT_ID = s.ID AND sp.PROJECT_ID = :projectId ";
+        Query query = currentSession().createSQLQuery( sqlString );
+        query.setLong( "projectId", projectId );
+
+        Collection<BigInteger> labelIds = query.list();
+
+        Collection<Long> ids = new ArrayList<Long>();
+        for ( BigInteger labelId : labelIds ) {
+            ids.add( labelId.longValue() );
+        }
+        return load( ids );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Collection<Label> getSubjectLabelsBySubjectId( Long id ) {
 
         String sqlString = "select distinct LABEL_FK from SUBJECT_LABEL sl WHERE sl.SUBJECT_FK = :subjectId ";

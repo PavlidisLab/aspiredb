@@ -51,4 +51,7 @@ public interface LabelDao extends SecurableDaoBase<Label> {
 
     @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     Collection<Label> getVariantLabelsByVariantId( Long id );
+
+    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
+    Collection<Label> getVariantLabelsByProjectId( Long projectId );
 }

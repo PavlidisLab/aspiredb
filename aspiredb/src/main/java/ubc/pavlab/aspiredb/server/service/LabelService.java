@@ -47,4 +47,8 @@ public interface LabelService {
 
     public Collection<LabelValueObject> getVariantLabels();
 
+    public Collection<LabelValueObject> getVariantLabelsByProjectId( Long projectId );
+
+    public Collection<LabelValueObject> getSubjectLabelsByProjectId( Long projectId );
+
 }
