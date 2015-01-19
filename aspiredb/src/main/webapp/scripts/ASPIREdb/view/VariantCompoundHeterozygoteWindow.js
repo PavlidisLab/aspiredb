@@ -47,7 +47,7 @@ Ext.define( "ASPIREdb.view.VariantCompoundHeterozygoteWindow", {
 
       }
 
-      console.log( Ext.JSON.encode( data ) );
+      // console.log( Ext.JSON.encode( data ) );
       return data;
    },
 
