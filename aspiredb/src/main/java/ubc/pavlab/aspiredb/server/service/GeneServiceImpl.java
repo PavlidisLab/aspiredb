@@ -138,6 +138,7 @@ public class GeneServiceImpl implements GeneService {
      * @throws NotLoggedInException
      * @throws BioMartServiceException
      */
+    @SuppressWarnings("boxing")
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
@@ -282,6 +283,7 @@ public class GeneServiceImpl implements GeneService {
      * @throws NotLoggedInException
      * @throws BioMartServiceException
      */
+    @SuppressWarnings("boxing")
     private Map<String, Double> getCnvBurdenAnalysisPerSubject( Collection<Long> variantIds )
             throws NotLoggedInException, BioMartServiceException {
 
@@ -412,13 +414,12 @@ public class GeneServiceImpl implements GeneService {
     /**
      * Returns all the genes that overlap with the variantIds, including non-protein coding genes.
      */
+    @SuppressWarnings("boxing")
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
     public Map<Long, Collection<GeneValueObject>> getGenesPerVariant( Collection<Long> variantIds )
             throws NotLoggedInException, BioMartServiceException {
-
-        int genesFound = 0;
 
         StopWatch timer = new StopWatch();
         timer.start();
@@ -453,7 +454,6 @@ public class GeneServiceImpl implements GeneService {
                     results.put( variant.getId(), new ArrayList<GeneValueObject>() );
                 }
                 results.get( variant.getId() ).addAll( genesInsideRange );
-                genesFound += genesInsideRange.size();
             }
         }
 
@@ -518,7 +518,7 @@ public class GeneServiceImpl implements GeneService {
     public Map<String, Map<GeneValueObject, Collection<VariantValueObject>>> getCompoundHeterozygotes(
             Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException {
 
-        Map<String, Map<GeneValueObject, Collection<VariantValueObject>>> result = new HashMap();
+        Map<String, Map<GeneValueObject, Collection<VariantValueObject>>> result = new HashMap<>();
 
         Map<Long, Collection<GeneValueObject>> map = getGenesPerVariant( variantIds );
 
@@ -526,7 +526,7 @@ public class GeneServiceImpl implements GeneService {
         Collection<Variant> variants = variantDao.load( variantIds );
 
         // transform data to patientId-geneSymbol pairs
-        Map<String, Map<GeneValueObject, Collection<VariantValueObject>>> seen = new HashMap();
+        Map<String, Map<GeneValueObject, Collection<VariantValueObject>>> seen = new HashMap<>();
         for ( Variant variant : variants ) {
 
             // not interested in CNV gains
@@ -595,6 +595,7 @@ public class GeneServiceImpl implements GeneService {
      * 
      * @param list
      */
+    @SuppressWarnings("boxing")
     public void multipleTestCorrectionForPhenotypeEnrichmentList( List<PhenotypeEnrichmentValueObject> list ) {
 
         DoubleArrayList doubleArrayList = new DoubleArrayList();
