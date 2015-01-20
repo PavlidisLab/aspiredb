@@ -19,6 +19,7 @@
 package ubc.pavlab.aspiredb.server.service;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,6 +48,7 @@ import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.server.model.GenomicLocation;
+import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.server.model.Variant;
@@ -54,8 +56,12 @@ import ubc.pavlab.aspiredb.server.util.GenomeBin;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
+import ubc.pavlab.aspiredb.shared.PhenotypeEnrichmentValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
+import ubic.basecode.math.MultipleTestCorrection;
+import ubic.basecode.math.SpecFunc;
+import cern.colt.list.DoubleArrayList;
 
 /**
  * author: anton date: 01/05/13
@@ -79,8 +85,10 @@ public class GeneServiceImpl implements GeneService {
     @Autowired
     private NeurocartaQueryService neurocartaQueryService;
 
+    DecimalFormat dformat = new DecimalFormat( "#.#####" );
+
     enum CnvBurdenAnalysisPerSubject {
-        PATIENT_ID, LABEL_NAME, NUM_DELETION, NUM_DUPLICATION, NUM_UNKNOWN, TOTAL, TOTAL_SIZE, AVG_SIZE, NUM_GENES, NUM_CNVS_WITH_GENE, AVG_GENES_PER_CNV
+        PATIENT_ID, LABEL_NAME, NUM_SAMPLES, NUM_DELETION, NUM_DUPLICATION, NUM_UNKNOWN, TOTAL, TOTAL_SIZE, AVG_SIZE, NUM_GENES, NUM_CNVS_WITH_GENE, AVG_GENES_PER_CNV
     }
 
     protected static Log log = LogFactory.getLog( GeneServiceImpl.class );
@@ -114,7 +122,7 @@ public class GeneServiceImpl implements GeneService {
             } else if ( key.equals( CnvBurdenAnalysisPerSubject.LABEL_NAME.toString() ) ) {
                 ret.put( key, String.format( "%s", stats.get( key ).toString() ) );
             } else {
-                ret.put( key, String.format( "%.0f", stats.get( key ) ) );
+                ret.put( key, dformat.format( stats.get( key ) ) );
             }
         }
         return ret;
@@ -208,6 +216,11 @@ public class GeneServiceImpl implements GeneService {
 
             // finally save the results
             Map<String, String> statsStr = statsToString( perLabelStats );
+
+            // TODO
+            // note that those samples with no variants are not counted towards the total
+            statsStr.put( CnvBurdenAnalysisPerSubject.NUM_SAMPLES.toString(),
+                    String.format( "%d / %d", labelPatientId.get( label ).size(), patientIdStats.keySet().size() ) );
 
             // assume unique label name?
             statsStr.put( CnvBurdenAnalysisPerSubject.LABEL_NAME.toString(), label );
@@ -576,4 +589,101 @@ public class GeneServiceImpl implements GeneService {
         }
         return result;
     }
+
+    /**
+     * TODO repurpose code for generic multiple test correction
+     * 
+     * @param list
+     */
+    public void multipleTestCorrectionForPhenotypeEnrichmentList( List<PhenotypeEnrichmentValueObject> list ) {
+
+        DoubleArrayList doubleArrayList = new DoubleArrayList();
+
+        for ( PhenotypeEnrichmentValueObject pvo : list ) {
+            doubleArrayList.add( pvo.getPValue() );
+        }
+
+        doubleArrayList = MultipleTestCorrection.benjaminiHochberg( doubleArrayList );
+
+        for ( int i = 0; i < doubleArrayList.size(); i++ ) {
+            list.get( i ).setPValueCorrected( doubleArrayList.get( i ) );
+            list.get( i ).setPValueCorrectedString( dformat.format( doubleArrayList.get( i ) ) );
+        }
+
+    }
+
+    /**
+     * TODO repurpose code for generic t-test
+     * 
+     * @param uriPhenotypes -all the phenotypes for a specific uri in the db for subjectIds and complementSubjectIds
+     * @param subjectIds
+     * @param complementSubjectIds
+     */
+    public PhenotypeEnrichmentValueObject getPhenotypeEnrichment( Collection<Phenotype> uriPhenotypes,
+            Collection<Long> subjectIds, Collection<Long> complementSubjectIds ) {
+
+        Integer successes = 0;
+
+        Integer compSuccesses = 0;
+
+        Integer positives = 0;
+
+        Integer n = subjectIds.size();
+
+        Integer complementGroupSize = complementSubjectIds.size();
+
+        Integer totalSize = subjectIds.size() + complementSubjectIds.size();
+
+        for ( Phenotype p : uriPhenotypes ) {
+            // this should always be true the way we are currently using this method.
+            if ( p.getValue().equals( "1" ) ) {
+
+                positives++;
+
+                if ( subjectIds.contains( p.getSubject().getId() ) ) {
+                    successes++;
+                }
+
+                if ( complementSubjectIds.contains( p.getSubject().getId() ) ) {
+                    compSuccesses++;
+                }
+
+            }
+        }
+
+        if ( successes == 0 || successes == n ) {
+            return null;
+        }
+
+        // do it this way because of possible unobserved phenotypes(no recorded value) for certain subjects, this could
+        // be wrong
+        Integer negatives = totalSize - positives;
+
+        // note lower.tail: logical; if TRUE (default), probabilities are P[X <= x],
+        // otherwise, P[X > x].
+        // Since we want P[X >= x], we want to set x = x - 1 and lower.tail false
+        double pValue;
+
+        pValue = SpecFunc.phyper( successes - 1, positives, negatives, n, false );
+
+        PhenotypeEnrichmentValueObject vo = new PhenotypeEnrichmentValueObject();
+
+        vo.setPValue( pValue );
+
+        Phenotype valueGrabber = uriPhenotypes.iterator().next();
+        vo.setUri( valueGrabber.getUri() );
+        vo.setName( valueGrabber.getName() );
+        vo.setInGroupTotal( successes );
+        vo.setOutGroupTotal( compSuccesses );
+        vo.setTotal( totalSize );
+
+        vo.setInGroupTotalString( vo.getInGroupTotal().toString() + "/" + n.toString() );
+        vo.setOutGroupTotalString( vo.getOutGroupTotal().toString() + "/" + complementGroupSize.toString() );
+
+        vo.setPValueString( dformat.format( pValue ) );
+
+        return vo;
+
+    }
+
 }

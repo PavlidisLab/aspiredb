@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [  ] );
+Ext.require( [] );
 
 /**
  * Create Burden Analysis Per Subject Label
@@ -31,7 +31,10 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
    saveAsTXT : function() {
       ASPIREdb.TextDataDownloadWindow.showBurdenAnalysisDownload( Ext.getStore( 'burdenAnalysisPerSubjectStore' ) );
    },
-   
+
+   /**
+    * Extract data elements (fields) and set to 'numeric' type by default
+    */
    extractFields : function(data) {
       var ret = [];
       if ( data == null || data.length == 0 ) {
@@ -39,7 +42,8 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
          return;
       }
       for ( var field in data) {
-         if ( field === 'LABEL_NAME' ) {
+         // non-numeric fields
+         if ( field === 'LABEL_NAME' || field === 'NUM_SAMPLES' ) {
             ret.push( field );
          } else {
             ret.push( {
@@ -75,6 +79,9 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
       var columns = [ {
          dataIndex : 'LABEL_NAME',
          text : 'Subject label',
+      }, {
+         dataIndex : 'NUM_SAMPLES',
+         text : 'Num samples',
       }, {
          dataIndex : 'NUM_DELETION',
          text : '# deletion',
@@ -150,8 +157,8 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
 
       var me = this;
 
-      var variantIds = ASPIREdb.view.report.VariantReportWindow.getColumnDataFromStore(store, 'id');
-         
+      var variantIds = ASPIREdb.view.report.VariantReportWindow.getColumnDataFromStore( store, 'id' );
+
       var window = me.up( '#variantReportWindow' );
       if ( window != null ) {
          window.setLoading( true );
