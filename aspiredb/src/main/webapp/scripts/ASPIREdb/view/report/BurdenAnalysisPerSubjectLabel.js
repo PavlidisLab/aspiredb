@@ -33,7 +33,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
    },
 
    /**
-    * Extract data elements (fields) and set to 'numeric' type by default
+    * Extract data elements (fields)
     */
    extractFields : function(data) {
       var ret = [];
@@ -43,14 +43,15 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
       }
       for ( var field in data) {
          // non-numeric fields
-         if ( field === 'LABEL_NAME' || field === 'NUM_SAMPLES' ) {
+         /*if ( field === 'LABEL_NAME' || field === 'NUM_SAMPLES' ) {
             ret.push( field );
          } else {
             ret.push( {
                name : field,
                type : 'number'
             } );
-         }
+         }*/
+         ret.push( field );
       }
       return ret;
    },

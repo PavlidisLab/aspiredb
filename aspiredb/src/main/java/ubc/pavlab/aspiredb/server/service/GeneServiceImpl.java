@@ -27,9 +27,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.apache.commons.math3.stat.descriptive.summary.Sum;
+import org.apache.commons.math3.stat.inference.TTest;
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,20 +52,14 @@ import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.server.model.GenomicLocation;
-import ubc.pavlab.aspiredb.server.model.Phenotype;
+import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.util.GenomeBin;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
-import ubc.pavlab.aspiredb.shared.LabelValueObject;
-import ubc.pavlab.aspiredb.shared.PhenotypeEnrichmentValueObject;
-import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
-import ubic.basecode.math.MultipleTestCorrection;
-import ubic.basecode.math.SpecFunc;
-import cern.colt.list.DoubleArrayList;
 
 /**
  * author: anton date: 01/05/13
@@ -78,6 +76,8 @@ public class GeneServiceImpl implements GeneService {
     private VariantDao variantDao;
     @Autowired
     private LabelDao labelDao;
+    @Autowired
+    private LabelService labelService;
     @Autowired
     private UserGeneSetDao userGeneSetDao;
     @Autowired
@@ -111,21 +111,96 @@ public class GeneServiceImpl implements GeneService {
         return this.neurocartaQueryService.fetchGenesAssociatedWithPhenotype( phenotypeValueUri );
     }
 
-    private Map<String, String> statsToString( Map<String, ?> stats ) {
-        HashMap<String, String> ret = new HashMap<>();
-        for ( String key : stats.keySet() ) {
-            if ( key.equals( CnvBurdenAnalysisPerSubject.AVG_SIZE.toString() )
-                    || key.equals( CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV.toString() ) ) {
+    private Map<CnvBurdenAnalysisPerSubject, String> statsToString( Map<CnvBurdenAnalysisPerSubject, ?> stats ) {
+        HashMap<CnvBurdenAnalysisPerSubject, String> ret = new HashMap<>();
+        for ( CnvBurdenAnalysisPerSubject key : stats.keySet() ) {
+            if ( key.equals( CnvBurdenAnalysisPerSubject.AVG_SIZE )
+                    || key.equals( CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV ) ) {
                 ret.put( key, String.format( "%.1f", stats.get( key ) ) );
-            } else if ( key.equals( CnvBurdenAnalysisPerSubject.PATIENT_ID.toString() ) ) {
+            } else if ( key.equals( CnvBurdenAnalysisPerSubject.PATIENT_ID ) ) {
                 ret.put( key, String.format( "%s", stats.get( key ).toString() ) );
-            } else if ( key.equals( CnvBurdenAnalysisPerSubject.LABEL_NAME.toString() ) ) {
+            } else if ( key.equals( CnvBurdenAnalysisPerSubject.LABEL_NAME ) ) {
                 ret.put( key, String.format( "%s", stats.get( key ).toString() ) );
             } else {
                 ret.put( key, dformat.format( stats.get( key ) ) );
             }
         }
         return ret;
+    }
+
+    /**
+     * @param variants
+     * @return Map<Label.name, Collection<Subject.patientID>>
+     */
+    private Map<String, Collection<String>> groupSubjectsBySubjectLabel( Collection<Subject> subjects ) {
+        Map<String, Collection<String>> labelPatientId = new HashMap<>();
+        for ( Subject subject : subjects ) {
+
+            // organize labels
+            for ( Label label : subject.getLabels() ) {
+                if ( !labelPatientId.containsKey( label.getName() ) ) {
+                    labelPatientId.put( label.getName(), new HashSet<String>() );
+                }
+                labelPatientId.get( label.getName() ).add( subject.getPatientId() );
+            }
+
+            // create a fake label to capture those Subjects with no labels
+            if ( subject.getLabels().size() == 0 ) {
+                String labelName = "NO_LABEL";
+                if ( !labelPatientId.containsKey( labelName ) ) {
+                    labelPatientId.put( labelName, new HashSet<String>() );
+                }
+                labelPatientId.get( labelName ).add( subject.getPatientId() );
+            }
+        }
+        return labelPatientId;
+    }
+
+    /**
+     * @param variants
+     * @return Map<Subject.patientId, Map<statsName, statsDoubleValue>>
+     * @throws NotLoggedInException
+     * @throws BioMartServiceException
+     */
+    private Map<String, Map<CnvBurdenAnalysisPerSubject, Double>> getVariantStatsBySubject( Collection<Variant> variants )
+            throws BioMartServiceException, NotLoggedInException {
+        Map<String, Collection<Long>> subjectVariants = new HashMap<>();
+        for ( Variant v : variants ) {
+            Subject subject = subjectDao.load( v.getSubject().getId() );
+
+            // group variants by patient id
+            Collection<Long> variantsAdded = subjectVariants.get( subject.getPatientId() );
+            if ( variantsAdded == null ) {
+                variantsAdded = new ArrayList<>();
+                subjectVariants.put( subject.getPatientId(), variantsAdded );
+            }
+            variantsAdded.add( v.getId() );
+
+        }
+
+        // store stats by patientId
+        Map<String, Map<CnvBurdenAnalysisPerSubject, Double>> patientIdStats = new HashMap<>();
+        for ( String patientId : subjectVariants.keySet() ) {
+            Map<CnvBurdenAnalysisPerSubject, Double> stats = getCnvBurdenAnalysisPerSubject( subjectVariants
+                    .get( patientId ) );
+            patientIdStats.put( patientId, stats );
+        }
+
+        return patientIdStats;
+    }
+
+    /**
+     * @param statName
+     * @param patientIds
+     * @return double[] array of the statName values for all of the patientIds
+     */
+    private double[] getPatientStats( CnvBurdenAnalysisPerSubject statName, Collection<String> patientIds,
+            Map<String, Map<CnvBurdenAnalysisPerSubject, Double>> patientIdStats ) {
+        Collection<Double> result = new ArrayList<>();
+        for ( String patientId : patientIds ) {
+            result.add( patientIdStats.get( patientId ).get( statName ) );
+        }
+        return ArrayUtils.toPrimitive( result.toArray( new Double[0] ) );
     }
 
     /**
@@ -142,91 +217,91 @@ public class GeneServiceImpl implements GeneService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Collection<Map<String, String>> getBurdenAnalysisPerSubjectLabel( Collection<Long> variantIds )
-            throws NotLoggedInException, BioMartServiceException {
-        Collection<Map<String, String>> results = new ArrayList<>();
+    public Collection<Map<CnvBurdenAnalysisPerSubject, String>> getBurdenAnalysisPerSubjectLabel(
+            Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException {
+        Collection<Map<CnvBurdenAnalysisPerSubject, String>> results = new ArrayList<>();
 
-        Map<String, Collection<String>> labelPatientId = new HashMap<>();
-        Map<String, Collection<Long>> subjectVariants = new HashMap<>();
-        for ( Variant v : variantDao.load( variantIds ) ) {
+        Collection<String> allPatientIds = new ArrayList<>();
+        Collection<Subject> subjects = new ArrayList<>();
+        Collection<Variant> variants = variantDao.load( variantIds );
+        for ( Variant v : variants ) {
             Subject subject = subjectDao.load( v.getSubject().getId() );
-            SubjectValueObject svo = subject.convertToValueObject();
-
-            // group variants by patient id
-            Collection<Long> variantsAdded = subjectVariants.get( subject.getPatientId() );
-            if ( variantsAdded == null ) {
-                variantsAdded = new ArrayList<>();
-                subjectVariants.put( subject.getPatientId(), variantsAdded );
-            }
-            variantsAdded.add( v.getId() );
-
-            // organize labels
-            for ( LabelValueObject label : svo.getLabels() ) {
-                if ( !labelPatientId.containsKey( label.getName() ) ) {
-                    labelPatientId.put( label.getName(), new HashSet<String>() );
-                }
-                labelPatientId.get( label.getName() ).add( subject.getPatientId() );
-            }
-            // create a fake label to capture those Subjects with no labels
-            if ( svo.getLabels().size() == 0 ) {
-                String labelName = "NO_LABEL";
-                if ( !labelPatientId.containsKey( labelName ) ) {
-                    labelPatientId.put( labelName, new HashSet<String>() );
-                }
-                labelPatientId.get( labelName ).add( subject.getPatientId() );
-            }
+            subjects.add( subject );
+            allPatientIds.add( subject.getPatientId() );
         }
 
-        // store stats by patientId
-        Map<String, Map<String, Double>> patientIdStats = new HashMap<>();
-        for ( String patientId : subjectVariants.keySet() ) {
-            Map<String, Double> stats = getCnvBurdenAnalysisPerSubject( subjectVariants.get( patientId ) );
-            patientIdStats.put( patientId, stats );
-        }
+        Map<String, Collection<String>> labelPatientId = groupSubjectsBySubjectLabel( subjects );
+        Map<String, Map<CnvBurdenAnalysisPerSubject, Double>> patientIdStats = getVariantStatsBySubject( variants );
 
-        // now aggregate patient stats by label by taking the average
         for ( String label : labelPatientId.keySet() ) {
-            Map<String, Double> perLabelStats = new HashMap<>();
-
-            // add all the values up for each patient
-            for ( String patientId : labelPatientId.get( label ) ) {
-                for ( String statName : patientIdStats.get( patientId ).keySet() ) {
-                    Double statVal = patientIdStats.get( patientId ).get( statName );
-                    if ( !perLabelStats.containsKey( statName ) ) {
-                        perLabelStats.put( statName, 0.0 );
-                    }
-                    perLabelStats.put( statName, perLabelStats.get( statName ) + statVal );
-                }
-            }
 
             // nothing to do when there's no patients associated with this label
             if ( labelPatientId.get( label ).size() == 0 ) {
                 continue;
             }
 
+            Collection<String> withLabel = labelPatientId.get( label );
+
+            Collection<String> withoutLabel = new ArrayList<>( allPatientIds );
+            withoutLabel.removeAll( withLabel );
+
+            Map<CnvBurdenAnalysisPerSubject, String> statsStr = new HashMap<>();
+            results.add( statsStr );
+
+            statsStr.put( CnvBurdenAnalysisPerSubject.LABEL_NAME, label );
+
+            // note that those samples with no variants are not counted towards the total
+            statsStr.put( CnvBurdenAnalysisPerSubject.NUM_SAMPLES,
+                    String.format( "%d / %d", withLabel.size(), allPatientIds.size() ) );
+
+            for ( CnvBurdenAnalysisPerSubject statName : patientIdStats.get( withLabel.iterator().next() ).keySet() ) {
+                double[] withLabelStats = getPatientStats( statName, withLabel, patientIdStats );
+                double[] withoutLabelStats = getPatientStats( statName, withoutLabel, patientIdStats );
+
+                Double pval = 1.0;
+                String pvalSuffix = "";
+                if ( withLabelStats.length > 1 && withoutLabelStats.length > 1 ) {
+                    pval = new TTest().tTest( withLabelStats, withoutLabelStats );
+                    if ( pval < 0.001 ) {
+                        pvalSuffix = "**";
+                    } else if ( pval < 0.05 ) {
+                        pvalSuffix = "*";
+                    }
+                }
+
+                String statValueStr = dformat.format( new Sum().evaluate( withLabelStats ) );
+                statsStr.put( statName, statValueStr + pvalSuffix );
+
+                // FIXME
+                if ( statName.equals( CnvBurdenAnalysisPerSubject.TOTAL_SIZE ) ) {
+                    statValueStr = dformat.format( new Mean().evaluate( withLabelStats ) );
+                    statsStr.put( CnvBurdenAnalysisPerSubject.AVG_SIZE, statValueStr + pvalSuffix );
+                } else if ( statName.equals( CnvBurdenAnalysisPerSubject.NUM_GENES ) ) {
+                    statValueStr = dformat.format( new Mean().evaluate( withLabelStats ) );
+                    statsStr.put( CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV, statValueStr + pvalSuffix );
+                }
+            }
+
+            // statsStr.put
             // compute aggregate stats
-            perLabelStats.put(
-                    CnvBurdenAnalysisPerSubject.AVG_SIZE.toString(),
-                    perLabelStats.get( CnvBurdenAnalysisPerSubject.TOTAL_SIZE.toString() )
-                            / perLabelStats.get( CnvBurdenAnalysisPerSubject.TOTAL.toString() ) * 1.0 );
-
-            perLabelStats.put(
-                    CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV.toString(),
-                    perLabelStats.get( CnvBurdenAnalysisPerSubject.NUM_GENES.toString() )
-                            / perLabelStats.get( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE.toString() ) * 1.0 );
-
-            // finally save the results
-            Map<String, String> statsStr = statsToString( perLabelStats );
+            // perLabelStats.put(
+            // CnvBurdenAnalysisPerSubject.AVG_SIZE.toString(),
+            // perLabelStats.get( CnvBurdenAnalysisPerSubject.TOTAL_SIZE.toString() )
+            // / perLabelStats.get( CnvBurdenAnalysisPerSubject.TOTAL.toString() ) * 1.0 );
+            //
+            // perLabelStats.put(
+            // CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV.toString(),
+            // perLabelStats.get( CnvBurdenAnalysisPerSubject.NUM_GENES.toString() )
+            // / perLabelStats.get( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE.toString() ) * 1.0 );
 
             // TODO
             // note that those samples with no variants are not counted towards the total
-            statsStr.put( CnvBurdenAnalysisPerSubject.NUM_SAMPLES.toString(),
-                    String.format( "%d / %d", labelPatientId.get( label ).size(), patientIdStats.keySet().size() ) );
+            // statsStr.put( CnvBurdenAnalysisPerSubject.NUM_SAMPLES.toString(),
+            // String.format( "%d / %d", labelPatientId.get( label ).size(), patientIdStats.keySet().size() ) );
+            //
+            // // assume unique label name?
+            // statsStr.put( CnvBurdenAnalysisPerSubject.LABEL_NAME.toString(), label );
 
-            // assume unique label name?
-            statsStr.put( CnvBurdenAnalysisPerSubject.LABEL_NAME.toString(), label );
-
-            results.add( statsStr );
         }
 
         return results;
@@ -243,9 +318,9 @@ public class GeneServiceImpl implements GeneService {
      */
     @Override
     @RemoteMethod
-    public Collection<Map<String, String>> getBurdenAnalysisPerSubject( Collection<Long> variantIds )
+    public Collection<Map<CnvBurdenAnalysisPerSubject, String>> getBurdenAnalysisPerSubject( Collection<Long> variantIds )
             throws NotLoggedInException, BioMartServiceException {
-        Collection<Map<String, String>> results = new ArrayList<>();
+        Collection<Map<CnvBurdenAnalysisPerSubject, String>> results = new ArrayList<>();
 
         // group variants by patient id
         Map<String, Collection<Long>> subjectVariants = new HashMap<>();
@@ -265,11 +340,12 @@ public class GeneServiceImpl implements GeneService {
         }
 
         for ( String patientId : subjectVariants.keySet() ) {
-            Map<String, Double> stats = getCnvBurdenAnalysisPerSubject( subjectVariants.get( patientId ) );
+            Map<CnvBurdenAnalysisPerSubject, Double> stats = getCnvBurdenAnalysisPerSubject( subjectVariants
+                    .get( patientId ) );
 
-            Map<String, String> statsStr = statsToString( stats );
+            Map<CnvBurdenAnalysisPerSubject, String> statsStr = statsToString( stats );
 
-            statsStr.put( CnvBurdenAnalysisPerSubject.PATIENT_ID.toString(), patientId );
+            statsStr.put( CnvBurdenAnalysisPerSubject.PATIENT_ID, patientId );
 
             results.add( statsStr );
         }
@@ -284,18 +360,19 @@ public class GeneServiceImpl implements GeneService {
      * @throws BioMartServiceException
      */
     @SuppressWarnings("boxing")
-    private Map<String, Double> getCnvBurdenAnalysisPerSubject( Collection<Long> variantIds )
+    private Map<CnvBurdenAnalysisPerSubject, Double> getCnvBurdenAnalysisPerSubject( Collection<Long> variantIds )
             throws NotLoggedInException, BioMartServiceException {
 
         // Initialize
-        Map<String, Double> results = new HashMap<>();
+        Map<CnvBurdenAnalysisPerSubject, Double> results = new HashMap<>();
         for ( CnvBurdenAnalysisPerSubject ba : CnvBurdenAnalysisPerSubject.values() ) {
             // don't add PATIENT_ID and LABEL_NAME
             if ( ba.equals( CnvBurdenAnalysisPerSubject.PATIENT_ID )
-                    || ba.equals( CnvBurdenAnalysisPerSubject.LABEL_NAME ) ) {
+                    || ba.equals( CnvBurdenAnalysisPerSubject.LABEL_NAME )
+                    || ba.equals( CnvBurdenAnalysisPerSubject.NUM_SAMPLES ) ) {
                 continue;
             }
-            results.put( ba.toString(), 0.0 );
+            results.put( ba, 0.0 );
         }
 
         // Gene overlap
@@ -316,46 +393,41 @@ public class GeneServiceImpl implements GeneService {
             CNV cnv = ( CNV ) v;
 
             if ( cnv.getType().equals( CnvType.GAIN ) ) {
-                results.put( CnvBurdenAnalysisPerSubject.NUM_DUPLICATION.toString(),
-                        results.get( CnvBurdenAnalysisPerSubject.NUM_DUPLICATION.toString() ) + 1 );
+                results.put( CnvBurdenAnalysisPerSubject.NUM_DUPLICATION,
+                        results.get( CnvBurdenAnalysisPerSubject.NUM_DUPLICATION ) + 1 );
             } else if ( cnv.getType().equals( CnvType.LOSS ) ) {
-                results.put( CnvBurdenAnalysisPerSubject.NUM_DELETION.toString(),
-                        results.get( CnvBurdenAnalysisPerSubject.NUM_DELETION.toString() ) + 1 );
+                results.put( CnvBurdenAnalysisPerSubject.NUM_DELETION,
+                        results.get( CnvBurdenAnalysisPerSubject.NUM_DELETION ) + 1 );
             } else {
-                results.put( CnvBurdenAnalysisPerSubject.NUM_UNKNOWN.toString(),
-                        results.get( CnvBurdenAnalysisPerSubject.NUM_UNKNOWN.toString() ) + 1 );
+                results.put( CnvBurdenAnalysisPerSubject.NUM_UNKNOWN,
+                        results.get( CnvBurdenAnalysisPerSubject.NUM_UNKNOWN ) + 1 );
             }
 
-            results.put( CnvBurdenAnalysisPerSubject.TOTAL.toString(),
-                    results.get( CnvBurdenAnalysisPerSubject.TOTAL.toString() ) + 1 );
+            results.put( CnvBurdenAnalysisPerSubject.TOTAL, results.get( CnvBurdenAnalysisPerSubject.TOTAL ) + 1 );
 
-            results.put( CnvBurdenAnalysisPerSubject.TOTAL_SIZE.toString(),
-                    results.get( CnvBurdenAnalysisPerSubject.TOTAL_SIZE.toString() ) + cnv.getCnvLength() );
+            results.put( CnvBurdenAnalysisPerSubject.TOTAL_SIZE, results.get( CnvBurdenAnalysisPerSubject.TOTAL_SIZE )
+                    + cnv.getCnvLength() );
 
             if ( genes.size() > 0 ) {
-                results.put( CnvBurdenAnalysisPerSubject.NUM_GENES.toString(),
-                        results.get( CnvBurdenAnalysisPerSubject.NUM_GENES.toString() ) + genes.size() );
+                results.put( CnvBurdenAnalysisPerSubject.NUM_GENES, results.get( CnvBurdenAnalysisPerSubject.NUM_GENES )
+                        + genes.size() );
 
-                results.put( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE.toString(),
-                        results.get( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE.toString() ) + 1 );
+                results.put( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE,
+                        results.get( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE ) + 1 );
             }
 
         }
 
-        results.put(
-                CnvBurdenAnalysisPerSubject.AVG_SIZE.toString(),
-                results.get( CnvBurdenAnalysisPerSubject.TOTAL_SIZE.toString() )
-                        / results.get( CnvBurdenAnalysisPerSubject.TOTAL.toString() ) * 1.0 );
+        results.put( CnvBurdenAnalysisPerSubject.AVG_SIZE, results.get( CnvBurdenAnalysisPerSubject.TOTAL_SIZE )
+                / results.get( CnvBurdenAnalysisPerSubject.TOTAL ) * 1.0 );
 
         // results.put(
         // CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE.toString(),
         // results.get( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE.toString() )
         // / results.get( CnvBurdenAnalysisPerSubject.TOTAL.toString() ) * 1.0 );
 
-        results.put(
-                CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV.toString(),
-                results.get( CnvBurdenAnalysisPerSubject.NUM_GENES.toString() )
-                        / results.get( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE.toString() ) * 1.0 );
+        results.put( CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV, results.get( CnvBurdenAnalysisPerSubject.NUM_GENES )
+                / results.get( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE ) * 1.0 );
 
         return results;
     }
@@ -588,103 +660,6 @@ public class GeneServiceImpl implements GeneService {
             }
         }
         return result;
-    }
-
-    /**
-     * TODO repurpose code for generic multiple test correction
-     * 
-     * @param list
-     */
-    @SuppressWarnings("boxing")
-    public void multipleTestCorrectionForPhenotypeEnrichmentList( List<PhenotypeEnrichmentValueObject> list ) {
-
-        DoubleArrayList doubleArrayList = new DoubleArrayList();
-
-        for ( PhenotypeEnrichmentValueObject pvo : list ) {
-            doubleArrayList.add( pvo.getPValue() );
-        }
-
-        doubleArrayList = MultipleTestCorrection.benjaminiHochberg( doubleArrayList );
-
-        for ( int i = 0; i < doubleArrayList.size(); i++ ) {
-            list.get( i ).setPValueCorrected( doubleArrayList.get( i ) );
-            list.get( i ).setPValueCorrectedString( dformat.format( doubleArrayList.get( i ) ) );
-        }
-
-    }
-
-    /**
-     * TODO repurpose code for generic t-test
-     * 
-     * @param uriPhenotypes -all the phenotypes for a specific uri in the db for subjectIds and complementSubjectIds
-     * @param subjectIds
-     * @param complementSubjectIds
-     */
-    public PhenotypeEnrichmentValueObject getPhenotypeEnrichment( Collection<Phenotype> uriPhenotypes,
-            Collection<Long> subjectIds, Collection<Long> complementSubjectIds ) {
-
-        Integer successes = 0;
-
-        Integer compSuccesses = 0;
-
-        Integer positives = 0;
-
-        Integer n = subjectIds.size();
-
-        Integer complementGroupSize = complementSubjectIds.size();
-
-        Integer totalSize = subjectIds.size() + complementSubjectIds.size();
-
-        for ( Phenotype p : uriPhenotypes ) {
-            // this should always be true the way we are currently using this method.
-            if ( p.getValue().equals( "1" ) ) {
-
-                positives++;
-
-                if ( subjectIds.contains( p.getSubject().getId() ) ) {
-                    successes++;
-                }
-
-                if ( complementSubjectIds.contains( p.getSubject().getId() ) ) {
-                    compSuccesses++;
-                }
-
-            }
-        }
-
-        if ( successes == 0 || successes == n ) {
-            return null;
-        }
-
-        // do it this way because of possible unobserved phenotypes(no recorded value) for certain subjects, this could
-        // be wrong
-        Integer negatives = totalSize - positives;
-
-        // note lower.tail: logical; if TRUE (default), probabilities are P[X <= x],
-        // otherwise, P[X > x].
-        // Since we want P[X >= x], we want to set x = x - 1 and lower.tail false
-        double pValue;
-
-        pValue = SpecFunc.phyper( successes - 1, positives, negatives, n, false );
-
-        PhenotypeEnrichmentValueObject vo = new PhenotypeEnrichmentValueObject();
-
-        vo.setPValue( pValue );
-
-        Phenotype valueGrabber = uriPhenotypes.iterator().next();
-        vo.setUri( valueGrabber.getUri() );
-        vo.setName( valueGrabber.getName() );
-        vo.setInGroupTotal( successes );
-        vo.setOutGroupTotal( compSuccesses );
-        vo.setTotal( totalSize );
-
-        vo.setInGroupTotalString( vo.getInGroupTotal().toString() + "/" + n.toString() );
-        vo.setOutGroupTotalString( vo.getOutGroupTotal().toString() + "/" + complementGroupSize.toString() );
-
-        vo.setPValueString( dformat.format( pValue ) );
-
-        return vo;
-
     }
 
 }

@@ -25,6 +25,7 @@ import java.util.Map;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
+import ubc.pavlab.aspiredb.server.service.GeneServiceImpl.CnvBurdenAnalysisPerSubject;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
@@ -49,11 +50,11 @@ public interface GeneService {
     public Map<Long, Collection<GeneValueObject>> getGenesPerVariant( Collection<Long> ids )
             throws NotLoggedInException, BioMartServiceException;
 
-    public Collection<Map<String, String>> getBurdenAnalysisPerSubject( Collection<Long> subjectIds )
+    public Collection<Map<CnvBurdenAnalysisPerSubject, String>> getBurdenAnalysisPerSubject( Collection<Long> subjectIds )
             throws NotLoggedInException, BioMartServiceException;
 
-    public Collection<Map<String, String>> getBurdenAnalysisPerSubjectLabel( Collection<Long> variantIds )
-            throws NotLoggedInException, BioMartServiceException;
+    public Collection<Map<CnvBurdenAnalysisPerSubject, String>> getBurdenAnalysisPerSubjectLabel(
+            Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException;
 
     /**
      * Returns a list of "potential" compound heterozygote variants, i.e. a patient has two variants (different alleles)
