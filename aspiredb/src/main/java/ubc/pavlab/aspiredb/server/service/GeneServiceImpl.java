@@ -220,8 +220,8 @@ public class GeneServiceImpl implements GeneService {
             Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException {
         Collection<Map<CnvBurdenAnalysisPerSubject, String>> results = new ArrayList<>();
 
-        Collection<String> allPatientIds = new ArrayList<>();
-        Collection<Subject> subjects = new ArrayList<>();
+        Collection<Subject> subjects = new HashSet<>();
+        Collection<String> allPatientIds = new HashSet<>();
         Collection<Variant> variants = variantDao.load( variantIds );
         for ( Variant v : variants ) {
             Subject subject = subjectDao.load( v.getSubject().getId() );
