@@ -25,6 +25,7 @@ import java.util.Map;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.model.Label;
+import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummaryValueObject;
 import ubc.pavlab.aspiredb.shared.StringMatrix;
@@ -77,5 +78,7 @@ public interface SubjectService {
 
     public Collection<PropertyValue> suggestValues( Property property, SuggestionContext suggestionContext );
 
-    Collection<Label> getSubjectLabels( Collection<Long> subjectIds );
+    public Collection<Label> getSubjectLabels( Collection<Long> subjectIds );
+
+    public Map<String, Collection<String>> groupSubjectsBySubjectLabel( Collection<Subject> subjects );
 }

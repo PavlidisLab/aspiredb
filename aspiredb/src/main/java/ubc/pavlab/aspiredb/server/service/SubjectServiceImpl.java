@@ -17,6 +17,7 @@ package ubc.pavlab.aspiredb.server.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -524,6 +525,35 @@ public class SubjectServiceImpl implements SubjectService {
             }
         }
         return labels;
+    }
+
+    /**
+     * @param variants
+     * @return Map<Label.name, Collection<Subject.patientID>>
+     */
+    @Override
+    public Map<String, Collection<String>> groupSubjectsBySubjectLabel( Collection<Subject> subjects ) {
+        Map<String, Collection<String>> labelPatientId = new HashMap<>();
+        for ( Subject subject : subjects ) {
+
+            // organize labels
+            for ( Label label : subject.getLabels() ) {
+                if ( !labelPatientId.containsKey( label.getName() ) ) {
+                    labelPatientId.put( label.getName(), new HashSet<String>() );
+                }
+                labelPatientId.get( label.getName() ).add( subject.getPatientId() );
+            }
+
+            // create a fake label to capture those Subjects with no labels
+            if ( subject.getLabels().size() == 0 ) {
+                String labelName = "NO_LABEL";
+                if ( !labelPatientId.containsKey( labelName ) ) {
+                    labelPatientId.put( labelName, new HashSet<String>() );
+                }
+                labelPatientId.get( labelName ).add( subject.getPatientId() );
+            }
+        }
+        return labelPatientId;
     }
 
     @Override

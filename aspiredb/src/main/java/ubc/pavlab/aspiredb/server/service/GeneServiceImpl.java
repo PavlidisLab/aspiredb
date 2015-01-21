@@ -51,7 +51,6 @@ import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.server.model.GenomicLocation;
-import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.server.model.Variant;
@@ -129,34 +128,6 @@ public class GeneServiceImpl implements GeneService {
 
     /**
      * @param variants
-     * @return Map<Label.name, Collection<Subject.patientID>>
-     */
-    private Map<String, Collection<String>> groupSubjectsBySubjectLabel( Collection<Subject> subjects ) {
-        Map<String, Collection<String>> labelPatientId = new HashMap<>();
-        for ( Subject subject : subjects ) {
-
-            // organize labels
-            for ( Label label : subject.getLabels() ) {
-                if ( !labelPatientId.containsKey( label.getName() ) ) {
-                    labelPatientId.put( label.getName(), new HashSet<String>() );
-                }
-                labelPatientId.get( label.getName() ).add( subject.getPatientId() );
-            }
-
-            // create a fake label to capture those Subjects with no labels
-            if ( subject.getLabels().size() == 0 ) {
-                String labelName = "NO_LABEL";
-                if ( !labelPatientId.containsKey( labelName ) ) {
-                    labelPatientId.put( labelName, new HashSet<String>() );
-                }
-                labelPatientId.get( labelName ).add( subject.getPatientId() );
-            }
-        }
-        return labelPatientId;
-    }
-
-    /**
-     * @param variants
      * @return Map<Subject.patientId, Map<statsName, statsDoubleValue>>
      * @throws NotLoggedInException
      * @throws BioMartServiceException
@@ -229,7 +200,7 @@ public class GeneServiceImpl implements GeneService {
             allPatientIds.add( subject.getPatientId() );
         }
 
-        Map<String, Collection<String>> labelPatientId = groupSubjectsBySubjectLabel( subjects );
+        Map<String, Collection<String>> labelPatientId = subjectService.groupSubjectsBySubjectLabel( subjects );
         Map<String, Map<CnvBurdenAnalysisPerSubject, Double>> patientIdStats = getVariantStatsBySubject( variants );
 
         for ( String label : labelPatientId.keySet() ) {
