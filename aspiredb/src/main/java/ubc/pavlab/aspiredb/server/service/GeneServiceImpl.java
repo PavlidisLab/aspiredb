@@ -31,7 +31,6 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.summary.Sum;
 import org.apache.commons.math3.stat.inference.TTest;
 import org.directwebremoting.annotations.RemoteMethod;
@@ -245,7 +244,8 @@ public class GeneServiceImpl implements GeneService {
             Collection<String> withoutLabel = new ArrayList<>( allPatientIds );
             withoutLabel.removeAll( withLabel );
 
-            Map<CnvBurdenAnalysisPerSubject, String> statsStr = new HashMap<>();
+            Map<CnvBurdenAnalysisPerSubject, Double> stats = new HashMap<>(); // store values
+            Map<CnvBurdenAnalysisPerSubject, String> statsStr = new HashMap<>(); // store as string with p-vals
             results.add( statsStr );
 
             statsStr.put( CnvBurdenAnalysisPerSubject.LABEL_NAME, label );
@@ -269,20 +269,22 @@ public class GeneServiceImpl implements GeneService {
                     }
                 }
 
-                String statValueStr = dformat.format( new Sum().evaluate( withLabelStats ) );
+                double statValue = new Sum().evaluate( withLabelStats );
+                String statValueStr = dformat.format( statValue );
+                stats.put( statName, statValue );
                 statsStr.put( statName, statValueStr + pvalSuffix );
-
-                // FIXME
-                if ( statName.equals( CnvBurdenAnalysisPerSubject.TOTAL_SIZE ) ) {
-                    statValueStr = dformat.format( new Mean().evaluate( withLabelStats ) );
-                    statsStr.put( CnvBurdenAnalysisPerSubject.AVG_SIZE, statValueStr + pvalSuffix );
-                } else if ( statName.equals( CnvBurdenAnalysisPerSubject.NUM_GENES ) ) {
-                    statValueStr = dformat.format( new Mean().evaluate( withLabelStats ) );
-                    statsStr.put( CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV, statValueStr + pvalSuffix );
-                }
             }
 
-            // statsStr.put
+            double statValue = 1.0 * stats.get( CnvBurdenAnalysisPerSubject.TOTAL_SIZE )
+                    / stats.get( CnvBurdenAnalysisPerSubject.TOTAL );
+            stats.put( CnvBurdenAnalysisPerSubject.AVG_SIZE, statValue );
+            statsStr.put( CnvBurdenAnalysisPerSubject.AVG_SIZE, dformat.format( statValue ) );
+
+            statValue = 1.0 * stats.get( CnvBurdenAnalysisPerSubject.NUM_GENES )
+                    / stats.get( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE );
+            stats.put( CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV, statValue );
+            statsStr.put( CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV, dformat.format( statValue ) );
+
             // compute aggregate stats
             // perLabelStats.put(
             // CnvBurdenAnalysisPerSubject.AVG_SIZE.toString(),

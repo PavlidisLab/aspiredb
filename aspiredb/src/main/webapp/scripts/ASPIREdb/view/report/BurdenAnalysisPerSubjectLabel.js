@@ -19,6 +19,36 @@
 Ext.require( [] );
 
 /**
+ * e.g. 2**, 9, 10*
+ */
+Ext.data.Types.FLOATWITHPVAL = {
+   convert : function(v, n) {
+      return v;
+   },
+   sortType : function(v) {
+      v = Ext.isNumber( v ) ? v : parseFloat( String( v.replace( /\*/g, '' ) ), 10 );
+      return isNaN( v ) ? 0 : v;
+   },
+   type : 'floatWithPval'
+};
+
+/**
+ * e.g. 2 / 3, 5 / 9
+ */
+Ext.data.Types.FRACTION = {
+   convert : function(v, n) {
+      return v;
+   },
+   sortType : function(v) {
+      var numerator = String( v.replace( / *\/.*/, '' ) );
+      var denominator = String( v.replace( /.*\/ */, '' ) );
+      v = Ext.isNumber( v ) ? v : parseFloat( (numerator / denominator), 10 );
+      return isNaN( v ) ? 0 : v;
+   },
+   type : 'fraction'
+};
+
+/**
  * Create Burden Analysis Per Subject Label
  */
 Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
@@ -41,18 +71,27 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
          console.log( 'data is empty' );
          return;
       }
+      
+      // set data types
       for ( var field in data) {
-         // non-numeric fields
-         /*if ( field === 'LABEL_NAME' || field === 'NUM_SAMPLES' ) {
-            ret.push( field );
+         if ( field === 'NUM_SAMPLES' ) {
+            ret.push( {
+               name : field,
+               type : 'fraction'
+            } );
+         } else if ( field === 'LABEL_NAME' ) {
+            ret.push( {
+               name : field,
+               type : 'text'
+            } );
          } else {
             ret.push( {
                name : field,
-               type : 'number'
+               type : 'floatWithPval'
             } );
-         }*/
-         ret.push( field );
+         }
       }
+//      console.log('ret='+Ext.JSON.encode(ret))
       return ret;
    },
 
