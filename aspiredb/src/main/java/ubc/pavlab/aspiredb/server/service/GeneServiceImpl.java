@@ -285,25 +285,6 @@ public class GeneServiceImpl implements GeneService {
             stats.put( CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV, statValue );
             statsStr.put( CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV, dformat.format( statValue ) );
 
-            // compute aggregate stats
-            // perLabelStats.put(
-            // CnvBurdenAnalysisPerSubject.AVG_SIZE.toString(),
-            // perLabelStats.get( CnvBurdenAnalysisPerSubject.TOTAL_SIZE.toString() )
-            // / perLabelStats.get( CnvBurdenAnalysisPerSubject.TOTAL.toString() ) * 1.0 );
-            //
-            // perLabelStats.put(
-            // CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV.toString(),
-            // perLabelStats.get( CnvBurdenAnalysisPerSubject.NUM_GENES.toString() )
-            // / perLabelStats.get( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE.toString() ) * 1.0 );
-
-            // TODO
-            // note that those samples with no variants are not counted towards the total
-            // statsStr.put( CnvBurdenAnalysisPerSubject.NUM_SAMPLES.toString(),
-            // String.format( "%d / %d", labelPatientId.get( label ).size(), patientIdStats.keySet().size() ) );
-            //
-            // // assume unique label name?
-            // statsStr.put( CnvBurdenAnalysisPerSubject.LABEL_NAME.toString(), label );
-
         }
 
         return results;
