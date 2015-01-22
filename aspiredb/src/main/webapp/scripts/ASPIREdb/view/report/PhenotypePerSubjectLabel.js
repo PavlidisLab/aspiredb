@@ -24,7 +24,7 @@ Ext.require( [] );
 Ext.define( 'ASPIREdb.view.report.PhenotypePerSubjectLabel', {
    extend : 'ASPIREdb.view.report.VariantReportPanel',
    alias : 'widget.phenotypePerSubjectLabel',
-   itemId : 'phenotypePerSubjectLabel',
+   id : 'variantReport',
    xtype : 'clustered-column',
    layout : 'fit',
 
@@ -45,8 +45,9 @@ Ext.define( 'ASPIREdb.view.report.PhenotypePerSubjectLabel', {
       // var variantIds = this.getColumnDataFromStore( store, 'id' );
       var variantIds = ASPIREdb.view.report.VariantReportWindow.getColumnDataFromStore( store, 'id' );
 
+      /*
       var columnName = 'phenotype';
-      var labelNames = [ 'label_A', 'non_label_A' ];
+      var labelNames = [ 'label_a', 'non_label_a' ];
 
       var mergedFreqData = [ {
          'phenotype' : 'pheno_1',
@@ -57,9 +58,37 @@ Ext.define( 'ASPIREdb.view.report.PhenotypePerSubjectLabel', {
          'label_A' : 40,
          'non_label_A' : 60
       }, ];
+      */
+      var labelId = 1;
+      
+      // we expect phenoSummary to have the 'phenotype' key
+      VariantService.createPhenotypeSummary( variantIds, labelId, {
+         callback : function( phenoSummary ) {
+            console.log(Ext.JSON.encode(phenoSummary));
+            if( phenoSummary == null || phenoSummary.length == 0) {
+               console.log('No phenotype summary');
+               return;
+            }
+            var columnName = 'phenotype';
+            var labelNames = [];
+            for( key in phenoSummary[0] ) {
+               if ( key !== columnName ) {
+                  labelNames.push( key );
+               }
+            }
+            me.createLabelReport( phenoSummary, columnName, labelNames );
+         },
+         errorHandler : function(message, exception) {
+            Ext.Msg.alert( 'Error', message )
+            console.log( message )
+            console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
+
+            reportWindow.setLoading( false );
+         }
+      } );
 
       reportWindow.setLoading( false );
-      me.createLabelReport( mergedFreqData, columnName, labelNames );
+//      me.createLabelReport( mergedFreqData, columnName, labelNames );
 
    }
 

@@ -237,7 +237,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       } else if ( selReportType === "phenotypePerSubjectLabel" ) {
          window.down( '#savePngButton' ).show();
          reportPanel = Ext.create( 'ASPIREdb.view.report.PhenotypePerSubjectLabel', {
-
+            id : 'variantReport'
          } );
       } else {
          window.down( '#savePngButton' ).show();

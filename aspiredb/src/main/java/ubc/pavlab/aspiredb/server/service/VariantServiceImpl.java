@@ -38,7 +38,6 @@ import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.gemma.NeurocartaQueryService;
 import ubc.pavlab.aspiredb.server.model.Label;
-import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.server.model.Variant;
@@ -590,32 +589,34 @@ public class VariantServiceImpl implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    public Map<String, Collection<VariantValueObject>> groupVariantsByPhenotypes( Collection<Long> variantIds,
-            Long labelId ) {
+    public Collection<Map<String, Object>> createPhenotypeSummary( Collection<Long> variantIds, Long labelId ) {
         final String NO_LABEL = "NO_LABEL";
-        Map<String, Collection<VariantValueObject>> result = new HashMap<>();
+        Collection<Map<String, Object>> result = new ArrayList<>();
 
-        for ( Long id : variantIds ) {
-            Variant v = variantDao.load( id );
-            Subject subject = subjectDao.load( v.getSubject().getId() );
-            Collection<Label> labels = subject.getLabels();
+        Map<String, Object> phenoSummary = new HashMap<>();
+        phenoSummary.put( "phenotype", "pheno_a" );
+        phenoSummary.put( "label_1", new Integer( 60 ) );
+        phenoSummary.put( "non_label_1", new Integer( 40 ) );
 
-            Collection<Phenotype> phenotypes = subject.getPhenotypes();
+        result.add( phenoSummary );
 
-            if ( labels.size() > 0 ) {
-                for ( Label label : labels ) {
-                    if ( !result.containsKey( label.getName() ) ) {
-                        result.put( label.getName(), new ArrayList<VariantValueObject>() );
-                    }
-                    result.get( label.getName() ).add( v.toValueObject() );
-                }
-            } else {
-                if ( !result.containsKey( NO_LABEL ) ) {
-                    result.put( NO_LABEL, new ArrayList<VariantValueObject>() );
-                }
-                result.get( NO_LABEL ).add( v.toValueObject() );
-            }
-        }
+        /*
+         * var mergedFreqData = [ { 'phenotype' : 'pheno_1', 'label_A' : 20, 'non_label_A' : 10 }, { 'phenotype' :
+         * 'pheno_2', 'label_A' : 40, 'non_label_A' : 60 }, ];
+         */
+
+        /*
+         * for ( Long id : variantIds ) { Variant v = variantDao.load( id ); Subject subject = subjectDao.load(
+         * v.getSubject().getId() ); Collection<Label> labels = subject.getLabels();
+         * 
+         * Collection<Phenotype> phenotypes = subject.getPhenotypes();
+         * 
+         * if ( labels.size() > 0 ) { for ( Label label : labels ) { if ( !result.containsKey( label.getName() ) ) {
+         * result.put( label.getName(), new ArrayList<VariantValueObject>() ); } result.get( label.getName() ).add(
+         * v.toValueObject() ); } } else { if ( !result.containsKey( NO_LABEL ) ) { result.put( NO_LABEL, new
+         * ArrayList<VariantValueObject>() ); } result.get( NO_LABEL ).add( v.toValueObject() ); } }
+         */
+
         return result;
     }
 }

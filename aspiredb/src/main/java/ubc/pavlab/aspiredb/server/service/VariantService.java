@@ -87,6 +87,5 @@ public interface VariantService {
      */
     public Map<String, Collection<VariantValueObject>> groupVariantsBySubjectLabels( Collection<Long> variantIds );
 
-    public Map<String, Collection<VariantValueObject>> groupVariantsByPhenotypes( Collection<Long> variantIds,
-            Long labelId );
+    public Collection<Map<String, Object>> createPhenotypeSummary( Collection<Long> variantIds, Long labelId );
 }
