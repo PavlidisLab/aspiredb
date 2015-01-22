@@ -87,5 +87,12 @@ public interface VariantService {
      */
     public Map<String, Collection<VariantValueObject>> groupVariantsBySubjectLabels( Collection<Long> variantIds );
 
-    public Collection<Map<String, Object>> createPhenotypeSummary( Collection<Long> variantIds, Long labelId );
+    /**
+     * @param variantIds
+     * @param labelId
+     * @return an array of maps where each map contains the 'phenotype' key that corresponds to the phenotype name and
+     *         the number of variants that matches the subject label and not subject label [ { 'phenotype' : 'pheno_1',
+     *         'label_A' : 20, 'non_label_A' : 10 }, { 'phenotype' : 'pheno_2', 'label_A' : 40, 'non_label_A' : 60 }, ];
+     */
+    public Collection<Map<String, Object>> createPhenotypeSummary( Collection<Long> variantIds, Long subjectLabelId );
 }

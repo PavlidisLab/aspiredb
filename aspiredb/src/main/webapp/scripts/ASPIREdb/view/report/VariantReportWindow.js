@@ -89,7 +89,70 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
 
       this.callParent();
 
-      this.reportTypeStore = Ext.create( 'Ext.data.ArrayStore', {
+      me.reportTypeStore = me.createReportTypeStore();
+
+      me.subjectLabelStore = me.createSubjectLabelStore();
+      
+      me.down( 'toolbar' ).insert( 0, {
+         xtype : 'combo',
+         itemId : 'reportCombo',
+         fieldLabel : 'Data',
+         store : me.reportTypeStore,
+         displayField : 'name',
+         valueField : 'id',
+         queryMode : 'local',
+         editable : false,
+         forceSelection : true,
+         width : 350,
+         listeners : {
+            'change' : me.reportComboSelectHandler,
+            afterrender : function(combo) {
+               var recordSelected = combo.getStore().getAt( 0 );
+               combo.setValue( recordSelected.get( 'id' ) );
+            }
+         }
+      } );
+      this.down( 'toolbar' ).insert( 1, {
+         xtype : 'tbspacer'
+      } );
+      this.down( 'toolbar' ).insert( 2, {
+         xtype : 'checkbox',
+         itemId : 'logTransformCheckbox',
+         hidden : true,
+         value : true,
+         boxLabel : 'Log2 transform? ',
+      } );
+
+      me.down( 'toolbar' ).insert( 3, {
+         xtype : 'combo',
+         itemId : 'subjectLabelCombo',
+         queryMode: 'local',
+         fieldLabel : 'Subject label',
+         autoSelect : 'true',
+         store : me.subjectLabelStore,
+         displayField : 'name',
+         valueField : 'id',
+         listeners : {
+            'change' : me.subjectLabelComboSelectHandler,
+            afterrender : function(combo) {
+               var recordSelected = combo.getStore().getAt( 0 );
+               if ( recordSelected == null ) return;
+               combo.setValue( recordSelected.get( 'id' ) );
+            }
+         },
+         hidden : false
+      } );
+      
+      this.down( 'toolbar' ).insert( 4, {
+         xtype : 'tbfill'
+      } );
+
+      this.down( "#logTransformCheckbox" ).on( 'change', me.reportComboSelectHandler );
+
+   },
+
+   createReportTypeStore : function() {
+      return Ext.create( 'Ext.data.ArrayStore', {
          fields : [ {
             name : 'id',
             type : 'string'
@@ -107,7 +170,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
 
          // phenotype
          [ 'phenotypePerSubjectLabel', 'Phenotype Per Subject Label' ],
-         
+
          // commonly used reports
          [ 'chromosome', 'Chromosome' ], [ 'patientId', 'Patient ID' ], [ 'variantType', 'Variant type' ],
 
@@ -120,44 +183,44 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          autoLoad : true,
          autoSync : true,
       } );
+   },
+   
+   /**
+    * Populates the labelCombo with Subject Labels
+    */
+   createSubjectLabelStore : function() {
 
-      this.down( 'toolbar' ).insert( 0, {
-         xtype : 'combo',
-         itemId : 'reportCombo',
-         fieldLabel : 'Data',
-         store : this.reportTypeStore,
-         displayField : 'name',
-         valueField : 'id',
-         queryMode : 'local',
-         editable : false,
-         forceSelection : true,
-         width : 350,
-         listeners : {
-            'change' : this.reportComboSelectHandler,
-            afterrender : function(combo) {
-               var recordSelected = combo.getStore().getAt( 0 );
-               combo.setValue( recordSelected.get( 'id' ) );
+      var me = this;
+      var subjectLabelData = [];
+      var subjectLabelStore = Ext.create( 'Ext.data.ArrayStore', {
+         data : subjectLabelData,
+         fields : [ {
+            name : 'id',
+         }, {
+            name : 'name',
+         } ],
+      } );
+      
+      
+      // subject labels
+      LabelService.getSubjectLabels( {
+         callback : function(labels) {
+            for (i = 0; i < labels.length; i++) {
+               subjectLabelData.push( [ labels[i].id, labels[i].name ]  );
             }
+//            console.log(Ext.JSON.encode(me.subjectLabelData));
+            me.down('#subjectLabelCombo').store.reload(); 
+         },
+         errorHandler : function(message, exception) {
+            Ext.Msg.alert( 'Error', message )
+            console.log( message )
+            console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
          }
       } );
-      this.down( 'toolbar' ).insert( 1, {
-         xtype : 'tbspacer'
-      } );
-      this.down( 'toolbar' ).insert( 2, {
-         xtype : 'checkbox',
-         itemId : 'logTransformCheckbox',
-         hidden : true,
-         value : true,
-         boxLabel : 'Log2 transform? ',
-      } );
-      this.down( 'toolbar' ).insert( 3, {
-         xtype : 'tbfill'
-      } );
 
-      this.down( "#logTransformCheckbox" ).on( 'change', me.reportComboSelectHandler );
-
+      return subjectLabelStore;
    },
-
+   
    /**
     * Hides report types that are not found in variantStore
     */
@@ -199,7 +262,12 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       me.show();
    },
 
-   reportComboSelectHandler : function() {
+   // TODO
+   subjectLabelComboSelectHandler : function( cmp, newValue, oldValue, eOpts ) {
+      console.log('subjectLabelComboSelectHandler ' + newValue)
+   },
+   
+   reportComboSelectHandler : function( cmp, newValue, oldValue, eOpts ) {
       var me = this;
 
       var window = this.up( '#variantReportWindow' );
