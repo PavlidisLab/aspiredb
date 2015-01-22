@@ -16,7 +16,8 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'ASPIREdb.view.report.VariantReportPanel', 'ASPIREdb.view.report.BurdenAnalysisPerSubject','ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel' ] );
+Ext.require( [ 'ASPIREdb.view.report.VariantReportPanel', 'ASPIREdb.view.report.BurdenAnalysisPerSubject',
+              'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', 'ASPIREdb.view.report.PhenotypePerSubjectLabel' ] );
 
 /**
  * Create Variant Report Window
@@ -33,51 +34,51 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       itemId : 'saveTxtButton',
       text : 'Save as TXT',
       tooltip : 'Save as TXT',
-//      icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
+   // icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
    }, {
       xtype : 'button',
       itemId : 'savePngButton',
       text : 'Save as PNG',
       tooltip : 'Save as PNG',
-//      icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
+   // icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
    } ],
 
    statics : {
       getColumnDataFromStore : function(store, columnName) {
          var result = [];
          for (var i = 0; i < store.data.length; i++) {
-            
+
             // extract values
             var row = store.data.getAt( i ).data;
             var val = row[columnName];
-            
+
             if ( val == undefined ) {
-               console.log("Error " + val);
+               console.log( "Error " + val );
                continue;
             }
-            
-         // For CNV specific attributes like type and length, ignore SNVs
+
+            // For CNV specific attributes like type and length, ignore SNVs
             if ( !this.isVariantTypeAndReportFieldCompatible( columnName, row["variantType"] ) ) {
                continue;
             }
-            
+
             // show NA for empty values
             if ( val === "" ) {
-                val = "NA";
+               val = "NA";
             }
-            
+
             result.push( val );
          }
          return result;
       },
-      
-      isVariantTypeAndReportFieldCompatible : function( columnName, variantType ) {
+
+      isVariantTypeAndReportFieldCompatible : function(columnName, variantType) {
          if ( variantType !== "CNV" ) {
             if ( columnName === "type" || columnName === "cnvLength" ) {
                return false;
             }
          }
-         
+
          return true;
       },
    },
@@ -85,7 +86,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
    initComponent : function() {
 
       var me = this;
-      
+
       this.callParent();
 
       this.reportTypeStore = Ext.create( 'Ext.data.ArrayStore', {
@@ -98,31 +99,27 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          } ],
          // [ VariantValueObjectPropertyName : DisplayValue ]
          data : [
-                 // gene summary tables, cnv specific
-                 [ 'genesPerSubject', 'CNV summary per subject' ], 
-                 [ 'genesPerSubjectLabel', 'CNV summary per subject label' ], 
+         // gene summary tables, cnv specific
+         [ 'genesPerSubject', 'CNV summary per subject' ], [ 'genesPerSubjectLabel', 'CNV summary per subject label' ],
 
-                 // cnv specific
-                 [ 'type', 'CNV type' ], 
-                 [ 'cnvLength', 'CNV length' ], 
-                 
-                 // commonly used reports
-                 [ 'chromosome', 'Chromosome' ],
-                 [ 'patientId', 'Patient ID' ], 
-                 [ 'variantType', 'Variant type' ],
-                 
-                 // characteristics
-                 [ 'Array Platform', 'Array platform' ],
-                 [ 'Array Report', 'Array report' ], 
-                 [ 'Characteristics', 'Characteristics' ],
-                 [ 'Inheritance', 'Inheritance' ], 
-                 
-                  ],
+         // cnv specific
+         [ 'type', 'CNV type' ], [ 'cnvLength', 'CNV length' ],
+
+         // phenotype
+         [ 'phenotypePerSubjectLabel', 'Phenotype Per Subject Label' ],
+         
+         // commonly used reports
+         [ 'chromosome', 'Chromosome' ], [ 'patientId', 'Patient ID' ], [ 'variantType', 'Variant type' ],
+
+         // characteristics
+         [ 'Array Platform', 'Array platform' ], [ 'Array Report', 'Array report' ],
+                 [ 'Characteristics', 'Characteristics' ], [ 'Inheritance', 'Inheritance' ],
+
+         ],
+
          autoLoad : true,
          autoSync : true,
       } );
-
-      
 
       this.down( 'toolbar' ).insert( 0, {
          xtype : 'combo',
@@ -151,44 +148,44 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          itemId : 'logTransformCheckbox',
          hidden : true,
          value : true,
-         boxLabel: 'Log2 transform? ',
+         boxLabel : 'Log2 transform? ',
       } );
       this.down( 'toolbar' ).insert( 3, {
          xtype : 'tbfill'
       } );
 
-      
-      this.down( "#logTransformCheckbox" ).on( 'change', me.reportComboSelectHandler); 
-         
+      this.down( "#logTransformCheckbox" ).on( 'change', me.reportComboSelectHandler );
+
    },
-   
+
    /**
     * Hides report types that are not found in variantStore
     */
    filterReportCombo : function(variantStore) {
       var me = this;
-      
-      var cnvOnlyData = ['genesPerSubject','genesPerSubjectLabel','type','cnvLength'];
-      
-      var reportCombo = me.down('#reportCombo');
-      
-      reportCombo.store.filter([{
+
+      var cnvOnlyData = [ 'genesPerSubject', 'genesPerSubjectLabel', 'type', 'cnvLength' ];
+
+      var reportCombo = me.down( '#reportCombo' );
+
+      reportCombo.store.filter( [ {
          fn : function(record) {
-            if ( record.get('id') === "Array Platform" ) {
-               return variantStore.collect('Array Platform').length > 0;
-            } else if ( record.get('id') === "Array Report" ) {
-               return variantStore.collect('Array Report').length > 0;
-            } else if ( cnvOnlyData.indexOf(record.get('id')) != -1 ) {
-               return variantStore.collect('variantType').indexOf('CNV') != -1;;
-            } else if ( record.get('id') === "Inheritance" ) {
-               return variantStore.collect('inheritance').length > 0;
-            } else if ( record.get('id') === "Characteristics" ) {
-               return variantStore.collect('Characteristics').length > 0;
+            if ( record.get( 'id' ) === "Array Platform" ) {
+               return variantStore.collect( 'Array Platform' ).length > 0;
+            } else if ( record.get( 'id' ) === "Array Report" ) {
+               return variantStore.collect( 'Array Report' ).length > 0;
+            } else if ( cnvOnlyData.indexOf( record.get( 'id' ) ) != -1 ) {
+               return variantStore.collect( 'variantType' ).indexOf( 'CNV' ) != -1;
+               ;
+            } else if ( record.get( 'id' ) === "Inheritance" ) {
+               return variantStore.collect( 'inheritance' ).length > 0;
+            } else if ( record.get( 'id' ) === "Characteristics" ) {
+               return variantStore.collect( 'Characteristics' ).length > 0;
             }
-            return true; 
+            return true;
          }
-      }])
-      
+      } ] )
+
    },
 
    createAndShow : function(variantStore) {
@@ -196,62 +193,75 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
 
       me.variantStore = variantStore;
 
-      me.filterReportCombo(variantStore);
-            
+      me.filterReportCombo( variantStore );
+
       me.doLayout();
       me.show();
    },
 
    reportComboSelectHandler : function() {
       var me = this;
-      
+
       var window = this.up( '#variantReportWindow' );
-      
-      var reportCombo = window.down('#reportCombo');
-      
+
+      var reportCombo = window.down( '#reportCombo' );
+
       var selReportType = reportCombo.value
-      
+
       var reportPanel = window.down( '#variantReport' );
       if ( reportPanel != null ) {
          window.remove( reportPanel );
          reportPanel.destroy();
       }
-      
+
       var logTransformCheckbox = window.down( "#logTransformCheckbox" );
-      
+
       logTransformCheckbox.hide();
-      
+
       var saveTextHandler = null;
-      if ( selReportType === "genesPerSubject") {
+      if ( selReportType === "genesPerSubject" ) {
          window.down( '#savePngButton' ).hide();
-         reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', { id : 'variantReport' } );
+         reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', {
+            id : 'variantReport'
+         } );
       } else if ( selReportType === "genesPerSubjectLabel" ) {
          window.down( '#savePngButton' ).hide();
-         reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', { id : 'variantReport' } );
-      } else if (selReportType === "cnvLength") {
+         reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
+            id : 'variantReport'
+         } );
+      } else if ( selReportType === "cnvLength" ) {
          logTransformCheckbox.show();
-         reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReportPanel', { logTransform : logTransformCheckbox.value } );
-      }else {
+         reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReportPanel', {
+            logTransform : logTransformCheckbox.value
+         } );
+      } else if ( selReportType === "phenotypePerSubjectLabel" ) {
+         window.down( '#savePngButton' ).show();
+         reportPanel = Ext.create( 'ASPIREdb.view.report.PhenotypePerSubjectLabel', {
+
+         } );
+      } else {
          window.down( '#savePngButton' ).show();
          reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReportPanel' );
       }
-      
+
       window.down( '#saveTxtButton' ).on( 'click', reportPanel.saveAsTXT );
 
-      window.down( '#savePngButton' ).on( 'click', function(e) {
-         var me = this;
-         Ext.MessageBox.confirm( 'Confirm Download', 'Would you like to download the chart as an image?',
-            function(choice) {
+      window.down( '#savePngButton' ).on(
+         'click',
+         function(e) {
+            var me = this;
+            Ext.MessageBox.confirm( 'Confirm Download', 'Would you like to download the chart as an image?', function(
+               choice) {
                if ( choice == 'yes' ) {
                   reportPanel.saveAsPNG();
                }
             } );
-      } );
+         } );
 
       window.add( reportPanel );
-      
+
       reportPanel.createReport( window.variantStore, selReportType );
-      
+
       window.doLayout();
    },
 

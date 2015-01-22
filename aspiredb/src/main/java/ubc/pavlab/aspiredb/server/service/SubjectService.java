@@ -81,4 +81,6 @@ public interface SubjectService {
     public Collection<Label> getSubjectLabels( Collection<Long> subjectIds );
 
     public Map<String, Collection<String>> groupSubjectsBySubjectLabel( Collection<Subject> subjects );
+
+    public boolean hasLabel( Long subjectId, Long labelId );
 }

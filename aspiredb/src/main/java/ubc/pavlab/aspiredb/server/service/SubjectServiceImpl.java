@@ -619,4 +619,16 @@ public class SubjectServiceImpl implements SubjectService {
 
         return matrix;
     }
+
+    @Override
+    @Transactional
+    public boolean hasLabel( Long subjectId, Long labelId ) {
+        Subject subject = subjectDao.load( subjectId );
+        for ( Label label : subject.getLabels() ) {
+            if ( label.getId() == labelId ) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

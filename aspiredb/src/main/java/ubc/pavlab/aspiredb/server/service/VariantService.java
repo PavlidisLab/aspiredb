@@ -86,4 +86,7 @@ public interface VariantService {
      * @return map containing the VariantValueObjects that matched the variantIds grouped by Subject label names
      */
     public Map<String, Collection<VariantValueObject>> groupVariantsBySubjectLabels( Collection<Long> variantIds );
+
+    public Map<String, Collection<VariantValueObject>> groupVariantsByPhenotypes( Collection<Long> variantIds,
+            Long labelId );
 }
