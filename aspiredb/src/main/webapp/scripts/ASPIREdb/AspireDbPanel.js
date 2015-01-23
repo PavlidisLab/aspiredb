@@ -25,7 +25,7 @@ Ext.require( [ 'ASPIREdb.MainPanel', 'ASPIREdb.EVENT_BUS', 'ASPIREdb.view.filter
  */
 if ( Ext.isChrome || Ext.IE ) {
    Ext.tip.Tip.prototype.minWidth = 200;
-   Ext.Msg.minWidth=450;
+   Ext.Msg.minWidth = 450;
 }
 
 /**
@@ -53,7 +53,8 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
             if ( version == null ) {
                version = "";
             }
-            aspireDbPanel.getComponent( 'statusbar' ).update( "ASPIREdb " + version + " Copyright 2014" );
+            aspireDbPanel.getComponent( 'statusbar' ).update(
+               "ASPIREdb " + version + " Copyright " + new Date().getFullYear() );
 
          }
       } );
@@ -235,7 +236,7 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          height : 30,
          margin : '5 5 5 5',
          handler : function() {
-            Ext.getCmp('aspireDbPanel').disableToolbarButtonsForDashboard( true );
+            Ext.getCmp( 'aspireDbPanel' ).disableToolbarButtonsForDashboard( true );
             ASPIREdb.view.DashboardWindow.show();
          }
       }, {
@@ -248,16 +249,16 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
             ASPIREdb.view.GeneManagerWindow.initGridAndShow();
 
          }
-//      }, {
-//         xtype : 'button',
-//         text : 'Label Manager',
-//         itemId : 'labelManagerButton',
-//         height : 30,
-//         margin : '5 5 5 5',
-//         handler : function() {
-//            ASPIREdb.view.LabelManagerWindow.initGridAndShow();
-//
-//         }
+      // }, {
+      // xtype : 'button',
+      // text : 'Label Manager',
+      // itemId : 'labelManagerButton',
+      // height : 30,
+      // margin : '5 5 5 5',
+      // handler : function() {
+      // ASPIREdb.view.LabelManagerWindow.initGridAndShow();
+      //
+      // }
       }, /**
           * { xtype : 'button', text : 'Subject Label Manager', itemId : 'subjectLabelManagerButton', height : 30,
           * margin : '5 5 5 5', handler : function() { var labelControlWindow = Ext.create(
