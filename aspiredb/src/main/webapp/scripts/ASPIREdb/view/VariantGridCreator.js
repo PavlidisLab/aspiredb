@@ -65,15 +65,12 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             }
          }
 
-         characteristicNames = [];
-
-         for (var i = 0; i < properties.length; i++) {
-
-            if ( properties[i].characteristic && fieldData.indexOf( properties[i].displayName ) == -1 ) {
-               fieldData.push( properties[i].displayName );
-               characteristicNames.push( properties[i].name );
+         var characteristicNames = this.extractCharacteristicNames(vvos);
+         for (var i = 0; i < characteristicNames.length; i++) {
+            var characteristic = characteristicNames[i];
+            if ( fieldData.indexOf( characteristic ) == -1 ) {
+               fieldData.push( characteristic );
             }
-
          }
 
          var visibleLabels = this.createVisibleLabels( vvos );
@@ -302,6 +299,18 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
          return grid;
       },
 
+      extractCharacteristicNames : function(vvos) {
+         var characteristicNames = [];
+         for (var i = 0; i < vvos.length; i++) {
+            for ( var char in vvos[i].characteristics) {
+               if ( characteristicNames.indexOf( char ) == -1 ) {
+                  characteristicNames.push( char );
+               }
+            }
+         }
+         return characteristicNames;
+      },
+      
       /**
        * Extract labels from value object
        * 
