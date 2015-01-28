@@ -30,7 +30,7 @@
  * @param {number} centromerePosition
  */
 var ChromosomeLayer = function (name, baseSize, centromerePosition, topY, leftX,
-        displayScaleFactor, ctx, bands, zoom) {
+        displayScaleFactor, ctx, bands, zoom, displayWidth) {
         this.name = name;
         this.baseSize = baseSize;
         this.centromerePosition = centromerePosition;
@@ -44,7 +44,8 @@ var ChromosomeLayer = function (name, baseSize, centromerePosition, topY, leftX,
         this.ctx = ctx;
         this.bands = bands;
 
-        this.displayWidth = 7;
+//        this.displayWidth = 7;
+        this.displayWidth = displayWidth;
         this.centromereDisplaySize = 10;
 
 /*
@@ -64,12 +65,20 @@ var ChromosomeLayer = function (name, baseSize, centromerePosition, topY, leftX,
  * @type {Object<string,string>}
  */
 ChromosomeLayer.stainToColor = {
+    /*
     "gpos25":   "rgba(0,0,0, 0.05)",
     "gpos50":   "rgba(0,0,0, 0.1)",
     "gpos":     "rgba(0,0,0, 0.1)",
     "gpos75":   "rgba(0,0,0, 0.2)",
     "gpos100":  "rgba(0,0,0, 0.3)",
     "stalk":    "rgba(0,0,255, 0.05)"
+    */
+    "gpos25":   "rgba(0,0,0, 0.5)",
+    "gpos50":   "rgba(0,0,0, 0.8)",
+    "gpos":     "rgba(0,0,0, 0.8)",
+    "gpos75":   "rgba(0,0,0, 0.9)",
+    "gpos100":  "rgba(0,0,0, 1)",
+    "stalk":    "rgba(0,0,255, 0.5)"
 };
 
 /**
@@ -131,7 +140,8 @@ ChromosomeLayer.prototype.drawChromosome = function () {
     this.ctx.strokeStyle = "rgba(0,0,0,1)";
     this.ctx.strokeText(this.name, this.xPosition, this.yPosition - 5);
 
-    this.ctx.strokeStyle = "rgba(0,0,0,0.2)";
+//    this.ctx.strokeStyle = "rgba(0,0,0,0.2)";
+    this.ctx.strokeStyle = "rgba(0,0,0,1)";
     this.ctx.translate(this.xPosition, this.yPosition);
     this.ctx.translate(0.5, 0.5);
     this.ctx.beginPath();
@@ -181,7 +191,8 @@ ChromosomeLayer.prototype.drawBands = function (ctx, displayScaleFactor) {
 
 ChromosomeLayer.prototype.drawVarBand = function(yStart, yEnd, ctx) {
         ctx.save();
-        ctx.strokeStyle = "rgba(0,0,0,0.2)";
+//        ctx.strokeStyle = "rgba(0,0,0,0.2)";
+        ctx.strokeStyle = "rgba(0,0,0,1)";
         ctx.translate(this.getLeftX(), 0);
         for (var y = yStart; y < yEnd; y += 3) {
             ctx.beginPath();

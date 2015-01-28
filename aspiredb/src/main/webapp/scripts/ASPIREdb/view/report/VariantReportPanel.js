@@ -538,9 +538,9 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
             reportWindow.setLoading( false );
          },
          errorHandler : function(message, exception) {
-            Ext.Msg.alert( 'Error', message )
-            console.log( message )
-            console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
+            Ext.Msg.alert( 'Error', message );
+            console.log( message );
+            console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) );
 
             reportWindow.setLoading( false );
          }

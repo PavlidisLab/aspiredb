@@ -347,6 +347,24 @@ public class VariantServiceImpl implements VariantService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
+    public Collection<Property> suggestPropertiesForVariantTypeInProject( VariantType variantType, Long projectId ) {
+        Collection<Property> properties = new ArrayList<Property>();
+
+        // properties.add( new VariantLabelProperty() );
+
+        properties.addAll( suggestEntityProperties( variantType ) );
+
+        Collection<String> characteristics = characteristicDao.getKeysMatching( "", projectId );
+        for ( String characteristic : characteristics ) {
+            properties.add( new CharacteristicProperty( characteristic ) );
+        }
+
+        return properties;
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
     public Collection<PropertyValue> suggestValues( Property property, SuggestionContext suggestionContext )
             throws BioMartServiceException, NeurocartaServiceException {
         List<PropertyValue> values = new ArrayList<PropertyValue>();
