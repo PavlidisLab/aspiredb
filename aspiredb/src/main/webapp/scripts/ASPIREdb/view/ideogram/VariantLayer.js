@@ -40,7 +40,8 @@ Ext
 						 * @type {Array.<TrackLayer>}
 						 */
 						this.trackLayers = [];
-						this.createTracks(10);
+						this.numberOfTracks = (this.displayWidth != null) ? this.displayWidth - 5 : 2;
+						this.createTracks(this.numberOfTracks);
 
 						return this;
 					},
@@ -52,6 +53,7 @@ Ext
 						leftX : null,
 						chromosomeLayer : null,
 					// selectedVariants : [],
+						displayWidth : null,
 					},
 
 					statics : {
@@ -542,11 +544,15 @@ Ext
 					 */
 					clearTracks : function() {
 						this.trackLayers = [];
-						this.createTracks(10);
+//						this.createTracks(10);
+						this.createTracks(this.numberOfTracks);
 					},
 
 					/**
+					 * numberOfTracks : the maximum variant pileup depth
+					 * 
 					 * @private
+					 * 
 					 */
 					createTracks : function(numberOfTracks) {
 						// Define helper classes
@@ -644,7 +650,8 @@ Ext
 						var start = segment.start;
 						var end = segment.end;
 
-						var x = this.leftX + 7;
+//						var x = this.leftX + 7;
+						var x = this.leftX + this.displayWidth;
 						x += 2 * this.zoom * layerIndex + 3.5;
 
 						var yStart = this.chromosomeLayer

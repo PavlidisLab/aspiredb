@@ -45,11 +45,13 @@ var ChromosomeIdeogram = function(name, baseSize, centromerePosition, topY, left
 
     this.zoom = zoom;
     this.topY = topY;
-
+    this.displayWidth = 13; // width of each ideogram
+    
     /*ChromosomeLayer */
     this.chromosomeLayer = new ChromosomeLayer(name, baseSize, centromerePosition, topY, leftX,
         displayScaleFactor, ctx,
-        chromosomeData.bands, zoom);
+        chromosomeData.bands, zoom,
+        this.displayWidth);
     this.chromosomeData = chromosomeData;
     this.zoom = zoom;
 
@@ -59,7 +61,8 @@ var ChromosomeIdeogram = function(name, baseSize, centromerePosition, topY, left
         leftX: leftX,
         displayScaleFactor: displayScaleFactor,
         chromosomeLayer: this.chromosomeLayer,
-        zoom: zoom
+        zoom: zoom,
+        displayWidth: this.displayWidth
     });
     /*@type {IdeogramCursorLayer}*/
     this.cursorLayer = new IdeogramCursorLayer(overlayCtx, leftX, chromosomeData, this.chromosomeLayer);
