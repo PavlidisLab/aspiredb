@@ -72,6 +72,8 @@ public interface VariantService {
 
     public Collection<Property> suggestPropertiesForVariantType( VariantType variantType );
 
+    public Collection<Property> suggestPropertiesForVariantTypeInProject( VariantType variantType, Long projectId );
+
     public Collection<PropertyValue> suggestValues( Property property, SuggestionContext suggestionContext )
             throws BioMartServiceException, NeurocartaServiceException;
 

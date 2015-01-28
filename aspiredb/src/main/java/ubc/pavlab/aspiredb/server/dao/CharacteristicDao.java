@@ -27,4 +27,5 @@ public interface CharacteristicDao extends SecurableDaoBase<Characteristic> {
 
     public Collection<String> getValuesForKey( String key );
 
+    public Collection<String> getKeysMatching( String query, Long projectId );
 }

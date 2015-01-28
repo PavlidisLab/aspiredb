@@ -29,12 +29,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.Characteristic;
+import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.service.VariantService;
@@ -59,10 +61,14 @@ public class VariantServiceTest extends BaseSpringContextTest {
     private SubjectDao subjectDao;
 
     @Autowired
+    private ProjectDao projectDao;
+
+    @Autowired
     private PersistentTestObjectHelper testObjectHelper;
 
     private Variant variant;
     private Subject subject;
+    private Project project;
 
     @After
     public void cleanup() {
@@ -71,6 +77,7 @@ public class VariantServiceTest extends BaseSpringContextTest {
             public void instructions() {
                 variantDao.remove( variant );
                 subjectDao.remove( subject );
+                projectDao.remove( project );
             }
         }.execute();
     }
@@ -80,7 +87,11 @@ public class VariantServiceTest extends BaseSpringContextTest {
         new InlineTransaction() {
             @Override
             public void instructions() {
+                Project p = new Project();
+                p.setName( "VariantServiceTestProject" );
+                project = testObjectHelper.createPersistentProject( p );
                 subject = testObjectHelper.createPersistentTestIndividualObject( "testSubjectVariantServiceTest" );
+                subject = testObjectHelper.addSubjectToProject( subject, project );
                 variant = testObjectHelper.createPersistentTestCNVObject();
                 variant.setSubject( subject );
             }
@@ -108,6 +119,17 @@ public class VariantServiceTest extends BaseSpringContextTest {
         Collection<Property> suggestions = variantService.suggestPropertiesForVariantType( VariantType.CNV );
         assertTrue( suggestions.size() > 2 );
         boolean found = false;
+        for ( Property prop : suggestions ) {
+            if ( prop.getName().equals( cnvLength ) && prop.getDataType() instanceof NumericalDataType ) {
+                found = true;
+            }
+        }
+        assertTrue( cnvLength + " not found", found );
+
+        // with a projectId
+        suggestions = variantService.suggestPropertiesForVariantTypeInProject( VariantType.CNV, project.getId() );
+        assertTrue( suggestions.size() > 2 );
+        found = false;
         for ( Property prop : suggestions ) {
             if ( prop.getName().equals( cnvLength ) && prop.getDataType() instanceof NumericalDataType ) {
                 found = true;

@@ -202,8 +202,8 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
          store : {
             proxy : {
                type : 'dwr',
-               dwrFunction : VariantService.suggestPropertiesForVariantType,
-               dwrParams : [ 'CNV' ],
+               dwrFunction : VariantService.suggestPropertiesForVariantTypeInProject,
+               dwrParams : [ 'CNV', ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0] ],
                model : 'ASPIREdb.model.Property',
                reader : {
                   type : 'json',
@@ -324,8 +324,8 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
             var storeInstance = Ext.create( 'Ext.data.Store', {
                proxy : {
                   type : 'dwr',
-                  dwrFunction : VariantService.suggestPropertiesForVariantType,
-                  dwrParams : [ 'CNV' ],
+                  dwrFunction : VariantService.suggestPropertiesForVariantTypeInProject,
+                  dwrParams : [ 'CNV', ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0] ],
                   model : 'ASPIREdb.model.Property',
                   reader : {
                      type : 'json',
@@ -364,8 +364,8 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
             var storeInstance = Ext.create( 'Ext.data.Store', {
                proxy : {
                   type : 'dwr',
-                  dwrFunction : VariantService.suggestPropertiesForVariantType,
-                  dwrParams : [ 'SNV' ],
+                  dwrFunction : VariantService.suggestPropertiesForVariantTypeInProject,
+                  dwrParams : [ 'SNV', ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0] ],
                   model : 'ASPIREdb.model.Property',
                   reader : {
                      type : 'json',
@@ -389,8 +389,8 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
             var storeInstance = Ext.create( 'Ext.data.Store', {
                proxy : {
                   type : 'dwr',
-                  dwrFunction : VariantService.suggestPropertiesForVariantType,
-                  dwrParams : [ 'INDEL' ],
+                  dwrFunction : VariantService.suggestPropertiesForVariantTypeInProject,
+                  dwrParams : [ 'INDEL', ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0] ],
                   model : 'ASPIREdb.model.Property',
                   reader : {
                      type : 'json',

@@ -48,4 +48,12 @@ public class CharacteristicDaoImpl extends SecurableDaoBaseImpl<Characteristic> 
         return currentSession().createQuery( "select distinct c.value from Characteristic as c where c.key = :key" )
                 .setParameter( "key", key ).list();
     }
+
+    @Override
+    public Collection<String> getKeysMatching( String partialName, Long projectId ) {
+        return currentSession()
+                .createQuery(
+                        "select distinct c.key from Subject as s left join s.projects as p left join s.variants as v left join v.characteristics as c WHERE c.key LIKE :partialName AND p.id = :projectId" )
+                .setParameter( "partialName", "%" + partialName + "%" ).setParameter( "projectId", projectId ).list();
+    }
 }
