@@ -36,18 +36,45 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
 		itemId : 'phenotypeEnrichmentGrid'
 	} ],
 
+	dockedItems : [ {
+      xtype : 'toolbar',
+      itemId : 'phenotypeEnrichmentGridToolbar',
+      dock : 'top',
+      items : [ {
+         xtype : 'tbfill',
+      }, {
+         xtype : 'button',
+         itemId : 'saveButton',
+         text : '',
+         tooltip : 'Download table contents as text',
+         tooltipType : 'title',
+         icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
+      } ]
+
+   } ],
+   
 	initComponent : function() {
 		var ref = this;
 
 		this.callParent();
+		
+      var saveButton = this.down('#phenotypeEnrichmentGridToolbar').down('#saveButton');
+      
+      saveButton.on('click', function(){
+         ASPIREdb.TextDataDownloadWindow.showPhenotypeEnrichmentDownload(ref.valueObjects);
+                  
+      }
+      );
 
 	},
 
 	populateGrid : function(vos) {
+	   
+	   var ref = this;
 
-		var grid = ASPIREdb.view.PhenotypeEnrichmentWindow.getComponent('phenotypeEnrichmentGrid');
+		var grid = ASPIREdb.view.PhenotypeEnrichmentWindow.down('#phenotypeEnrichmentGrid');
 		
-		grid.valueObjects= vos;
+		ref.valueObjects= vos;
 
 		var data = [];
 		for ( var i = 0; i < vos.length; i++) {
@@ -63,7 +90,7 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
 	
 	clearGrid : function(){
 		
-		var grid = ASPIREdb.view.PhenotypeEnrichmentWindow.getComponent('phenotypeEnrichmentGrid');
+		var grid = ASPIREdb.view.PhenotypeEnrichmentWindow.down('#phenotypeEnrichmentGrid');
 		
 		grid.getStore().removeAll();		
 		

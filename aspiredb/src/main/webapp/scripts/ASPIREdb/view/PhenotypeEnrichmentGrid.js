@@ -24,22 +24,6 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.phenotypeEnrichmentGrid',
 	
-	dockedItems : [ {
-		xtype : 'toolbar',
-		itemId : 'phenotypeEnrichmentGridToolbar',
-		dock : 'top',
-		items : [ {
-		   xtype : 'tbfill',
-		}, {
-			xtype : 'button',
-			itemId : 'saveButton',
-			text : '',
-			tooltip : 'Download table contents as text',
-			tooltipType : 'title',
-			icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
-		} ]
-
-	} ],
 
 	columns : [ {
 		header : 'Name',
@@ -62,23 +46,13 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentGrid', {
 		dataIndex : 'corrpValue',
 		flex : 1
 	} ],
-	
-	valueObjects : [],
 
 	store : Ext.create('ASPIREdb.store.PhenotypeEnrichmentStore'),
 
 	initComponent : function() {
 		this.callParent();
 
-		var ref = this;
 		
-		var saveButton = this.getComponent('phenotypeEnrichmentGridToolbar').getComponent('saveButton');
-		
-		saveButton.on('click', function(){
-			ASPIREdb.TextDataDownloadWindow.showPhenotypeEnrichmentDownload(ref.valueObjects);
-						
-		}
-		);
 
 	}
 	
