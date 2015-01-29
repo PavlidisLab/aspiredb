@@ -13,7 +13,6 @@ Ext.apply( Ext.data.SortTypes, {
 Ext.define( 'ASPIREdb.store.PhenotypeEnrichmentStore', {
    extend : 'Ext.data.ArrayStore',
    alias : 'store.phenotypeEnrichmentStore',
-
    fields : [ {
       name : 'name',
       type : 'string'

@@ -26,18 +26,18 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
 	title : 'Phenotype Enrichment',
 	closable : true,
 	closeAction : 'hide',
-	width : 800,
-	height : 500,
+	width : 900,
+	height : 600,
 	layout : 'fit',
 	bodyStyle : 'padding: 5px;',
 
-	items : [ {
-		xtype : 'phenotypeEnrichmentGrid',
-		itemId : 'phenotypeEnrichmentGrid'
-	},  {
+	items : [   {
       xtype : 'phenotypeEnrichmentChart',
-      itemId : 'phenotypeEnrichmentChart'
-   } ],
+      itemId : 'phenotypeEnrichmentChart',
+   }, {
+		xtype : 'phenotypeEnrichmentGrid',
+		itemId : 'phenotypeEnrichmentGrid',
+	}, ],
 
 	dockedItems : [ {
       xtype : 'toolbar',
@@ -45,7 +45,7 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
       dock : 'top',
       items : [ {
         xtype : 'button',
-        text : 'Show chart',
+        text : 'Show table',
         itemId : 'showChartButton',
       }, {
          xtype : 'tbfill',
@@ -100,6 +100,7 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
 		}		
 
 		grid.store.loadData(data);
+		grid.store.sort('pValue','ASC');
 
 	},
 
@@ -127,12 +128,16 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
          var row = { name : vo.name, 
             inGroup : this.asFraction( vo.inGroupTotalString ) * 100.0,
             outGroup : this.asFraction( vo.outGroupTotalString ) * 100.0,
+            inGroupStr : vo.inGroupTotalString,
+            outGroupStr : vo.outGroupTotalString,
+            pValue : parseFloat(vo.PValueString), 
+            qValue : parseFloat(vo.PValueCorrectedString)
             }
          data.push(row);
       }     
 
       chart.store.loadData(data);
-
+      chart.store.sort('pValue','ASC');
    },
 	   
 	clearGrid : function(){

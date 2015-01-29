@@ -44,6 +44,10 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentChart', {
    
    store : Ext.create( 'Ext.data.JsonStore', {
       storeId : 'phenotypeEnrichmentChartStore',
+      sortInfo: {
+         field: 'pValue',
+         direction:'ASC'// or 'DESC' (case sensitive for local sorting)
+     },
       fields : [ {
          name : 'name', 
          type : 'string',
@@ -57,6 +61,18 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentChart', {
          type : 'numeric',
          minimum : 0.0,
          maximum : 100.0,
+      }, {
+         name : 'inGroupStr',
+         type : 'string'
+      }, {
+         name : 'outGroupStr',
+         type : 'string'
+      }, {
+         name : 'pValue',
+         type : 'numeric'
+      }, {
+         name : 'qValue',
+         type : 'numeric'
       } ],
    } ),
       
@@ -96,8 +112,8 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentChart', {
       title : "Percentage of phenotypes",
       label : {
          renderer : function(v) {
-            // return v + '%';
-            return v;
+             return v + '%';
+//            return v;
          }
       }
    }, {
@@ -108,7 +124,10 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentChart', {
       grid : true,
       label : {
          rotate : {
-            degrees : -45
+            degrees : -90
+         },
+         renderer : function(v) {
+            return v.substring(0, 25) + "..."
          }
       }
    } ],
@@ -132,7 +151,14 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentChart', {
          style : 'background: #FFF',
          renderer : function(storeItem, item) {
             var label = item.series.title[Ext.Array.indexOf( item.series.yField, item.yField )];
-            var msg = label + " " + storeItem.get( item.series.xField ) + ': ' + storeItem.get( item.yField );
+            var fractionStr = storeItem.get('outGroupStr');
+            if ( label === "In-group" ) {
+               fractionStr = storeItem.get('inGroupStr');
+            }
+            var msg = storeItem.get( item.series.xField ) 
+            + '<br>' + label + ': ' + storeItem.get( item.yField ).toPrecision(4) + ' (' + fractionStr + ')' 
+            + '<br>p-value: ' + storeItem.get('pValue').toPrecision(4)
+            + '<br>q-value: ' + storeItem.get('qValue').toPrecision(4);
             this.update( msg );
          }
       }
