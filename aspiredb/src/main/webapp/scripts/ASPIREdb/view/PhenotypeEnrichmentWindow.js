@@ -17,7 +17,7 @@
  *
  */
 
-Ext.require([ 'Ext.Window', 'ASPIREdb.view.PhenotypeEnrichmentGrid' ]);
+Ext.require([ 'Ext.Window', 'ASPIREdb.view.PhenotypeEnrichmentGrid', 'ASPIREdb.view.PhenotypeEnrichmentChart' ]);
 
 Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
 	extend : 'Ext.Window',
@@ -34,13 +34,20 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
 	items : [ {
 		xtype : 'phenotypeEnrichmentGrid',
 		itemId : 'phenotypeEnrichmentGrid'
-	} ],
+	},  {
+      xtype : 'phenotypeEnrichmentChart',
+      itemId : 'phenotypeEnrichmentChart'
+   } ],
 
 	dockedItems : [ {
       xtype : 'toolbar',
       itemId : 'phenotypeEnrichmentGridToolbar',
       dock : 'top',
       items : [ {
+        xtype : 'button',
+        text : 'Show chart',
+        itemId : 'showChartButton',
+      }, {
          xtype : 'tbfill',
       }, {
          xtype : 'button',
@@ -59,12 +66,20 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
 		this.callParent();
 		
       var saveButton = this.down('#phenotypeEnrichmentGridToolbar').down('#saveButton');
-      
       saveButton.on('click', function(){
-         ASPIREdb.TextDataDownloadWindow.showPhenotypeEnrichmentDownload(ref.valueObjects);
-                  
-      }
-      );
+         ASPIREdb.TextDataDownloadWindow.showPhenotypeEnrichmentDownload(ref.valueObjects);           
+      } );
+
+      var showChartButton = this.down('#phenotypeEnrichmentGridToolbar').down('#showChartButton');
+      showChartButton.on('click', function(){
+         var showChart = showChartButton.text === "Show chart";
+         if ( showChart ) {
+            showChartButton.setText( "Show table" )
+         } else {
+            showChartButton.setText( "Show chart" )
+         }
+         ref.showChart(showChart);
+      } );
 
 	},
 
@@ -87,13 +102,60 @@ Ext.define('ASPIREdb.view.PhenotypeEnrichmentWindow', {
 		grid.store.loadData(data);
 
 	},
+
+	asFraction : function(fraction) {
+      var tokens = fraction.split( '/' );
+      if ( tokens.length != 2 ) {
+         return fraction;
+      }
+      return parseInt( tokens[0] ) / parseInt( tokens[1] ) * 1.0;
+   },
 	
+  populateChart : function(vos) {
+      
+      var ref = this;
+
+      var chart = ASPIREdb.view.PhenotypeEnrichmentWindow.down('#phenotypeEnrichmentChart');
+      
+      ref.valueObjects= vos;
+
+      var data = [];
+      for ( var i = 0; i < vos.length; i++) {
+         var vo = vos[i];
+
+         //var row = [ vo.name, vo.inGroupTotalString, vo.outGroupTotalString, vo.PValueString, vo.PValueCorrectedString ];
+         var row = { name : vo.name, 
+            inGroup : this.asFraction( vo.inGroupTotalString ) * 100.0,
+            outGroup : this.asFraction( vo.outGroupTotalString ) * 100.0,
+            }
+         data.push(row);
+      }     
+
+      chart.store.loadData(data);
+
+   },
+	   
 	clearGrid : function(){
 		
 		var grid = ASPIREdb.view.PhenotypeEnrichmentWindow.down('#phenotypeEnrichmentGrid');
 		
 		grid.getStore().removeAll();		
 		
+	},
+	
+	clearChart : function(){
+      
+      var chart = ASPIREdb.view.PhenotypeEnrichmentWindow.down('#phenotypeEnrichmentChart');
+      
+      chart.getStore().removeAll();     
+      
+   },
+   
+	showChart : function(isShow) {
+	   var grid = ASPIREdb.view.PhenotypeEnrichmentWindow.down('#phenotypeEnrichmentGrid');
+	   var chart = ASPIREdb.view.PhenotypeEnrichmentWindow.down('#phenotypeEnrichmentChart');
+      grid.setVisible(!isShow);
+      chart.setVisible(isShow);
 	}
 
 });

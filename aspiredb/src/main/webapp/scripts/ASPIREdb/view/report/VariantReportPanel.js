@@ -293,6 +293,11 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
 
       var fields = [ columnName ].concat( seriesTitle ); // insert "type" into the first position
 
+      // xField = "type"
+      // yField = "withVar"
+      // fields = ["type", "withVar"]
+      // mergedFreqData = { { type : "LOSS", withVar : 68}, { type : "GAIN", withVar : 40 } }
+      
       // convert to Extjs Store
       var myDataStore = Ext.create( 'Ext.data.JsonStore', {
          storeId : 'reportStore',

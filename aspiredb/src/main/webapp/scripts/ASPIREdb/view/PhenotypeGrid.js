@@ -637,6 +637,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
 
    getPhenotypeEnrichment : function() {
 
+      ASPIREdb.view.PhenotypeEnrichmentWindow.clearChart();
       ASPIREdb.view.PhenotypeEnrichmentWindow.clearGrid();
       ASPIREdb.view.PhenotypeEnrichmentWindow.show();
       ASPIREdb.view.PhenotypeEnrichmentWindow.setLoading( true );
@@ -645,6 +646,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
          this.currentSubjectIds, {
             callback : function(vos) {
                ASPIREdb.view.PhenotypeEnrichmentWindow.populateGrid( vos );
+               ASPIREdb.view.PhenotypeEnrichmentWindow.populateChart( vos );
                ASPIREdb.view.PhenotypeEnrichmentWindow.setLoading( false );
             }
          } );
