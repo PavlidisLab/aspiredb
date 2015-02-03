@@ -760,7 +760,7 @@ public class VariantUploadService {
 
     private static GenomicRange getGenomicRangeFromResultSet( ResultSet results ) throws Exception {
 
-        String chrom = results.getString( CommonVariantColumn.CHROM.key ).toUpperCase();
+        String chrom = results.getString( CommonVariantColumn.CHROM.key ).trim().toUpperCase();
 
         // For decipher data, this really shouldn't be here, adding it to quickly add in decipher data
         if ( chrom.startsWith( "CHR" ) ) {
