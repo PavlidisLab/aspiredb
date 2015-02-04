@@ -767,8 +767,11 @@ public class VariantUploadService {
             chrom = chrom.replace( "CHR", "" );
         }
 
-        GenomicRange gr = new GenomicRange( chrom, results.getInt( CommonVariantColumn.START.key ),
-                results.getInt( CommonVariantColumn.END.key ) );
+        // Strip any commas e.g. 200,000
+        int start = Integer.parseInt( results.getString( CommonVariantColumn.START.key ).replaceAll( ",", "" ) );
+        int end = Integer.parseInt( results.getString( CommonVariantColumn.END.key ).replaceAll( ",", "" ) );
+
+        GenomicRange gr = new GenomicRange( chrom, start, end );
         // Note that results.getInt return 0 if it is not a number
 
         validateGenomicRange( gr );
