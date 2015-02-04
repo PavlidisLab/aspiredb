@@ -192,11 +192,11 @@ public class VariantUploadService {
 
         CNVValueObject cnv = new CNVValueObject();
 
-        cnv.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
+        cnv.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ).trim() );
         cnv.setGenomicRange( getGenomicRangeFromResultSet( results ) );
         cnv.setCnvLength( cnv.getGenomicRange().getBaseEnd() - cnv.getGenomicRange().getBaseStart() );
 
-        cnv.setType( results.getString( cnvType ) );
+        cnv.setType( results.getString( cnvType ).trim() );
 
         if ( !cnv.getType().toUpperCase().equals( CnvType.GAIN.name() )
                 && !cnv.getType().toUpperCase().equals( CnvType.LOSS.name() ) ) {
@@ -227,7 +227,7 @@ public class VariantUploadService {
 
         CNVValueObject cnv = new CNVValueObject();
 
-        cnv.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
+        cnv.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ).trim() );
         cnv.setGenomicRange( getGenomicRangeFromResultSet( results ) );
         cnv.setCnvLength( cnv.getGenomicRange().getBaseEnd() - cnv.getGenomicRange().getBaseStart() );
 
@@ -281,7 +281,7 @@ public class VariantUploadService {
     // Quick and dirty method to grab data from DGV data file they gave us
     public static CNVValueObject makeDGVCNVFromResultSet( ResultSet results ) throws Exception {
 
-        String variantsubtype = results.getString( "variantsubtype" );
+        String variantsubtype = results.getString( "variantsubtype" ).trim();
 
         // Sanja says to exclude these
         if ( variantsubtype.equals( "Complex" ) || variantsubtype.equals( "Inversion" )
@@ -295,8 +295,8 @@ public class VariantUploadService {
 
         // set patientId as variantid, so each variant will have a 'subject' associated with it
         // might not be right choice, other option would be all variants with one subject, or no subject at all
-        cnv.setPatientId( results.getString( "variantaccession" ) );
-        cnv.setUserVariantId( results.getString( "variantaccession" ) );
+        cnv.setPatientId( results.getString( "variantaccession" ).trim() );
+        cnv.setUserVariantId( results.getString( "variantaccession" ).trim() );
         cnv.setGenomicRange( getGenomicRangeFromResultSet( results ) );
         cnv.setCnvLength( cnv.getGenomicRange().getBaseEnd() - cnv.getGenomicRange().getBaseStart() );
 
@@ -319,7 +319,7 @@ public class VariantUploadService {
 
         CharacteristicValueObject charVO = new CharacteristicValueObject();
         charVO.setKey( "pubmedid" );
-        charVO.setValue( results.getString( "pubmedid" ) );
+        charVO.setValue( results.getString( "pubmedid" ).trim() );
         characteristics.put( charVO.getKey(), charVO );
 
         cnv.setCharacteristics( characteristics );
@@ -335,7 +335,7 @@ public class VariantUploadService {
         IndelValueObject indel = new IndelValueObject();
 
         indel.setGenomicRange( getGenomicRangeFromResultSet( results ) );
-        indel.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
+        indel.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ).trim() );
         indel.setLength( results.getInt( indelLength ) );
 
         if ( indel.getLength() < 0 ) {
@@ -359,7 +359,7 @@ public class VariantUploadService {
         InversionValueObject inversion = new InversionValueObject();
 
         inversion.setGenomicRange( getGenomicRangeFromResultSet( results ) );
-        inversion.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
+        inversion.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ).trim() );
 
         inversion.setCharacteristics( getCharacteristicsFromResultSet( results, reservedIndelColumns ) );
 
@@ -377,10 +377,10 @@ public class VariantUploadService {
         SNVValueObject snv = new SNVValueObject();
 
         snv.setGenomicRange( getGenomicRangeFromResultSet( results ) );
-        snv.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
+        snv.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ).trim() );
 
-        snv.setReferenceBase( results.getString( refBase ) );
-        snv.setObservedBase( results.getString( obsBase ) );
+        snv.setReferenceBase( results.getString( refBase ).trim() );
+        snv.setObservedBase( results.getString( obsBase ).trim() );
 
         if ( !acceptableValues.contains( snv.getReferenceBase().toUpperCase() ) ) {
             throw new InvalidDataException( "invalid " + refBase + ":" + snv.getReferenceBase() );
@@ -390,7 +390,7 @@ public class VariantUploadService {
         }
 
         try {
-            snv.setDbSNPID( results.getString( OptionalSNVColumn.DBSNPID.key ) );
+            snv.setDbSNPID( results.getString( OptionalSNVColumn.DBSNPID.key ).trim() );
         } catch ( SQLException e ) {
             // dbsnpid column not present
             log.debug( "dbsnpid not found" );
@@ -552,10 +552,10 @@ public class VariantUploadService {
         timer.start();
 
         // get db source paths from properties file
-        String aspireRefBaseColumn = ConfigUtils.getString( propnameRefBase );
-        String aspireObsBaseColumn = ConfigUtils.getString( propnameObsBase );
-        String dbDirectory = ConfigUtils.getString( propnamePath );
-        String dbPredColname = ConfigUtils.getString( propnamePredictionColumn );
+        String aspireRefBaseColumn = ConfigUtils.getString( propnameRefBase ).trim();
+        String aspireObsBaseColumn = ConfigUtils.getString( propnameObsBase ).trim();
+        String dbDirectory = ConfigUtils.getString( propnamePath ).trim();
+        String dbPredColname = ConfigUtils.getString( propnamePredictionColumn ).trim();
         if ( dbDirectory == null || dbDirectory.length() == 0 ) {
             log.warn( "Property " + propnamePath + " not set. Functional prediction will not be computed." );
             return matched;
@@ -799,7 +799,7 @@ public class VariantUploadService {
             String column = rsmd.getColumnName( i );
 
             if ( column.equals( columnName ) ) {
-                return results.getString( i );
+                return results.getString( i ).trim();
             }
         }
 
