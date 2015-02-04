@@ -768,8 +768,8 @@ public class VariantUploadService {
         }
 
         // Strip any commas e.g. 200,000
-        int start = Integer.parseInt( results.getString( CommonVariantColumn.START.key ).replaceAll( ",", "" ) );
-        int end = Integer.parseInt( results.getString( CommonVariantColumn.END.key ).replaceAll( ",", "" ) );
+        int start = Integer.parseInt( results.getString( CommonVariantColumn.START.key ).trim().replaceAll( ",", "" ) );
+        int end = Integer.parseInt( results.getString( CommonVariantColumn.END.key ).trim().replaceAll( ",", "" ) );
 
         GenomicRange gr = new GenomicRange( chrom, start, end );
         // Note that results.getInt return 0 if it is not a number
