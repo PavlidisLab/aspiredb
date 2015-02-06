@@ -495,6 +495,17 @@ public class VariantUploadService {
 
     }
 
+    public static void validateResultSet( ResultSet results ) {
+        for ( String reserved : CommonVariantColumn.getCommonVariantColumnNames() ) {
+            try {
+                results.getString( reserved );
+            } catch ( SQLException s ) {
+                log.error( s );
+                throw new IllegalArgumentException( "Required column '" + reserved + "' not found" );
+            }
+        }
+    }
+
     public static VariantUploadServiceResult makeVariantValueObjectsFromResultSet( ResultSet results,
             VariantType variantType ) throws Exception {
 
@@ -502,9 +513,14 @@ public class VariantUploadService {
         int lineNumber = 1;
         ArrayList<String> errorMessages = new ArrayList<String>();
 
-        // TODO maybe validate columns first, and bail if they are all not there
         while ( results.next() ) {
+
+            if ( lineNumber <= 1 ) {
+                validateResultSet( results );
+            }
+
             lineNumber++;
+
             try {
                 variantsToAdd.add( makeVariantValueObjectFromResultSet( results, variantType ) );
             } catch ( InvalidDataException e ) {

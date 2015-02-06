@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -291,9 +292,13 @@ public class ProjectServiceImpl implements ProjectService {
 
         // create a connection
         // arg[0] is the directory in which the .csv files are held
-        Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + file.getParentFile().getAbsolutePath() );
+        Properties props = new Properties();
+        props.put( "trimHeaders", "true" );
+        props.put( "trimValues", "true" );
+        Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + file.getParentFile().getAbsolutePath(),
+                props );
 
-        Statement stmt = conn.createStatement();
+        Statement stmt = conn.createStatement( ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY );
         ResultSet results = stmt.executeQuery( "SELECt * from " + filename );
 
         // check weather the project exist
@@ -378,9 +383,12 @@ public class ProjectServiceImpl implements ProjectService {
 
             // create a connection
             // arg[0] is the directory in which the .csv files are held
-            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
+            Properties props = new Properties();
+            props.put( "trimHeaders", "true" );
+            props.put( "trimValues", "true" );
+            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/", props );
 
-            Statement stmt = conn.createStatement();
+            Statement stmt = conn.createStatement( ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY );
             ResultSet results = stmt.executeQuery( "SELECt * from variantFile" );
 
             // check weather the project exist
