@@ -96,10 +96,10 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    statics : {
       getHtmlLabel : function(label) {
          var fontColour = 'white';
-         // var ret = "<font color=" + fontColour + "><span style='background-color: " + label.colour + "'>&nbsp&nbsp"
-         // + label.name + "&nbsp&nbsp</span></font>&nbsp&nbsp&nbsp";
-         var ret = "<font color=" + fontColour + "><span style='background-color: " + label.labelColour
-            + "'>&nbsp&nbsp" + label.labelName + "&nbsp&nbsp</span></font>&nbsp&nbsp&nbsp";
+         var ret = "<font color=" + fontColour + "><span style='background-color: " + label.colour + "'>&nbsp&nbsp"
+            + label.name + "&nbsp&nbsp</span></font>&nbsp&nbsp&nbsp";
+         // var ret = "<font color=" + fontColour + "><span style='background-color: " + label.labelColour
+         // + "'>&nbsp&nbsp" + label.labelName + "&nbsp&nbsp</span></font>&nbsp&nbsp&nbsp";
          return ret;
       },
    },
@@ -132,9 +132,9 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
             flex : 1,
             renderer : function(labelId, meta, rec, rowIndex, colIndex, store) {
                meta.tdAttr = 'data-qtip="Double-click to rename label"';
-               // var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
-               // var ret = ASPIREdb.view.LabelControlWindow.getHtmlLabel( label );
-               var ret = ASPIREdb.view.LabelControlWindow.getHtmlLabel( rec.data );
+               var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
+               var ret = ASPIREdb.view.LabelControlWindow.getHtmlLabel( label );
+               // var ret = ASPIREdb.view.LabelControlWindow.getHtmlLabel( rec.data );
                return ret;
             },
 
@@ -178,28 +178,26 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                // create edit label window
 
                var ref = this;
-               var row = e.store.data.items[index].data;
-               var labelcolour = row.labelColour;
-               var labelName = row.labelName;
-               var labelid = row.labelId;
+               var row = ref.up( '#labelControlWindow' ).visibleLabels[record.data.labelId];
+               var labelColour = row.colour;
+               var labelName = row.name;
+               var labelId = row.id;
 
                Ext.define( 'ASPIREdb.view.CreateLabelWindowEdit', {
                   isSubjectLabel : false,
                   title : 'Edit Label Manager',
                   extend : 'ASPIREdb.view.CreateLabelWindow',
                   labelName : labelName,
-                  labelColour : labelcolour,
+                  labelColour : labelColour,
 
                   // override
                   onOkButtonClick : function() {
-
-                     this.callParent();
 
                      var vo = this.getLabel();
                      if ( vo == null ) {
                         return;
                      }
-                     var label = ref.up( '#labelControlWindow' ).visibleLabels[labelid];
+                     var label = ref.up( '#labelControlWindow' ).visibleLabels[labelId];
                      label.name = vo.name;
                      label.colour = vo.colour;
                      label.htmlLabel = ASPIREdb.view.LabelControlWindow.getHtmlLabel( label );
@@ -220,6 +218,13 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                            console.log( exception.stack );
                         }
                      } );
+
+                     if ( this.isSubjectLabel ) {
+                        ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' );
+                     } else {
+                        ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' );
+                     }
+                     this.hide();
                   },
 
                } );
