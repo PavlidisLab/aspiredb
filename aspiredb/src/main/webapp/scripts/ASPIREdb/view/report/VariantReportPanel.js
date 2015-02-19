@@ -227,7 +227,8 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
             var characteristic = row['characteristics'][columnName];
 
             if ( characteristic == undefined ) {
-               console.log( "Error: Attribute '" + columnName + "' not found in " + row );
+               console.log( "Error: Attribute '" + columnName + "' not found in variant " + row.genomeCoordinates
+                  + " of patient " + row.patientId + " " );
                continue;
             } else {
                val = characteristic['value'];
@@ -284,10 +285,10 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          }
       } )
 
-      var title = 'Project: '
-         + ASPIREdb.ActiveProjectSettings.getActiveProjectName();
-      var varCountsText = "# of variants: " + Ext.util.JSON.encode( totals ).replace( '{', '' ).replace( '}', '' ).replace( /,/g, ', ' )
-            .replace( /"/g, '' ).replace(/:/g,' ');
+      var title = 'Project: ' + ASPIREdb.ActiveProjectSettings.getActiveProjectName();
+      var varCountsText = "# of variants: "
+         + Ext.util.JSON.encode( totals ).replace( '{', '' ).replace( '}', '' ).replace( /,/g, ', ' )
+            .replace( /"/g, '' ).replace( /:/g, ' ' );
       var xField = columnName;
       var yField = seriesTitle;
 
@@ -297,7 +298,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       // yField = "withVar"
       // fields = ["type", "withVar"]
       // mergedFreqData = { { type : "LOSS", withVar : 68}, { type : "GAIN", withVar : 40 } }
-      
+
       // convert to Extjs Store
       var myDataStore = Ext.create( 'Ext.data.JsonStore', {
          storeId : 'reportStore',
