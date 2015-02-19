@@ -127,11 +127,12 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       this.reportButton = Ext.create( 'Ext.Button', {
          itemId : 'reportButton',
-         text : 'Report',
+         text : 'Reports',
          disabled : false,
          handler : this.showReportHandler,
          scope : this,
-         tip : 'Generate reports on the filtered variants'
+         tooltip : 'Generate reports on the filtered variants',
+         tooltipType : 'title',
       } );
 
       this.selectAllButton = Ext.create( 'Ext.Button', {

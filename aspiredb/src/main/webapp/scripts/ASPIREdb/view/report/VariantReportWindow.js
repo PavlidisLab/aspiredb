@@ -16,8 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'ASPIREdb.view.report.VariantReportPanel', 'ASPIREdb.view.report.BurdenAnalysisPerSubject',
-              'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel' ] );
+Ext.require( [ 'ASPIREdb.view.report.VariantReportPanel' ] );
 
 /**
  * Create Variant Report Window
@@ -30,18 +29,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
    title : 'Variant Report',
    layout : 'fit',
    resizable : true,
-   tbar : [ {
-      itemId : 'saveTxtButton',
-      text : 'Save as TXT',
-      tooltip : 'Save as TXT',
-   // icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
-   }, {
-      xtype : 'button',
-      itemId : 'savePngButton',
-      text : 'Save as PNG',
-      tooltip : 'Save as PNG',
-   // icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
-   } ],
+   tbar : [],
 
    statics : {
       getColumnDataFromStore : function(store, columnName) {
@@ -91,9 +79,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
 
       me.reportTypeStore = me.createReportTypeStore();
 
-      me.subjectLabelStore = me.createSubjectLabelStore();
-
-      me.down( 'toolbar' ).insert( 0, {
+      me.down( 'toolbar' ).add( {
          xtype : 'combo',
          itemId : 'reportCombo',
          fieldLabel : 'Data',
@@ -111,41 +97,27 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
                combo.setValue( recordSelected.get( 'id' ) );
             }
          }
-      } );
-      this.down( 'toolbar' ).insert( 1, {
+      }, {
          xtype : 'tbspacer'
-      } );
-      this.down( 'toolbar' ).insert( 2, {
+      }, {
          xtype : 'checkbox',
          itemId : 'logTransformCheckbox',
          hidden : true,
          value : true,
          boxLabel : 'Log2 transform? ',
-      } );
-
-      me.down( 'toolbar' ).insert( 3, {
-         xtype : 'combo',
-         itemId : 'subjectLabelCombo',
-         queryMode : 'local',
-         fieldLabel : 'Subject label',
-         autoSelect : 'true',
-         store : me.subjectLabelStore,
-         displayField : 'name',
-         valueField : 'id',
-         listeners : {
-            'change' : me.subjectLabelComboSelectHandler,
-            afterrender : function(combo) {
-               var recordSelected = combo.getStore().getAt( 0 );
-               if ( recordSelected == null )
-                  return;
-               combo.setValue( recordSelected.get( 'id' ) );
-            }
-         },
-         hidden : false
-      } );
-
-      this.down( 'toolbar' ).insert( 4, {
+      }, {
          xtype : 'tbfill'
+      }, {
+         itemId : 'saveTxtButton',
+         text : 'Save as TXT',
+         tooltip : 'Save as TXT',
+      // icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
+      }, {
+         xtype : 'button',
+         itemId : 'savePngButton',
+         text : 'Save as PNG',
+         tooltip : 'Save as PNG',
+      // icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
       } );
 
       this.down( "#logTransformCheckbox" ).on( 'change', me.reportComboSelectHandler );
@@ -163,8 +135,6 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          } ],
          // [ VariantValueObjectPropertyName : DisplayValue ]
          data : [
-         // gene summary tables, cnv specific
-         [ 'genesPerSubject', 'CNV summary per subject' ], [ 'genesPerSubjectLabel', 'CNV summary per subject label' ],
 
          // cnv specific
          [ 'type', 'CNV type' ], [ 'cnvLength', 'CNV length' ],
@@ -181,41 +151,6 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          autoLoad : true,
          autoSync : true,
       } );
-   },
-
-   /**
-    * Populates the labelCombo with Subject Labels
-    */
-   createSubjectLabelStore : function() {
-
-      var me = this;
-      var subjectLabelData = [];
-      var subjectLabelStore = Ext.create( 'Ext.data.ArrayStore', {
-         data : subjectLabelData,
-         fields : [ {
-            name : 'id',
-         }, {
-            name : 'name',
-         } ],
-      } );
-
-      // subject labels
-      LabelService.getSubjectLabels( {
-         callback : function(labels) {
-            for (i = 0; i < labels.length; i++) {
-               subjectLabelData.push( [ labels[i].id, labels[i].name ] );
-            }
-            // console.log(Ext.JSON.encode(me.subjectLabelData));
-            me.down( '#subjectLabelCombo' ).store.reload();
-         },
-         errorHandler : function(message, exception) {
-            Ext.Msg.alert( 'Error', message )
-            console.log( message )
-            console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
-         }
-      } );
-
-      return subjectLabelStore;
    },
 
    /**
@@ -259,11 +194,6 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       me.show();
    },
 
-   // TODO
-   subjectLabelComboSelectHandler : function(cmp, newValue, oldValue, eOpts) {
-      console.log( 'subjectLabelComboSelectHandler ' + newValue )
-   },
-
    reportComboSelectHandler : function(cmp, newValue, oldValue, eOpts) {
       var me = this;
 
@@ -284,17 +214,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       logTransformCheckbox.hide();
 
       var saveTextHandler = null;
-      if ( selReportType === "genesPerSubject" ) {
-         window.down( '#savePngButton' ).hide();
-         reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', {
-            id : 'variantReport'
-         } );
-      } else if ( selReportType === "genesPerSubjectLabel" ) {
-         window.down( '#savePngButton' ).hide();
-         reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
-            id : 'variantReport'
-         } );
-      } else if ( selReportType === "cnvLength" ) {
+      if ( selReportType === "cnvLength" ) {
          logTransformCheckbox.show();
          reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReportPanel', {
             logTransform : logTransformCheckbox.value
