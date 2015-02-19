@@ -85,7 +85,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
    columns : [ {
       text : "Subject Id",
       dataIndex : 'patientId',
-//      flex : 1
+   // flex : 1
    }, {
       text : "Labels",
       dataIndex : 'labelIds',
@@ -177,7 +177,17 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
          itemId : 'saveButton',
          text : '',
          tooltip : 'Download table contents as text',
+         tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
+      } );
+
+      this.selectAllButton = Ext.create( 'Ext.Button', {
+         itemId : 'burdenAnalysisButton',
+         text : 'Burden Analysis',
+         handler : this.burdenAnalysisHandler,
+         scope : this,
+         tooltip : 'Perform burden analysis on the filtered variants',
+         tooltipType : 'title',
       } );
 
       this.toolbar = Ext.create( 'Ext.toolbar.Toolbar', {
@@ -194,6 +204,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       } );
 
       this.toolbar.add( this.labelsButton );
+      this.toolbar.add( this.burdenAnalysisButton );
       this.toolbar.add( this.selectAllButton );
       this.toolbar.add( this.deselectAllButton );
       this.toolbar.add( Ext.create( 'Ext.toolbar.Fill' ) );
@@ -210,8 +221,8 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       ASPIREdb.EVENT_BUS.on( 'filter_submit', this.filterSubmitHandler, this );
 
       // when subject selected
-      //this.on( 'selectionchange', me.selectionChangeHandler, me );
-      this.on( 'cellclick', me.selectionChangeHandler, me );   
+      // this.on( 'selectionchange', me.selectionChangeHandler, me );
+      this.on( 'cellclick', me.selectionChangeHandler, me );
 
       // when subject label is removed
       ASPIREdb.EVENT_BUS.on( 'subject_label_removed', this.labelRemovedHandler, this );
@@ -219,8 +230,8 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       // when subject label is removed
       ASPIREdb.EVENT_BUS.on( 'subject_label_updated', this.labelUpdateHandler, this );
 
-      ASPIREdb.EVENT_BUS.on( 'select_subject_from_variant_grid', this.selectSubjectHandler, this);
-      
+      ASPIREdb.EVENT_BUS.on( 'select_subject_from_variant_grid', this.selectSubjectHandler, this );
+
       // when subject label is shown
       ASPIREdb.EVENT_BUS.on( 'subject_label_changed', function() {
 
@@ -229,23 +240,23 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       }, this );
    },
 
-   selectSubjectHandler : function( subjectIds ) {
+   selectSubjectHandler : function(subjectIds) {
 
       var grid = this;
-  
+
       grid.getSelectionModel().deselectAll();
-      
-      grid.selModel.select( grid.store.find('id',subjectIds[0]) );
-      
+
+      grid.selModel.select( grid.store.find( 'id', subjectIds[0] ) );
+
       // use just to make sure selected record is at the top
       grid.getView().scrollBy( {
          x : 0,
          y : 1000
       } );
-      grid.getView().focusRow( grid.store.find('id',subjectIds[0]) );
-      
+      grid.getView().focusRow( grid.store.find( 'id', subjectIds[0] ) );
+
    },
-   
+
    /**
     * Load subject labels created by the user
     * 
@@ -477,9 +488,9 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
     * Remove labels from subjects in local store.
     */
    removeLabelsFromSubjects : function(subjects, labelsToRemove) {
-   // removing to visible label to show in the subject grid
-    //  this.visibleLabels.pop(this.visibleLabels[labelsToRemove.id]);
-           
+      // removing to visible label to show in the subject grid
+      // this.visibleLabels.pop(this.visibleLabels[labelsToRemove.id]);
+
       for (var i = 0; i < subjects.length; i++) {
          var labelIds = subjects[i].data.labelIds;
          for (var k = 0; k < labelsToRemove.length; k++) {
@@ -604,6 +615,13 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       this.cancelBubble = true;
       this.getSelectionModel().deselectAll(); // calls selectionChangeHandler
       this.selectAllStatus = 'No';
+   },
+
+   // TODO
+   burdenAnalysisHandler : function() {
+      var reportWindow = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisWindow' );
+      var variantStore = Ext.StoreMgr.lookup( 'variantGrid' );
+      reportWindow.createAndShow( variantStore );
    }
 
 } );
