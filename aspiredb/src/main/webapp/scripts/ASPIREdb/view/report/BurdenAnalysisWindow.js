@@ -81,7 +81,9 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
 
       me.subjectLabelStore = me.createSubjectLabelStore();
 
-      me.charLabelStore = me.createCharacteristicLabelStore();
+      me.charLabelStore = me.createCharacteristicStore();
+
+      me.varLabelStore = me.createVariantLabelStore();
 
       // me.down( 'toolbar' ).add( {
       me.down( 'toolbar' ).add( {
@@ -153,7 +155,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             xtype : 'combo',
             itemId : 'charLabelCombo',
             queryMode : 'local',
-            fieldLabel : 'Variant',
+            fieldLabel : 'Characteristic',
             autoSelect : 'true',
             store : me.charLabelStore,
             displayField : 'name',
@@ -170,8 +172,23 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
              */
             },
             hidden : true,
-            tooltip : 'Select a variant label or characteristic to view',
-            tooltipType : 'title'
+         }, , {
+            xtype : 'combo',
+            itemId : 'varLabelCombo',
+            queryMode : 'local',
+            fieldLabel : 'Label',
+            autoSelect : 'true',
+            store : me.varLabelStore,
+            displayField : 'name',
+            valueField : 'id',
+            ueryMode : 'local',
+            editable : false,
+            forceSelection : true,
+            width : 300,
+            listeners : {
+               'change' : me.varLabelComboSelectHandler,
+            },
+            hidden : true,
          }, ]
 
       }, {
@@ -222,7 +239,10 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
          [ 'genesPerSubjectLabel', 'Genes overlapped' ],
 
          // TODO
-         // [ 'characteristics', 'Characteristics' ],
+         // [ 'variantLabel', 'Variant Label' ],
+
+         // TODO
+         // [ 'characteristic', 'Characteristic' ],
 
          // TODO genes for SNVs??
 
@@ -269,10 +289,30 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       return subjectLabelStore;
    },
 
+   createVariantLabelStore : function() {
+      var me = this;
+      var data = [];
+      var store = Ext.create( 'Ext.data.ArrayStore', {
+         data : data,
+         fields : [ {
+            name : 'id',
+         }, {
+            name : 'name',
+         } ],
+      } );
+
+      data.push( [ 1, 'var label 1', true ] );
+      data.push( [ 2, 'var label 2', false ] );
+
+      store.reload();
+
+      return store;
+   },
+
    /**
-    * Populates the labelCombo with Subject Labels
+    * Populates the labelCombo with Variant characteristics
     */
-   createCharacteristicLabelStore : function() {
+   createCharacteristicStore : function() {
       var me = this;
       var data = [];
       var store = Ext.create( 'Ext.data.ArrayStore', {
@@ -350,12 +390,18 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
 
       var window = me.up( '#burdenAnalysisWindow' );
 
-      var combo = window.down( '#charLabelCombo' );
+      var charCombo = window.down( '#charLabelCombo' );
+      var varLabelCombo = window.down( '#varLabelCombo' );
 
-      if ( me.value === "characteristics" ) {
-         combo.show();
+      if ( me.value === "characteristic" ) {
+         charCombo.show();
+         varLabelCombo.hide();
+      } else if ( me.value === "variantLabel" ) {
+         charCombo.hide();
+         varLabelCombo.show();
       } else {
-         combo.hide();
+         charCombo.hide();
+         varLabelCombo.hide();
       }
 
    },
@@ -363,9 +409,19 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
    charLabelComboSelectHandler : function(cmp, newValue, oldValue, eOpts) {
       var me = this;
 
-      var window = me.up( '#burdenAnalysisWindow' );
+      // var window = me.up( '#burdenAnalysisWindow' );
+      //
+      // var combo = window.down( '#reportCombo' );
 
-      var combo = window.down( '#reportCombo' );
+   },
+
+   varLabelComboSelectHandler : function(cmp, newValue, oldValue, eOpts) {
+      var me = this;
+
+      // var window = me.up( '#burdenAnalysisWindow' );
+      //
+      // var combo = window.down( '#reportCombo' );
+
    },
 
    analyze : function() {
@@ -379,10 +435,11 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       var subjectLabel1 = window.down( '#subjectLabelCombo1' ).value
       var subjectLabel2 = window.down( '#subjectLabelCombo2' ).value
       var charLabel = window.down( '#charLabelCombo' ).value
+      var varLabel = window.down( '#varLabelCombo' ).value
 
       // TODO
       console.log( 'selReportType=' + selReportType + "; subjectLabel1=" + subjectLabel1 + "; subjectLabel2="
-         + subjectLabel2 + "; charLabel=" + charLabel );
+         + subjectLabel2 + "; charLabel=" + charLabel + "; varLabel=" + varLabel );
 
       var reportPanel = window.down( '#variantReport' );
       if ( reportPanel != null ) {
