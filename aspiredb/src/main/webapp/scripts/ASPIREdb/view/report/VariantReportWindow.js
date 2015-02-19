@@ -17,7 +17,7 @@
  *
  */
 Ext.require( [ 'ASPIREdb.view.report.VariantReportPanel', 'ASPIREdb.view.report.BurdenAnalysisPerSubject',
-              'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', 'ASPIREdb.view.report.PhenotypePerSubjectLabel' ] );
+              'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel' ] );
 
 /**
  * Create Variant Report Window
@@ -92,7 +92,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       me.reportTypeStore = me.createReportTypeStore();
 
       me.subjectLabelStore = me.createSubjectLabelStore();
-      
+
       me.down( 'toolbar' ).insert( 0, {
          xtype : 'combo',
          itemId : 'reportCombo',
@@ -126,7 +126,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       me.down( 'toolbar' ).insert( 3, {
          xtype : 'combo',
          itemId : 'subjectLabelCombo',
-         queryMode: 'local',
+         queryMode : 'local',
          fieldLabel : 'Subject label',
          autoSelect : 'true',
          store : me.subjectLabelStore,
@@ -136,13 +136,14 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
             'change' : me.subjectLabelComboSelectHandler,
             afterrender : function(combo) {
                var recordSelected = combo.getStore().getAt( 0 );
-               if ( recordSelected == null ) return;
+               if ( recordSelected == null )
+                  return;
                combo.setValue( recordSelected.get( 'id' ) );
             }
          },
          hidden : false
       } );
-      
+
       this.down( 'toolbar' ).insert( 4, {
          xtype : 'tbfill'
       } );
@@ -168,9 +169,6 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          // cnv specific
          [ 'type', 'CNV type' ], [ 'cnvLength', 'CNV length' ],
 
-         // phenotype
-         [ 'phenotypePerSubjectLabel', 'Phenotype Per Subject Label' ],
-
          // commonly used reports
          [ 'chromosome', 'Chromosome' ], [ 'patientId', 'Patient ID' ], [ 'variantType', 'Variant type' ],
 
@@ -184,7 +182,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          autoSync : true,
       } );
    },
-   
+
    /**
     * Populates the labelCombo with Subject Labels
     */
@@ -200,16 +198,15 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
             name : 'name',
          } ],
       } );
-      
-      
+
       // subject labels
       LabelService.getSubjectLabels( {
          callback : function(labels) {
             for (i = 0; i < labels.length; i++) {
-               subjectLabelData.push( [ labels[i].id, labels[i].name ]  );
+               subjectLabelData.push( [ labels[i].id, labels[i].name ] );
             }
-//            console.log(Ext.JSON.encode(me.subjectLabelData));
-            me.down('#subjectLabelCombo').store.reload(); 
+            // console.log(Ext.JSON.encode(me.subjectLabelData));
+            me.down( '#subjectLabelCombo' ).store.reload();
          },
          errorHandler : function(message, exception) {
             Ext.Msg.alert( 'Error', message )
@@ -220,7 +217,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
 
       return subjectLabelStore;
    },
-   
+
    /**
     * Hides report types that are not found in variantStore
     */
@@ -263,11 +260,11 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
    },
 
    // TODO
-   subjectLabelComboSelectHandler : function( cmp, newValue, oldValue, eOpts ) {
-      console.log('subjectLabelComboSelectHandler ' + newValue)
+   subjectLabelComboSelectHandler : function(cmp, newValue, oldValue, eOpts) {
+      console.log( 'subjectLabelComboSelectHandler ' + newValue )
    },
-   
-   reportComboSelectHandler : function( cmp, newValue, oldValue, eOpts ) {
+
+   reportComboSelectHandler : function(cmp, newValue, oldValue, eOpts) {
       var me = this;
 
       var window = this.up( '#variantReportWindow' );
@@ -301,11 +298,6 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          logTransformCheckbox.show();
          reportPanel = Ext.create( 'ASPIREdb.view.report.VariantReportPanel', {
             logTransform : logTransformCheckbox.value
-         } );
-      } else if ( selReportType === "phenotypePerSubjectLabel" ) {
-         window.down( '#savePngButton' ).show();
-         reportPanel = Ext.create( 'ASPIREdb.view.report.PhenotypePerSubjectLabel', {
-            id : 'variantReport'
          } );
       } else {
          window.down( '#savePngButton' ).show();
