@@ -198,8 +198,14 @@ public class VariantUploadService {
 
         cnv.setType( results.getString( cnvType ).trim() );
 
-        if ( !cnv.getType().toUpperCase().equals( CnvType.GAIN.name() )
-                && !cnv.getType().toUpperCase().equals( CnvType.LOSS.name() ) ) {
+        boolean found = false;
+        for ( CnvType type : CnvType.values() ) {
+            if ( cnv.getType().toUpperCase().equals( type.name() ) ) {
+                found = true;
+                break;
+            }
+        }
+        if ( !found ) {
             throw new InvalidDataException( "invalid " + cnvType + ":" + cnv.getType() );
         }
 
