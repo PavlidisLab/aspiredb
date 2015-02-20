@@ -450,6 +450,24 @@ public class ProjectManagerImpl implements ProjectManager {
     public Collection<Variant2VariantOverlap> populateProjectToProjectOverlap( String projectName,
             String overlappingProjectName ) throws ExternalDependencyException, NotLoggedInException {
 
+        Project projectToPopulate = projectDao.findByProjectName( projectName );
+
+        ProjectFilterConfig projectToPopulateFilterConfig = getProjectFilterConfigById( projectToPopulate );
+
+        Set<AspireDbFilterConfig> projSet = new HashSet<>();
+        projSet.add( projectToPopulateFilterConfig );
+
+        BoundedList<VariantValueObject> projToPopulateVvos = queryService.queryVariants( projSet );
+
+        return populateProjectToProjectOverlap( projectName, overlappingProjectName, projToPopulateVvos.getItems() );
+    }
+
+    @Override
+    @Transactional
+    public Collection<Variant2VariantOverlap> populateProjectToProjectOverlap( String projectName,
+            String overlappingProjectName, Collection<VariantValueObject> projToPopulateVvos )
+            throws ExternalDependencyException, NotLoggedInException {
+
         StopWatch timer = new StopWatch();
         timer.start();
 
@@ -464,13 +482,13 @@ public class ProjectManagerImpl implements ProjectManager {
         Set<AspireDbFilterConfig> projSet = new HashSet<>();
         projSet.add( projectToPopulateFilterConfig );
 
-        BoundedList<VariantValueObject> projToPopulateVvos = queryService.queryVariants( projSet );
+        // BoundedList<VariantValueObject> projToPopulateVvos = queryService.queryVariants( projSet );
 
         Collection<Variant2VariantOverlap> overlapVos = new HashSet<>();
 
         // This probably won't work for all variant types
         int i = 0;
-        for ( VariantValueObject vvo : projToPopulateVvos.getItems() ) {
+        for ( VariantValueObject vvo : projToPopulateVvos ) {
 
             Set<AspireDbFilterConfig> filters = new HashSet<>();
 
@@ -495,10 +513,9 @@ public class ProjectManagerImpl implements ProjectManager {
             }
 
             if ( ( ++i % 100 ) == 0 ) {
-                log.info( " Processed " + i + "/" + projToPopulateVvos.getItems().size() + " ("
-                        + String.format( "%.2f", ( 100.0 * i / projToPopulateVvos.getItems().size() ) )
-                        + " %) variants in " + projectName + " and found " + overlapVos.size() + " overlaps with "
-                        + overlappingProjectName );
+                log.info( " Processed " + i + "/" + projToPopulateVvos.size() + " ("
+                        + String.format( "%.2f", ( 100.0 * i / projToPopulateVvos.size() ) ) + " %) variants in "
+                        + projectName + " and found " + overlapVos.size() + " overlaps with " + overlappingProjectName );
             }
         }
 
@@ -506,7 +523,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
         variantDao.printCacheStatistics();
 
-        log.info( "Found " + overlapVos.size() + " variant overlaps between " + projectName + " and "
+        log.info( "Found " + overlapVos.size() + " new variant overlaps between " + projectName + " and "
                 + overlappingProjectName + " which took " + timer.getTime() + " ms" );
 
         return overlapVos;

@@ -73,8 +73,29 @@ public interface ProjectManager {
 
     public String isProjectHasSubjectPhenotypes( String projectName ) throws Exception;
 
+    /**
+     * Computes the overlap of all the variants in projectName against all the variants in specialProjectName
+     * 
+     * @param projectName
+     * @param specialProjectName
+     * @return
+     * @throws Exception
+     */
     @Secured({ "GROUP_USER", "RUN_AS_ADMIN" })
     public Collection<Variant2VariantOverlap> populateProjectToProjectOverlap( String projectName,
             String specialProjectName ) throws Exception;
+
+    /**
+     * Computes the overlap of the projectVariants from projectName against all the variants in specialProjectName
+     * 
+     * @param projectName
+     * @param specialProjectName
+     * @param projectVariants
+     * @return
+     * @throws Exception
+     */
+    @Secured({ "GROUP_USER", "RUN_AS_ADMIN" })
+    public Collection<Variant2VariantOverlap> populateProjectToProjectOverlap( String projectName,
+            String specialProjectName, Collection<VariantValueObject> projectVariants ) throws Exception;
 
 }
