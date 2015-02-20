@@ -19,7 +19,7 @@
 Ext.require( [ 'ASPIREdb.view.report.BurdenAnalysisPerSubject', 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel' ] );
 
 /**
- * Create Variant Report Window
+ * Create Burden Analysis window
  */
 Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
    extend : 'Ext.Window',
@@ -441,7 +441,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       console.log( 'selReportType=' + selReportType + "; subjectLabel1=" + subjectLabel1 + "; subjectLabel2="
          + subjectLabel2 + "; charLabel=" + charLabel + "; varLabel=" + varLabel );
 
-      var reportPanel = window.down( '#variantReport' );
+      var reportPanel = window.down( '#burdenReport' );
       if ( reportPanel != null ) {
          window.remove( reportPanel );
          reportPanel.destroy();
@@ -452,17 +452,17 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       if ( selReportType === "genesPerSubject" ) {
          window.down( '#savePngButton' ).hide();
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', {
-            id : 'variantReport'
+            id : 'burdenReport'
          } );
       } else if ( selReportType === "genesPerSubjectLabel" ) {
          window.down( '#savePngButton' ).hide();
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
-            id : 'variantReport'
+            id : 'burdenReport'
          } );
       }
 
       if ( reportPanel == null ) {
-         console.log( "reportPanel is null" );
+         console.log( "burdenReport is null" );
          return;
       }
 

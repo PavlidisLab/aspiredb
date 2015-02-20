@@ -71,7 +71,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
          console.log( 'data is empty' );
          return;
       }
-      
+
       // set data types
       for ( var field in data) {
          if ( field === 'NUM_SAMPLES' ) {
@@ -91,7 +91,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
             } );
          }
       }
-//      console.log('ret='+Ext.JSON.encode(ret))
+      // console.log('ret='+Ext.JSON.encode(ret))
       return ret;
    },
 
@@ -178,7 +178,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
          callback : function(results) {
             var grid = me.createGrid( results );
             me.add( grid );
-            var window = me.up( '#variantReportWindow' );
+            var window = me.up( '#burdenAnalysisWindow' );
             if ( window != null ) {
                window.setLoading( false );
             }
@@ -199,7 +199,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
 
       var variantIds = ASPIREdb.view.report.VariantReportWindow.getColumnDataFromStore( store, 'id' );
 
-      var window = me.up( '#variantReportWindow' );
+      var window = me.up( '#burdenAnalysisWindow' );
       if ( window != null ) {
          window.setLoading( true );
       }
