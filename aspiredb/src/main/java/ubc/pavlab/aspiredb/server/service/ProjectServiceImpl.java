@@ -942,7 +942,7 @@ public class ProjectServiceImpl implements ProjectService {
                             for ( Project specialProject : projectDao.getSpecialOverlapProjects() ) {
                                 try {
                                     overlap = projectManager.populateProjectToProjectOverlap( projectName,
-                                            specialProject.getName() );
+                                            specialProject.getName(), variantResult.getVariantsToAdd() );
                                     returnMsg.append( String.format( STR_FMT, "Number of Overlaps with "
                                             + specialProject.getName(), overlap.size() ) );
                                 } catch ( Exception e ) {
