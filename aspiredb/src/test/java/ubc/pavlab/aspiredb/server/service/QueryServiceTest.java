@@ -304,15 +304,16 @@ public class QueryServiceTest extends BaseSpringContextTest {
             fail();
         }
         // these should be 0 but just in case ...
-        int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
-        int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
+        final int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
+        final int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );
 
         // add variants to the db
         new InlineTransaction() {
 
             @Override
             public void instructions() {
-                subject = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
+                String addedPatientId = patientId + "_added";
+                subject = persistentTestObjectHelper.createPersistentTestIndividualObject( addedPatientId );
 
                 CNV cnv1 = createCNV( "4", 3174681, 3174781 ); // overlaps with HTT gene
                 CNV cnv2 = createCNV( "4", 2174681, 3174681 ); // overlaps with HTT gene
@@ -322,11 +323,12 @@ public class QueryServiceTest extends BaseSpringContextTest {
                 subject.addVariant( cnv2 );
                 subject.addVariant( cnv3 );
                 subjectDao.update( subject );
+
+                assertEquals( addedPatientId, subject.getPatientId() );
+                assertEquals( 3, subject.getVariants().size() );
+
             }
         }.execute();
-
-        assertEquals( patientId, subject.getPatientId() );
-        assertEquals( 3, subject.getVariants().size() );
 
         // check the overlaps
         try {
@@ -337,8 +339,8 @@ public class QueryServiceTest extends BaseSpringContextTest {
             fail();
         }
         assertEquals( 1, ret.get( VariantDao.SUBJECT_IDS_KEY ) - addedSubjectCount ); // one subject was added
-        assertEquals( 2, ret.get( VariantDao.VARIANT_IDS_KEY ) - addedVariantCount ); // we added two that overlap
-
+        assertEquals( 2, ret.get( VariantDao.VARIANT_IDS_KEY ) - addedVariantCount ); // we added two that
+                                                                                      // overlap
     }
 
     private CNV createCNV( String chr, int start, int end ) {
