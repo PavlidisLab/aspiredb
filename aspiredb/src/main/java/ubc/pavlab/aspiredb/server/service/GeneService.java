@@ -26,7 +26,9 @@ import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.ExternalDependencyException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.service.GeneServiceImpl.CnvBurdenAnalysisPerSubject;
+import ubc.pavlab.aspiredb.shared.BurdenAnalysisValueObject;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
+import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 /**
@@ -67,4 +69,17 @@ public interface GeneService {
      */
     public Map<String, Map<GeneValueObject, Collection<VariantValueObject>>> getCompoundHeterozygotes(
             Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException;
+
+    /**
+     * Performs a burden analysis between filtered variants with subject label group1 and group2.
+     * 
+     * @param group1
+     * @param group2
+     * @param variantIds
+     * @return
+     * @throws NotLoggedInException
+     * @throws BioMartServiceException
+     */
+    public Collection<BurdenAnalysisValueObject> getBurdenAnalysisPerSubjectLabel( LabelValueObject group1,
+            LabelValueObject group2, Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException;
 }

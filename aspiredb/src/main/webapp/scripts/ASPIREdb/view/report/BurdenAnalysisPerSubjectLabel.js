@@ -95,7 +95,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
       return ret;
    },
 
-   createStore : function(data) {
+   oldCreateStore : function(data) {
       if ( data == null || data.length == 0 ) {
          console.log( 'data is empty' );
          return;
@@ -114,7 +114,84 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
       return store;
    },
 
+   createStore : function(data) {
+      var fields = [ {
+         name : 'name',
+      }, {
+         name : 'group1',
+         type : 'float'
+      }, {
+         name : 'group2',
+         type : 'float'
+      }, {
+         name : 'pValue',
+         type : 'float'
+      }, {
+         name : 'qValue',
+         type : 'float'
+      } ];
+      // TODO
+      /*
+       * var data = [ { name : 'Group size', group1 : 200, group2 : 400, pValue : 0.004, qValue : 0.403, }, { name :
+       * 'Total CNV length', group1 : 200, group2 : 400, pValue : 0.004, qValue : 0.403, }, { name : 'Average CNV
+       * length', group1 : 200, group2 : 400, pValue : 0.004, qValue : 0.403, }, { name : 'Number of CNVs', group1 :
+       * 200, group2 : 400, pValue : 0.004, qValue : 0.403, }, { name : 'CNVs per subject', group1 : 200, group2 : 400,
+       * pValue : 0.004, qValue : 0.403, }, { name : 'Genes per CNV', group1 : 200, group2 : 400, pValue : 0.004, qValue :
+       * 0.403, } ];
+       */
+      var store = new Ext.data.JsonStore( {
+         storeId : 'burdenAnalysisPerSubjectStore',
+         fields : fields,
+         data : data,
+      } );
+
+      return store;
+   },
+
+   createColumns : function() {
+
+      var columns = [ {
+         dataIndex : 'name',
+         text : '',
+         flex : 2
+      }, {
+         dataIndex : 'group1',
+         text : 'Group 1',
+         flex : 1
+      }, {
+         dataIndex : 'group2',
+         text : 'Group 2',
+         flex : 1
+      }, {
+         dataIndex : 'pValue',
+         text : 'P-value',
+         flex : 1
+      }, {
+         dataIndex : 'qValue',
+         text : 'Corrected p-value',
+         flex : 1
+      } ];
+
+      return columns;
+   },
+
    createGrid : function(data) {
+      var me = this;
+      var columns = me.createColumns();
+      var store = me.createStore( data );
+      var grid = Ext.create( 'Ext.grid.Panel', {
+         store : store,
+         itemId : 'burdenAnalysisPerSubjectLabelGrid',
+         columns : columns
+      } );
+
+      grid.doLayout();
+      grid.show();
+
+      return grid;
+   },
+
+   oldCreateGrid : function(data) {
       var me = this;
       var columns = [ {
          dataIndex : 'LABEL_NAME',
@@ -174,22 +251,35 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
 
       var me = this;
 
-      GeneService.getBurdenAnalysisPerSubjectLabel( variantIds, {
+      var window = me.up( '#burdenAnalysisWindow' );
+      var label1 = window.down( '#subjectLabelCombo1' ).getValue();
+      var label2 = window.down( '#subjectLabelCombo2' ).getValue();
+
+      GeneService.getBurdenAnalysisPerSubjectLabel( label1, label2, variantIds, {
          callback : function(results) {
             var grid = me.createGrid( results );
             me.add( grid );
-            var window = me.up( '#burdenAnalysisWindow' );
+
             if ( window != null ) {
                window.setLoading( false );
             }
-
          },
          errorHandler : function(errorString, exception) {
             var msg = 'Error calculating Burden Analysis Per Subject Label: ' + errorString;
             console.log( msg, exception );
             Ext.Msg.alert( 'Error', msg );
+
+            if ( window != null ) {
+               window.setLoading( false );
+            }
          }
       } );
+
+      // TODO
+      /*
+       * var results = []; var grid = me.createGrid( results ); me.add( grid ); var window = me.up(
+       * '#burdenAnalysisWindow' ); if ( window != null ) { window.setLoading( false ); }
+       */
 
    },
 

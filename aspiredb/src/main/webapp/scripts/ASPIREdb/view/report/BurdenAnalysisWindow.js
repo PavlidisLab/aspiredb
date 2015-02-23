@@ -23,8 +23,8 @@ Ext.require( [ 'ASPIREdb.view.report.BurdenAnalysisPerSubject', 'ASPIREdb.view.r
  */
 Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
    extend : 'Ext.Window',
-   width : 950,
-   height : 500,
+   width : 800,
+   height : 300,
    id : 'burdenAnalysisWindow',
    title : 'Burden Analysis',
    layout : 'fit',
@@ -99,16 +99,14 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             autoSelect : 'true',
             store : me.subjectLabelStore,
             displayField : 'name',
-            valueField : 'id',
+            valueField : 'vo',
             width : 300,
             listeners : {
                'change' : me.subjectLabelCombo1SelectHandler,
-               afterrender : function(combo) {
-                  var recordSelected = combo.getStore().getAt( 0 );
-                  if ( recordSelected == null )
-                     return;
-                  combo.setValue( recordSelected.get( 'id' ) );
-               }
+            /*
+             * afterrender : function(combo) { var recordSelected = combo.getStore().getAt( 0 ); if ( recordSelected ==
+             * null ) return; combo.setValue( recordSelected.get( 'vo' ) ); }
+             */
             },
             hidden : false
          }, {
@@ -119,7 +117,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             autoSelect : 'true',
             store : me.subjectLabelStore,
             displayField : 'name',
-            valueField : 'id',
+            valueField : 'vo',
             width : 300,
             listeners : {
                'change' : me.subjectLabelCombo2SelectHandler,
@@ -263,7 +261,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       var subjectLabelStore = Ext.create( 'Ext.data.ArrayStore', {
          data : subjectLabelData,
          fields : [ {
-            name : 'id',
+            name : 'vo',
          }, {
             name : 'name',
          } ],
@@ -273,7 +271,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       LabelService.getSubjectLabels( {
          callback : function(labels) {
             for (i = 0; i < labels.length; i++) {
-               subjectLabelData.push( [ labels[i].id, labels[i].name ] );
+               subjectLabelData.push( [ labels[i], labels[i].name ] );
             }
             // console.log(Ext.JSON.encode(me.subjectLabelData));
             me.down( '#subjectLabelCombo1' ).store.reload();

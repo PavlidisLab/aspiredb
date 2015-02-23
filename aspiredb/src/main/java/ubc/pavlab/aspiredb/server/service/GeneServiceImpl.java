@@ -55,8 +55,10 @@ import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.UserGeneSet;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.util.GenomeBin;
+import ubc.pavlab.aspiredb.shared.BurdenAnalysisValueObject;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
+import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 /**
@@ -171,6 +173,20 @@ public class GeneServiceImpl implements GeneService {
             result.add( patientIdStats.get( patientId ).get( statName ) );
         }
         return ArrayUtils.toPrimitive( result.toArray( new Double[0] ) );
+    }
+
+    @SuppressWarnings("boxing")
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<BurdenAnalysisValueObject> getBurdenAnalysisPerSubjectLabel( LabelValueObject group1,
+            LabelValueObject group2, Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException {
+
+        Collection<BurdenAnalysisValueObject> ret = new ArrayList<>();
+
+        ret.add( new BurdenAnalysisValueObject( "Group size", 500.4, 900.5, 0.004, 0.003 ) );
+
+        return ret;
     }
 
     /**
