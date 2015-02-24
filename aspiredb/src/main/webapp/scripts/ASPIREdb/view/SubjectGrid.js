@@ -161,14 +161,14 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
       this.selectAllButton = Ext.create( 'Ext.Button', {
          itemId : 'selectAll',
-         text : 'Select All',
+         text : 'Select all',
          handler : this.selectAllHandler,
          scope : this
       } );
 
       this.deselectAllButton = Ext.create( 'Ext.Button', {
          itemId : 'deselectAll',
-         text : 'Clear All',
+         text : 'Clear all',
          handler : this.deselectAllHandler,
          scope : this
       } );
@@ -183,7 +183,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
       this.selectAllButton = Ext.create( 'Ext.Button', {
          itemId : 'burdenAnalysisButton',
-         text : 'Burden Analysis',
+         text : 'Burden analysis',
          handler : this.burdenAnalysisHandler,
          scope : this,
          tooltip : 'Perform burden analysis on the filtered variants',

@@ -19,16 +19,11 @@
 Ext.require( [] );
 
 /**
- * Create Burden Analysis Per Subject Label
+ * 
  */
-Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
+Ext.define( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
    extend : 'Ext.panel.Panel',
    layout : 'fit',
-   
-   config : {
-      label1 : null,
-      label2 : null,
-   },
 
    /**
     * Display table contents as plain text for downloading to a TSV
@@ -133,10 +128,8 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
       var me = this;
 
       var window = me.up( '#burdenAnalysisWindow' );
-      //var label1 = window.down( '#subjectLabelCombo1' ).getValue();
-      //var label2 = window.down( '#subjectLabelCombo2' ).getValue();
-      var label1 = me.label1;
-      var label2 = me.label2;
+      var label1 = window.down( '#subjectLabelCombo1' ).getValue();
+      var label2 = window.down( '#subjectLabelCombo2' ).getValue();
 
       if ( label1.id === label2.id ) {
          Ext.Msg.alert( 'Error', "Labels must be different" );

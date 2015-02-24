@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'ASPIREdb.view.report.BurdenAnalysisPerSubject', 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel' ] );
+Ext.require( [ 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel' ] );
 
 /**
  * Create Burden Analysis window
@@ -159,7 +159,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             autoSelect : 'true',
             store : me.charLabelStore,
             displayField : 'name',
-            valueField : 'id',
+            valueField : 'vo',
             ueryMode : 'local',
             editable : false,
             forceSelection : true,
@@ -242,7 +242,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
          // [ 'variantLabel', 'Variant Label' ],
 
          // TODO
-         // [ 'characteristic', 'Characteristic' ],
+          [ 'characteristic', 'Characteristic' ],
 
          // TODO genes for SNVs??
 
@@ -308,58 +308,91 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
 
       return store;
    },
+   
+   /**
+    * Adds characteristic to data if the characteristic contains nominal values (e.g. gain, loss, maternal, paternal, etc.)
+    */
+   addNominalCharacteristic : function( characteristic, data, store ) {
 
+      var char = characteristic;
+      var MAX_VALUES = 10;        // maximum unique values we allow
+      
+      VariantService.suggestValues( characteristic, null, {
+         callback : function( results ) {
+            if ( results.length == 0 ) {
+               return;
+            }
+//            if ( isNaN(Number(result[0])) ) {
+//               return true;
+//            }
+            if ( results.length > MAX_VALUES ) {
+               console.log(char.displayName + " is not nominal! " + results.length + " values : " + results[0].displayValue + ", " + results[1].displayValue + ", " + results[2].displayValue + " ... " );
+               return;
+            }
+            
+            if ( data == null ) {
+               console.log("data is " + data);
+               return;
+            }
+            
+            data.push( [char, char.displayName] )
+            
+            store.reload();
+         },
+         errorHandler : function(message, exception) {
+            console.log( message )
+            console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
+         },
+      } );
+      
+   },
+   
    /**
     * Populates the labelCombo with Variant characteristics
     */
    createCharacteristicStore : function() {
       var me = this;
+      
       var data = [];
       var store = Ext.create( 'Ext.data.ArrayStore', {
          data : data,
          fields : [ {
-            name : 'id',
+            name : 'vo',
          }, {
             name : 'name',
          } ],
       } );
+      
+      var pId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
+      VariantService.suggestPropertiesForVariantTypeInProject("CNV",pId, {
+         callback : function(results) {
 
-      data.push( [ 1, 'characteristic1', true ] );
-      data.push( [ 2, 'characteristic2', false ] );
+            for(var i = 0; i < results.length; i++) {
+               var char = results[i];
+               
+               if ( !char.characteristic ) {
+                  continue;
+               }
+               
+               me.addNominalCharacteristic(char, data, store);
+               
+            }
 
-      store.reload();
+            store.reload();
+         },
+         errorHandler : function(message, exception) {
+            console.log( message )
+            console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
+         },
+      });
 
       return store;
-   },
-
-   /**
-    * Hides report types that are not found in variantStore
-    */
-   filterReportCombo : function(variantStore) {
-      var me = this;
-
-      var cnvOnlyData = [ 'genesPerSubject', 'genesPerSubjectLabel', 'type', 'cnvLength' ];
-
-      var reportCombo = me.down( '#reportCombo' );
-
-      reportCombo.store.filter( [ {
-         fn : function(record) {
-            if ( cnvOnlyData.indexOf( record.get( 'id' ) ) != -1 ) {
-               return variantStore.collect( 'variantType' ).indexOf( 'CNV' ) != -1;
-               ;
-            }
-            return true;
-         }
-      } ] )
-
    },
 
    createAndShow : function(variantStore) {
       var me = this;
 
       me.variantStore = variantStore;
-
-      me.filterReportCombo( variantStore );
 
       me.doLayout();
       me.show();
@@ -434,12 +467,12 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       var selReportType = window.down( '#reportCombo' ).value
       var subjectLabel1 = window.down( '#subjectLabelCombo1' ).value
       var subjectLabel2 = window.down( '#subjectLabelCombo2' ).value
-      var charLabel = window.down( '#charLabelCombo' ).value
+      var characteristic = window.down( '#charLabelCombo' ).value
       var varLabel = window.down( '#varLabelCombo' ).value
 
       // TODO
       console.log( 'selReportType=' + selReportType + "; subjectLabel1=" + subjectLabel1 + "; subjectLabel2="
-         + subjectLabel2 + "; charLabel=" + charLabel + "; varLabel=" + varLabel );
+         + subjectLabel2 + "; charLabel=" + characteristic + "; varLabel=" + varLabel );
 
       var reportPanel = window.down( '#burdenReport' );
       if ( reportPanel != null ) {
@@ -449,15 +482,18 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       }
 
       var saveTextHandler = null;
-      if ( selReportType === "genesPerSubject" ) {
+      if ( selReportType === "characteristic" ) {
          window.down( '#savePngButton' ).hide();
-         reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', {
-            id : 'burdenReport'
+         reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
+            id : 'burdenReport',
+            characteristic : characteristic
          } );
       } else if ( selReportType === "genesPerSubjectLabel" ) {
          window.down( '#savePngButton' ).hide();
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
-            id : 'burdenReport'
+            id : 'burdenReport',
+            label1 : subjectLabel1,
+            label2 : subjectLabel2,
          } );
       }
 
