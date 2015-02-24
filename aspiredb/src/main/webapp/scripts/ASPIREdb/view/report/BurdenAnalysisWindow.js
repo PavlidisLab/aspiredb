@@ -24,7 +24,7 @@ Ext.require( [ 'ASPIREdb.view.report.BurdenAnalysisPerSubject', 'ASPIREdb.view.r
 Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
    extend : 'Ext.Window',
    width : 800,
-   height : 300,
+   height : 500,
    id : 'burdenAnalysisWindow',
    title : 'Burden Analysis',
    layout : 'fit',
@@ -101,6 +101,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             displayField : 'name',
             valueField : 'vo',
             width : 300,
+            emptyText : 'Subject label',
             listeners : {
                'change' : me.subjectLabelCombo1SelectHandler,
             /*
@@ -118,6 +119,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             store : me.subjectLabelStore,
             displayField : 'name',
             valueField : 'vo',
+            emptyText : 'Subject label',
             width : 300,
             listeners : {
                'change' : me.subjectLabelCombo2SelectHandler,
@@ -234,7 +236,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
          // TODO gene summary tables, cnv specific
          // [ 'genesPerSubject', 'CNV summary per subject' ],
 
-         [ 'genesPerSubjectLabel', 'Genes overlapped' ],
+         [ 'genesPerSubjectLabel', 'Length and genes overlapped' ],
 
          // TODO
          // [ 'variantLabel', 'Variant Label' ],
@@ -268,7 +270,8 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       } );
 
       // subject labels
-      LabelService.getSubjectLabels( {
+      var projectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
+      LabelService.getSubjectLabelsByProjectId( projectId, {
          callback : function(labels) {
             for (i = 0; i < labels.length; i++) {
                subjectLabelData.push( [ labels[i], labels[i].name ] );
@@ -278,11 +281,10 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             me.down( '#subjectLabelCombo2' ).store.reload();
          },
          errorHandler : function(message, exception) {
-            Ext.Msg.alert( 'Error', message )
             console.log( message )
             console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
-         }
-      } );
+         },
+      } )
 
       return subjectLabelStore;
    },

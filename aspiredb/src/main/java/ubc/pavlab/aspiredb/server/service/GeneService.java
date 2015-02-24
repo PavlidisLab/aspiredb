@@ -55,9 +55,6 @@ public interface GeneService {
     public Collection<Map<CnvBurdenAnalysisPerSubject, String>> getBurdenAnalysisPerSubject( Collection<Long> subjectIds )
             throws NotLoggedInException, BioMartServiceException;
 
-    public Collection<Map<CnvBurdenAnalysisPerSubject, String>> getBurdenAnalysisPerSubjectLabel(
-            Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException;
-
     /**
      * Returns a list of "potential" compound heterozygote variants, i.e. a patient has two variants (different alleles)
      * that overlap the same gene. We say "potential" because parent data is not available.

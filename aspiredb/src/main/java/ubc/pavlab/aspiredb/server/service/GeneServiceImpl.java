@@ -28,11 +28,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.math3.stat.descriptive.summary.Sum;
-import org.apache.commons.math3.stat.inference.TTest;
+import org.apache.commons.math3.stat.StatUtils;
+import org.apache.commons.math3.stat.inference.MannWhitneyUTest;
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,42 +171,45 @@ public class GeneServiceImpl implements GeneService {
             Map<String, Map<CnvBurdenAnalysisPerSubject, Double>> patientIdStats ) {
         Collection<Double> result = new ArrayList<>();
         for ( String patientId : patientIds ) {
-            result.add( patientIdStats.get( patientId ).get( statName ) );
+            Double val = patientIdStats.get( patientId ).get( statName );
+            if ( val == null ) {
+                continue;
+            }
+            result.add( val );
         }
         return ArrayUtils.toPrimitive( result.toArray( new Double[0] ) );
+    }
+
+    private double[] removeNaNs( double[] d ) {
+        Collection<Double> ret = new ArrayList<>();
+        for ( int i = 0; i < d.length; i++ ) {
+            if ( Double.isInfinite( d[i] ) || Double.isNaN( d[i] ) ) {
+                continue;
+            }
+            ret.add( d[i] );
+        }
+        return ArrayUtils.toPrimitive( ret.toArray( new Double[ret.size()] ) );
     }
 
     @SuppressWarnings("boxing")
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
+    // TODO
     public Collection<BurdenAnalysisValueObject> getBurdenAnalysisPerSubjectLabel( LabelValueObject group1,
             LabelValueObject group2, Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException {
 
         Collection<BurdenAnalysisValueObject> ret = new ArrayList<>();
 
-        ret.add( new BurdenAnalysisValueObject( "Group size", 500.4, 900.5, 0.004, 0.003 ) );
+        if ( group1 == null || group2 == null ) {
+            log.warn( "Labels can't be null! Group1 is " + group1 + " and group2 is " + group2 );
+            return ret;
+        }
 
-        return ret;
-    }
-
-    /**
-     * Returns the BurdenAnalysis per Subject label (See Bug 4129). Takes the average of all the per-sample metrics in a
-     * subject label.
-     * 
-     * @param subjectIds
-     * @return a map with the patientID as index, e.g. { LABEL_NAME : 'Control', NUM_DELETION : 2, NUM_DUPLICATION : 4,
-     *         }'
-     * @throws NotLoggedInException
-     * @throws BioMartServiceException
-     */
-    @SuppressWarnings("boxing")
-    @Override
-    @RemoteMethod
-    @Transactional(readOnly = true)
-    public Collection<Map<CnvBurdenAnalysisPerSubject, String>> getBurdenAnalysisPerSubjectLabel(
-            Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException {
-        Collection<Map<CnvBurdenAnalysisPerSubject, String>> results = new ArrayList<>();
+        if ( variantIds == null ) {
+            log.warn( "No variants found." );
+            return ret;
+        }
 
         Collection<Subject> subjects = new HashSet<>();
         Collection<String> allPatientIds = new HashSet<>();
@@ -217,64 +221,86 @@ public class GeneServiceImpl implements GeneService {
         }
 
         Map<String, Collection<String>> labelPatientId = subjectService.groupSubjectsBySubjectLabel( subjects );
+
+        labelPatientId = getMutuallyExclusivePatientIds( labelPatientId, group1.getName(), group2.getName() );
+
+        if ( !labelPatientId.containsKey( group1.getName() ) ) {
+            log.warn( "Subject label " + group1.getName() + " not found" );
+            return ret;
+        }
+
+        if ( !labelPatientId.containsKey( group2.getName() ) ) {
+            log.warn( "Subject label " + group2.getName() + " not found" );
+            return ret;
+        }
+
+        double group1Size = 1.0 * labelPatientId.get( group1.getName() ).size();
+        double group2Size = 1.0 * labelPatientId.get( group2.getName() ).size();
+        ret.add( new BurdenAnalysisValueObject( "Total number of subjects", group1Size, group2Size, null ) );
+
         Map<String, Map<CnvBurdenAnalysisPerSubject, Double>> patientIdStats = getVariantStatsBySubject( variants );
 
-        for ( String label : labelPatientId.keySet() ) {
+        for ( CnvBurdenAnalysisPerSubject statName : CnvBurdenAnalysisPerSubject.values() ) {
 
-            // nothing to do when there's no patients associated with this label
-            if ( labelPatientId.get( label ).size() == 0 ) {
+            double[] label1Stats = getPatientStats( statName, labelPatientId.get( group1.getName() ), patientIdStats );
+            double[] label2Stats = getPatientStats( statName, labelPatientId.get( group2.getName() ), patientIdStats );
+
+            if ( label1Stats.length == 0 ) {
+                log.warn( "No values found for " + statName );
                 continue;
             }
 
-            Collection<String> withLabel = labelPatientId.get( label );
+            // remove NaNs
+            label1Stats = removeNaNs( label1Stats );
+            label2Stats = removeNaNs( label2Stats );
 
-            Collection<String> withoutLabel = new ArrayList<>( allPatientIds );
-            withoutLabel.removeAll( withLabel );
-
-            Map<CnvBurdenAnalysisPerSubject, Double> stats = new HashMap<>(); // store values
-            Map<CnvBurdenAnalysisPerSubject, String> statsStr = new HashMap<>(); // store as string with p-vals
-            results.add( statsStr );
-
-            statsStr.put( CnvBurdenAnalysisPerSubject.LABEL_NAME, label );
-
-            // note that those samples with no variants are not counted towards the total
-            statsStr.put( CnvBurdenAnalysisPerSubject.NUM_SAMPLES,
-                    String.format( "%d / %d", withLabel.size(), allPatientIds.size() ) );
-
-            for ( CnvBurdenAnalysisPerSubject statName : patientIdStats.get( withLabel.iterator().next() ).keySet() ) {
-                double[] withLabelStats = getPatientStats( statName, withLabel, patientIdStats );
-                double[] withoutLabelStats = getPatientStats( statName, withoutLabel, patientIdStats );
-
-                Double pval = 1.0;
-                String pvalSuffix = "";
-                if ( withLabelStats.length > 1 && withoutLabelStats.length > 1 ) {
-                    pval = new TTest().tTest( withLabelStats, withoutLabelStats );
-                    if ( pval < 0.001 ) {
-                        pvalSuffix = "**";
-                    } else if ( pval < 0.05 ) {
-                        pvalSuffix = "*";
-                    }
-                }
-
-                double statValue = new Sum().evaluate( withLabelStats );
-                String statValueStr = dformat.format( statValue );
-                stats.put( statName, statValue );
-                statsStr.put( statName, statValueStr + pvalSuffix );
+            double mean1 = StatUtils.mean( label1Stats );
+            double mean2 = StatUtils.mean( label2Stats );
+            if ( mean1 + mean2 == 0 ) {
+                log.warn( "No " + statName + " stats was found" );
+                continue;
             }
+            double pval = new MannWhitneyUTest().mannWhitneyUTest( label1Stats, label2Stats );
 
-            double statValue = 1.0 * stats.get( CnvBurdenAnalysisPerSubject.TOTAL_SIZE )
-                    / stats.get( CnvBurdenAnalysisPerSubject.TOTAL );
-            stats.put( CnvBurdenAnalysisPerSubject.AVG_SIZE, statValue );
-            statsStr.put( CnvBurdenAnalysisPerSubject.AVG_SIZE, dformat.format( statValue ) );
-
-            statValue = 1.0 * stats.get( CnvBurdenAnalysisPerSubject.NUM_GENES )
-                    / stats.get( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE );
-            stats.put( CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV, statValue );
-            statsStr.put( CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV, dformat.format( statValue ) );
-
+            ret.add( new BurdenAnalysisValueObject( statName.name(), mean1, mean2, pval ) );
         }
 
-        return results;
+        return ret;
+    }
+
+    /**
+     * Excludes those IDs that have both label1 and label2.
+     * 
+     * @param labelPatientId
+     * @param name
+     * @param name2
+     * @return
+     */
+    private Map<String, Collection<String>> getMutuallyExclusivePatientIds(
+            Map<String, Collection<String>> labelPatientId, String label1, String label2 ) {
+
+        if ( !labelPatientId.containsKey( label1 ) || !labelPatientId.containsKey( label2 ) ) {
+            log.warn( "Label not found" );
+            return labelPatientId;
+        }
+        Collection<String> label1IdsOld = new ArrayList<>( labelPatientId.get( label1 ) );
+        Collection<String> label2IdsOld = new ArrayList<>( labelPatientId.get( label2 ) );
+        Collection<String> label1Ids = labelPatientId.get( label1 );
+        Collection<String> label2Ids = labelPatientId.get( label2 );
+        boolean removed = label1Ids.removeAll( label2IdsOld );
+        label2Ids.removeAll( label1IdsOld );
+
+        // for logging
+        if ( removed ) {
+            label1IdsOld.removeAll( label1Ids );
+            label2IdsOld.removeAll( label2Ids );
+            label1IdsOld.addAll( label2IdsOld );
+            log.info( "Ignoring " + label1IdsOld.size() + " (" + StringUtils.join( label1IdsOld, "," )
+                    + ") subjects with labels " + label1 + " and " + label2 + ". After filtering, " + label1 + " has "
+                    + label1Ids.size() + " and " + label2 + " has " + label2Ids.size() );
+        }
+
+        return labelPatientId;
     }
 
     /**

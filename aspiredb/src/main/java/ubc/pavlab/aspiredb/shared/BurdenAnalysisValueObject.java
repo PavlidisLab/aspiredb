@@ -42,12 +42,11 @@ public class BurdenAnalysisValueObject implements Serializable {
     public BurdenAnalysisValueObject() {
     }
 
-    public BurdenAnalysisValueObject( String name, Double group1, Double group2, Double pValue, Double qValue ) {
+    public BurdenAnalysisValueObject( String name, Double group1, Double group2, Double pValue ) {
         this.name = name;
         this.group1 = group1;
         this.group2 = group2;
         this.pValue = pValue;
-        this.qValue = qValue;
     }
 
     public Long getId() {
