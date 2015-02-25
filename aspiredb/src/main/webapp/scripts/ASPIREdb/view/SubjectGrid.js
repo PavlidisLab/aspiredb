@@ -17,7 +17,7 @@
  *
  */
 Ext.require( [ 'ASPIREdb.store.SubjectStore', 'ASPIREdb.view.CreateLabelWindow', 'ASPIREdb.view.LabelControlWindow',
-              'ASPIREdb.TextDataDownloadWindow' ] );
+              'ASPIREdb.TextDataDownloadWindow', 'ASPIREdb.view.report.BurdenAnalysisWindow' ] );
 
 /**
  * Queries Subject values and loads them into a {@link Ext.grid.Panel}

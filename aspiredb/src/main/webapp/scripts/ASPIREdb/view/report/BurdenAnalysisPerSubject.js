@@ -127,7 +127,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubject', {
 
       var me = this;
 
-      GeneService.getBurdenAnalysisPerSubject( variantIds, {
+      BurdenAnalysisService.getBurdenAnalysisPerSubject( variantIds, {
          callback : function(results) {
             var grid = me.createGrid( results );
             me.add( grid );

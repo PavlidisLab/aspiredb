@@ -25,6 +25,12 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
    extend : 'Ext.panel.Panel',
    layout : 'fit',
 
+   config : {
+      label1 : null,
+      label2 : null,
+      characteristic : null,
+   },
+   
    /**
     * Display table contents as plain text for downloading to a TSV
     */
@@ -128,16 +134,17 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
       var me = this;
 
       var window = me.up( '#burdenAnalysisWindow' );
-      var label1 = window.down( '#subjectLabelCombo1' ).getValue();
-      var label2 = window.down( '#subjectLabelCombo2' ).getValue();
-
+      var label1 = me.label1;
+      var label2 = me.label2;
+      var char = me.characteristic;
+      
       if ( label1.id === label2.id ) {
-         Ext.Msg.alert( 'Error', "Labels must be different" );
+         Ext.Msg.alert( 'Error', "Subject labels must be different!" );
          window.setLoading( false );
          return;
       }
 
-      GeneService.getBurdenAnalysisPerSubjectLabel( label1, label2, variantIds, {
+      BurdenAnalysisService.getBurdenAnalysisCharacteristic( char, label1, label2, variantIds, {
          callback : function(results) {
             var grid = me.createGrid( results );
             me.add( grid );

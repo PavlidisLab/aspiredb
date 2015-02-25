@@ -31,46 +31,6 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
    resizable : true,
    tbar : [],
 
-   statics : {
-      getColumnDataFromStore : function(store, columnName) {
-         var result = [];
-         for (var i = 0; i < store.data.length; i++) {
-
-            // extract values
-            var row = store.data.getAt( i ).data;
-            var val = row[columnName];
-
-            if ( val == undefined ) {
-               console.log( "Error " + val );
-               continue;
-            }
-
-            // For CNV specific attributes like type and length, ignore SNVs
-            if ( !this.isVariantTypeAndReportFieldCompatible( columnName, row["variantType"] ) ) {
-               continue;
-            }
-
-            // show NA for empty values
-            if ( val === "" ) {
-               val = "NA";
-            }
-
-            result.push( val );
-         }
-         return result;
-      },
-
-      isVariantTypeAndReportFieldCompatible : function(columnName, variantType) {
-         if ( variantType !== "CNV" ) {
-            if ( columnName === "type" || columnName === "cnvLength" ) {
-               return false;
-            }
-         }
-
-         return true;
-      },
-   },
-
    initComponent : function() {
 
       var me = this;
@@ -486,6 +446,8 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
          window.down( '#savePngButton' ).hide();
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
             id : 'burdenReport',
+            label1 : subjectLabel1,
+            label2 : subjectLabel2,
             characteristic : characteristic
          } );
       } else if ( selReportType === "genesPerSubjectLabel" ) {

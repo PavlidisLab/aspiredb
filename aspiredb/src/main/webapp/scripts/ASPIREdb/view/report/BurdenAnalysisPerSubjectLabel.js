@@ -139,12 +139,12 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
       var label2 = me.label2;
 
       if ( label1.id === label2.id ) {
-         Ext.Msg.alert( 'Error', "Labels must be different" );
+         Ext.Msg.alert( 'Error', "Subject labels must be different!" );
          window.setLoading( false );
          return;
       }
 
-      GeneService.getBurdenAnalysisPerSubjectLabel( label1, label2, variantIds, {
+      BurdenAnalysisService.getBurdenAnalysisPerSubjectLabel( label1, label2, variantIds, {
          callback : function(results) {
             var grid = me.createGrid( results );
             me.add( grid );

@@ -10,6 +10,7 @@
 <script src="dwr/interface/SubjectService.js"></script>
 <script src="dwr/interface/VariantService.js"></script>
 <script src="dwr/interface/GeneService.js"></script>
+<script src="dwr/interface/BurdenAnalysisService.js"></script>
 <script src="dwr/interface/UserGeneSetService.js"></script>
 <script src="dwr/interface/UserManagerService.js"></script>
 <script src="dwr/interface/UCSCConnector.js"></script>
