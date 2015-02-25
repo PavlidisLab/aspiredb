@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.math3.stat.StatUtils;
+import org.apache.commons.math3.stat.inference.ChiSquareTest;
 import org.apache.commons.math3.stat.inference.MannWhitneyUTest;
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
@@ -41,16 +42,18 @@ import ubc.pavlab.aspiredb.server.dao.LabelDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.CNV;
+import ubc.pavlab.aspiredb.server.model.Characteristic;
 import ubc.pavlab.aspiredb.server.model.CnvType;
-import ubc.pavlab.aspiredb.server.model.GenomicLocation;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.BurdenAnalysisValueObject;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.query.CharacteristicProperty;
+import ubc.pavlab.aspiredb.shared.query.PropertyValue;
 
 /**
  * 
@@ -61,6 +64,8 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
 
     @Autowired
     private SubjectService subjectService;
+    @Autowired
+    private VariantService variantService;
     @Autowired
     private SubjectDao subjectDao;
     @Autowired
@@ -148,6 +153,7 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         return ArrayUtils.toPrimitive( result.toArray( new Double[0] ) );
     }
 
+    @SuppressWarnings("boxing")
     private double[] removeNaNs( double[] d ) {
         Collection<Double> ret = new ArrayList<>();
         for ( int i = 0; i < d.length; i++ ) {
@@ -163,7 +169,6 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
-    // TODO
     public Collection<BurdenAnalysisValueObject> getBurdenAnalysisPerSubjectLabel( LabelValueObject group1,
             LabelValueObject group2, Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException {
 
@@ -396,38 +401,160 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         return results;
     }
 
-    private boolean isOverlapping( GenomicLocation loc1, GenomicLocation loc2 ) {
-        boolean sameChromosome = loc2.getChromosome().equals( loc1.getChromosome() );
-        if ( !sameChromosome ) {
-            return false;
-        }
-        boolean geneInsideRegion = ( loc1.getStart() <= loc2.getStart() ) && ( loc1.getEnd() >= loc2.getEnd() );
-        if ( geneInsideRegion ) {
-            return true;
-        }
-        boolean geneSurroundsRegion = ( loc1.getStart() >= loc2.getStart() ) && ( loc1.getEnd() <= loc2.getEnd() );
-        if ( geneSurroundsRegion ) {
-            return true;
-        }
-        boolean geneHitsEndOfRegion = ( loc1.getStart() <= loc2.getStart() ) && ( loc1.getEnd() >= loc2.getStart() );
-        if ( geneHitsEndOfRegion ) {
-            return true;
-        }
-        boolean geneHitsStartOfRegion = ( loc1.getStart() <= loc2.getEnd() ) && ( loc1.getEnd() >= loc2.getEnd() );
-        if ( geneHitsStartOfRegion ) {
-            return true;
-        }
-        return false;
-    }
-
+    @SuppressWarnings("boxing")
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
     public Collection<BurdenAnalysisValueObject> getBurdenAnalysisCharacteristic(
             CharacteristicProperty characteristic, LabelValueObject group1, LabelValueObject group2,
-            Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException {
-        // TODO Auto-generated method stub
-        return null;
+            Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException,
+            NeurocartaServiceException {
+
+        class YesNoCount {
+            long yesCount = 0;
+            long noCount = 0;
+
+            public long incrementYes() {
+                return this.yesCount++;
+            }
+
+            public long incrementNo() {
+                return this.noCount++;
+            }
+
+            public long getYesCount() {
+                return this.yesCount;
+            }
+
+            public long getNoCount() {
+                return this.noCount;
+            }
+        }
+
+        final int MAX_CHAR_VALUES = 50; // maximum number of unique characteristic values we allow
+
+        Collection<BurdenAnalysisValueObject> ret = new ArrayList<>();
+
+        if ( characteristic == null ) {
+            log.warn( "Characteristic can't be null!" );
+            return ret;
+        }
+
+        if ( group1 == null || group2 == null ) {
+            log.warn( "Labels can't be null! Group1 is " + group1 + " and group2 is " + group2 );
+            return ret;
+        }
+
+        if ( variantIds == null ) {
+            log.warn( "No variants found." );
+            return ret;
+        }
+
+        Map<String, Subject> patientIdSubjects = new HashMap<>();
+        Collection<String> allPatientIds = new HashSet<>();
+        Collection<Variant> variants = variantDao.load( variantIds );
+
+        for ( Variant v : variants ) {
+            Subject subject = subjectDao.load( v.getSubject().getId() );
+            patientIdSubjects.put( subject.getPatientId(), subject );
+            allPatientIds.add( subject.getPatientId() );
+        }
+
+        // key: labelName, values: patientIds
+        Map<String, Collection<String>> labelPatientId = subjectService.groupSubjectsBySubjectLabel( patientIdSubjects
+                .values() );
+
+        labelPatientId = getMutuallyExclusivePatientIds( labelPatientId, group1.getName(), group2.getName() );
+
+        if ( !labelPatientId.containsKey( group1.getName() ) ) {
+            log.warn( "Subject label " + group1.getName() + " not found" );
+            return ret;
+        }
+
+        if ( !labelPatientId.containsKey( group2.getName() ) ) {
+            log.warn( "Subject label " + group2.getName() + " not found" );
+            return ret;
+        }
+
+        Collection<PropertyValue> charValues = variantService.suggestValues( characteristic, null );
+        if ( charValues.size() > MAX_CHAR_VALUES ) {
+            log.warn( "There are too many (>" + MAX_CHAR_VALUES + ") " + characteristic.getDisplayName() + " values!" );
+            return ret;
+        }
+
+        // TODO
+        // keys: charValue, subjectLabel {group1, group2},
+        // value: YesNoCount {subjectCountYes, subjectCountNo}
+        Map<String, Map<String, YesNoCount>> counts = new HashMap<>();
+
+        // init map
+        for ( PropertyValue v : charValues ) {
+            Map<String, YesNoCount> m = new HashMap<>();
+            counts.put( v.getDisplayValue(), m );
+            for ( String label : labelPatientId.keySet() ) {
+                m.put( label, new YesNoCount() );
+            }
+        }
+
+        // count which subjects has a variant that matches the character name and value
+        // TODO could potentially use some optimization?
+        for ( PropertyValue v : charValues ) {
+            for ( String label : labelPatientId.keySet() ) {
+                for ( String patientId : labelPatientId.get( label ) ) {
+
+                    boolean found = subjectHasCharacteristicValue( patientIdSubjects.get( patientId ).getVariants(),
+                            characteristic.getDisplayName(), v );
+
+                    YesNoCount yesNo = counts.get( v.getDisplayValue() ).get( label );
+
+                    if ( found ) {
+                        yesNo.incrementYes();
+                    } else {
+                        yesNo.incrementNo();
+                    }
+
+                }
+            }
+        }
+
+        // calculate chi-squred tests for each charValue using counts
+        for ( String charValue : counts.keySet() ) {
+
+            YesNoCount grp1 = counts.get( charValue ).get( group1.getName() );
+            YesNoCount grp2 = counts.get( charValue ).get( group2.getName() );
+
+            long[][] d = { { grp1.getYesCount(), grp1.getNoCount() }, { grp2.getYesCount(), grp2.getNoCount() } };
+
+            double pval = new ChiSquareTest().chiSquareTest( d );
+
+            if ( Double.isNaN( pval ) ) {
+                log.warn( charValue + "'s p-value is NaN, values " + d );
+                continue;
+            }
+
+            String grp1frac = grp1.getYesCount() + "/" + ( grp1.getYesCount() + grp1.getNoCount() );
+            String grp2frac = grp2.getYesCount() + "/" + ( grp2.getYesCount() + grp2.getNoCount() );
+
+            ret.add( new BurdenAnalysisValueObject( charValue, grp1frac, grp2frac, pval ) );
+        }
+
+        return ret;
     }
 
+    private boolean subjectHasCharacteristicValue( Collection<Variant> variants, String displayName,
+            PropertyValue charValue ) {
+
+        for ( Variant v : variants ) {
+            for ( Characteristic c : v.getCharacteristics() ) {
+                if ( !c.getKey().equalsIgnoreCase( displayName ) ) {
+                    continue;
+                }
+                if ( c.getValue().equalsIgnoreCase( charValue.getDisplayValue() ) ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

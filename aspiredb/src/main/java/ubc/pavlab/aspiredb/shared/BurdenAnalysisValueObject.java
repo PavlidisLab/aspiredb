@@ -34,15 +34,15 @@ public class BurdenAnalysisValueObject implements Serializable {
     private Long id;
 
     private String name;
-    private Double group1;
-    private Double group2;
+    private Object group1;
+    private Object group2;
     private Double pValue;
     private Double qValue;
 
     public BurdenAnalysisValueObject() {
     }
 
-    public BurdenAnalysisValueObject( String name, Double group1, Double group2, Double pValue ) {
+    public BurdenAnalysisValueObject( String name, Object group1, Object group2, Double pValue ) {
         this.name = name;
         this.group1 = group1;
         this.group2 = group2;
@@ -61,7 +61,7 @@ public class BurdenAnalysisValueObject implements Serializable {
         this.name = name;
     }
 
-    public Double getGroup1() {
+    public Object getGroup1() {
         return group1;
     }
 
@@ -69,7 +69,7 @@ public class BurdenAnalysisValueObject implements Serializable {
         this.group1 = group1;
     }
 
-    public Double getGroup2() {
+    public Object getGroup2() {
         return group2;
     }
 

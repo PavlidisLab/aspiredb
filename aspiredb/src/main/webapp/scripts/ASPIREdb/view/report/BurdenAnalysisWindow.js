@@ -275,7 +275,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
    addNominalCharacteristic : function( characteristic, data, store ) {
 
       var char = characteristic;
-      var MAX_VALUES = 10;        // maximum unique values we allow
+      var MAX_VALUES = 20;        // maximum number of unique characteristic values we allow
       
       VariantService.suggestValues( characteristic, null, {
          callback : function( results ) {

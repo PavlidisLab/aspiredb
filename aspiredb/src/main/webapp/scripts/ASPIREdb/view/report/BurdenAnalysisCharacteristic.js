@@ -30,7 +30,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
       label2 : null,
       characteristic : null,
    },
-   
+
    /**
     * Display table contents as plain text for downloading to a TSV
     */
@@ -43,10 +43,12 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
          name : 'name',
       }, {
          name : 'group1',
-         type : 'float'
+         type : 'string',
+//         sortType : 'asFraction'
       }, {
          name : 'group2',
-         type : 'float'
+         type : 'string',
+//         sortType : 'asFraction'
       }, {
          name : 'pValue',
          type : 'float',
@@ -57,6 +59,10 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
          storeId : 'burdenAnalysisPerSubjectStore',
          fields : fields,
          data : data,
+         sorters : {
+            property : 'pValue',
+            direction : 'ASC'// or 'DESC' (case sensitive for local sorting)
+         }
       } );
 
       return store;
@@ -72,34 +78,14 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
          dataIndex : 'name',
          text : '',
          flex : 2,
-         renderer : function(value, metaData, record, row, col, store, gridView) {
-            var nameDesc = {
-               NUM_DELETION : 'Mean number of deletions',
-               NUM_DUPLICATION : 'Mean number of duplications',
-               NUM_UNKNOWN : 'Mean number of unknown types',
-               TOTAL : 'Mean number of CNVs',
-               TOTAL_SIZE : 'Mean total CNV size (bp)',
-               AVG_SIZE : 'Mean average CNV size (bp)',
-               NUM_GENES : 'Mean number of genes',
-               NUM_CNVS_WITH_GENE : 'Mean number of CNVs overlapping a gene',
-               AVG_GENES_PER_CNV : 'Mean number of genes per CNV'
-            };
-            var ret = nameDesc[value];
-            if ( ret == undefined ) {
-               ret = value;
-            }
-            return ret;
-         }
       }, {
          dataIndex : 'group1',
          text : 'Group 1',
          flex : 1,
-         renderer : precisionRenderer
       }, {
          dataIndex : 'group2',
          text : 'Group 2',
          flex : 1,
-         renderer : precisionRenderer
       }, {
          dataIndex : 'pValue',
          text : 'P-value',
@@ -137,7 +123,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
       var label1 = me.label1;
       var label2 = me.label2;
       var char = me.characteristic;
-      
+
       if ( label1.id === label2.id ) {
          Ext.Msg.alert( 'Error', "Subject labels must be different!" );
          window.setLoading( false );

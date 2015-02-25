@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
+import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.service.BurdenAnalysisServiceImpl.CnvBurdenAnalysisPerSubject;
 import ubc.pavlab.aspiredb.shared.BurdenAnalysisValueObject;
@@ -60,9 +61,11 @@ public interface BurdenAnalysisService {
      * @return
      * @throws NotLoggedInException
      * @throws BioMartServiceException
+     * @throws NeurocartaServiceException
      */
     public Collection<BurdenAnalysisValueObject> getBurdenAnalysisCharacteristic(
             CharacteristicProperty characteristic, LabelValueObject group1, LabelValueObject group2,
-            Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException;
+            Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException,
+            NeurocartaServiceException;
 
 }

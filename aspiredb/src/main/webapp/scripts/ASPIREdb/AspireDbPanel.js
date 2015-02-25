@@ -28,6 +28,16 @@ if ( Ext.isChrome || Ext.IE ) {
    Ext.Msg.minWidth = 450;
 }
 
+Ext.apply( Ext.data.SortTypes, {
+   asFraction : function(fraction) {
+      var tokens = fraction.split( '/' );
+      if ( tokens.length != 2 ) {
+         return fraction;
+      }
+      return parseInt( tokens[0] ) / parseInt( tokens[1] ) * 1.0;
+   }
+} );
+
 /**
  * Main Panel which trigger the Main Panel after user's successful login Events: - login - logout
  */
