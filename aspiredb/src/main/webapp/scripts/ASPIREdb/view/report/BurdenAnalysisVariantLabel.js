@@ -19,9 +19,9 @@
 Ext.require( [] );
 
 /**
- * Create Burden Analysis Per Subject Label
+ * 
  */
-Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
+Ext.define( 'ASPIREdb.view.report.BurdenAnalysisVariantLabel', {
    extend : 'Ext.panel.Panel',
    layout : 'fit',
 
@@ -42,10 +42,12 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
          name : 'name',
       }, {
          name : 'group1',
-         type : 'float'
+         type : 'string',
+      // sortType : 'asFraction'
       }, {
          name : 'group2',
-         type : 'float'
+         type : 'string',
+      // sortType : 'asFraction'
       }, {
          name : 'pValue',
          type : 'float',
@@ -56,6 +58,10 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
          storeId : 'burdenAnalysisPerSubjectStore',
          fields : fields,
          data : data,
+         sorters : {
+            property : 'pValue',
+            direction : 'ASC'// or 'DESC' (case sensitive for local sorting)
+         }
       } );
 
       return store;
@@ -75,18 +81,16 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
          dataIndex : 'group1',
          text : 'Group 1',
          flex : 1,
-         renderer : precisionRenderer
       }, {
          dataIndex : 'group2',
          text : 'Group 2',
          flex : 1,
-         renderer : precisionRenderer
       }, {
          dataIndex : 'pValue',
          text : 'P-value',
          flex : 1,
          renderer : precisionRenderer,
-         tooltip : 'Mann-Whitney U test',
+         tooltip : 'Chi-square test',
          tooltipType : 'title'
       } ];
 
@@ -115,8 +119,6 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
       var me = this;
 
       var window = me.up( '#burdenAnalysisWindow' );
-      // var label1 = window.down( '#subjectLabelCombo1' ).getValue();
-      // var label2 = window.down( '#subjectLabelCombo2' ).getValue();
       var label1 = me.label1;
       var label2 = me.label2;
 
@@ -126,7 +128,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
          return;
       }
 
-      BurdenAnalysisService.getBurdenAnalysisPerSubjectLabel( label1, label2, variantIds, {
+      BurdenAnalysisService.getBurdenAnalysisVariantLabel( label1, label2, variantIds, {
          callback : function(results) {
             var grid = me.createGrid( results );
             me.add( grid );

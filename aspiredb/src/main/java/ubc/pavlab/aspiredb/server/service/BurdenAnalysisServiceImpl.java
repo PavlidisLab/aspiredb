@@ -47,6 +47,9 @@ import ubc.pavlab.aspiredb.server.exceptions.NotLoggedInException;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Characteristic;
 import ubc.pavlab.aspiredb.server.model.CnvType;
+import ubc.pavlab.aspiredb.server.model.Indel;
+import ubc.pavlab.aspiredb.server.model.Label;
+import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.BurdenAnalysisValueObject;
@@ -80,7 +83,27 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
     DecimalFormat dformat = new DecimalFormat( "#.#####" );
 
     enum CnvBurdenAnalysisPerSubject {
-        PATIENT_ID, LABEL_NAME, NUM_SAMPLES, NUM_DELETION, NUM_DUPLICATION, NUM_UNKNOWN, TOTAL, TOTAL_SIZE, AVG_SIZE, NUM_GENES, NUM_CNVS_WITH_GENE, AVG_GENES_PER_CNV
+        PATIENT_ID, LABEL_NAME, NUM_SAMPLES, NUM_CNV_LOSS, NUM_CNV_GAIN, NUM_CNV_UNKNOWN, TOTAL_CNV, TOTAL_SIZE, AVG_SIZE, NUM_GENES, NUM_VARIANTS_WITH_GENE, AVG_GENES_PER_CNV, TOTAL_SNV, TOTAL_INDEL
+    }
+
+    final Map<CnvBurdenAnalysisPerSubject, String> CnvBurdenAnalysisPerSubjectDesc = new HashMap<>();
+
+    {
+        CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.NUM_CNV_LOSS, "Mean number of CNV loss" );
+        CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.NUM_CNV_GAIN, "Mean number of CNV gains" );
+        CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.NUM_CNV_UNKNOWN,
+                "Mean number of unknown types" );
+        CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.TOTAL_CNV, "Mean number of CNVs" );
+        CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.TOTAL_SIZE, "Mean total CNV size (bp)" );
+        CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.AVG_SIZE, "Mean average CNV size (bp)" );
+        CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.NUM_GENES,
+                "Mean number of genes overlapping a variant" );
+        CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.NUM_VARIANTS_WITH_GENE,
+                "Mean number of variants overlapping a gene" );
+        CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV,
+                "Mean number of genes per CNV" );
+        CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.TOTAL_SNV, "Mean number of SNVs" );
+        CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.TOTAL_INDEL, "Mean number of Indels" );
     }
 
     protected static Log log = LogFactory.getLog( BurdenAnalysisServiceImpl.class );
@@ -235,7 +258,7 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
             }
             double pval = new MannWhitneyUTest().mannWhitneyUTest( label1Stats, label2Stats );
 
-            ret.add( new BurdenAnalysisValueObject( statName.name(), mean1, mean2, pval ) );
+            ret.add( new BurdenAnalysisValueObject( CnvBurdenAnalysisPerSubjectDesc.get( statName ), mean1, mean2, pval ) );
         }
 
         return ret;
@@ -353,55 +376,69 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
             Variant v = variantDao.load( variantId );
 
             // skip non-CNV
-            if ( !( v instanceof CNV ) ) {
-                continue;
-            }
+            // if ( !( v instanceof CNV ) ) {
+            // continue;
+            // }
 
             Collection<GeneValueObject> genes = genesPerVariant.get( variantId );
 
-            CNV cnv = ( CNV ) v;
+            if ( v instanceof CNV ) {
+                CNV cnv = ( CNV ) v;
 
-            if ( cnv.getType().equals( CnvType.GAIN ) ) {
-                results.put( CnvBurdenAnalysisPerSubject.NUM_DUPLICATION,
-                        results.get( CnvBurdenAnalysisPerSubject.NUM_DUPLICATION ) + 1 );
-            } else if ( cnv.getType().equals( CnvType.LOSS ) ) {
-                results.put( CnvBurdenAnalysisPerSubject.NUM_DELETION,
-                        results.get( CnvBurdenAnalysisPerSubject.NUM_DELETION ) + 1 );
-            } else {
-                results.put( CnvBurdenAnalysisPerSubject.NUM_UNKNOWN,
-                        results.get( CnvBurdenAnalysisPerSubject.NUM_UNKNOWN ) + 1 );
+                if ( cnv.getType().equals( CnvType.GAIN ) ) {
+                    results.put( CnvBurdenAnalysisPerSubject.NUM_CNV_GAIN,
+                            results.get( CnvBurdenAnalysisPerSubject.NUM_CNV_GAIN ) + 1 );
+                } else if ( cnv.getType().equals( CnvType.LOSS ) ) {
+                    results.put( CnvBurdenAnalysisPerSubject.NUM_CNV_LOSS,
+                            results.get( CnvBurdenAnalysisPerSubject.NUM_CNV_LOSS ) + 1 );
+                } else {
+                    results.put( CnvBurdenAnalysisPerSubject.NUM_CNV_UNKNOWN,
+                            results.get( CnvBurdenAnalysisPerSubject.NUM_CNV_UNKNOWN ) + 1 );
+                }
+
+                results.put( CnvBurdenAnalysisPerSubject.TOTAL_CNV,
+                        results.get( CnvBurdenAnalysisPerSubject.TOTAL_CNV ) + 1 );
+
+                results.put( CnvBurdenAnalysisPerSubject.TOTAL_SIZE,
+                        results.get( CnvBurdenAnalysisPerSubject.TOTAL_SIZE ) + cnv.getCnvLength() );
+            } else if ( v instanceof SNV ) {
+                results.put( CnvBurdenAnalysisPerSubject.TOTAL_SNV,
+                        results.get( CnvBurdenAnalysisPerSubject.TOTAL_SNV ) + 1 );
+            } else if ( v instanceof Indel ) {
+                results.put( CnvBurdenAnalysisPerSubject.TOTAL_INDEL,
+                        results.get( CnvBurdenAnalysisPerSubject.TOTAL_INDEL ) + 1 );
             }
-
-            results.put( CnvBurdenAnalysisPerSubject.TOTAL, results.get( CnvBurdenAnalysisPerSubject.TOTAL ) + 1 );
-
-            results.put( CnvBurdenAnalysisPerSubject.TOTAL_SIZE, results.get( CnvBurdenAnalysisPerSubject.TOTAL_SIZE )
-                    + cnv.getCnvLength() );
 
             if ( genes.size() > 0 ) {
                 results.put( CnvBurdenAnalysisPerSubject.NUM_GENES, results.get( CnvBurdenAnalysisPerSubject.NUM_GENES )
                         + genes.size() );
 
-                results.put( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE,
-                        results.get( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE ) + 1 );
+                results.put( CnvBurdenAnalysisPerSubject.NUM_VARIANTS_WITH_GENE,
+                        results.get( CnvBurdenAnalysisPerSubject.NUM_VARIANTS_WITH_GENE ) + 1 );
             }
 
         }
 
-        results.put( CnvBurdenAnalysisPerSubject.AVG_SIZE, results.get( CnvBurdenAnalysisPerSubject.TOTAL_SIZE )
-                / results.get( CnvBurdenAnalysisPerSubject.TOTAL ) * 1.0 );
+        if ( results.get( CnvBurdenAnalysisPerSubject.TOTAL_SIZE ) > 0
+                && results.get( CnvBurdenAnalysisPerSubject.NUM_VARIANTS_WITH_GENE ) > 0 ) {
+            results.put( CnvBurdenAnalysisPerSubject.AVG_SIZE, results.get( CnvBurdenAnalysisPerSubject.TOTAL_SIZE )
+                    / results.get( CnvBurdenAnalysisPerSubject.TOTAL_CNV ) * 1.0 );
 
-        // results.put(
-        // CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE.toString(),
-        // results.get( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE.toString() )
-        // / results.get( CnvBurdenAnalysisPerSubject.TOTAL.toString() ) * 1.0 );
+            // results.put(
+            // CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE.toString(),
+            // results.get( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE.toString() )
+            // / results.get( CnvBurdenAnalysisPerSubject.TOTAL.toString() ) * 1.0 );
 
-        results.put( CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV, results.get( CnvBurdenAnalysisPerSubject.NUM_GENES )
-                / results.get( CnvBurdenAnalysisPerSubject.NUM_CNVS_WITH_GENE ) * 1.0 );
+            results.put(
+                    CnvBurdenAnalysisPerSubject.AVG_GENES_PER_CNV,
+                    results.get( CnvBurdenAnalysisPerSubject.NUM_GENES )
+                            / results.get( CnvBurdenAnalysisPerSubject.NUM_VARIANTS_WITH_GENE ) * 1.0 );
+        }
 
         return results;
     }
 
-    @SuppressWarnings("boxing")
+    @SuppressWarnings({ "boxing", "rawtypes" })
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
@@ -451,13 +488,11 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         }
 
         Map<String, Subject> patientIdSubjects = new HashMap<>();
-        Collection<String> allPatientIds = new HashSet<>();
         Collection<Variant> variants = variantDao.load( variantIds );
 
         for ( Variant v : variants ) {
             Subject subject = subjectDao.load( v.getSubject().getId() );
             patientIdSubjects.put( subject.getPatientId(), subject );
-            allPatientIds.add( subject.getPatientId() );
         }
 
         // key: labelName, values: patientIds
@@ -482,7 +517,6 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
             return ret;
         }
 
-        // TODO
         // keys: charValue, subjectLabel {group1, group2},
         // value: YesNoCount {subjectCountYes, subjectCountNo}
         Map<String, Map<String, YesNoCount>> counts = new HashMap<>();
@@ -523,17 +557,17 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
             YesNoCount grp1 = counts.get( charValue ).get( group1.getName() );
             YesNoCount grp2 = counts.get( charValue ).get( group2.getName() );
 
+            String grp1frac = grp1.getYesCount() + "/" + ( grp1.getYesCount() + grp1.getNoCount() );
+            String grp2frac = grp2.getYesCount() + "/" + ( grp2.getYesCount() + grp2.getNoCount() );
+
             long[][] d = { { grp1.getYesCount(), grp1.getNoCount() }, { grp2.getYesCount(), grp2.getNoCount() } };
 
             double pval = new ChiSquareTest().chiSquareTest( d );
 
             if ( Double.isNaN( pval ) ) {
-                log.warn( charValue + "'s p-value is NaN, values " + d );
+                log.warn( charValue + "'s p-value is NaN, grp1 " + grp1frac + ", grp2 " + grp2frac );
                 continue;
             }
-
-            String grp1frac = grp1.getYesCount() + "/" + ( grp1.getYesCount() + grp1.getNoCount() );
-            String grp2frac = grp2.getYesCount() + "/" + ( grp2.getYesCount() + grp2.getNoCount() );
 
             ret.add( new BurdenAnalysisValueObject( charValue, grp1frac, grp2frac, pval ) );
         }
@@ -541,6 +575,7 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         return ret;
     }
 
+    @SuppressWarnings("rawtypes")
     private boolean subjectHasCharacteristicValue( Collection<Variant> variants, String displayName,
             PropertyValue charValue ) {
 
@@ -556,5 +591,149 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         }
 
         return false;
+    }
+
+    private boolean subjectHasVariantLabel( Collection<Variant> variants, LabelValueObject label ) {
+
+        for ( Variant v : variants ) {
+            for ( Label l : v.getLabels() ) {
+                if ( l.getId() == label.getId() ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @SuppressWarnings({ "boxing" })
+    @Override
+    @Transactional(readOnly = true)
+    @RemoteMethod
+    public Collection<BurdenAnalysisValueObject> getBurdenAnalysisVariantLabel( LabelValueObject group1,
+            LabelValueObject group2, Collection<Long> variantIds ) throws NotLoggedInException,
+            BioMartServiceException, NeurocartaServiceException {
+
+        class YesNoCount {
+            long yesCount = 0;
+            long noCount = 0;
+
+            public long incrementYes() {
+                return this.yesCount++;
+            }
+
+            public long incrementNo() {
+                return this.noCount++;
+            }
+
+            public long getYesCount() {
+                return this.yesCount;
+            }
+
+            public long getNoCount() {
+                return this.noCount;
+            }
+        }
+
+        final int MAX_VARIANT_LABELS = 50; // maximum number of unique characteristic values we allow
+
+        Collection<BurdenAnalysisValueObject> ret = new ArrayList<>();
+
+        if ( group1 == null || group2 == null ) {
+            log.warn( "Labels can't be null! Group1 is " + group1 + " and group2 is " + group2 );
+            return ret;
+        }
+
+        if ( variantIds == null ) {
+            log.warn( "No variants found." );
+            return ret;
+        }
+
+        Map<String, Subject> patientIdSubjects = new HashMap<>();
+        Collection<Variant> variants = variantDao.load( variantIds );
+
+        for ( Variant v : variants ) {
+            Subject subject = subjectDao.load( v.getSubject().getId() );
+            patientIdSubjects.put( subject.getPatientId(), subject );
+        }
+
+        // key: labelName, values: patientIds
+        Map<String, Collection<String>> labelPatientId = subjectService.groupSubjectsBySubjectLabel( patientIdSubjects
+                .values() );
+
+        labelPatientId = getMutuallyExclusivePatientIds( labelPatientId, group1.getName(), group2.getName() );
+
+        if ( !labelPatientId.containsKey( group1.getName() ) ) {
+            log.warn( "Subject label " + group1.getName() + " not found" );
+            return ret;
+        }
+
+        if ( !labelPatientId.containsKey( group2.getName() ) ) {
+            log.warn( "Subject label " + group2.getName() + " not found" );
+            return ret;
+        }
+
+        Collection<LabelValueObject> variantLabels = labelService.getVariantLabelsByProjectId( variants.iterator()
+                .next().getSubject().getProjects().iterator().next().getId() );
+        if ( variantLabels.size() > MAX_VARIANT_LABELS ) {
+            log.warn( "There are too many (>" + MAX_VARIANT_LABELS + ") variant labels!" );
+            return ret;
+        }
+
+        // keys: charValue, subjectLabel {group1, group2},
+        // value: YesNoCount {subjectCountYes, subjectCountNo}
+        Map<String, Map<String, YesNoCount>> counts = new HashMap<>();
+
+        // init map
+        for ( LabelValueObject l : variantLabels ) {
+            Map<String, YesNoCount> m = new HashMap<>();
+            counts.put( l.getName(), m );
+            for ( String subjectLabel : labelPatientId.keySet() ) {
+                m.put( subjectLabel, new YesNoCount() );
+            }
+        }
+
+        // count which subjects has a variant that matches the character name and value
+        // TODO could potentially use some optimization?
+        for ( LabelValueObject l : variantLabels ) {
+            for ( String subjectLabel : labelPatientId.keySet() ) {
+                for ( String patientId : labelPatientId.get( subjectLabel ) ) {
+
+                    boolean found = subjectHasVariantLabel( patientIdSubjects.get( patientId ).getVariants(), l );
+
+                    YesNoCount yesNo = counts.get( l.getName() ).get( subjectLabel );
+
+                    if ( found ) {
+                        yesNo.incrementYes();
+                    } else {
+                        yesNo.incrementNo();
+                    }
+
+                }
+            }
+        }
+
+        // calculate chi-squred tests for each charValue using counts
+        for ( String charValue : counts.keySet() ) {
+
+            YesNoCount grp1 = counts.get( charValue ).get( group1.getName() );
+            YesNoCount grp2 = counts.get( charValue ).get( group2.getName() );
+
+            String grp1frac = grp1.getYesCount() + "/" + ( grp1.getYesCount() + grp1.getNoCount() );
+            String grp2frac = grp2.getYesCount() + "/" + ( grp2.getYesCount() + grp2.getNoCount() );
+
+            long[][] d = { { grp1.getYesCount(), grp1.getNoCount() }, { grp2.getYesCount(), grp2.getNoCount() } };
+
+            double pval = new ChiSquareTest().chiSquareTest( d );
+
+            if ( Double.isNaN( pval ) ) {
+                log.warn( charValue + "'s p-value is NaN, grp1 " + grp1frac + ", grp2 " + grp2frac );
+                continue;
+            }
+
+            ret.add( new BurdenAnalysisValueObject( charValue, grp1frac, grp2frac, pval ) );
+        }
+
+        return ret;
     }
 }

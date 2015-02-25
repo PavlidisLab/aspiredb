@@ -16,7 +16,8 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel' ] );
+Ext.require( [ 'ASPIREdb.view.report.BurdenAnalysisCharacteristic',
+              'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel' ] );
 
 /**
  * Create Burden Analysis window
@@ -43,8 +44,6 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
 
       me.charLabelStore = me.createCharacteristicStore();
 
-      me.varLabelStore = me.createVariantLabelStore();
-
       // me.down( 'toolbar' ).add( {
       me.down( 'toolbar' ).add( {
          xtype : 'container',
@@ -61,7 +60,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             displayField : 'name',
             valueField : 'vo',
             width : 300,
-            emptyText : 'Subject label',
+            emptyText : 'Select subject label',
             listeners : {
                'change' : me.subjectLabelCombo1SelectHandler,
             /*
@@ -79,7 +78,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             store : me.subjectLabelStore,
             displayField : 'name',
             valueField : 'vo',
-            emptyText : 'Subject label',
+            emptyText : 'Select subject label',
             width : 300,
             listeners : {
                'change' : me.subjectLabelCombo2SelectHandler,
@@ -100,6 +99,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             displayField : 'name',
             valueField : 'id',
             queryMode : 'local',
+            emptyText : 'Select report type',
             editable : false,
             forceSelection : true,
             width : 300,
@@ -120,6 +120,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             store : me.charLabelStore,
             displayField : 'name',
             valueField : 'vo',
+            emptyText : 'Select variant characteristic',
             ueryMode : 'local',
             editable : false,
             forceSelection : true,
@@ -130,23 +131,6 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
              * afterrender : function(combo) { var recordSelected = combo.getStore().getAt( 0 ); if ( recordSelected ==
              * null ) return; combo.setValue( recordSelected.get( 'id' ) ); }
              */
-            },
-            hidden : true,
-         }, , {
-            xtype : 'combo',
-            itemId : 'varLabelCombo',
-            queryMode : 'local',
-            fieldLabel : 'Label',
-            autoSelect : 'true',
-            store : me.varLabelStore,
-            displayField : 'name',
-            valueField : 'id',
-            ueryMode : 'local',
-            editable : false,
-            forceSelection : true,
-            width : 300,
-            listeners : {
-               'change' : me.varLabelComboSelectHandler,
             },
             hidden : true,
          }, ]
@@ -166,12 +150,14 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
          itemId : 'saveTxtButton',
          text : 'Save as TXT',
          tooltip : 'Save as TXT',
+         tooltipType : 'title',
       // icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
       }, {
          xtype : 'button',
          itemId : 'savePngButton',
          text : 'Save as PNG',
          tooltip : 'Save as PNG',
+         tooltipType : 'title',
          hidden : true
       // icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
       } );
@@ -180,6 +166,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
 
    createReportTypeStore : function() {
       return Ext.create( 'Ext.data.ArrayStore', {
+
          fields : [ {
             name : 'id',
             type : 'string'
@@ -187,26 +174,9 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             name : 'name',
             type : 'string'
          } ],
-         // [ VariantValueObjectPropertyName : DisplayValue ]
-         data : [
 
-         // TODO
-         // [ 'cnvLength', 'CNV Length' ],
-
-         // TODO gene summary tables, cnv specific
-         // [ 'genesPerSubject', 'CNV summary per subject' ],
-
-         [ 'genesPerSubjectLabel', 'Length and genes overlapped' ],
-
-         // TODO
-         // [ 'variantLabel', 'Variant Label' ],
-
-         // TODO
-          [ 'characteristic', 'Characteristic' ],
-
-         // TODO genes for SNVs??
-
-         ],
+         data : [ [ 'genesPerSubjectLabel', 'Length and genes overlapped' ], [ 'variantLabel', 'Variant label' ],
+                 [ 'characteristic', 'Characteristic' ], ],
 
          autoLoad : true,
          autoSync : true,
@@ -241,78 +211,62 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             me.down( '#subjectLabelCombo2' ).store.reload();
          },
          errorHandler : function(message, exception) {
-            console.log( message )
-            console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
+            console.log( message );
+            console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) );
          },
-      } )
+      } );
 
       return subjectLabelStore;
    },
 
-   createVariantLabelStore : function() {
-      var me = this;
-      var data = [];
-      var store = Ext.create( 'Ext.data.ArrayStore', {
-         data : data,
-         fields : [ {
-            name : 'id',
-         }, {
-            name : 'name',
-         } ],
-      } );
-
-      data.push( [ 1, 'var label 1', true ] );
-      data.push( [ 2, 'var label 2', false ] );
-
-      store.reload();
-
-      return store;
-   },
-   
    /**
-    * Adds characteristic to data if the characteristic contains nominal values (e.g. gain, loss, maternal, paternal, etc.)
+    * Adds characteristic to data if the characteristic contains nominal values (e.g. gain, loss, maternal, paternal,
+    * etc.)
     */
-   addNominalCharacteristic : function( characteristic, data, store ) {
+   addNominalCharacteristic : function(characteristic, data, store) {
 
       var char = characteristic;
-      var MAX_VALUES = 20;        // maximum number of unique characteristic values we allow
-      
+      var MAX_VALUES = 20; // maximum number of unique characteristic values we allow
+
       VariantService.suggestValues( characteristic, null, {
-         callback : function( results ) {
-            if ( results.length == 0 ) {
+         callback : function(results) {
+            if ( results.length === 0 ) {
                return;
             }
-//            if ( isNaN(Number(result[0])) ) {
-//               return true;
-//            }
+            // if ( isNaN(Number(result[0])) ) {
+            // return true;
+            // }
             if ( results.length > MAX_VALUES ) {
-               console.log(char.displayName + " is not nominal! " + results.length + " values : " + results[0].displayValue + ", " + results[1].displayValue + ", " + results[2].displayValue + " ... " );
+               console
+                  .log( char.displayName + " is not nominal! " + results.length + " values : "
+                     + results[0].displayValue + ", " + results[1].displayValue + ", " + results[2].displayValue
+                     + " ... " );
                return;
             }
-            
-            if ( data == null ) {
-               console.log("data is " + data);
+
+            if ( data === null ) {
+               console.log( "data is " + data );
                return;
             }
-            
-            data.push( [char, char.displayName] )
-            
+
+            data.push( [ char, char.displayName ] );
+
             store.reload();
          },
          errorHandler : function(message, exception) {
-            console.log( message )
-            console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
+            console.log( message );
+            console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) );
          },
       } );
-      
+
    },
-   
+
    /**
     * Populates the labelCombo with Variant characteristics
     */
    createCharacteristicStore : function() {
       var me = this;
-      
+
       var data = [];
       var store = Ext.create( 'Ext.data.ArrayStore', {
          data : data,
@@ -322,29 +276,29 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             name : 'name',
          } ],
       } );
-      
+
       var pId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
-      VariantService.suggestPropertiesForVariantTypeInProject("CNV",pId, {
+      VariantService.suggestPropertiesForVariantTypeInProject( "CNV", pId, {
          callback : function(results) {
 
-            for(var i = 0; i < results.length; i++) {
+            for (var i = 0; i < results.length; i++) {
                var char = results[i];
-               
+
                if ( !char.characteristic ) {
                   continue;
                }
-               
-               me.addNominalCharacteristic(char, data, store);
-               
+
+               me.addNominalCharacteristic( char, data, store );
+
             }
 
             store.reload();
          },
          errorHandler : function(message, exception) {
-            console.log( message )
-            console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
+            console.log( message );
+            console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) );
          },
-      });
+      } );
 
       return store;
    },
@@ -384,31 +338,18 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       var window = me.up( '#burdenAnalysisWindow' );
 
       var charCombo = window.down( '#charLabelCombo' );
-      var varLabelCombo = window.down( '#varLabelCombo' );
 
       if ( me.value === "characteristic" ) {
          charCombo.show();
-         varLabelCombo.hide();
       } else if ( me.value === "variantLabel" ) {
          charCombo.hide();
-         varLabelCombo.show();
       } else {
          charCombo.hide();
-         varLabelCombo.hide();
       }
 
    },
 
    charLabelComboSelectHandler : function(cmp, newValue, oldValue, eOpts) {
-      var me = this;
-
-      // var window = me.up( '#burdenAnalysisWindow' );
-      //
-      // var combo = window.down( '#reportCombo' );
-
-   },
-
-   varLabelComboSelectHandler : function(cmp, newValue, oldValue, eOpts) {
       var me = this;
 
       // var window = me.up( '#burdenAnalysisWindow' );
@@ -424,18 +365,13 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
 
       var combo = window.down( '#reportCombo' );
 
-      var selReportType = window.down( '#reportCombo' ).value
-      var subjectLabel1 = window.down( '#subjectLabelCombo1' ).value
-      var subjectLabel2 = window.down( '#subjectLabelCombo2' ).value
-      var characteristic = window.down( '#charLabelCombo' ).value
-      var varLabel = window.down( '#varLabelCombo' ).value
-
-      // TODO
-      console.log( 'selReportType=' + selReportType + "; subjectLabel1=" + subjectLabel1 + "; subjectLabel2="
-         + subjectLabel2 + "; charLabel=" + characteristic + "; varLabel=" + varLabel );
+      var selReportType = window.down( '#reportCombo' ).value;
+      var subjectLabel1 = window.down( '#subjectLabelCombo1' ).value;
+      var subjectLabel2 = window.down( '#subjectLabelCombo2' ).value;
+      var characteristic = window.down( '#charLabelCombo' ).value;
 
       var reportPanel = window.down( '#burdenReport' );
-      if ( reportPanel != null ) {
+      if ( reportPanel !== null ) {
          window.remove( reportPanel );
          reportPanel.destroy();
          reportPanel = null;
@@ -450,6 +386,13 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             label2 : subjectLabel2,
             characteristic : characteristic
          } );
+      } else if ( selReportType === "variantLabel" ) {
+         window.down( '#savePngButton' ).hide();
+         reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisVariantLabel', {
+            id : 'burdenReport',
+            label1 : subjectLabel1,
+            label2 : subjectLabel2
+         } );
       } else if ( selReportType === "genesPerSubjectLabel" ) {
          window.down( '#savePngButton' ).hide();
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
@@ -459,7 +402,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
          } );
       }
 
-      if ( reportPanel == null ) {
+      if ( reportPanel === null ) {
          console.log( "burdenReport is null" );
          return;
       }

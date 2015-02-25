@@ -30,7 +30,8 @@ import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.query.CharacteristicProperty;
 
 /**
- * 
+ * Compares the "burden" between two subject labels. "burden" can be number of genes affected, CNV length, number of
+ * subjects with a pathogenic variant, etc.
  */
 public interface BurdenAnalysisService {
 
@@ -67,5 +68,21 @@ public interface BurdenAnalysisService {
             CharacteristicProperty characteristic, LabelValueObject group1, LabelValueObject group2,
             Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException,
             NeurocartaServiceException;
+
+    /**
+     * Performs a burden analysis between subject labels group1 and group2 filtered variants for each of the variant
+     * label.
+     * 
+     * @param group1
+     * @param group2
+     * @param variantIds
+     * @return
+     * @throws NotLoggedInException
+     * @throws BioMartServiceException
+     * @throws NeurocartaServiceException
+     */
+    public Collection<BurdenAnalysisValueObject> getBurdenAnalysisVariantLabel( LabelValueObject group1,
+            LabelValueObject group2, Collection<Long> variantIds ) throws NotLoggedInException,
+            BioMartServiceException, NeurocartaServiceException;
 
 }

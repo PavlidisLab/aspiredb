@@ -71,7 +71,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
    createColumns : function() {
 
       var precisionRenderer = function(value, metaData, record, row, col, store, gridView) {
-         return value.toPrecision( 4 )
+         return value.toPrecision( 4 );
       };
 
       var columns = [ {
@@ -91,7 +91,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
          text : 'P-value',
          flex : 1,
          renderer : precisionRenderer,
-         tooltip : 'Mann-Whitney U Test',
+         tooltip : 'Chi-square test',
          tooltipType : 'title'
       } ];
 
@@ -135,7 +135,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
             var grid = me.createGrid( results );
             me.add( grid );
 
-            if ( window != null ) {
+            if ( window !== null ) {
                window.setLoading( false );
             }
          },
@@ -144,7 +144,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
             console.log( msg, exception );
             Ext.Msg.alert( 'Error', msg );
 
-            if ( window != null ) {
+            if ( window !== null ) {
                window.setLoading( false );
             }
          }
@@ -159,7 +159,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
       var variantIds = ASPIREdb.view.report.VariantReportWindow.getColumnDataFromStore( store, 'id' );
 
       var window = me.up( '#burdenAnalysisWindow' );
-      if ( window != null ) {
+      if ( window !== null ) {
          window.setLoading( true );
       }
 

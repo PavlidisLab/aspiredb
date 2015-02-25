@@ -95,7 +95,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
          var ret = "";
          for (var i = 0; i < value.length; i++) {
             var label = this.visibleLabels[value[i]];
-            if ( label == undefined ) {
+            if ( label === undefined ) {
                continue;
             }
             if ( label.isShown ) {
@@ -181,7 +181,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
          icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
       } );
 
-      this.selectAllButton = Ext.create( 'Ext.Button', {
+      this.burdenAnalysisButton = Ext.create( 'Ext.Button', {
          itemId : 'burdenAnalysisButton',
          text : 'Burden analysis',
          handler : this.burdenAnalysisHandler,
@@ -333,7 +333,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
                   // user has no
                   // permissions
                   // to modify the label
-                  if ( aLabel == undefined ) {
+                  if ( aLabel === undefined ) {
                      aLabel = val.labels[j];
                   }
 
@@ -342,8 +342,6 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
                // create summary of number
                // of variants
-               val.numOfPhenotypes;
-
                var row = [ val.id, val.patientId, labelIds, val.variants, val.numOfPhenotypes ];
                data.push( row );
             }
@@ -356,8 +354,8 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
             me.getView().refresh();
 
             var ids = [];
-            for (var i = 0; i < me.valueObjects.length; i++) {
-               var o = me.valueObjects[i];
+            for (var k = 0; k < me.valueObjects.length; k++) {
+               var o = me.valueObjects[k];
                ids.push( o.id );
             }
 
@@ -375,7 +373,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       this.selSubjects = this.getSelectionModel().getSelection();
       this.selectAllStatus = 'No';
 
-      if ( this.selSubjects.length == 0 ) {
+      if ( this.selSubjects.length === 0 ) {
          this.down( '#makeLabel' ).disable();
          // return;
       } else {
@@ -419,7 +417,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
             var labelCombo = this.down( "#labelCombo" );
             var vo = this.getLabel();
-            if ( vo == null ) {
+            if ( vo === null ) {
                return;
             }
             var labelIndex = labelCombo.getStore().findExact( 'display', vo.name );
@@ -466,7 +464,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
             LabelService.updateLabel( addedLabel );
 
             var existingLab = me.visibleLabels[addedLabel.id];
-            if ( existingLab == undefined ) {
+            if ( existingLab === undefined ) {
                me.visibleLabels[addedLabel.id] = addedLabel;
             } else {
                existingLab.isShown = true;
@@ -617,7 +615,6 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       this.selectAllStatus = 'No';
    },
 
-   // TODO
    burdenAnalysisHandler : function() {
       var reportWindow = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisWindow' );
       var variantStore = Ext.StoreMgr.lookup( 'variantGrid' );
