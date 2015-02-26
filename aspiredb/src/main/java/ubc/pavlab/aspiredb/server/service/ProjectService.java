@@ -101,4 +101,13 @@ public interface ProjectService {
     public String addSubjectVariantsPhenotypeToProject( String variantFilename, String phenotypeFilename,
             boolean createProject, String projectName, String variantType );
 
+    public String addSubjectVariantsPhenotypeToProject( String variantFilename, String phenotypeFilename,
+            boolean createProject, String projectName, String variantType, boolean dryRun );
+
+    public VariantUploadServiceResult addSubjectVariantsToProject( String filepath, boolean createProject,
+            String projectName, String variantType, boolean dryRun ) throws Exception;
+
+    public PhenotypeUploadServiceResult addSubjectPhenotypeToProject( String filepath, boolean createProject,
+            String projectName, boolean dryRun ) throws Exception;
+
 }

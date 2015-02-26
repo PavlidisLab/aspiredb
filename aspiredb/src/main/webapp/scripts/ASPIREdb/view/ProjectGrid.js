@@ -57,23 +57,16 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
          // defaults to text field if no xtype is supplied
          allowBlank : false
       }
-   }, {
-      header : 'Description',
-      dataIndex : 'projectDescription',
-      flex : 1,
-      editor : {
-         // defaults to text field if no xtype is supplied
-         allowBlank : true
-      }
-   } ],
+   }, /*
+       * { header : 'Description', dataIndex : 'projectDescription', flex : 1, editor : { // defaults to text field if
+       * no xtype is supplied allowBlank : true } }
+       */],
 
-// TODO Implement record update
-   /*plugins : [ rowEditing ], 
-   listeners : {
-      'selectionchange' : function(view, records) {
-         this.down( '#removeProject' ).setDisabled( !records.length );
-      }
-   },*/
+   // TODO Implement record update
+   /*
+    * plugins : [ rowEditing ], listeners : { 'selectionchange' : function(view, records) { this.down( '#removeProject'
+    * ).setDisabled( !records.length ); } },
+    */
 
    initComponent : function() {
 
@@ -143,8 +136,8 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
                } );
             }
          }
-      });
-      
+      } );
+
       ASPIREdb.EVENT_BUS.fireEvent( 'project_selected', this.selProject );
 
    },
@@ -216,7 +209,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
             var newProjectName = ref.down( '#ProjectName' ).getValue().trim();
 
             if ( newProjectName.length == 0 ) {
-               Ext.Msg.alert( 'Error',"Please enter a valid project name" );
+               Ext.Msg.alert( 'Error', "Please enter a valid project name" );
                return;
             }
 

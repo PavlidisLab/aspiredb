@@ -263,6 +263,13 @@ public class ProjectServiceImpl implements ProjectService {
         return returnString;
     }
 
+    @Override
+    @RemoteMethod
+    public VariantUploadServiceResult addSubjectVariantsToProject( String filepath, boolean createProject,
+            String projectName, String variantType ) throws Exception {
+        return addSubjectVariantsToProject( filepath, createProject, projectName, variantType, false );
+    }
+
     /**
      * @author gaya
      * @param fileContent
@@ -273,7 +280,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @RemoteMethod
     public VariantUploadServiceResult addSubjectVariantsToProject( String filepath, boolean createProject,
-            String projectName, String variantType ) throws Exception {
+            String projectName, String variantType, final boolean dryRun ) throws Exception {
 
         Class.forName( "org.relique.jdbc.csv.CsvDriver" );
 
@@ -334,10 +341,12 @@ public class ProjectServiceImpl implements ProjectService {
             StopWatch timer = new StopWatch();
             timer.start();
 
-            projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
+            if ( !dryRun ) {
+                projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
 
-            log.info( "Adding " + result.getVariantsToAdd().size() + " variants to project " + projectName + " took "
-                    + timer.getTime() + " ms" );
+                log.info( "Adding " + result.getVariantsToAdd().size() + " variants to project " + projectName
+                        + " took " + timer.getTime() + " ms" );
+            }
         }
 
         // }
@@ -520,6 +529,13 @@ public class ProjectServiceImpl implements ProjectService {
         return returnString;
     }
 
+    @Override
+    @RemoteMethod
+    public PhenotypeUploadServiceResult addSubjectPhenotypeToProject( String filepath, boolean createProject,
+            String projectName ) throws Exception {
+        return addSubjectPhenotypeToProject( filepath, createProject, projectName, false );
+    }
+
     /**
      * @author gaya
      * @param fileContent
@@ -530,18 +546,15 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @RemoteMethod
     public PhenotypeUploadServiceResult addSubjectPhenotypeToProject( String filepath, boolean createProject,
-            String projectName ) throws Exception {
+            String projectName, final boolean dryRun ) throws Exception {
 
-        os.getHumanPhenotypeOntologyService().startInitializationThread( true );
-        int c = 0;
-
-        while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
-            Thread.sleep( 10000 );
-            log.info( "Waiting for HumanPhenotypeOntology to load" );
-            if ( ++c > 10 ) {
-                throw new Exception( "Ontology load timeout" );
-            }
-        }
+        /*
+         * os.getHumanPhenotypeOntologyService().startInitializationThread( true ); int c = 0;
+         * 
+         * while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) { Thread.sleep( 10000 ); log.info(
+         * "Waiting for HumanPhenotypeOntology to load" ); if ( ++c > 10 ) { throw new Exception(
+         * "Ontology load timeout" ); } }
+         */
 
         File f = new File( filepath );
         String directory = f.getParent();
@@ -578,9 +591,11 @@ public class ProjectServiceImpl implements ProjectService {
         stmt.close();
         conn.close();
 
-        projectManager.addSubjectPhenotypesToProject( projectName, createProject, phenResult.getPhenotypesToAdd() );
+        if ( !dryRun ) {
+            projectManager.addSubjectPhenotypesToProject( projectName, createProject, phenResult.getPhenotypesToAdd() );
 
-        log.info( "Added " + phenResult.getPhenotypesToAdd().size() + " phenotypes to project " + projectName );
+            log.info( "Added " + phenResult.getPhenotypesToAdd().size() + " phenotypes to project " + projectName );
+        }
 
         return phenResult;
     }
@@ -892,6 +907,14 @@ public class ProjectServiceImpl implements ProjectService {
     @RemoteMethod
     public String addSubjectVariantsPhenotypeToProject( final String variantFilename, final String phenotypeFilename,
             final boolean createProject, final String projectName, final String variantType ) {
+        return addSubjectVariantsPhenotypeToProject( variantFilename, phenotypeFilename, createProject, projectName,
+                variantType, false );
+    }
+
+    @Override
+    @RemoteMethod
+    public String addSubjectVariantsPhenotypeToProject( final String variantFilename, final String phenotypeFilename,
+            final boolean createProject, final String projectName, final String variantType, final boolean dryRun ) {
 
         // Run the upload task on a separate thread so we don't block the current thread and return a proxy error on the
         // front end
@@ -926,7 +949,7 @@ public class ProjectServiceImpl implements ProjectService {
 
                     try {
                         variantResult = addSubjectVariantsToProject( variantFilename, createProject, projectName,
-                                variantType );
+                                variantType, dryRun );
                         returnMsg.append( String.format( STR_FMT, "Number of Subjects", getSubjects( projectName )
                                 .size() ) );
                         returnMsg.append( String.format( STR_FMT, "Number of Variants", variantResult
@@ -935,19 +958,21 @@ public class ProjectServiceImpl implements ProjectService {
                             errMsg.append( err + "\n" );
                         }
 
-                        // only run SpecialProject overlap if projectName is not a special project
-                        try {
-                            SpecialProject.valueOf( projectName );
-                        } catch ( IllegalArgumentException argEx ) {
-                            for ( Project specialProject : projectDao.getSpecialOverlapProjects() ) {
-                                try {
-                                    overlap = projectManager.populateProjectToProjectOverlap( projectName,
-                                            specialProject.getName(), variantResult.getVariantsToAdd() );
-                                    returnMsg.append( String.format( STR_FMT, "Number of Overlaps with "
-                                            + specialProject.getName(), overlap.size() ) );
-                                } catch ( Exception e ) {
-                                    log.error( e.getLocalizedMessage(), e );
-                                    errMsg.append( e.getLocalizedMessage() + "\n" );
+                        if ( !dryRun ) {
+                            // only run SpecialProject overlap if projectName is not a special project
+                            try {
+                                SpecialProject.valueOf( projectName );
+                            } catch ( IllegalArgumentException argEx ) {
+                                for ( Project specialProject : projectDao.getSpecialOverlapProjects() ) {
+                                    try {
+                                        overlap = projectManager.populateProjectToProjectOverlap( projectName,
+                                                specialProject.getName(), variantResult.getVariantsToAdd() );
+                                        returnMsg.append( String.format( STR_FMT, "Number of Overlaps with "
+                                                + specialProject.getName(), overlap.size() ) );
+                                    } catch ( Exception e ) {
+                                        log.error( e.getLocalizedMessage(), e );
+                                        errMsg.append( e.getLocalizedMessage() + "\n" );
+                                    }
                                 }
                             }
                         }
@@ -960,7 +985,8 @@ public class ProjectServiceImpl implements ProjectService {
 
                 if ( phenotypeFilename.length() > 0 ) {
                     try {
-                        phenResult = addSubjectPhenotypeToProject( phenotypeFilename, createProject, projectName );
+                        phenResult = addSubjectPhenotypeToProject( phenotypeFilename, createProject, projectName,
+                                dryRun );
                         if ( returnMsg.indexOf( "Number of Subjects" ) == -1 ) {
                             returnMsg.append( String.format( STR_FMT, "Number of Subjects", getSubjects( projectName )
                                     .size() ) );
@@ -990,11 +1016,13 @@ public class ProjectServiceImpl implements ProjectService {
 
                 log.info( returnStr );
 
-                // email users that the upload has finished
+                if ( !dryRun ) {
+                    // email users that the upload has finished
 
-                // if ( timer.getTime() > ConfigUtils.getLong( "aspiredb.uploadTimeThreshold", 60000 ) ) {
-                emailUploadFinished( projectName, returnStr );
-                // }
+                    // if ( timer.getTime() > ConfigUtils.getLong( "aspiredb.uploadTimeThreshold", 60000 ) ) {
+                    emailUploadFinished( projectName, returnStr );
+                    // }
+                }
 
             }
         }

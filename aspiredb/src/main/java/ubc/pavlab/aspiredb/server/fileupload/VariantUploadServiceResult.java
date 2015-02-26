@@ -17,8 +17,11 @@ package ubc.pavlab.aspiredb.server.fileupload;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
+@DataTransferObject
 public class VariantUploadServiceResult {
 
     List<VariantValueObject> variantsToAdd;

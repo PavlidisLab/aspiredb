@@ -64,13 +64,14 @@ Ext
 
                           if ( form.isValid() ) {
 
-                             Ext.Msg.show({
-                                title      : '',
-                                msg        : 'Your project has been submitted.<br/>You will receive an e-mail once the upload is complete.<br/>',
-                                width      : 400,
-                                buttons    : Ext.MessageBox.OK,
-                             })
-                             
+                             Ext.Msg
+                                .show( {
+                                   title : '',
+                                   msg : 'Your project has been submitted.<br/>You will receive an e-mail once the upload is complete.<br/>',
+                                   width : 400,
+                                   buttons : Ext.MessageBox.OK,
+                                } )
+
                              // getting the form values
                              values = form.getFieldValues();
                              var variantfilename = me.up( "ProjectUploadGrid" ).variantServerFilename;
@@ -109,17 +110,14 @@ Ext
                              ProjectService.addSubjectVariantsPhenotypeToProject( variantfilename, phenotypefilename,
                                 false, projectName, variantTypeEdit
                              /*
-                               * ,{ callback : function(message) {
-                               *  // this can be a long message, break it up with <br> //Ext.Msg.alert( 'Result',
-                               * message.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;') ); console.log( message );
-                               * Ext.Msg.alert( 'Result', '<pre>' + message + '</pre>' );
+                               * ,{ callback : function(message) { // this can be a long message, break it up with <br>
+                               * //Ext.Msg.alert( 'Result', message.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;') );
+                               * console.log( message ); Ext.Msg.alert( 'Result', '<pre>' + message + '</pre>' );
                                * 
                                * ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' ); me.up( "ProjectUploadGrid"
-                               * ).setLoading( false );
-                               *  }, errorHandler : function(er, exception) { Ext.Msg.alert( 'Error', er + "\n" +
-                               * exception.stack ); console.log( exception.stack ); me.up( "ProjectUploadGrid"
-                               * ).setLoading( false );
-                               *  }
+                               * ).setLoading( false ); }, errorHandler : function(er, exception) { Ext.Msg.alert(
+                               * 'Error', er + "\n" + exception.stack ); console.log( exception.stack ); me.up(
+                               * "ProjectUploadGrid" ).setLoading( false ); }
                                */
                              // }
                              );
@@ -260,39 +258,50 @@ Ext
                                  .alert( 'Success',
                                     'Your project has been submitted<br/>. We will send you an e-mail once the upload is complete.<br/>' );
 
-                              form
-                                 .submit( {
-                                    method : 'POST',
-                                    url : 'upload_action.html',
-                                    waitMsg : 'Uploading your variant file...',
-                                    headers : {
-                                       'Content-Type' : 'multipart/form-data;charset=UTF-8'
-                                    },
+                              form.submit( {
+                                 method : 'POST',
+                                 url : 'upload_action.html',
+                                 waitMsg : 'Uploading your variant file...',
+                                 headers : {
+                                    'Content-Type' : 'multipart/form-data;charset=UTF-8'
+                                 },
 
-                                    success : function(form, action) {
-                                       var fReader = new FileReader();
-                                       fReader.readAsBinaryString( file );
+                                 success : function(form, action) {
+                                    var fReader = new FileReader();
+                                    fReader.readAsBinaryString( file );
 
-                                       // cache the server file name
-                                       me.up( "ProjectUploadGrid" ).variantServerFilename = action.result.data.filePath;
+                                    // cache the server file name
+                                    me.up( "ProjectUploadGrid" ).variantServerFilename = action.result.data.filePath;
 
-                                       fReader.onloadend = function(event) {
-                                          var variantSrc = event.target.result;
-                                          var variantCount = variantSrc.split( /\r\n|\r|\n/ ).length;
-                                          variantCount = variantCount - 2;
-                                          Ext.Msg.alert( 'Success', 'Your file has been uploaded <br/><br/> Name : '
-                                             + ref.variantFileEdit + '<br/> Size : ' + file.size
-                                             + '<br/> Variant Type: ' + ref.variantTypeEdit + '<br/> # Variants : '
-                                             + variantCount + '<br/><br/>' );
+                                    var variantFilename = action.result.data.filePath;
+                                    var createProject = false;
+                                    var projectName = "testVariant";
+                                    var variantType = ref.variantTypeEdit
+                                    var dryRun = true;
+                                    ProjectService.addSubjectVariantsToProject( variantFilename, createProject,
+                                       projectName, variantType, dryRun, {
+                                          callback : function(result) {
 
-                                       }
+                                             if ( result.errorMessages.length > 0 ) {
+                                                Ext.Msg.alert( 'Error', 'Your file has failed with these errors: <br/>'
+                                                   + result.errorMessages.slice( 0, 5 ).join( '<br/>' ) );
+                                             } else {
+                                                Ext.Msg.alert( 'Success',
+                                                   'Your file is ready to be submitted <br/><br/> Name: '
+                                                      + ref.variantFileEdit + '<br/> Variant type: '
+                                                      + ref.variantTypeEdit + '<br/> # Variants : '
+                                                      + result.variantsToAdd.length + '<br/><br/>' );
+                                             }
 
-                                    },
-                                    failure : function(form, action) {
-                                       Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' );
-                                    }
+                                          }
+                                       } );
 
-                                 } );
+                                 },
+                                 failure : function(form, action) {
+                                    Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' );
+                                 }
+
+                              } );
 
                            } else {
                               // Ext.Msg.alert( "Error!", "Your form is invalid!" );
@@ -382,16 +391,26 @@ Ext
                               // cache the uploaded file's absolute server file path
                               me.up( "ProjectUploadGrid" ).phenotypeServerFilename = action.result.data.filePath;
 
-                              fReader.onloadend = function(event) {
-                                 var variantSrc = event.target.result;
-                                 var fileArray = variantSrc.split( /\r\n|\r|\n/ );
-                                 var pheneCount = fileArray[0].split( "," ).length;
-                                 pheneCount = pheneCount - 1;
-                                 Ext.Msg.alert( 'Success', 'Your file has been uploaded <br/><br/> Name : '
-                                    + ref.phenotypeFileEdit + '<br/> Size : ' + file.size + '<br/> # Phenotypes : '
-                                    + pheneCount + '<br/><br/>' );
+                              var phenotypeFilename = action.result.data.filePath;
+                              var createProject = false;
+                              var projectName = "testPhenotype";
+                              var dryRun = true;
+                              ProjectService.addSubjectPhenotypeToProject( phenotypeFilename, createProject,
+                                 projectName, dryRun, {
+                                    callback : function(result) {
 
-                              }
+                                       if ( result.errorMessages.length > 0 ) {
+                                          Ext.Msg.alert( 'Error', 'Your file has failed with these errors: <br/>'
+                                             + result.errorMessages.slice( 0, 5 ).join( '<br/>' ) );
+                                       } else {
+                                          Ext.Msg.alert( 'Success',
+                                             'Your file is ready to be submitted <br/><br/> Name: '
+                                                + ref.variantFileEdit + '<br/> # Phenotypes : '
+                                                + result.phenotypesToAdd.length + '<br/><br/>' );
+                                       }
+
+                                    }
+                                 } );
 
                            },
                            failure : function(form, action) {

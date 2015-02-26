@@ -28,13 +28,9 @@ Ext.define( 'ASPIREdb.store.ProjectStore', {
    fields : [ {
       name : 'ProjectName',
       type : 'string'
-   }, {
-      name : 'projectDescription',
-      type : 'string'
-   }, {
-      name : 'ProjectSize',
-      type : 'string'
-   } ],
+   }, /*
+       * { name : 'projectDescription', type : 'string' }, { name : 'ProjectSize', type : 'string'
+       */],
 
    storeId : 'ProjectStore'
 

@@ -16,6 +16,7 @@ package ubc.pavlab.aspiredb.server.fileupload;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -124,6 +125,19 @@ public class PhenotypeUploadService {
 
         while ( results.next() ) {
 
+            // check if required fields exist
+            if ( lineNumber <= 1 ) {
+                String requiredColumn = CommonVariantColumn.SUBJECTID.key;
+                try {
+                    results.getString( requiredColumn );
+                } catch ( SQLException e ) {
+                    String errorMessage = "Required column '" + requiredColumn + "' not found.";
+                    log.error( errorMessage, e );
+                    errorMessages.add( errorMessage );
+                    break;
+                }
+            }
+
             for ( String p : phenotypeFileColumns ) {
 
                 try {
@@ -135,6 +149,7 @@ public class PhenotypeUploadService {
                         if ( results.getString( p ) != null && !results.getString( p ).trim().isEmpty() ) {
 
                             PhenotypeValueObject vo = new PhenotypeValueObject();
+
                             vo.setExternalSubjectId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
 
                             phenotypeUtil.setNameUriValueType( vo, p );

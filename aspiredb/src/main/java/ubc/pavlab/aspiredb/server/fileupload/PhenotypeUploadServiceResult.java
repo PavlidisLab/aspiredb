@@ -18,8 +18,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.directwebremoting.annotations.DataTransferObject;
+
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 
+@DataTransferObject
 public class PhenotypeUploadServiceResult {
 
     HashSet<String> unmatched = new HashSet<String>();

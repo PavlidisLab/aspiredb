@@ -190,6 +190,12 @@ public class VariantUploadService {
 
         String cnvType = ConfigUtils.getString( "aspiredb.cli.variant.cnv.type" );
 
+        ArrayList<String> reservedCNVColumns = getReservedVariantColumns();
+
+        reservedCNVColumns.add( cnvType );
+
+        checkRequiredColumnNames( results, reservedCNVColumns );
+
         CNVValueObject cnv = new CNVValueObject();
 
         cnv.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ).trim() );
@@ -209,13 +215,10 @@ public class VariantUploadService {
             throw new InvalidDataException( "invalid " + cnvType + ":" + cnv.getType() );
         }
 
+        reservedCNVColumns.addAll( OptionalCNVColumn.getOptionalCNVColumnNames() );
+
         populateOptionalVariantColumns( results, cnv );
         populateOptionalCNVColumns( results, cnv );
-
-        ArrayList<String> reservedCNVColumns = getReservedVariantColumns();
-
-        reservedCNVColumns.add( cnvType );
-        reservedCNVColumns.addAll( OptionalCNVColumn.getOptionalCNVColumnNames() );
 
         cnv.setCharacteristics( getCharacteristicsFromResultSet( results, reservedCNVColumns ) );
 
@@ -338,6 +341,12 @@ public class VariantUploadService {
 
         String indelLength = ConfigUtils.getString( "aspiredb.cli.variant.indel.length" );
 
+        ArrayList<String> requiredIndelColumns = new ArrayList<String>();
+        requiredIndelColumns.add( indelLength );
+        requiredIndelColumns.addAll( CommonVariantColumn.getCommonVariantColumnNames() );
+
+        checkRequiredColumnNames( results, requiredIndelColumns );
+
         IndelValueObject indel = new IndelValueObject();
 
         indel.setGenomicRange( getGenomicRangeFromResultSet( results ) );
@@ -347,10 +356,6 @@ public class VariantUploadService {
         if ( indel.getLength() < 0 ) {
             throw new InvalidDataException( indelLength + " " + indel.getLength() + " is not allowed" );
         }
-
-        ArrayList<String> requiredIndelColumns = new ArrayList<String>();
-        requiredIndelColumns.add( indelLength );
-        requiredIndelColumns.addAll( CommonVariantColumn.getCommonVariantColumnNames() );
 
         indel.setCharacteristics( getCharacteristicsFromResultSet( results, requiredIndelColumns ) );
 
@@ -380,6 +385,13 @@ public class VariantUploadService {
         String refBase = ConfigUtils.getString( "aspiredb.cli.variant.snv.referencebase" );
         String obsBase = ConfigUtils.getString( "aspiredb.cli.variant.snv.observedbase" );
 
+        ArrayList<String> reservedSNVColumns = getReservedVariantColumns();
+
+        reservedSNVColumns.add( refBase );
+        reservedSNVColumns.add( obsBase );
+
+        checkRequiredColumnNames( results, reservedSNVColumns );
+
         SNVValueObject snv = new SNVValueObject();
 
         snv.setGenomicRange( getGenomicRangeFromResultSet( results ) );
@@ -401,11 +413,6 @@ public class VariantUploadService {
             // dbsnpid column not present
             log.debug( "dbsnpid not found" );
         }
-
-        ArrayList<String> reservedSNVColumns = getReservedVariantColumns();
-
-        reservedSNVColumns.add( refBase );
-        reservedSNVColumns.add( obsBase );
 
         reservedSNVColumns.addAll( OptionalSNVColumn.getOptionalSNVColumnNames() );
 
@@ -451,13 +458,17 @@ public class VariantUploadService {
             try {
                 variantsToAdd.add( makeVariantValueObjectFromResultSet( results, VariantType.DECIPHER ) );
             } catch ( InvalidDataException e ) {
+                log.error( e );
                 errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
             } catch ( NumberFormatException e ) {
+                log.error( e );
                 errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
             } catch ( SQLException e ) {
+                log.error( e );
                 errorMessages.add( "Invalid data format on line number: " + lineNumber + " error message:"
                         + e.getMessage() );
             } catch ( Exception e ) {
+                log.error( e );
                 errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
             }
         }
@@ -501,13 +512,17 @@ public class VariantUploadService {
 
     }
 
-    public static void validateResultSet( ResultSet results ) {
-        for ( String reserved : CommonVariantColumn.getCommonVariantColumnNames() ) {
+    public static void checkRequiredColumnNames( ResultSet results, Collection<String> reservedColumnNames )
+            throws SQLException {
+        for ( String reserved : reservedColumnNames ) {
+            if ( OptionalVariantColumn.getOptionalVariantColumnNames().indexOf( reserved ) != -1 ) {
+                continue;
+            }
             try {
                 results.getString( reserved );
             } catch ( SQLException s ) {
                 log.error( s );
-                throw new IllegalArgumentException( "Required column '" + reserved + "' not found" );
+                throw new SQLException( "Required column '" + reserved + "' not found", s );
             }
         }
     }
@@ -521,8 +536,14 @@ public class VariantUploadService {
 
         while ( results.next() ) {
 
-            if ( lineNumber <= 1 ) {
-                validateResultSet( results );
+            try {
+                if ( lineNumber <= 1 ) {
+                    checkRequiredColumnNames( results, CommonVariantColumn.getCommonVariantColumnNames() );
+                }
+            } catch ( SQLException e ) {
+                log.error( e );
+                errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
+                break;
             }
 
             lineNumber++;
@@ -530,13 +551,17 @@ public class VariantUploadService {
             try {
                 variantsToAdd.add( makeVariantValueObjectFromResultSet( results, variantType ) );
             } catch ( InvalidDataException e ) {
+                log.error( e );
                 errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
             } catch ( NumberFormatException e ) {
+                log.error( e );
                 errorMessages.add( "Invalid data on line number: " + lineNumber + " error message:" + e.getMessage() );
             } catch ( SQLException e ) {
+                log.error( e );
                 errorMessages.add( "Invalid data format on line number: " + lineNumber + " error message:"
                         + e.getMessage() );
             } catch ( Exception e ) {
+                log.error( e );
                 errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
             }
         }
@@ -766,14 +791,20 @@ public class VariantUploadService {
         // Get the column names; column indices start from 1
         for ( int i = 1; i < numColumns + 1; i++ ) {
             String columnName = rsmd.getColumnName( i ).trim();
-            String value = results.getString( i ).trim();
+            try {
 
-            if ( !requiredColumns.contains( columnName ) && !value.isEmpty() ) {
+                String value = results.getString( i ).trim();
 
-                CharacteristicValueObject charVO = new CharacteristicValueObject();
-                charVO.setKey( columnName );
-                charVO.setValue( value );
-                characteristics.put( charVO.getKey(), charVO );
+                if ( !requiredColumns.contains( columnName ) && !value.isEmpty() ) {
+
+                    CharacteristicValueObject charVO = new CharacteristicValueObject();
+                    charVO.setKey( columnName );
+                    charVO.setValue( value );
+                    characteristics.put( charVO.getKey(), charVO );
+                }
+            } catch ( SQLException e ) {
+                log.error( e );
+                throw new SQLException( "Required column '" + columnName + "' not found", e );
             }
         }
 
