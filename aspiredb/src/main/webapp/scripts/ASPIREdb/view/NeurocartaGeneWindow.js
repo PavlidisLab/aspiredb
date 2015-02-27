@@ -96,7 +96,8 @@ Ext.define( 'ASPIREdb.view.NeurocartaGeneWindow', {
             linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl( vo.symbol );
          }
 
-         var row = [ vo.symbol, vo.geneBioType, vo.name, pname[1], linkToGemma ];
+         // see ASPIREdb.store.GeneStore
+         var row = [ vo.symbol, vo.geneBioType, vo.name, null, pname[1], linkToGemma ];
          data.push( row );
       }
 
@@ -104,33 +105,6 @@ Ext.define( 'ASPIREdb.view.NeurocartaGeneWindow', {
       grid.setLoading( false );
 
       grid.enableToolbar( gvos, uri );
-
-   },
-
-   populateNeurocartaGrid : function(map, uri) {
-
-      var grid = ASPIREdb.view.NeurocartaGeneWindow.getComponent( 'neurocartaGeneGrid' );
-
-      var data = [];
-      var vos = [];
-
-      map.each( function(key, value, length) {
-         console.log( key, value, length );
-         var linkToGemma = "";
-
-         if ( value.geneBioType == "protein_coding" ) {
-            linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl( value.symbol );
-         }
-         vos.push( value );
-
-         var row = [ value.symbol, value.geneBioType, value.name, key, linkToGemma ];
-         data.push( row );
-      } );
-
-      grid.store.loadData( data );
-      grid.setLoading( false );
-
-      grid.enableToolbar( vos, uri );
 
    },
 
