@@ -5,7 +5,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
    extend : 'Ext.Container',
    alias : 'widget.filter_property',
    width : 875,
-   height : 36,
+   // height : 36,
    layout : {
       type : 'hbox',
 
@@ -24,7 +24,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
       this.initConfig( cfg );
       this.callParent( arguments );
    },
-   
+
    isMultiValue : true,
    selectedProperty : null,
 
@@ -237,7 +237,7 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
          items : [ {
             xtype : 'multivalue_combo',
             itemId : 'multicombo',
-            width : 300, // 450,
+            width : 400, // 450,
             enableKeyEvents : false,
             suggestValuesRemoteFunction : me.getSuggestValuesRemoteFunction(),
          }, {
@@ -514,9 +514,9 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
       }
 
    },
-   
-   setOperationLabel : function( operation ) {
-      this.down('#operationLabel').setText( operation );
+
+   setOperationLabel : function(operation) {
+      this.down( '#operationLabel' ).setText( operation );
    }
-   
+
 } );
