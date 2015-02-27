@@ -548,13 +548,19 @@ public class ProjectServiceImpl implements ProjectService {
     public PhenotypeUploadServiceResult addSubjectPhenotypeToProject( String filepath, boolean createProject,
             String projectName, final boolean dryRun ) throws Exception {
 
-        /*
-         * os.getHumanPhenotypeOntologyService().startInitializationThread( true ); int c = 0;
-         * 
-         * while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) { Thread.sleep( 10000 ); log.info(
-         * "Waiting for HumanPhenotypeOntology to load" ); if ( ++c > 10 ) { throw new Exception(
-         * "Ontology load timeout" ); } }
-         */
+        if ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
+            os.getHumanPhenotypeOntologyService().startInitializationThread( true );
+        }
+
+        int c = 0;
+
+        while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
+            Thread.sleep( 10000 );
+            log.info( "Waiting for HumanPhenotypeOntology to load" );
+            if ( ++c > 10 ) {
+                throw new Exception( "Ontology load timeout" );
+            }
+        }
 
         File f = new File( filepath );
         String directory = f.getParent();
