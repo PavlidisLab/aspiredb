@@ -31,6 +31,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
    layout : 'fit',
    resizable : true,
    tbar : [],
+   modal : true,
 
    initComponent : function() {
 

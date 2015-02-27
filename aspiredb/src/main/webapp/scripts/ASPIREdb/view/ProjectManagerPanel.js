@@ -26,43 +26,45 @@ Ext.define( 'ASPIREdb.ProjectManagerPanel', {
    alias : 'widget.ASPIREdb_projectmanagerpanel',
    layout : 'border',
    items : [ {
-      region : 'center',
+      region : 'west',
       xtype : 'ProjectGrid',
       id : 'ProjectGrid',
-      width : '50%', //480,
+      width : '50%', // 480,
       collapsible : true,
       split : true,
       title : 'Project'
    }, {
-      region : 'south',
+      region : 'center',
       xtype : 'ProjectUploadGrid',
       id : 'ProjectUploadGrid',
-      width : '100%', //480,
+      // width : '50%', // 480,
+      split : true,
+      collapsible : false,
       title : 'Upload files to project'
-   }, 
+   },
 
    ],
 
    initComponent : function() {
       this.callParent();
-      
+
       var me = this;
       LoginStatusService.isUserAdministrator( {
          callback : function(admin) {
             if ( admin ) {
-               me.add({
+               me.add( {
                   region : 'east',
                   xtype : 'ProjectUserGrid',
                   id : 'ProjectUserGrid',
-                  width : '50%', //480,
+                  width : '50%', // 480,
                   collapsible : true,
                   split : true,
                   title : 'Project Users'
-               });
-               me.down("#ProjectGrid").doLayout();
+               } );
+               me.down( "#ProjectGrid" ).doLayout();
             }
          }
-      });
+      } );
    },
-   
+
 } );

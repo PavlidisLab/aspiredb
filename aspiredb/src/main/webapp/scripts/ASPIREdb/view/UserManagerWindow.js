@@ -31,6 +31,7 @@ Ext.define( 'ASPIREdb.view.UserManagerWindow', {
    width : 1000,
    height : 500,
    layout : 'fit',
+   modal : true,
    bodyStyle : 'padding: 5px;',
 
    items : [ {
@@ -63,12 +64,12 @@ Ext.define( 'ASPIREdb.view.UserManagerWindow', {
       grid.setLoading( true );
 
       ref.groupMemeberSize = []
-   
-     UserManagerService.loadUserEditableGroups({
-         callback : function(ugs) { 
-            console.log("user manager "+ugs);
-           ref.populategroupMemeberGrid( ugs );
-           
+
+      UserManagerService.loadUserEditableGroups( {
+         callback : function(ugs) {
+            console.log( "user manager " + ugs );
+            ref.populategroupMemeberGrid( ugs );
+
          },
          errorHandler : function(er, exception) {
             Ext.Msg.alert( "Load user group Error", er + "\n" + exception.stack );

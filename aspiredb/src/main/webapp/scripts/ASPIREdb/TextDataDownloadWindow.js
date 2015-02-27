@@ -26,6 +26,7 @@ Ext.define( 'ASPIREdb.TextDataDownloadWindow', {
    height : 500,
    layout : 'fit',
    border : false,
+   modal : true,
    title : 'Select all and right click to copy to clipboard',
 
    initComponent : function() {

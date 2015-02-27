@@ -17,106 +17,94 @@
  *
  */
 
-Ext.require([ 'Ext.Window', 'ASPIREdb.view.GeneManagerPanel','ASPIREdb.GemmaURLUtils' ]);
+Ext.require( [ 'Ext.Window', 'ASPIREdb.view.GeneManagerPanel', 'ASPIREdb.GemmaURLUtils' ] );
 /**
  * Gene manager has Gene Panel
  */
-Ext.define('ASPIREdb.view.GeneManagerWindow', {
-	extend : 'Ext.Window',
-	alias : 'widget.geneManagerWindow',
-	singleton : true,
-	title : 'Gene Set Manager',
-	closable : true,
-	closeAction : 'hide',
-	width : 1000,
-	height : 500,
-	layout : 'fit',
-	bodyStyle : 'padding: 5px;',
-	
-	
-	items : [{
-		region : 'center',
-		itemId : 'ASPIREdb_genemanagerpanel',
-		xtype : 'ASPIREdb_genemanagerpanel',
-	}],
+Ext.define( 'ASPIREdb.view.GeneManagerWindow', {
+   extend : 'Ext.Window',
+   alias : 'widget.geneManagerWindow',
+   singleton : true,
+   title : 'Gene Set Manager',
+   closable : true,
+   closeAction : 'hide',
+   width : 1000,
+   height : 500,
+   layout : 'fit',
+   modal : true,
+   bodyStyle : 'padding: 5px;',
 
-	 config :{
-	    genesetSize :[],
-	 },
-	
-	initComponent : function() {
-	
-		var ref = this;
-		this.callParent();		
+   items : [ {
+      region : 'center',
+      itemId : 'ASPIREdb_genemanagerpanel',
+      xtype : 'ASPIREdb_genemanagerpanel',
+   } ],
 
-	},
-	
-	/**
-	 * Show the gene manager window
-	 */	
-	initGridAndShow : function(){
-		
-		var ref = this;
-		var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
-		var grid =panel.down ('#geneSetGrid');
-		
-		ref.show();
-		grid.setLoading(true);
-		
-		ref.genesetSize=[]
-		
-		/**UserGeneSetService.getSavedUserGeneSetNames( {
-			callback : function(geneSetNames) {	
-			   
-			   for (var i=0;i<geneSetNames.length;i++){
-			      UserGeneSetService.loadUserGeneSet( geneSetNames[i], {
-	               callback : function(gvos) {
-	                  
-	                 ref.genesetSize.push(gvos.length);
-	               }
-	            } );
-			   }
-			         }
-      });
-			 */
-		// ASPIREdb.view.GeneManagerWindow.populateGeneSetGrid(geneSetNames,ref.genesetSize);
-		UserGeneSetService.getSavedUserGeneSets( {
-         callback : function(gvos) { 
-            ASPIREdb.view.GeneManagerWindow.populateGeneSetGrid(gvos);
+   config : {
+      genesetSize : [],
+   },
+
+   initComponent : function() {
+
+      var ref = this;
+      this.callParent();
+
+   },
+
+   /**
+    * Show the gene manager window
+    */
+   initGridAndShow : function() {
+
+      var ref = this;
+      var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
+      var grid = panel.down( '#geneSetGrid' );
+
+      ref.show();
+      grid.setLoading( true );
+
+      ref.genesetSize = []
+
+      /**
+       * UserGeneSetService.getSavedUserGeneSetNames( { callback : function(geneSetNames) {
+       * 
+       * for (var i=0;i<geneSetNames.length;i++){ UserGeneSetService.loadUserGeneSet( geneSetNames[i], { callback :
+       * function(gvos) {
+       * 
+       * ref.genesetSize.push(gvos.length); } } ); } } });
+       */
+      // ASPIREdb.view.GeneManagerWindow.populateGeneSetGrid(geneSetNames,ref.genesetSize);
+      UserGeneSetService.getSavedUserGeneSets( {
+         callback : function(gvos) {
+            ASPIREdb.view.GeneManagerWindow.populateGeneSetGrid( gvos );
          }
-		});
-	
-	
-	},
-	
-	
-	
-	/**
-	 * Populate and gene set names in the gene set grid
-	 */
-	populateGeneSetGrid : function(gvos) {
-		
-		var panel = ASPIREdb.view.GeneManagerWindow.down('#ASPIREdb_genemanagerpanel');
-		var grid =panel.down ('#geneSetGrid');
-		
-			
-		var data = [];
-		for ( var i = 0; i < gvos.length; i++) {
-			var row = [ gvos[i].name,'',gvos[i].object.length];		
-			data.push(row);					
-		}
-			
-		grid.store.loadData(data);
-		grid.setLoading(false);		
-		grid.getView().refresh();
-		grid.enableToolbar();
-	},	
-	
-	
-		
-	clearGridAndMask : function(){
-		ASPIREdb.view.GeneManagerWindow.getComponent('ASPIREdb_genemanagerpanel').store.removeAll();
-		ASPIREdb.view.GeneManagerWindow.getComponent('ASPIREdb_genemanagerpanel').setLoading(true);				
-	}
+      } );
 
-});
+   },
+
+   /**
+    * Populate and gene set names in the gene set grid
+    */
+   populateGeneSetGrid : function(gvos) {
+
+      var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
+      var grid = panel.down( '#geneSetGrid' );
+
+      var data = [];
+      for (var i = 0; i < gvos.length; i++) {
+         var row = [ gvos[i].name, '', gvos[i].object.length ];
+         data.push( row );
+      }
+
+      grid.store.loadData( data );
+      grid.setLoading( false );
+      grid.getView().refresh();
+      grid.enableToolbar();
+   },
+
+   clearGridAndMask : function() {
+      ASPIREdb.view.GeneManagerWindow.getComponent( 'ASPIREdb_genemanagerpanel' ).store.removeAll();
+      ASPIREdb.view.GeneManagerWindow.getComponent( 'ASPIREdb_genemanagerpanel' ).setLoading( true );
+   }
+
+} );

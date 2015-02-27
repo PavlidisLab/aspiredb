@@ -70,6 +70,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
       }, {
          xtype : 'button',
          text : 'Heatmap',
+         disabled : 'true',
          itemId : 'heatmapButton',
          tooltip : 'View subject-phenotype heatmap',
          tooltipType : 'title',
@@ -90,7 +91,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
          tooltip : 'Download table contents as text',
          tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
-         
+
       } ]
 
    } ],
@@ -121,7 +122,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
                     var ret = value.name + " " + image;
                     return ret;
                  },
-//                 width : 350,
+                 // width : 350,
                  flex : 1
               },
 
@@ -130,7 +131,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
                  text : '',
                  dataIndex : 'selectedPhenotype',
                  hidden : true,
-//                 width : 80,
+                 // width : 80,
                  renderer : function(value) {
 
                     var phenSummary = value.selectedPhenotype;
@@ -203,7 +204,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
                  },
 
               },
-              
+
               {
                  text : 'Value',
                  tooltip : 'Number of subjects for each phenotype value',
@@ -221,7 +222,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
                        return "";
                  },
                  width : 60,
-//                 flex : 1
+              // flex : 1
               } ],
    listeners : {
       sortchange : function(phenotypeGrid, sortinfo) {

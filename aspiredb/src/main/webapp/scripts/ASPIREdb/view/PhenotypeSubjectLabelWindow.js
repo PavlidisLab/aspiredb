@@ -10,6 +10,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeSubjectLabelWindow', {
    width : 900,
    height : 450,
    layout : 'fit',
+   modal : true,
    bodyStyle : 'padding: 5px;',
    config : {
       selectedSubjectIds : [],

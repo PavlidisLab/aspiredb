@@ -35,24 +35,19 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
    bodyStyle : 'padding: 10px;',
    id : 'subjectPhenotypeHeatmapWindow',
    // TODO FIXME Bug 4419. Combine labels and dendrograms with the matrix image
-   /*tbar : new Ext.Toolbar( {
-      items : [ {
-         xtype : 'button',
-         itemId : 'exportButton',
-         text : '',
-         tooltip : 'Save heatmap as PNG',
-         icon : 'scripts/ASPIREdb/resources/images/icons/export.png'
-      } ]
-   } ),*/
+   /*
+    * tbar : new Ext.Toolbar( { items : [ { xtype : 'button', itemId : 'exportButton', text : '', tooltip : 'Save
+    * heatmap as PNG', icon : 'scripts/ASPIREdb/resources/images/icons/export.png' } ] } ),
+    */
 
    initComponent : function() {
       var ref = this;
       this.callParent();
 
       // TODO FIXME Bug 4419. Combine labels and dendrograms with the matrix image
-      //this.down( '#exportButton' ).on( 'click', function() {
-      //   ref.exportButtonHandler();
-      //}, this );
+      // this.down( '#exportButton' ).on( 'click', function() {
+      // ref.exportButtonHandler();
+      // }, this );
 
    },
 
@@ -294,7 +289,7 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 
       // hack to fix known Extjs bug with tooltip width being too small
       // http://stackoverflow.com/questions/15834689/extjs-4-2-tooltips-not-wide-enough-to-see-contents
-//      delete Ext.tip.Tip.prototype.minWidth;
+      // delete Ext.tip.Tip.prototype.minWidth;
 
       var t = new Ext.ToolTip( {
          floating : {
@@ -333,10 +328,12 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 
       heatmap.on( 'label-mouse-in', function(index) {
          // t.update('Label Enter: '+index.index+','+index.subIndex);
-         if ( index.orientation == Orientation.HORIZONTAL ) {
-            t.update( this.matrix.rows[this.matrix.rowOrder[index.index]].Subject );
-         } else if ( index.orientation == Orientation.VERTICAL ) {
-            t.update( this.matrix.columns[this.matrix.colOrder[index.index]].Phenotype );
+         if ( this.matrix.rows != null ) {
+            if ( index.orientation == Orientation.HORIZONTAL ) {
+               t.update( this.matrix.rows[this.matrix.rowOrder[index.index]].Subject );
+            } else if ( index.orientation == Orientation.VERTICAL ) {
+               t.update( this.matrix.columns[this.matrix.colOrder[index.index]].Phenotype );
+            }
          }
          t.show();
       } );

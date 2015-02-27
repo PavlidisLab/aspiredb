@@ -29,6 +29,7 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
    closeAction : 'hide',
    width : 400,
    height : 250,
+   modal : true,
    layout : {
       type : 'vbox',
       align : 'center'
@@ -180,38 +181,38 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
 
          }
       } );
-      
+
       LoginStatusService.isUserAdministrator( {
          callback : function(admin) {
             if ( admin ) {
                // this seems redundant since we already have a Project Manager
                // add upload project button
-//               me.getDockedComponent( 'dashboardToolbar' ).add( {
-//                  xtype : 'button',
-//                  id : 'createProject',
-//                  text : 'New Project',
-//                  tooltip : 'Craete new Project',
-//                  icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
-//                  handler : function() {
-//                     ASPIREdb.view.UploadDataManagerWindow.initGridAndShow();
-//
-//                  }
-//               } );
-//
-//               me.getDockedComponent( 'dashboardToolbar' ).add( '-' );
+               // me.getDockedComponent( 'dashboardToolbar' ).add( {
+               // xtype : 'button',
+               // id : 'createProject',
+               // text : 'New Project',
+               // tooltip : 'Craete new Project',
+               // icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
+               // handler : function() {
+               // ASPIREdb.view.UploadDataManagerWindow.initGridAndShow();
+               //
+               // }
+               // } );
+               //
+               // me.getDockedComponent( 'dashboardToolbar' ).add( '-' );
 
                // add project manager button
-//               me.getDockedComponent( 'dashboardToolbar' ).add( {
-//                  xtype : 'button',
-//                  id : 'manageProject',
-//                  text : 'Manage Project',
-//                  tooltip : 'Add users and upload variants or upload phenotypes',
-//                  icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
-//                  handler : function() {
-//                     ASPIREdb.view.ProjectManagerWindow.initGridAndShow();
-//
-//                  }
-//               } );
+               // me.getDockedComponent( 'dashboardToolbar' ).add( {
+               // xtype : 'button',
+               // id : 'manageProject',
+               // text : 'Manage Project',
+               // tooltip : 'Add users and upload variants or upload phenotypes',
+               // icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
+               // handler : function() {
+               // ASPIREdb.view.ProjectManagerWindow.initGridAndShow();
+               //
+               // }
+               // } );
 
                me.getDockedComponent( 'dashboardToolbar' ).add( '-' );
 
@@ -238,7 +239,7 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
     * Refresh the dash board
     */
    refreshDashboardHandler : function() {
-      Ext.getCmp('projectField').getStore().load();
+      Ext.getCmp( 'projectField' ).getStore().load();
    }
 
 } );

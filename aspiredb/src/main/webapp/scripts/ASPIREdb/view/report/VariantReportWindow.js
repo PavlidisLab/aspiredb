@@ -29,13 +29,14 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
    title : 'Variant Report',
    layout : 'fit',
    resizable : true,
+   modal : true,
    tbar : [],
 
    statics : {
       getColumnDataFromStore : function(store, columnName) {
          var result = [];
-         if (store == null || store.data == null) {
-            console.log("store is " + store);
+         if ( store == null || store.data == null ) {
+            console.log( "store is " + store );
             return result;
          }
          for (var i = 0; i < store.data.length; i++) {
