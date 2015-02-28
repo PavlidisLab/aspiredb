@@ -137,7 +137,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       this.selectAllButton = Ext.create( 'Ext.Button', {
          itemId : 'selectAll',
-         text : 'Select All',
+         text : 'Select all',
          handler : this.selectAllHandler,
          scope : this,
          hidden : true,
@@ -145,7 +145,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       this.deselectAllButton = Ext.create( 'Ext.Button', {
          itemId : 'deselectAll',
-         text : 'Clear All',
+         text : 'Clear all',
          disabled : false,
          handler : this.deselectAllHandler,
          scope : this,
