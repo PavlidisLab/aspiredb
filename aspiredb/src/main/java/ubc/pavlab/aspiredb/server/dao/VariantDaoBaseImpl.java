@@ -441,10 +441,13 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
             VariantFilterConfig locationFilter = ( VariantFilterConfig ) filter;
             RestrictionExpression restriction = locationFilter.getRestriction();
             addSingleVariantFilter( restriction, criteria );
-        } else if ( filter.getClass() == ProjectFilterConfig.class ) {
-            ProjectFilterConfig projectFilter = ( ProjectFilterConfig ) filter;
-            criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
-                    .add( Restrictions.in( "project.id", projectFilter.getProjectIds() ) );
+
+            // This is now handled by getVariantIdsByProject() for faster performance
+            // } else if ( filter.getClass() == ProjectFilterConfig.class ) {
+            // ProjectFilterConfig projectFilter = ( ProjectFilterConfig ) filter;
+            // criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
+            // .add( Restrictions.in( "project.id", projectFilter.getProjectIds() ) );
+
         } else if ( filter.getClass() == SubjectFilterConfig.class ) {
             SubjectFilterConfig subjectFilter = ( SubjectFilterConfig ) filter;
             RestrictionExpression restrictionExpression = subjectFilter.getRestriction();
@@ -467,10 +470,17 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
     }
 
     private List<Long> findIds( AspireDbFilterConfig filter ) {
-        // Project overlap filter requires a little more data processing than the other filters and uses precalculated
-        // database table
-        // as it doesn't quite fit the same paradigm as the other filters I am breaking it off into its own method
-        if ( filter instanceof ProjectOverlapFilterConfig ) {
+
+        // for performance reasons as Criteria can be slow
+        if ( filter instanceof ProjectFilterConfig ) {
+
+            return this.getVariantIdsByProject( ( ProjectFilterConfig ) filter );
+
+            // Project overlap filter requires a little more data processing than the other filters and uses
+            // precalculated
+            // database table
+            // as it doesn't quite fit the same paradigm as the other filters I am breaking it off into its own method
+        } else if ( filter instanceof ProjectOverlapFilterConfig ) {
 
             return this.getProjectOverlapVariantIds( ( ProjectOverlapFilterConfig ) filter );
 
@@ -494,6 +504,18 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends SecurableDao
         criteria.setProjection( Projections.distinct( Projections.id() ) );
 
         return criteria.list();
+    }
+
+    private List<Long> getVariantIdsByProject( ProjectFilterConfig filter ) {
+
+        Long projectId = filter.getProjectIds().iterator().next();
+
+        Query query = this.getSessionFactory().getCurrentSession()
+                .createQuery( "select v.id from Variant v left join v.subject.projects p where p.id = :id" );
+
+        query.setParameter( "id", projectId );
+
+        return query.list();
     }
 
     private List<Long> getFilteredIds( Set<AspireDbFilterConfig> filters ) {
