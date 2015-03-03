@@ -250,7 +250,8 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService {
         Collection<Phenotype> phenotypes = phenotypeDao.loadBySubjectIds( subjectIds );
 
         if ( timer.getTime() > 100 ) {
-            log.info( "loading phenotypes for " + subjectIds.size() + " subjects took " + timer.getTime() + "ms" );
+            log.info( "loading " + phenotypes.size() + " phenotypes for " + subjectIds.size() + " subjects took "
+                    + timer.getTime() + "ms" );
         }
 
         return phenotypes;

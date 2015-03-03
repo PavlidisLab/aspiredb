@@ -208,20 +208,15 @@ public class PhenotypeDaoImpl extends SecurableDaoBaseImpl<Phenotype> implements
         return this.load( ids );
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Collection<Phenotype> loadBySubjectIds( Collection<Long> subjectIds ) {
         if ( subjectIds.isEmpty() ) {
             return new HashSet<Phenotype>();
         }
+        Query query = currentSession().createQuery( "from Phenotype as p where p.subject.id IN (:subjectIds)" );
+        query.setParameterList( "subjectIds", subjectIds );
 
-        Session session = currentSession();
-
-        Criteria criteria = session.createCriteria( Phenotype.class ).createAlias( "subject", "subject" )
-                .add( Restrictions.in( "subject.id", subjectIds ) );
-
-        criteria.setProjection( Projections.distinct( Projections.id() ) );
-        List<Long> ids = criteria.list();
-
-        return this.load( ids );
+        return query.list();
     }
 }
