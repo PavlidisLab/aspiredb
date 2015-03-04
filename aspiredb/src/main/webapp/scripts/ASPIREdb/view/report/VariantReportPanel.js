@@ -29,7 +29,8 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    layout : 'fit',
 
    config : {
-      logTransform : false
+      logTransform : false,
+      N_BINS : 20,
    },
 
    initComponent : function() {
@@ -39,17 +40,17 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    /**
     * Return the value where the bin is found
     */
-   findBin : function(val, BINS, BINS_TEXT) {
-      for (var i = 0; i < BINS.length; i++) {
-         if ( (BINS[i] - val) >= 0 ) {
+   findBin : function(val, bins, binsText) {
+      for (var i = 0; i < bins.length; i++) {
+         if ( (bins[i] - Number(val)) >= 0 ) {
             // console.log( val + " is in bin " + BINS_TEXT[i] );
-            return BINS_TEXT[i];
+            return binsText[i];
          }
       }
 
       // it must be the last bin
       // console.log( val + " is in bin " + BINS_TEXT[BINS_TEXT.length - 1] );
-      return BINS_TEXT[BINS_TEXT.length - 1];
+      return binsText[binsText.length - 1];
    },
 
    /**
@@ -255,8 +256,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       } );
 
       var title = 'Project: ' + ASPIREdb.ActiveProjectSettings.getActiveProjectName();
-      var varCountsText = "# of variants: "
-         + Ext.util.JSON.encode( totals ).replace( '{', '' ).replace( '}', '' ).replace( /,/g, ', ' )
+      var varCountsText = "# of variants: " + Ext.util.JSON.encode( totals ).replace( '{', '' ).replace( '}', '' ).replace( /,/g, ', ' )
             .replace( /"/g, '' ).replace( /:/g, ' ' );
       var xField = columnName;
       var yField = seriesTitle;
@@ -442,7 +442,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    generateBinsLogTransform : function(data, logbase) {
 
       var start = 5;
-      var bins = Array.apply( start, Array( 20 ) ).map( function(val, i) {
+      var bins = Array.apply( start, Array( this.N_BINS ) ).map( function(val, i) {
          return Math.pow(logbase, start + i);
       } );
       
@@ -450,31 +450,40 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    },
    
    generateBins : function(data) {
-      var binSize = 21;
+      var binSize = this.N_BINS;
       var bins = Array( binSize );
       
       data = data.sort( function(a, b) {
-         return a - b;
+         return Number(a) - Number(b);
       } );
       
       var unique = [];
       
       data.forEach( function(e) {
          if ( unique.indexOf( e ) == -1 && e !== undefined )
-            unique.push( e );
+            unique.push( Number(e) );
       } );
       
       data = unique;
       var dataMid = data[Math.floor( (data.length - 1) / 2 )];
-      var binWidth = (data[data.length - 1] - dataMid) / data.length;
-
+      var binWidth = Math.ceil((data[Math.floor( (data.length - 1) * 3 / 4 )] - dataMid) / binSize / 2);
+      
+      
       for (var i = 0; i < binSize; i++) {
          bins[i] = i - Math.floor( binSize / 2 );
       }
 
       bins.forEach( function(e, i) {
-         bins[i] = i * binWidth + dataMid / 10;
+         bins[i] = e * binWidth + dataMid;
       } );
+      
+      if ( bins[0] < 0 ) {
+         bins.forEach( function(e, i) {
+            bins[i] = i * binWidth + Ext.Array.min(data);
+         } );
+      }
+      
+//      console.log("dataMid="+dataMid+"; binWidth="+binWidth+"; bins[0]=" + bins[0] + "; bins[last]="+bins[bins.length-1]);
       
       return bins;
    },
