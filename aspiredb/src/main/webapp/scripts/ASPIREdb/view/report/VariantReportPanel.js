@@ -269,12 +269,26 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       // mergedFreqData = { { type : "LOSS", withVar : 68}, { type : "GAIN", withVar : 40 } }
 
       // convert to Extjs Store
-      var myDataStore = Ext.create( 'Ext.data.JsonStore', {
+      // JSON store have problems with columnNames that have spaces!
+      /*var myDataStore = Ext.create( 'Ext.data.JsonStore', {
          storeId : 'reportStore',
          fields : fields,
-         data : mergedFreqData,
+         data : mergedFreqData, // ensures that key names with spaces are quoted
+      } );*/
+      var mergedFreqArray = []
+      for (var i = 0; i < mergedFreqData.length; i++) {
+         var row = []
+         for (var j=0; j < fields.length; j++) {
+            row.push( mergedFreqData[i][fields[j]] );
+         }
+         mergedFreqArray.push(row);
+      }
+      var myDataStore = Ext.create( 'Ext.data.ArrayStore', {
+         storeId : 'reportStore',
+         fields : fields,
+         data : mergedFreqArray, // ensures that key names with spaces are quoted
       } );
-
+      
       me.add( [ {
          xtype : 'chart',
          id : 'variantChart',
