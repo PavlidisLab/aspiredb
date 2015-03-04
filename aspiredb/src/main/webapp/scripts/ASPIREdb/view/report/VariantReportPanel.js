@@ -67,7 +67,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
             prevVal = BINS[i - 1];
          }
 
-         if ( i == 0 ) {
+         if ( i === 0 ) {
             bin = "<=" + this.formatNumberComma( val );
          } else if ( i == BINS.length - 1 ) {
             bin = this.formatNumberComma( prevVal + 1 ) + "-" + this.formatNumberComma( val );
@@ -93,7 +93,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
 
       var map = new Ext.util.HashMap();
 
-      if ( bins == null ) {
+      if ( bins === null ) {
          bins = Array.apply( 0, Array( 20 ) ).map( function(val, i) {
             return 10000 * (i + 1);
          } );
@@ -105,9 +105,9 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          map.add( binsText[i], 0 );
       }
 
-      for (var i = 0; i < data.length; i++) {
+      for (var j = 0; j < data.length; j++) {
 
-         var val = data[i];
+         var val = data[j];
 
          // bin the value
          var bin = this.findBin( val, bins, binsText );
@@ -119,16 +119,16 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       }
 
       // a collection of freq objects
-      var data = [];
+      var ret = [];
       map.each( function(key, value, length) {
          // console.log( key, value, length );
-         var freq = {}
+         var freq = {};
          freq[columnName] = key;
          freq[countColumnName] = value;
-         data.push( freq );
+         ret.push( freq );
       } );
 
-      return data;
+      return ret;
    },
 
    /**
@@ -151,7 +151,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          var val = data[i];
 
          // now lets calculate and store it!
-         if ( map.get( val ) == undefined ) {
+         if ( map.get( val ) === undefined ) {
             map.add( val, 1 );
          } else {
             var count = map.get( val );
@@ -161,16 +161,16 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       }
 
       // a collection of freq objects
-      var data = [];
+      var ret = [];
       map.each( function(key, value, length) {
          // console.log(key, value, length);
-         var freq = {}
+         var freq = {};
          freq[columnName] = key;
          freq[countColumnName] = value;
-         data.push( freq );
+         ret.push( freq );
       } );
 
-      return data;
+      return ret;
    },
 
    getColumnDataFromArray : function(data, columnName) {
@@ -246,13 +246,13 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
             if ( label === columnName ) {
                continue;
             }
-            if ( totals[label] == undefined ) {
-               totals[label] = o[label]
+            if ( totals[label] === undefined ) {
+               totals[label] = o[label];
             } else {
-               totals[label] += o[label]
+               totals[label] += o[label];
             }
          }
-      } )
+      } );
 
       var title = 'Project: ' + ASPIREdb.ActiveProjectSettings.getActiveProjectName();
       var varCountsText = "# of variants: "
@@ -389,7 +389,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          var ele = freqData[i];
          var mEle = mergedFreqData[i];
 
-         if ( mEle == undefined ) {
+         if ( mEle === undefined ) {
             mergedFreqData.push( ele );
             continue;
          }
@@ -399,7 +399,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
 
             var mVal = mEle[attr];
 
-            if ( mVal == undefined ) {
+            if ( mVal === undefined ) {
                mEle[attr] = val;
             }
          }
@@ -416,14 +416,14 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       var freqData = null;
       var rawData = me.getColumnDataFromArray( data, columnName );
 
-      if ( rawData.length == 0 ) {
-         console.log( "Could not extract '" + columnName + "' from data" )
+      if ( rawData.length === 0 ) {
+         console.log( "Could not extract '" + columnName + "' from data" );
          return null;
       }
 
       var countColumnName = labelName;
 
-      if ( bins != null ) {
+      if ( bins !== null ) {
          freqData = me.calculateBinFrequencies( rawData, columnName, countColumnName, bins, binsText );
       } else {
 
@@ -442,37 +442,41 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    generateBinsLogTransform : function(data, logbase) {
 
       var start = 5;
-      BINS = Array.apply( start, Array( 20 ) ).map( function(val, i) {
+      var bins = Array.apply( start, Array( 20 ) ).map( function(val, i) {
          return Math.pow(logbase, start + i);
       } );
       
-      return BINS;
+      return bins;
    },
    
    generateBins : function(data) {
-      var binSize = 21
-      var bins = Array( binSize )
+      var binSize = 21;
+      var bins = Array( binSize );
       
-      var data = data.sort( function(a, b) {
-         return a - b
-      } )
-      var unique = [];
-      data.forEach( function(e) {
-         if ( unique.indexOf( e ) == -1 && e != undefined )
-            unique.push( e )
+      data = data.sort( function(a, b) {
+         return a - b;
       } );
+      
+      var unique = [];
+      
+      data.forEach( function(e) {
+         if ( unique.indexOf( e ) == -1 && e !== undefined )
+            unique.push( e );
+      } );
+      
       data = unique;
-      var dataMid = data[Math.floor( (data.length - 1) / 2 )]
-      var binWidth = (data[data.length - 1] - dataMid) / data.length
+      var dataMid = data[Math.floor( (data.length - 1) / 2 )];
+      var binWidth = (data[data.length - 1] - dataMid) / data.length;
 
       for (var i = 0; i < binSize; i++) {
-         bins[i] = i - Math.floor( binSize / 2 )
+         bins[i] = i - Math.floor( binSize / 2 );
       }
 
       bins.forEach( function(e, i) {
-         bins[i] = i * binWidth + dataMid / 10
-      } )
-      return bins
+         bins[i] = i * binWidth + dataMid / 10;
+      } );
+      
+      return bins;
    },
 
    createReport : function(store, columnName) {
@@ -516,7 +520,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
                labelNames.push( labelName );
 
                var freqData = me.createFreqData( variantsByLabel, labelName, columnName, bins, binsText );
-               if ( freqData == null ) {
+               if ( freqData === null ) {
                   continue;
                }
 
