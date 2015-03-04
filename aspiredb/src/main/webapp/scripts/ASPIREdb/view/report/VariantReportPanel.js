@@ -210,6 +210,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
 
    getColumnDataFromArray : function(data, columnName) {
       var result = [];
+      var errorCount = 0;
       for (var i = 0; i < data.length; i++) {
 
          // extract values
@@ -227,9 +228,12 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
             var characteristic = row['characteristics'][columnName];
 
             if ( characteristic == undefined ) {
-               console.log( "Error: Attribute '" + columnName + "' not found in variant " + row.genomeCoordinates
-                  + " of patient " + row.patientId + " " );
-               continue;
+               // only print a few error messages
+               if ( errorCount++ < 1 ) {
+                  console.log( "Error: Attribute '" + columnName + "' not found in variant " + row.genomeCoordinates
+                     + " of patient " + row.patientId + " " );
+               }
+               continue;   
             } else {
                val = characteristic['value'];
             }
@@ -454,7 +458,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
 
       var countColumnName = labelName;
 
-      if ( me.isHistogramType( columnName ) ) {
+      if ( me.isHistogramType( rawData ) ) {
          freqData = me.calculateBinFrequencies( rawData, columnName, countColumnName, me.logTransform, bins );
       } else {
 
@@ -464,11 +468,10 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       return freqData;
    },
 
-   isHistogramType : function(type) {
-      // columns that needs binning
-      var COLUMN_TYPE_BIN = [ "cnvLength" ];
-
-      return (COLUMN_TYPE_BIN.indexOf( type ) != -1)
+   isHistogramType : function(data) {
+      
+      return ( !isNaN(Number(data[0])) && Ext.Array.unique(data).length >= 10 ); 
+      
    },
 
    generateBins : function(data) {

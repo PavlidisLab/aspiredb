@@ -6,6 +6,9 @@ Ext.define( 'ASPIREdb.model.Property', {
       name : 'displayName',
       type : 'string'
    }, {
+      name : 'name',
+      type : 'string',
+   }, {
       name : 'exampleValues',
       type : 'string'
    }, {

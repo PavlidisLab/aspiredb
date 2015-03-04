@@ -82,25 +82,36 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
 
       this.callParent();
 
-      me.reportTypeStore = me.createReportTypeStore();
+      me.reportTypeStore = { 
+         proxy : {
+            type : 'dwr',
+            dwrFunction : VariantService.suggestPropertiesForVariantTypeInProject,
+            dwrParams : [ 'CNV', ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0] ],
+            model : 'ASPIREdb.model.Property',
+            reader : {
+               type : 'json',
+               root : 'data',
+               totalProperty : 'count'
+            }
+         }
+      };
 
       me.down( 'toolbar' ).add( {
          xtype : 'combo',
          itemId : 'reportCombo',
          fieldLabel : 'Data',
          store : me.reportTypeStore,
-         displayField : 'name',
-         valueField : 'id',
-         queryMode : 'local',
          editable : false,
          forceSelection : true,
+         displayField : 'displayName',
+         valueField : 'name',
          width : 350,
          listeners : {
-            'change' : me.reportComboSelectHandler,
-            afterrender : function(combo) {
+            select : me.reportComboSelectHandler,
+            /*afterrender : function(combo) {
                var recordSelected = combo.getStore().getAt( 0 );
                combo.setValue( recordSelected.get( 'id' ) );
-            }
+            }*/
          }
       }, {
          xtype : 'tbspacer'
@@ -126,74 +137,30 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       } );
 
       this.down( "#logTransformCheckbox" ).on( 'change', me.reportComboSelectHandler );
-
-   },
-
-   createReportTypeStore : function() {
-      return Ext.create( 'Ext.data.ArrayStore', {
-         fields : [ {
-            name : 'id',
-            type : 'string'
-         }, {
-            name : 'name',
-            type : 'string'
-         } ],
-         // [ VariantValueObjectPropertyName : DisplayValue ]
-         data : [
-
-         // cnv specific
-         [ 'type', 'CNV type' ], [ 'cnvLength', 'CNV length' ],
-
-         // commonly used reports
-         [ 'chromosome', 'Chromosome' ], [ 'patientId', 'Patient ID' ], [ 'variantType', 'Variant type' ],
-
-         // characteristics
-         [ 'Array Platform', 'Array platform' ], [ 'Array Report', 'Array report' ],
-                 [ 'Characteristics', 'Characteristics' ], [ 'Inheritance', 'Inheritance' ],
-
-         ],
-
-         autoLoad : true,
-         autoSync : true,
-      } );
+      
    },
 
    /**
-    * Hides report types that are not found in variantStore
+    * Hides report types that are not found in variants
     */
-   filterReportCombo : function(variantStore) {
+   filterReportCombo : function(variants) {
       var me = this;
-
-      var cnvOnlyData = [ 'genesPerSubject', 'genesPerSubjectLabel', 'type', 'cnvLength' ];
-
       var reportCombo = me.down( '#reportCombo' );
 
       reportCombo.store.filter( [ {
          fn : function(record) {
-            if ( record.get( 'id' ) === "Array Platform" ) {
-               return variantStore.collect( 'Array Platform' ).length > 0;
-            } else if ( record.get( 'id' ) === "Array Report" ) {
-               return variantStore.collect( 'Array Report' ).length > 0;
-            } else if ( cnvOnlyData.indexOf( record.get( 'id' ) ) != -1 ) {
-               return variantStore.collect( 'variantType' ).indexOf( 'CNV' ) != -1;
-               ;
-            } else if ( record.get( 'id' ) === "Inheritance" ) {
-               return variantStore.collect( 'inheritance' ).length > 0;
-            } else if ( record.get( 'id' ) === "Characteristics" ) {
-               return variantStore.collect( 'Characteristics' ).length > 0;
-            }
-            return true;
+            return variants.collect( record.get('name') ).length > 0;
          }
-      } ] )
+      } ] );
 
    },
-
-   createAndShow : function(variantStore) {
+   
+   createAndShow : function( vvos ) {
       var me = this;
 
-      me.variantStore = variantStore;
+      me.variants = vvos;
 
-      me.filterReportCombo( variantStore );
+      me.filterReportCombo( vvos );
 
       me.doLayout();
       me.show();
@@ -201,13 +168,13 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
 
    reportComboSelectHandler : function(cmp, newValue, oldValue, eOpts) {
       var me = this;
-
+      
       var window = this.up( '#variantReportWindow' );
 
       var reportCombo = window.down( '#reportCombo' );
 
       var selReportType = reportCombo.value
-
+      
       var reportPanel = window.down( '#variantReport' );
       if ( reportPanel != null ) {
          window.remove( reportPanel );
@@ -245,9 +212,10 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
 
       window.add( reportPanel );
 
-      reportPanel.createReport( window.variantStore, selReportType );
+      reportPanel.createReport( window.variants, selReportType );
 
       window.doLayout();
+      
    },
 
 } );
