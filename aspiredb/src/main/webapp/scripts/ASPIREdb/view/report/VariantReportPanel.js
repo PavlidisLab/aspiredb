@@ -29,7 +29,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    layout : 'fit',
 
    config : {
-      logTransform : true
+      logTransform : false
    },
 
    initComponent : function() {
@@ -89,55 +89,20 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
     * Use for numerical data types, bin the data first and plot the frequencies
     * 
     */
-   calculateBinFrequencies : function(data, columnName, countColumnName, logTransform, bins) {
+   calculateBinFrequencies : function(data, columnName, countColumnName, bins, binsText) {
 
       var map = new Ext.util.HashMap();
 
-      var BINS_TEXT = [];
-      var BINS = [];
-
-      // var logbase = 10;
-      var logbase = 2;
-
-      // log10
-      if ( logTransform ) {
-
-         // transform rawData to log()
-         var dataLogged = []
-         data.forEach( function(e) {
-            var fun = null;
-            if ( logbase == 10 ) {
-               fun = Math.log10
-            } else {
-               fun = Math.log2
-            }
-            dataLogged.push( fun( e ) )
-         } )
-         data = dataLogged
-
-         var start = 5;
-         BINS = Array.apply( start, Array( 20 ) ).map( function(val, i) {
-            return start + i;
+      if ( bins == null ) {
+         bins = Array.apply( 0, Array( 20 ) ).map( function(val, i) {
+            return 10000 * (i + 1);
          } );
-
-         BINS.forEach( function(x) {
-            BINS_TEXT.push( Math.pow( logbase, x ) )
-         } );
-         BINS_TEXT = this.bins2text( BINS_TEXT );
-      } else {
-         if ( bins == null ) {
-            BINS = Array.apply( 0, Array( 20 ) ).map( function(val, i) {
-               return 10000 * (i + 1);
-            } );
-         } else {
-            BINS = bins;
-         }
-         BINS_TEXT = this.bins2text( BINS );
+         binsText = this.bins2text( bins );
       }
 
       // initialize map with all the bins
-      for (var i = 0; i < BINS_TEXT.length; i++) {
-         map.add( BINS_TEXT[i], 0 );
+      for (var i = 0; i < binsText.length; i++) {
+         map.add( binsText[i], 0 );
       }
 
       for (var i = 0; i < data.length; i++) {
@@ -145,7 +110,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
          var val = data[i];
 
          // bin the value
-         var bin = this.findBin( val, BINS, BINS_TEXT );
+         var bin = this.findBin( val, bins, binsText );
 
          // now lets calculate and store it!
          var count = map.get( bin );
@@ -443,7 +408,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       return mergedFreqData;
    },
 
-   createFreqData : function(variantsByLabel, labelName, columnName, bins) {
+   createFreqData : function(variantsByLabel, labelName, columnName, bins, binsText) {
       var me = this;
 
       var data = variantsByLabel[labelName];
@@ -458,8 +423,8 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
 
       var countColumnName = labelName;
 
-      if ( me.isHistogramType( rawData ) ) {
-         freqData = me.calculateBinFrequencies( rawData, columnName, countColumnName, me.logTransform, bins );
+      if ( bins != null ) {
+         freqData = me.calculateBinFrequencies( rawData, columnName, countColumnName, bins, binsText );
       } else {
 
          freqData = me.calculateFrequencies( rawData, columnName, countColumnName );
@@ -474,9 +439,20 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       
    },
 
+   generateBinsLogTransform : function(data, logbase) {
+
+      var start = 5;
+      BINS = Array.apply( start, Array( 20 ) ).map( function(val, i) {
+         return Math.pow(logbase, start + i);
+      } );
+      
+      return BINS;
+   },
+   
    generateBins : function(data) {
       var binSize = 21
       var bins = Array( binSize )
+      
       var data = data.sort( function(a, b) {
          return a - b
       } )
@@ -519,22 +495,27 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
             // special case for histogram, gather all data and generate bins
             var allData = [];
             var bins = null;
-            if ( me.isHistogramType( columnName ) && !me.logTransform ) {
-               Object.keys( variantsByLabel ).forEach( function(labelName) {
-                  for (var j = 0; j < variantsByLabel[labelName].length; j++) {
-                     var val = variantsByLabel[labelName][j][columnName];
-                     if ( val != undefined ) {
-                        allData.push( val )
-                     }
-                  }
-               } )
-               bins = me.generateBins( allData );
+            var binsText = null;
+            var logbase = 2;
+            
+            Object.keys( variantsByLabel ).forEach( function(labelName) {
+               var vals = me.getColumnDataFromArray( variantsByLabel[labelName], columnName );
+               allData = allData.concat(vals);
+            } );
+            
+            if ( me.isHistogramType( allData ) ) {
+               if ( !me.logTransform ) {
+                  bins = me.generateBins( allData );
+               } else {
+                  bins = me.generateBinsLogTransform( allData, logbase );
+               }
+               binsText = me.bins2text( bins );
             }
 
             for ( var labelName in variantsByLabel) {
                labelNames.push( labelName );
 
-               var freqData = me.createFreqData( variantsByLabel, labelName, columnName, bins );
+               var freqData = me.createFreqData( variantsByLabel, labelName, columnName, bins, binsText );
                if ( freqData == null ) {
                   continue;
                }

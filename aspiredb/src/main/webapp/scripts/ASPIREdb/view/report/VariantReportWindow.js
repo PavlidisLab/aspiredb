@@ -103,6 +103,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          store : me.reportTypeStore,
          editable : false,
          forceSelection : true,
+         emptyText : 'Select report',
          displayField : 'displayName',
          valueField : 'name',
          width : 350,
