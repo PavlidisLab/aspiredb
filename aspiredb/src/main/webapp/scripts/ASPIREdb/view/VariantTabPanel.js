@@ -657,6 +657,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                property.displayName = 'Common CNV';
                ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
                this.redrawIdeogram( property );
+               break;
             }
             case 'arrayReport': {
                var property = new CharacteristicProperty();
