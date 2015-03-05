@@ -80,9 +80,16 @@ Ext
                                          }, {
                                             xtype : 'button',
                                             flex : 1,
+                                            text : 'Save query',
+                                            itemId : 'saveQueryButton',
+                                            handler : me.saveQueryHandler,
+                                            scope : me
+                                         }, {
+                                            xtype : 'button',
+                                            flex : 1,
                                             text : 'Query Manager',
                                             id : 'querymanager',
-                                            shrinkWrap : 1,
+                                            // shrinkWrap : 1,
                                             width : 30,
                                             disabled : true,
                                             itemId : 'deleteQueryButton',
@@ -132,29 +139,29 @@ Ext
                                 items : [ {
                                    xtype : 'label',
                                    itemId : 'numberOfSubjectsLabel',
-                                   style: {
-                                      opacity: 0
+                                   style : {
+                                      opacity : 0
                                    }
                                 }, {
                                    xtype : 'label',
                                    text : ' subjects and ',
                                    itemId : 'numberOfSubjectsLabelText',
-                                      style: {
-                                         opacity: 0
-                                      }
+                                   style : {
+                                      opacity : 0
+                                   }
                                 }, {
                                    xtype : 'label',
                                    itemId : 'numberOfVariantsLabel',
-                                   style: {
-                                      opacity: 0
+                                   style : {
+                                      opacity : 0
                                    }
 
                                 }, {
                                    xtype : 'label',
                                    text : ' variants will be returned.',
                                    itemId : 'numberOfVariantsLabelText',
-                                   style: {
-                                      opacity: 0
+                                   style : {
+                                      opacity : 0
                                    }
                                 } ]
                              }, {
@@ -171,8 +178,8 @@ Ext
                                 },
                                 items : [ {
                                    xtype : 'button',
-                                   flex : 2,
-                                   text : 'Preview query',
+                                   flex : 1,
+                                   text : 'Preview',
                                    itemId : 'previewQueryButton',
                                    handler : me.previewQueryHandler,
                                    scope : me
@@ -187,13 +194,6 @@ Ext
                                       ASPIREdb.EVENT_BUS.fireEvent( 'filter_submit', filterConfigs );
                                       me.close();
                                    }
-                                }, {
-                                   xtype : 'button',
-                                   flex : 2,
-                                   text : 'Save query',
-                                   itemId : 'saveQueryButton',
-                                   handler : me.saveQueryHandler,
-                                   scope : me
                                 }, {
                                    xtype : 'button',
                                    flex : 1,
@@ -337,7 +337,7 @@ Ext
                   callback : this.loadQueryHandler,
                   errorHandler : function(message, exception) {
                      console.log( message )
-                     console.log( dwr.util.toDescriptiveString(exception.stackTrace,3) )
+                     console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
                   },
                   scope : this
                } );
@@ -435,8 +435,8 @@ Ext
                errorHandler : function(errorString, exception) {
                   me.setLoading( false );
                   alert( errorString )
-                  console.log( dwr.util.toDescriptiveString(exception,2 ) )
-                  console.log( dwr.util.toDescriptiveString(exception.stackTrace,3) )
+                  console.log( dwr.util.toDescriptiveString( exception, 2 ) )
+                  console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
                }
             } );
 
