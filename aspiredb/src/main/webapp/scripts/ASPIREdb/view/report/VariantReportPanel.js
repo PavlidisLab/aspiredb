@@ -42,7 +42,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
     */
    findBin : function(val, bins, binsText) {
       for (var i = 0; i < bins.length; i++) {
-         if ( (bins[i] - Number(val)) >= 0 ) {
+         if ( (bins[i] - Number( val )) >= 0 ) {
             // console.log( val + " is in bin " + BINS_TEXT[i] );
             return binsText[i];
          }
@@ -199,7 +199,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
                   console.log( "Error: Attribute '" + columnName + "' not found in variant " + row.genomeCoordinates
                      + " of patient " + row.patientId + " " );
                }
-               continue;   
+               continue;
             } else {
                val = characteristic['value'];
             }
@@ -256,7 +256,8 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       } );
 
       var title = 'Project: ' + ASPIREdb.ActiveProjectSettings.getActiveProjectName();
-      var varCountsText = "# of variants: " + Ext.util.JSON.encode( totals ).replace( '{', '' ).replace( '}', '' ).replace( /,/g, ', ' )
+      var varCountsText = "# of variants: "
+         + Ext.util.JSON.encode( totals ).replace( '{', '' ).replace( '}', '' ).replace( /,/g, ', ' )
             .replace( /"/g, '' ).replace( /:/g, ' ' );
       var xField = columnName;
       var yField = seriesTitle;
@@ -270,36 +271,35 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
 
       // convert to Extjs Store
       // JSON store have problems with columnNames that have spaces!
-      /*var myDataStore = Ext.create( 'Ext.data.JsonStore', {
-         storeId : 'reportStore',
-         fields : fields,
-         data : mergedFreqData, // ensures that key names with spaces are quoted
-      } );*/
+      /*
+       * var myDataStore = Ext.create( 'Ext.data.JsonStore', { storeId : 'reportStore', fields : fields, data :
+       * mergedFreqData, // ensures that key names with spaces are quoted } );
+       */
       var mergedFreqArray = []
       for (var i = 0; i < mergedFreqData.length; i++) {
          var row = []
-         for (var j=0; j < fields.length; j++) {
-            
+         for (var j = 0; j < fields.length; j++) {
+
             // truncate long texts
             if ( typeof mergedFreqData[i][fields[j]] === "string" ) {
-               var txt =  mergedFreqData[i][fields[j]];
+               var txt = mergedFreqData[i][fields[j]];
                if ( txt.length > 20 ) {
-                  txt = txt.substr(0,20) + "...";
+                  txt = txt.substr( 0, 15 ) + "..." + txt.substr( txt.length - 5, 5 );
                }
-              row.push( txt );
+               row.push( txt );
             } else {
                row.push( mergedFreqData[i][fields[j]] );
             }
-            
+
          }
-         mergedFreqArray.push(row);
+         mergedFreqArray.push( row );
       }
       var myDataStore = Ext.create( 'Ext.data.ArrayStore', {
          storeId : 'reportStore',
          fields : fields,
          data : mergedFreqArray, // ensures that key names with spaces are quoted
       } );
-      
+
       me.add( [ {
          xtype : 'chart',
          id : 'variantChart',
@@ -402,35 +402,40 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    },
 
    /**
-    * Adds the contents of freqData to mergedFreqData
+    * Merges the contents of freqData to mergedFreqData
     * 
     * freqData = "[{"type":"LOSS","withVar":68},{"type":"GAIN","withVar":48}]" freqData =
     * "[{"type":"LOSS","label2":20},{"type":"GAIN","label2":10}]"
     * 
     * mergedFreqData = "[{"type":"LOSS","withVar":68,"label2":20},{"type":"GAIN","withVar":48,"label2":10}]"
     */
-   addFreqData : function(freqData, mergedFreqData) {
-      for (var i = 0; i < freqData.length; i++) {
-         var ele = freqData[i];
-         var mEle = mergedFreqData[i];
+   mergeFreqData : function(freqData, mergedFreqData, columnName) {
 
-         if ( mEle === undefined ) {
-            mergedFreqData.push( ele );
-            continue;
-         }
-
-         for ( var attr in ele) {
-            var val = ele[attr];
-
-            var mVal = mEle[attr];
-
-            if ( mVal === undefined ) {
-               mEle[attr] = val;
-            }
-         }
+      if ( mergedFreqData === null || mergedFreqData.length == 0 ) {
+         return freqData;
       }
 
-      return mergedFreqData;
+      var ret = [];
+      var added = false;
+      for (var i = 0; i < freqData.length; i++) {
+         var freqVal = freqData[i][columnName];
+         for (var j = 0; j < mergedFreqData.length; j++) {
+            var mergedVal = mergedFreqData[j][columnName];
+            if ( mergedVal === freqVal ) {
+               ret.push( Ext.Object.merge( freqData[i], mergedFreqData[j] ) );
+               added = true;
+               break;
+            }
+         }
+         // we have a new column value!
+         if ( !added ) {
+            ret.push( freqData[i] );
+         }
+
+         added = false;
+      }
+
+      return ret;
    },
 
    createFreqData : function(variantsByLabel, labelName, columnName, bins, binsText) {
@@ -459,41 +464,40 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
    },
 
    isHistogramType : function(data) {
-      
-      return ( !isNaN(Number(data[0])) && Ext.Array.unique(data).length >= 10 ); 
-      
+
+      return (!isNaN( Number( data[0] ) ) && Ext.Array.unique( data ).length >= 10);
+
    },
 
    generateBinsLogTransform : function(data, logbase) {
 
       var start = 5;
       var bins = Array.apply( start, Array( this.N_BINS ) ).map( function(val, i) {
-         return Math.pow(logbase, start + i);
+         return Math.pow( logbase, start + i );
       } );
-      
+
       return bins;
    },
-   
+
    generateBins : function(data) {
       var binSize = this.N_BINS;
       var bins = Array( binSize );
-      
+
       data = data.sort( function(a, b) {
-         return Number(a) - Number(b);
+         return Number( a ) - Number( b );
       } );
-      
+
       var unique = [];
-      
+
       data.forEach( function(e) {
          if ( unique.indexOf( e ) == -1 && e !== undefined )
-            unique.push( Number(e) );
+            unique.push( Number( e ) );
       } );
-      
+
       data = unique;
       var dataMid = data[Math.floor( (data.length - 1) / 2 )];
-      var binWidth = Math.ceil((data[Math.floor( (data.length - 1) * 3 / 4 )] - dataMid) / binSize / 2);
-      
-      
+      var binWidth = Math.ceil( (data[Math.floor( (data.length - 1) * 3 / 4 )] - dataMid) / binSize / 2 );
+
       for (var i = 0; i < binSize; i++) {
          bins[i] = i - Math.floor( binSize / 2 );
       }
@@ -501,15 +505,16 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       bins.forEach( function(e, i) {
          bins[i] = e * binWidth + dataMid;
       } );
-      
+
       if ( bins[0] < 0 ) {
          bins.forEach( function(e, i) {
-            bins[i] = i * binWidth + Ext.Array.min(data);
+            bins[i] = i * binWidth + Ext.Array.min( data );
          } );
       }
-      
-//      console.log("dataMid="+dataMid+"; binWidth="+binWidth+"; bins[0]=" + bins[0] + "; bins[last]="+bins[bins.length-1]);
-      
+
+      // console.log("dataMid="+dataMid+"; binWidth="+binWidth+"; bins[0]=" + bins[0] + ";
+      // bins[last]="+bins[bins.length-1]);
+
       return bins;
    },
 
@@ -535,12 +540,12 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
             var bins = null;
             var binsText = null;
             var logbase = 2;
-            
+
             Object.keys( variantsByLabel ).forEach( function(labelName) {
                var vals = me.getColumnDataFromArray( variantsByLabel[labelName], columnName );
-               allData = allData.concat(vals);
+               allData = allData.concat( vals );
             } );
-            
+
             if ( me.isHistogramType( allData ) ) {
                if ( !me.logTransform ) {
                   bins = me.generateBins( allData );
@@ -558,7 +563,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
                   continue;
                }
 
-               me.addFreqData( freqData, mergedFreqData );
+               mergedFreqData = me.mergeFreqData( freqData, mergedFreqData, columnName );
             }
 
             me.createLabelReport( mergedFreqData, columnName, labelNames );
