@@ -213,7 +213,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
 
          // show NA for empty values
          if ( val === "" ) {
-            val = "NA";
+            val = "<NA>";
          }
 
          result.push( val );
@@ -279,7 +279,18 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       for (var i = 0; i < mergedFreqData.length; i++) {
          var row = []
          for (var j=0; j < fields.length; j++) {
-            row.push( mergedFreqData[i][fields[j]] );
+            
+            // truncate long texts
+            if ( typeof mergedFreqData[i][fields[j]] === "string" ) {
+               var txt =  mergedFreqData[i][fields[j]];
+               if ( txt.length > 20 ) {
+                  txt = txt.substr(0,20) + "...";
+               }
+              row.push( txt );
+            } else {
+               row.push( mergedFreqData[i][fields[j]] );
+            }
+            
          }
          mergedFreqArray.push(row);
       }
