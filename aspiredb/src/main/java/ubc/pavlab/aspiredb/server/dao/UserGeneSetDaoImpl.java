@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -56,7 +57,7 @@ public class UserGeneSetDaoImpl extends SecurableDaoBaseImpl<UserGeneSet> implem
     @Transactional(readOnly = true)
     public List<UserGeneSet> suggestGeneSetNames( String query ) {
         Criteria criteria = currentSession().createCriteria( UserGeneSet.class );
-        criteria.add( Restrictions.ilike( "name", query ) );
+        criteria.add( Restrictions.ilike( "name", query, MatchMode.START ) );
         return criteria.list();
     }
 
