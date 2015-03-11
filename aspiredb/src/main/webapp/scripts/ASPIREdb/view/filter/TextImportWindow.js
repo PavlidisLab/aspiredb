@@ -4,8 +4,9 @@ Ext.define( 'ASPIREdb.view.filter.TextImportWindow', {
    extend : 'Ext.Window',
    alias : 'widget.textimportwindow',
    singleton : true,
-   title : 'Enter List',
+   title : 'Gene Symbols',
    closable : true,
+   modal : true,
    closeAction : 'hide',
    width : 500,
    height : 400,
@@ -16,7 +17,8 @@ Ext.define( 'ASPIREdb.view.filter.TextImportWindow', {
       var me = this;
       this.items = [ {
          xtype : 'textarea',
-         itemId : 'textImport'
+         itemId : 'textImport',
+         emptyText : 'Type one gene symbol per line',
       } ];
 
       this.buttons = [ {
@@ -42,12 +44,19 @@ Ext.define( 'ASPIREdb.view.filter.TextImportWindow', {
 
    },
 
+   /**
+    * propertyFilterRef must have these fields:
+    * 
+    * selectedProperty - e.g. GeneProperty()
+    * me.propertyFilterRef.populateMultiComboItemFromImportList - function to parse GeneValueObjects and load into combo list or a grid component
+    * 
+    */
    setPropertyFilterAndShow : function(propertyFilterRef) {
 
       this.property = propertyFilterRef.selectedProperty;
 
       this.propertyFilterRef = propertyFilterRef;
-
+      
       this.show();
    },
 
@@ -83,7 +92,7 @@ Ext.define( 'ASPIREdb.view.filter.TextImportWindow', {
       for (var i = 0; i < vos.length; i++) {
          var vo = vos[i];
 
-         if ( vo == null ) {
+         if ( vo === null ) {
             invalidFilterIndicies.push( i );
          } else {
             verifiedValues.push( vo );

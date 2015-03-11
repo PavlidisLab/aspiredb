@@ -46,6 +46,8 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
       gvos : [],
       selectedGeneSet : [],
       suggestionContext : null,
+      selectedProperty : new GeneProperty(),
+      
 
    },
 
@@ -101,6 +103,70 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
       this.selectedGeneSet = selGeneSet;
    },
 
+
+   populateMultiComboItemFromImportList : function( vos ) {
+      this.populateGridFromImportList(vos);
+   },
+   
+   addGenesToGrid : function( gvos, grid ) {
+      var data = [];
+      
+      for(var i = 0; i < gvos.length; i++) {
+         var gvo = gvos[i];
+         var row = [ gvo.symbol, gvo.geneBioType, gvo.name, '' ];
+         data.push( row );
+      }
+
+      grid.store.removeAll();
+      grid.store.add( data );
+      grid.getView().refresh( true );
+      grid.setLoading( false );
+      grid.down( '#geneName' ).setValue( '' );
+
+      ASPIREdb.EVENT_BUS.fireEvent( 'gene_added', data );
+      // update the gene set grid size
+      var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
+      var geneSetGrid = panel.down( '#geneSetGrid' );
+
+      var selection = geneSetGrid.getView().getSelectionModel().getSelection()[0];
+      if ( selection ) {
+         selection.set( 'geneSetSize', data.length );
+      }   
+   },
+   
+   populateGridFromImportList : function( vos ) {
+      
+      var ref = this;
+      
+      if ( ref.selectedGeneSet.length === 0 ) {
+         Ext.Msg.alert( 'Error', 'select the Gene Set Name to add Genes ' );
+         return;
+      }
+      
+      var geneSymbols = [];
+      for( var i = 0; i < vos.length; i++ ) {
+         geneSymbols.push(vos[i].symbol);
+      }
+      
+      var geneSetName = ref.selectedGeneSet[0].data.geneSetName;
+      UserGeneSetService.addGenesToGeneSet( geneSetName, geneSymbols, {
+         callback : function(gvos) {
+            
+            if ( gvos.length === 0 ) {
+               console.log('No genes were added to ' + geneSetName);
+               return;
+            }
+            
+            ref.addGenesToGrid(gvos, ref);
+            
+         }, 
+         errorHandler : function(er, exception) {
+            Ext.Msg.alert( "Gene Grid Error", er + "\n" + exception.stack );
+            console.log( exception.stack );
+         }
+      });
+   },
+   
    /**
     * Enable the tool bar in Gene grid
     * 
@@ -113,14 +179,13 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
          {
             xtype : 'combo',
             id : 'geneName',
-            emptyText : 'Type Gene Symbols',
+            emptyText : 'Type gene symbol',
             width : 200,
             displayField : 'displayName',
             triggerAction : 'query',
             minChars : 0,
             matchFieldWidth : false,
             hideTrigger : true,
-            triggerAction : 'query',
             autoSelect : true,
             forceSelection : true,
             enableKeyEvents : false,
@@ -153,15 +218,16 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
 
       var ref = this;
 
-      this.getDockedComponent( 'geneGridToolbar' ).add( {
+      var toolbar = this.getDockedComponent( 'geneGridToolbar' );
+      toolbar.add( {
          xtype : 'button',
-         id : 'addGene',
+         itemId : 'addGene',
          text : '',
          tooltip : 'Add genes to selected gene set',
+         tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
          handler : function() {
 
-            // TODO: have to populate human taxon gene list auto complete features
             var genesymbol = ref.down( '#geneName' ).getValue();
             // console.log( 'added genes name : ' + genesymbol );
             var geneSetName = ref.selectedGeneSet[0].data.geneSetName;
@@ -173,30 +239,11 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
                   if ( gvoSta ) {
                      Ext.Msg.alert( 'Gene Set', 'Gene already exist in gene set' );
                      grid.down( '#geneName' ).setValue( '' );
-                  } else if ( ref.selectedGeneSet[0] != null ) {
-                     UserGeneSetService.addGenes( geneSetName, genesymbol, {
-                        callback : function(gvo) {
+                  } else if ( ref.selectedGeneSet[0] !== null ) {
+                     UserGeneSetService.addGenesToGeneSet( geneSetName, [ genesymbol ], {
+                        callback : function(gvos) {
 
-                           var data = [];
-                           var row = [ genesymbol, gvo.geneBioType, gvo.name, '' ];
-                           data.push( row );
-
-                           // TODO : refresh grid when loaded
-                           grid.store.add( data );
-                           grid.getView().refresh( true );
-                           grid.setLoading( false );
-                           grid.down( '#geneName' ).setValue( '' );
-
-                           ASPIREdb.EVENT_BUS.fireEvent( 'gene_added', data );
-                           // update the gene set grid size
-                           var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
-                           var geneSetGrid = panel.down( '#geneSetGrid' );
-
-                           var selection = geneSetGrid.getView().getSelectionModel().getSelection()[0];
-                           if ( selection ) {
-                              var oldSize = selection.data.geneSetSize;
-                              selection.set( 'geneSetSize', parseInt( oldSize ) + 1 );
-                           }
+                           ref.addGenesToGrid(gvos, grid);
 
                         },
                         errorHandler : function(er, exception) {
@@ -213,11 +260,12 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
          }
       } );
 
-      this.getDockedComponent( 'geneGridToolbar' ).add( {
+      toolbar.add( {
          xtype : 'button',
-         id : 'removeGene',
+         itemId : 'removeGene',
          text : '',
          tooltip : 'Remove the selected gene',
+         tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
          handler : function() {
             var geneSymbol = ref.selectedGene[0].data.symbol;
@@ -234,10 +282,9 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
 
                   // resize the gene size in gene set grid
                   // update the gene set grid size
-                  var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
                   var geneSetGrid = panel.down( '#geneSetGrid' );
 
-                  var selection = geneSetGrid.getView().getSelectionModel().getSelection()[0];
+                  selection = geneSetGrid.getView().getSelectionModel().getSelection()[0];
                   if ( selection ) {
                      var oldSize = selection.data.geneSetSize;
                      selection.set( 'geneSetSize', parseInt( oldSize ) - 1 );
@@ -247,6 +294,19 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
             } );
          }
       } );
-
+      
+      toolbar.add( {
+         xtype : 'button',
+         itemId : 'enterListButton',
+         text : '',
+         tooltip : 'Enter list ...',
+         tooltipType : 'title',
+         icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
+         handler : function() {
+            var prop = new GeneProperty();
+            ASPIREdb.view.filter.TextImportWindow.setPropertyFilterAndShow( ref );
+         }
+      } );
+      
    }
 } );

@@ -53,8 +53,10 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
     private BioMartQueryService bioMartQueryService;
 
     @Override
+    @Transactional
     @RemoteMethod
-    public GeneValueObject addGenes( String geneSetName, String geneSymbol ) throws BioMartServiceException {
+    public Collection<GeneValueObject> addGenesToGeneSet( String geneSetName, List<String> geneSymbolList )
+            throws BioMartServiceException {
 
         final List<UserGeneSet> geneSet = userGeneSetDao.findByName( geneSetName );
 
@@ -63,59 +65,7 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
 
         if ( geneSet.size() > 0 ) {
             existingGeneValueObjects = ( List<GeneValueObject> ) geneSet.iterator().next().getObject();
-        } else
-            existingGeneValueObjects = null;
-
-        // storing the existing genes to the gene set
-        for ( GeneValueObject existingGeneValueObject : existingGeneValueObjects ) {
-            geneSymbols.add( existingGeneValueObject.getSymbol() );
-        }
-
-        // adding the gene to the gene set
-        geneSymbols.add( geneSymbol );
-
-        // getting the actual gene value objects. Gene value object will return null unless the gene value object id is
-        // specified. so we need to do this workaround to obtain the complete gene value object
-        List<GeneValueObject> geneValueObjects = bioMartQueryService.getGenes( geneSymbols );
-
-        UserGeneSet savedUserGeneSet = null;
-        if ( geneSet.isEmpty() ) {
-            UserGeneSet userGeneSet = new UserGeneSet( geneSetName, ( Serializable ) geneValueObjects );
-            savedUserGeneSet = userGeneSetDao.create( userGeneSet );
-        } else if ( geneSet.size() == 1 ) {
-            UserGeneSet userGeneSet = geneSet.iterator().next();
-            userGeneSet.setObject( ( Serializable ) geneValueObjects );
-            userGeneSetDao.update( userGeneSet );
-            savedUserGeneSet = userGeneSet;
-        } else {
-            throw new IllegalStateException(
-                    "Found more than one saved gene sets with same name belonging to one user." );
-        }
-
-        Collection<String> geneSetNames = new ArrayList<>();
-        Collection<UserGeneSet> genesets = userGeneSetDao.loadAll();
-
-        for ( UserGeneSet geneset : genesets ) {
-            geneSetNames.add( geneset.getName() );
-        }
-        // returning the added gene value object
-        List<String> returningGeneSymbols = new ArrayList<>();
-        returningGeneSymbols.add( geneSymbol );
-        List<GeneValueObject> returningGeneValueObjects = bioMartQueryService.getGenes( returningGeneSymbols );
-        return returningGeneValueObjects.get( 0 );
-    }
-
-    @Override
-    @RemoteMethod
-    public void addGenesToGeneSet( String geneSetName, List<String> geneSymbolList ) throws BioMartServiceException {
-
-        final List<UserGeneSet> geneSet = userGeneSetDao.findByName( geneSetName );
-
-        List<String> geneSymbols = new ArrayList<>();
-        List<GeneValueObject> existingGeneValueObjects = new ArrayList<>();
-
-        if ( geneSet.size() > 0 ) {
-            existingGeneValueObjects = ( List<GeneValueObject> ) geneSet.iterator().next().getObject();
+            log.info( "Loaded " + existingGeneValueObjects.size() + " genes from gene set '" + geneSetName + "'" );
         } else
             existingGeneValueObjects = null;
 
@@ -136,30 +86,27 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         // specified. so we need to do this workaround to obtain the complete gene value object
         List<GeneValueObject> geneValueObjects = bioMartQueryService.getGenes( geneSymbols );
 
-        UserGeneSet savedUserGeneSet = null;
+        UserGeneSet userGeneSet = null;
         if ( geneSet.isEmpty() ) {
-            UserGeneSet userGeneSet = new UserGeneSet( geneSetName, ( Serializable ) geneValueObjects );
-            savedUserGeneSet = userGeneSetDao.create( userGeneSet );
+            userGeneSet = new UserGeneSet( geneSetName, ( Serializable ) geneValueObjects );
+            userGeneSetDao.create( userGeneSet );
         } else if ( geneSet.size() == 1 ) {
-            UserGeneSet userGeneSet = geneSet.iterator().next();
+            userGeneSet = geneSet.iterator().next();
             userGeneSet.setObject( ( Serializable ) geneValueObjects );
             userGeneSetDao.update( userGeneSet );
-            savedUserGeneSet = userGeneSet;
         } else {
             throw new IllegalStateException(
                     "Found more than one saved gene sets with same name belonging to one user." );
         }
 
-        Collection<String> geneSetNames = new ArrayList<>();
-        Collection<UserGeneSet> genesets = userGeneSetDao.loadAll();
+        log.info( "Added " + geneValueObjects.size() + " genes to gene set '" + geneSetName + "'" );
 
-        for ( UserGeneSet geneset : genesets ) {
-            geneSetNames.add( geneset.getName() );
-        }
+        return geneValueObjects;
     }
 
     @Override
     @RemoteMethod
+    @Transactional
     public void deleteGene( String geneSetName, String geneSymbol ) throws BioMartServiceException {
         final List<UserGeneSet> geneSet = userGeneSetDao.findByName( geneSetName );
 
@@ -194,6 +141,7 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
     }
 
     @Override
+    @Transactional
     @RemoteMethod
     public void deleteUserGeneSet( String name ) {
         List<UserGeneSet> genesets = userGeneSetDao.findByName( name );

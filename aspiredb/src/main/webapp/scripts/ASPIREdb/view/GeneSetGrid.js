@@ -26,7 +26,6 @@ var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
    autoCancel : false
 } );
 
-// TODO js documentation
 Ext.define( 'ASPIREdb.view.GeneSetGrid', {
    extend : 'Ext.grid.Panel',
    alias : 'widget.geneSetGrid',
@@ -121,7 +120,6 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
    updateGeneSetGridHandler : function(geneSetName) {
       var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
       var geneGrid = panel.down( '#geneSetGrid' );
-      // TODO : refresh grid when loaded
 
       this.store.add( geneSetName );
       this.getView().refresh( true );
@@ -137,13 +135,14 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
       var me = this;
       this.selGeneSet = this.getSelectionModel().getSelection();
       var geneSetName = this.selGeneSet[0].data.geneSetName;
-      // TODO: This DWR is returning the null objects even though java is returning the correct objects
+
       UserGeneSetService.loadUserGeneSet( geneSetName, {
          callback : function(gvos) {
 
             me.populateGeneGrid( gvos );
          }
       } );
+      
       ASPIREdb.EVENT_BUS.fireEvent( 'geneSet_selected', this.selGeneSet );
 
    },
@@ -157,7 +156,7 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
       var data = [];
       for (var i = 0; i < gvos.length; i++) {
          var gvo = gvos[i];
-         var row = []
+         var row = [];
          // find the position of the fields we want to use
          var geneStore = Ext.getStore('geneStore');
          var fieldNames = [];
@@ -188,7 +187,7 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
          text : '',
          scope : this,
          allowBlank : true,
-         emptyText : 'Type gene Set Name',
+         emptyText : 'Type gene set name',
 
       } );
 
@@ -222,7 +221,6 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
                   geneSetGrid.getView().refresh( true );
                   geneSetGrid.setLoading( false );
 
-                  var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_genemanagerpanel' );
                   var grid = panel.down( '#geneGrid' );
                   grid.store.removeAll( true );
                   ref.down( '#geneSetName' ).setValue( '' );
@@ -251,7 +249,7 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
                   if ( selection ) {
                      geneSetGrid.store.remove( selection );
                   }
-
+                  geneSetGrid.getView().getSelectionModel().select(0);
                   console.log( 'selected geneset :' + ref.selGeneSet[0].data.geneSetName + ' deleted' );
                }
             } );

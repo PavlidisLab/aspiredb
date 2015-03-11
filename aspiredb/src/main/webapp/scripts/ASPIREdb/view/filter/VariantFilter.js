@@ -237,6 +237,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilter', {
          xtype : 'button',
          text : '',
          tooltip : 'Enter list...',
+         tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
          disabled : true,
          hidden : true
@@ -255,7 +256,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilter', {
       propertyComboBoxV.on( 'select', function(obj, records) {
          var record = records[0];
          var value = record.data.displayName;
-         if (value ="CNV Characteristics"){
+         if (value === "CNV Characteristics"){
             var contextMenu = new Ext.menu.Menu( {
                items : [ {
                   text : 'Vancouver',

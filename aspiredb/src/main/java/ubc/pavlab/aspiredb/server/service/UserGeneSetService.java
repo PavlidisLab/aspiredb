@@ -26,8 +26,6 @@ import ubc.pavlab.aspiredb.shared.GeneValueObject;
  */
 public interface UserGeneSetService {
 
-    public GeneValueObject addGenes( String geneName, String geneSymbol ) throws BioMartServiceException;
-
     public void deleteGene( String geneSetName, String geneSymbol ) throws BioMartServiceException;
 
     public void deleteUserGeneSet( String name );
@@ -46,7 +44,17 @@ public interface UserGeneSetService {
 
     public void updateUserGeneSet( GeneSetValueObject geneset );
 
-    void addGenesToGeneSet( String geneSetName, List<String> geneSymbol ) throws BioMartServiceException;
+    /**
+     * Adds all the genes with matching geneSymbols to geneSetName and returns a collection of all the genes in
+     * geneSetName, including previously added genes.
+     * 
+     * @param geneSetName
+     * @param geneSymbols
+     * @return
+     * @throws BioMartServiceException
+     */
+    public Collection<GeneValueObject> addGenesToGeneSet( String geneSetName, List<String> geneSymbols )
+            throws BioMartServiceException;
 
     GeneSetValueObject findUserGeneSet( String geneSetName );
 
