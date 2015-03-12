@@ -328,7 +328,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    removeSubjectLabels : function(labels, rowIndex) {
       var me = this;
       if ( me.selectedOwnerIds.length == 0 ) {
-         Ext.MessageBox.confirm( 'Delete', 'Remove label ' + 'for all subjects?', function(btn) {
+         Ext.MessageBox.confirm( 'Delete', 'Remove label for all subjects?', function(btn) {
             if ( btn === 'yes' ) {
                LabelService.deleteSubjectLabels( labels, {
                   callback : function() {
@@ -339,7 +339,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
             }
          } );
       } else {
-         Ext.MessageBox.confirm( 'Delete', 'Remove ' + labels.length + ' label(s) ' + 'for selected subject(s)?',
+         Ext.MessageBox.confirm( 'Delete', 'Remove labels for selected subject(s)?',
             function(btn) {
                if ( btn === 'yes' ) {
                   LabelService.removeLabelsFromSubjects( labels, me.selectedOwnerIds, {
@@ -359,7 +359,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    removeVariantLabels : function(labels, rowIndex) {
       var me = this;
       if ( me.selectedOwnerIds.length == 0 ) {
-         Ext.MessageBox.confirm( 'Delete', 'Remove label ' + 'for all variants?', function(btn) {
+         Ext.MessageBox.confirm( 'Delete', 'Remove label for all variants?', function(btn) {
             if ( btn === 'yes' ) {
                LabelService.deleteVariantLabels( labels, {
                   callback : function() {
@@ -370,7 +370,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
             }
          } );
       } else {
-         Ext.MessageBox.confirm( 'Delete', 'Remove ' + labels.length + ' label(s) ' + 'for selected variant(s)?',
+         Ext.MessageBox.confirm( 'Delete', 'Remove labels for selected variant(s)?',
             function(btn) {
                if ( btn === 'yes' ) {
                   LabelService.removeLabelsFromVariants( labels, me.selectedOwnerIds, {
