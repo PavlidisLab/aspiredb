@@ -64,7 +64,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
          text : 'Analyze',
          disabled : 'true',
          itemId : 'analyzeButton',
-         tooltip : 'Report the phenotype that is enriched for the list of filtered subjects',
+         tooltip : 'Report the enrichment of HPO phenotypes between filtered and unfiltered subject groups',
          tooltipType : 'title',
 
       }, {
