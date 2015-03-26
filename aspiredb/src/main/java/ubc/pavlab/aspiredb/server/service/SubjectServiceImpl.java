@@ -244,7 +244,17 @@ public class SubjectServiceImpl implements SubjectService {
                 } else {
                     phenoSummaryMap.put( key, size );
                     displaySummary = displaySummary + ' ' + key + " (" + size + ')';
-                    displaySummary = "<span " + "style='color:" + colors[j] + "'" + ">" + displaySummary + "</span>";
+
+                    // special case for phenotype with many values
+                    if ( j < colors.length ) {
+                        displaySummary = "<span " + "style='color:" + colors[j] + "'" + ">" + displaySummary
+                                + "</span>";
+                    } else {
+                        log.warn( "There are more '" + sum.getName() + "' phenotype values than there are colors" );
+                        displaySummary = "<span " + "style='color:" + colors[colors.length - 1] + "'" + ">"
+                                + displaySummary + "</span>";
+                    }
+
                     j++;
                 }
 
@@ -349,7 +359,17 @@ public class SubjectServiceImpl implements SubjectService {
                 } else {
                     phenoSummaryMap.put( key, size );
                     displaySummary = displaySummary + ' ' + key + " (" + size + ')';
-                    displaySummary = "<span " + "style='color:" + colors[j] + "'" + ">" + displaySummary + "</span>";
+
+                    // special case for phenotype with many values
+                    if ( j < colors.length ) {
+                        displaySummary = "<span " + "style='color:" + colors[j] + "'" + ">" + displaySummary
+                                + "</span>";
+                    } else {
+                        log.warn( "There are more '" + sum.getName() + "' phenotype values than there are colors" );
+                        displaySummary = "<span " + "style='color:" + colors[colors.length - 1] + "'" + ">"
+                                + displaySummary + "</span>";
+                    }
+
                     j++;
                 }
 
