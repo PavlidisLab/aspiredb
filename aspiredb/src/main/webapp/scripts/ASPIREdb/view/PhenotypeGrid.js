@@ -499,6 +499,12 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
    },
 
    drawCanvas : function(canvas, phenSummary, phenMap) {
+
+      if ( phenMap === undefined ) {
+         // console.log( "phenSummary name " + phenSummary.name + " phenMap is undefined" );
+         return;
+      }
+
       var keyArray = phenSummary.phenoSet;
 
       var total = 0;

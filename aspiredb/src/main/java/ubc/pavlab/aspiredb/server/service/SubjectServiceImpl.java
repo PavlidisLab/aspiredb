@@ -223,14 +223,14 @@ public class SubjectServiceImpl implements SubjectService {
                 Integer size = sum.getDbValueToSubjectSet().get( key ).size();
 
                 if ( sum.getValueType().equals( "HPONTOLOGY" ) ) {
-                    if ( key.equals( "1" ) ) {
+                    if ( key.equals( "1" ) || key.equals( "Y" ) ) {
                         phenoSummaryMap.put( "Present", size );
                         present = size;
                         denominator = denominator + size;
                         displaySummary = displaySummary + " Present(" + size + ')';
                         displaySummary = "<span " + "style='color: " + colors[0] + "'" + ">" + displaySummary
                                 + "</span>";
-                    } else if ( key.equals( "0" ) ) {
+                    } else if ( key.equals( "0" ) || key.equals( "N" ) ) {
                         phenoSummaryMap.put( "Absent", size );
                         denominator = denominator + size;
                         displaySummary = displaySummary + " Absent(" + size + ')';
@@ -250,7 +250,7 @@ public class SubjectServiceImpl implements SubjectService {
                         displaySummary = "<span " + "style='color:" + colors[j] + "'" + ">" + displaySummary
                                 + "</span>";
                     } else {
-                        log.warn( "There are more '" + sum.getName() + "' phenotype values than there are colors" );
+                        // log.warn( "There are more '" + sum.getName() + "' phenotype values than there are colors" );
                         displaySummary = "<span " + "style='color:" + colors[colors.length - 1] + "'" + ">"
                                 + displaySummary + "</span>";
                     }
@@ -338,14 +338,14 @@ public class SubjectServiceImpl implements SubjectService {
                 Integer size = sum.getDbValueToSubjectSet().get( key ).size();
 
                 if ( sum.getValueType().equals( "HPONTOLOGY" ) ) {
-                    if ( key.equals( "1" ) ) {
+                    if ( key.equals( "1" ) || key.equals( "Y" ) ) {
                         phenoSummaryMap.put( "Present", size );
                         present = size;
                         denominator = denominator + size;
                         displaySummary = displaySummary + " Present(" + size + ')';
                         displaySummary = "<span " + "style='color: " + colors[0] + "'" + ">" + displaySummary
                                 + "</span>";
-                    } else if ( key.equals( "0" ) ) {
+                    } else if ( key.equals( "0" ) || key.equals( "N" ) ) {
                         phenoSummaryMap.put( "Absent", size );
                         denominator = denominator + size;
                         displaySummary = displaySummary + " Absent(" + size + ')';
@@ -365,7 +365,7 @@ public class SubjectServiceImpl implements SubjectService {
                         displaySummary = "<span " + "style='color:" + colors[j] + "'" + ">" + displaySummary
                                 + "</span>";
                     } else {
-                        log.warn( "There are more '" + sum.getName() + "' phenotype values than there are colors" );
+                        // log.warn( "There are more '" + sum.getName() + "' phenotype values than there are colors" );
                         displaySummary = "<span " + "style='color:" + colors[colors.length - 1] + "'" + ">"
                                 + displaySummary + "</span>";
                     }
