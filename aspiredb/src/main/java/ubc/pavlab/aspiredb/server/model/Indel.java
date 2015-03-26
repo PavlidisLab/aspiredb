@@ -56,7 +56,7 @@ public class Indel extends Variant {
         vo.setPatientId( this.getSubject().getPatientId() );
         vo.setSubjectId( this.getSubject().getId() );
         vo.setUserVariantId( this.getUserVariantId() );
-        vo.setLength( this.getIndelLength() );
+        vo.setIndelLength( this.getIndelLength() );
 
         GenomicRange genomicRange = new GenomicRange( this.getLocation().getChromosome(),
                 this.getLocation().getStart(), this.getLocation().getEnd() );

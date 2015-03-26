@@ -351,10 +351,10 @@ public class VariantUploadService {
 
         indel.setGenomicRange( getGenomicRangeFromResultSet( results ) );
         indel.setPatientId( results.getString( CommonVariantColumn.SUBJECTID.key ).trim() );
-        indel.setLength( results.getInt( indelLength ) );
+        indel.setIndelLength( results.getInt( indelLength ) );
 
-        if ( indel.getLength() < 0 ) {
-            throw new InvalidDataException( indelLength + " " + indel.getLength() + " is not allowed" );
+        if ( indel.getIndelLength() < 0 ) {
+            throw new InvalidDataException( indelLength + " " + indel.getIndelLength() + " is not allowed" );
         }
 
         indel.setCharacteristics( getCharacteristicsFromResultSet( results, requiredIndelColumns ) );

@@ -143,7 +143,7 @@ public class VariantUploadServiceTest extends BaseSpringContextTest {
             assertEquals( temp1indel.getGenomicRange().getChromosome(), "10" );
             assertEquals( temp1indel.getGenomicRange().getBaseStart(), 1 );
             assertEquals( temp1indel.getGenomicRange().getBaseEnd(), 5 );
-            assertEquals( temp1indel.getLength(), 200 );
+            assertEquals( temp1indel.getIndelLength(), 200 );
 
             Map<String, CharacteristicValueObject> charMap = temp1indel.getCharacteristics();
 
@@ -161,7 +161,7 @@ public class VariantUploadServiceTest extends BaseSpringContextTest {
             assertEquals( temp3indel.getGenomicRange().getChromosome(), "17" );
             assertEquals( temp3indel.getGenomicRange().getBaseStart(), 4 );
             assertEquals( temp3indel.getGenomicRange().getBaseEnd(), 8 );
-            assertEquals( temp3indel.getLength(), 0 );
+            assertEquals( temp3indel.getIndelLength(), 0 );
 
             charMap = temp3indel.getCharacteristics();
 

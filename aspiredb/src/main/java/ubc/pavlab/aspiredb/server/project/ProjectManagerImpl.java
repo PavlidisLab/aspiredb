@@ -717,7 +717,7 @@ public class ProjectManagerImpl implements ProjectManager {
             indelEntity = ( Indel ) getVariant( indel );
         }
 
-        indelEntity.setIndelLength( indel.getLength() );
+        indelEntity.setIndelLength( indel.getIndelLength() );
 
         if ( indelEntity.getId() == null ) {
             addSubjectVariantToProject( project, indel.getPatientId(), indelEntity, specialProject );
