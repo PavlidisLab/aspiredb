@@ -395,7 +395,12 @@ public class ProjectManagerImpl implements ProjectManager {
         // variantDao.remove( variants );
         // phenotypeDao.remove( phenotypes );
 
-        subjectDao.remove( subjects );
+        try {
+            subjectDao.remove( subjects );
+        } catch ( Exception e ) {
+            log.error( e );
+        }
+
         projectDao.remove( project );
 
         log.info( project + " has been deleted which took " + timer.getTime() + " ms" );
@@ -635,7 +640,8 @@ public class ProjectManagerImpl implements ProjectManager {
     }
 
     // The PhenotypeValueObject class doesn't really fit well with this, using it anyway
-    private void createSubjectPhenotypesFromPhenotypeValueObjects( Project project, List<PhenotypeValueObject> voList )
+    @Transactional
+    public void createSubjectPhenotypesFromPhenotypeValueObjects( Project project, List<PhenotypeValueObject> voList )
             throws InvalidDataException {
 
         // gather all patient IDs and create new subjects first in bulk
@@ -681,7 +687,10 @@ public class ProjectManagerImpl implements ProjectManager {
             }
         }
 
+        StopWatch timer = new StopWatch();
+        timer.start();
         phenotypeDao.create( phenotypes );
+        log.info( "phenotypeDao.create took " + timer.getTime() + " ms for " + phenotypes.size() + " phenotypes" );
     }
 
     @Transactional
@@ -767,11 +776,12 @@ public class ProjectManagerImpl implements ProjectManager {
         return snvEntity;
     }
 
-    private void createSubjectVariantsFromVariantValueObjects( Project project, List<VariantValueObject> voList ) {
+    public void createSubjectVariantsFromVariantValueObjects( Project project, List<VariantValueObject> voList ) {
         createSubjectVariantsFromVariantValueObjects( project, voList, false );
     }
 
-    private HashMap<String, Subject> findOrCreateByPatientIds( Project project, Collection<String> patientIds ) {
+    @Transactional
+    public HashMap<String, Subject> findOrCreateByPatientIds( Project project, Collection<String> patientIds ) {
         Collection<Subject> allEntities = new HashSet<>();
         Collection<Subject> newEntities = new HashSet<>();
         Collection<Subject> foundEntities = subjectDao.findByPatientIds( project, patientIds );
@@ -803,7 +813,7 @@ public class ProjectManagerImpl implements ProjectManager {
     }
 
     @Transactional
-    private void createSubjectVariantsFromVariantValueObjects( Project project, List<VariantValueObject> voList,
+    public void createSubjectVariantsFromVariantValueObjects( Project project, List<VariantValueObject> voList,
             Boolean specialProject ) {
         log.info( "Adding " + voList.size() + " value objects" );
         int counter = 0;
