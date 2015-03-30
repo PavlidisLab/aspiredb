@@ -681,10 +681,6 @@ public class ProjectManagerImpl implements ProjectManager {
                 log.debug( "Adding phenotype to existing subject " + p.getUri() );
                 subject.addPhenotype( p );
             }
-
-            if ( phenotypes.size() % 500 == 0 ) {
-                log.info( "Processed " + phenotypes.size() + " phenotypes" );
-            }
         }
 
         StopWatch timer = new StopWatch();
