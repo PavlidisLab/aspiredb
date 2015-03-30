@@ -47,4 +47,7 @@ public interface PhenotypeService {
     public Collection<PropertyValue> suggestPhenotypeValues( PhenotypeProperty property,
             SuggestionContext suggestionContext ) throws NotLoggedInException;
 
+    public List<PhenotypeEnrichmentValueObject> getPhenotypeEnrichmentValueObjects( Collection<Long> activeProjects,
+            Collection<Long> subjectIds, Collection<Long> complementSubjectIds ) throws NotLoggedInException;
+
 }

@@ -85,4 +85,17 @@ public interface BurdenAnalysisService {
             LabelValueObject group2, Collection<Long> variantIds ) throws NotLoggedInException,
             BioMartServiceException, NeurocartaServiceException;
 
+    /**
+     * Performs a burden analysis between subject labels group1 and group2 filtered variants for each phenotype.
+     * 
+     * @param activeProjects
+     * @param group1
+     * @param group2
+     * @return
+     * @throws NotLoggedInException
+     * @throws BioMartServiceException
+     */
+    public Collection<BurdenAnalysisValueObject> getBurdenAnalysisPerPhenotype( Collection<Long> activeProjects,
+            LabelValueObject group1, LabelValueObject group2 ) throws NotLoggedInException, BioMartServiceException;
+
 }

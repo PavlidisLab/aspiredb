@@ -34,6 +34,9 @@ public class BurdenAnalysisValueObject implements Serializable {
     private Long id;
 
     private String name;
+    /**
+     * Can be a simple integer like 200 or a String fraction like "10/200"
+     */
     private Object group1;
     private Object group2;
     private Double pValue;
@@ -47,6 +50,14 @@ public class BurdenAnalysisValueObject implements Serializable {
         this.group1 = group1;
         this.group2 = group2;
         this.pValue = pValue;
+    }
+
+    public BurdenAnalysisValueObject( PhenotypeEnrichmentValueObject pvo ) {
+        this.name = pvo.getName();
+        this.group1 = pvo.getInGroupTotalString();
+        this.group2 = pvo.getOutGroupTotalString();
+        this.pValue = pvo.getPValue();
+        this.qValue = pvo.getPValueCorrected();
     }
 
     public Long getId() {

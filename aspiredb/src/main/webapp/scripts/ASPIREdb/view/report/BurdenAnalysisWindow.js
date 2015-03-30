@@ -177,7 +177,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
          } ],
 
          data : [ [ 'genesPerSubjectLabel', 'Length and genes overlapped' ], [ 'variantLabel', 'Variant label' ],
-                 [ 'characteristic', 'Characteristic' ], ],
+                 [ 'characteristic', 'Characteristic' ], [ 'phenotype', 'Phenotype' ], ],
 
          autoLoad : true,
          autoSync : true,
@@ -397,6 +397,13 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       } else if ( selReportType === "genesPerSubjectLabel" ) {
          window.down( '#savePngButton' ).hide();
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
+            id : 'burdenReport',
+            label1 : subjectLabel1,
+            label2 : subjectLabel2,
+         } );
+      } else if ( selReportType === "phenotype" ) {
+         window.down( '#savePngButton' ).hide();
+         reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerPhenotype', {
             id : 'burdenReport',
             label1 : subjectLabel1,
             label2 : subjectLabel2,

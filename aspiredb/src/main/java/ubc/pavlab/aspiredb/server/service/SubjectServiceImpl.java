@@ -552,7 +552,7 @@ public class SubjectServiceImpl implements SubjectService {
      * @return Map<Label.name, Collection<Subject.patientID>>
      */
     @Override
-    public Map<String, Collection<String>> groupSubjectsBySubjectLabel( Collection<Subject> subjects ) {
+    public Map<String, Collection<String>> groupPatientIdsBySubjectLabel( Collection<Subject> subjects ) {
         Map<String, Collection<String>> labelPatientId = new HashMap<>();
         for ( Subject subject : subjects ) {
 
@@ -574,6 +574,35 @@ public class SubjectServiceImpl implements SubjectService {
             }
         }
         return labelPatientId;
+    }
+
+    /**
+     * @param variants
+     * @return Map<Label.name, Collection<Subject.patientID>>
+     */
+    @Override
+    public Map<String, Collection<Long>> groupSubjectIdsBySubjectLabel( Collection<Subject> subjects ) {
+        Map<String, Collection<Long>> labelSubjectId = new HashMap<>();
+        for ( Subject subject : subjects ) {
+
+            // organize labels
+            for ( Label label : subject.getLabels() ) {
+                if ( !labelSubjectId.containsKey( label.getName() ) ) {
+                    labelSubjectId.put( label.getName(), new HashSet<Long>() );
+                }
+                labelSubjectId.get( label.getName() ).add( subject.getId() );
+            }
+
+            // create a fake label to capture those Subjects with no labels
+            if ( subject.getLabels().size() == 0 ) {
+                String labelName = "NO_LABEL";
+                if ( !labelSubjectId.containsKey( labelName ) ) {
+                    labelSubjectId.put( labelName, new HashSet<Long>() );
+                }
+                labelSubjectId.get( labelName ).add( subject.getId() );
+            }
+        }
+        return labelSubjectId;
     }
 
     @Override
