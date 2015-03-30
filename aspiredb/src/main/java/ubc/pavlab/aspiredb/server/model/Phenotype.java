@@ -15,7 +15,7 @@
 package ubc.pavlab.aspiredb.server.model;
 
 import gemma.gsec.model.Securable;
-import gemma.gsec.model.SecuredNotChild;
+import gemma.gsec.model.SecuredChild;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,7 +24,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.BatchSize;
 
@@ -39,10 +38,7 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 @Entity
 @BatchSize(size = 50)
 @Table(name = "PHENOTYPE")
-public class Phenotype implements SecuredNotChild {
-
-    @Transient
-    Securable securityOwner;
+public class Phenotype implements SecuredChild {
 
     @Id
     @GeneratedValue
@@ -140,12 +136,8 @@ public class Phenotype implements SecuredNotChild {
         this.valueType = valueType;
     }
 
-    // @Override
-    // public Securable getSecurityOwner() {
-    // return securityOwner;
-    // }
-
-    public void setSecurityOwner( Securable securityOwner ) {
-        this.securityOwner = securityOwner;
+    @Override
+    public Securable getSecurityOwner() {
+        return null;
     }
 }
