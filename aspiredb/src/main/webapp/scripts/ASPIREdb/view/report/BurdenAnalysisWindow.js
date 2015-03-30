@@ -24,8 +24,8 @@ Ext.require( [ 'ASPIREdb.view.report.BurdenAnalysisCharacteristic',
  */
 Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
    extend : 'Ext.Window',
-   width : 800,
-   height : 500,
+   width : 900,
+   height : 600,
    id : 'burdenAnalysisWindow',
    title : 'Burden Analysis',
    layout : 'fit',
@@ -161,6 +161,28 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
          tooltipType : 'title',
          hidden : true
       // icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
+      }, {
+         xtype : 'button',
+         itemId : 'showChartButton',
+         text : 'Show table',
+         hidden : true,
+      } );
+
+      var showChartButton = me.down( '#showChartButton' );
+      showChartButton.on( 'click', function() {
+         var showChart = showChartButton.text === "Show chart";
+         var reportPanel = me.down( "#burdenReport" );
+         var chart = reportPanel.down( "#phenotypeEnrichmentChart" );
+         var grid = reportPanel.down( '#burdenAnalysisPerPhenotypeGrid' );
+         if ( showChart ) {
+            showChartButton.setText( "Show table" );
+            chart.setVisible( true );
+            grid.setVisible( false );
+         } else {
+            showChartButton.setText( "Show chart" );
+            chart.setVisible( false );
+            grid.setVisible( true );
+         }
       } );
 
    },
@@ -381,6 +403,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       var saveTextHandler = null;
       if ( selReportType === "characteristic" ) {
          window.down( '#savePngButton' ).hide();
+         window.down( '#showChartButton' ).hide();
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
             id : 'burdenReport',
             label1 : subjectLabel1,
@@ -389,6 +412,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
          } );
       } else if ( selReportType === "variantLabel" ) {
          window.down( '#savePngButton' ).hide();
+         window.down( '#showChartButton' ).hide();
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisVariantLabel', {
             id : 'burdenReport',
             label1 : subjectLabel1,
@@ -396,6 +420,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
          } );
       } else if ( selReportType === "genesPerSubjectLabel" ) {
          window.down( '#savePngButton' ).hide();
+         window.down( '#showChartButton' ).hide();
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
             id : 'burdenReport',
             label1 : subjectLabel1,
@@ -403,11 +428,13 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
          } );
       } else if ( selReportType === "phenotype" ) {
          window.down( '#savePngButton' ).hide();
+         window.down( '#showChartButton' ).show();
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerPhenotype', {
             id : 'burdenReport',
             label1 : subjectLabel1,
             label2 : subjectLabel2,
          } );
+
       }
 
       if ( reportPanel === null ) {

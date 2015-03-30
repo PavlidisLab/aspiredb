@@ -125,7 +125,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeEnrichmentChart', {
       axis : 'left',
       xField : [ 'name' ],
       yField : [ 'inGroup', 'outGroup' ],
-      title : [ "In-group", "Out-group" ],
+      title : [ "Group 1", "Group 2" ],
       style : {
          opacity : 0.80
       },
@@ -141,7 +141,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeEnrichmentChart', {
          renderer : function(storeItem, item) {
             var label = item.series.title[Ext.Array.indexOf( item.series.yField, item.yField )];
             var fractionStr = storeItem.get( 'outGroupStr' );
-            if ( label === "In-group" ) {
+            if ( label === "Group 1" ) {
                fractionStr = storeItem.get( 'inGroupStr' );
             }
             var msg = storeItem.get( item.series.xField ) + '<br>' + label + ': '
@@ -168,23 +168,21 @@ Ext.define( 'ASPIREdb.view.PhenotypeEnrichmentChart', {
  * 
  * var countColumnName = '# of variants';
  * 
- * var seriesTitle = labelNames;
- *  // get total counts for each label var totals = {}; mergedFreqData.forEach( function(o) { for ( var label in o) { if (
- * label === columnName ) { continue; } if ( totals[label] == undefined ) { totals[label] = o[label] } else {
- * totals[label] += o[label] } } } )
+ * var seriesTitle = labelNames; // get total counts for each label var totals = {}; mergedFreqData.forEach( function(o) {
+ * for ( var label in o) { if ( label === columnName ) { continue; } if ( totals[label] == undefined ) { totals[label] =
+ * o[label] } else { totals[label] += o[label] } } } )
  * 
  * var title = 'Project: ' + ASPIREdb.ActiveProjectSettings.getActiveProjectName(); var varCountsText = "# of variants: " +
  * Ext.util.JSON.encode( totals ).replace( '{', '' ).replace( '}', '' ).replace( /,/g, ', ' ) .replace( /"/g, ''
  * ).replace(/:/g,' '); var xField = columnName; var yField = seriesTitle;
  * 
- * var fields = [ columnName ].concat( seriesTitle ); // insert "type" into the first position
- *  // convert to Extjs Store var myDataStore = Ext.create( 'Ext.data.JsonStore', { storeId : 'reportStore', fields :
- * fields, data : mergedFreqData, } );
+ * var fields = [ columnName ].concat( seriesTitle ); // insert "type" into the first position // convert to Extjs Store
+ * var myDataStore = Ext.create( 'Ext.data.JsonStore', { storeId : 'reportStore', fields : fields, data :
+ * mergedFreqData, } );
  * 
  * me.add( [ { xtype : 'chart', } ] );
  * 
- * me.doLayout(); me.show();
- *  },
+ * me.doLayout(); me.show(); },
  */
 
 } );

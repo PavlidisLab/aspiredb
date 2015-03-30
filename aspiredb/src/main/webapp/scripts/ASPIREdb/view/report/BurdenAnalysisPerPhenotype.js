@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [] );
+Ext.require( [ 'ASPIREdb.view.PhenotypeEnrichmentChart' ] );
 
 /**
  * Create Burden Analysis Per Phenotype
@@ -120,6 +120,48 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerPhenotype', {
       return grid;
    },
 
+   asFraction : function(fraction) {
+      var tokens = fraction.split( '/' );
+      if ( tokens.length != 2 ) {
+         return fraction;
+      }
+      return parseInt( tokens[0] ) / parseInt( tokens[1] ) * 1.0;
+   },
+
+   createChart : function(vos) {
+
+      var ref = this;
+
+      var chart = Ext.create( 'ASPIREdb.view.PhenotypeEnrichmentChart', {
+         itemId : 'phenotypeEnrichmentChart'
+      } );
+
+      ref.valueObjects = vos;
+
+      var data = [];
+      for (var i = 0; i < vos.length; i++) {
+         var vo = vos[i];
+
+         // var row = [ vo.name, vo.inGroupTotalString, vo.outGroupTotalString, vo.PValueString,
+         // vo.PValueCorrectedString ];
+         var row = {
+            name : vo.name,
+            inGroup : ref.asFraction( vo.group1 ) * 100.0,
+            outGroup : ref.asFraction( vo.group2 ) * 100.0,
+            inGroupStr : vo.group1,
+            outGroupStr : vo.group2,
+            pValue : parseFloat( vo.pValue ),
+            qValue : parseFloat( vo.qValue )
+         }
+         data.push( row );
+      }
+
+      chart.store.loadData( data );
+      chart.store.sort( 'pValue', 'ASC' );
+
+      return chart;
+   },
+
    calculateAndShow : function(variantIds) {
 
       var me = this;
@@ -139,6 +181,12 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerPhenotype', {
             callback : function(results) {
                var grid = me.createGrid( results );
                me.add( grid );
+
+               // TODO
+               grid.setVisible( false );
+
+               var chart = me.createChart( results );
+               me.add( chart );
 
                me.setLoading( false );
             },
