@@ -375,7 +375,9 @@ Ext
                      ref.phenotypeFileEdit = file.name;
 
                      if ( form.isValid() ) {
-
+                        
+                        phenotypePanel.setLoading(true);
+                        
                         form.submit( {
 
                            method : 'POST',
@@ -399,6 +401,8 @@ Ext
                                  projectName, dryRun, {
                                     callback : function(result) {
 
+                                       phenotypePanel.setLoading(false);
+                                       
                                        if ( result.errorMessages.length > 0 ) {
                                           Ext.Msg.alert( 'Error', 'Your file has failed with these errors: <br/>'
                                              + result.errorMessages.slice( 0, 5 ).join( '<br/>' ) );
@@ -414,6 +418,7 @@ Ext
 
                            },
                            failure : function(form, action) {
+                              phenotypePanel.setLoading(false);
                               Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' );
                            }
                         } );
