@@ -177,19 +177,19 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       } );
 
       this.zoomInButton = Ext.create( 'Ext.Button', {
-         id : 'zoomOutButton',
+         id : 'zoomInButton',
          text : '',
-         tooltip : 'Zoom out ideogram',
+         tooltip : 'Zoom in ideogram',
          tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/zoom_in.png'
 
       } );
 
       this.zoomOutButton = Ext.create( 'Ext.Button', {
-         id : 'zoomInButton',
+         id : 'zoomOutButton',
          text : '',
          hidden : true,
-         tooltip : 'Zoom in ideogram',
+         tooltip : 'Zoom out ideogram',
          tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/zoom_out.png'
 
