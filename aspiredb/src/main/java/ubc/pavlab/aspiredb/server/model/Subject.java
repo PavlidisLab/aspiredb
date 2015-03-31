@@ -15,7 +15,7 @@
 package ubc.pavlab.aspiredb.server.model;
 
 import gemma.gsec.model.Securable;
-import gemma.gsec.model.SecuredNotChild;
+import gemma.gsec.model.SecuredChild;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -35,7 +35,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.BatchSize;
 import org.springframework.security.access.annotation.Secured;
@@ -47,7 +46,7 @@ import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 @Entity
 @BatchSize(size = 50)
 @Table(name = "SUBJECT")
-public class Subject implements Serializable, SecuredNotChild {
+public class Subject implements Serializable, SecuredChild {
 
     private static final long serialVersionUID = -7549951725408353980L;
 
@@ -62,9 +61,6 @@ public class Subject implements Serializable, SecuredNotChild {
     public static Collection<Subject> emptyCollection() {
         return new ArrayList<Subject>();
     }
-
-    @Transient
-    Securable securityOwner;
 
     @Id
     @GeneratedValue
@@ -246,12 +242,8 @@ public class Subject implements Serializable, SecuredNotChild {
         return "id=" + id + " patientId=" + patientId;
     }
 
-    // @Override
-    // public Securable getSecurityOwner() {
-    // return securityOwner;
-    // }
-
-    public void setSecurityOwner( Securable securityOwner ) {
-        this.securityOwner = securityOwner;
+    @Override
+    public Securable getSecurityOwner() {
+        return null;
     }
 }

@@ -15,7 +15,6 @@
 package ubc.pavlab.aspiredb.server.dao;
 
 import gemma.gsec.model.Securable;
-import gemma.gsec.util.SecurityUtil;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSupport implements SecurableDaoBase<T> {
 
     Log log = LogFactory.getLog( SecurableDaoBaseImpl.class );
-    
+
     // Generic class
     private Class<T> elementClass;
 
@@ -69,7 +69,22 @@ public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSuppo
         if ( entities.isEmpty() ) {
             return entities;
         }
-        this.getHibernateTemplate().saveOrUpdateAll( entities );
+        // this.getHibernateTemplate().saveOrUpdateAll( entities );
+        // just save it for faster performance!
+        HibernateTemplate template = this.getHibernateTemplate();
+        Session session = this.getSession();
+
+        int i = 0;
+        for ( T t : entities ) {
+            template.saveOrUpdate( t );
+            if ( ++i % 10000 == 0 ) {
+                session.flush();
+                session.clear();
+                String percentage = String.format( "%.2f", 100.0 * i / entities.size() );
+                log.info( "Created " + i + " (" + percentage + "%) " + t.getClass().getName() + " records ..." );
+            }
+        }
+
         return entities;
     }
 

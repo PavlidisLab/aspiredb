@@ -30,25 +30,25 @@ public class IndelValueObject extends VariantValueObject {
 	 */
     private static final long serialVersionUID = 6947488320581484129L;
 
-    private int length;
+    private int indelLength;
 
     public IndelValueObject() {
 
     }
 
-    public int getLength() {
-        return length;
+    public int getIndelLength() {
+        return indelLength;
     }
 
     @Override
     public String getPropertyStringValue( Property property ) {
         if ( property instanceof IndelLengthProperty ) {
-            return String.valueOf( this.getLength() );
+            return String.valueOf( this.getIndelLength() );
         }
         return super.getPropertyStringValue( property );
     }
 
-    public void setLength( int length ) {
-        this.length = length;
+    public void setIndelLength( int length ) {
+        this.indelLength = length;
     }
 }

@@ -25,7 +25,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
 
@@ -44,9 +43,6 @@ public class Characteristic implements SecuredChild {
         }
         return characteristicValueObjects;
     }
-
-    @Transient
-    Securable securityOwner;
 
     @Id
     @GeneratedValue
@@ -98,10 +94,6 @@ public class Characteristic implements SecuredChild {
 
     @Override
     public Securable getSecurityOwner() {
-        return securityOwner;
-    }
-
-    public void setSecurityOwner( Securable securityOwner ) {
-        this.securityOwner = securityOwner;
+        return null;
     }
 }

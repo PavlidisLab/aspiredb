@@ -15,7 +15,7 @@
 package ubc.pavlab.aspiredb.server.model;
 
 import gemma.gsec.model.Securable;
-import gemma.gsec.model.SecuredNotChild;
+import gemma.gsec.model.SecuredChild;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -38,7 +38,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
@@ -61,10 +60,7 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "discriminator", discriminatorType = DiscriminatorType.STRING)
-public abstract class Variant implements SecuredNotChild, ValueObjectConvertible<VariantValueObject> {
-
-    @Transient
-    Securable securityOwner;
+public abstract class Variant implements SecuredChild, ValueObjectConvertible<VariantValueObject> {
 
     @OneToMany(cascade = javax.persistence.CascadeType.ALL, orphanRemoval = true)
     @JoinTable(name = "VARIANT_CHARACTERISTIC", joinColumns = { @JoinColumn(name = "VARIANT_FK") }, inverseJoinColumns = { @JoinColumn(name = "CHARACTERISTIC_FK") })
@@ -206,12 +202,8 @@ public abstract class Variant implements SecuredNotChild, ValueObjectConvertible
         return "Variant [id=" + id + ", subject=" + subject + ", location=" + location + "]";
     }
 
-    // @Override
-    // public Securable getSecurityOwner() {
-    // return securityOwner;
-    // }
-
-    public void setSecurityOwner( Securable securityOwner ) {
-        this.securityOwner = securityOwner;
+    @Override
+    public Securable getSecurityOwner() {
+        return null;
     }
 }

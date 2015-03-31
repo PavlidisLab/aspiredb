@@ -63,10 +63,20 @@
 				<prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.cache.use_second_level_cache">true</prop>
                 <prop key="hibernate.cache.use_query_cache">false</prop>
-                <prop key="hibernate.generate_statistics">true</prop>
-                <prop key="hibernate.cache.use_structured_entries">true</prop>
+                <prop key="hibernate.generate_statistics">false</prop>
+                <prop key="hibernate.cache.use_structured_entries">false</prop>
                 <prop key="hibernate.cache.query_cache_factory">org.hibernate.cache.StandardQueryCacheFactory</prop>
 			    <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+       
+                <prop key="hibernate.max_fetch_depth">3</prop>
+                <prop key="hibernate.jdbc.fetch_size">512</prop>
+                <prop key="hibernate.default_batch_fetch_size">512</prop>
+                <prop key="hibernate.jdbc.batch_size">256</prop>
+                <prop key="hibernate.order_inserts">true</prop>
+                 <prop key="hibernate.order_updates">true</prop>
+                
+                
+                 
            </props>
           </property>
          <property name="cacheRegionFactory">

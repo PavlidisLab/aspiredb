@@ -52,7 +52,8 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
          for (var i = 0; i < dataIndexes.length; i++) {
 
-            if ( dataIndexes[i] == 'baseStart' || dataIndexes[i] == 'baseEnd' || dataIndexes[i] == 'indelLength' ) {
+            if ( dataIndexes[i] == 'baseStart' || dataIndexes[i] == 'baseEnd' || dataIndexes[i] == 'cnvLength'
+               || dataIndexes[i] == 'indelLength' ) {
                fieldData.push( {
                   name : dataIndexes[i],
                   type : 'int'
@@ -65,7 +66,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             }
          }
 
-         var characteristicNames = this.extractCharacteristicNames(vvos);
+         var characteristicNames = this.extractCharacteristicNames( vvos );
          for (var i = 0; i < characteristicNames.length; i++) {
             var characteristic = characteristicNames[i];
             if ( fieldData.indexOf( characteristic ) == -1 ) {
@@ -84,25 +85,25 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
          } );
 
-         var columnHeaders = [ 'Patient Id', 'Type', 'Genome Coordinates', 'Copy Number', 'CNV Type',
-                              'CNV Length', 'DB SNP ID', 'Observed Base', 'Reference Base', 'Indel Length', 'Gene' ];
+         var columnHeaders = [ 'Patient Id', 'Type', 'Genome Coordinates', 'Copy Number', 'CNV Type', 'CNV Length',
+                              'DB SNP ID', 'Observed Base', 'Reference Base', 'Indel Length', 'Gene' ];
          var columnConfig = [];
 
-//         columnConfig.push( {
-//            xtype : 'actioncolumn',
-//            width : 30,
-//            items : [ {
-//               icon : 'scripts/ASPIREdb/resources/images/icons/zoom.png',
-//               tooltip : 'View subject',
-//               handler : function(grid, rowIndex, colIndex) {
-//                  var rec = grid.getStore().getAt( rowIndex );
-//                  var patientId = rec.get('patientId');
-//                  var subjectStore = Ext.getStore('subjectStore')
-//                  var subjectId = subjectStore.getAt(subjectStore.findExact('patientId',patientId)).get('id')
-//                  ASPIREdb.EVENT_BUS.fireEvent('select_subject_from_variant_grid', [subjectId] );
-//               }
-//            } ]
-//         } );
+         // columnConfig.push( {
+         // xtype : 'actioncolumn',
+         // width : 30,
+         // items : [ {
+         // icon : 'scripts/ASPIREdb/resources/images/icons/zoom.png',
+         // tooltip : 'View subject',
+         // handler : function(grid, rowIndex, colIndex) {
+         // var rec = grid.getStore().getAt( rowIndex );
+         // var patientId = rec.get('patientId');
+         // var subjectStore = Ext.getStore('subjectStore')
+         // var subjectId = subjectStore.getAt(subjectStore.findExact('patientId',patientId)).get('id')
+         // ASPIREdb.EVENT_BUS.fireEvent('select_subject_from_variant_grid', [subjectId] );
+         // }
+         // } ]
+         // } );
 
          columnConfig.push( {
             text : 'Patient Id',
@@ -261,7 +262,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             columnHeaders : columnHeaders,
             // multiSelect : true,
 
-             listeners : {
+            listeners : {
                cellclick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
 
                   var rec = grid.getStore().getAt( rowIndex );
@@ -310,7 +311,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
          }
          return characteristicNames;
       },
-      
+
       /**
        * Extract labels from value object
        * 
@@ -400,8 +401,8 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
                dataRow.push( "" );
             }
 
-            if ( vvo.variantType == "INDEL" ) {
-               dataRow.push( vvo.length );
+            if ( vvo.variantType == "Indel" ) {
+               dataRow.push( vvo.indelLength );
             } else {
                dataRow.push( "" );
             }
