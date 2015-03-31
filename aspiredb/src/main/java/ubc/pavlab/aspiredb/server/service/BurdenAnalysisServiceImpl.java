@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
+import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
@@ -49,12 +51,14 @@ import ubc.pavlab.aspiredb.server.model.Characteristic;
 import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.server.model.Indel;
 import ubc.pavlab.aspiredb.server.model.Label;
+import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.SNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.BurdenAnalysisValueObject;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
+import ubc.pavlab.aspiredb.shared.PhenotypeEnrichmentValueObject;
 import ubc.pavlab.aspiredb.shared.query.CharacteristicProperty;
 import ubc.pavlab.aspiredb.shared.query.PropertyValue;
 
@@ -66,9 +70,13 @@ import ubc.pavlab.aspiredb.shared.query.PropertyValue;
 public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
 
     @Autowired
+    private ProjectDao projectDao;
+    @Autowired
     private SubjectService subjectService;
     @Autowired
     private VariantService variantService;
+    @Autowired
+    private PhenotypeService phenotypeService;
     @Autowired
     private SubjectDao subjectDao;
     @Autowired
@@ -216,7 +224,7 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
             allPatientIds.add( subject.getPatientId() );
         }
 
-        Map<String, Collection<String>> labelPatientId = subjectService.groupSubjectsBySubjectLabel( subjects );
+        Map<String, Collection<String>> labelPatientId = subjectService.groupPatientIdsBySubjectLabel( subjects );
 
         labelPatientId = getMutuallyExclusivePatientIds( labelPatientId, group1.getName(), group2.getName() );
 
@@ -496,8 +504,8 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         }
 
         // key: labelName, values: patientIds
-        Map<String, Collection<String>> labelPatientId = subjectService.groupSubjectsBySubjectLabel( patientIdSubjects
-                .values() );
+        Map<String, Collection<String>> labelPatientId = subjectService
+                .groupPatientIdsBySubjectLabel( patientIdSubjects.values() );
 
         labelPatientId = getMutuallyExclusivePatientIds( labelPatientId, group1.getName(), group2.getName() );
 
@@ -606,6 +614,47 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         return false;
     }
 
+    @SuppressWarnings("boxing")
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public Collection<BurdenAnalysisValueObject> getBurdenAnalysisPerPhenotype( Collection<Long> activeProjects,
+            LabelValueObject group1, LabelValueObject group2 ) throws NotLoggedInException, BioMartServiceException {
+
+        Collection<BurdenAnalysisValueObject> ret = new ArrayList<>();
+
+        if ( group1 == null || group2 == null ) {
+            log.warn( "Labels can't be null! Group1 is " + group1 + " and group2 is " + group2 );
+            return ret;
+        }
+
+        Project activeProject = projectDao.load( activeProjects.iterator().next() );
+
+        Map<String, Collection<Long>> labelSubjectId = subjectService.groupSubjectIdsBySubjectLabel( activeProject
+                .getSubjects() );
+
+        if ( !labelSubjectId.containsKey( group1.getName() ) ) {
+            log.warn( "Subject label " + group1.getName() + " not found" );
+            return ret;
+        }
+
+        if ( !labelSubjectId.containsKey( group2.getName() ) ) {
+            log.warn( "Subject label " + group2.getName() + " not found" );
+            return ret;
+        }
+
+        List<PhenotypeEnrichmentValueObject> phenoVOs = phenotypeService.getPhenotypeEnrichmentValueObjects(
+                activeProjects, labelSubjectId.get( group1.getName() ), labelSubjectId.get( group2.getName() ) );
+
+        // convert to BurdenAnalysisValueObject
+        for ( PhenotypeEnrichmentValueObject pvo : phenoVOs ) {
+            ret.add( new BurdenAnalysisValueObject( pvo ) );
+        }
+
+        return ret;
+
+    }
+
     @SuppressWarnings({ "boxing" })
     @Override
     @Transactional(readOnly = true)
@@ -658,8 +707,8 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         }
 
         // key: labelName, values: patientIds
-        Map<String, Collection<String>> labelPatientId = subjectService.groupSubjectsBySubjectLabel( patientIdSubjects
-                .values() );
+        Map<String, Collection<String>> labelPatientId = subjectService
+                .groupPatientIdsBySubjectLabel( patientIdSubjects.values() );
 
         labelPatientId = getMutuallyExclusivePatientIds( labelPatientId, group1.getName(), group2.getName() );
 

@@ -177,20 +177,9 @@ public class PhenotypeServiceImpl implements PhenotypeService {
     @RemoteMethod
     @Transactional(readOnly = true)
     public List<PhenotypeEnrichmentValueObject> getPhenotypeEnrichmentValueObjects( Collection<Long> activeProjects,
-            Collection<Long> subjectIds ) throws NotLoggedInException {
+            Collection<Long> subjectIds, Collection<Long> complementSubjectIds ) throws NotLoggedInException {
 
         ArrayList<PhenotypeEnrichmentValueObject> list = new ArrayList<PhenotypeEnrichmentValueObject>();
-
-        Project activeProject = projectDao.load( activeProjects.iterator().next() );
-
-        List<Subject> subjectList = activeProject.getSubjects();
-        List<Long> complementSubjectIds = new ArrayList<Long>();
-
-        for ( Subject s : subjectList ) {
-            if ( !subjectIds.contains( s.getId() ) ) {
-                complementSubjectIds.add( s.getId() );
-            }
-        }
 
         Collection<String> distinctUris = phenotypeDao.getDistinctOntologyUris( activeProjects );
 
@@ -210,6 +199,26 @@ public class PhenotypeServiceImpl implements PhenotypeService {
         multipleTestCorrectionForPhenotypeEnrichmentList( list );
 
         return list;
+    }
+
+    @Override
+    @RemoteMethod
+    @Transactional(readOnly = true)
+    public List<PhenotypeEnrichmentValueObject> getPhenotypeEnrichmentValueObjects( Collection<Long> activeProjects,
+            Collection<Long> subjectIds ) throws NotLoggedInException {
+
+        Project activeProject = projectDao.load( activeProjects.iterator().next() );
+
+        List<Subject> subjectList = activeProject.getSubjects();
+        List<Long> complementSubjectIds = new ArrayList<Long>();
+
+        for ( Subject s : subjectList ) {
+            if ( !subjectIds.contains( s.getId() ) ) {
+                complementSubjectIds.add( s.getId() );
+            }
+        }
+
+        return getPhenotypeEnrichmentValueObjects( activeProjects, subjectIds, complementSubjectIds );
     }
 
     @Override
