@@ -400,10 +400,13 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
          reportPanel = null;
       }
 
+      // reset state
+      window.down( '#savePngButton' ).hide();
+      window.down( '#showChartButton' ).setText("Show table");
+      window.down( '#showChartButton' ).hide();
+      
       var saveTextHandler = null;
       if ( selReportType === "characteristic" ) {
-         window.down( '#savePngButton' ).hide();
-         window.down( '#showChartButton' ).hide();
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
             id : 'burdenReport',
             label1 : subjectLabel1,
@@ -411,23 +414,18 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             characteristic : characteristic
          } );
       } else if ( selReportType === "variantLabel" ) {
-         window.down( '#savePngButton' ).hide();
-         window.down( '#showChartButton' ).hide();
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisVariantLabel', {
             id : 'burdenReport',
             label1 : subjectLabel1,
             label2 : subjectLabel2
          } );
       } else if ( selReportType === "genesPerSubjectLabel" ) {
-         window.down( '#savePngButton' ).hide();
-         window.down( '#showChartButton' ).hide();
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
             id : 'burdenReport',
             label1 : subjectLabel1,
             label2 : subjectLabel2,
          } );
       } else if ( selReportType === "phenotype" ) {
-         window.down( '#savePngButton' ).hide();
          window.down( '#showChartButton' ).show();
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisPerPhenotype', {
             id : 'burdenReport',

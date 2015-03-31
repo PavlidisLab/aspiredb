@@ -18,7 +18,7 @@
  */
 
 Ext.require( [ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings',
-              'ASPIREdb.view.PhenotypeEnrichmentWindow', 'Ext.grid.column.Column',
+              'Ext.grid.column.Column',
               'ASPIREdb.view.NeurocartaGeneWindow', 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow',
               'ASPIREdb.view.PhenotypesContigencyTableWindow' ] );
 
@@ -60,14 +60,6 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
       itemId : 'phenotypeGridToolbar',
       dock : 'top',
       items : [ {
-         xtype : 'button',
-         text : 'Analyze',
-         disabled : 'true',
-         itemId : 'analyzeButton',
-         tooltip : 'Report the enrichment of HPO phenotypes between filtered and unfiltered subject groups',
-         tooltipType : 'title',
-
-      }, {
          xtype : 'button',
          text : 'Heatmap',
          disabled : 'true',
@@ -239,9 +231,6 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
    initComponent : function() {
       this.callParent();
 
-      this.getDockedComponent( 'phenotypeGridToolbar' ).getComponent( 'analyzeButton' ).on( 'click',
-         this.getPhenotypeEnrichment, this );
-
       this.getDockedComponent( 'phenotypeGridToolbar' ).getComponent( 'heatmapButton' ).on( 'click', this.viewHeatmap,
          this );
 
@@ -263,22 +252,6 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
       ASPIREdb.EVENT_BUS.on( 'subjects_loaded', function(subjectIds) {
 
          ref.currentSubjectIds = subjectIds;
-
-         ProjectService.numSubjects( ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
-            callback : function(numSubjects) {
-
-               if ( subjectIds.length > 0 ) {
-
-                  if ( subjectIds.length < numSubjects - 1 ) {
-                     ref.getDockedComponent( 'phenotypeGridToolbar' ).getComponent( 'analyzeButton' ).enable();
-                  } else {
-                     ref.getDockedComponent( 'phenotypeGridToolbar' ).getComponent( 'analyzeButton' ).disable();
-                  }
-
-               }
-
-            }
-         } );
 
          SubjectService.getPhenotypeSummaries( subjectIds, ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
             callback : function(vos) {// vos is a list of phenotypeSummaryValueobjects (converted to a javascript
@@ -639,24 +612,6 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
       }
 
       return subjectValue;
-
-   },
-
-   getPhenotypeEnrichment : function() {
-
-      ASPIREdb.view.PhenotypeEnrichmentWindow.clearChart();
-      ASPIREdb.view.PhenotypeEnrichmentWindow.clearGrid();
-      ASPIREdb.view.PhenotypeEnrichmentWindow.show();
-      ASPIREdb.view.PhenotypeEnrichmentWindow.setLoading( true );
-
-      PhenotypeService.getPhenotypeEnrichmentValueObjects( ASPIREdb.ActiveProjectSettings.getActiveProjectIds(),
-         this.currentSubjectIds, {
-            callback : function(vos) {
-               ASPIREdb.view.PhenotypeEnrichmentWindow.populateGrid( vos );
-               ASPIREdb.view.PhenotypeEnrichmentWindow.populateChart( vos );
-               ASPIREdb.view.PhenotypeEnrichmentWindow.setLoading( false );
-            }
-         } );
 
    },
 
