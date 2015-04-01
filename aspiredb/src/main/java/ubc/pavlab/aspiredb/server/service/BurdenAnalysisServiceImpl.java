@@ -308,6 +308,41 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
     }
 
     /**
+     * Excludes those IDs that have both label1 and label2.
+     * 
+     * @param labelSubjectId
+     * @param name
+     * @param name2
+     * @return
+     */
+    private Map<String, Collection<Long>> getMutuallyExclusiveSubjectIds( Map<String, Collection<Long>> labelSubjectId,
+            String label1, String label2 ) {
+
+        if ( !labelSubjectId.containsKey( label1 ) || !labelSubjectId.containsKey( label2 ) ) {
+            log.warn( "Label not found" );
+            return labelSubjectId;
+        }
+        Collection<Long> label1IdsOld = new ArrayList<>( labelSubjectId.get( label1 ) );
+        Collection<Long> label2IdsOld = new ArrayList<>( labelSubjectId.get( label2 ) );
+        Collection<Long> label1Ids = labelSubjectId.get( label1 );
+        Collection<Long> label2Ids = labelSubjectId.get( label2 );
+        boolean removed = label1Ids.removeAll( label2IdsOld );
+        label2Ids.removeAll( label1IdsOld );
+
+        // for logging
+        if ( removed ) {
+            label1IdsOld.removeAll( label1Ids );
+            label2IdsOld.removeAll( label2Ids );
+            label1IdsOld.addAll( label2IdsOld );
+            log.info( "Ignoring " + label1IdsOld.size() + " (" + StringUtils.join( label1IdsOld, "," )
+                    + ") subjects with labels " + label1 + " and " + label2 + ". After filtering, " + label1 + " has "
+                    + label1Ids.size() + " and " + label2 + " has " + label2Ids.size() );
+        }
+
+        return labelSubjectId;
+    }
+
+    /**
      * Returns the BurdenAnalysis per Subject (See Bug 4129).
      * 
      * @param subjectIds
@@ -632,6 +667,8 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
 
         Map<String, Collection<Long>> labelSubjectId = subjectService.groupSubjectIdsBySubjectLabel( activeProject
                 .getSubjects() );
+
+        labelSubjectId = getMutuallyExclusiveSubjectIds( labelSubjectId, group1.getName(), group2.getName() );
 
         if ( !labelSubjectId.containsKey( group1.getName() ) ) {
             log.warn( "Subject label " + group1.getName() + " not found" );

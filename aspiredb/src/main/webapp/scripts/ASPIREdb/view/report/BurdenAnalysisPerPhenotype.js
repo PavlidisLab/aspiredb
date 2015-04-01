@@ -179,14 +179,18 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerPhenotype', {
       BurdenAnalysisService.getBurdenAnalysisPerPhenotype( ASPIREdb.ActiveProjectSettings.getActiveProjectIds(),
          label1, label2, {
             callback : function(results) {
-               var grid = me.createGrid( results );
-               me.add( grid );
-
-               // TODO
-               grid.setVisible( false );
-
-               var chart = me.createChart( results );
-               me.add( chart );
+               
+               if ( results !== null && results.length > 0 ) {
+                  var grid = me.createGrid( results );
+                  me.add( grid );
+                  grid.setVisible( false );
+   
+                  var chart = me.createChart( results );
+                  me.add( chart );
+               } else {
+                  console.log( 'No results found' );
+                  Ext.Msg.alert( 'Results', 'No results found' );
+               }
 
                me.setLoading( false );
             },
