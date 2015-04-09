@@ -14,9 +14,6 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
-import gemma.gsec.model.Securable;
-import gemma.gsec.model.SecuredChild;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -38,7 +35,7 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 @Entity
 @BatchSize(size = 50)
 @Table(name = "PHENOTYPE")
-public class Phenotype implements SecuredChild {
+public class Phenotype {
 
     @Id
     @GeneratedValue
@@ -69,7 +66,7 @@ public class Phenotype implements SecuredChild {
 
     public PhenotypeValueObject convertToValueObject() {
         PhenotypeValueObject valueObject = new PhenotypeValueObject();
-        valueObject.setId( this.getId() );
+        // valueObject.setId( this.getId() );
         valueObject.setSubjectId( subject.getId() );
         valueObject.setExternalSubjectId( subject.getPatientId() );
         valueObject.setUri( this.getUri() );
@@ -79,10 +76,9 @@ public class Phenotype implements SecuredChild {
         return valueObject;
     }
 
-    @Override
-    public Long getId() {
-        return id;
-    }
+    /*
+     * @Override public Long getId() { return id; }
+     */
 
     public String getName() {
         return name;
@@ -136,8 +132,7 @@ public class Phenotype implements SecuredChild {
         this.valueType = valueType;
     }
 
-    @Override
-    public Securable getSecurityOwner() {
-        return null;
-    }
+    /*
+     * @Override public Securable getSecurityOwner() { return null; }
+     */
 }

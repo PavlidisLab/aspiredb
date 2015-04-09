@@ -619,15 +619,14 @@ public class ProjectManagerImpl implements ProjectManager {
 
             }
 
-            for ( Phenotype phen : s.getPhenotypes() ) {
-
-                if ( grant ) {
-                    securityService.makeWriteableByGroup( phen, groupName );
-                } else {
-                    securityService.makeUnreadableByGroup( phen, groupName );
-                }
-
-            }
+            // TODO
+            // for ( Phenotype phen : s.getPhenotypes() ) {
+            // if ( grant ) {
+            // securityService.makeWriteableByGroup( phen, groupName );
+            // } else {
+            // securityService.makeUnreadableByGroup( phen, groupName );
+            // }
+            // }
 
         }
     }

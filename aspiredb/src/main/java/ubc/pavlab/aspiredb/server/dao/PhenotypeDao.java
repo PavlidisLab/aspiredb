@@ -17,7 +17,6 @@ package ubc.pavlab.aspiredb.server.dao;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.model.Phenotype;
@@ -28,18 +27,14 @@ import ubc.pavlab.aspiredb.server.model.Phenotype;
  * @author ??
  * @version $Id: PhenotypeDao.java,v 1.24 2013/07/12 17:11:46 cmcdonald Exp $
  */
-public interface PhenotypeDao extends SecurableDaoBase<Phenotype> {
+public interface PhenotypeDao extends DaoBase<Phenotype> {
 
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<Phenotype> findBySubjectId( Long id );
 
-    @Secured({ "GROUP_USER" })
     public Integer findPhenotypeCountBySubjectId( Long id );
 
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<Phenotype> findPresentByProjectIdsAndUri( Collection<Long> ids, String uri );
 
-    @Secured({ "GROUP_USER" })
     public List<String> getDistinctOntologyUris( Collection<Long> activeProjects );
 
     /**
@@ -50,7 +45,6 @@ public interface PhenotypeDao extends SecurableDaoBase<Phenotype> {
      * @return
      */
     @Transactional(readOnly = true)
-    @Secured({ "GROUP_USER" })
     public List<String> getExistingNames( Collection<Long> activeProjectIds );
 
     // TODO: reuse for suggestions
@@ -61,22 +55,16 @@ public interface PhenotypeDao extends SecurableDaoBase<Phenotype> {
     public List<String> getExistingURIs( String name );
 
     @Transactional(readOnly = true)
-    @Secured({ "GROUP_USER" })
     public List<String> getExistingValues( String name );
 
     // TODO: reuse for suggestions
-    @Secured({ "GROUP_USER" })
     public List<String> getListOfPossibleValuesByName( Collection<Long> projectIds, String name );
 
-    @Secured({ "GROUP_USER" })
     public List<String> getListOfPossibleValuesByUri( Collection<Long> projectIds, String uri );
 
     @Transactional(readOnly = true)
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<Phenotype> loadAllByProjectIds( Collection<Long> projectIds );
 
-    // @Secured({"GROUP_USER" ,"AFTER_ACL_COLLECTION_READ"})
-    @Secured({ "GROUP_USER" })
     public Collection<Phenotype> loadBySubjectIds( Collection<Long> subjectIds );
 
     @Transactional(readOnly = true)

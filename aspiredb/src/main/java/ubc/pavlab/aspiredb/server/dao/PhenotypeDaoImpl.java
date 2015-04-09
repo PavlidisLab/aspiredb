@@ -37,10 +37,14 @@ import ubc.pavlab.aspiredb.server.model.Phenotype;
  * @version $Id: PhenotypeDaoImpl.java,v 1.30 2013/07/12 17:11:46 cmcdonald Exp $
  */
 @Repository("phenotypeDao")
-public class PhenotypeDaoImpl extends SecurableDaoBaseImpl<Phenotype> implements PhenotypeDao {
+public class PhenotypeDaoImpl extends DaoBaseImpl<Phenotype> implements PhenotypeDao {
 
     @Autowired
     SubjectDao individualDao;
+
+    private Session currentSession() {
+        return getSession();
+    }
 
     @Autowired
     public PhenotypeDaoImpl( SessionFactory sessionFactory ) {
