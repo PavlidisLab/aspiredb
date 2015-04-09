@@ -15,9 +15,6 @@
 
 package ubc.pavlab.aspiredb.server.security.authorization.acl;
 
-import java.util.Collection;
-import java.util.HashSet;
-
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +25,6 @@ import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.model.CNV;
-import ubc.pavlab.aspiredb.server.model.Phenotype;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
@@ -88,27 +84,28 @@ public class AclAdviceTest extends BaseSpringContextTest {
 
     }
 
-    @Test
-    public void testPhenotypeAcls() throws Exception {
-        Collection<Phenotype> phenos = new HashSet<Phenotype>();
-        Phenotype pheno = testObjectHelper.createPersistentTestPhenotypeObject(
-                RandomStringUtils.randomAlphabetic( 4 ), RandomStringUtils.randomAlphabetic( 4 ),
-                RandomStringUtils.randomAlphabetic( 1 ), RandomStringUtils.randomAlphabetic( 4 ) );
-        phenos.add( pheno );
-
-        pheno = testObjectHelper.createPersistentTestPhenotypeObject( RandomStringUtils.randomAlphabetic( 4 ),
-                RandomStringUtils.randomAlphabetic( 4 ), RandomStringUtils.randomAlphabetic( 1 ),
-                RandomStringUtils.randomAlphabetic( 4 ) );
-        phenos.add( pheno );
-
-        // TODO figure out why removing a collection throws an error
-        // phenotypeDao.remove( phenos );
-
-        for ( Phenotype apheno : phenos ) {
-            aclTestUtils.checkHasAcl( apheno );
-            testObjectHelper.removePhenotype( apheno );
-            aclTestUtils.checkDeletedAcl( apheno );
-        }
-
-    }
+    // Bug 4230. Removed Phenotype ACLs because they're too slow.
+    // @Test
+    // public void testPhenotypeAcls() throws Exception {
+    // Collection<Phenotype> phenos = new HashSet<Phenotype>();
+    // Phenotype pheno = testObjectHelper.createPersistentTestPhenotypeObject(
+    // RandomStringUtils.randomAlphabetic( 4 ), RandomStringUtils.randomAlphabetic( 4 ),
+    // RandomStringUtils.randomAlphabetic( 1 ), RandomStringUtils.randomAlphabetic( 4 ) );
+    // phenos.add( pheno );
+    //
+    // pheno = testObjectHelper.createPersistentTestPhenotypeObject( RandomStringUtils.randomAlphabetic( 4 ),
+    // RandomStringUtils.randomAlphabetic( 4 ), RandomStringUtils.randomAlphabetic( 1 ),
+    // RandomStringUtils.randomAlphabetic( 4 ) );
+    // phenos.add( pheno );
+    //
+    // // TODO figure out why removing a collection throws an error
+    // // phenotypeDao.remove( phenos );
+    //
+    // for ( Phenotype apheno : phenos ) {
+    // aclTestUtils.checkHasAcl( apheno );
+    // testObjectHelper.removePhenotype( apheno );
+    // aclTestUtils.checkDeletedAcl( apheno );
+    // }
+    //
+    // }
 }
