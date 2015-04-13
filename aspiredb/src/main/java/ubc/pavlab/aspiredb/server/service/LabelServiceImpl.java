@@ -165,7 +165,7 @@ public class LabelServiceImpl implements LabelService {
     @Transactional
     @RemoteMethod
     public void removeLabelsFromVariants( Collection<LabelValueObject> labels, Collection<Long> variantIds ) {
-        Collection<Variant> variants = variantDao.load( variantIds );
+        Collection<Variant> variants = ( Collection<Variant> ) variantDao.load( variantIds );
         // Collection<Label> labels = labelDao.load( labelIds );
         for ( Variant variant : variants ) {
             for ( LabelValueObject label : labels ) {

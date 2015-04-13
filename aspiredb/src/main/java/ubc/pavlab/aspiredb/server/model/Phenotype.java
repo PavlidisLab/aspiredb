@@ -35,7 +35,7 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 @Entity
 @BatchSize(size = 50)
 @Table(name = "PHENOTYPE")
-public class Phenotype {
+public class Phenotype implements SubjectAttribute {
 
     @Id
     @GeneratedValue
@@ -84,6 +84,7 @@ public class Phenotype {
         return name;
     }
 
+    @Override
     public Subject getSubject() {
         return subject;
     }
@@ -112,6 +113,7 @@ public class Phenotype {
         this.name = name;
     }
 
+    @Override
     public void setSubject( Subject subject ) {
         this.subject = subject;
     }

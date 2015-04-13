@@ -16,8 +16,6 @@ package ubc.pavlab.aspiredb.server.dao;
 
 import java.util.Collection;
 
-import org.springframework.security.access.annotation.Secured;
-
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.query.Property;
@@ -29,9 +27,8 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
  * @author ??
  * @version $Id: VariantDaoBase.java,v 1.11 2013/06/11 22:30:43 anton Exp $
  */
-public interface VariantDaoBase<T extends Variant> extends SecurableDaoBase<T>, RemotePaging<T> {
+public interface VariantDaoBase<T extends Variant> extends DaoBase<T>, RemotePaging<T> {
 
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<T> findByGenomicLocation( GenomicRange range, Collection<Long> activeProjectIds );
 
     /**
@@ -39,11 +36,9 @@ public interface VariantDaoBase<T extends Variant> extends SecurableDaoBase<T>, 
      * @param id
      * @return
      */
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     @Deprecated
     public Collection<T> findBySubjectPatientId( String id );
 
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<T> findBySubjectPatientId( Long projectId, String patientId );
 
     public Collection<String> suggestValuesForEntityProperty( Property property, SuggestionContext suggestionContext );

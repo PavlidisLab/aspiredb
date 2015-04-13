@@ -1,7 +1,7 @@
 /*
  * The aspiredb project
  * 
- * Copyright (c) 2013 University of British Columbia
+ * Copyright (c) 2015 University of British Columbia
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,18 @@
  * limitations under the License.
  *
  */
-package ubc.pavlab.aspiredb.server.dao;
 
-import java.util.Collection;
+package ubc.pavlab.aspiredb.server.model;
 
-import ubc.pavlab.aspiredb.server.model.Characteristic;
+/**
+ * Classes that implements this
+ * 
+ * @author ptan
+ * @version $Id$
+ */
+public interface SubjectAttribute {
 
-public interface CharacteristicDao extends DaoBase<Characteristic> {
-    public Collection<String> getKeysMatching( String query );
+    public Subject getSubject();
 
-    public Collection<String> getValuesForKey( String key );
-
-    public Collection<String> getKeysMatching( String query, Long projectId );
+    public void setSubject( Subject subject );
 }

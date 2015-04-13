@@ -259,7 +259,7 @@ public class GeneServiceImpl implements GeneService {
         Map<Long, Collection<GeneValueObject>> map = getGenesPerVariant( variantIds );
 
         // assume that each variant is a different allele, ie. unique position
-        Collection<Variant> variants = variantDao.load( variantIds );
+        Collection<Variant> variants = ( Collection<Variant> ) variantDao.load( variantIds );
 
         // transform data to patientId-geneSymbol pairs
         Map<String, Map<GeneValueObject, Collection<VariantValueObject>>> seen = new HashMap<>();

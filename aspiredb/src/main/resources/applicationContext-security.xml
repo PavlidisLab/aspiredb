@@ -92,6 +92,10 @@
         <s:after-invocation-provider ref="postInvocationAdviceProvider" /><!-- for @Post... -->
     </s:global-method-security>
 
+    <!-- after reading a collection filter: remove unallowed objects -->
+    <bean id="subjectAttributeAspect" class="ubc.pavlab.aspiredb.server.aspect.SubjectAttributeAspect">
+    </bean>
+    
     <!-- Aspect that adds ACLs for new entities, and deletes them for deleted entities. -->
     <aop:config>
         <aop:aspect id="aclAspect" ref="aclAdvice" order="4">

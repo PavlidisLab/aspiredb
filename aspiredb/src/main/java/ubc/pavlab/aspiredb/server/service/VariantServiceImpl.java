@@ -118,7 +118,7 @@ public class VariantServiceImpl implements VariantService {
     @Transactional
     public LabelValueObject addLabel( Collection<Long> ids, LabelValueObject label ) {
 
-        Collection<Variant> variants = variantDao.load( ids );
+        Collection<Variant> variants = ( Collection<Variant> ) variantDao.load( ids );
         Label labelEntity = labelDao.findOrCreate( label );
         for ( Variant variant : variants ) {
             variant.addLabel( labelEntity );

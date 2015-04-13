@@ -14,9 +14,6 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
-import gemma.gsec.model.Securable;
-import gemma.gsec.model.SecuredChild;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -60,7 +57,7 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "discriminator", discriminatorType = DiscriminatorType.STRING)
-public abstract class Variant implements SecuredChild, ValueObjectConvertible<VariantValueObject> {
+public abstract class Variant implements SubjectAttribute, ValueObjectConvertible<VariantValueObject> {
 
     @OneToMany(cascade = javax.persistence.CascadeType.ALL, orphanRemoval = true)
     @JoinTable(name = "VARIANT_CHARACTERISTIC", joinColumns = { @JoinColumn(name = "VARIANT_FK") }, inverseJoinColumns = { @JoinColumn(name = "CHARACTERISTIC_FK") })
@@ -120,6 +117,10 @@ public abstract class Variant implements SecuredChild, ValueObjectConvertible<Va
         return true;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public List<Characteristic> getCharacteristics() {
         return characteristics;
     }
@@ -132,11 +133,6 @@ public abstract class Variant implements SecuredChild, ValueObjectConvertible<Va
         return externalId;
     }
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
     public Collection<Label> getLabels() {
         return labels;
     }
@@ -145,6 +141,7 @@ public abstract class Variant implements SecuredChild, ValueObjectConvertible<Va
         return location;
     }
 
+    @Override
     public Subject getSubject() {
         return subject;
     }
@@ -189,6 +186,7 @@ public abstract class Variant implements SecuredChild, ValueObjectConvertible<Va
         this.location = location;
     }
 
+    @Override
     public void setSubject( Subject subject ) {
         this.subject = subject;
     }
@@ -200,10 +198,5 @@ public abstract class Variant implements SecuredChild, ValueObjectConvertible<Va
     @Override
     public String toString() {
         return "Variant [id=" + id + ", subject=" + subject + ", location=" + location + "]";
-    }
-
-    @Override
-    public Securable getSecurityOwner() {
-        return null;
     }
 }

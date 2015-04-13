@@ -17,7 +17,6 @@ package ubc.pavlab.aspiredb.server.dao;
 import java.util.Collection;
 import java.util.Set;
 
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
@@ -27,12 +26,10 @@ import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 public interface RemotePaging<T> {
 
     @Transactional(readOnly = true)
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Collection<? extends T> load( Set<AspireDbFilterConfig> filters ) throws BioMartServiceException,
             NeurocartaServiceException;
 
     @Transactional(readOnly = true)
-    @Secured({ "GROUP_USER", "AFTER_ACL_COLLECTION_READ" })
     public Page<? extends T> loadPage( int offset, int limit, String sortProperty, String sortDirection,
             Set<AspireDbFilterConfig> filters ) throws BioMartServiceException, NeurocartaServiceException;
 

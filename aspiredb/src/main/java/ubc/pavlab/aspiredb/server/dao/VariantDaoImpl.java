@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,10 @@ public class VariantDaoImpl extends VariantDaoBaseImpl<Variant> implements Varia
     public VariantDaoImpl( SessionFactory sessionFactory ) {
         super( Variant.class );
         super.setSessionFactory( sessionFactory );
+    }
+
+    private Session currentSession() {
+        return getSession();
     }
 
     @Override

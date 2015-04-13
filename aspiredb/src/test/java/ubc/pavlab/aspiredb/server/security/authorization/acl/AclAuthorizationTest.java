@@ -179,22 +179,23 @@ public class AclAuthorizationTest extends BaseSpringContextTest {
 
     }
 
-    @Test
-    public void testUserOwnsIndividualAndIndividualCNVs() throws Exception {
-
-        super.runAsUser( this.ownerUsername );
-
-        // CNV cnv = cnvDao.findBySubjectPatientId( patientId ).iterator().next();
-
-        CNV cnv = cnvDao.findBySubjectPatientId( subject.getProjects().iterator().next().getId(), patientId )
-                .iterator().next();
-
-        assertTrue( "User should own the individual's cnvs", securityService.isOwnedByCurrentUser( cnv ) );
-
-        super.runAsUser( this.aDifferentUsername );
-
-        assertFalse( "User shouldn't own the individual's cnvs", securityService.isOwnedByCurrentUser( cnv ) );
-
-    }
+    // Bug 4230. Removed Variant ACLs because upload is too slow.
+    // @Test
+    // public void testUserOwnsIndividualAndIndividualCNVs() throws Exception {
+    //
+    // super.runAsUser( this.ownerUsername );
+    //
+    // // CNV cnv = cnvDao.findBySubjectPatientId( patientId ).iterator().next();
+    //
+    // CNV cnv = cnvDao.findBySubjectPatientId( subject.getProjects().iterator().next().getId(), patientId )
+    // .iterator().next();
+    //
+    // assertTrue( "User should own the individual's cnvs", securityService.isOwnedByCurrentUser( cnv ) );
+    //
+    // super.runAsUser( this.aDifferentUsername );
+    //
+    // assertFalse( "User shouldn't own the individual's cnvs", securityService.isOwnedByCurrentUser( cnv ) );
+    //
+    // }
 
 }

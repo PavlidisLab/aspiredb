@@ -526,7 +526,7 @@ public class ProjectManagerImpl implements ProjectManager {
 
         variant2SpecialVariantOverlapDao.create( overlapVos );
 
-        variantDao.printCacheStatistics();
+        // variantDao.printCacheStatistics();
 
         log.info( "Found " + overlapVos.size() + " new variant overlaps between " + projectName + " and "
                 + overlappingProjectName + " which took " + timer.getTime() + " ms" );
@@ -600,26 +600,27 @@ public class ProjectManagerImpl implements ProjectManager {
                 securityService.makeUnreadableByGroup( s, groupName );
             }
 
-            for ( Variant v : s.getVariants() ) {
+            // Bug 4230. Removed Variant ACLs because upload is too slow.
+            // for ( Variant v : s.getVariants() ) {
+            //
+            // if ( grant ) {
+            // securityService.makeWriteableByGroup( v, groupName );
+            // } else {
+            // securityService.makeUnreadableByGroup( v, groupName );
+            // }
+            //
+            // for ( Characteristic c : v.getCharacteristics() ) {
+            // if ( grant ) {
+            // securityService.makeWriteableByGroup( c, groupName );
+            // } else {
+            // securityService.makeUnreadableByGroup( c, groupName );
+            // }
+            //
+            // }
+            //
+            // }
 
-                if ( grant ) {
-                    securityService.makeWriteableByGroup( v, groupName );
-                } else {
-                    securityService.makeUnreadableByGroup( v, groupName );
-                }
-
-                for ( Characteristic c : v.getCharacteristics() ) {
-                    if ( grant ) {
-                        securityService.makeWriteableByGroup( c, groupName );
-                    } else {
-                        securityService.makeUnreadableByGroup( c, groupName );
-                    }
-
-                }
-
-            }
-
-            // TODO
+            // Bug 4230. Removed Phenotype ACLs because upload is too slow.
             // for ( Phenotype phen : s.getPhenotypes() ) {
             // if ( grant ) {
             // securityService.makeWriteableByGroup( phen, groupName );

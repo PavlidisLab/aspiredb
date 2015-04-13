@@ -45,7 +45,7 @@ public interface PhenotypeDao extends DaoBase<Phenotype> {
      * @return
      */
     @Transactional(readOnly = true)
-    public List<String> getExistingNames( Collection<Long> activeProjectIds );
+    public Collection<String> getExistingNames( Collection<Long> activeProjectIds );
 
     // TODO: reuse for suggestions
     @Transactional(readOnly = true)

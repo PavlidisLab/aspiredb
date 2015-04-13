@@ -19,6 +19,7 @@
 package ubc.pavlab.aspiredb.server.model;
 
 import gemma.gsec.model.Securable;
+import gemma.gsec.model.SecuredChild;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,7 +39,7 @@ import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 @Entity
 @Table(name = "LABEL")
-public class Label implements Securable, ValueObjectConvertible<LabelValueObject> {
+public class Label implements SecuredChild, ValueObjectConvertible<LabelValueObject> {
 
     public static Collection<LabelValueObject> toValueObjects( Collection<Label> labels ) {
         Collection<LabelValueObject> valueObjects = new ArrayList<LabelValueObject>();
@@ -153,5 +154,11 @@ public class Label implements Securable, ValueObjectConvertible<LabelValueObject
     @Override
     public LabelValueObject toValueObject() {
         return new LabelValueObject( id, name, colour, isShown );
+    }
+
+    @Override
+    public Securable getSecurityOwner() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

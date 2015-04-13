@@ -20,6 +20,7 @@ package ubc.pavlab.aspiredb.server.dao;
 
 import java.util.Collection;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -27,11 +28,15 @@ import org.springframework.stereotype.Repository;
 import ubc.pavlab.aspiredb.server.model.Characteristic;
 
 @Repository
-public class CharacteristicDaoImpl extends SecurableDaoBaseImpl<Characteristic> implements CharacteristicDao {
+public class CharacteristicDaoImpl extends DaoBaseImpl<Characteristic> implements CharacteristicDao {
     @Autowired
     public CharacteristicDaoImpl( SessionFactory sessionFactory ) {
         super( Characteristic.class );
         super.setSessionFactory( sessionFactory );
+    }
+
+    private Session currentSession() {
+        return getSession();
     }
 
     @Override

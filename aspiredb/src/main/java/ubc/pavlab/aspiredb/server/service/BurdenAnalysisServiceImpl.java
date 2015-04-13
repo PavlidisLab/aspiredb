@@ -217,7 +217,7 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
 
         Collection<Subject> subjects = new HashSet<>();
         Collection<String> allPatientIds = new HashSet<>();
-        Collection<Variant> variants = variantDao.load( variantIds );
+        Collection<Variant> variants = ( Collection<Variant> ) variantDao.load( variantIds );
         for ( Variant v : variants ) {
             Subject subject = subjectDao.load( v.getSubject().getId() );
             subjects.add( subject );
@@ -531,7 +531,7 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         }
 
         Map<String, Subject> patientIdSubjects = new HashMap<>();
-        Collection<Variant> variants = variantDao.load( variantIds );
+        Collection<Variant> variants = ( Collection<Variant> ) variantDao.load( variantIds );
 
         for ( Variant v : variants ) {
             Subject subject = subjectDao.load( v.getSubject().getId() );
@@ -736,7 +736,7 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         }
 
         Map<String, Subject> patientIdSubjects = new HashMap<>();
-        Collection<Variant> variants = variantDao.load( variantIds );
+        Collection<Variant> variants = ( Collection<Variant> ) variantDao.load( variantIds );
 
         for ( Variant v : variants ) {
             Subject subject = subjectDao.load( v.getSubject().getId() );

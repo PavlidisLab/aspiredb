@@ -17,12 +17,16 @@ package ubc.pavlab.aspiredb.server.dao;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
 
 public abstract class DaoBaseImpl<T> extends HibernateDaoSupport implements DaoBase<T> {
+
+    Log log = LogFactory.getLog( DaoBaseImpl.class );
 
     // Generic class
     private Class<T> elementClass;

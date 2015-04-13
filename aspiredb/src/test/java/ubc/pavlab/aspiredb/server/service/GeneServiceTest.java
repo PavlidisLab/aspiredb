@@ -85,8 +85,9 @@ public class GeneServiceTest extends BaseSpringContextTest {
 
         variantDaoMock = EasyMock.createMock( VariantDao.class );
         // EasyMock.expect( variantDaoMock.load( 2L ) ).andReturn( variant );
-        EasyMock.expect( variantDaoMock.load( Arrays.asList( 2L ) ) ).andReturn( Arrays.asList( variant ) ).times( 2 );
-        EasyMock.expect( variantDaoMock.load( Arrays.asList( 2L, 3L ) ) )
+        EasyMock.expect( ( Collection<Variant> ) variantDaoMock.load( Arrays.asList( 2L ) ) )
+                .andReturn( Arrays.asList( variant ) ).times( 2 );
+        EasyMock.expect( ( Collection<Variant> ) variantDaoMock.load( Arrays.asList( 2L, 3L ) ) )
                 .andReturn( Arrays.asList( variant, variant2 ) ).times( 2 );
         EasyMock.replay( variantDaoMock );
 

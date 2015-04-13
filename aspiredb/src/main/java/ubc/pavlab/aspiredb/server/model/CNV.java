@@ -111,8 +111,9 @@ public class CNV extends Variant {
     @Override
     public VariantValueObject toValueObject() {
         CNVValueObject vo = new CNVValueObject();
-        vo.setId( this.getId() );
         vo.setVariantType( this.getClass().getSimpleName() );
+
+        vo.setId( this.getId() );
 
         if ( this.getSubject() != null ) {
             vo.setPatientId( this.getSubject().getPatientId() );

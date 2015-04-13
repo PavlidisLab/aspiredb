@@ -14,9 +14,6 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
-import gemma.gsec.model.Securable;
-import gemma.gsec.model.SecuredChild;
-
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -34,7 +31,7 @@ import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
  */
 @Entity
 @Table(name = "CHARACTERISTIC")
-public class Characteristic implements SecuredChild {
+public class Characteristic {
 
     public static Collection<CharacteristicValueObject> toValueObjects( Collection<Characteristic> entityCharacteristics ) {
         Collection<CharacteristicValueObject> characteristicValueObjects = new ArrayList<CharacteristicValueObject>();
@@ -63,7 +60,6 @@ public class Characteristic implements SecuredChild {
         this.value = v;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -90,10 +86,5 @@ public class Characteristic implements SecuredChild {
 
     public CharacteristicValueObject toValueObject() {
         return new CharacteristicValueObject( id, key, value );
-    }
-
-    @Override
-    public Securable getSecurityOwner() {
-        return null;
     }
 }

@@ -201,7 +201,7 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
     @Override
     public Collection<Subject> loadByVariantIds( List<Long> variantIds ) {
 
-        Collection<Variant> variants = variantDao.load( variantIds );
+        Collection<Variant> variants = ( Collection<Variant> ) variantDao.load( variantIds );
 
         HashSet<Subject> subjects = new HashSet<Subject>();
 
