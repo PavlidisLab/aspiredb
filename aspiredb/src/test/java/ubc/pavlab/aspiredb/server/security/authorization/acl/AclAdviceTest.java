@@ -24,7 +24,6 @@ import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
-import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
 
@@ -54,21 +53,22 @@ public class AclAdviceTest extends BaseSpringContextTest {
     @Autowired
     PhenotypeDao phenotypeDao;
 
-    /**
-     * @throws Exception
-     */
-    @Test
-    public void testCNVAcls() throws Exception {
-
-        CNV cnv = testObjectHelper.createPersistentTestCNVObject();
-
-        aclTestUtils.checkHasAcl( cnv );
-
-        testObjectHelper.removeVariant( cnv );
-
-        aclTestUtils.checkDeletedAcl( cnv );
-
-    }
+    // Bug 4230. Removed Phenotype ACLs because they're too slow.
+    // /**
+    // * @throws Exception
+    // */
+    // @Test
+    // public void testCNVAcls() throws Exception {
+    //
+    // CNV cnv = testObjectHelper.createPersistentTestCNVObject();
+    //
+    // aclTestUtils.checkHasAcl( cnv );
+    //
+    // testObjectHelper.removeVariant( cnv );
+    //
+    // aclTestUtils.checkDeletedAcl( cnv );
+    //
+    // }
 
     @Test
     public void testIndividualAcls() throws Exception {

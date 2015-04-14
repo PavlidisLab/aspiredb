@@ -36,11 +36,12 @@ import org.springframework.security.access.AccessDeniedException;
 
 import ubc.pavlab.aspiredb.server.dao.Page;
 import ubc.pavlab.aspiredb.server.dao.PageBean;
+import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.SubjectAttribute;
 
 /**
- * Works similarly to gemma.gsec.acl.afterinvocation.AclEntryAfterInvocationCollectionFilteringProvider but looks at the
- * object's Subject for security permissions. Use with Phenotype and Variant objects.
+ * Provides a way of checking the permissions for any unsecured objects that implements the SubjectAttribute interface
+ * (e.g. Phenotype and Variant).
  * 
  * @author ptan
  * @version $Id$
@@ -55,32 +56,51 @@ public class SubjectAttributeAspect {
     @Autowired
     private UserManager userManager;
 
-    // @Pointcut("execution(* ubc.pavlab.aspiredb.server.dao.DaoBase*.update(..))")
-    // private void anyDaoBaseUpdateOperation() {
-    // }
-    //
-    //
-    // @Before(value = "anyDaoBaseUpdateOperation() && target(ubc.pavlab.aspiredb.server.model.SubjectAttribute) ")
-    // public void checkUpdate() throws Throwable {
-    // log.info( "checkUpdate() " + pjp.getSignature().getName() + " result = " + rawResults );
-    // }
-    //
+    @Pointcut("execution(* ubc.pavlab.aspiredb.server.dao.DaoBase.update(..))")
+    private void anyDaoUpdateOperation() {
+    }
+
+    @Pointcut("execution(* ubc.pavlab.aspiredb.server.dao.DaoBase.remove(..))")
+    private void anyDaoRemoveOperation() {
+    }
 
     @Pointcut("execution(* ubc.pavlab.aspiredb.server.dao.VariantDao*.*(..))")
-    private void anyVariantDaoOperation() {
+    private void variantDaoOperation() {
     }
 
     @Pointcut("execution(* ubc.pavlab.aspiredb.server.dao.PhenotypeDao*.*(..))")
-    private void anyPhenotypeDaoOperation() {
+    private void phenotypeDaoOperation() {
     }
 
-    @Around("anyVariantDaoOperation() || anyPhenotypeDaoOperation()")
+    /**
+     * Throw an exception if the current user has no permission to modify the object.
+     * 
+     * @param pjp
+     * @param obj
+     * @throws Throwable
+     */
+    @Around("(anyDaoUpdateOperation() || anyDaoRemoveOperation()) && args(obj) ")
+    public void checkUpdateRemove( ProceedingJoinPoint pjp, Object obj ) throws Throwable {
+
+        if ( isViewableByUser( obj, userManager.getCurrentUsername(), true ) ) {
+            pjp.proceed( pjp.getArgs() );
+        }
+    }
+
+    /**
+     * Remove those objects which the current user has no permission to.
+     * 
+     * @param pjp
+     * @return
+     * @throws Throwable
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Around("variantDaoOperation() || phenotypeDaoOperation()")
     public Object filterSubjectPermission( ProceedingJoinPoint pjp ) throws Throwable {
 
         Object rawResults = pjp.proceed();
 
         String username = userManager.getCurrentUsername();
-        log.info( "filterSubjectPermission() " + pjp.getSignature().getName() + " result = " + rawResults );
 
         if ( rawResults == null ) {
             return rawResults;
@@ -88,11 +108,10 @@ public class SubjectAttributeAspect {
 
         if ( Collection.class.isAssignableFrom( rawResults.getClass() ) ) {
 
-            @SuppressWarnings("unchecked")
             Collection<Object> results = new ArrayList<>();
             Collection<Object> list = ( Collection<Object> ) rawResults;
             for ( Object obj : list ) {
-                if ( isViewableByUser( obj, username ) ) {
+                if ( isViewableByUser( obj, username, false ) ) {
                     results.add( obj );
                 }
             }
@@ -106,7 +125,7 @@ public class SubjectAttributeAspect {
         } else {
 
             // not a collection but a single object
-            if ( isViewableByUser( rawResults, username ) ) {
+            if ( isViewableByUser( rawResults, username, false ) ) {
                 return rawResults;
             } else {
                 return null;
@@ -114,12 +133,32 @@ public class SubjectAttributeAspect {
         }
     }
 
-    private boolean isViewableByUser( Object obj, String username ) {
+    /**
+     * Helper function that performs the permission verification.
+     * 
+     * @param obj
+     * @param username
+     * @param throwException if true, an AccessDeniedException is thrown, otherwise no exception is thrown
+     * @return
+     * @throws AccessDeniedException
+     */
+    private boolean isViewableByUser( Object obj, String username, boolean throwException )
+            throws AccessDeniedException {
         if ( SubjectAttribute.class.isAssignableFrom( obj.getClass() ) ) {
             SubjectAttribute sa = ( SubjectAttribute ) obj;
+            Subject subject = sa.getSubject();
+
+            // if we have a variant without a subject, the variant was probably created in a unit test
+            if ( subject == null ) {
+                return true;
+            }
+
             try {
-                return securityService.isViewableByUser( sa.getSubject(), username );
+                return securityService.isViewableByUser( subject, username );
             } catch ( AccessDeniedException e ) {
+                if ( throwException ) {
+                    throw ( e );
+                }
                 return false;
             }
         }
