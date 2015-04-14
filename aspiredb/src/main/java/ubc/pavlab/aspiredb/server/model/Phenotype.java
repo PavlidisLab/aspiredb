@@ -66,7 +66,7 @@ public class Phenotype implements SubjectAttribute {
 
     public PhenotypeValueObject convertToValueObject() {
         PhenotypeValueObject valueObject = new PhenotypeValueObject();
-        // valueObject.setId( this.getId() );
+        valueObject.setId( this.getId() );
         valueObject.setSubjectId( subject.getId() );
         valueObject.setExternalSubjectId( subject.getPatientId() );
         valueObject.setUri( this.getUri() );
@@ -109,6 +109,10 @@ public class Phenotype implements SubjectAttribute {
         this.id = id;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public void setName( String name ) {
         this.name = name;
     }
@@ -133,8 +137,4 @@ public class Phenotype implements SubjectAttribute {
     public void setValueType( String valueType ) {
         this.valueType = valueType;
     }
-
-    /*
-     * @Override public Securable getSecurityOwner() { return null; }
-     */
 }
