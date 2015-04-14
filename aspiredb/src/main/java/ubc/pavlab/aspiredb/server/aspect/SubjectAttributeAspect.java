@@ -64,6 +64,11 @@ public class SubjectAttributeAspect {
     private void anyDaoRemoveOperation() {
     }
 
+    @Pointcut("execution(* ubc.pavlab.aspiredb.server.dao.DaoBase.load*(..))")
+    private void anyDaoLoadOperation() {
+    }
+
+    // @Pointcut("execution(* ubc.pavlab.aspiredb.server.dao.VariantDao*.*(..))")
     @Pointcut("execution(* ubc.pavlab.aspiredb.server.dao.VariantDao*.*(..))")
     private void variantDaoOperation() {
     }
@@ -95,7 +100,7 @@ public class SubjectAttributeAspect {
      * @throws Throwable
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    @Around("variantDaoOperation() || phenotypeDaoOperation()")
+    @Around("anyDaoLoadOperation() || variantDaoOperation() || phenotypeDaoOperation()")
     public Object filterSubjectPermission( ProceedingJoinPoint pjp ) throws Throwable {
 
         Object rawResults = pjp.proceed();

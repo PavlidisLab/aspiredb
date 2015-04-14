@@ -16,7 +16,6 @@ package ubc.pavlab.aspiredb.server.dao;
 
 import gemma.gsec.SecurityService;
 import gemma.gsec.authentication.UserManager;
-import gemma.gsec.model.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,7 +37,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.stat.SecondLevelCacheStatistics;
 import org.hibernate.stat.Statistics;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
@@ -157,14 +155,12 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
 
         Collection<Subject> subjects = subjectDao.findByPhenotype( filterConfig );
 
-        Collection<Subject> viewableSubjects = getViewableSubjects( subjects );
-
-        if ( viewableSubjects.size() == 0 ) {
+        if ( subjects.size() == 0 ) {
             return new ArrayList<Variant>();
         }
 
         return this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
-                .add( Restrictions.in( "subject", viewableSubjects ) ).list();
+                .add( Restrictions.in( "subject", subjects ) ).list();
 
     }
 
@@ -180,32 +176,13 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
                 .add( Restrictions.eq( "patientId", id ) ).createAlias( "projects", "project" )
                 .add( Restrictions.eq( "project.id", projectId ) ).list();
 
-        // TODO
-        // Collection<Subject> viewableSubjects = getViewableSubjects( subjects );
-        Collection<Subject> viewableSubjects = subjects;
-
-        if ( viewableSubjects.size() == 0 ) {
+        if ( subjects.size() == 0 ) {
             return new ArrayList<T>();
         }
 
         List<T> variants = this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
-                .add( Restrictions.in( "subject", viewableSubjects ) ).list();
+                .add( Restrictions.in( "subject", subjects ) ).list();
         return variants;
-    }
-
-    private Collection<Subject> getViewableSubjects( Collection<Subject> subjects ) {
-        Collection<Subject> viewableSubjects = new ArrayList<>();
-        User user = userManager.getCurrentUser();
-        for ( Subject s : subjects ) {
-            try {
-                if ( securityService.isViewableByUser( s, user.getUserName() ) ) {
-                    viewableSubjects.add( s );
-                }
-            } catch ( AccessDeniedException e ) {
-
-            }
-        }
-        return viewableSubjects;
     }
 
     @Override
@@ -216,16 +193,12 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
         List<Subject> subjects = this.getSessionFactory().getCurrentSession().createCriteria( Subject.class )
                 .add( Restrictions.eq( "patientId", id ) ).list();
 
-        // TODO
-        // Collection<Subject> viewableSubjects = getViewableSubjects( subjects );
-        Collection<Subject> viewableSubjects = subjects;
-
-        if ( viewableSubjects.size() == 0 ) {
+        if ( subjects.size() == 0 ) {
             return new ArrayList<T>();
         }
 
         List<T> variants = this.getSessionFactory().getCurrentSession().createCriteria( this.elementClass )
-                .add( Restrictions.in( "subject", viewableSubjects ) ).list();
+                .add( Restrictions.in( "subject", subjects ) ).list();
         return variants;
     }
 
