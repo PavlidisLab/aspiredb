@@ -24,7 +24,10 @@ import gemma.gsec.authentication.UserManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -69,11 +72,11 @@ public class SubjectAttributeAspect {
     }
 
     // @Pointcut("execution(* ubc.pavlab.aspiredb.server.dao.VariantDao*.*(..))")
-    @Pointcut("execution(* ubc.pavlab.aspiredb.server.dao.VariantDao*.*(..))")
+    @Pointcut("execution(java.util.Collection<ubc.pavlab.aspiredb.server.model.Variant> ubc.pavlab.aspiredb.server.dao.VariantDao*.*(..))")
     private void variantDaoOperation() {
     }
 
-    @Pointcut("execution(* ubc.pavlab.aspiredb.server.dao.PhenotypeDao*.*(..))")
+    @Pointcut("execution(java.util.Collection<ubc.pavlab.aspiredb.server.model.Phenotype> ubc.pavlab.aspiredb.server.dao.PhenotypeDao*.*(..))")
     private void phenotypeDaoOperation() {
     }
 
@@ -87,7 +90,7 @@ public class SubjectAttributeAspect {
     @Around("(anyDaoUpdateOperation() || anyDaoRemoveOperation()) && args(obj) ")
     public void checkUpdateRemove( ProceedingJoinPoint pjp, Object obj ) throws Throwable {
 
-        if ( isViewableByUser( obj, userManager.getCurrentUsername(), true ) ) {
+        if ( isViewableByUser( getSubject( obj ), userManager.getCurrentUsername(), true ) ) {
             pjp.proceed( pjp.getArgs() );
         }
     }
@@ -100,7 +103,7 @@ public class SubjectAttributeAspect {
      * @throws Throwable
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    @Around("anyDaoLoadOperation() || variantDaoOperation() || phenotypeDaoOperation()")
+    @Around("variantDaoOperation() || phenotypeDaoOperation()")
     public Object filterSubjectPermission( ProceedingJoinPoint pjp ) throws Throwable {
 
         Object rawResults = pjp.proceed();
@@ -115,10 +118,52 @@ public class SubjectAttributeAspect {
 
             Collection<Object> results = new ArrayList<>();
             Collection<Object> list = ( Collection<Object> ) rawResults;
+
+            if ( list.size() == 0 ) {
+                return rawResults;
+            }
+
+            // group objects by subject so we avoid checking permissions for each object
+            Map<Subject, Collection<Object>> subjectObject = new HashMap<>();
             for ( Object obj : list ) {
-                if ( isViewableByUser( obj, username, false ) ) {
+                Subject subject = getSubject( obj );
+
+                // no subject so no permissions to check!
+                if ( subject == null ) {
                     results.add( obj );
+                    continue;
                 }
+
+                if ( !subjectObject.containsKey( subject ) ) {
+                    subjectObject.put( subject, new ArrayList<>() );
+                }
+                subjectObject.get( subject ).add( obj );
+            }
+
+            StopWatch timer = new StopWatch();
+            timer.start();
+
+            // check subject permissions
+            // TODO: maybe only check the first one for speedup?
+            int i = 0;
+            for ( Subject subject : subjectObject.keySet() ) {
+
+                if ( !isViewableByUser( subject, username, false ) ) {
+                    continue;
+                }
+
+                results.addAll( subjectObject.get( subject ) );
+
+                if ( timer.getTime() > 10000 ) {
+                    String percent = String.format( "%.2f", new Double( 100.00 * i / subjectObject.keySet().size() ) );
+                    log.info( "checking permissions for " + i + "/" + subjectObject.keySet().size() + "(" + percent
+                            + "%) subjects ... " );
+                    timer.reset();
+                    timer.start();
+                }
+
+                i++;
+
             }
 
             if ( rawResults instanceof Page ) {
@@ -130,7 +175,7 @@ public class SubjectAttributeAspect {
         } else {
 
             // not a collection but a single object
-            if ( isViewableByUser( rawResults, username, false ) ) {
+            if ( isViewableByUser( getSubject( rawResults ), username, false ) ) {
                 return rawResults;
             } else {
                 return null;
@@ -138,8 +183,16 @@ public class SubjectAttributeAspect {
         }
     }
 
+    private Subject getSubject( Object obj ) {
+        if ( SubjectAttribute.class.isAssignableFrom( obj.getClass() ) ) {
+            SubjectAttribute sa = ( SubjectAttribute ) obj;
+            return sa.getSubject();
+        }
+        return null;
+    }
+
     /**
-     * Helper function that performs the permission verification.
+     * Helper function that performs the permission verification. This can be slow.
      * 
      * @param obj
      * @param username
@@ -147,27 +200,22 @@ public class SubjectAttributeAspect {
      * @return
      * @throws AccessDeniedException
      */
-    private boolean isViewableByUser( Object obj, String username, boolean throwException )
+    private boolean isViewableByUser( Subject subject, String username, boolean throwException )
             throws AccessDeniedException {
-        if ( SubjectAttribute.class.isAssignableFrom( obj.getClass() ) ) {
-            SubjectAttribute sa = ( SubjectAttribute ) obj;
-            Subject subject = sa.getSubject();
 
-            // if we have a variant without a subject, the variant was probably created in a unit test
-            if ( subject == null ) {
-                return true;
-            }
-
-            try {
-                return securityService.isViewableByUser( subject, username );
-            } catch ( AccessDeniedException e ) {
-                if ( throwException ) {
-                    throw ( e );
-                }
-                return false;
-            }
+        // if we have a variant without a subject, the variant was probably created in a unit test
+        if ( subject == null ) {
+            return true;
         }
-        return true; // there's no way to check the permission, eg. with a String, so just allow
+
+        try {
+            return securityService.isViewableByUser( subject, username );
+        } catch ( AccessDeniedException e ) {
+            if ( throwException ) {
+                throw ( e );
+            }
+            return false;
+        }
     }
 
 }
