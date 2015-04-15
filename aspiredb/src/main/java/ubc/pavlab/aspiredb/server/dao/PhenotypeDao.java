@@ -17,6 +17,7 @@ package ubc.pavlab.aspiredb.server.dao;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.server.model.Phenotype;
@@ -29,10 +30,12 @@ import ubc.pavlab.aspiredb.server.model.Phenotype;
  */
 public interface PhenotypeDao extends DaoBase<Phenotype> {
 
+    @Secured({ "GROUP_USER", "AFTER_ACL_SUBJECT_ATTRIBUTE_COLLECTION_READ" })
     public Collection<Phenotype> findBySubjectId( Long id );
 
     public Integer findPhenotypeCountBySubjectId( Long id );
 
+    @Secured({ "GROUP_USER", "AFTER_ACL_SUBJECT_ATTRIBUTE_COLLECTION_READ" })
     public Collection<Phenotype> findPresentByProjectIdsAndUri( Collection<Long> ids, String uri );
 
     public List<String> getDistinctOntologyUris( Collection<Long> activeProjects );
@@ -63,8 +66,10 @@ public interface PhenotypeDao extends DaoBase<Phenotype> {
     public List<String> getListOfPossibleValuesByUri( Collection<Long> projectIds, String uri );
 
     @Transactional(readOnly = true)
+    @Secured({ "GROUP_USER", "AFTER_ACL_SUBJECT_ATTRIBUTE_COLLECTION_READ" })
     public Collection<Phenotype> loadAllByProjectIds( Collection<Long> projectIds );
 
+    @Secured({ "GROUP_USER", "AFTER_ACL_SUBJECT_ATTRIBUTE_COLLECTION_READ" })
     public Collection<Phenotype> loadBySubjectIds( Collection<Long> subjectIds );
 
     @Transactional(readOnly = true)

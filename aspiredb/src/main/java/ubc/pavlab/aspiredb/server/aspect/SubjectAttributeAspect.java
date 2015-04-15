@@ -22,12 +22,6 @@ package ubc.pavlab.aspiredb.server.aspect;
 import gemma.gsec.SecurityService;
 import gemma.gsec.authentication.UserManager;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -37,14 +31,12 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 
-import ubc.pavlab.aspiredb.server.dao.Page;
-import ubc.pavlab.aspiredb.server.dao.PageBean;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.SubjectAttribute;
 
 /**
- * Provides a way of checking the permissions for any unsecured objects that implements the SubjectAttribute interface
- * (e.g. Phenotype and Variant).
+ * Check permissions for any unsecured objects that implements the SubjectAttribute interface during update() and
+ * remove() (e.g. Phenotype and Variant). Also see AclAfterSubjectAttributeCollectionFilter.
  * 
  * @author ptan
  * @version $Id$
@@ -67,19 +59,6 @@ public class SubjectAttributeAspect {
     private void anyDaoRemoveOperation() {
     }
 
-    @Pointcut("execution(* ubc.pavlab.aspiredb.server.dao.DaoBase.load*(..))")
-    private void anyDaoLoadOperation() {
-    }
-
-    // @Pointcut("execution(* ubc.pavlab.aspiredb.server.dao.VariantDao*.*(..))")
-    @Pointcut("execution(java.util.Collection<ubc.pavlab.aspiredb.server.model.Variant> ubc.pavlab.aspiredb.server.dao.VariantDao*.*(..))")
-    private void variantDaoOperation() {
-    }
-
-    @Pointcut("execution(java.util.Collection<ubc.pavlab.aspiredb.server.model.Phenotype> ubc.pavlab.aspiredb.server.dao.PhenotypeDao*.*(..))")
-    private void phenotypeDaoOperation() {
-    }
-
     /**
      * Throw an exception if the current user has no permission to modify the object.
      * 
@@ -92,94 +71,6 @@ public class SubjectAttributeAspect {
 
         if ( isViewableByUser( getSubject( obj ), userManager.getCurrentUsername(), true ) ) {
             pjp.proceed( pjp.getArgs() );
-        }
-    }
-
-    /**
-     * Remove those objects which the current user has no permission to.
-     * 
-     * @param pjp
-     * @return
-     * @throws Throwable
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    @Around("variantDaoOperation() || phenotypeDaoOperation()")
-    public Object filterSubjectPermission( ProceedingJoinPoint pjp ) throws Throwable {
-
-        Object rawResults = pjp.proceed();
-
-        String username = userManager.getCurrentUsername();
-
-        if ( rawResults == null ) {
-            return rawResults;
-        }
-
-        if ( Collection.class.isAssignableFrom( rawResults.getClass() ) ) {
-
-            Collection<Object> results = new ArrayList<>();
-            Collection<Object> list = ( Collection<Object> ) rawResults;
-
-            if ( list.size() == 0 ) {
-                return rawResults;
-            }
-
-            // group objects by subject so we avoid checking permissions for each object
-            Map<Subject, Collection<Object>> subjectObject = new HashMap<>();
-            for ( Object obj : list ) {
-                Subject subject = getSubject( obj );
-
-                // no subject so no permissions to check!
-                if ( subject == null ) {
-                    results.add( obj );
-                    continue;
-                }
-
-                if ( !subjectObject.containsKey( subject ) ) {
-                    subjectObject.put( subject, new ArrayList<>() );
-                }
-                subjectObject.get( subject ).add( obj );
-            }
-
-            StopWatch timer = new StopWatch();
-            timer.start();
-
-            // check subject permissions
-            // TODO: maybe only check the first one for speedup?
-            int i = 0;
-            for ( Subject subject : subjectObject.keySet() ) {
-
-                if ( !isViewableByUser( subject, username, false ) ) {
-                    continue;
-                }
-
-                results.addAll( subjectObject.get( subject ) );
-
-                if ( timer.getTime() > 10000 ) {
-                    String percent = String.format( "%.2f", new Double( 100.00 * i / subjectObject.keySet().size() ) );
-                    log.info( "checking permissions for " + i + "/" + subjectObject.keySet().size() + "(" + percent
-                            + "%) subjects ... " );
-                    timer.reset();
-                    timer.start();
-                }
-
-                i++;
-
-            }
-
-            if ( rawResults instanceof Page ) {
-                return new PageBean( results, results.size() );
-            }
-
-            return results;
-
-        } else {
-
-            // not a collection but a single object
-            if ( isViewableByUser( getSubject( rawResults ), username, false ) ) {
-                return rawResults;
-            } else {
-                return null;
-            }
         }
     }
 
