@@ -121,9 +121,17 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService {
         }
 
         // Make PhenotypeSummaryValueObjects and populate their value counts.
-
         StopWatch timer = new StopWatch();
         timer.start();
+
+        // collect all possible values and store in memory instead of querying the database
+        Map<String, Collection<String>> phenotypeValueMap = new HashMap<>();
+        for ( Phenotype phenotype : phenotypes ) {
+            if ( !phenotypeValueMap.containsKey( phenotype.getName() ) ) {
+                phenotypeValueMap.put( phenotype.getName(), new HashSet<String>() );
+            }
+            phenotypeValueMap.get( phenotype.getName() ).add( phenotype.getValue() );
+        }
 
         log.info( "constructing PhenotypeSummaryValueObject for " + phenotypes.size() + " phenotypes, specialproject="
                 + containsLargeSpecialProject );
@@ -133,11 +141,14 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService {
             // Create new PhenotypeSummaryValueObject.
             if ( phenotypeSummary == null ) {
 
-                List<String> possibleValues = new ArrayList<String>();
+                Collection<String> possibleValues = new ArrayList<String>();
 
+                // TODO FIXME
                 // all possible values of only large special project are HPO so this database call is unnecessary
                 if ( !containsLargeSpecialProject ) {
-                    possibleValues = phenotypeDao.getListOfPossibleValuesByName( projectIds, phenotype.getName() );
+
+                    possibleValues = phenotypeValueMap.get( phenotype.getName() );
+
                 } else {
                     possibleValues.add( "1" );
                     possibleValues.add( "0" );
@@ -257,7 +268,7 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService {
         return phenotypes;
     }
 
-    private PhenotypeSummary makePhenotypeSummary( Phenotype phenotype, List<String> possibleValues,
+    private PhenotypeSummary makePhenotypeSummary( Phenotype phenotype, Collection<String> possibleValues,
             Collection<Long> subjectIds, Boolean disableForLargeProject ) throws NeurocartaServiceException {
         Map<String, Set<Long>> valueToSubjectIds = new HashMap<String, Set<Long>>();
 
