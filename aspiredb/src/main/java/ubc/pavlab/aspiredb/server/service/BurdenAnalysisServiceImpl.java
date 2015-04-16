@@ -217,9 +217,11 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
 
         Collection<Subject> subjects = new HashSet<>();
         Collection<String> allPatientIds = new HashSet<>();
+        @SuppressWarnings("unchecked")
         Collection<Variant> variants = ( Collection<Variant> ) variantDao.load( variantIds );
         Map<String, Collection<CNV>> cnvMap = new HashMap<>();
         Map<String, Collection<SNV>> snvMap = new HashMap<>();
+        Map<String, Collection<Indel>> indelMap = new HashMap<>();
         for ( Variant v : variants ) {
             Subject subject = subjectDao.load( v.getSubject().getId() );
             subjects.add( subject );
@@ -235,6 +237,11 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
                     snvMap.put( subject.getPatientId(), new ArrayList<SNV>() );
                 }
                 snvMap.get( subject.getPatientId() ).add( ( SNV ) v );
+            } else if ( v instanceof Indel ) {
+                if ( !indelMap.containsKey( subject.getPatientId() ) ) {
+                    indelMap.put( subject.getPatientId(), new ArrayList<Indel>() );
+                }
+                indelMap.get( subject.getPatientId() ).add( ( Indel ) v );
             }
         }
 
@@ -255,18 +262,23 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         // count total number of CNVs and SNVs by group
         Map<String, Collection<CNV>> cnvMapByGroup = new HashMap<>();
         Map<String, Collection<SNV>> snvMapByGroup = new HashMap<>();
+        Map<String, Collection<Indel>> indelMapByGroup = new HashMap<>();
         Collection<String> groupNames = new ArrayList<>();
         groupNames.add( group1.getName() );
         groupNames.add( group2.getName() );
         for ( String groupName : groupNames ) {
             cnvMapByGroup.put( groupName, new ArrayList<CNV>() );
             snvMapByGroup.put( groupName, new ArrayList<SNV>() );
+            indelMapByGroup.put( groupName, new ArrayList<Indel>() );
             for ( String patientId : labelPatientId.get( groupName ) ) {
                 if ( cnvMap.containsKey( patientId ) ) {
                     cnvMapByGroup.get( groupName ).addAll( cnvMap.get( patientId ) );
                 }
                 if ( snvMap.containsKey( patientId ) ) {
                     snvMapByGroup.get( groupName ).addAll( snvMap.get( patientId ) );
+                }
+                if ( indelMap.containsKey( patientId ) ) {
+                    indelMapByGroup.get( groupName ).addAll( indelMap.get( patientId ) );
                 }
             }
         }
@@ -279,11 +291,16 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         double group2CNVCount = 1.0 * cnvMapByGroup.get( group2.getName() ).size();
         double group1SNVCount = 1.0 * snvMapByGroup.get( group1.getName() ).size();
         double group2SNVCount = 1.0 * snvMapByGroup.get( group2.getName() ).size();
+        double group1IndelCount = 1.0 * indelMapByGroup.get( group1.getName() ).size();
+        double group2IndelCount = 1.0 * indelMapByGroup.get( group2.getName() ).size();
         if ( group1CNVCount + group2CNVCount > 0 ) {
             ret.add( new BurdenAnalysisValueObject( "Total number of CNVs", group1CNVCount, group2CNVCount, null ) );
         }
         if ( group1SNVCount + group2SNVCount > 0 ) {
             ret.add( new BurdenAnalysisValueObject( "Total number of SNVs", group1SNVCount, group2SNVCount, null ) );
+        }
+        if ( group1IndelCount + group2IndelCount > 0 ) {
+            ret.add( new BurdenAnalysisValueObject( "Total number of Indels", group1IndelCount, group2IndelCount, null ) );
         }
 
         Map<String, Map<CnvBurdenAnalysisPerSubject, Double>> patientIdStats = getVariantStatsBySubject( variants );
