@@ -419,9 +419,11 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
             label1IdsOld.removeAll( label1Ids );
             label2IdsOld.removeAll( label2Ids );
             label1IdsOld.addAll( label2IdsOld );
-            log.info( "Ignoring " + label1IdsOld.size() + " (" + StringUtils.join( label1IdsOld, "," )
-                    + ") subjects with labels " + label1 + " and " + label2 + ". After filtering, " + label1 + " has "
-                    + label1Ids.size() + " and " + label2 + " has " + label2Ids.size() );
+            String overlappedIds = StringUtils.join( label1IdsOld, ", " );
+            log.info( "Ignoring " + label1IdsOld.size() + " ("
+                    + overlappedIds.substring( 0, Math.min( 50, overlappedIds.length() ) )
+                    + "... ) subjects with labels " + label1 + " and " + label2 + ". After filtering, " + label1
+                    + " has " + label1Ids.size() + " and " + label2 + " has " + label2Ids.size() );
         }
 
         return labelPatientId;
