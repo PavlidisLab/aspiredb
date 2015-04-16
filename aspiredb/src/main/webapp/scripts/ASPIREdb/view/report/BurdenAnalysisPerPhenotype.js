@@ -172,7 +172,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerPhenotype', {
 
       if ( label1 === null || label2 === null ) {
          Ext.Msg.alert( 'Error', "Subject labels are required!" );
-         window.setLoading( false );
+         me.setLoading( false );
          return;
       }
 
