@@ -111,7 +111,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
              * recordSelected.get( 'id' ) ); }
              */
             },
-            hidden : true
+            hidden : false
          }, {
             xtype : 'combo',
             itemId : 'charLabelCombo',
@@ -402,9 +402,9 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
 
       // reset state
       window.down( '#savePngButton' ).hide();
-      window.down( '#showChartButton' ).setText("Show table");
+      window.down( '#showChartButton' ).setText( "Show table" );
       window.down( '#showChartButton' ).hide();
-      
+
       var saveTextHandler = null;
       if ( selReportType === "characteristic" ) {
          reportPanel = Ext.create( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {

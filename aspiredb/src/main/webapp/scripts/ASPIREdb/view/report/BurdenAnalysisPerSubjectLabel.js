@@ -42,10 +42,12 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
          name : 'name',
       }, {
          name : 'group1',
-         type : 'float'
+         type : 'float',
+         useNull : true
       }, {
          name : 'group2',
-         type : 'float'
+         type : 'float',
+         useNull : true
       }, {
          name : 'pValue',
          type : 'float',
@@ -120,7 +122,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
       var label1 = me.label1;
       var label2 = me.label2;
 
-      if ( label1.id === label2.id ) {
+      if ( label1 !== null && label2 !== null && label1.id === label2.id ) {
          Ext.Msg.alert( 'Error', "Subject labels must be different!" );
          window.setLoading( false );
          return;

@@ -170,6 +170,12 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerPhenotype', {
       var label1 = me.label1;
       var label2 = me.label2;
 
+      if ( label1 === null || label2 === null ) {
+         Ext.Msg.alert( 'Error', "Subject labels are required!" );
+         window.setLoading( false );
+         return;
+      }
+
       if ( label1.id === label2.id ) {
          Ext.Msg.alert( 'Error', "Subject labels must be different!" );
          me.setLoading( false );
@@ -179,12 +185,12 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerPhenotype', {
       BurdenAnalysisService.getBurdenAnalysisPerPhenotype( ASPIREdb.ActiveProjectSettings.getActiveProjectIds(),
          label1, label2, {
             callback : function(results) {
-               
+
                if ( results !== null && results.length > 0 ) {
                   var grid = me.createGrid( results );
                   me.add( grid );
                   grid.setVisible( false );
-   
+
                   var chart = me.createChart( results );
                   me.add( chart );
                } else {

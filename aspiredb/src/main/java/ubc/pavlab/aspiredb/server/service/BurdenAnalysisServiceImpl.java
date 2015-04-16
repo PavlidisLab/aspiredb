@@ -203,12 +203,14 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
     public Collection<BurdenAnalysisValueObject> getBurdenAnalysisPerSubjectLabel( LabelValueObject group1,
             LabelValueObject group2, Collection<Long> variantIds ) throws NotLoggedInException, BioMartServiceException {
 
+        final String NO_LABEL = "<NO_LABEL>";
+
         Collection<BurdenAnalysisValueObject> ret = new ArrayList<>();
 
-        if ( group1 == null || group2 == null ) {
-            log.warn( "Labels can't be null! Group1 is " + group1 + " and group2 is " + group2 );
-            return ret;
-        }
+        // if ( group1 == null ) {
+        // log.warn( "Labels can't be null! Group1 is " + group1 );
+        // return ret;
+        // }
 
         if ( variantIds == null ) {
             log.warn( "No variants found." );
@@ -245,16 +247,26 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
             }
         }
 
-        Map<String, Collection<String>> labelPatientId = subjectService.groupPatientIdsBySubjectLabel( subjects );
+        Map<String, Collection<String>> labelPatientId = null;
 
-        labelPatientId = getMutuallyExclusivePatientIds( labelPatientId, group1.getName(), group2.getName() );
+        if ( group1 != null && group2 != null ) {
+            labelPatientId = subjectService.groupPatientIdsBySubjectLabel( subjects );
+            labelPatientId = getMutuallyExclusivePatientIds( labelPatientId, group1.getName(), group2.getName() );
+        } else if ( group1 == null ) {
+            group1 = new LabelValueObject( NO_LABEL );
+            labelPatientId = new HashMap<>();
+            labelPatientId.put( group1.getName(), allPatientIds );
+        } else {
+            log.warn( "Either select both Group 1 and Group 2 labels or none at all" );
+            return ret;
+        }
 
-        if ( !labelPatientId.containsKey( group1.getName() ) ) {
+        if ( group1 != null && !labelPatientId.containsKey( group1.getName() ) ) {
             log.warn( "Subject label " + group1.getName() + " not found" );
             return ret;
         }
 
-        if ( !labelPatientId.containsKey( group2.getName() ) ) {
+        if ( group2 != null && !labelPatientId.containsKey( group2.getName() ) ) {
             log.warn( "Subject label " + group2.getName() + " not found" );
             return ret;
         }
@@ -265,7 +277,9 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         Map<String, Collection<Indel>> indelMapByGroup = new HashMap<>();
         Collection<String> groupNames = new ArrayList<>();
         groupNames.add( group1.getName() );
-        groupNames.add( group2.getName() );
+        if ( group2 != null ) {
+            groupNames.add( group2.getName() );
+        }
         for ( String groupName : groupNames ) {
             cnvMapByGroup.put( groupName, new ArrayList<CNV>() );
             snvMapByGroup.put( groupName, new ArrayList<SNV>() );
@@ -283,32 +297,31 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
             }
         }
 
-        double group1SubjectCount = 1.0 * labelPatientId.get( group1.getName() ).size();
-        double group2SubjectCount = 1.0 * labelPatientId.get( group2.getName() ).size();
+        Double group1SubjectCount = 1.0 * labelPatientId.get( group1.getName() ).size();
+        Double group2SubjectCount = group2 != null ? 1.0 * labelPatientId.get( group2.getName() ).size() : null;
         ret.add( new BurdenAnalysisValueObject( "Total number of subjects", group1SubjectCount, group2SubjectCount,
                 null ) );
-        double group1CNVCount = 1.0 * cnvMapByGroup.get( group1.getName() ).size();
-        double group2CNVCount = 1.0 * cnvMapByGroup.get( group2.getName() ).size();
-        double group1SNVCount = 1.0 * snvMapByGroup.get( group1.getName() ).size();
-        double group2SNVCount = 1.0 * snvMapByGroup.get( group2.getName() ).size();
-        double group1IndelCount = 1.0 * indelMapByGroup.get( group1.getName() ).size();
-        double group2IndelCount = 1.0 * indelMapByGroup.get( group2.getName() ).size();
-        if ( group1CNVCount + group2CNVCount > 0 ) {
-            ret.add( new BurdenAnalysisValueObject( "Total number of CNVs", group1CNVCount, group2CNVCount, null ) );
-        }
-        if ( group1SNVCount + group2SNVCount > 0 ) {
-            ret.add( new BurdenAnalysisValueObject( "Total number of SNVs", group1SNVCount, group2SNVCount, null ) );
-        }
-        if ( group1IndelCount + group2IndelCount > 0 ) {
-            ret.add( new BurdenAnalysisValueObject( "Total number of Indels", group1IndelCount, group2IndelCount, null ) );
-        }
+        Double group1CNVCount = 1.0 * cnvMapByGroup.get( group1.getName() ).size();
+        Double group2CNVCount = group2 != null ? 1.0 * cnvMapByGroup.get( group2.getName() ).size() : null;
+        Double group1SNVCount = 1.0 * snvMapByGroup.get( group1.getName() ).size();
+        Double group2SNVCount = group2 != null ? 1.0 * snvMapByGroup.get( group2.getName() ).size() : null;
+        Double group1IndelCount = 1.0 * indelMapByGroup.get( group1.getName() ).size();
+        Double group2IndelCount = group2 != null ? 1.0 * indelMapByGroup.get( group2.getName() ).size() : null;
+        // if ( group1CNVCount + group2CNVCount > 0 ) {
+        ret.add( new BurdenAnalysisValueObject( "Total number of CNVs", group1CNVCount, group2CNVCount, null ) );
+        // }
+        // if ( group1SNVCount + group2SNVCount > 0 ) {
+        ret.add( new BurdenAnalysisValueObject( "Total number of SNVs", group1SNVCount, group2SNVCount, null ) );
+        // }
+        // if ( group1IndelCount + group2IndelCount > 0 ) {
+        ret.add( new BurdenAnalysisValueObject( "Total number of Indels", group1IndelCount, group2IndelCount, null ) );
+        // }
 
         Map<String, Map<CnvBurdenAnalysisPerSubject, Double>> patientIdStats = getVariantStatsBySubject( variants );
 
         for ( CnvBurdenAnalysisPerSubject statName : CnvBurdenAnalysisPerSubject.values() ) {
 
             double[] label1Stats = getPatientStats( statName, labelPatientId.get( group1.getName() ), patientIdStats );
-            double[] label2Stats = getPatientStats( statName, labelPatientId.get( group2.getName() ), patientIdStats );
 
             if ( label1Stats.length == 0 ) {
                 log.warn( "No values found for " + statName );
@@ -317,15 +330,25 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
 
             // remove NaNs
             label1Stats = removeNaNs( label1Stats );
-            label2Stats = removeNaNs( label2Stats );
 
-            double mean1 = StatUtils.mean( label1Stats );
-            double mean2 = StatUtils.mean( label2Stats );
-            if ( mean1 + mean2 == 0 ) {
-                log.warn( "No " + statName + " stats was found" );
-                continue;
+            Double mean1 = StatUtils.mean( label1Stats );
+            Double mean2 = null;
+            Double pval = null;
+
+            if ( group2 != null ) {
+                double[] label2Stats = getPatientStats( statName, labelPatientId.get( group2.getName() ),
+                        patientIdStats );
+                label2Stats = removeNaNs( label2Stats );
+
+                mean2 = StatUtils.mean( label2Stats );
+
+                if ( mean1 + mean2 == 0 ) {
+                    log.warn( "No " + statName + " stats was found" );
+                    continue;
+                }
+
+                pval = new MannWhitneyUTest().mannWhitneyUTest( label1Stats, label2Stats );
             }
-            double pval = new MannWhitneyUTest().mannWhitneyUTest( label1Stats, label2Stats );
 
             ret.add( new BurdenAnalysisValueObject( CnvBurdenAnalysisPerSubjectDesc.get( statName ), mean1, mean2, pval ) );
         }

@@ -122,6 +122,12 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisVariantLabel', {
       var label1 = me.label1;
       var label2 = me.label2;
 
+      if ( label1 === null || label2 === null ) {
+         Ext.Msg.alert( 'Error', "Subject labels are required!" );
+         window.setLoading( false );
+         return;
+      }
+
       if ( label1.id === label2.id ) {
          Ext.Msg.alert( 'Error', "Subject labels must be different!" );
          window.setLoading( false );

@@ -39,7 +39,8 @@ public interface BurdenAnalysisService {
             throws NotLoggedInException, BioMartServiceException;
 
     /**
-     * Performs a burden analysis between subject labels group1 and group2 filtered variants.
+     * Performs a burden analysis between subject labels group1 and group2 filtered variants. If no subject labels are
+     * provided, then all subjects are assigned to group1. Columns group2 and p-value are null.
      * 
      * @param group1
      * @param group2
