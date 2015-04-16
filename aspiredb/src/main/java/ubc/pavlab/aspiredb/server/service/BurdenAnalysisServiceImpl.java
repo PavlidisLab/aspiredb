@@ -100,7 +100,7 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.NUM_CNV_LOSS, "Mean number of CNV loss" );
         CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.NUM_CNV_GAIN, "Mean number of CNV gains" );
         CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.NUM_CNV_UNKNOWN,
-                "Mean number of unknown types" );
+                "Mean number of unknown CNV types" );
         CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.TOTAL_CNV, "Mean number of CNVs" );
         CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.TOTAL_SIZE, "Mean total CNV size (bp)" );
         CnvBurdenAnalysisPerSubjectDesc.put( CnvBurdenAnalysisPerSubject.AVG_SIZE, "Mean average CNV size (bp)" );
@@ -221,7 +221,9 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         Collection<String> allPatientIds = new HashSet<>();
         @SuppressWarnings("unchecked")
         Collection<Variant> variants = ( Collection<Variant> ) variantDao.load( variantIds );
-        Map<String, Collection<CNV>> cnvMap = new HashMap<>();
+        Map<String, Collection<CNV>> cnvGainMap = new HashMap<>();
+        Map<String, Collection<CNV>> cnvLossMap = new HashMap<>();
+        Map<String, Collection<CNV>> cnvUnknownMap = new HashMap<>();
         Map<String, Collection<SNV>> snvMap = new HashMap<>();
         Map<String, Collection<Indel>> indelMap = new HashMap<>();
         for ( Variant v : variants ) {
@@ -230,10 +232,24 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
             allPatientIds.add( subject.getPatientId() );
 
             if ( v instanceof CNV ) {
-                if ( !cnvMap.containsKey( subject.getPatientId() ) ) {
-                    cnvMap.put( subject.getPatientId(), new ArrayList<CNV>() );
+                CNV cnv = ( CNV ) v;
+                if ( cnv.getType() == CnvType.GAIN ) {
+                    if ( !cnvGainMap.containsKey( subject.getPatientId() ) ) {
+                        cnvGainMap.put( subject.getPatientId(), new ArrayList<CNV>() );
+                    }
+                    cnvGainMap.get( subject.getPatientId() ).add( ( CNV ) v );
+                } else if ( cnv.getType() == CnvType.LOSS ) {
+                    if ( !cnvLossMap.containsKey( subject.getPatientId() ) ) {
+                        cnvLossMap.put( subject.getPatientId(), new ArrayList<CNV>() );
+                    }
+                    cnvLossMap.get( subject.getPatientId() ).add( ( CNV ) v );
+                } else {
+                    if ( !cnvUnknownMap.containsKey( subject.getPatientId() ) ) {
+                        cnvUnknownMap.put( subject.getPatientId(), new ArrayList<CNV>() );
+                    }
+                    cnvUnknownMap.get( subject.getPatientId() ).add( ( CNV ) v );
                 }
-                cnvMap.get( subject.getPatientId() ).add( ( CNV ) v );
+
             } else if ( v instanceof SNV ) {
                 if ( !snvMap.containsKey( subject.getPatientId() ) ) {
                     snvMap.put( subject.getPatientId(), new ArrayList<SNV>() );
@@ -272,7 +288,9 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         }
 
         // count total number of CNVs and SNVs by group
-        Map<String, Collection<CNV>> cnvMapByGroup = new HashMap<>();
+        Map<String, Collection<CNV>> cnvGainMapByGroup = new HashMap<>();
+        Map<String, Collection<CNV>> cnvLossMapByGroup = new HashMap<>();
+        Map<String, Collection<CNV>> cnvUnknownMapByGroup = new HashMap<>();
         Map<String, Collection<SNV>> snvMapByGroup = new HashMap<>();
         Map<String, Collection<Indel>> indelMapByGroup = new HashMap<>();
         Collection<String> groupNames = new ArrayList<>();
@@ -281,12 +299,20 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
             groupNames.add( group2.getName() );
         }
         for ( String groupName : groupNames ) {
-            cnvMapByGroup.put( groupName, new ArrayList<CNV>() );
+            cnvGainMapByGroup.put( groupName, new ArrayList<CNV>() );
+            cnvLossMapByGroup.put( groupName, new ArrayList<CNV>() );
+            cnvUnknownMapByGroup.put( groupName, new ArrayList<CNV>() );
             snvMapByGroup.put( groupName, new ArrayList<SNV>() );
             indelMapByGroup.put( groupName, new ArrayList<Indel>() );
             for ( String patientId : labelPatientId.get( groupName ) ) {
-                if ( cnvMap.containsKey( patientId ) ) {
-                    cnvMapByGroup.get( groupName ).addAll( cnvMap.get( patientId ) );
+                if ( cnvGainMap.containsKey( patientId ) ) {
+                    cnvGainMapByGroup.get( groupName ).addAll( cnvGainMap.get( patientId ) );
+                }
+                if ( cnvLossMap.containsKey( patientId ) ) {
+                    cnvLossMapByGroup.get( groupName ).addAll( cnvLossMap.get( patientId ) );
+                }
+                if ( cnvUnknownMap.containsKey( patientId ) ) {
+                    cnvUnknownMapByGroup.get( groupName ).addAll( cnvUnknownMap.get( patientId ) );
                 }
                 if ( snvMap.containsKey( patientId ) ) {
                     snvMapByGroup.get( groupName ).addAll( snvMap.get( patientId ) );
@@ -301,15 +327,25 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         Double group2SubjectCount = group2 != null ? 1.0 * labelPatientId.get( group2.getName() ).size() : null;
         ret.add( new BurdenAnalysisValueObject( "Total number of subjects", group1SubjectCount, group2SubjectCount,
                 null ) );
-        Double group1CNVCount = 1.0 * cnvMapByGroup.get( group1.getName() ).size();
-        Double group2CNVCount = group2 != null ? 1.0 * cnvMapByGroup.get( group2.getName() ).size() : null;
+        Double group1CNVGainCount = 1.0 * cnvGainMapByGroup.get( group1.getName() ).size();
+        Double group2CNVGainCount = group2 != null ? 1.0 * cnvGainMapByGroup.get( group2.getName() ).size() : null;
+        Double group1CNVLossCount = 1.0 * cnvLossMapByGroup.get( group1.getName() ).size();
+        Double group2CNVLossCount = group2 != null ? 1.0 * cnvLossMapByGroup.get( group2.getName() ).size() : null;
+        Double group1CNVUnknownCount = 1.0 * cnvUnknownMapByGroup.get( group1.getName() ).size();
+        Double group2CNVUnknownCount = group2 != null ? 1.0 * cnvUnknownMapByGroup.get( group2.getName() ).size()
+                : null;
         Double group1SNVCount = 1.0 * snvMapByGroup.get( group1.getName() ).size();
         Double group2SNVCount = group2 != null ? 1.0 * snvMapByGroup.get( group2.getName() ).size() : null;
         Double group1IndelCount = 1.0 * indelMapByGroup.get( group1.getName() ).size();
         Double group2IndelCount = group2 != null ? 1.0 * indelMapByGroup.get( group2.getName() ).size() : null;
         // if ( group1CNVCount + group2CNVCount > 0 ) {
-        ret.add( new BurdenAnalysisValueObject( "Total number of CNVs", group1CNVCount, group2CNVCount, null ) );
+        ret.add( new BurdenAnalysisValueObject( "Total number of CNV gains", group1CNVGainCount, group2CNVGainCount,
+                null ) );
         // }
+        ret.add( new BurdenAnalysisValueObject( "Total number of CNV losses", group1CNVLossCount, group2CNVLossCount,
+                null ) );
+        ret.add( new BurdenAnalysisValueObject( "Total number of unknown CNV types", group1CNVUnknownCount,
+                group2CNVUnknownCount, null ) );
         // if ( group1SNVCount + group2SNVCount > 0 ) {
         ret.add( new BurdenAnalysisValueObject( "Total number of SNVs", group1SNVCount, group2SNVCount, null ) );
         // }
