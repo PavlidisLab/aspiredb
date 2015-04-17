@@ -565,7 +565,7 @@ public class ProjectManagerImpl implements ProjectManager {
             v.setUserVariantId( getNewVariantId( patientId ) );
         }
 
-        // v = variantDao.create( v );
+        v = variantDao.create( v );
         v.setSubject( subject );
         subject.addVariant( v );
 
@@ -573,7 +573,7 @@ public class ProjectManagerImpl implements ProjectManager {
             subject.getProjects().add( project );
         }
 
-        // subjectDao.update( subject );
+        subjectDao.update( subject );
     }
 
     /**
@@ -825,9 +825,11 @@ public class ProjectManagerImpl implements ProjectManager {
                 log.error( "unsupported VariantValueObject" );
             }
 
-            if ( v != null ) {
-                variants.add( v );
-            }
+            // if ( v != null ) {
+            // variants.add( v );
+            // }
+
+            vo.setId( v.getId() );
 
             counter++;
 
@@ -836,11 +838,11 @@ public class ProjectManagerImpl implements ProjectManager {
             }
         }
 
-        StopWatch timer = new StopWatch();
-        timer.start();
-        variantDao.create( variants );
-        log.info( "variantDao.create took " + timer.getTime() + " ms for " + subjects.size() + " subjects and "
-                + variants.size() + " variants" );
+        // StopWatch timer = new StopWatch();
+        // timer.start();
+        // variantDao.create( variants );
+        // log.info( "variantDao.create took " + timer.getTime() + " ms for " + subjects.size() + " subjects and "
+        // + variants.size() + " variants" );
 
     }
 

@@ -188,6 +188,15 @@ public class Variant2VariantOverlap implements Serializable {
     }
 
     private void computeOverlap( final VariantValueObject vvo, final VariantValueObject vvoOverlapped ) {
+
+        if ( vvo == null || vvo.getId() == null ) {
+            throw new IllegalArgumentException( "VariantValueObject is null or has no ID!" );
+        }
+
+        if ( vvoOverlapped == null || vvoOverlapped.getId() == null ) {
+            throw new IllegalArgumentException( "Overlapped VariantValueObject is null or has no ID!" );
+        }
+
         int start = Math.max( vvo.getGenomicRange().getBaseStart(), vvoOverlapped.getGenomicRange().getBaseStart() );
         int end = Math.min( vvo.getGenomicRange().getBaseEnd(), vvoOverlapped.getGenomicRange().getBaseEnd() );
 
