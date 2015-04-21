@@ -61,6 +61,16 @@ public class Variant2SpecialVariantOverlapDaoImpl extends DaoBaseImpl<Variant2Va
 
     @Override
     @Transactional
+    public void deleteByProjectId( Long id ) {
+
+        Collection<Variant2VariantOverlap> overlaps = loadByProjectId( id );
+
+        this.getHibernateTemplate().deleteAll( overlaps );
+
+    }
+
+    @Override
+    @Transactional
     public void deleteByOverlapProjectIds( Collection<Long> ids ) {
 
         for ( Long id : ids ) {
@@ -70,6 +80,22 @@ public class Variant2SpecialVariantOverlapDaoImpl extends DaoBaseImpl<Variant2Va
             this.getHibernateTemplate().deleteAll( overlaps );
 
         }
+
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Collection<Variant2VariantOverlap> loadByProjectId( Long projectId ) {
+
+        if ( projectId == null ) {
+            return new ArrayList<Variant2VariantOverlap>();
+        }
+
+        String[] paramNames = { "projectId" };
+        Object[] objectValues = { projectId };
+
+        return this.getHibernateTemplate().findByNamedParam( "from Variant2VariantOverlap where projectId =:projectId",
+                paramNames, objectValues );
 
     }
 

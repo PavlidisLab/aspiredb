@@ -34,11 +34,14 @@ public interface Variant2SpecialVariantOverlapDao extends DaoBase<Variant2Varian
 
     public Collection<Variant2VariantOverlap> loadByOverlapProjectId( Long overlapProjectId );
 
-    public Collection<Variant2VariantOverlap> loadByProjectIdAndOverlapProjectId( Long projectId,
-            Long overlapProjectId );
+    public Collection<Variant2VariantOverlap> loadByProjectIdAndOverlapProjectId( Long projectId, Long overlapProjectId );
 
     public Collection<Variant2VariantOverlap> loadByVariantId( Long id, Collection<Long> overlapProjectIds );
 
-    public Collection<Variant2VariantOverlap> loadByVariantIdAndOverlap( Long id,
-            SimpleRestriction overlapRestriction, Collection<Long> overlapProjectIds );
+    public Collection<Variant2VariantOverlap> loadByVariantIdAndOverlap( Long id, SimpleRestriction overlapRestriction,
+            Collection<Long> overlapProjectIds );
+
+    public Collection<Variant2VariantOverlap> loadByProjectId( Long projectId );
+
+    public void deleteByProjectId( Long id );
 }

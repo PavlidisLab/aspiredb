@@ -383,6 +383,9 @@ public class ProjectManagerImpl implements ProjectManager {
             }
         }
 
+        variant2SpecialVariantOverlapDao.deleteByProjectId( project.getId() );
+        variant2SpecialVariantOverlapDao.deleteByOverlapProjectId( project.getId() );
+
         for ( Subject s : subjects ) {
             s.getPhenotypes().removeAll( phenotypes );
             s.getVariants().removeAll( variants );
