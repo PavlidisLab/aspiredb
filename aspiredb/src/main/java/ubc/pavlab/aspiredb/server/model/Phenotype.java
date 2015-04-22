@@ -23,6 +23,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 
@@ -33,6 +35,7 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
  * @version $Id: Phenotype.java,v 1.15 2013/06/11 22:55:58 anton Exp $
  */
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @BatchSize(size = 50)
 @Table(name = "PHENOTYPE")
 public class Phenotype implements SubjectAttribute {

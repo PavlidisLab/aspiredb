@@ -24,6 +24,9 @@ import net.sf.ehcache.config.CacheConfiguration;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +36,7 @@ import org.springframework.stereotype.Component;
  * @author paul
  * @version $Id: CacheMonitorImpl.java,v 1.3 2013/06/12 17:00:22 anton Exp $
  */
+@Aspect
 @Component
 public class CacheMonitorImpl implements CacheMonitor {
 
@@ -81,6 +85,23 @@ public class CacheMonitorImpl implements CacheMonitor {
 
     }
 
+    @Around("execution(* ubc.pavlab.aspiredb.server.service.ProjectService.addSubjectVariantsToProject(..)) || execution(* ubc.pavlab.aspiredb.server.service.QueryService.queryVariants(..))")
+    public Object log( ProceedingJoinPoint pjp ) throws Throwable {
+        if ( !log.isDebugEnabled() ) {
+            return pjp.proceed();
+        }
+
+        enableStatistics();
+
+        Object result = pjp.proceed();
+
+        log.debug( getStats() );
+
+        disableStatistics();
+
+        return result;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -96,22 +117,28 @@ public class CacheMonitorImpl implements CacheMonitor {
         buf.append( cacheNames.length + " caches; only non-empty caches listed below." );
 
         int count = 0;
+
+        buf.append( "\n"
+                + String.format( "%50s", "CacheName" )
+                + "\tCacheHits\tCacheMisses\tCacheHitRate(%)\tObjectCount\tInMemoryHits\tInMemoryMisses\tOnDiskHits\tEvictions" );
+
         for ( String rawCacheName : cacheNames ) {
             Cache cache = cacheManager.getCache( rawCacheName );
             Statistics statistics = cache.getStatistics();
 
             long objectCount = statistics.getObjectCount();
 
-            if ( objectCount == 0 ) {
-                continue;
-            }
+            // if ( objectCount == 0 ) {
+            // continue;
+            // }
 
             // a little shorter...
             String cacheName = rawCacheName;
 
-            buf.append( "\n" + cacheName );
+            buf.append( "\n" + String.format( "%50s", cacheName ) + "\t" );
             long hits = statistics.getCacheHits();
             long misses = statistics.getCacheMisses();
+            double hitRate = hits + misses > 0 ? 100.0 * hits / ( hits + misses ) : 0.0;
             long inMemoryHits = statistics.getInMemoryHits();
             long inMemoryMisses = statistics.getInMemoryMisses();
 
@@ -120,6 +147,7 @@ public class CacheMonitorImpl implements CacheMonitor {
 
             buf.append( hits + "\t" );
             buf.append( misses + "\t" );
+            buf.append( String.format( "%.2f", hitRate ) + "\t" );
             buf.append( objectCount + "\t" );
             buf.append( inMemoryHits + "\t" );
             buf.append( inMemoryMisses + "\t" );

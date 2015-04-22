@@ -32,7 +32,7 @@ public class GeneProperty extends Property<GenomicRangeDataType> {
     public GeneProperty() {
         this.dataType = new GenomicRangeDataType();
         this.displayName = "Gene";
-        this.exampleValues = "Gene symbols or description - Examples: <b>AHSA2</b>, <b>BNIP3P1</b>, <b>shock</b>";
+        this.exampleValues = "Gene symbols or description - Examples: <b>AHSA2</b>, <b>BNIP3P1</b>, <b>*shock</b>";
         this.operators = Arrays.asList( Operator.IS_IN_SET, Operator.IS_NOT_IN_SET );
         this.supportsSuggestions = true;
     }

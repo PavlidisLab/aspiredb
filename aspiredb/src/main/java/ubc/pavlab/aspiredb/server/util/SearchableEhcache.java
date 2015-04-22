@@ -31,7 +31,8 @@ public abstract class SearchableEhcache<T> {
 
     public Collection<T> fetchByCriteria( Criteria criteria ) {
         net.sf.ehcache.search.Query query = this.cache.createQuery();
-        query.includeValues();
+        // query.includeValues();
+        query.includeKeys();
         query.addCriteria( criteria );
 
         Results results = query.execute();
@@ -39,7 +40,8 @@ public abstract class SearchableEhcache<T> {
         Collection<T> genes = new HashSet<T>( results.size() );
 
         for ( Result result : results.all() ) {
-            genes.add( ( T ) result.getValue() );
+            genes.add( ( T ) cache.get( result.getKey() ).getObjectValue() );
+            // genes.add( ( T ) result.getValue() );
         }
 
         return genes;

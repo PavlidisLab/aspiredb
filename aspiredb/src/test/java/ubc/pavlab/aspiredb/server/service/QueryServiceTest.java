@@ -297,12 +297,12 @@ public class QueryServiceTest extends BaseSpringContextTest {
 
         // check the counts before adding to the db
         Map<Integer, Integer> ret = null;
-        try {
-            ret = getSubjectVariantCountForPhenocarta( phenotypeURI, patientId );
-        } catch ( Exception e ) {
-            e.printStackTrace();
-            fail();
-        }
+        // try {
+        ret = getSubjectVariantCountForPhenocarta( phenotypeURI, patientId );
+        // } catch ( Exception e ) {
+        // e.printStackTrace();
+        // fail();
+        // }
         // these should be 0 but just in case ...
         final int addedSubjectCount = ret.get( VariantDao.SUBJECT_IDS_KEY );
         final int addedVariantCount = ret.get( VariantDao.VARIANT_IDS_KEY );

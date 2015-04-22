@@ -34,13 +34,10 @@
 
     <cache name="ubc.pavlab.aspiredb.server.model.Variant" statistics="false" maxElementsInMemory="300000" eternal="true"
         overflowToDisk="false" />
-        
-    <cache name="loadBySubjectIds" maxElementsInMemory="20000" eternal="false" timeToIdleSeconds="86400"
-        timeToLiveSeconds="432000" overflowToDisk="false" />
 
-    <cache name="BioMartCache" maxElementsInMemory="0" statistics="false" eternal="true" overflowToDisk="false">
-        <searchable>
-            <searchAttribute name="ensemblId" />
+    <cache name="BioMartCache" maxElementsInMemory="60000" statistics="true" eternal="true" overflowToDisk="false">
+        <searchable values="false">
+            <searchAttribute name="ensemblId"/>
             <searchAttribute name="name" />
             <searchAttribute name="symbol" />
             <searchAttribute name="genomicRangeChromosome" expression="value.getGenomicRange().getChromosome()" />
@@ -50,7 +47,7 @@
         </searchable>
     </cache>
 
-    <cache name="NeurocartaPhenotypeCache" maxElementsInMemory="0" eternal="false" timeToLiveSeconds="86400"
+    <cache name="NeurocartaPhenotypeCache" maxElementsInMemory="6000" eternal="false" timeToLiveSeconds="86400"
         overflowToDisk="false">
         <searchable>
             <searchAttribute name="name" />
