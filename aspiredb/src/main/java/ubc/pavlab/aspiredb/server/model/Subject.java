@@ -37,6 +37,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.security.access.annotation.Secured;
 
 import ubc.pavlab.aspiredb.server.util.PhenotypeUtil;
@@ -44,6 +46,7 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @BatchSize(size = 50)
 @Table(name = "SUBJECT")
 public class Subject implements Serializable, SecuredChild {

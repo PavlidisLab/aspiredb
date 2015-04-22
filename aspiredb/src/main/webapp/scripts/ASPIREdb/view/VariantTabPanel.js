@@ -430,14 +430,14 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
                var vvos = pageLoad.items;
                ref.loadedVariants = vvos;
-               var variantPatientIds = [];
+//               var variantPatientIds = [];
                var projectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
 
-               for (var i = 0; i < vvos.length; i++) {
-                  if ( variantPatientIds.indexOf( vvos[i].patientId ) == -1 )
-                     variantPatientIds.push( VariantService.getSubjectVariants( projectId, vvos[i].patientId ) );
-
-               }
+//               for (var i = 0; i < vvos.length; i++) {
+//                  if ( variantPatientIds.indexOf( vvos[i].patientId ) == -1 )
+//                     variantPatientIds.push( VariantService.getSubjectVariants( projectId, vvos[i].patientId ) );
+//
+//               }
 
                var variantIds = [];
 

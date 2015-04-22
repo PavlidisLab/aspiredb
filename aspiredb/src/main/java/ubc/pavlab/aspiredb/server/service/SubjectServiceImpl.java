@@ -188,7 +188,7 @@ public class SubjectServiceImpl implements SubjectService {
     public List<PhenotypeSummaryValueObject> getPhenotypeSummaries( List<Long> subjectIds, Collection<Long> projectIds )
             throws NeurocartaServiceException {
 
-        subjectDao.load( subjectIds );
+        // subjectDao.load( subjectIds );
 
         StopWatch timer = new StopWatch();
         timer.start();
@@ -301,7 +301,7 @@ public class SubjectServiceImpl implements SubjectService {
     public Map<String, PhenotypeSummaryValueObject> getPhenotypeSummaryValueObjects( List<Long> subjectIds,
             Collection<Long> projectIds ) throws NeurocartaServiceException {
 
-        subjectDao.load( subjectIds );
+        // subjectDao.load( subjectIds );
 
         StopWatch timer = new StopWatch();
         timer.start();
