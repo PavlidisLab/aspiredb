@@ -36,7 +36,7 @@ import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
  */
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@BatchSize(size = 50)
+@BatchSize(size = 100)
 @Table(name = "PHENOTYPE")
 public class Phenotype implements SubjectAttribute {
 

@@ -47,7 +47,7 @@ import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@BatchSize(size = 50)
+@BatchSize(size = 100)
 @Table(name = "SUBJECT")
 public class Subject implements Serializable, SecuredChild {
 
