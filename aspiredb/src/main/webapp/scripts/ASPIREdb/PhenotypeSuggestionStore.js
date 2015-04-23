@@ -28,22 +28,32 @@ Ext.define('ASPIREdb.PhenotypeSuggestionStore', {
 
     suggestionContext: null,
 
+    config : {
+       projectIds : ASPIREdb.ActiveProjectSettings.getActiveProjectIds(),
+    },
+    
     constructor: function (config) {
-        config.proxy = {
-            type: 'dwr',
-            dwrFunction: PhenotypeService.suggestPhenotypes,
-            reader: {
-                type: 'json',
-                root: 'data',
-                totalProperty: 'count'
-            }
-        };
+       
+       if ( config != null ) {
+           config.proxy = {
+               type: 'dwr',
+               dwrFunction: PhenotypeService.suggestPhenotypes,
+               reader: {
+                   type: 'json',
+                   root: 'data',
+                   totalProperty: 'count'
+               }
+           };
+       }
         this.callParent(arguments);
     },
 
     load: function(options) {
         this.suggestionContext = new SuggestionContext();
-        this.suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds() ;
+        if ( this.projectIds === undefined ) {
+           this.projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+        }
+        this.suggestionContext.activeProjectIds = this.projectIds;
         this.suggestionContext.valuePrefix = options.params.query;
         this.proxy.dwrParams = [this.suggestionContext];
         this.callParent(options);

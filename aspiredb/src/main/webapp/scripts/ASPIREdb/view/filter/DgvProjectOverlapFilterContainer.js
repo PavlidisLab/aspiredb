@@ -230,6 +230,9 @@ Ext.define( 'ASPIREdb.view.filter.DgvProjectOverlapFilterContainer', {
 
             ref.specialProjectValueObject = pvo;
 
+            var filterContainer = ref.getComponent( "filterContainer" );
+            
+            filterContainer.getComponent( 'phenRestriction' ).updateProjectIds( [ pvo.id ] );
          }
       } );
 

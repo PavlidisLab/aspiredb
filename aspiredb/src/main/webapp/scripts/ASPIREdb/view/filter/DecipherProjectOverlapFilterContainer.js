@@ -159,6 +159,8 @@ Ext.define( 'ASPIREdb.view.filter.DecipherProjectOverlapFilterContainer', {
    initComponent : function() {
       this.callParent();
 
+      this.updateSpecialProjectValue();
+      
       var filterContainer = this.getComponent( "filterContainer" );
 
       var getNewOverlapItem = this.getNewOverlapItemFunction( VariantService.suggestPropertiesForProjectOverlap, this
@@ -189,8 +191,9 @@ Ext.define( 'ASPIREdb.view.filter.DecipherProjectOverlapFilterContainer', {
 
       filterContainer.insert( 0, {
          xtype : 'filter_phenotype_property',
-         itemId : 'phenRestriction'
+         itemId : 'phenRestriction',
       } );
+      
       filterContainer.insert( 0, {
          xtype : 'label',
          text : 'Overlap Phenotype Association: '
@@ -215,8 +218,6 @@ Ext.define( 'ASPIREdb.view.filter.DecipherProjectOverlapFilterContainer', {
          text : 'Overlap size: '
       } );
 
-      this.updateSpecialProjectValue();
-
    },
 
    updateSpecialProjectValue : function() {
@@ -229,6 +230,11 @@ Ext.define( 'ASPIREdb.view.filter.DecipherProjectOverlapFilterContainer', {
 
             ref.specialProjectValueObject = pvo;
 
+            
+            var filterContainer = ref.getComponent( "filterContainer" );
+            
+            filterContainer.getComponent( 'phenRestriction' ).updateProjectIds( [ pvo.id ] );
+            
          }
       } );
 

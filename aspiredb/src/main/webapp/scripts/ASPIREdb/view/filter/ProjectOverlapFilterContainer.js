@@ -190,12 +190,13 @@ Ext.define( 'ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 
       var supportOfVariantsOverlapItem = getNewVariantSupportOverlapItem();
 
+      // TODO Show Overlapped Variants
       filterContainer.insert( 0, {
-
          xtype : 'button',
          flex : 1,
          itemId : 'overlappedVariants',
          text : 'Overlapped Variants',
+         hidden : true,
          disabled : true,
          handler : this.overlappedVariantsHandler,
          scope : this
@@ -245,8 +246,11 @@ Ext.define( 'ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
          editable : false,
          forceSelection : true,
          value : 'PROJECT_PLACEHOLDER',
-         store : [ [ 'PROJECT_PLACEHOLDER', '<Project Name>' ] ]
-
+         store : [ [ 'PROJECT_PLACEHOLDER', '<Project Name>' ] ],
+         listeners : {
+            scope : this,
+            'change' : this.overlapProjectComboBoxHandler,
+         },
       } );
 
       filterContainer.insert( 0, {
@@ -258,18 +262,26 @@ Ext.define( 'ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 
    },
 
+   overlapProjectComboBoxHandler : function(cmp, newValue, oldValue, eOpts) {
+      var filterContainer = this.getComponent( "filterContainer" );
+      filterContainer.getComponent( 'phenRestriction' ).updateProjectIds( [ newValue ] );
+   },
+
+   // TODO Show Overlapped Variants
    overlappedVariantsHandler : function() {
       var filterContainer = this.getComponent( "filterContainer" );
       var overlapProjectComboBox = filterContainer.getComponent( 'overlapProjectComboBox' );
       ASPIREdb.view.filter.FilterWindow.overlappedVariantsHandler( overlapProjectComboBox.getValue() );
       console.log( 'overlap project selected : ' + overlapProjectComboBox.getValue() );
-
    },
 
    updateOverlapProjectCombo : function() {
 
+      
       var overlapProjectComboBox = this.down( '#overlapProjectComboBox' );
 
+      overlapProjectComboBox.setLoading(true);
+      
       ProjectService.getOverlapProjects( ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
 
          callback : function(pvos) {
@@ -284,6 +296,8 @@ Ext.define( 'ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 
             overlapProjectComboBox.getStore().loadData( storedata );
 
+            overlapProjectComboBox.setLoading(false);
+            
          }
 
       } );

@@ -8,12 +8,30 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
          right : 2,
       }
    },
+   
+   config : {
+      projectIds : ASPIREdb.ActiveProjectSettings.getActiveProjectIds(),
+   },
+   
+   // First method that gets called upon class instantiation
+   constructor : function (config) {
+       // Initializes config properties
+       this.callParent(arguments);
+   },
+//   
 //   width : 850,
+   
+   updateProjectIds : function( newIds ) {
+      this.projectIds = newIds;
+      this.getComponent('nameCombo').store.projectIds = newIds;
+   },
+   
    /**
     * @private
     * @override
     */
    initComponent : function() {
+      
       this.items = [ {
          xtype : 'combo',
          itemId : 'nameCombo',
@@ -25,7 +43,8 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
          hideTrigger : true,
          displayField : 'displayName',
          store : Ext.create( 'ASPIREdb.PhenotypeSuggestionStore', {
-            remoteFunction : PhenotypeService.suggestPhenotypes
+            remoteFunction : PhenotypeService.suggestPhenotypes,
+            projectIds : this.projectIds,
          } ),
          listConfig : {
             loadingText : 'Searching...',
