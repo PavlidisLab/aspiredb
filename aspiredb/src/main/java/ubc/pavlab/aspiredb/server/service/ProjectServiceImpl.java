@@ -25,6 +25,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -64,8 +65,10 @@ import ubc.pavlab.aspiredb.server.security.authentication.UserService;
 import ubc.pavlab.aspiredb.server.util.ConfigUtils;
 import ubc.pavlab.aspiredb.server.util.MailEngine;
 import ubc.pavlab.aspiredb.server.util.MessageUtil;
+import ubc.pavlab.aspiredb.shared.PhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -337,16 +340,33 @@ public class ProjectServiceImpl implements ProjectService {
             result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DGV );
         }
 
-        if ( result.getErrorMessages().isEmpty() ) {
-            StopWatch timer = new StopWatch();
-            timer.start();
+        if ( !result.getErrorMessages().isEmpty() ) {
+            return result;
+        }
 
-            if ( !dryRun ) {
-                projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
-
-                log.info( "Adding " + result.getVariantsToAdd().size() + " variants to project " + projectName
-                        + " took " + timer.getTime() + " ms" );
+        // check if the user is trying to upload too much data
+        boolean isSpecialProject = false;
+        for ( SpecialProject sp : SpecialProject.values() ) {
+            if ( sp.toString().equals( projectName ) ) {
+                isSpecialProject = true;
+                break;
             }
+        }
+        int limit = ConfigUtils.getInt( "aspiredb.upload.maxRecords", 10000 );
+        if ( !isSpecialProject && result.getVariantsToAdd().size() > limit ) {
+            List<String> errorMessages = Collections.singletonList( "Upload is limited to " + limit + " variants" );
+            ArrayList<VariantValueObject> variantsToAdd = new ArrayList<>();
+            return new VariantUploadServiceResult( variantsToAdd, errorMessages );
+        }
+
+        StopWatch timer = new StopWatch();
+        timer.start();
+
+        if ( !dryRun ) {
+            projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
+
+            log.info( "Adding " + result.getVariantsToAdd().size() + " variants to project " + projectName + " took "
+                    + timer.getTime() + " ms" );
         }
 
         // }
@@ -596,6 +616,22 @@ public class ProjectServiceImpl implements ProjectService {
         results.close();
         stmt.close();
         conn.close();
+
+        // check if the user is trying to upload too much data
+        boolean isSpecialProject = false;
+        for ( SpecialProject sp : SpecialProject.values() ) {
+            if ( sp.toString().equals( projectName ) ) {
+                isSpecialProject = true;
+                break;
+            }
+        }
+        int limit = ConfigUtils.getInt( "aspiredb.upload.maxRecords", 10000 );
+        if ( !isSpecialProject && phenResult.getPhenotypesToAdd().size() > limit ) {
+            List<String> errorMessages = Collections.singletonList( "Upload is limited to " + limit + " phenotypes" );
+            ArrayList<PhenotypeValueObject> phenosToAdd = new ArrayList<>();
+            HashSet<String> unmatchedStrings = new HashSet<>();
+            return new PhenotypeUploadServiceResult( phenosToAdd, errorMessages, unmatchedStrings );
+        }
 
         if ( !dryRun ) {
             projectManager.addSubjectPhenotypesToProject( projectName, createProject, phenResult.getPhenotypesToAdd() );

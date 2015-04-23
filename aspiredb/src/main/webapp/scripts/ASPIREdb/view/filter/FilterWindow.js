@@ -412,13 +412,6 @@ Ext
                filterContainer.down( '#overlappedVariants' ).enable();
             }
 
-            if ( this.down( '#numberOfSubjectsLabel' ).getEl() && this.down( '#numberOfVariantsLabel' ).getEl() ) {
-               this.down( '#numberOfSubjectsLabel' ).getEl().setOpacity( 1, true );
-               this.down( '#numberOfVariantsLabel' ).getEl().setOpacity( 1, true );
-               this.down( '#numberOfSubjectsLabelText' ).getEl().setOpacity( 1, true );
-               this.down( '#numberOfVariantsLabelText' ).getEl().setOpacity( 1, true );
-            }
-
             var me = this;
 
             var SUBJECT_IDS_KEY = 0;
@@ -430,6 +423,14 @@ Ext
                callback : function(totalCounts) {
                   me.down( '#numberOfSubjectsLabel' ).setText( totalCounts[SUBJECT_IDS_KEY].toString() );
                   me.down( '#numberOfVariantsLabel' ).setText( totalCounts[VARIANT_IDS_KEY].toString() );
+
+                  if ( me.down( '#numberOfSubjectsLabel' ).getEl() && me.down( '#numberOfVariantsLabel' ).getEl() ) {
+                     me.down( '#numberOfSubjectsLabel' ).getEl().setOpacity( 1, true );
+                     me.down( '#numberOfVariantsLabel' ).getEl().setOpacity( 1, true );
+                     me.down( '#numberOfSubjectsLabelText' ).getEl().setOpacity( 1, true );
+                     me.down( '#numberOfVariantsLabelText' ).getEl().setOpacity( 1, true );
+                  }
+
                   me.setLoading( false );
                },
                errorHandler : function(errorString, exception) {

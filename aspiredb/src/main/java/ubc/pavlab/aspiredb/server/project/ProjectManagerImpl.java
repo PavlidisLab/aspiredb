@@ -476,6 +476,11 @@ public class ProjectManagerImpl implements ProjectManager {
             String overlappingProjectName, Collection<VariantValueObject> projToPopulateVvos )
             throws ExternalDependencyException, NotLoggedInException {
 
+        if ( projectName.equals( overlappingProjectName ) ) {
+            log.warn( "Project name is the same as the overlapping project name! No overlaps computed." );
+            return new ArrayList<>();
+        }
+
         StopWatch timer = new StopWatch();
         timer.start();
 
