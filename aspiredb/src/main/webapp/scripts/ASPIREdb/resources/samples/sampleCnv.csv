@@ -1,0 +1,10 @@
+subjectid,chrom,start,end,Markers,type,Inheritance,Common CNV,Characteristics,Array Report,Array Report in detail,Array Platform
+02_MDL_20,13,57752361,57831960,1,loss,unclassified,Y,Benign,Normal,Normal,SG 1Mb
+02_MDL_20,14,29511827,29698386,1,loss,unclassified,Y,Benign,Normal,Normal,SG 1Mb
+03_01,1,104154527,104311748,1,loss,unclassified,Y,Benign,Normal,Normal,SG 1Mb
+03_01,6,67084125,67084761,1,loss,unclassified,Y,Benign,Normal,Normal,SG 1Mb
+03_02,1,248756015,248785703,3,loss,unclassified,Y,Benign,Abnormal,de novo_1,AG 105K
+03_02,9,135569655,135721455,8,gain,unclassified,Y,Benign,Abnormal,de novo_1,AG 105K
+03_02,14,19434375,19572452,4,gain,unclassified,Y,Benign,Abnormal,de novo_1,AG 105K
+03_02,15,34666802,34785223,6,loss,unclassified,Y,Benign,Abnormal,de novo_1,AG 105K
+03_02,16,14968655,16249748,51,loss,unclassified,Y,Benign,Abnormal,de novo_1,AG 105K

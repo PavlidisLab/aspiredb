@@ -49,7 +49,8 @@ Ext
 
          items : [ {
             xtype : 'label',
-            html : "For help with the data file format, see <a target='_blank' href='http://aspiredb.chibi.ubc.ca/data-loaders-and-admin-tools-setup/data-loaders-2/'>this page</a>.",
+            html : "For help with the data file format, see <a target='_blank' href='http://aspiredb.chibi.ubc.ca/data-loaders-and-admin-tools-setup/data-loaders-2/'>this page</a>."
+               + "<br/><br/>Sample files: <a download target='_blank' href='scripts/ASPIREdb/resources/samples/sampleCnv.csv'>sampleCnv.csv</a>, <a download target='_blank' href='scripts/ASPIREdb/resources/samples/samplePhenotype.csv'>samplePhenotype.csv</a>",
          } ],
 
          buttons : [
@@ -375,9 +376,9 @@ Ext
                      ref.phenotypeFileEdit = file.name;
 
                      if ( form.isValid() ) {
-                        
-                        phenotypePanel.setLoading(true);
-                        
+
+                        phenotypePanel.setLoading( true );
+
                         form.submit( {
 
                            method : 'POST',
@@ -401,15 +402,15 @@ Ext
                                  projectName, dryRun, {
                                     callback : function(result) {
 
-                                       phenotypePanel.setLoading(false);
-                                       
+                                       phenotypePanel.setLoading( false );
+
                                        if ( result.errorMessages.length > 0 ) {
                                           Ext.Msg.alert( 'Error', 'Your file has failed with these errors: <br/>'
                                              + result.errorMessages.slice( 0, 5 ).join( '<br/>' ) );
                                        } else {
                                           Ext.Msg.alert( 'Success',
                                              'Your file is ready to be submitted <br/><br/> Name: '
-                                                + ref.variantFileEdit + '<br/> # Phenotypes : '
+                                                + ref.phenotypeFileEdit + '<br/> # Phenotypes : '
                                                 + result.phenotypesToAdd.length + '<br/><br/>' );
                                        }
 
@@ -418,7 +419,7 @@ Ext
 
                            },
                            failure : function(form, action) {
-                              phenotypePanel.setLoading(false);
+                              phenotypePanel.setLoading( false );
                               Ext.Msg.alert( 'Failed', action.result ? action.result.message : 'No response' );
                            }
                         } );
