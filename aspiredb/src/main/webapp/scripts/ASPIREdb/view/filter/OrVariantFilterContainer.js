@@ -4,7 +4,7 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
    extend : 'ASPIREdb.view.filter.FilterPanel',
    alias : 'widget.filter_or_variant',
    closable : true,
-//   title : 'OR Variant Filter',
+   // title : 'OR Variant Filter',
    title : 'AND',
    width : 910,
    // layout : {
@@ -41,7 +41,7 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
          layout : {
             type : 'vbox',
             defaultMargins : {
-//               top : 5,
+               // top : 5,
                right : 5,
                left : 5,
                bottom : 2
@@ -52,7 +52,8 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
             disjunction.restrictions = [];
             this.items.each( function(item, index, length) {
                disjunction.restrictions.push( item.getRestrictionExpression() );
-               if ( disjunction.restrictions[index].property.displayName == 'GeneSet' ) {
+               if ( disjunction.restrictions[index].property !== null
+                  && disjunction.restrictions[index].property.displayName == 'GeneSet' ) {
                   disjunction.restrictions[index].property = new GeneProperty();
                   disjunction.restrictions[index].property.displayName = 'Gene';
                   disjunction.restrictions[index].values = disjunction.restrictions[index].values[index].object;
@@ -98,7 +99,7 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
             filterContainer.doLayout();
 
          },
-         
+
          items : [ {
             xtype : 'filter_property',
             itemId : 'filterProperty',
@@ -115,11 +116,11 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
          layout : {
             type : 'hbox',
             defaultMargins : {
-//             top : 5,
-             right : 10,
-//             left : 5,
-//             bottom : 5
-          }
+               // top : 5,
+               right : 10,
+            // left : 5,
+            // bottom : 5
+            }
          },
          items : [ {
             xtype : 'tbspacer',
@@ -127,7 +128,7 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
          }, {
             xtype : 'button',
             itemId : 'addButton',
-//            padding : '5 5 5 5',
+            // padding : '5 5 5 5',
             // icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
             text : 'OR'
          } ]
@@ -136,14 +137,14 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
       this.callParent();
 
       // Adds the 'OR' text after each variant filter property
-      me.down("#filterContainer").on('add', function( ref, component, index, opts) {
+      me.down( "#filterContainer" ).on( 'add', function(ref, component, index, opts) {
          if ( index == 0 ) {
             return;
          }
-         var filterProperty = ref.items.items[index-1];
+         var filterProperty = ref.items.items[index - 1];
          filterProperty.setOperationLabel( 'OR' );
-      });
-      
+      } );
+
       me.down( "#addButton" ).on( 'click', function(button, event) {
          var filterContainer = me.getComponent( "filterContainer" );
          filterContainer.add( Ext.create( 'ASPIREdb.view.filter.PropertyFilter', {
