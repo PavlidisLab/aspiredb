@@ -219,10 +219,12 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
    listeners : {
       sortchange : function(phenotypeGrid, sortinfo) {
 
-         if ( sortinfo.dataIndex == 'allPhenoSummaryMap' )
-            ASPIREdb.EVENT_BUS.fireEvent( 'allPhenoSummary_sorted' );
-         if ( sortinfo.dataIndex == 'phenoSummaryMap' )
-            ASPIREdb.EVENT_BUS.fireEvent( 'selectedPhenoSummary_sorted' );
+         ASPIREdb.EVENT_BUS.fireEvent( 'allPhenoSummary_sorted' );
+         
+//         if ( sortinfo.dataIndex == 'allPhenoSummaryMap' )
+//            ASPIREdb.EVENT_BUS.fireEvent( 'allPhenoSummary_sorted' );
+//         if ( sortinfo.dataIndex == 'phenoSummaryMap' )
+//            ASPIREdb.EVENT_BUS.fireEvent( 'selectedPhenoSummary_sorted' );
       }
    },
 
