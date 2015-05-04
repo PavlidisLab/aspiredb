@@ -646,9 +646,15 @@ public class QueryServiceImpl implements QueryService {
         List<VariantValueObject> variantValueObjects = new LinkedList<VariantValueObject>();
 
         for ( Variant variant : variants ) {
-            VariantValueObject valueObject = variant.toValueObject();
-            converter.fillInCytobandCoordinates( valueObject.getGenomicRange() );
-            variantValueObjects.add( valueObject );
+
+            try {
+                VariantValueObject valueObject = variant.toValueObject();
+                converter.fillInCytobandCoordinates( valueObject.getGenomicRange() );
+                variantValueObjects.add( valueObject );
+            } catch ( Exception e ) {
+                log.warn( "Failed to convert variant to value object. " + variant, e );
+            }
+
         }
 
         return variantValueObjects;
