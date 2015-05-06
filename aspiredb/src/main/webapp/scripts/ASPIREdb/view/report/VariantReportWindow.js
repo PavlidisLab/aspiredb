@@ -85,8 +85,10 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       me.reportTypeStore = { 
          proxy : {
             type : 'dwr',
-            dwrFunction : VariantService.suggestPropertiesForVariantTypeInProject,
-            dwrParams : [ 'CNV', ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0] ],
+            //dwrFunction : VariantService.suggestPropertiesForVariantTypeInProject,
+            //dwrParams : [ 'CNV', ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0] ],
+            dwrFunction : VariantService.suggestPropertiesForAllVariantTypesInProject,
+            dwrParams : [  ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0] ],
             model : 'ASPIREdb.model.Property',
             reader : {
                type : 'json',
@@ -150,7 +152,8 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
 
       reportCombo.store.filter( [ {
          fn : function(record) {
-            return variants.collect( record.get('name') ).length > 0;
+            // [0] == false, [] == false
+            return variants.collect( record.get('name') ) != 0;
          }
       } ] );
 

@@ -97,4 +97,6 @@ public interface VariantService {
      *         'label_A' : 20, 'non_label_A' : 10 }, { 'phenotype' : 'pheno_2', 'label_A' : 40, 'non_label_A' : 60 }, ];
      */
     public Collection<Map<String, Object>> createPhenotypeSummary( Collection<Long> variantIds, Long subjectLabelId );
+
+    public Collection<Property> suggestPropertiesForAllVariantTypesInProject( Long projectId );
 }
