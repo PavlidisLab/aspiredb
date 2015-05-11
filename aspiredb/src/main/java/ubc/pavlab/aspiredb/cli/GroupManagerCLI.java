@@ -28,7 +28,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -45,8 +44,7 @@ public class GroupManagerCLI extends AbstractCLI {
     private static UserManager userManager;
 
     // ShaPasswordEncoder passwordEncoder = new ShaPasswordEncoder();
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private static PasswordEncoder passwordEncoder;
 
     private boolean createUser = false;
 
@@ -85,6 +83,8 @@ public class GroupManagerCLI extends AbstractCLI {
         applicationContext = SpringContextUtil.getApplicationContext( false );
 
         userManager = ( UserManager ) applicationContext.getBean( "userManager" );
+
+        passwordEncoder = ( PasswordEncoder ) applicationContext.getBean( "passwordEncoder" );
 
         GroupManagerCLI p = new GroupManagerCLI();
         try {
