@@ -59,28 +59,16 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
          // defaults to text field if no xtype is supplied
          allowBlank : false
       }
-   }, {
-      header : 'Description',
-      dataIndex : 'groupDescription',
-      flex : 1,
-      editor : {
-         // defaults to text field if no xtype is supplied
-         allowBlank : true
-      }
-   }, {
-      header : 'Size',
-      dataIndex : 'groupSize',
-      flex : 1,
+   }, /*
+       * { header : 'Description', dataIndex : 'groupDescription', flex : 1, editor : { // defaults to text field if no
+       * xtype is supplied allowBlank : true } }, { header : 'Size', dataIndex : 'groupSize', flex : 1, }
+       */],
 
-   } ],
-
-// TODO Implement record update
-   /*plugins : [ rowEditing ],
-   listeners : {
-      'selectionchange' : function(view, records) {
-         this.down( '#removeUserGroup' ).setDisabled( !records.length );
-      }
-   },*/
+   // TODO Implement record update
+   /*
+    * plugins : [ rowEditing ], listeners : { 'selectionchange' : function(view, records) { this.down(
+    * '#removeUserGroup' ).setDisabled( !records.length ); } },
+    */
 
    initComponent : function() {
 
@@ -198,10 +186,10 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
             var newUserGroupName = ref.down( '#userGroupName' ).getValue();
 
             if ( newUserGroupName == null || newUserGroupName.trim().length == 0 ) {
-               Ext.Msg.alert('Error','Enter a valid user group name');
+               Ext.Msg.alert( 'Error', 'Enter a valid user group name' );
                return;
             }
-               
+
             geneValueObjects = [];
             geneValueObjects.push( new GeneValueObject() );
 
@@ -228,7 +216,8 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
                      // geneset
                      // grid
                      var data = [];
-                     var row = [ newUserGroupName, '', 0 ];
+                     // var row = [ newUserGroupName, '', 0 ];
+                     var row = [ newUserGroupName ];
                      data.push( row );
                      userGroupGrid.store.add( data );
                      userGroupGrid.getView().refresh( true );
@@ -238,7 +227,7 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
                      var userGroupMemeberGrid = panel.down( '#groupMemeberGrid' );
 
                      userGroupMemeberGrid.store.removeAll( true );
-                    // userGroupMemeberGrid.getView().refresh( true );
+                     // userGroupMemeberGrid.getView().refresh( true );
                      ref.down( '#userGroupName' ).setValue( '' );
                      // console.log(
                      // 'returned
@@ -265,14 +254,14 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
          tooltip : 'Remove the selected group',
          icon : 'scripts/ASPIREdb/resources/images/icons/group_delete.png',
          handler : function() {
-            
+
             if ( ref.selUserGroup[0] == null ) {
-               Ext.Msg.alert('Error','Select a group name to delete');
+               Ext.Msg.alert( 'Error', 'Select a group name to delete' );
                return;
             }
-            
+
             var groupName = ref.selUserGroup[0].data.groupName;
-            
+
             // Delete user group
             UserManagerService.deleteGroup( groupName, {
                callback : function(status) {

@@ -67,7 +67,7 @@ Ext.define( 'ASPIREdb.view.UserManagerWindow', {
 
       UserManagerService.loadUserEditableGroups( {
          callback : function(ugs) {
-            console.log( "user manager " + ugs );
+            // console.log( "user manager " + ugs );
             ref.populategroupMemeberGrid( ugs );
 
          },
@@ -89,7 +89,8 @@ Ext.define( 'ASPIREdb.view.UserManagerWindow', {
 
       var data = [];
       for (var i = 0; i < ugs.length; i++) {
-         var row = [ ugs[i], '', 0 ];
+         // var row = [ ugs[i], '', 0 ];
+         var row = [ ugs[i] ];
          data.push( row );
       }
 
