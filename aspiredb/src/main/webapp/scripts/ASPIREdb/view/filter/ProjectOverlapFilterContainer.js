@@ -190,6 +190,20 @@ Ext.define( 'ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 
       var supportOfVariantsOverlapItem = getNewVariantSupportOverlapItem();
 
+      var projectStore = Ext.create( 'Ext.data.Store', {
+         id : 'projectStore',
+         proxy : {
+            type : 'dwr',
+            dwrFunction : ProjectService.getOverlapProjects,
+            dwrParams : [ ASPIREdb.ActiveProjectSettings.getActiveProjectIds() ],
+            model : 'ASPIREdb.model.Project',
+            reader : {
+               type : 'json',
+               root : 'name'
+            }
+         }
+      } );
+
       // TODO Show Overlapped Variants
       filterContainer.insert( 0, {
          xtype : 'button',
@@ -243,22 +257,28 @@ Ext.define( 'ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
 
          xtype : 'combo',
          itemId : 'overlapProjectComboBox',
+         // editable : false,
+         // forceSelection : true,
+         // value : 'PROJECT_PLACEHOLDER',
+         // store : [ [ 'PROJECT_PLACEHOLDER', '<Project Name>' ] ],
+         // listeners : {
+         // scope : this,
+         // 'change' : this.overlapProjectComboBoxHandler,
+         // },
+         store : projectStore,
          editable : false,
+         displayField : 'name',
+         allowBlank : false,
+         valueField : 'id',
          forceSelection : true,
-         value : 'PROJECT_PLACEHOLDER',
-         store : [ [ 'PROJECT_PLACEHOLDER', '<Project Name>' ] ],
-         listeners : {
-            scope : this,
-            'change' : this.overlapProjectComboBoxHandler,
-         },
+         emptyText : "Choose project...",
+         msgTarget : 'qtip'
       } );
 
       filterContainer.insert( 0, {
          xtype : 'label',
          text : 'Project to search for overlap: '
       } );
-
-      this.updateOverlapProjectCombo();
 
    },
 
@@ -274,34 +294,5 @@ Ext.define( 'ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
       ASPIREdb.view.filter.FilterWindow.overlappedVariantsHandler( overlapProjectComboBox.getValue() );
       console.log( 'overlap project selected : ' + overlapProjectComboBox.getValue() );
    },
-
-   updateOverlapProjectCombo : function() {
-
-      
-      var overlapProjectComboBox = this.down( '#overlapProjectComboBox' );
-
-      overlapProjectComboBox.setLoading(true);
-      
-      ProjectService.getOverlapProjects( ASPIREdb.ActiveProjectSettings.getActiveProjectIds(), {
-
-         callback : function(pvos) {
-
-            var storedata = [ [ 'Value', '<Project name>' ] ];
-
-            for (var i = 0; i < pvos.length; i++) {
-
-               storedata.push( [ pvos[i].id, pvos[i].name ] );
-
-            }
-
-            overlapProjectComboBox.getStore().loadData( storedata );
-
-            overlapProjectComboBox.setLoading(false);
-            
-         }
-
-      } );
-
-   }
 
 } );

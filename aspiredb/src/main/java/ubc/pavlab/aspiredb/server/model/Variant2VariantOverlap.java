@@ -202,6 +202,10 @@ public class Variant2VariantOverlap implements Serializable {
 
         int overlap = end - start;
 
+        if ( overlap == 0 ) {
+            log.warn( "Overlap size is 0 between " + vvo.getId() + " and " + vvoOverlapped.getId() );
+        }
+
         float vvoSize = vvo.getGenomicRange().getBaseEnd() - vvo.getGenomicRange().getBaseStart();
         float vvoOverlappedSize = vvoOverlapped.getGenomicRange().getBaseEnd()
                 - vvoOverlapped.getGenomicRange().getBaseStart();

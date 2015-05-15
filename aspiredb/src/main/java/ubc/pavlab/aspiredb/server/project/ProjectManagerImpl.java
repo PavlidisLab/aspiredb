@@ -532,7 +532,7 @@ public class ProjectManagerImpl implements ProjectManager {
             }
         }
 
-        variant2SpecialVariantOverlapDao.create( overlapVos );
+        overlapVos = ( Collection<Variant2VariantOverlap> ) variant2SpecialVariantOverlapDao.create( overlapVos );
 
         // variantDao.printCacheStatistics();
 
