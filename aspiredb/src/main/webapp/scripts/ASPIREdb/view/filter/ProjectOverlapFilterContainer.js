@@ -210,7 +210,6 @@ Ext.define( 'ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
          flex : 1,
          itemId : 'overlappedVariants',
          text : 'Overlapped Variants',
-         hidden : true,
          disabled : true,
          handler : this.overlappedVariantsHandler,
          scope : this
@@ -272,7 +271,12 @@ Ext.define( 'ASPIREdb.view.filter.ProjectOverlapFilterContainer', {
          valueField : 'id',
          forceSelection : true,
          emptyText : "Choose project...",
-         msgTarget : 'qtip'
+         msgTarget : 'qtip',
+         listeners : {
+            'select' : function() {
+               this.up().down( "#overlappedVariants" ).setDisabled( false );
+            }
+         }
       } );
 
       filterContainer.insert( 0, {
