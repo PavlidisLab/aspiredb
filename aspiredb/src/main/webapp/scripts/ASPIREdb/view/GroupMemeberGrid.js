@@ -66,32 +66,31 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
          // defaults to textfield if no xtype is supplied
          allowBlank : false
       }
-   }, 
-//   {
-//      header : 'Email',
-//      dataIndex : 'memberEmail',
-//      flex : 1,
-//      editor : {
-//         // defaults to textfield if no xtype is supplied
-//         allowBlank : true
-//      }
-//   } 
+   },
+   // {
+   // header : 'Email',
+   // dataIndex : 'memberEmail',
+   // flex : 1,
+   // editor : {
+   // // defaults to textfield if no xtype is supplied
+   // allowBlank : true
+   // }
+   // }
    ],
 
-// TODO Implement record update
-   /*plugins : [ rowEditing ],
-   listeners : {
-      'selectionchange' : function(view, records) {
-         this.down( '#removeGroupMemeber' ).setDisabled( !records.length );
-         this.selectedUser = this.getSelectionModel().getSelection();
-
-      }
-   },*/
+   // TODO Implement record update
+   /*
+    * plugins : [ rowEditing ], listeners : { 'selectionchange' : function(view, records) { this.down(
+    * '#removeGroupMemeber' ).setDisabled( !records.length ); this.selectedUser =
+    * this.getSelectionModel().getSelection(); } },
+    */
 
    initComponent : function() {
       this.callParent();
       var me = this;
       me.enableToolbar();
+
+      this.on( 'select', this.userSelectHandler, this );
 
       ASPIREdb.EVENT_BUS.on( 'userGroup_selected', this.groupMemberSelectHandler, this );
 
@@ -105,6 +104,10 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
     */
    groupMemberSelectHandler : function(selUserGroup) {
       this.selectedGroup = selUserGroup;
+   },
+
+   userSelectHandler : function(ref, record, index, eOpts) {
+      this.selectedUser = record;
    },
 
    /**
@@ -163,21 +166,21 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
          handler : function() {
 
             if ( ref.selectedGroup[0] == null ) {
-               Ext.Msg.alert('Error','Select a user group');
+               Ext.Msg.alert( 'Error', 'Select a user group' );
                return;
             }
-            
+
             var groupMember = ref.down( '#groupMemberName' ).lastQuery;
             if ( groupMember == null || groupMember.trim().length == 0 ) {
-               Ext.Msg.alert('Error','Enter a valid user name');
+               Ext.Msg.alert( 'Error', 'Enter a valid user name' );
                return;
             }
-               
+
             var groupName = ref.selectedGroup[0].data.groupName;
 
-            UserManagerService.addUserToGroup( groupName,groupMember, {
+            UserManagerService.addUserToGroup( groupName, groupMember, {
                callback : function(status) {
-                  if (status=="Success"){
+                  if ( status == "Success" ) {
                      var panel = ASPIREdb.view.UserManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
                      var groupMemberGrid = panel.down( '#groupMemeberGrid' );
 
@@ -189,12 +192,12 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
                         groupMemberGrid.store.add( data );
                      }
 
-                     console.log( 'selected geneset :' + ref.selectedGeneGroup[0].data.groupName + ' deleted' );
-                     
-                  }else {
+                     // console.log( 'selected geneset :' + ref.selectedGeneGroup[0].data.groupName + ' deleted' );
+
+                  } else {
                      Ext.Msg.alert( "Server Reply", status );
                   }
-                 
+
                }
             } );
 
@@ -210,26 +213,26 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
          icon : 'scripts/ASPIREdb/resources/images/icons/user_delete.png',
          handler : function() {
 
-            if ( ref.selectedUser[0] == null ) {
-               Ext.Msg.alert('Error','Select a user name<br/>');
+            if ( ref.selectedUser == null ) {
+               Ext.Msg.alert( 'Error', 'Select a user name<br/>' );
                return;
             }
-            
-            var groupMember = ref.selectedUser[0].data.memberName;
+
+            var groupMember = ref.selectedUser.data.memberName;
             var groupName = ref.selectedGroup[0].data.groupName;
-            
+
             UserManagerService.deleteUserFromGroup( groupName, groupMember, {
                callback : function(status) {
                   var panel = ASPIREdb.view.UserManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
                   var groupMemberGrid = panel.down( '#groupMemeberGrid' );
 
-                 // var selection = ref.selectedUser[0].data.memberName;
+                  // var selection = ref.selectedUser[0].data.memberName;
                   var selection = groupMemberGrid.getView().getSelectionModel().getSelection()[0];
                   if ( selection ) {
                      groupMemberGrid.store.remove( selection );
                   }
 
-                  console.log( 'selected user :' + ref.selectedGeneGroup[0].data.groupName + ' deleted' );
+                  console.log( 'selected user :' + groupMember + ' deleted' );
                }
             } );
          }
