@@ -41,7 +41,7 @@
 		</property>
 	</bean>
 
-	<dwr:controller id="dwrController" debug="true">
+	<dwr:controller id="dwrController" debug="false">
 		<dwr:config-param name="generateDtoClasses" value="dtoall" />
 		<dwr:config-param name="allowScriptTagRemoting"
 			value="true" />
