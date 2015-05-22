@@ -115,11 +115,11 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
             itemId : 'registerButton',
             text : 'Register',
             handler : function(obj) {
-//               window.location.href = '/aspiredb/register.html';
-//               obj.getEl().on( 'click', function() {
-//                  var myForm = new ASPIREdb.view.RegistrationForm();
+               // window.location.href = '/aspiredb/register.html';
+               // obj.getEl().on( 'click', function() {
+               // var myForm = new ASPIREdb.view.RegistrationForm();
                ASPIREdb.view.RegistrationForm.initAndShow();
-//               }, this);
+               // }, this);
             }
          }, {
             xtype : 'button',
@@ -159,6 +159,8 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
    submitHandler : function() {
 
       var me = this;
+      me.setLoading( true );
+
       Ext.Ajax.request( {
          url : 'j_spring_security_check',
          method : 'POST',
@@ -172,6 +174,7 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
             'ajaxLoginTrue' : true
          } ),
          success : function(response) {
+            me.setLoading( false );
             var messageLabel = me.down( '#message' );
             var usernameTextfield = me.down( '#username' );
             var passwordTextfield = me.down( '#password' );
@@ -185,8 +188,10 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
             } else {
                messageLabel.show();
             }
+
          },
          failure : function(response, opts) {
+            me.setLoading( false );
             var messageLabel = me.down( '#message' );
             messageLabel.show();
          }
