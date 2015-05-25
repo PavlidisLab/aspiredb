@@ -1,3 +1,12 @@
+
+
+<html>
+<body>
+</body>
+</html>
+
+
+
 <script type="text/javascript" src="dwr/engine.js"></script>
 
 <script src="dwr/interface/ChromosomeService.js"></script>
@@ -30,18 +39,42 @@
 
 <!-- <link href="http://cdn.sencha.com/ext/gpl/4.2.0/resources/css/ext-all.css" rel="stylesheet" />-->
 <link rel="stylesheet" type="text/css"
-	href="scripts/ASPIREdb/resources/css/multivaluecombo.css" />
+    href="scripts/ASPIREdb/resources/css/multivaluecombo.css" />
 <!-- <link rel="stylesheet" type="text/css" href="scripts/lib/resources/css/ext-all-neptune.css">-->
 <link rel="stylesheet" type="text/css"
-	href="scripts/lib/resources/css/ext-all-steelblue.css">
+    href="scripts/lib/resources/css/ext-all-steelblue.css">
 <link rel="icon" type="image/x-icon"
-	href="scripts/ASPIREdb/resources/images/favicon.ico" />
+    href="scripts/ASPIREdb/resources/images/favicon.ico" />
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
 <script src="scripts/ASPIREdb/view/ideogram/IdeogramCursorLayer.js"></script>
 <script src="scripts/ASPIREdb/view/ideogram/ChromosomeLayer.js"></script>
 <script src="scripts/ASPIREdb/view/ideogram/ChromosomeIdeogram.js"></script>
 <script src="scripts/ASPIREdb/view/filter/FilterUtil.js"></script>
+
+
+<script>
+
+	//Basic mask:
+	var myMask = new Ext.LoadMask(Ext.getBody(), {msg:"Please wait..."});
+	myMask.show();
+
+   Ext.application( {
+      name : 'ASPIREdb',
+      appFolder : 'scripts/ASPIREdb',
+      enableQuickTips : true,
+      
+      launch : function() {
+         
+         //var win = Ext.create('ASPIREdb.view.LoginForm');
+         var viewport = Ext.create( 'ASPIREdb.AspireDbPanel' );
+         //win.show();
+         
+         myMask.hide();
+      }
+   } );
+   
+</script>
 
 <!--  matrix2viz -->
 <script src="scripts/lib/matrix2viz/third-party/clusterfck.js"></script>
@@ -58,21 +91,3 @@
 <script src="scripts/lib/matrix2viz/js/ClusterHelper.js"></script>
 <script src="scripts/lib/matrix2viz/js/Matrix2Viz.js"></script>
 <!--script src="scripts/lib/matrix2viz/examples/matrixviz.js"></script-->
-
-<script>
-   Ext.application( {
-      name : 'ASPIREdb',
-      appFolder : 'scripts/ASPIREdb',
-
-      launch : function() {
-         //var win = Ext.create('ASPIREdb.view.LoginForm');
-         var viewport = Ext.create( 'ASPIREdb.AspireDbPanel' );
-         //win.show();
-      }
-   } );
-</script>
-
-<html>
-<body>
-</body>
-</html>
