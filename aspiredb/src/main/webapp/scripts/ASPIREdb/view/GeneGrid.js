@@ -47,7 +47,6 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
       selectedGeneSet : [],
       suggestionContext : null,
       selectedProperty : new GeneProperty(),
-      
 
    },
 
@@ -103,15 +102,14 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
       this.selectedGeneSet = selGeneSet;
    },
 
-
-   populateMultiComboItemFromImportList : function( vos ) {
-      this.populateGridFromImportList(vos);
+   populateMultiComboItemFromImportList : function(vos) {
+      this.populateGridFromImportList( vos );
    },
-   
-   addGenesToGrid : function( gvos, grid ) {
+
+   addGenesToGrid : function(gvos, grid) {
       var data = [];
-      
-      for(var i = 0; i < gvos.length; i++) {
+
+      for (var i = 0; i < gvos.length; i++) {
          var gvo = gvos[i];
          var row = [ gvo.symbol, gvo.geneBioType, gvo.name, '' ];
          data.push( row );
@@ -131,42 +129,44 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
       var selection = geneSetGrid.getView().getSelectionModel().getSelection()[0];
       if ( selection ) {
          selection.set( 'geneSetSize', data.length );
-      }   
+      }
    },
-   
-   populateGridFromImportList : function( vos ) {
-      
+
+   populateGridFromImportList : function(vos) {
+
       var ref = this;
-      
+
       if ( ref.selectedGeneSet.length === 0 ) {
          Ext.Msg.alert( 'Error', 'select the Gene Set Name to add Genes ' );
          return;
       }
-      
+
       var geneSymbols = [];
-      for( var i = 0; i < vos.length; i++ ) {
-         geneSymbols.push(vos[i].symbol);
+      for (var i = 0; i < vos.length; i++) {
+         geneSymbols.push( vos[i].symbol );
       }
-      
+
       var geneSetName = ref.selectedGeneSet[0].data.geneSetName;
+      ref.setLoading( true );
       UserGeneSetService.addGenesToGeneSet( geneSetName, geneSymbols, {
          callback : function(gvos) {
-            
+
             if ( gvos.length === 0 ) {
-               console.log('No genes were added to ' + geneSetName);
+               console.log( 'No genes were added to ' + geneSetName );
                return;
             }
-            
-            ref.addGenesToGrid(gvos, ref);
-            
-         }, 
+
+            ref.addGenesToGrid( gvos, ref );
+            ref.setLoading( false );
+         },
          errorHandler : function(er, exception) {
             Ext.Msg.alert( "Gene Grid Error", er + "\n" + exception.stack );
             console.log( exception.stack );
+            ref.setLoading( false );
          }
-      });
+      } );
    },
-   
+
    /**
     * Enable the tool bar in Gene grid
     * 
@@ -243,7 +243,7 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
                      UserGeneSetService.addGenesToGeneSet( geneSetName, [ genesymbol ], {
                         callback : function(gvos) {
 
-                           ref.addGenesToGrid(gvos, grid);
+                           ref.addGenesToGrid( gvos, grid );
 
                         },
                         errorHandler : function(er, exception) {
@@ -294,7 +294,7 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
             } );
          }
       } );
-      
+
       toolbar.add( {
          xtype : 'button',
          itemId : 'enterListButton',
@@ -307,6 +307,6 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
             ASPIREdb.view.filter.TextImportWindow.setPropertyFilterAndShow( ref );
          }
       } );
-      
+
    }
 } );

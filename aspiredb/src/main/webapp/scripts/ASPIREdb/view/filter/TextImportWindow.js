@@ -47,8 +47,8 @@ Ext.define( 'ASPIREdb.view.filter.TextImportWindow', {
    /**
     * propertyFilterRef must have these fields:
     * 
-    * selectedProperty - e.g. GeneProperty()
-    * me.propertyFilterRef.populateMultiComboItemFromImportList - function to parse GeneValueObjects and load into combo list or a grid component
+    * selectedProperty - e.g. GeneProperty() me.propertyFilterRef.populateMultiComboItemFromImportList - function to
+    * parse GeneValueObjects and load into combo list or a grid component
     * 
     */
    setPropertyFilterAndShow : function(propertyFilterRef) {
@@ -56,7 +56,7 @@ Ext.define( 'ASPIREdb.view.filter.TextImportWindow', {
       this.property = propertyFilterRef.selectedProperty;
 
       this.propertyFilterRef = propertyFilterRef;
-      
+
       this.show();
    },
 
@@ -68,6 +68,8 @@ Ext.define( 'ASPIREdb.view.filter.TextImportWindow', {
 
       var textList = text.match( /[^\r\n]+/g );
 
+      me.setLoading( true );
+
       if ( textList ) {
 
          QueryService.getVariantLocationValueObjects( this.property, textList, {
@@ -76,6 +78,8 @@ Ext.define( 'ASPIREdb.view.filter.TextImportWindow', {
                var verifiedValues = me.processVerifiedValues( valueObjects, textList );
 
                me.propertyFilterRef.populateMultiComboItemFromImportList( verifiedValues );
+
+               me.setLoading( false );
 
             }
          } );
