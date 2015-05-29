@@ -113,7 +113,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          }, {
             itemId : 'viewCompoundHeterozygotes',
             text : 'View compound heterozygotes',
-            disabled : false,
+            disabled : true,
             handler : this.viewCompoundHeterozygotes,
             scope : this
          } ]
@@ -430,14 +430,14 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
                var vvos = pageLoad.items;
                ref.loadedVariants = vvos;
-//               var variantPatientIds = [];
+               // var variantPatientIds = [];
                var projectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
 
-//               for (var i = 0; i < vvos.length; i++) {
-//                  if ( variantPatientIds.indexOf( vvos[i].patientId ) == -1 )
-//                     variantPatientIds.push( VariantService.getSubjectVariants( projectId, vvos[i].patientId ) );
-//
-//               }
+               // for (var i = 0; i < vvos.length; i++) {
+               // if ( variantPatientIds.indexOf( vvos[i].patientId ) == -1 )
+               // variantPatientIds.push( VariantService.getSubjectVariants( projectId, vvos[i].patientId ) );
+               //
+               // }
 
                var variantIds = [];
 
@@ -962,14 +962,14 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    enableActionButtonsBySelectedRecords : function(records) {
 
       if ( records.length > 0 ) {
-
          this.down( '#viewGenes' ).enable();
          this.down( '#makeLabel' ).enable();
+         this.down( '#viewCompoundHeterozygotes' ).enable();
       } else {
-
          this.down( '#viewGenes' ).disable();
          this.down( '#viewInUCSC' ).disable();
          this.down( '#makeLabel' ).disable();
+         this.down( '#viewCompoundHeterozygotes' ).disable();
          return;
       }
 
