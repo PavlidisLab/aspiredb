@@ -130,10 +130,11 @@ public class PhenotypeUtil {
             phenotype.setDbValue( convertValueToHPOntologyStandardValue( value ) );
         } else if ( phenotype.getValueType().equalsIgnoreCase( PhenotypeValueType.GENDER.toString() ) ) {
             value = value.trim().toUpperCase();
-            if ( value.equals( "MALE" ) || value.equals( "FEMALE" ) || value.equals( "M" ) || value.equals( "F" ) ) {
+            if ( value.equals( "MALE" ) || value.equals( "FEMALE" ) || value.equals( "M" ) || value.equals( "F" )
+                    || value.equals( "UNKNOWN" ) || value.equals( "" ) ) {
                 phenotype.setDbValue( value );
             } else {
-                throw new InvalidDataException( "Invalid Gender value, use MALE, FEMALE, M, or F" );
+                throw new InvalidDataException( "Invalid Gender value, use MALE, FEMALE, M, or F or UNKNOWN or <blank>" );
             }
         } else {
             phenotype.setDbValue( value );
