@@ -71,6 +71,7 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 
    draw : function(matrix) {
 
+      var me = this;
       var matrixColumnMetadata = [];
       var matrixRowMetadata = [];
 
@@ -78,16 +79,21 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
 
       for (var i = 0; i < matrix.columnNames.length; i++) {
          var type;
-         if ( matrix.columnNames[i] == "Gender" || matrix.columnNames[i] == "Family history" ) {
+         var range = {};
+         if ( matrix.columnNames[i].toLocaleLowerCase() == "gender"
+            || matrix.columnNames[i].toLocaleLowerCase() == "family history" ) {
             type = 'gender';
-         } else if ( matrix.columnNames[i] == "Hairwhorls" ) {
+         } else if ( new RegExp( "^age" ).test( matrix.columnNames[i].toLocaleLowerCase() )
+            || matrix.columnNames[i].toLocaleLowerCase() == "hairwhorls"
+            || matrix.columnNames[i].toLocaleLowerCase() == "phenotype" ) {
             type = 'count';
          } else {
             type = 'binary';
          }
          matrixColumnMetadata.push( {
             Phenotype : matrix.columnNames[i],
-            type : type
+            type : type,
+            range : range
          } );
       }
 
@@ -97,9 +103,12 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
          } );
       }
 
-      var convertedData = this.convertData( matrix.matrix, matrixColumnMetadata );
+      var convertedData = me.convertData( matrix.matrix, matrixColumnMetadata );
+      me.convertedData = convertedData;
 
       var order = h2m.ClusterHelper.produceClusteredOrder( convertedData );
+      console.log( "number of columns " + matrix.columnNames.length + "; equals columnOrder.length? "
+         + (matrix.columnNames.length == order.columnOrder.length) );
 
       var dataMatrix = {
          dimensions : {
@@ -124,23 +133,38 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
       M2V.Util.dataType.renderCountCell = function(ctx, value, row, column, size) {
          var color;
          var offset = 2;
+
          var idx = parseInt( value ) + offset;
-         if ( idx < colors.length ) {
-            color = colors[idx];
-         } else {
-            color = colors[colorNAIndex];
+
+         if ( !isNaN( idx ) ) {
+            if ( idx >= colors.length ) {
+
+               idx = colorNAIndex;
+            }
+         } else if ( value.length > 0 ) {
+            // value is not an integer
+
+            if ( me.valuesSeen == undefined ) {
+               me.valuesSeen = [];
+            }
+            if ( me.valuesSeen.indexOf( value ) < 0 ) {
+               me.valuesSeen.push( value );
+            }
+
+            idx = me.valuesSeen.indexOf( value );
+
          }
 
-         ctx.fillStyle = color;
+         ctx.fillStyle = colors[idx];
          ctx.fillRect( 1, 1, size.width - 2, size.height - 2 );
       };
 
       M2V.Util.dataType.renderGenderCell = function(ctx, value, row, column, size) {
          var color;
          value = value.toUpperCase();
-         if ( value === "M" || value === "Y" ) {
+         if ( value.toUpperCase() === "MALE" || value.toUpperCase() === "M" || value.toUpperCase() === "Y" ) {
             color = colors[4]; // blue
-         } else if ( value === "F" || value === "N" ) {
+         } else if ( value.toUpperCase() === "FEMALE" || value.toUpperCase() === "F" || value.toUpperCase() === "N" ) {
             color = colors[3]; // yellow
          } else {
             color = colors[2]; // grey
@@ -155,9 +179,11 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
          // TODO write a legend
          var color;
          value = value.toUpperCase();
-         if ( value === 0 || value === "0" || value === "N" || value === "M" ) {
+         if ( value === 0 || value === "0" || value.toUpperCase() === "N" || value.toUpperCase() === "MALE"
+            || value.toUpperCase() === "M" ) {
             color = colors[1]; // green
-         } else if ( value === 1 || value === "1" || value === "Y" || value === "F" ) {
+         } else if ( value === 1 || value === "1" || value.toUpperCase() === "Y" || value.toUpperCase() === "FEMALE"
+            || value.toUpperCase() === "F" ) {
             color = colors[0]; // brown
          } else {
             color = colors[2]; // unknown
@@ -359,8 +385,17 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
       return Math.floor( value / ((range.high - range.low) / numberOfBins) );
    },
 
+   encode : function(s) {
+      var number = "";
+      for (var i = 0; i < s.length; i++)
+         number += s.charCodeAt( i ).toString();
+      return number;
+   },
+
    convertData : function(data, columns) {
       var converted = [];
+      var valuesSeen = [];
+
       for (var i = 0; i < data.length; i++) {
          var row = data[i];
          var convertedRow = [];
@@ -373,8 +408,10 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
             if ( columns[j].type === 'gender' ) {
                if ( value.toUpperCase() === 'M' ) {
                   convertedValue = 1;
-               } else {
+               } else if ( value.toUpperCase() === 'F' ) {
                   convertedValue = 0;
+               } else {
+                  convertedValue = 2;
                }
             } else if ( columns[j].type === 'numeric' ) {
                convertedValue = this.bin( 3, value, columns[j].range );
@@ -383,6 +420,19 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
                   convertedValue = 1;
                } else if ( value.toUpperCase() === 'N' || value === '0' ) {
                   convertedValue = 0;
+               } else {
+                  convertedValue = 2;
+               }
+            } else if ( columns[j].type === 'count' ) {
+
+               // probably a factor
+               if ( isNaN( parseInt( convertedValue ) ) ) {
+
+                  if ( valuesSeen.indexOf( convertedValue ) < 0 ) {
+                     valuesSeen.push( convertedValue );
+                  }
+
+                  convertedValue = valuesSeen.indexOf( convertedValue );
                }
             }
             convertedRow.push( convertedValue );
