@@ -16,7 +16,6 @@
 package ubc.pavlab.aspiredb.server.project;
 
 import gemma.gsec.SecurityService;
-import gemma.gsec.acl.domain.AclObjectIdentity;
 import gemma.gsec.acl.domain.AclService;
 import gemma.gsec.authentication.UserDetailsImpl;
 import gemma.gsec.authentication.UserManager;
@@ -28,14 +27,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Acl;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -84,7 +82,8 @@ import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.restriction.SetRestriction;
 
 /**
- * TODO Document Me
+ * Class for project operations such as create, update, and delete. Project creation includes addition of subjects and
+ * variants.
  * 
  * @author cmcdonald
  * @version $Id: ProjectManagerImpl.java,v 1.33 2013/06/24 20:24:44 cmcdonald Exp $
@@ -404,7 +403,11 @@ public class ProjectManagerImpl implements ProjectManager {
             log.error( e );
         }
 
-        projectDao.remove( project );
+        try {
+            projectDao.remove( project );
+        } catch ( Exception e ) {
+            log.error( e );
+        }
 
         log.info( project + " has been deleted which took " + timer.getTime() + " ms" );
     }
@@ -470,6 +473,7 @@ public class ProjectManagerImpl implements ProjectManager {
         return populateProjectToProjectOverlap( projectName, overlappingProjectName, projToPopulateVvos.getItems() );
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     @Transactional
     public Collection<Variant2VariantOverlap> populateProjectToProjectOverlap( String projectName,
@@ -549,41 +553,6 @@ public class ProjectManagerImpl implements ProjectManager {
         v.setExternalId( vvo.getExternalId() );
     }
 
-    private void addSubjectVariantToProject( Project project, String patientId, Variant v, Boolean specialProject ) {
-
-        if ( v == null || project == null ) {
-            log.warn( "Variant or project is null" );
-            return;
-        }
-
-        Subject subject = v.getSubject();
-        if ( v.getSubject() == null ) {
-            subject = subjectDao.findByPatientId( project, patientId );
-        }
-
-        boolean newSubject = false;
-        if ( subject == null ) {
-            newSubject = true;
-            subject = new Subject();
-            subject.setPatientId( patientId );
-            subject = subjectDao.create( subject );
-        }
-
-        if ( !specialProject && ( v.getUserVariantId() == null || v.getUserVariantId().trim().isEmpty() ) ) {
-            v.setUserVariantId( getNewVariantId( patientId ) );
-        }
-
-        v = variantDao.create( v );
-        v.setSubject( subject );
-        subject.addVariant( v );
-
-        if ( newSubject ) {
-            subject.getProjects().add( project );
-        }
-
-        subjectDao.update( subject );
-    }
-
     /**
      * public Collection<String> getUsersForProject(String projectName){ Project proj = projectDao.findByProjectName(
      * projectName ); return securityservice.readableBy(proj ); }
@@ -594,7 +563,6 @@ public class ProjectManagerImpl implements ProjectManager {
         List<Subject> subjects = project.getSubjects();
 
         if ( grant ) {
-            Acl acl = aclService.readAclById( new AclObjectIdentity( project ) );
             securityService.makeWriteableByGroup( project, groupName );
         } else {
             securityService.makeUnreadableByGroup( project, groupName );
@@ -607,35 +575,6 @@ public class ProjectManagerImpl implements ProjectManager {
             } else {
                 securityService.makeUnreadableByGroup( s, groupName );
             }
-
-            // Bug 4230. Removed Variant ACLs because upload is too slow.
-            // for ( Variant v : s.getVariants() ) {
-            //
-            // if ( grant ) {
-            // securityService.makeWriteableByGroup( v, groupName );
-            // } else {
-            // securityService.makeUnreadableByGroup( v, groupName );
-            // }
-            //
-            // for ( Characteristic c : v.getCharacteristics() ) {
-            // if ( grant ) {
-            // securityService.makeWriteableByGroup( c, groupName );
-            // } else {
-            // securityService.makeUnreadableByGroup( c, groupName );
-            // }
-            //
-            // }
-            //
-            // }
-
-            // Bug 4230. Removed Phenotype ACLs because upload is too slow.
-            // for ( Phenotype phen : s.getPhenotypes() ) {
-            // if ( grant ) {
-            // securityService.makeWriteableByGroup( phen, groupName );
-            // } else {
-            // securityService.makeUnreadableByGroup( phen, groupName );
-            // }
-            // }
 
         }
     }
@@ -688,87 +627,69 @@ public class ProjectManagerImpl implements ProjectManager {
         log.info( "phenotypeDao.create took " + timer.getTime() + " ms for " + phenotypes.size() + " phenotypes" );
     }
 
-    @Transactional
-    private Variant createSubjectVariantFromCNVValueObject( Project project, CNVValueObject cnv, Boolean specialProject ) {
+    private void writeIndelValueObjects( Project project, Collection<VariantValueObject> vos,
+            Map<String, Subject> patientIdEntityMap, Boolean specialProject ) {
 
-        CNV cnvEntity;
+        for ( VariantValueObject vo : vos ) {
+            IndelValueObject indel = ( IndelValueObject ) vo;
+            Indel indelEntity = ( Indel ) getVariant( indel );
 
-        if ( specialProject ) {
-            cnvEntity = ( CNV ) getSpecialProjectVariant( cnv );
-        } else {
-            cnvEntity = ( CNV ) getVariant( cnv );
+            if ( specialProject ) {
+                indelEntity = ( Indel ) getSpecialProjectVariant( indel );
+            } else {
+                indelEntity = ( Indel ) getVariant( indel );
+            }
+
+            indelEntity.setIndelLength( indel.getIndelLength() );
+
+            indelEntity.setSubject( patientIdEntityMap.get( vo.getPatientId() ) );
+
+            patientIdEntityMap.get( vo.getPatientId() ).addVariant( indelEntity );
+
+            vo.setId( variantDao.create( indelEntity ).getId() );
         }
-        cnvEntity.setType( CnvType.valueOf( cnv.getType().toUpperCase() ) );
-        cnvEntity.setCopyNumber( cnv.getCopyNumber() );
-        cnvEntity.setCnvLength( cnv.getCnvLength() );
-
-        if ( cnvEntity.getId() == null ) {
-            addSubjectVariantToProject( project, cnv.getPatientId(), cnvEntity, specialProject );
-        }
-
-        return cnvEntity;
     }
 
     @Transactional
-    private Variant createSubjectVariantFromIndelValueObject( Project project, IndelValueObject indel,
-            Boolean specialProject ) {
+    private void writeInversionValueObjects( Project project, Collection<VariantValueObject> vos,
+            Map<String, Subject> patientIdEntityMap, Boolean specialProject ) {
 
-        Indel indelEntity = ( Indel ) getVariant( indel );
+        for ( VariantValueObject vo : vos ) {
+            InversionValueObject inversion = ( InversionValueObject ) vo;
+            Inversion inversionEntity = ( Inversion ) getVariant( inversion );
 
-        if ( specialProject ) {
-            indelEntity = ( Indel ) getSpecialProjectVariant( indel );
-        } else {
-            indelEntity = ( Indel ) getVariant( indel );
+            if ( specialProject ) {
+                inversionEntity = ( Inversion ) getSpecialProjectVariant( inversion );
+            } else {
+                inversionEntity = ( Inversion ) getVariant( inversion );
+            }
+            patientIdEntityMap.get( vo.getPatientId() ).addVariant( inversionEntity );
+
+            vo.setId( variantDao.create( inversionEntity ).getId() );
         }
-
-        indelEntity.setIndelLength( indel.getIndelLength() );
-
-        if ( indelEntity.getId() == null ) {
-            addSubjectVariantToProject( project, indel.getPatientId(), indelEntity, specialProject );
-        }
-
-        return indelEntity;
     }
 
-    @Transactional
-    private Variant createSubjectVariantFromInversionValueObject( Project project, InversionValueObject inversion,
-            Boolean specialProject ) {
+    private void writeSNVValueObjects( Project project, Collection<VariantValueObject> vos,
+            Map<String, Subject> patientIdEntityMap, Boolean specialProject ) {
 
-        Inversion inversionEntity = ( Inversion ) getVariant( inversion );
+        for ( VariantValueObject vo : vos ) {
+            SNVValueObject snv = ( SNVValueObject ) vo;
+            SNV snvEntity = null;
+            if ( specialProject ) {
+                snvEntity = ( SNV ) getSpecialProjectVariant( snv );
+            } else {
+                snvEntity = ( SNV ) getVariant( snv );
+            }
+            snvEntity.setReferenceBase( snv.getReferenceBase() );
+            snvEntity.setObservedBase( snv.getObservedBase() );
+            snvEntity.setDbSNPID( snv.getDbSNPID() );
 
-        if ( specialProject ) {
-            inversionEntity = ( Inversion ) getSpecialProjectVariant( inversion );
-        } else {
-            inversionEntity = ( Inversion ) getVariant( inversion );
+            snvEntity.setSubject( patientIdEntityMap.get( vo.getPatientId() ) );
+
+            patientIdEntityMap.get( vo.getPatientId() ).addVariant( snvEntity );
+
+            vo.setId( variantDao.create( snvEntity ).getId() );
         }
-
-        if ( inversionEntity.getId() == null ) {
-            addSubjectVariantToProject( project, inversion.getPatientId(), inversionEntity, specialProject );
-        }
-
-        return inversionEntity;
-    }
-
-    @Transactional
-    private Variant createSubjectVariantFromSNVValueObject( Project project, SNVValueObject snv, Boolean specialProject ) {
-        SNV snvEntity;
-
-        if ( specialProject ) {
-            snvEntity = ( SNV ) getSpecialProjectVariant( snv );
-        } else {
-            snvEntity = ( SNV ) getVariant( snv );
-        }
-
-        snvEntity.setReferenceBase( snv.getReferenceBase() );
-        snvEntity.setObservedBase( snv.getObservedBase() );
-
-        snvEntity.setDbSNPID( snv.getDbSNPID() );
-
-        if ( snvEntity.getId() == null ) {
-            addSubjectVariantToProject( project, snv.getPatientId(), snvEntity, specialProject );
-        }
-
-        return snvEntity;
     }
 
     public void createSubjectVariantsFromVariantValueObjects( Project project, List<VariantValueObject> voList ) {
@@ -809,48 +730,50 @@ public class ProjectManagerImpl implements ProjectManager {
     @Transactional
     public void createSubjectVariantsFromVariantValueObjects( Project project, List<VariantValueObject> voList,
             Boolean specialProject ) {
+
         log.info( "Adding " + voList.size() + " value objects" );
-        int counter = 0;
-
-        Collection<Variant> variants = new HashSet<>();
-
         Collection<String> patientIds = extractPatientIds( voList );
-        Collection<Subject> subjects = findOrCreateByPatientIds( project, patientIds ).values();
+        Map<String, Subject> patientIdEntityMap = findOrCreateByPatientIds( project, patientIds );
 
-        for ( VariantValueObject vo : voList ) {
-
-            Variant v = null;
-
-            if ( vo instanceof CNVValueObject ) {
-                v = createSubjectVariantFromCNVValueObject( project, ( CNVValueObject ) vo, specialProject );
-            } else if ( vo instanceof SNVValueObject ) {
-                v = createSubjectVariantFromSNVValueObject( project, ( SNVValueObject ) vo, specialProject );
-            } else if ( vo instanceof IndelValueObject ) {
-                v = createSubjectVariantFromIndelValueObject( project, ( IndelValueObject ) vo, specialProject );
-            } else if ( vo instanceof InversionValueObject ) {
-                v = createSubjectVariantFromInversionValueObject( project, ( InversionValueObject ) vo, specialProject );
-            } else {
-                log.error( "unsupported VariantValueObject" );
-            }
-
-            // if ( v != null ) {
-            // variants.add( v );
-            // }
-
-            vo.setId( v.getId() );
-
-            counter++;
-
-            if ( counter % 500 == 0 ) {
-                log.info( "Added " + counter + " variants" );
-            }
+        if ( voList.size() == 0 ) {
+            log.warn( "No variants to add!" );
+            return;
         }
 
-        // StopWatch timer = new StopWatch();
-        // timer.start();
-        // variantDao.create( variants );
-        // log.info( "variantDao.create took " + timer.getTime() + " ms for " + subjects.size() + " subjects and "
-        // + variants.size() + " variants" );
+        if ( voList.iterator().next() instanceof CNVValueObject ) {
+            writeCNVValueObjects( project, voList, patientIdEntityMap, specialProject );
+        } else if ( voList.iterator().next() instanceof SNVValueObject ) {
+            writeSNVValueObjects( project, voList, patientIdEntityMap, specialProject );
+        } else if ( voList.iterator().next() instanceof IndelValueObject ) {
+            writeIndelValueObjects( project, voList, patientIdEntityMap, specialProject );
+        } else if ( voList.iterator().next() instanceof InversionValueObject ) {
+            writeInversionValueObjects( project, voList, patientIdEntityMap, specialProject );
+        } else {
+            log.warn( "TODO Not implemented yet!" );
+        }
+    }
+
+    private void writeCNVValueObjects( Project project, Collection<VariantValueObject> vos,
+            Map<String, Subject> patientIdEntityMap, Boolean specialProject ) {
+
+        for ( VariantValueObject vo : vos ) {
+            CNVValueObject cnv = ( CNVValueObject ) vo;
+            CNV cnvEntity = null;
+            if ( specialProject ) {
+                cnvEntity = ( CNV ) getSpecialProjectVariant( cnv );
+            } else {
+                cnvEntity = ( CNV ) getVariant( cnv );
+            }
+            cnvEntity.setType( CnvType.valueOf( cnv.getType().toUpperCase() ) );
+            cnvEntity.setCopyNumber( cnv.getCopyNumber() );
+            cnvEntity.setCnvLength( cnv.getCnvLength() );
+
+            cnvEntity.setSubject( patientIdEntityMap.get( vo.getPatientId() ) );
+
+            patientIdEntityMap.get( vo.getPatientId() ).addVariant( cnvEntity );
+
+            vo.setId( variantDao.create( cnvEntity ).getId() );
+        }
 
     }
 
@@ -880,22 +803,6 @@ public class ProjectManagerImpl implements ProjectManager {
 
         return genomicLocation;
 
-    }
-
-    private String getNewVariantId( String patientId ) {
-        String userVariantId;
-        int ridiculousnessCount = 0;
-        do {
-            userVariantId = RandomStringUtils.randomAlphanumeric( 6 );
-
-            ridiculousnessCount++;
-            if ( ridiculousnessCount > 1000 ) {
-                log.error( "This is ridiculous" );
-                break;
-            }
-        } while ( variantDao.findByUserVariantId( userVariantId, patientId ) != null );
-
-        return userVariantId;
     }
 
     private ProjectFilterConfig getProjectFilterConfigById( Project p ) {

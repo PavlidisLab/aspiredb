@@ -112,9 +112,6 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
     @Transactional(readOnly = true)
     public Subject findByPatientId( Project project, String patientId ) {
 
-        // make sure that any creates are saved before we do a lookup
-        this.getSessionFactory().getCurrentSession().flush();
-
         Query query = this
                 .getSessionFactory()
                 .getCurrentSession()
