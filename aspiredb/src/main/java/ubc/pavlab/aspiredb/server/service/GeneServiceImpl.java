@@ -159,6 +159,7 @@ public class GeneServiceImpl implements GeneService {
 
         StopWatch timer = new StopWatch();
         timer.start();
+        int genesFound = 0;
 
         Map<Long, Collection<GeneValueObject>> results = new HashMap<>();
 
@@ -190,11 +191,13 @@ public class GeneServiceImpl implements GeneService {
                     results.put( variant.getId(), new ArrayList<GeneValueObject>() );
                 }
                 results.get( variant.getId() ).addAll( genesInsideRange );
+
+                genesFound += genesInsideRange.size();
             }
         }
 
-        // log.info( "Found " + genesFound + " genes that overlap " + results.size() + " variants in "
-        // + variantBin.keySet().size() + " bins (" + timer.getTime() + " ms)" );
+        log.info( "Found " + genesFound + " genes that overlap " + results.size() + " variants in "
+                + variantBin.keySet().size() + " bins (" + timer.getTime() + " ms)" );
 
         return results;
     }

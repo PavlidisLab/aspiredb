@@ -743,13 +743,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       var selectedRecords = grid.getSelectionModel().getSelection();
 
       if ( selectedRecords.length > 0 ) {
-         grid.getView().focusRow( grid.store.indexOfId( selectedRecords[0].data.id ) );
-         // use just to make sure selected record is at the top
-         grid.getView().scrollBy( {
-            x : 0,
-            y : 1000
-         } );
-         grid.getView().focusRow( grid.store.indexOfId( selectedRecords[0].data.id ) );
+         grid.getView().bufferedRenderer.scrollTo( grid.store.indexOfId( selectedRecords[0].data.id ) );
       }
    },
 

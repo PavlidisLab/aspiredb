@@ -81,6 +81,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             storeId : 'variantGrid',
             fields : fieldData,
             data : storeData,
+            pageSize : 100,
          // groupField : 'patientId'
 
          } );
@@ -260,6 +261,12 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             itemId : 'variantGrid',
             columns : columnConfig,
             columnHeaders : columnHeaders,
+            plugins : {
+               ptype : 'bufferedrenderer',
+               trailingBufferZone : 20, // Keep 20 rows rendered in the table behind scroll
+               leadingBufferZone : 50
+            // Keep 50 rows rendered in the table ahead of scroll
+            },
             // multiSelect : true,
 
             listeners : {
