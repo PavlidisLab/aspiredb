@@ -76,8 +76,18 @@ public class LabelValueObject implements Displayable, Serializable {
     public String getHtmlLabel() {
         // String fontcolor = ( Integer.parseInt( this.colour, 16 ) > 0xffffff / 2 ) ? "black" : "white";
         String fontcolor = "white";
-        return "<font color=" + fontcolor + "><span style='background-color: " + this.colour + "'>&nbsp&nbsp"
+        String backgroundColor = this.colour;
+        try {
+            // is the color in hex?
+            Integer.parseInt( this.colour, 16 );
+            backgroundColor = "#" + backgroundColor;
+        } catch ( NumberFormatException nfe ) {
+            // nope
+        }
+
+        return "<font color=" + fontcolor + "><span style='background-color: " + backgroundColor + "'>&nbsp&nbsp"
                 + this.name + "&nbsp&nbsp</span></font>&nbsp&nbsp&nbsp";
+
     }
 
     public Long getId() {
