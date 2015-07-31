@@ -16,17 +16,12 @@ package ubc.pavlab.aspiredb.server.model;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.OneToMany;
 
 import ubc.pavlab.aspiredb.shared.CNVValueObject;
 import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
@@ -69,9 +64,13 @@ public class CNV extends Variant {
     @Column(name = "CNV_LENGTH")
     private Integer cnvLength;
 
-    @OneToMany(cascade = javax.persistence.CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "CNV_LOC", joinColumns = { @JoinColumn(name = "VARIANT_FK") }, inverseJoinColumns = { @JoinColumn(name = "LOC_FK") })
-    private List<GenomicLocation> targetLocations;
+    /*
+     * @OneToMany(cascade = javax.persistence.CascadeType.ALL, fetch = FetchType.EAGER)
+     * 
+     * @JoinTable(name = "CNV_LOC", joinColumns = { @JoinColumn(name = "VARIANT_FK") }, inverseJoinColumns = {
+     * 
+     * @JoinColumn(name = "LOC_FK") }) private List<GenomicLocation> targetLocations;
+     */
 
     public CNV() {
     }
@@ -84,9 +83,9 @@ public class CNV extends Variant {
         return copyNumber;
     }
 
-    public List<GenomicLocation> getTargetLocations() {
-        return targetLocations;
-    }
+    /*
+     * public List<GenomicLocation> getTargetLocations() { return targetLocations; }
+     */
 
     public CnvType getType() {
         return type;
@@ -100,9 +99,10 @@ public class CNV extends Variant {
         this.copyNumber = copyNumber;
     }
 
-    public void setTargetLocations( List<GenomicLocation> targetLocations ) {
-        this.targetLocations = targetLocations;
-    }
+    /*
+     * public void setTargetLocations( List<GenomicLocation> targetLocations ) { this.targetLocations = targetLocations;
+     * }
+     */
 
     public void setType( CnvType type ) {
         this.type = type;

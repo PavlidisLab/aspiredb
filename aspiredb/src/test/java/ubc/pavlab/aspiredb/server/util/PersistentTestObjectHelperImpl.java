@@ -204,7 +204,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         targetLocations.add( targLocation );
         targetLocations.add( targLocation2 );
 
-        cnv.setTargetLocations( targetLocations );
+        // cnv.setTargetLocations( targetLocations );
 
         cnv.setType( CnvType.valueOf( "LOSS" ) );
 
@@ -249,7 +249,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
         targetLocations.add( targLocation );
 
-        cnv.setTargetLocations( targetLocations );
+        // cnv.setTargetLocations( targetLocations );
 
         cnv.setType( CnvType.valueOf( "LOSS" ) );
 
