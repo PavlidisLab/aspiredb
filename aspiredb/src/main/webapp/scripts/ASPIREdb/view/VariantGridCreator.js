@@ -416,13 +416,17 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
 
             // Concatenate gene symbols
             var geneSymbols = [];
-            for (var geneIdx = 0; geneIdx < variantGenes[vvo.id].length; geneIdx++) {
-               var g = variantGenes[vvo.id][geneIdx];
-               if ( g.geneBioType === "protein_coding" ) {
-                  geneSymbols.push( g.symbol );
+            if ( variantGenes != null && variantGenes[vvo.id] != null ) {
+               for (var geneIdx = 0; geneIdx < variantGenes[vvo.id].length; geneIdx++) {
+                  var g = variantGenes[vvo.id][geneIdx];
+                  if ( g.geneBioType === "protein_coding" ) {
+                     geneSymbols.push( g.symbol );
+                  }
                }
+               dataRow.push( geneSymbols.join( ',' ) );
+            } else {
+               dataRow.push( "" );
             }
-            dataRow.push( geneSymbols.join( ',' ) );
 
             for (var j = 0; j < characteristicNames.length; j++) {
 

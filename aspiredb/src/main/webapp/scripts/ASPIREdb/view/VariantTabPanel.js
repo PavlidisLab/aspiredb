@@ -479,7 +479,9 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                   errorHandler : function(message, exception) {
                      Ext.Msg.alert( 'Error', message )
                      console.log( message )
-                     console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
+                     // console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
+                     ref.createVariantGrid( vvos, properties, null )
+                     ref.setLoading( false );
                   }
                } );
 

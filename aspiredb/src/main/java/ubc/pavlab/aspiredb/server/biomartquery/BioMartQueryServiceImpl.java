@@ -227,7 +227,7 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
                 public void run() {
                     log.info( "Waiting for BioMart response ... " + timer.getTime() + " ms" );
                 }
-            }, 0, 10 * 1000 );
+            }, 0, 100 * 1000 );
 
             String response = sendRequest( xmlQueryWriter.toString() );
             uploadCheckerTimer.cancel();
