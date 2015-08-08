@@ -232,7 +232,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       // because extJS was
       // bugging out when we added the dynamically created
       // grid afterwords
-      ASPIREdb.EVENT_BUS.on( 'filter_submit', this.filterSubmitHandler, this );
+      // when subject filter submit
+      ASPIREdb.EVENT_BUS.on( 'construct_variant_grid', this.constructGrid, this );
 
       // when subject label change
       ASPIREdb.EVENT_BUS.on( 'variant_label_changed', this.variantLabelUpdateHandler, this );
@@ -415,7 +416,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
     * @param legendProperty -
     *           which legend to display in the ideogram (e.g. Variant Label)
     */
-   filterSubmitHandler : function(filterConfigs, legendProperty) {
+   constructGrid : function(filterConfigs, vos, properties, legendProperty) {
 
       var ref = this;
 
@@ -423,102 +424,90 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       ref.setLoading( true );
 
-      VariantService.suggestProperties( function(properties) {
+      var vvos = vos;
+      ref.loadedVariants = vvos;
+      // var variantPatientIds = [];
+      var projectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
 
-         QueryService.queryVariants( filterConfigs, {
-            callback : function(pageLoad) {
+      // for (var i = 0; i < vvos.length; i++) {
+      // if ( variantPatientIds.indexOf( vvos[i].patientId ) == -1 )
+      // variantPatientIds.push( VariantService.getSubjectVariants( projectId, vvos[i].patientId ) );
+      //
+      // }
 
-               var vvos = pageLoad.items;
-               ref.loadedVariants = vvos;
-               // var variantPatientIds = [];
-               var projectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
+      var variantIds = [];
 
-               // for (var i = 0; i < vvos.length; i++) {
-               // if ( variantPatientIds.indexOf( vvos[i].patientId ) == -1 )
-               // variantPatientIds.push( VariantService.getSubjectVariants( projectId, vvos[i].patientId ) );
-               //
-               // }
+      for (var k = 0; k < vvos.length; k++) {
+         variantIds.push( vvos[k].id );
+      }
 
-               var variantIds = [];
+      // GeneService.getGeneValueObjectsInsideVariants( variantIds, {
+      // callback : function(vos) {
+      // console.log( 'variant gene value objects' + vos );
 
-               for (var k = 0; k < vvos.length; k++) {
-                  variantIds.push( vvos[k].id );
-               }
+      // ASPIREdb.view.GeneHitsByVariantWindow.getComponent( 'geneHitsByVariantGrid'
+      // ).setLodedvariantvalueObjects(vos );
+      // ASPIREdb.view.GeneHitsByVariantWindow.populateGrid( vos );
 
-               // GeneService.getGeneValueObjectsInsideVariants( variantIds, {
-               // callback : function(vos) {
-               // console.log( 'variant gene value objects' + vos );
-
-               // ASPIREdb.view.GeneHitsByVariantWindow.getComponent( 'geneHitsByVariantGrid'
-               // ).setLodedvariantvalueObjects(vos );
-               // ASPIREdb.view.GeneHitsByVariantWindow.populateGrid( vos );
-
-               ProjectService.numVariants( filterConfigs[0].projectIds, {
-                  callback : function(NoOfVariants) {
-                     /*
-                      * if ( NoOfVariants > vvos.length ) { ref.setTitle( "Variant :" + vvos.length + " of " +
-                      * NoOfVariants + " filtered" ); } else if ( NoOfVariants == vvos.length ) ref.setTitle( "Variant" );
-                      */
-                     ref.down( '#statusbar' ).update(
-                        ref.loadedVariants.length + " / " + NoOfVariants + " variants loaded" );
-                  }
-               } );
-
-               var ideogram = ref.getComponent( 'ideogram' );
-               ideogram.drawChromosomes();
-               ideogram.drawVariants( vvos );
-
-               var d = new Date();
-               GeneService.getGenesPerVariant( variantIds, {
-                  callback : function(variantGenes) {
-                     ref.createVariantGrid( vvos, properties, variantGenes )
-                     ref.setLoading( false );
-                     console.log( 'Getting genes for ' + variantIds.length + ' variants took ' + (new Date() - d)
-                        + ' ms' )
-                  },
-                  errorHandler : function(message, exception) {
-                     Ext.Msg.alert( 'Error', message )
-                     console.log( message )
-                     // console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
-                     ref.createVariantGrid( vvos, properties, null )
-                     ref.setLoading( false );
-                  }
-               } );
-
-               var toolbar = ref.getDockedComponent( 'variantTabPanelToolbar' );
-
-               toolbar.add( ref.actionsButton );
-               toolbar.add( ref.labelsButton );
-               toolbar.add( ref.reportButton );
-               toolbar.add( ref.tbSeparator );
-
-               toolbar.add( ref.selectAllButton );
-               toolbar.add( ref.deselectAllButton );
-
-               toolbar.add( ref.colourVariantByCombo );
-               toolbar.add( ref.tbSpacer );
-
-               toolbar.add( ref.zoomInButton );
-               toolbar.add( ref.zoomOutButton );
-
-               toolbar.add( ref.tbFill );
-               toolbar.add( ref.saveButton );
-               toolbar.add( ref.exportButton );
-
-               // refresh the legend (e.g. Variant Labels) in ideogram
-               if ( legendProperty != null ) {
-                  ASPIREdb.EVENT_BUS.fireEvent( 'colorCoding_selected' );
-                  ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', legendProperty );
-                  ref.redrawIdeogram( legendProperty );
-               }
-
-               // }
-               // } );
-            }
-         } );
-
+      ProjectService.numVariants( filterConfigs[0].projectIds, {
+         callback : function(NoOfVariants) {
+            /*
+             * if ( NoOfVariants > vvos.length ) { ref.setTitle( "Variant :" + vvos.length + " of " + NoOfVariants + "
+             * filtered" ); } else if ( NoOfVariants == vvos.length ) ref.setTitle( "Variant" );
+             */
+            ref.down( '#statusbar' ).update( ref.loadedVariants.length + " / " + NoOfVariants + " variants loaded" );
+         }
       } );
 
+      var ideogram = ref.getComponent( 'ideogram' );
+      ideogram.drawChromosomes();
+      ideogram.drawVariants( vvos );
+
+      var d = new Date();
+      GeneService.getGenesPerVariant( variantIds, {
+         callback : function(variantGenes) {
+            ref.createVariantGrid( vvos, properties, variantGenes )
+            ref.setLoading( false );
+            console.log( 'Getting genes for ' + variantIds.length + ' variants took ' + (new Date() - d) + ' ms' )
+         },
+         errorHandler : function(message, exception) {
+            // Ext.Msg.alert( 'Error', message )
+            console.log( message )
+            // console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
+            ref.createVariantGrid( vvos, properties, null )
+            ref.setLoading( false );
+         }
+      } );
+
+      var toolbar = ref.getDockedComponent( 'variantTabPanelToolbar' );
+
+      toolbar.add( ref.actionsButton );
+      toolbar.add( ref.labelsButton );
+      toolbar.add( ref.reportButton );
+      toolbar.add( ref.tbSeparator );
+
+      toolbar.add( ref.selectAllButton );
+      toolbar.add( ref.deselectAllButton );
+
+      toolbar.add( ref.colourVariantByCombo );
+      toolbar.add( ref.tbSpacer );
+
+      toolbar.add( ref.zoomInButton );
+      toolbar.add( ref.zoomOutButton );
+
+      toolbar.add( ref.tbFill );
+      toolbar.add( ref.saveButton );
+      toolbar.add( ref.exportButton );
+
+      // refresh the legend (e.g. Variant Labels) in ideogram
+      if ( legendProperty != null ) {
+         ASPIREdb.EVENT_BUS.fireEvent( 'colorCoding_selected' );
+         ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', legendProperty );
+         ref.redrawIdeogram( legendProperty );
+      }
+
+      // }
+      // } );
    },
 
    /**

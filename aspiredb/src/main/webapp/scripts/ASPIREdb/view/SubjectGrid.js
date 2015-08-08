@@ -218,7 +218,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       }, this );
 
       // when subject filter submit
-      ASPIREdb.EVENT_BUS.on( 'filter_submit', this.filterSubmitHandler, this );
+      ASPIREdb.EVENT_BUS.on( 'construct_subject_grid', this.constructGrid, this );
 
       // when subject selected
       // this.on( 'selectionchange', me.selectionChangeHandler, me );
@@ -238,6 +238,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
          me.getView().refresh();
 
       }, this );
+
    },
 
    selectSubjectHandler : function(subjectIds) {
@@ -283,87 +284,78 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
     *           subject filter configurations
     * 
     */
-   filterSubmitHandler : function(filterConfigs) {
+   constructGrid : function(filterConfigs, vos) {
 
       var me = this;
-      me.filterConfigs = filterConfigs;
+      me.valueObjects = vos;
       me.setLoading( true );
       me.getStore().removeAll();
 
-      // DWR : get subjects match the subject filter
-      // configuration
-      QueryService.querySubjects( filterConfigs, {
-         callback : function(pageLoad) {
-            me.valueObjects = pageLoad.items;
+      // load existing subject labels
+      me.visibleLabels = me.createVisibleLabels( me.valueObjects );
 
-            // load existing subject labels
-            me.visibleLabels = me.createVisibleLabels( me.valueObjects );
+      var data = [];
 
-            var data = [];
+      console.log( me.valueObjects.length + " subjects being processed into value objects" );
+      // find the number of subjects
+      // filtered
 
-            console.log( me.valueObjects.length + " subjects being processed into value objects" );
-            // find the number of subjects
-            // filtered
-
-            ProjectService.numSubjects( filterConfigs[0].projectIds, {
-               callback : function(NoOfSubjects) {
-                  /*
-                   * if ( NoOfSubjects > me.valueObjects.length ) { me.setTitle( "Subject :" + me.valueObjects.length + "
-                   * of " + NoOfSubjects + " filtered" ); } else if ( NoOfSubjects == me.valueObjects.length )
-                   * me.setTitle( "Subject" );
-                   */
-                  me.down( '#statusbar' ).update( me.valueObjects.length + " / " + NoOfSubjects + " subjects loaded" );
-               }
-            } );
-
-            for (var i = 0; i < me.valueObjects.length; i++) {
-               var val = me.valueObjects[i];
-
-               // create only one unique
-               // label instance
-               var labelIds = [];
-
-               for (var j = 0; j < val.labels.length; j++) {
-                  var aLabel = me.visibleLabels[val.labels[j].id];
-
-                  // this happens when a
-                  // label has been
-                  // assigned
-                  // by the admin and the
-                  // user has no
-                  // permissions
-                  // to modify the label
-                  if ( aLabel === undefined ) {
-                     aLabel = val.labels[j];
-                  }
-
-                  labelIds.push( aLabel.id );
-               }
-
-               // create summary of number
-               // of variants
-               var row = [ val.id, val.patientId, labelIds, val.variants, val.numOfPhenotypes ];
-               data.push( row );
-            }
-
-            me.store.loadData( data );
-
-            me.setLoading( false );
-
-            // refresh grid
-            me.getView().refresh();
-
-            var ids = [];
-            for (var k = 0; k < me.valueObjects.length; k++) {
-               var o = me.valueObjects[k];
-               ids.push( o.id );
-            }
-
-            console.log( ids.length + " subjects loaded" );
-            ASPIREdb.EVENT_BUS.fireEvent( 'subjects_loaded', ids );
-
+      ProjectService.numSubjects( filterConfigs[0].projectIds, {
+         callback : function(NoOfSubjects) {
+            /*
+             * if ( NoOfSubjects > me.valueObjects.length ) { me.setTitle( "Subject :" + me.valueObjects.length + " of " +
+             * NoOfSubjects + " filtered" ); } else if ( NoOfSubjects == me.valueObjects.length ) me.setTitle( "Subject" );
+             */
+            me.down( '#statusbar' ).update( me.valueObjects.length + " / " + NoOfSubjects + " subjects loaded" );
          }
       } );
+
+      for (var i = 0; i < me.valueObjects.length; i++) {
+         var val = me.valueObjects[i];
+
+         // create only one unique
+         // label instance
+         var labelIds = [];
+
+         for (var j = 0; j < val.labels.length; j++) {
+            var aLabel = me.visibleLabels[val.labels[j].id];
+
+            // this happens when a
+            // label has been
+            // assigned
+            // by the admin and the
+            // user has no
+            // permissions
+            // to modify the label
+            if ( aLabel === undefined ) {
+               aLabel = val.labels[j];
+            }
+
+            labelIds.push( aLabel.id );
+         }
+
+         // create summary of number
+         // of variants
+         var row = [ val.id, val.patientId, labelIds, val.variants, val.numOfPhenotypes ];
+         data.push( row );
+      }
+
+      me.store.loadData( data );
+
+      me.setLoading( false );
+
+      // refresh grid
+      me.getView().refresh();
+
+      var ids = [];
+      for (var k = 0; k < me.valueObjects.length; k++) {
+         var o = me.valueObjects[k];
+         ids.push( o.id );
+      }
+
+      console.log( ids.length + " subjects loaded" );
+      ASPIREdb.EVENT_BUS.fireEvent( 'subjects_loaded', ids );
+
    },
 
    /**

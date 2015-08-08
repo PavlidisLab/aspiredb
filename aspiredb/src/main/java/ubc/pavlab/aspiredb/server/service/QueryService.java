@@ -100,6 +100,9 @@ public interface QueryService {
     public Map<Integer, Integer> getSubjectVariantCounts( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException;
 
+    public Map<Integer, Collection<Object>> getSubjectsVariants( Set<AspireDbFilterConfig> filters )
+            throws NotLoggedInException, ExternalDependencyException;
+
     Query getQuery( Long id );
 
     Map<Integer, Integer> getSubjectGenes( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException,

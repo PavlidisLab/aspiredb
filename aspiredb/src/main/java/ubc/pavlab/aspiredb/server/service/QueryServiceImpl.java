@@ -250,11 +250,11 @@ public class QueryServiceImpl implements QueryService {
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
-    public Map<Integer, Integer> getSubjectVariantCounts( Set<AspireDbFilterConfig> filters )
+    public Map<Integer, Collection<Object>> getSubjectsVariants( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException {
 
         Map<Integer, Collection<Long>> svIds = new HashMap<>();
-        Map<Integer, Integer> ret = new HashMap<>();
+        Map<Integer, Collection<Object>> ret = new HashMap<>();
 
         Set<Long> svoIds = new HashSet<Long>();
         Set<Long> vvoIds = new HashSet<Long>();
@@ -318,8 +318,33 @@ public class QueryServiceImpl implements QueryService {
         subjectCount = svoIds.size();
         variantCount = vvoIds.size();
 
-        ret.put( VariantDao.SUBJECT_IDS_KEY, subjectCount );
-        ret.put( VariantDao.VARIANT_IDS_KEY, variantCount );
+        Collection<Object> retSvos = new ArrayList<>();
+        for ( Subject s : subjectDao.load( svoIds ) ) {
+            retSvos.add( s.convertToValueObjectWithPhenotypes() );
+        }
+        Collection<Object> retVvos = new ArrayList<>();
+        for ( Variant v : variantDao.load( vvoIds ) ) {
+            retVvos.add( v.toValueObject() );
+        }
+
+        ret.put( VariantDao.SUBJECT_IDS_KEY, retSvos );
+        ret.put( VariantDao.VARIANT_IDS_KEY, retVvos );
+
+        return ret;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @RemoteMethod
+    public Map<Integer, Integer> getSubjectVariantCounts( Set<AspireDbFilterConfig> filters )
+            throws NotLoggedInException, ExternalDependencyException {
+
+        Map<Integer, Integer> ret = new HashMap<>();
+
+        Map<Integer, Collection<Object>> vos = getSubjectsVariants( filters );
+
+        ret.put( VariantDao.SUBJECT_IDS_KEY, vos.get( VariantDao.SUBJECT_IDS_KEY ).size() );
+        ret.put( VariantDao.VARIANT_IDS_KEY, vos.get( VariantDao.VARIANT_IDS_KEY ).size() );
 
         return ret;
     }

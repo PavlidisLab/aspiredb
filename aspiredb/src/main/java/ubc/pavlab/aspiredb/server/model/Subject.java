@@ -111,6 +111,12 @@ public class Subject implements Serializable, SecuredChild {
         valueObject.setId( this.getId() );
         valueObject.setPatientId( this.getPatientId() );
         valueObject.setLabels( Label.toValueObjects( this.getLabels() ) );
+        if ( this.getVariants() != null ) {
+            valueObject.setVariants( this.getVariants().size() );
+        }
+        if ( this.getPhenotypes() != null ) {
+            valueObject.setNumOfPhenotypes( this.getPhenotypes().size() );
+        }
 
         // Map<String, PhenotypeValueObject> map = new HashMap<String, PhenotypeValueObject>();
         //
@@ -128,6 +134,7 @@ public class Subject implements Serializable, SecuredChild {
         valueObject.setId( this.getId() );
         valueObject.setPatientId( this.getPatientId() );
         valueObject.setLabels( Label.toValueObjects( this.getLabels() ) );
+        valueObject.setVariants( this.getVariants().size() );
 
         Map<String, PhenotypeValueObject> map = new HashMap<String, PhenotypeValueObject>();
         for ( Phenotype phenotype : phenotypes ) {
@@ -136,6 +143,8 @@ public class Subject implements Serializable, SecuredChild {
         }
 
         valueObject.setPhenotypes( map );
+        valueObject.setNumOfPhenotypes( map.size() );
+
         return valueObject;
     }
 

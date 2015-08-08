@@ -24,6 +24,8 @@ Ext
          constrain : true,
          config : {
             isOverlapedProjects : 'No',
+            SUBJECT_IDS_KEY : 0,
+            VARIANT_IDS_KEY : 1,
          },
 
          initComponent : function() {
@@ -190,7 +192,6 @@ Ext
                                    itemId : 'applyButton',
                                    handler : function() {
                                       var filterConfigs = me.getFilterConfigs();
-                                      console.log( "filter_submit event from FilterWindow" );
                                       ASPIREdb.EVENT_BUS.fireEvent( 'filter_submit', filterConfigs );
                                       me.close();
                                    }
@@ -222,6 +223,8 @@ Ext
             this.enableDisableQueryManager();
 
             this.down( '#savedQueryComboBox' ).on( 'select', this.savedQueryComboBoxSelectHandler, this );
+
+            ASPIREdb.EVENT_BUS.on( 'filter_submit', this.filterSubmitHandler, this );
 
             ASPIREdb.EVENT_BUS.on( 'project_select', this.clearButtonHandler, this );
 
@@ -414,15 +417,12 @@ Ext
 
             var me = this;
 
-            var SUBJECT_IDS_KEY = 0;
-            var VARIANT_IDS_KEY = 1;
-
             me.setLoading( true );
 
             QueryService.getSubjectVariantCounts( this.getFilterConfigs(), {
                callback : function(totalCounts) {
-                  me.down( '#numberOfSubjectsLabel' ).setText( totalCounts[SUBJECT_IDS_KEY].toString() );
-                  me.down( '#numberOfVariantsLabel' ).setText( totalCounts[VARIANT_IDS_KEY].toString() );
+                  me.down( '#numberOfSubjectsLabel' ).setText( totalCounts[me.SUBJECT_IDS_KEY].toString() );
+                  me.down( '#numberOfVariantsLabel' ).setText( totalCounts[me.VARIANT_IDS_KEY].toString() );
 
                   if ( me.down( '#numberOfSubjectsLabel' ).getEl() && me.down( '#numberOfVariantsLabel' ).getEl() ) {
                      me.down( '#numberOfSubjectsLabel' ).getEl().setOpacity( 1, true );
@@ -432,6 +432,30 @@ Ext
                   }
 
                   me.setLoading( false );
+               },
+               errorHandler : function(errorString, exception) {
+                  me.setLoading( false );
+                  alert( errorString )
+                  console.log( dwr.util.toDescriptiveString( exception, 2 ) )
+                  console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
+               }
+            } );
+
+         },
+
+         filterSubmitHandler : function(filterConfigs) {
+
+            var me = this;
+
+            QueryService.getSubjectsVariants( filterConfigs, {
+               callback : function(ret) {
+
+                  VariantService.suggestProperties( function(properties) {
+                     ASPIREdb.EVENT_BUS.fireEvent( 'construct_variant_grid', filterConfigs, ret[me.VARIANT_IDS_KEY],
+                        properties );
+                  } );
+
+                  ASPIREdb.EVENT_BUS.fireEvent( 'construct_subject_grid', filterConfigs, ret[me.SUBJECT_IDS_KEY] );
                },
                errorHandler : function(errorString, exception) {
                   me.setLoading( false );
