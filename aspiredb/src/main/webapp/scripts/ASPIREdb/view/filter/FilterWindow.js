@@ -447,8 +447,14 @@ Ext
 
             var me = this;
 
+            var myMask = new Ext.LoadMask( Ext.getBody(), {
+               msg : "Loading..."
+            } );
+            myMask.show();
+
             QueryService.getSubjectsVariants( filterConfigs, {
                callback : function(ret) {
+                  myMask.hide();
 
                   VariantService.suggestProperties( function(properties) {
                      ASPIREdb.EVENT_BUS.fireEvent( 'construct_variant_grid', filterConfigs, ret[me.VARIANT_IDS_KEY],
@@ -456,9 +462,10 @@ Ext
                   } );
 
                   ASPIREdb.EVENT_BUS.fireEvent( 'construct_subject_grid', filterConfigs, ret[me.SUBJECT_IDS_KEY] );
+
                },
                errorHandler : function(errorString, exception) {
-                  me.setLoading( false );
+                  myMask.hide();
                   alert( errorString )
                   console.log( dwr.util.toDescriptiveString( exception, 2 ) )
                   console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )

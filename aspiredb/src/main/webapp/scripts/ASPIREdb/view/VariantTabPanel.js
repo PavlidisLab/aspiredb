@@ -422,7 +422,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       ref.filterConfigs = filterConfigs;
 
-      ref.setLoading( true );
+      // ref.setLoading( true );
 
       var vvos = vos;
       ref.loadedVariants = vvos;

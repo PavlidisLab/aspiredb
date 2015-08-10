@@ -17,8 +17,7 @@
  *
  */
 
-Ext.require( [ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings',
-              'Ext.grid.column.Column',
+Ext.require( [ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings', 'Ext.grid.column.Column',
               'ASPIREdb.view.NeurocartaGeneWindow', 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow',
               'ASPIREdb.view.PhenotypesContigencyTableWindow' ] );
 
@@ -220,11 +219,11 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
       sortchange : function(phenotypeGrid, sortinfo) {
 
          ASPIREdb.EVENT_BUS.fireEvent( 'allPhenoSummary_sorted' );
-         
-//         if ( sortinfo.dataIndex == 'allPhenoSummaryMap' )
-//            ASPIREdb.EVENT_BUS.fireEvent( 'allPhenoSummary_sorted' );
-//         if ( sortinfo.dataIndex == 'phenoSummaryMap' )
-//            ASPIREdb.EVENT_BUS.fireEvent( 'selectedPhenoSummary_sorted' );
+
+         // if ( sortinfo.dataIndex == 'allPhenoSummaryMap' )
+         // ASPIREdb.EVENT_BUS.fireEvent( 'allPhenoSummary_sorted' );
+         // if ( sortinfo.dataIndex == 'phenoSummaryMap' )
+         // ASPIREdb.EVENT_BUS.fireEvent( 'selectedPhenoSummary_sorted' );
       }
    },
 
@@ -243,7 +242,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
 
       ASPIREdb.EVENT_BUS.on( 'filter_submit', function() {
 
-         ref.setLoading( true );
+         // ref.setLoading( true );
          ref.getStore().removeAll();
 
       } );
