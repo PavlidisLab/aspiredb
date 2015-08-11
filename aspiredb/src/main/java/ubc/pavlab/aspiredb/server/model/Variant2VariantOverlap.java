@@ -23,6 +23,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.BatchSize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,7 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
  */
 @Entity
 @Table(name = "VARIANT2VARIANTOVERLAP")
+@BatchSize(size = 50)
 public class Variant2VariantOverlap implements Serializable {
 
     /**
@@ -50,8 +52,8 @@ public class Variant2VariantOverlap implements Serializable {
     private static Logger log = LoggerFactory.getLogger( Variant2VariantOverlap.class );
 
     @Id
-    @GeneratedValue
     @Column(name = "ID")
+    @GeneratedValue
     private Long id;
 
     @Column(name = "VARIANTID")

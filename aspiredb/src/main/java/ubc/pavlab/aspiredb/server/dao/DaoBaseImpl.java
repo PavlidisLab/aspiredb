@@ -60,11 +60,32 @@ public abstract class DaoBaseImpl<T> extends HibernateDaoSupport implements DaoB
     @Override
     @Transactional
     public Collection<? extends T> create( Collection<? extends T> entities ) {
+
+        // this.getHibernateTemplate().saveOrUpdateAll( entities );
+
+        final int BATCH_SIZE = 1024;
+
         nullCheck( entities );
         if ( entities.isEmpty() ) {
             return entities;
         }
-        this.getHibernateTemplate().saveOrUpdateAll( entities );
+        Session sess = this.getSessionFactory().getCurrentSession();
+
+        int count = 0;
+        for ( T e : entities ) {
+            sess.save( e );
+
+            if ( count % BATCH_SIZE == 0 ) {
+                sess.flush();
+                sess.clear();
+            }
+
+            count++;
+        }
+
+        sess.flush();
+        sess.clear();
+
         return entities;
     }
 

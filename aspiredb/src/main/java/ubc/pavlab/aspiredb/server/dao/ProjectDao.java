@@ -51,4 +51,18 @@ public interface ProjectDao extends SecurableDaoBase<Project> {
     @Secured({ "GROUP_USER" })
     public Integer getVariantCountForProjects( Collection<Long> projectIds );
 
+    /**
+     * @param projectId
+     * @return list of genomic location IDs for project
+     */
+    @Secured({ "GROUP_USER" })
+    public Collection<Object[]> getVariantLocationsForProjects( Long projectId );
+
+    /**
+     * @param projectId
+     * @return list of genomic location IDs for project
+     */
+    @Secured({ "GROUP_USER" })
+    public Collection<Long> getAllVariantsForProject( Long projectId );
+
 }

@@ -27,7 +27,7 @@ import ubc.pavlab.aspiredb.server.model.GenomicLocation;
  * @version $Id: GenomicLocationDaoImpl.java,v 1.7 2013/06/11 22:30:46 anton Exp $
  */
 @Repository
-public class GenomicLocationDaoImpl extends DaoBaseImpl<GenomicLocation> {
+public class GenomicLocationDaoImpl extends DaoBaseImpl<GenomicLocation> implements GenomicLocationDao {
 
     @Autowired
     public GenomicLocationDaoImpl( SessionFactory sessionFactory ) {

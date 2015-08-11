@@ -20,6 +20,7 @@ import org.springframework.security.access.annotation.Secured;
 
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
@@ -50,4 +51,7 @@ public interface VariantDaoBase<T extends Variant> extends DaoBase<T>, RemotePag
 
     void printCacheStatistics();
 
+    public Collection<Long> findByGenomicLocation( GenomicRange range );
+
+    public Collection<VariantValueObject> loadByGenomicLocationIDs( Collection<Long> genomicLocIDs );
 }

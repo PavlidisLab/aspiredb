@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ubc.pavlab.aspiredb.cli.InvalidDataException;
 import ubc.pavlab.aspiredb.server.dao.CharacteristicDao;
+import ubc.pavlab.aspiredb.server.dao.GenomicLocationDao;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
@@ -92,6 +93,9 @@ import ubc.pavlab.aspiredb.shared.query.restriction.SetRestriction;
 public class ProjectManagerImpl implements ProjectManager {
 
     protected static Log log = LogFactory.getLog( ProjectManagerImpl.class );
+
+    @Autowired
+    private GenomicLocationDao genomicLocDao;
 
     @Autowired
     private ProjectDao projectDao;
@@ -492,40 +496,50 @@ public class ProjectManagerImpl implements ProjectManager {
 
         Project projectToPopulate = projectDao.findByProjectName( projectName );
 
-        ProjectFilterConfig specialProjectFilterConfig = getProjectFilterConfigById( specialProject );
-
         ProjectFilterConfig projectToPopulateFilterConfig = getProjectFilterConfigById( projectToPopulate );
 
         Set<AspireDbFilterConfig> projSet = new HashSet<>();
         projSet.add( projectToPopulateFilterConfig );
 
-        // BoundedList<VariantValueObject> projToPopulateVvos = queryService.queryVariants( projSet );
-
         Collection<Variant2VariantOverlap> overlapVos = new HashSet<>();
+
+        Collection<Object[]> specialProjectLocationIDs = projectDao.getVariantLocationsForProjects( specialProject
+                .getId() );
+        Map<String, Set<Long>> specialProjectHash = new HashMap<>();
+        for ( Object[] binLocID : specialProjectLocationIDs ) {
+            String key = ( String ) binLocID[0]; // chr
+            long locID = ( long ) binLocID[1];
+            Set<Long> val = null;
+            if ( specialProjectHash.containsKey( key ) ) {
+                val = specialProjectHash.get( key );
+            } else {
+                val = new HashSet<>();
+                specialProjectHash.put( key, val );
+            }
+            val.add( locID ); // genomic_loc_ID
+        }
+
+        log.info( "Found " + specialProjectLocationIDs.size() + " variant locations in special project "
+                + specialProject.getName() );
 
         // This probably won't work for all variant types
         int i = 0;
         for ( VariantValueObject vvo : projToPopulateVvos ) {
 
-            Set<AspireDbFilterConfig> filters = new HashSet<>();
+            String key = vvo.getGenomicRange().getChromosome();
 
-            filters.add( specialProjectFilterConfig );
-            filters.add( getVariantFilterConfigForSingleVariant( vvo ) );
+            if ( !specialProjectHash.containsKey( key ) ) {
+                continue;
+            }
 
-            // BoundedList<VariantValueObject> overLappedVvos = queryService.queryVariants( filters );
-            Collection<Variant> overlappedVvos = variantDao.findByGenomicLocation( vvo.getGenomicRange(),
-                    Collections.singletonList( specialProject.getId() ) );
+            Set<Long> match = new HashSet<>( variantDao.findByGenomicLocation( vvo.getGenomicRange() ) );
+            match.retainAll( specialProjectHash.get( key ) );
 
-            for ( Variant v : overlappedVvos ) {
-                VariantValueObject vvoOverlapped = v.toValueObject();
-                // for ( VariantValueObject vvoOverlapped : overLappedVvos.getItems() ) {
-
+            // getting the variant IDs can be a bit slow ...
+            Collection<VariantValueObject> overlappedVvos = variantDao.loadByGenomicLocationIDs( match );
+            for ( VariantValueObject vvoOverlapped : overlappedVvos ) {
                 overlapVos.add( new Variant2VariantOverlap( vvo, vvoOverlapped, projectToPopulate.getId(),
                         specialProject.getId() ) );
-
-                // if ( overlapVos.size() % 100 == 0 ) {
-                // log.info( "Computed " + overlapVos.size() + " overlaps" );
-                // }
 
             }
 

@@ -150,9 +150,40 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
 
     @Override
     @Transactional(readOnly = true)
+    public Collection<Object[]> getVariantLocationsForProjects( Long projectId ) {
+
+        Query query = this
+                .getSessionFactory()
+                .getCurrentSession()
+                .createQuery(
+                        "select v.location.chromosome, v.location.id from Variant v join v.subject subject join subject.projects projs where projs.id = :id" );
+
+        query.setParameter( "id", projectId );
+
+        Collection<Object[]> locIDs = query.list();
+
+        return locIDs;
+
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Collection<Subject> getSubjects( Long projectId ) {
         Query query = this.getSessionFactory().getCurrentSession()
                 .createQuery( "select subject from Subject subject join subject.projects projs where projs.id = :id" );
+
+        query.setParameter( "id", projectId );
+
+        return query.list();
+    }
+
+    @Override
+    public Collection<Long> getAllVariantsForProject( Long projectId ) {
+        Query query = this
+                .getSessionFactory()
+                .getCurrentSession()
+                .createQuery(
+                        "select variant.id from Variant variant join variant.subject.projects projs where projs.id = :id" );
 
         query.setParameter( "id", projectId );
 
