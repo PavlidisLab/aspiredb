@@ -51,7 +51,6 @@ import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.NumericValue;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
-import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
 import ubc.pavlab.aspiredb.shared.query.Operator;
 import ubc.pavlab.aspiredb.shared.query.PhenotypeFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.ProjectFilterConfig;
@@ -109,44 +108,6 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
         // + StringUtils.collectionToCommaDelimitedString( cacheEntries.keySet() ) );
     }
 
-    // TODO Refactor this so we only have one findByGenomicLocation()
-    @Override
-    @Transactional(readOnly = true)
-    public Collection<Long> findByGenomicLocation( GenomicRange range ) {
-        SimpleRestriction restriction = new SimpleRestriction( new GenomicLocationProperty(), Operator.IS_IN_SET, range );
-        Session session = this.getSessionFactory().getCurrentSession();
-
-        // Criteria criteria = session.createCriteria( this.elementClass );
-        // criteria.createAlias( "location", "location" );
-        // criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
-        // .add( Restrictions.in( "project.id", activeProjectIds ) );
-        //
-        // criteria.add( CriteriaBuilder.buildCriteriaRestriction( restriction, CriteriaBuilder.EntityType.VARIANT ) );
-        //
-        // criteria.setProjection( Projections.distinct( Projections.id() ) );
-        // Collection<Long> variantIds = criteria.list();
-        //
-        // // load from cache if it exists
-        // Collection<T> variants = new HashSet<>();
-        // for ( Long id : variantIds ) {
-        // variants.add( ( T ) session.get( this.elementClass, id ) );
-        // }
-
-        List<Integer> bins = GenomeBin.relevantBins( range.getChromosome(), range.getBaseStart(), range.getBaseEnd() );
-        // String hql =
-        // "select variant.id from Variant variant inner join variant.location as location WHERE location.bin in (:bins) and location.chromosome=:chromosome and ((location.start>=:start and location.end<=:end) or (location.start<=:start and location.end>=:start) or (location.start<=:end and location.end>=:end))";
-        String hql = "select id from GenomicLocation location WHERE location.bin in (:bins) and location.chromosome=:chromosome and ((location.start>=:start and location.end<=:end) or (location.start<=:start and location.end>=:start) or (location.start<=:end and location.end>=:end))";
-        Query query = session.createQuery( hql );
-        query.setParameterList( "bins", bins );
-        query.setParameter( "chromosome", range.getChromosome() );
-        query.setParameter( "start", range.getBaseStart() );
-        query.setParameter( "end", range.getBaseEnd() );
-        Collection<Long> ids = query.list();
-
-        // List<T> variants = criteria.list();
-        return ids;
-    }
-
     @Override
     @Transactional(readOnly = true)
     public Collection<VariantValueObject> loadByGenomicLocationIDs( Collection<Long> genomicLocIDs ) {
@@ -177,8 +138,6 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
     @Override
     @Transactional(readOnly = true)
     public Collection<T> findByGenomicLocation( GenomicRange range, Collection<Long> activeProjectIds ) {
-        SimpleRestriction restriction = new SimpleRestriction( new GenomicLocationProperty(), Operator.IS_IN_SET, range );
-
         Session session = this.getSessionFactory().getCurrentSession();
 
         // Criteria criteria = session.createCriteria( this.elementClass );

@@ -532,7 +532,7 @@ public class ProjectManagerImpl implements ProjectManager {
                 continue;
             }
 
-            Set<Long> match = new HashSet<>( variantDao.findByGenomicLocation( vvo.getGenomicRange() ) );
+            Set<Long> match = new HashSet<>( genomicLocDao.findByGenomicLocation( vvo.getGenomicRange() ) );
             match.retainAll( specialProjectHash.get( key ) );
 
             // getting the variant IDs can be a bit slow ...

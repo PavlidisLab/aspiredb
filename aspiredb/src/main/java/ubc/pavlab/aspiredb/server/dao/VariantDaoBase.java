@@ -51,7 +51,5 @@ public interface VariantDaoBase<T extends Variant> extends DaoBase<T>, RemotePag
 
     void printCacheStatistics();
 
-    public Collection<Long> findByGenomicLocation( GenomicRange range );
-
     public Collection<VariantValueObject> loadByGenomicLocationIDs( Collection<Long> genomicLocIDs );
 }

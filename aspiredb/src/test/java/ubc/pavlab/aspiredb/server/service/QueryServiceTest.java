@@ -46,6 +46,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.CNVDao;
+import ubc.pavlab.aspiredb.server.dao.GenomicLocationDao;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
@@ -110,6 +111,9 @@ public class QueryServiceTest extends BaseSpringContextTest {
     private String HP_MOUTH = "Abnormality of the mouth";
 
     private String HP_NERVOUS = "Abnormality of the nervous system";
+
+    @Autowired
+    private GenomicLocationDao genomicLocDao;
 
     @Autowired
     private NeurocartaQueryService neurocartaQueryService;
@@ -434,13 +438,16 @@ public class QueryServiceTest extends BaseSpringContextTest {
                 GenomeBin.binFromRange( cnv2.getLocation().getChromosome(), cnv2.getLocation().getStart(), cnv2
                         .getLocation().getEnd() ) );
 
-        Collection<Variant> vars = variantDao.findByGenomicLocation( new GenomicRange( "8", 37885255, 37890000 ),
-                Collections.singletonList( project.getId() ) );
+        GenomicRange range = new GenomicRange( "8", 37885255, 37890000 );
+        Collection<Variant> vars = variantDao
+                .findByGenomicLocation( range, Collections.singletonList( project.getId() ) );
         assertTrue( vars.contains( cnv1 ) );
+        assertTrue( genomicLocDao.findByGenomicLocation( range ).contains( cnv1.getLocation().getId() ) );
 
-        vars = variantDao.findByGenomicLocation( new GenomicRange( "9", 37885255, 37890000 ),
-                Collections.singletonList( project.getId() ) );
+        range = new GenomicRange( "9", 37885255, 37890000 );
+        vars = variantDao.findByGenomicLocation( range, Collections.singletonList( project.getId() ) );
         assertTrue( vars.isEmpty() );
+        assertTrue( genomicLocDao.findByGenomicLocation( range ).isEmpty() );
 
         // cleanup
         persistentTestObjectHelper.removeVariant( cnv1 );
