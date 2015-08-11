@@ -455,14 +455,12 @@ Ext
             QueryService.getSubjectsVariants( filterConfigs, {
                callback : function(ret) {
 
-                  VariantService.suggestProperties( function(properties) {
-                     ASPIREdb.EVENT_BUS.fireEvent( 'construct_variant_grid', filterConfigs, ret[me.VARIANT_IDS_KEY],
-                        properties );
-
-                     myMask.hide();
-                  } );
+                  ASPIREdb.EVENT_BUS.fireEvent( 'construct_variant_grid', filterConfigs, ret[me.VARIANT_IDS_KEY],
+                     null );
 
                   ASPIREdb.EVENT_BUS.fireEvent( 'construct_subject_grid', filterConfigs, ret[me.SUBJECT_IDS_KEY] );
+                  
+                  myMask.hide();
                   
                },
                errorHandler : function(errorString, exception) {
