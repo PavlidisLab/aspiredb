@@ -503,44 +503,15 @@ public class ProjectManagerImpl implements ProjectManager {
 
         Collection<Variant2VariantOverlap> overlapVos = new HashSet<>();
 
-        Collection<Object[]> specialProjectLocationIDs = projectDao.getVariantLocationsForProjects( specialProject
-                .getId() );
-        Map<String, Set<Long>> specialProjectHash = new HashMap<>();
-        for ( Object[] binLocID : specialProjectLocationIDs ) {
-            String key = ( String ) binLocID[0]; // chr
-            long locID = ( long ) binLocID[1];
-            Set<Long> val = null;
-            if ( specialProjectHash.containsKey( key ) ) {
-                val = specialProjectHash.get( key );
-            } else {
-                val = new HashSet<>();
-                specialProjectHash.put( key, val );
-            }
-            val.add( locID ); // genomic_loc_ID
-        }
-
-        log.info( "Found " + specialProjectLocationIDs.size() + " variant locations in special project "
-                + specialProject.getName() );
-
         // This probably won't work for all variant types
         int i = 0;
         for ( VariantValueObject vvo : projToPopulateVvos ) {
 
-            String key = vvo.getGenomicRange().getChromosome();
-
-            if ( !specialProjectHash.containsKey( key ) ) {
-                continue;
-            }
-
-            Set<Long> match = new HashSet<>( genomicLocDao.findByGenomicLocation( vvo.getGenomicRange() ) );
-            match.retainAll( specialProjectHash.get( key ) );
-
-            // getting the variant IDs can be a bit slow ...
-            Collection<VariantValueObject> overlappedVvos = variantDao.loadByGenomicLocationIDs( match );
+            Collection<VariantValueObject> overlappedVvos = variantDao.findByGenomicLocationQuick(
+                    vvo.getGenomicRange(), Collections.singletonList( specialProject.getId() ) );
             for ( VariantValueObject vvoOverlapped : overlappedVvos ) {
                 overlapVos.add( new Variant2VariantOverlap( vvo, vvoOverlapped, projectToPopulate.getId(),
                         specialProject.getId() ) );
-
             }
 
             if ( ( ++i % 100 ) == 0 ) {

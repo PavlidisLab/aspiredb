@@ -76,6 +76,7 @@ import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
 import ubc.pavlab.aspiredb.shared.SubjectValueObject;
 import ubc.pavlab.aspiredb.shared.TextValue;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.ExternalSubjectIdProperty;
 import ubc.pavlab.aspiredb.shared.query.GenomicLocationProperty;
@@ -443,11 +444,16 @@ public class QueryServiceTest extends BaseSpringContextTest {
                 .findByGenomicLocation( range, Collections.singletonList( project.getId() ) );
         assertTrue( vars.contains( cnv1 ) );
         assertTrue( genomicLocDao.findByGenomicLocation( range ).contains( cnv1.getLocation().getId() ) );
+        Collection<VariantValueObject> vars2 = variantDao.findByGenomicLocationQuick( range,
+                Collections.singletonList( project.getId() ) );
+        assertEquals( cnv1.getId(), vars2.iterator().next().getId() );
 
         range = new GenomicRange( "9", 37885255, 37890000 );
         vars = variantDao.findByGenomicLocation( range, Collections.singletonList( project.getId() ) );
         assertTrue( vars.isEmpty() );
         assertTrue( genomicLocDao.findByGenomicLocation( range ).isEmpty() );
+        assertTrue( variantDao.findByGenomicLocationQuick( range, Collections.singletonList( project.getId() ) )
+                .isEmpty() );
 
         // cleanup
         persistentTestObjectHelper.removeVariant( cnv1 );

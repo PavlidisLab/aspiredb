@@ -170,6 +170,33 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
         return variants;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Collection<VariantValueObject> findByGenomicLocationQuick( GenomicRange range,
+            Collection<Long> activeProjectIds ) {
+        Session session = this.getSessionFactory().getCurrentSession();
+
+        List<Integer> bins = GenomeBin.relevantBins( range.getChromosome(), range.getBaseStart(), range.getBaseEnd() );
+        String hql = "select distinct variant.id, location.chromosome, location.start, location.end from Variant variant inner join variant.location as location inner join variant.subject.projects as projects WHERE :projectIds in projects.id and location.bin in (:bins) and location.chromosome=:chromosome and ((location.start>=:start and location.end<=:end) or (location.start<=:start and location.end>=:start) or (location.start<=:end and location.end>=:end))";
+        Query query = session.createQuery( hql );
+        query.setParameterList( "bins", bins );
+        query.setParameterList( "projectIds", activeProjectIds );
+        query.setParameter( "chromosome", range.getChromosome() );
+        query.setParameter( "start", range.getBaseStart() );
+        query.setParameter( "end", range.getBaseEnd() );
+        Collection<Object[]> results = query.list();
+
+        Collection<VariantValueObject> ret = new ArrayList<>();
+        for ( Object[] r : results ) {
+            VariantValueObject vvoOverlapped = new VariantValueObject();
+            vvoOverlapped.setId( ( Long ) r[0] );
+            vvoOverlapped.setGenomicRange( new GenomicRange( ( String ) r[1], ( int ) r[2], ( int ) r[3] ) );
+            ret.add( vvoOverlapped );
+        }
+
+        return ret;
+    }
+
     /**
      * Returns list of IDs that satisfy the PhenotypeFilter. Get a list of Subjects first then get the list of all the
      * Variants for that Subject. This is done for performance reasons.

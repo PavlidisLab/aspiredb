@@ -52,4 +52,14 @@ public interface VariantDaoBase<T extends Variant> extends DaoBase<T>, RemotePag
     void printCacheStatistics();
 
     public Collection<VariantValueObject> loadByGenomicLocationIDs( Collection<Long> genomicLocIDs );
+
+    /**
+     * Only populates the variant ID and location for faster execution, for example during project overlap.
+     * 
+     * @param range
+     * @param activeProjectIds
+     * @return
+     */
+    public Collection<VariantValueObject> findByGenomicLocationQuick( GenomicRange range,
+            Collection<Long> activeProjectIds );
 }
