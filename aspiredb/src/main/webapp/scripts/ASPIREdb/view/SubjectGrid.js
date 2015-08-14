@@ -57,7 +57,13 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       this.initConfig( cfg );
       this.callParent( arguments );
    },
-
+   plugins : {
+      ptype : 'bufferedrenderer',
+      trailingBufferZone : 20, // Keep 20 rows rendered in the table behind scroll
+      leadingBufferZone : 50
+   // Keep 50 rows rendered in the table ahead of scroll
+   },
+   pageSize : 100,
    listeners : {
       /**
        * Prevents the browser handling the right-click on the control.
@@ -250,11 +256,14 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       grid.selModel.select( grid.store.find( 'id', subjectIds[0] ) );
 
       // use just to make sure selected record is at the top
-      grid.getView().scrollBy( {
-         x : 0,
-         y : 1000
-      } );
-      grid.getView().focusRow( grid.store.find( 'id', subjectIds[0] ) );
+      // grid.getView().scrollBy( {
+      // x : 0,
+      // y : 1000
+      // } );
+      // grid.getView().focusRow( grid.store.find( 'id', subjectIds[0] ) );
+
+      var selectedRecords = grid.getSelectionModel().getSelection();
+      grid.getView().bufferedRenderer.scrollTo( grid.store.indexOfId( selectedRecords[0].data.id ) );
 
    },
 

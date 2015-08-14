@@ -800,7 +800,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
    },
    selectionChangeHandler : function(model, records) {
-      console.log( 'on grid selection change handler variant tab panel' );
+      // console.log( 'on grid selection change handler variant tab panel' );
       this.selectedVariants = records;
 
       this.enableActionButtonsBySelectedRecords( records );

@@ -53,7 +53,13 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
       this.initConfig( cfg );
       this.callParent( arguments );
    },
-
+   plugins : {
+      ptype : 'bufferedrenderer',
+      trailingBufferZone : 20, // Keep 20 rows rendered in the table behind scroll
+      leadingBufferZone : 50
+   // Keep 50 rows rendered in the table ahead of scroll
+   },
+   pageSize : 100,
    dockedItems : [ {
       xtype : 'toolbar',
       itemId : 'phenotypeGridToolbar',
@@ -365,7 +371,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
       var activeProjectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
 
       var ref = this;
-      console.log( "on subject select handler in phenotype grid ..........." );
+      // console.log( "on subject select handler in phenotype grid ..........." );
 
       if ( subjectIds.length == 1 ) {
          SubjectService.getSubject( activeProjectId, subjectIds[0], {
@@ -474,7 +480,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
 
    drawCanvas : function(canvas, phenSummary, phenMap) {
 
-      if ( phenMap === undefined ) {
+      if ( canvas === null || phenMap === undefined ) {
          // console.log( "phenSummary name " + phenSummary.name + " phenMap is undefined" );
          return;
       }
