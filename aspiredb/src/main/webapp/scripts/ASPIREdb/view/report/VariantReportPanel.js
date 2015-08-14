@@ -416,23 +416,23 @@ Ext.define( 'ASPIREdb.view.report.VariantReportPanel', {
       }
 
       var ret = [];
-      var added = false;
+
+      // copy mergedFreqData to ret
+      for (var i = 0; i < mergedFreqData.length; i++) {
+         ret.push( mergedFreqData[i] );
+      }
+
+      // copy freqData to ret, while checking if it already exists,
+      // and if it does then merge!
       for (var i = 0; i < freqData.length; i++) {
          var freqVal = freqData[i][columnName];
          for (var j = 0; j < mergedFreqData.length; j++) {
             var mergedVal = mergedFreqData[j][columnName];
             if ( mergedVal === freqVal ) {
-               ret.push( Ext.Object.merge( freqData[i], mergedFreqData[j] ) );
-               added = true;
+               ret.splice( j, 1, Ext.Object.merge( freqData[i], mergedFreqData[j] ) );
                break;
             }
          }
-         // we have a new column value!
-         if ( !added ) {
-            ret.push( freqData[i] );
-         }
-
-         added = false;
       }
 
       return ret;
