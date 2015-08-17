@@ -23,7 +23,7 @@ import java.io.Serializable;
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
- * author: anton date: 11/04/13
+ * Labels are for tagging Subjects and Variants of interest with a name and color. author: anton date: 11/04/13
  */
 @DataTransferObject(javascript = "LabelValueObject")
 public class LabelValueObject implements Displayable, Serializable {
@@ -34,6 +34,7 @@ public class LabelValueObject implements Displayable, Serializable {
     private Long id;
     private String colour;
     private Boolean isShown;
+    private String description;
 
     public LabelValueObject() {
     }
@@ -51,11 +52,12 @@ public class LabelValueObject implements Displayable, Serializable {
         this.isShown = false;
     }
 
-    public LabelValueObject( Long id, String name, String colour, Boolean isShown ) {
+    public LabelValueObject( Long id, String name, String colour, Boolean isShown, String description ) {
         this.id = id;
         this.name = name;
         this.colour = colour;
         this.isShown = isShown;
+        this.description = description;
     }
 
     public LabelValueObject( String name ) {
@@ -131,5 +133,19 @@ public class LabelValueObject implements Displayable, Serializable {
     @Override
     public String toString() {
         return this.getName();
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription( String description ) {
+        this.description = description;
     }
 }

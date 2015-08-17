@@ -67,6 +67,9 @@ public class Label implements SecuredChild, ValueObjectConvertible<LabelValueObj
     @JoinColumn(name = "QUERY_FK")
     private Query query;
 
+    @Column(name = "DESCRIPTION", length = 4096)
+    private String description;
+
     public Label() {
     }
 
@@ -153,7 +156,7 @@ public class Label implements SecuredChild, ValueObjectConvertible<LabelValueObj
 
     @Override
     public LabelValueObject toValueObject() {
-        return new LabelValueObject( id, name, colour, isShown );
+        return new LabelValueObject( id, name, colour, isShown, description );
     }
 
     @Override

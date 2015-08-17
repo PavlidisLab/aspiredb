@@ -49,7 +49,7 @@ public class Characteristic {
     @Column(name = "NAME")
     private String key;
 
-    @Column(name = "VALUE", length = 2048)
+    @Column(name = "VALUE", length = 4096)
     private String value;
 
     public Characteristic() {

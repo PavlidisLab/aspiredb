@@ -96,12 +96,21 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
          valueField : 'value',
          renderTo : Ext.getBody(),
          value : me.labelName,
-
+         fieldLabel : 'Name',
+         margin : 5,
       } );
 
+      // TODO
+      var descriptionField = Ext.create( 'Ext.form.TextArea', {
+         itemId : 'descriptionField',
+         renderTo : Ext.getBody(),
+         value : me.labelDescription,
+         fieldLabel : 'Description',
+         margin : 5,
+      } );
 
       var defaultColour = "000000";
-      
+
       labelCombo.on( 'select', function(combo, records, eOpts) {
          // Bug 3917 fixed
          var vo = records[0].data.value;
@@ -115,7 +124,13 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
       } );
 
       me.add( [
-               labelCombo,
+               {
+                  xtype : 'container',
+                  layout : {
+                     type : 'vbox'
+                  },
+                  items : [ labelCombo, descriptionField ]
+               },
                {
                   xtype : 'colorpicker',
                   itemId : 'colorPicker',
