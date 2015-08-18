@@ -79,10 +79,11 @@ public class Label implements SecuredChild, ValueObjectConvertible<LabelValueObj
         this.isShown = true;
     }
 
-    public Label( String name, String colour, Boolean isShown ) {
+    public Label( String name, String colour, Boolean isShown, String description ) {
         this.name = name;
         this.colour = colour;
         this.isShown = isShown;
+        this.description = description;
     }
 
     @Override
@@ -152,6 +153,10 @@ public class Label implements SecuredChild, ValueObjectConvertible<LabelValueObj
 
     public void setQuery( Query query ) {
         this.query = query;
+    }
+
+    public void setDescription( String description ) {
+        this.description = description;
     }
 
     @Override

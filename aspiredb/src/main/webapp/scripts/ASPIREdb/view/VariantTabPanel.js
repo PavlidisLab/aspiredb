@@ -21,7 +21,7 @@ Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowMode
               'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings',
               'ASPIREdb.view.VariantGridCreator', 'ASPIREdb.view.GeneGridCreator', 'ASPIREdb.IdeogramDownloadWindow',
               'Ext.data.ArrayStore', 'Ext.form.ComboBox', 'ASPIREdb.view.SubjectGrid',
-              'ASPIREdb.view.report.VariantReportWindow', 'ASPIREdb.view.VariantCompoundHeterozygoteWindow' ] );
+              'ASPIREdb.view.report.VariantReportWindow', 'ASPIREdb.view.VariantCompoundHeterozygoteWindow', 'ASPIREdb.Utils' ] );
 
 /**
  * Variant Tab Panel contains both Ideogram view and Variant table view
@@ -271,14 +271,10 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
          for (var i = 0; i < selectedIds.length; i++) {
             var labelIds = grid.store.findRecord( 'id', selectedIds[i] ).data.labelIds;
-            labelIds.push( addedLabel.id )
+             if ( labelIds.indexOf(addedLabel.id) == -1) {
+                labelIds.push( addedLabel.id );
+             }
          }
-         /*
-          * var currentlySelectedRecords = ref.getVariantRecordSelection(); for (var i = 0; i <
-          * currentlySelectedRecords.length; i++) { var labelIds = currentlySelectedRecords[i].get( 'labelIds' ); //
-          * console.log('labelIds = ' + Ext.JSON.encode(labelIds) + " rec = " + currentlySelectedRecords[i].get( 'id' //
-          * )); labelIds.push( addedLabel.id ); }
-          */
 
          if ( ref.getActiveTab().itemId == 'ideogram' ) {
             ref.newIdeogramLabel = true;
@@ -1070,13 +1066,15 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
    getSelectedVariantIds : function(selectedVariantRecords) {
 
-      var selectedVariantIds = [];
-
-      for (var i = 0; i < selectedVariantRecords.length; i++) {
-         selectedVariantIds.push( selectedVariantRecords[i].data.id );
-      }
-
-      return selectedVariantIds;
+//      var selectedVariantIds = [];
+//
+//      for (var i = 0; i < selectedVariantRecords.length; i++) {
+//         selectedVariantIds.push( selectedVariantRecords[i].data.id );
+//      }
+//
+//      return selectedVariantIds;
+      
+      return ASPIREdb.Utils.getSelectedIds( selectedVariantRecords );
    },
 
    getSelectedPatientIds : function(selectedVariantRecords) {

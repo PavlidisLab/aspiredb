@@ -120,6 +120,8 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
                console.log( 'Warning: Label colour ' + vo.colour + ' is not available, setting to ' + defaultColour );
             }
             me.down( '#colorPicker' ).select( vo.colour );
+            
+            me.down('#descriptionField').setValue( vo.description );
          }
       } );
 
@@ -169,7 +171,7 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
    },
 
    /**
-    * Override this function to create or update Label in the back-end
+    * Create or update Label in the back-end
     */
    onOkButtonClick : function() {
       var me = this;
@@ -185,7 +187,6 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
             if ( btn === 'yes' ) {
                me.addLabelHandler( vo, me.selectedIds );
                this.hide();
-
             }
 
          }, this );
@@ -193,7 +194,6 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
       } else {
          me.addLabelHandler( vo, me.selectedIds );
          this.hide();
-
       }
    },
 
@@ -234,6 +234,7 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
    getLabel : function() {
       var colorPicker = this.down( "#colorPicker" );
       var labelCombo = this.down( "#labelCombo" );
+      var description = this.down( '#descriptionField' );
 
       // vo will be a ValueObject if it already exists
       // otherwise, it's just a name of type string
@@ -248,6 +249,8 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
       vo.colour = colorPicker.getValue();
       vo.htmlLabel = ASPIREdb.view.LabelControlWindow.getHtmlLabel( vo );
       vo.isShown = true;
+      vo.description = description.getValue();
+      
       return vo;
    },
 

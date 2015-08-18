@@ -90,9 +90,10 @@ public abstract class Variant implements SubjectAttribute, ValueObjectConvertibl
     @Column(name = "USERVARIANTID")
     private String userVariantId;
 
-    // TODO: has to be unique
     public void addLabel( Label label ) {
-        this.labels.add( label );
+        if ( !this.labels.contains( label ) ) {
+            this.labels.add( label );
+        }
     }
 
     @Override

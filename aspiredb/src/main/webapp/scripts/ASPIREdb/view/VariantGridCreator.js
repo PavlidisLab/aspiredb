@@ -158,23 +158,7 @@ Ext
                   text : "Labels",
                   dataIndex : 'labelIds',
                   renderer : function(value, metaData) {
-                     var ret = "";
-                     for (var i = 0; i < value.length; i++) {
-
-                        var label = this.visibleLabels[value[i]];
-                        if ( label === undefined ) {
-                           continue;
-                        }
-                        if ( label.isShown ) {
-                           ret += "<p style='line-height:50%; font-size: x-small; color: white;'><span style='background-color:#"
-                              + label.colour + "'>&nbsp;" + label.label + "&nbsp;</span></p>"
-                        }
-
-                     }
-
-                     metaData.tdAttr = 'data-qtip="' + ret.replace( "x-small", "normal" ) + '"';
-                     return ret;
-                  },
+                     return ASPIREdb.Utils.renderLabel( this.visibleLabels, value, metaData );                  },
                   flex : 1
                } );
 

@@ -48,7 +48,8 @@ public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDa
     @Transactional
     public Label findOrCreate( LabelValueObject labelVO ) {
         if ( labelVO.getId() == null ) {
-            Label label = new Label( labelVO.getName(), labelVO.getColour(), labelVO.getIsShown() );
+            Label label = new Label( labelVO.getName(), labelVO.getColour(), labelVO.getIsShown(),
+                    labelVO.getDescription() );
             this.create( label );
             return label;
         } else {

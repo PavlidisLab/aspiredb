@@ -186,6 +186,7 @@ public class LabelServiceImpl implements LabelService {
         labelEntity.setName( label.getName() );
         labelEntity.setColour( label.getColour() );
         labelEntity.setIsShown( label.getIsShown() );
+        labelEntity.setDescription( label.getDescription() );
         labelDao.update( labelEntity );
         // updateSubjectLabel( label );
     }

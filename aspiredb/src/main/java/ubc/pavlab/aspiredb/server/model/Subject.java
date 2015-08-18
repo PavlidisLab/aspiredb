@@ -93,7 +93,9 @@ public class Subject implements Serializable, SecuredChild {
     }
 
     public void addLabel( Label label ) {
-        this.labels.add( label );
+        if ( !this.labels.contains( label ) ) {
+            this.labels.add( label );
+        }
     }
 
     public void addPhenotype( Phenotype p ) {

@@ -17,7 +17,7 @@
  *
  */
 Ext.require( [ 'ASPIREdb.store.SubjectStore', 'ASPIREdb.view.CreateLabelWindow', 'ASPIREdb.view.LabelControlWindow',
-              'ASPIREdb.TextDataDownloadWindow', 'ASPIREdb.view.report.BurdenAnalysisWindow' ] );
+              'ASPIREdb.TextDataDownloadWindow', 'ASPIREdb.view.report.BurdenAnalysisWindow', 'ASPIREdb.Utils' ] );
 
 /**
  * Queries Subject values and loads them into a {@link Ext.grid.Panel}
@@ -103,22 +103,7 @@ Ext
                        // This is very slow we need to rethink this
                        renderer : function(value, metaData, record, row, col, store, gridView) {
 
-                          var ret = "";
-                          for (var i = 0; i < value.length; i++) {
-
-                             var label = this.visibleLabels[value[i]];
-                             if ( label === undefined ) {
-                                continue;
-                             }
-                             if ( label.isShown ) {
-                                ret += "<p style='line-height:50%; font-size: x-small; color: white;'><span style='background-color:#"
-                                   + label.colour + "'>&nbsp;" + label.label + "&nbsp;</span></p>"
-                             }
-
-                          }
-
-                          metaData.tdAttr = 'data-qtip="' + ret.replace( "x-small", "normal" ) + '"';
-                          return ret;
+                          return ASPIREdb.Utils.renderLabel( this.visibleLabels, value, metaData );
 
                        },
                        flex : 1
@@ -414,85 +399,19 @@ Ext
          makeLabelHandler : function(event) {
 
             var me = this;
-
-            var selSubjectIds = [];
-            for (var i = 0; i < me.selSubjects.length; i++) {
-               selSubjectIds.push( me.selSubjects[i].data.id );
-            }
+            
+            me.selSubjects = me.getSelectionModel().getSelection();
 
             Ext.define( 'ASPIREdb.view.CreateLabelWindowSubject', {
                isSubjectLabel : true,
                title : 'Create Subject Label',
                extend : 'ASPIREdb.view.CreateLabelWindow',
-
-               // override
-               onOkButtonClick : function() {
-
-                  var labelCombo = this.down( "#labelCombo" );
-                  var vo = this.getLabel();
-                  if ( vo === null ) {
-                     return;
-                  }
-                  var labelIndex = labelCombo.getStore().findExact( 'display', vo.name );
-                  if ( labelIndex != -1 ) {
-                     // activate confirmation
-                     // window
-                     Ext.MessageBox.confirm( 'Label already exist', 'Label already exist. Add into it ?',
-                        function(btn) {
-                           if ( btn === 'yes' ) {
-                              me.addLabelHandler( vo, selSubjectIds );
-                              this.hide();
-                              ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_created' );
-                           }
-
-                        }, this );
-
-                  } else {
-                     me.addLabelHandler( vo, selSubjectIds );
-                     this.hide();
-                     ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_created' );
-                  }
-
-               }
+               selectedIds : ASPIREdb.Utils.getSelectedIds( me.getSelectionModel().getSelection() ),
+               
             } );
 
             var labelWindow = new ASPIREdb.view.CreateLabelWindowSubject();
             labelWindow.show();
-
-         },
-
-         /**
-          * Add the label to the store
-          * 
-          * @param: label value object, selected subject Ids
-          */
-         addLabelHandler : function(vo, selSubjectIds) {
-
-            var me = this;
-
-            // store in database
-            SubjectService.addLabel( selSubjectIds, vo, {
-               callback : function(addedLabel) {
-
-                  addedLabel.isShown = true;
-                  LabelService.updateLabel( addedLabel );
-
-                  var existingLab = me.visibleLabels[addedLabel.id];
-                  if ( existingLab === undefined ) {
-                     me.visibleLabels[addedLabel.id] = addedLabel;
-                  } else {
-                     existingLab.isShown = true;
-                  }
-
-                  // update local store
-                  for (var i = 0; i < me.selSubjects.length; i++) {
-                     me.selSubjects[i].get( 'labelIds' ).push( addedLabel.id );
-                  }
-
-                  // refresh grid
-                  me.getView().refresh();
-               }
-            } );
 
          },
 
@@ -515,38 +434,33 @@ Ext
          },
 
          /**
-          * Update Subject labels in local store.
-          */
-         updateSubjectsLabels : function(subjectIds, labelToUpdate) {
-            // adding to visible label to show in the subject grid
-            this.visibleLabels[labelToUpdate.id] = labelToUpdate;
-
-            for (var i = 0; i < subjectIds.length; i++) {
-               // select selected subjects in subject grid
-               var selectedSubjectId = this.store.find( 'id', subjectIds[i] );
-               var selectionModel = this.getSelectionModel();
-               selectionModel.doSelect( this.store.data.items[selectedSubjectId] );
-               var record = this.getSelectionModel().getSelection();
-
-               var labelIds = record[0].get( 'labelIds' );
-               labelIds.push( labelToUpdate.id );
-
-            }
-         },
-
-         /**
           * Label changed. Update subjects label in grid.
           */
-         labelUpdateHandler : function(selSubjectIds, labelToUpdate) {
-            var me = this;
+         labelUpdateHandler : function(selectedIds, addedLabel) {
+            var ref = this;
 
-            if ( selSubjectIds.length > 0 ) {
-               me.updateSubjectsLabels( selSubjectIds, labelToUpdate );
+            if ( selectedIds == undefined || selectedIds.length == 0 || addedLabel == undefined ) {
+               return;
             }
 
+            // update the label store cache for rendering
+            var existingLab = ref.visibleLabels[addedLabel.id];
+            if ( existingLab == undefined ) {
+               ref.visibleLabels[addedLabel.id] = addedLabel;
+            } else {
+               existingLab.isShown = true;
+            }
+
+            for (var i = 0; i < selectedIds.length; i++) {
+               var labelIds = ref.store.findRecord( 'id', selectedIds[i] ).data.labelIds;
+               if ( labelIds.indexOf(addedLabel.id) == -1) {
+                  labelIds.push( addedLabel.id );
+               }
+            }
+            
             ASPIREdb.EVENT_BUS.fireEvent( 'subjects_label_changed' );
 
-            me.getView().refresh();
+            ref.getView().refresh();
          },
 
          /**
