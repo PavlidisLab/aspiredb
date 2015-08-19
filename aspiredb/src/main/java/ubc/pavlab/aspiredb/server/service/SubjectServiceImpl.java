@@ -74,6 +74,9 @@ public class SubjectServiceImpl implements SubjectService {
     private PhenotypeBrowserService phenotypeBrowserService;
 
     @Autowired
+    private LabelService labelService;
+
+    @Autowired
     private LabelDao labelDao;
 
     @Autowired
@@ -485,8 +488,9 @@ public class SubjectServiceImpl implements SubjectService {
             subject.addLabel( label );
             subjectDao.update( subject );
         }
-        ret = label.toValueObject();
-        return ret;
+        labelVO.setId( label.getId() );
+        labelService.updateLabel( labelVO );
+        return labelVO;
     }
 
     @Override

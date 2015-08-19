@@ -449,6 +449,9 @@ Ext
                ref.visibleLabels[addedLabel.id] = addedLabel;
             } else {
                existingLab.isShown = true;
+               existingLab.name = addedLabel.name;
+               existingLab.description = addedLabel.description;
+               existingLab.colour = addedLabel.colour;
             }
 
             for (var i = 0; i < selectedIds.length; i++) {

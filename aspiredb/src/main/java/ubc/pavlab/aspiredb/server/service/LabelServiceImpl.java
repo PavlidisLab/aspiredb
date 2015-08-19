@@ -66,7 +66,9 @@ public class LabelServiceImpl implements LabelService {
         labels.add( label );
         removeLabelsFromSubjects( labels, subjectIds );
         Label labelEntity = labelDao.load( label.getId() );
-        labelDao.remove( labelEntity );
+        if ( labelEntity != null ) {
+            labelDao.remove( labelEntity );
+        }
     }
 
     @Override

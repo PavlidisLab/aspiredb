@@ -35,6 +35,9 @@ Ext.define( 'ASPIREdb.store.LabelStore', {
    }, {
       name : 'show',
       type : 'boolean'
+   }, {
+      name : 'labelDesc',
+      type : 'string'
    } ],
 
    storeId : 'labelStore'

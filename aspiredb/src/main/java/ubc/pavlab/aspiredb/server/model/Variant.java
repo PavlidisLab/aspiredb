@@ -14,6 +14,7 @@
  */
 package ubc.pavlab.aspiredb.server.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -91,7 +92,11 @@ public abstract class Variant implements SubjectAttribute, ValueObjectConvertibl
     private String userVariantId;
 
     public void addLabel( Label label ) {
-        if ( !this.labels.contains( label ) ) {
+        Collection<Long> existingIds = new ArrayList<>();
+        for ( Label existingLabel : this.labels ) {
+            existingIds.add( existingLabel.getId() );
+        }
+        if ( !existingIds.contains( label.getId() ) ) {
             this.labels.add( label );
         }
     }

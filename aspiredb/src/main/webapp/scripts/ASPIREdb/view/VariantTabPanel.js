@@ -537,17 +537,38 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    /**
     * Refresh grid view by reloading data from database because it was updated
     */
-   variantLabelUpdateHandler : function() {
+   variantLabelUpdateHandler : function(selectedIds, addedLabel) {
 
       var property = new VariantLabelProperty();
       property.name = 'Labels';
       property.displayName = 'Variant Labels';
 
-      var me = this;
-      // me.filterSubmitHandler( me.filterConfigs, property );
+      var ref = this;
+      // ref.filterSubmitHandler( me.filterConfigs, property );
 
+      if ( selectedIds != null && addedLabel != null ) {
+         // update the label store cache for rendering
+         var existingLab = ref.visibleLabels[addedLabel.id];
+         if ( existingLab == undefined ) {
+            ref.visibleLabels[addedLabel.id] = addedLabel;
+         } else {
+            existingLab.isShown = true;
+            existingLab.name = addedLabel.name;
+            existingLab.description = addedLabel.description;
+            existingLab.colour = addedLabel.colour;
+         }
+
+         for (var i = 0; i < selectedIds.length; i++) {
+            var labelIds = ref.store.findRecord( 'id', selectedIds[i] ).data.labelIds;
+            if ( labelIds.indexOf(addedLabel.id) == -1) {
+               labelIds.push( addedLabel.id );
+            }
+         }
+
+      }
+            
       // refresh the variant in grid
-      me.down( '#variantGrid' ).getView().refresh();
+      ref.down( '#variantGrid' ).getView().refresh();
 
    },
 

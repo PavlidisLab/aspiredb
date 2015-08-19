@@ -29,6 +29,10 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
    modal : true,
    closeAction : 'destroy',
    bodyStyle : 'padding: 5px;',
+   layout : 'fit',
+   width : 600,
+   height : 250,
+   frame : true,
    layout : {
       type : 'hbox',
       defaultMargins : {
@@ -41,16 +45,33 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
 
    config : {
       isSubjectLabel : false,
-      labelName : '',
-      labelColour : '',
       selectedIds : [],
       service : null,
+      selectedLabel : null,
    },
 
    constructor : function(cfg) {
       this.initConfig( cfg );
       this.callParent( arguments );
    },
+
+   buttons : [ {
+      xtype : 'button',
+      itemId : 'okButton',
+      text : 'OK',
+      margin : 5,
+      handler : function(ref) {
+         ref.up( '.window' ).onOkButtonClick();
+      }
+   }, {
+      xtype : 'button',
+      itemId : 'cancelButton',
+      text : 'Cancel',
+      margin : 5,
+      handler : function(ref) {
+         ref.up( '.window' ).hide();
+      }
+   }, ],
 
    initComponent : function() {
       var me = this;
@@ -95,35 +116,23 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
          displayField : 'display',
          valueField : 'value',
          renderTo : Ext.getBody(),
-         value : me.labelName,
          fieldLabel : 'Name',
+         emptyText : 'Choose existing or enter new label name',
          margin : 5,
+         width : 400,
       } );
 
-      // TODO
       var descriptionField = Ext.create( 'Ext.form.TextArea', {
          itemId : 'descriptionField',
          renderTo : Ext.getBody(),
-         value : me.labelDescription,
          fieldLabel : 'Description',
+         emptyText : 'Enter label description',
          margin : 5,
+         width : 400,
+         height : 100,
       } );
 
       var defaultColour = "000000";
-
-      labelCombo.on( 'select', function(combo, records, eOpts) {
-         // Bug 3917 fixed
-         var vo = records[0].data.value;
-         if ( vo != null && vo.colour != null ) {
-            if ( me.down( '#colorPicker' ).colors.indexOf( vo.colour ) == -1 ) {
-               vo.colour = defaultColour;
-               console.log( 'Warning: Label colour ' + vo.colour + ' is not available, setting to ' + defaultColour );
-            }
-            me.down( '#colorPicker' ).select( vo.colour );
-            
-            me.down('#descriptionField').setValue( vo.description );
-         }
-      } );
 
       me.add( [
                {
@@ -142,30 +151,47 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
                   height : 40,
                   colors : [ "000000", "993300", "AC051B", "003300", "636E01", "000080", "333399", "036F0A", "800000",
                             "7C0474" ]
-               }, {
-                  xtype : 'button',
-                  itemId : 'okButton',
-                  text : 'OK',
-                  flex : 1,
-                  handler : function() {
-                     me.onOkButtonClick();
-                  }
-               }, {
-                  xtype : 'button',
-                  itemId : 'cancelButton',
-                  text : 'Cancel',
-                  flex : 1,
-                  handler : function() {
-                     me.hide();
-                  }
                }, ] );
 
+      labelCombo.on( 'change', me.labelComboSelect, this );
+
+      // select "selectedLabel" in the combobox
+      if ( me.selectedLabel != null && labelCombo != null ) {
+         labelCombo.store.on( 'load', function(ds, records, o) {
+            var rec = labelCombo.findRecordByDisplay( me.selectedLabel.name );
+            labelCombo.setValue( rec );
+         } );
+      }
+
+      labelCombo.store.load();
+   },
+
+   /**
+    * This method is called when the user selects from the label combo box. Sets the component values based on
+    * this.labelColour, this.labelDesc
+    */
+   labelComboSelect : function(combo, record) {
+      var me = this;
+
+      var defaultColour = "000000";
+
+      if ( record == null ) {
+         return;
+      }
+
+      var vo = record;
+      me.selectedLabel = vo;
+
       // if color is found in the color pickers, then assign it, otherwise use the default
-      if ( me.down( '#colorPicker' ).colors.indexOf( me.labelColour ) != -1 ) {
-         me.down( '#colorPicker' ).select( me.labelColour );
+      if ( vo.colour != null && me.down( '#colorPicker' ).colors.indexOf( vo.colour ) != -1 ) {
+         me.down( '#colorPicker' ).select( vo.colour );
       } else {
-         console.log( 'Warning: Label colour ' + me.labelColour + ' is not available, setting to ' + defaultColour );
+         console.log( 'Warning: Label colour ' + vo.colour + ' is not available, setting to ' + defaultColour );
          me.down( '#colorPicker' ).select( defaultColour );
+      }
+
+      if ( vo.description != null ) {
+         me.down( '#descriptionField' ).setValue( vo.description );
       }
 
    },
@@ -180,21 +206,8 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
       if ( vo == null ) {
          return;
       }
-      var labelIndex = labelCombo.getStore().findExact( 'display', vo.name );
-      if ( labelIndex != -1 ) {
-         // activate confirmation window
-         Ext.MessageBox.confirm( 'Label already exist', 'Label already exist. Add into it ?', function(btn) {
-            if ( btn === 'yes' ) {
-               me.addLabelHandler( vo, me.selectedIds );
-               this.hide();
-            }
-
-         }, this );
-
-      } else {
-         me.addLabelHandler( vo, me.selectedIds );
-         this.hide();
-      }
+      me.addLabelHandler( vo, me.selectedIds );
+      this.hide();
    },
 
    /**
@@ -211,13 +224,6 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
          callback : function(addedLabel) {
 
             addedLabel.isShown = true;
-            LabelService.updateLabel( addedLabel );
-            /*
-             * var existingLab = me.visibleLabels[addedLabel.id]; if ( existingLab == undefined ) {
-             * me.visibleLabels[addedLabel.id] = addedLabel; } else { existingLab.isShown = true; }
-             * 
-             * for (var i = 0; i < me.selSubjects.length; i++) { me.selSubjects[i].labels.push( addedLabel ); }
-             */
 
             // refresh the grid
             if ( me.isSubjectLabel ) {
@@ -231,26 +237,41 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
 
    },
 
-   getLabel : function() {
-      var colorPicker = this.down( "#colorPicker" );
-      var labelCombo = this.down( "#labelCombo" );
-      var description = this.down( '#descriptionField' );
+   /**
+    * Creates a new LabelValueObject if it doesn't exist, otherwise, update the values from UI components.
+    * 
+    * @param selectedLabel
+    *           assign values to selectedLabel if not null
+    */
+   getLabel : function(selectedLabel) {
 
-      // vo will be a ValueObject if it already exists
-      // otherwise, it's just a name of type string
+      var me = this;
+
+      var colorPicker = me.down( "#colorPicker" );
+      var labelCombo = me.down( "#labelCombo" );
+      var description = me.down( '#descriptionField' );
+
       var vo = labelCombo.getValue();
-      if ( vo == null || vo.length == "" ) {
-         return null;
+
+      if ( selectedLabel != null ) {
+         vo = selectedLabel;
       }
-      if ( vo.id == undefined ) {
+
+      if ( vo.id == null ) {
+         // user wants to create a new Label
          vo = new LabelValueObject();
+         vo.name = labelCombo.getValue();
+      } else {
+         // user chooses an existing label
+         vo.id = me.selectedLabel.id;
+         vo.name = labelCombo.getDisplayValue();
       }
-      vo.name = labelCombo.getValue();
+
       vo.colour = colorPicker.getValue();
       vo.htmlLabel = ASPIREdb.view.LabelControlWindow.getHtmlLabel( vo );
       vo.isShown = true;
       vo.description = description.getValue();
-      
+
       return vo;
    },
 

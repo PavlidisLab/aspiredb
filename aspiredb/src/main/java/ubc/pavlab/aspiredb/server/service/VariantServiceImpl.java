@@ -112,6 +112,8 @@ public class VariantServiceImpl implements VariantService {
     private NeurocartaQueryService neurocartaQueryService;
     @Autowired
     private ChromosomeService chromosomeService;
+    @Autowired
+    private LabelService labelService;
 
     @Override
     @RemoteMethod
@@ -124,7 +126,9 @@ public class VariantServiceImpl implements VariantService {
             variant.addLabel( labelEntity );
             variantDao.update( variant );
         }
-        return labelEntity.toValueObject();
+        label.setId( labelEntity.getId() );
+        labelService.updateLabel( label );
+        return label;
     }
 
     @Override
@@ -201,8 +205,10 @@ public class VariantServiceImpl implements VariantService {
     public void removeLabel( Long id, LabelValueObject label ) {
         Variant variant = variantDao.load( id );
         Label labelEntity = labelDao.load( label.getId() );
-        variant.removeLabel( labelEntity );
-        variantDao.update( variant );
+        if ( labelEntity != null ) {
+            variant.removeLabel( labelEntity );
+            variantDao.update( variant );
+        }
     }
 
     @Override

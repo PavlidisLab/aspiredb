@@ -42,6 +42,13 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
  */
 public interface SubjectService {
 
+    /**
+     * Find or create label. If found, update it.
+     * 
+     * @param subjectIds
+     * @param label
+     * @return
+     */
     public LabelValueObject addLabel( Collection<Long> subjectIds, LabelValueObject label );
 
     /**

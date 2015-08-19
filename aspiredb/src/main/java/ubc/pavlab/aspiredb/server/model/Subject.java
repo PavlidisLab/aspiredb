@@ -93,7 +93,11 @@ public class Subject implements Serializable, SecuredChild {
     }
 
     public void addLabel( Label label ) {
-        if ( !this.labels.contains( label ) ) {
+        Collection<Long> existingIds = new ArrayList<>();
+        for ( Label existingLabel : this.labels ) {
+            existingIds.add( existingLabel.getId() );
+        }
+        if ( !existingIds.contains( label.getId() ) ) {
             this.labels.add( label );
         }
     }
