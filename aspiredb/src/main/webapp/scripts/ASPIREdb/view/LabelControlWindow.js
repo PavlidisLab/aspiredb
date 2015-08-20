@@ -182,7 +182,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                              },
                              {
                                 header : 'Show',
-                                dataIndex : 'show',
+                                dataIndex : 'isShown',
                                 xtype : 'checkcolumn',
                                 id : 'labelShowColumn',
                                 width : 50,
@@ -461,6 +461,9 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    },
 
    editLabel : function(selectedLabel, isSubjectLabel) {
+      var me = this;
+      var grid = me.down( '#labelSettingsGrid' );
+
       Ext.define( 'ASPIREdb.view.CreateLabelWindowEdit', {
          isSubjectLabel : isSubjectLabel,
          title : 'Edit Label Manager',
@@ -478,8 +481,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
 
             LabelService.updateLabel( vo, {
                callback : function() {
-                  // ref.getView().refresh();
-                  ASPIREdb.EVENT_BUS.fireEvent( 'label_color_changed' );
+                  grid.getView().refresh();
                },
                errorHandler : function(er, exception) {
                   Ext.Msg.alert( "Update Label Error", er + "\n" + exception.stack );
