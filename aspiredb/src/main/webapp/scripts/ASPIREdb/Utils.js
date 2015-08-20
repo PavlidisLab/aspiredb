@@ -19,18 +19,21 @@
 
 Ext.define( 'ASPIREdb.Utils', {
    singleton : true,
-   
+
    /**
     * Renders the label
     * 
-    * @param visibleLabels - array of label value objects
-    * @param value - array of label IDs
-    * @param metaData - to show tooltips 
+    * @param visibleLabels -
+    *           array of label value objects
+    * @param value -
+    *           array of label IDs
+    * @param metaData -
+    *           to show tooltips
     */
-   renderLabel : function( visibleLabels, value, metaData ) {
+   renderLabel : function(visibleLabels, value, metaData) {
       var ret = "";
       var qtip = "";
-      
+
       for (var i = 0; i < value.length; i++) {
 
          var label = visibleLabels[value[i]];
@@ -38,14 +41,13 @@ Ext.define( 'ASPIREdb.Utils', {
             continue;
          }
          if ( label.isShown ) {
-            
-            var labelHtml = "<span style='color: white; background-color:#"
-               + label.colour + "'>&nbsp;" + label.label + "&nbsp;</span>";
+
+            var labelHtml = ASPIREdb.view.LabelControlWindow.getHtmlLabel( label );
             ret += "<p style='line-height:50%; font-size: x-small;'>" + labelHtml + "</p>";
-            
+
             var desc = label.description === null ? "" : label.description;
             qtip += "<p>" + labelHtml + "&nbsp;" + desc + "</p>";
-               
+
          }
 
       }
@@ -53,7 +55,7 @@ Ext.define( 'ASPIREdb.Utils', {
       metaData.tdAttr = 'data-qtip="' + qtip + '"';
       return ret;
    },
-   
+
    /**
     * Extract IDs from the current selection.
     */
@@ -67,5 +69,5 @@ Ext.define( 'ASPIREdb.Utils', {
 
       return selectedVariantIds;
    },
-   
+
 } );

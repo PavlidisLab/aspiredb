@@ -94,12 +94,22 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    },
 
    statics : {
+
+      /**
+       * Source : https://24ways.org/2010/calculating-color-contrast/
+       */
+      getContrastYIQ : function(hexcolor) {
+         var r = parseInt( hexcolor.substr( 0, 2 ), 16 );
+         var g = parseInt( hexcolor.substr( 2, 2 ), 16 );
+         var b = parseInt( hexcolor.substr( 4, 2 ), 16 );
+         var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+         return (yiq >= 128) ? 'black' : 'white';
+      },
+
       getHtmlLabel : function(label) {
-         var fontColour = 'white';
+         var fontColour = ASPIREdb.view.LabelControlWindow.getContrastYIQ( label.colour );
          var ret = "<font color=" + fontColour + "><span style='background-color: " + label.colour + "'>&nbsp&nbsp"
             + label.name + "&nbsp&nbsp</span></font>&nbsp&nbsp&nbsp";
-         // var ret = "<font color=" + fontColour + "><span style='background-color: " + label.labelColour
-         // + "'>&nbsp&nbsp" + label.labelName + "&nbsp&nbsp</span></font>&nbsp&nbsp&nbsp";
          return ret;
       },
    },

@@ -30,7 +30,7 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
    closeAction : 'destroy',
    bodyStyle : 'padding: 5px;',
    layout : 'fit',
-   width : 600,
+   width : 610,
    height : 250,
    frame : true,
    layout : {
@@ -56,6 +56,14 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
    },
 
    buttons : [ {
+      xtype : 'button',
+      itemId : 'previewButton',
+      text : 'Preview',
+      margin : 5,
+      handler : function(ref) {
+         ref.up( '.window' ).onPreviewButtonClick();
+      }
+   }, {
       xtype : 'button',
       itemId : 'okButton',
       text : 'OK',
@@ -134,24 +142,39 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
 
       var defaultColour = "000000";
 
-      me.add( [
-               {
-                  xtype : 'container',
-                  layout : {
-                     type : 'vbox'
-                  },
-                  items : [ labelCombo, descriptionField ]
-               },
-               {
-                  xtype : 'colorpicker',
-                  itemId : 'colorPicker',
-                  value : defaultColour, // default
-                  flex : 1,
-                  width : 90,
-                  height : 40,
-                  colors : [ "000000", "993300", "AC051B", "003300", "636E01", "000080", "333399", "036F0A", "800000",
-                            "7C0474" ]
-               }, ] );
+      var colorPicker = {
+         xtype : 'colorpicker',
+         itemId : 'colorPicker',
+         value : defaultColour, // default
+         width : 145,
+         height : 50,
+         margins : 5,
+         // brewer.pal(12,name="Paired")
+         colors : [ "A6CEE3", "1F78B4", "B2DF8A", "33A02C", "FB9A99", "E31A1C", "FDBF6F", "FF7F00", "CAB2D6", "6A3D9A",
+                   "FFFF99", "B15928",
+
+                   "000000", "FFFFFF", "AC051B", "003300", "636E01", "000080", "333399", "036F0A", "800000", "7C0474" ]
+      };
+
+      var preview = {
+         xtype : 'label',
+         itemId : 'previewLabel',
+         margins : 5,
+      };
+
+      me.add( [ {
+         xtype : 'container',
+         layout : {
+            type : 'vbox'
+         },
+         items : [ labelCombo, descriptionField ]
+      }, {
+         xtype : 'container',
+         layout : {
+            type : 'vbox'
+         },
+         items : [ colorPicker, preview ]
+      }, ] );
 
       labelCombo.on( 'change', me.labelComboSelect, this );
 
@@ -194,6 +217,21 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
          me.down( '#descriptionField' ).setValue( vo.description );
       }
 
+   },
+
+   /**
+    * Display the preview of the label
+    */
+   onPreviewButtonClick : function() {
+      var me = this;
+      var preview = me.down( "#previewLabel" );
+      var labelCombo = me.down( "#labelCombo" );
+      preview.setText( '', false );
+      var vo = me.getLabel();
+      if ( vo == null ) {
+         return;
+      }
+      preview.setText( vo.htmlLabel, false );
    },
 
    /**
@@ -252,6 +290,10 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
       var description = me.down( '#descriptionField' );
 
       var vo = labelCombo.getValue();
+
+      if ( vo === null ) {
+         return;
+      }
 
       if ( selectedLabel != null ) {
          vo = selectedLabel;
