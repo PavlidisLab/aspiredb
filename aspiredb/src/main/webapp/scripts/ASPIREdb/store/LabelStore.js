@@ -24,19 +24,19 @@ Ext.define( 'ASPIREdb.store.LabelStore', {
    autoSync : true,
 
    fields : [ {
-      name : 'labelId',
+      name : 'id',
       type : 'int'
    }, {
-      name : 'labelName',
+      name : 'name',
       type : 'string'
    }, {
-      name : 'labelColour',
+      name : 'colour',
       type : 'string'
    }, {
-      name : 'show',
+      name : 'isShown',
       type : 'boolean'
    }, {
-      name : 'labelDesc',
+      name : 'description',
       type : 'string'
    } ],
 

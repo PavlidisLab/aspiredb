@@ -33,7 +33,7 @@ var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
 
 var contextMenu = new Ext.menu.Menu( {
    itemId : 'contextMenu',
-   displayField : 'labelColour',
+   displayField : 'colour',
    items : [ {
       text : colorPicker,
       scope : this,
@@ -42,7 +42,7 @@ var contextMenu = new Ext.menu.Menu( {
 } );
 
 var colorPicker = Ext.create( 'Ext.menu.ColorPicker', {
-   displayField : 'labelColour',
+   displayField : 'colour',
    listeners : {
       select : function(picker, selColor) {
          console.log( 'picker value ' + picker.value );
@@ -158,11 +158,11 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                   columns : [
                              {
                                 header : 'Label',
-                                dataIndex : 'labelId',
+                                dataIndex : 'id',
                                 flex : 1,
-                                renderer : function(labelId, meta, rec, rowIndex, colIndex, store) {
+                                renderer : function(id, meta, rec, rowIndex, colIndex, store) {
                                    // meta.tdAttr = 'data-qtip="Double-click to rename label"';
-                                   var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
+                                   var label = this.up( '#labelControlWindow' ).visibleLabels[id];
                                    var ret = ASPIREdb.view.LabelControlWindow.getHtmlLabel( label );
                                    return ret;
                                 },
@@ -170,11 +170,11 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                              },
                              {
                                 header : 'Description',
-                                dataIndex : 'labelId',
+                                dataIndex : 'id',
                                 flex : 2,
-                                renderer : function(labelId, meta, rec, rowIndex, colIndex, store) {
+                                renderer : function(id, meta, rec, rowIndex, colIndex, store) {
                                    // meta.tdAttr = 'data-qtip="Double-click to rename label"';
-                                   var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
+                                   var label = this.up( '#labelControlWindow' ).visibleLabels[id];
                                    var ret = label.description;
                                    return ret;
                                 },
@@ -220,7 +220,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                                       this.fireEvent( 'itemclick', this, action, view, rowIndex, colIndex, item, e );
                                    },
                                    getTip : function(v, metaData, r, rowIndex, colIndex, store) {
-                                      var ret = 'Remove <b>' + r.get( 'labelName' ) + '</b> from the selected '
+                                      var ret = 'Remove <b>' + r.get( 'name' ) + '</b> from the selected '
                                          + (this.up( '.window' ).isSubjectLabel ? 'subjects' : 'variants') + '?';
 
                                       metaData.tdAttr = 'data-qtip="' + ret + '" qwidth="auto"';
@@ -251,7 +251,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
 
                         var ref = this;
                         var labelControlWindow = ref.up( '#labelControlWindow' );
-                        var row = labelControlWindow.visibleLabels[record.data.labelId];
+                        var row = labelControlWindow.visibleLabels[record.data.id];
                         var selectedLabel = row;
                         var grid = labelControlWindow.down( '#labelSettingsGrid' );
 
@@ -413,7 +413,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
       var me = this;
       var labels = [ label ];
       if ( me.isSubjectLabel ) {
-         Ext.MessageBox.confirm( 'Delete Subject Label', 'Delete <b>' + label.labelName + '</b> from all subjects?',
+         Ext.MessageBox.confirm( 'Delete Subject Label', 'Delete <b>' + label.name + '</b> from all subjects?',
             function(btn) {
                if ( btn === 'yes' ) {
                   LabelService.deleteSubjectLabels( labels, {
@@ -425,7 +425,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                }
             } );
       } else {
-         Ext.MessageBox.confirm( 'Delete Variant Label', 'Delete <b>' + label.labelName + '</b> from all variants?',
+         Ext.MessageBox.confirm( 'Delete Variant Label', 'Delete <b>' + label.name + '</b> from all variants?',
             function(btn) {
                if ( btn === 'yes' ) {
                   LabelService.deleteVariantLabels( labels, {
@@ -443,14 +443,14 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
       var me = this;
       var rec = view.store.getAt( rowIndex );
       var label = rec.data;
-      me.editLabel( me.visibleLabels[label.labelId], me.isSubjectLabel );
+      me.editLabel( me.visibleLabels[label.id], me.isSubjectLabel );
    },
 
    onLabelRemoveActionClick : function(column, action, view, rowIndex, colIndex, item, e) {
       var me = this;
       var rec = view.store.getAt( rowIndex );
       var label = rec.data;
-      me.removeLabels( [ me.visibleLabels[label.labelId] ], rowIndex );
+      me.removeLabels( [ me.visibleLabels[label.id] ], rowIndex );
    },
 
    onLabelDeleteActionClick : function(column, action, view, rowIndex, colIndex, item, e) {
@@ -525,8 +525,8 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
     */
    onLabelShowCheckChange : function(checkColumn, rowIndex, checked, eOpts) {
       var me = this;
-      var labelId = this.down( '#labelSettingsGrid' ).store.data.items[rowIndex].data.labelId;
-      var label = this.visibleLabels[labelId];
+      var id = this.down( '#labelSettingsGrid' ).store.data.items[rowIndex].data.id;
+      var label = this.visibleLabels[id];
       label.isShown = checked;
       LabelService.updateLabel( label, {
          callback : function() {
