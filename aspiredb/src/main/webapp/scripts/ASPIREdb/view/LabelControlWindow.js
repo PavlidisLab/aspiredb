@@ -73,7 +73,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    height : 400,
    renderTo : Ext.getBody(),
    config : {
-      visibleLabels : {},
+      visibleLabels : {}, // holds all the LabelValueObjects in memory
       isSubjectLabel : false,
       selectedOwnerIds : [],
       XValue : 0,
@@ -129,88 +129,137 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
          }
       },
 
-      items : [ {
-         xtype : 'grid',
-         region : 'center',
-         itemId : 'labelSettingsGrid',
-         store : Ext.create( 'ASPIREdb.store.LabelStore' ),
-         columns : [ {
-            header : 'Label',
-            dataIndex : 'labelId',
-            flex : 1,
-            renderer : function(labelId, meta, rec, rowIndex, colIndex, store) {
-               // meta.tdAttr = 'data-qtip="Double-click to rename label"';
-               var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
-               var ret = ASPIREdb.view.LabelControlWindow.getHtmlLabel( label );
-               return ret;
-            },
+      items : [
+               // TODO: Add this back when there's a way to get labels not associated with Subjects and Variants by
+               // Project ID,
+               // ACLs? Share Labels?
+               // {
+               // xtype : 'button',
+               // region : 'north',
+               // itemId : 'createLabel',
+               // text : 'Create new label',
+               // icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
+               // tooltip : 'Create new label',
+               // margins : {
+               // top : 2,
+               // left : 2,
+               // right : 450,
+               // bottom : 2
+               // },
+               // handler : function(ref) {
+               // ref.up( '.window' ).onCreateButtonClick();
+               // }
+               // },
+               {
+                  xtype : 'grid',
+                  region : 'center',
+                  itemId : 'labelSettingsGrid',
+                  store : Ext.create( 'ASPIREdb.store.LabelStore' ),
+                  columns : [
+                             {
+                                header : 'Label',
+                                dataIndex : 'labelId',
+                                flex : 1,
+                                renderer : function(labelId, meta, rec, rowIndex, colIndex, store) {
+                                   // meta.tdAttr = 'data-qtip="Double-click to rename label"';
+                                   var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
+                                   var ret = ASPIREdb.view.LabelControlWindow.getHtmlLabel( label );
+                                   return ret;
+                                },
 
-         }, {
-            header : 'Description',
-            dataIndex : 'labelId',
-            flex : 2,
-            renderer : function(labelId, meta, rec, rowIndex, colIndex, store) {
-               // meta.tdAttr = 'data-qtip="Double-click to rename label"';
-               var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
-               var ret = label.description;
-               return ret;
-            },
+                             },
+                             {
+                                header : 'Description',
+                                dataIndex : 'labelId',
+                                flex : 2,
+                                renderer : function(labelId, meta, rec, rowIndex, colIndex, store) {
+                                   // meta.tdAttr = 'data-qtip="Double-click to rename label"';
+                                   var label = this.up( '#labelControlWindow' ).visibleLabels[labelId];
+                                   var ret = label.description;
+                                   return ret;
+                                },
 
-         }, {
-            header : 'Show',
-            dataIndex : 'show',
-            xtype : 'checkcolumn',
-            id : 'labelShowColumn',
-            width : 50,
-            sortable : false
-         }, {
-            header : '',
-            xtype : 'actioncolumn',
-            id : 'labelEditAction',
-            handler : function(view, rowIndex, colIndex, item, e) {
-               var action = 'editLabel';
-               this.fireEvent( 'itemclick', this, action, view, rowIndex, colIndex, item, e );
-            },
+                             },
+                             {
+                                header : 'Show',
+                                dataIndex : 'show',
+                                xtype : 'checkcolumn',
+                                id : 'labelShowColumn',
+                                width : 50,
+                                sortable : false
+                             },
+                             {
+                                header : 'Edit',
+                                xtype : 'actioncolumn',
+                                id : 'labelEditAction',
+                                handler : function(view, rowIndex, colIndex, item, e) {
+                                   var action = 'editLabel';
+                                   this.fireEvent( 'itemclick', this, action, view, rowIndex, colIndex, item, e );
+                                },
 
-            width : 30,
-            items : [ {
-               icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
-               tooltip : 'Edit label',
+                                width : 30,
+                                items : [ {
+                                   icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
+                                   tooltip : 'Edit label',
 
-            } ]
-         }, {
-            header : '',
-            xtype : 'actioncolumn',
-            id : 'labelRemoveAction',
-            handler : function(view, rowIndex, colIndex, item, e) {
-               var action = 'removeLabel';
-               this.fireEvent( 'itemclick', this, action, view, rowIndex, colIndex, item, e );
-            },
+                                } ]
+                             },
+                             {
+                                header : '',
+                                xtype : 'actioncolumn',
+                                id : 'labelRemoveAction',
 
-            width : 30,
-            items : [ {
-               icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
-               tooltip : 'Remove label',
+                                width : 30,
+                                items : [ {
+                                   id : 'deleteIcon',
+                                   icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
+                                   tooltipType : 'title',
+                                   // tooltip : 'Remove label from selected items',
+                                   handler : function(view, rowIndex, colIndex, item, e) {
+                                      var action = 'removeLabel';
+                                      this.fireEvent( 'itemclick', this, action, view, rowIndex, colIndex, item, e );
+                                   },
+                                   getTip : function(v, metaData, r, rowIndex, colIndex, store) {
+                                      var ret = 'Remove <b>' + r.get( 'labelName' ) + '</b> from the selected '
+                                         + (this.up( '.window' ).isSubjectLabel ? 'subjects' : 'variants') + '?';
 
-            } ]
-         }, ],
-         // plugins : [ rowEditing ],
+                                      metaData.tdAttr = 'data-qtip="' + ret + '" qwidth="auto"';
 
-         listeners : {
-            itemdblclick : function(e, record, item, index) {
-               // create edit label window
+                                      return ret;
+                                   },
+                                } ]
+                             }, {
+                                header : '',
+                                xtype : 'actioncolumn',
+                                id : 'labelDeleteAction',
 
-               var ref = this;
-               var labelControlWindow = ref.up( '#labelControlWindow' );
-               var row = labelControlWindow.visibleLabels[record.data.labelId];
-               var selectedLabel = row;
-               var grid = labelControlWindow.down( '#labelSettingsGrid' );
+                                width : 30,
+                                items : [ {
+                                   icon : 'scripts/ASPIREdb/resources/images/icons/cross.png',
+                                   tooltip : 'Delete label',
+                                   handler : function(view, rowIndex, colIndex, item, e) {
+                                      var action = 'deleteLabel';
+                                      this.fireEvent( 'itemclick', this, action, view, rowIndex, colIndex, item, e );
+                                   },
+                                } ]
+                             }, ],
+                  // plugins : [ rowEditing ],
 
-               labelControlWindow.editLabel( selectedLabel, labelControlWindow.isSubjectLabel );
+                  listeners : {
+                     itemdblclick : function(e, record, item, index) {
+                        // create edit label window
 
-            }
-         }
-      },// end of grid
+                        var ref = this;
+                        var labelControlWindow = ref.up( '#labelControlWindow' );
+                        var row = labelControlWindow.visibleLabels[record.data.labelId];
+                        var selectedLabel = row;
+                        var grid = labelControlWindow.down( '#labelSettingsGrid' );
+
+                        labelControlWindow.editLabel( selectedLabel, labelControlWindow.isSubjectLabel );
+
+                     }
+                  }
+               },// end of grid
       ]
    } ],
 
@@ -220,6 +269,8 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
       var me = this;
 
       me.down( '#labelShowColumn' ).on( 'checkchange', me.onLabelShowCheckChange, this );
+
+      me.down( '#labelDeleteAction' ).on( 'itemclick', me.onLabelDeleteActionClick, this );
 
       me.down( '#labelRemoveAction' ).on( 'itemclick', me.onLabelRemoveActionClick, this );
 
@@ -233,21 +284,6 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    initGridAndShow : function() {
       var me = this;
 
-      /**
-       * Created for row editing me.down( '#labelSettingsGrid' ).on( 'edit', function(editor, e) { var record =
-       * e.record; var label = me.visibleLabels[record.data.labelId]; label.name = record.data.labelName;
-       * label.htmlLabel ="<font color=black><span
-       * style='background-color:"+label.colour+"'>&nbsp&nbsp"+label.name+"&nbsp</span></font>&nbsp&nbsp&nbsp";
-       * 
-       * LabelService.updateLabel( label, { callback : function() { me.down( '#labelSettingsGrid' ).getView().refresh();
-       * if ( me.isSubjectLabel ) { ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_changed' ); } else {
-       * ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_changed' ); } },errorHandler : function(er, exception) {
-       * Ext.Msg.alert( "Update Label Error", er + "\n" + exception.stack ); console.log( exception.stack ); } } ); } );
-       * 
-       * me.down( '#labelSettingsGrid' ).on( 'validateedit', function(editor, e) { var record = e.record; var
-       * labelcolour = record.data.labelColour; // TODO: check for valid color or find a better way to edit colours
-       * using color picker // if (labelcolour) } );
-       */
       if ( me.isSubjectLabel ) {
          me.service = SubjectService;
       } else {
@@ -306,23 +342,25 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    removeSubjectLabels : function(labels, rowIndex) {
       var me = this;
       if ( me.selectedOwnerIds.length == 0 ) {
-         Ext.MessageBox.confirm( 'Delete', 'Remove label for all subjects?', function(btn) {
-            if ( btn === 'yes' ) {
-               LabelService.deleteSubjectLabels( labels, {
-                  callback : function() {
-                     ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_removed', me.selectedOwnerIds, labels );
-                     me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
-                  }
-               } );
-            }
-         } );
+         Ext.MessageBox.confirm( 'Delete Subject Label', 'Delete  <b>' + labels[0].name + '</b> from all subjects?',
+            function(btn) {
+               if ( btn === 'yes' ) {
+                  LabelService.deleteSubjectLabels( labels, {
+                     callback : function() {
+                        ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_removed', me.selectedOwnerIds, labels );
+                        me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
+                     }
+                  } );
+               }
+            } );
       } else {
-         Ext.MessageBox.confirm( 'Delete', 'Remove labels for selected subject(s)?', function(btn) {
+         Ext.MessageBox.confirm( 'Remove Subject Label', 'Remove  <b>' + labels[0].name + '</b> from '
+            + me.selectedOwnerIds.length + ' selected subject(s)?', function(btn) {
             if ( btn === 'yes' ) {
                LabelService.removeLabelsFromSubjects( labels, me.selectedOwnerIds, {
                   callback : function() {
                      ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_removed', me.selectedOwnerIds, labels );
-                     me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
+                     // me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
                   }
                } );
             }
@@ -334,29 +372,70 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
     * Returns true if label was removed
     */
    removeVariantLabels : function(labels, rowIndex) {
+      if ( labels === null || rowIndex === null ) {
+         return;
+      }
       var me = this;
       if ( me.selectedOwnerIds.length == 0 ) {
-         Ext.MessageBox.confirm( 'Delete', 'Remove label for all variants?', function(btn) {
-            if ( btn === 'yes' ) {
-               LabelService.deleteVariantLabels( labels, {
-                  callback : function() {
-                     ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_removed', me.selectedOwnerIds, labels );
-                     me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
-                  }
-               } );
-            }
-         } );
+         Ext.MessageBox.confirm( 'Delete Variant Label', 'Delete <b>' + labels[0].name + '</b> from all variants?',
+            function(btn) {
+               if ( btn === 'yes' ) {
+                  LabelService.deleteVariantLabels( labels, {
+                     callback : function() {
+                        ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_removed', me.selectedOwnerIds, labels );
+                        me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
+                     }
+                  } );
+               }
+            } );
       } else {
-         Ext.MessageBox.confirm( 'Delete', 'Remove labels for selected variant(s)?', function(btn) {
+         Ext.MessageBox.confirm( 'Remove Variant Label', 'Remove <b>' + labels[0].name + '</b> from '
+            + me.selectedOwnerIds.length + ' selected variant(s)?', function(btn) {
             if ( btn === 'yes' ) {
                LabelService.removeLabelsFromVariants( labels, me.selectedOwnerIds, {
                   callback : function() {
                      ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_removed', me.selectedOwnerIds, labels );
-                     me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
+                     // me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
                   }
                } );
             }
          } );
+      }
+   },
+
+   /**
+    * Delete label
+    */
+   deleteLabel : function(label, rowIndex) {
+      if ( label === null || rowIndex === null ) {
+         return;
+      }
+      var me = this;
+      var labels = [ label ];
+      if ( me.isSubjectLabel ) {
+         Ext.MessageBox.confirm( 'Delete Subject Label', 'Delete <b>' + label.labelName + '</b> from all subjects?',
+            function(btn) {
+               if ( btn === 'yes' ) {
+                  LabelService.deleteSubjectLabels( labels, {
+                     callback : function() {
+                        ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_removed', [], labels );
+                        me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
+                     }
+                  } );
+               }
+            } );
+      } else {
+         Ext.MessageBox.confirm( 'Delete Variant Label', 'Delete <b>' + label.labelName + '</b> from all variants?',
+            function(btn) {
+               if ( btn === 'yes' ) {
+                  LabelService.deleteVariantLabels( labels, {
+                     callback : function() {
+                        ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_removed', [], labels );
+                        me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
+                     }
+                  } );
+               }
+            } );
       }
    },
 
@@ -374,12 +453,20 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
       me.removeLabels( [ me.visibleLabels[label.labelId] ], rowIndex );
    },
 
+   onLabelDeleteActionClick : function(column, action, view, rowIndex, colIndex, item, e) {
+      var me = this;
+      var rec = view.store.getAt( rowIndex );
+      var label = rec.data;
+      me.deleteLabel( label, rowIndex );
+   },
+
    editLabel : function(selectedLabel, isSubjectLabel) {
       Ext.define( 'ASPIREdb.view.CreateLabelWindowEdit', {
          isSubjectLabel : isSubjectLabel,
          title : 'Edit Label Manager',
          extend : 'ASPIREdb.view.CreateLabelWindow',
          selectedLabel : selectedLabel,
+         isCreate : false,
 
          // override
          onOkButtonClick : function() {

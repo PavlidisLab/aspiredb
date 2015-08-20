@@ -48,6 +48,7 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
       selectedIds : [],
       service : null,
       selectedLabel : null,
+      isCreate : true, // Are we creating a new label or editing existing labels?
    },
 
    constructor : function(cfg) {
@@ -91,6 +92,7 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
       }
 
       Ext.getCmp( 'aspireDbPanel' ).setLoading( true );
+
       me.service.suggestLabels( null, {
          callback : function(vos) {
             me.createItems( vos, me );
@@ -125,7 +127,7 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
          valueField : 'value',
          renderTo : Ext.getBody(),
          fieldLabel : 'Name',
-         emptyText : 'Choose existing or enter new label name',
+         emptyText : 'Choose or enter a new label name',
          margin : 5,
          width : 400,
       } );

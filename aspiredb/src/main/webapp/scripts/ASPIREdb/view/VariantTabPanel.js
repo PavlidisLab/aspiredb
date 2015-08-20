@@ -21,7 +21,8 @@ Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowMode
               'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings',
               'ASPIREdb.view.VariantGridCreator', 'ASPIREdb.view.GeneGridCreator', 'ASPIREdb.IdeogramDownloadWindow',
               'Ext.data.ArrayStore', 'Ext.form.ComboBox', 'ASPIREdb.view.SubjectGrid',
-              'ASPIREdb.view.report.VariantReportWindow', 'ASPIREdb.view.VariantCompoundHeterozygoteWindow', 'ASPIREdb.Utils' ] );
+              'ASPIREdb.view.report.VariantReportWindow', 'ASPIREdb.view.VariantCompoundHeterozygoteWindow',
+              'ASPIREdb.Utils' ] );
 
 /**
  * Variant Tab Panel contains both Ideogram view and Variant table view
@@ -78,13 +79,13 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       this.labelsMenu = Ext.create( 'Ext.menu.Menu', {
          items : [ {
             itemId : 'makeLabel',
-            text : 'Make label...',
+            text : 'Create or apply label',
             disabled : true,
             handler : this.makeLabelHandler,
             scope : this
          }, {
             itemId : 'labelManager',
-            text : 'Label Manager',
+            text : 'Manage labels',
             disabled : false,
             handler : this.labelManagerHandler,
             scope : this
@@ -271,9 +272,9 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
          for (var i = 0; i < selectedIds.length; i++) {
             var labelIds = grid.store.findRecord( 'id', selectedIds[i] ).data.labelIds;
-             if ( labelIds.indexOf(addedLabel.id) == -1) {
-                labelIds.push( addedLabel.id );
-             }
+            if ( labelIds.indexOf( addedLabel.id ) == -1 ) {
+               labelIds.push( addedLabel.id );
+            }
          }
 
          if ( ref.getActiveTab().itemId == 'ideogram' ) {
@@ -372,11 +373,11 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
          var contextMenu = new Ext.menu.Menu( {
             items : [ {
-               text : 'Make label',
+               text : 'Create or apply label',
                handler : ref.makeLabelHandler,
                scope : ref,
             }, {
-               text : 'Label Manager',
+               text : 'Remove label',
                handler : ref.labelManagerHandler,
                scope : ref,
             } ]
@@ -560,13 +561,13 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
          for (var i = 0; i < selectedIds.length; i++) {
             var labelIds = ref.store.findRecord( 'id', selectedIds[i] ).data.labelIds;
-            if ( labelIds.indexOf(addedLabel.id) == -1) {
+            if ( labelIds.indexOf( addedLabel.id ) == -1 ) {
                labelIds.push( addedLabel.id );
             }
          }
 
       }
-            
+
       // refresh the variant in grid
       ref.down( '#variantGrid' ).getView().refresh();
 
@@ -1087,14 +1088,14 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
    getSelectedVariantIds : function(selectedVariantRecords) {
 
-//      var selectedVariantIds = [];
-//
-//      for (var i = 0; i < selectedVariantRecords.length; i++) {
-//         selectedVariantIds.push( selectedVariantRecords[i].data.id );
-//      }
-//
-//      return selectedVariantIds;
-      
+      // var selectedVariantIds = [];
+      //
+      // for (var i = 0; i < selectedVariantRecords.length; i++) {
+      // selectedVariantIds.push( selectedVariantRecords[i].data.id );
+      // }
+      //
+      // return selectedVariantIds;
+
       return ASPIREdb.Utils.getSelectedIds( selectedVariantRecords );
    },
 

@@ -25,6 +25,7 @@ Ext.require( [ 'ASPIREdb.MainPanel', 'ASPIREdb.EVENT_BUS', 'ASPIREdb.view.filter
  */
 if ( Ext.isChrome || Ext.IE ) {
    Ext.tip.Tip.prototype.minWidth = 200;
+   Ext.tip.Tip.prototype.minHeight = 50;
    Ext.Msg.minWidth = 450;
 }
 
