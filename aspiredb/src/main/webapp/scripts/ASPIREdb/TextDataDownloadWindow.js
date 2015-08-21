@@ -210,7 +210,6 @@ Ext.define( 'ASPIREdb.TextDataDownloadWindow', {
 
    showVariantsDownload : function(data, columnHeaders) {
       var text = '';
-
       for (var i = 0; i < columnHeaders.length; i++) {
 
          text = text + columnHeaders[i];
@@ -223,11 +222,42 @@ Ext.define( 'ASPIREdb.TextDataDownloadWindow', {
 
          vvoArray = data[i].raw;
 
-         // first column is subjectId so skip
+         // ignore subject DB ID at the beginning
          for (var j = 1; j < vvoArray.length; j++) {
 
             if ( vvoArray[j] ) {
-               text = text + vvoArray[j];
+               if ( columnHeaders[j - 1].toLowerCase() == 'gene' ) {
+                  var genes = vvoArray[j];
+                  var symbols = [];
+
+                  if ( !genes ) {
+                     continue;
+                  }
+
+                  // it's a gene, expect an array
+                  for (var k = 0; k < genes.length; k++) {
+                     symbols.push( genes[k].symbol );
+                  }
+
+                  text = text + symbols.join( ', ' );
+               } else if ( columnHeaders[j - 1].toLowerCase() == 'labels' ) {
+                  // TODO
+                  var labels = vvoArray[j];
+                  var names = [];
+
+                  if ( !labels ) {
+                     continue;
+                  }
+
+                  // it's a label, expect an array
+                  for (var k = 0; k < labels.length; k++) {
+                     names.push( labels[k].name );
+                  }
+
+                  text = text + names.join( ', ' );
+               } else {
+                  text = text + vvoArray[j];
+               }
             }
             text = text + "\t";
          }

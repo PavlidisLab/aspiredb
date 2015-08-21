@@ -131,8 +131,11 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
          } );
 
          // these are required variant properties
-         var columnHeaders = [ 'Patient Id', 'Type', 'Genome Coordinates', 'Copy Number', 'CNV Type', 'CNV Length',
-                              'DB SNP ID', 'Observed Base', 'Reference Base', 'Indel Length', 'Gene' ];
+         // var columnHeaders = [ 'Patient Id', 'Type', 'Genome Coordinates', 'Copy Number', 'CNV Type', 'CNV Length',
+         // 'DB SNP ID', 'Observed Base', 'Reference Base', 'Indel Length', 'Gene' ];
+         var columnHeaders = [ 'Patient Id', 'Type', 'Genome Coordinates', 'Chromosome', 'Base Start', 'Base End',
+                              'Labels', 'Copy Number', 'CNV Type', 'CNV Length', 'DB SNP ID', 'Observed Base',
+                              'Reference Base', 'Indel Length', 'Gene' ];
          var columnConfig = [];
 
          columnConfig.push( {
