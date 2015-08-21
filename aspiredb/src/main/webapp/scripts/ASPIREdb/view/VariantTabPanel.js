@@ -82,13 +82,17 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             text : 'Create or apply label',
             disabled : true,
             handler : this.makeLabelHandler,
-            scope : this
+            scope : this,
+            tooltip : 'Create or apply labels to selected Variants',
+            tooltipType : 'title'
          }, {
             itemId : 'labelManager',
             text : 'Manage labels',
             disabled : false,
             handler : this.labelManagerHandler,
-            scope : this
+            scope : this,
+            tooltip : 'Edit, delete or remove labels from selected Variants',
+            tooltipType : 'title'
          } ]
       } );
 

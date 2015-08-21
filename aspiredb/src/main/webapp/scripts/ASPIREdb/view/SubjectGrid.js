@@ -140,13 +140,17 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
             text : 'Create or apply label',
             disabled : true,
             handler : this.makeLabelHandler,
-            scope : this
+            scope : this,
+            tooltip : 'Create or apply labels to selected Subjects',
+            tooltipType : 'title'
          }, {
             itemId : 'labelManager',
             text : 'Manage labels',
             disabled : false,
             handler : this.labelManagerHandler,
-            scope : this
+            scope : this,
+            tooltip : 'Edit, delete or remove labels from selected Subjects',
+            tooltipType : 'title'
          } ]
       } );
 
@@ -183,7 +187,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
          text : 'Burden analysis',
          handler : this.burdenAnalysisHandler,
          scope : this,
-         tooltip : 'Perform burden analysis on the filtered variants',
+         tooltip : 'Compare mutation burden between subject groups',
          tooltipType : 'title',
       } );
 

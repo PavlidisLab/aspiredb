@@ -69,7 +69,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
          text : 'Heatmap',
          disabled : 'true',
          itemId : 'heatmapButton',
-         tooltip : 'View subject-phenotype heatmap',
+         tooltip : 'Show subject and phenotype clusters',
          tooltipType : 'title',
 
       }, {
@@ -77,7 +77,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
          text : 'Contingency table',
          disabled : 'true',
          itemId : 'contingencyTableButton',
-         tooltip : 'View subject-phenotype labels',
+         tooltip : 'Create subject labels by phenotype values',
          tooltipType : 'title',
       }, {
          xtype : 'tbfill',

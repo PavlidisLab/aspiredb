@@ -219,6 +219,8 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          xtype : 'button',
          text : 'Filter...',
          itemId : 'filterButton',
+         tooltip : 'Apply expressions to filter subjects and variants',
+         tooltipType : 'title',
          height : 30,
          margin : '5 5 5 5',
          handler : function() {
@@ -228,6 +230,8 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          xtype : 'button',
          text : 'Clear filter',
          itemId : 'clearFilterButton',
+         tooltip : 'Remove applied filters',
+         tooltipType : 'title',
          height : 30,
          margin : '5 5 5 5',
          handler : function() {
@@ -246,6 +250,8 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          itemId : 'dashboardButton',
          height : 30,
          margin : '5 5 5 5',
+         tooltip : 'Manage or load projects',
+         tooltipType : 'title',
          handler : function() {
             Ext.getCmp( 'aspireDbPanel' ).disableToolbarButtonsForDashboard( true );
             ASPIREdb.view.DashboardWindow.show();
@@ -254,6 +260,8 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          xtype : 'button',
          text : 'Gene Set Manager',
          itemId : 'geneManagerButton',
+         tooltip : 'Manage gene sets',
+         tooltipType : 'title',
          height : 30,
          margin : '5 5 5 5',
          handler : function() {
