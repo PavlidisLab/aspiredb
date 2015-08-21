@@ -200,6 +200,11 @@ Ext.define( 'ASPIREdb.view.filter.PropertyFilter', {
          emptyText : 'Type characteristics',
          suggestValuesRemoteFunction : VariantService.suggestValues,
          store : {
+            extend : Ext.data.Store,
+            sorters : [ {
+               property : 'displayName',
+               direction : 'ASC'
+            } ],
             proxy : {
                type : 'dwr',
                dwrFunction : VariantService.suggestPropertiesForVariantTypeInProject,

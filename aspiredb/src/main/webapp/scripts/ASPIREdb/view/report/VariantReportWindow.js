@@ -82,13 +82,16 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
 
       this.callParent();
 
-      me.reportTypeStore = { 
+      Ext.define( 'ASPIREdb.view.report.VariantReportWindowStore', {
+         extend : Ext.data.Store,
+         sorters : [ {
+            property : 'displayName',
+            direction : 'ASC'
+         } ],
          proxy : {
             type : 'dwr',
-            //dwrFunction : VariantService.suggestPropertiesForVariantTypeInProject,
-            //dwrParams : [ 'CNV', ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0] ],
             dwrFunction : VariantService.suggestPropertiesForAllVariantTypesInProject,
-            dwrParams : [  ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0] ],
+            dwrParams : [ ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0] ],
             model : 'ASPIREdb.model.Property',
             reader : {
                type : 'json',
@@ -96,7 +99,8 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
                totalProperty : 'count'
             }
          }
-      };
+      } );
+      me.reportTypeStore = Ext.create( 'ASPIREdb.view.report.VariantReportWindowStore' );
 
       me.down( 'toolbar' ).add( {
          xtype : 'combo',
@@ -111,10 +115,10 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
          width : 350,
          listeners : {
             select : me.reportComboSelectHandler,
-            /*afterrender : function(combo) {
-               var recordSelected = combo.getStore().getAt( 0 );
-               combo.setValue( recordSelected.get( 'id' ) );
-            }*/
+         /*
+          * afterrender : function(combo) { var recordSelected = combo.getStore().getAt( 0 ); combo.setValue(
+          * recordSelected.get( 'id' ) ); }
+          */
          }
       }, {
          xtype : 'tbspacer'
@@ -140,7 +144,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       } );
 
       this.down( "#logTransformCheckbox" ).on( 'change', me.reportComboSelectHandler );
-      
+
    },
 
    /**
@@ -153,13 +157,13 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       reportCombo.store.filter( [ {
          fn : function(record) {
             // [0] == false, [] == false
-            return variants.collect( record.get('name') ) != 0;
+            return variants.collect( record.get( 'name' ) ) != 0;
          }
       } ] );
 
    },
-   
-   createAndShow : function( vvos ) {
+
+   createAndShow : function(vvos) {
       var me = this;
 
       me.variants = vvos;
@@ -172,13 +176,13 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
 
    reportComboSelectHandler : function(cmp, newValue, oldValue, eOpts) {
       var me = this;
-      
+
       var window = this.up( '#variantReportWindow' );
 
       var reportCombo = window.down( '#reportCombo' );
 
       var selReportType = reportCombo.value
-      
+
       var reportPanel = window.down( '#variantReport' );
       if ( reportPanel != null ) {
          window.remove( reportPanel );
@@ -219,7 +223,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
       reportPanel.createReport( window.variants, selReportType );
 
       window.doLayout();
-      
+
    },
 
 } );
