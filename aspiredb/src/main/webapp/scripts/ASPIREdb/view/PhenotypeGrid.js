@@ -77,7 +77,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
          text : 'Contingency table',
          disabled : 'true',
          itemId : 'contingencyTableButton',
-         tooltip : 'Create subject labels by phenotype values',
+         tooltip : 'Create subject labels based on the selected phenotype',
          tooltipType : 'title',
       }, {
          xtype : 'tbfill',

@@ -49,11 +49,20 @@ Ext
 
          items : [ {
             xtype : 'label',
-            html : "For help with the data file format, see <a target='_blank' href='http://aspiredb.chibi.ubc.ca/data-loaders-and-admin-tools-setup/data-loaders-2/'>this page</a>."
-               + "<br/><br/>Sample files: <a download target='_blank' href='scripts/ASPIREdb/resources/samples/sampleCnv.csv'>sampleCnv.csv</a>, <a download target='_blank' href='scripts/ASPIREdb/resources/samples/samplePhenotype.csv'>samplePhenotype.csv</a>",
+            html : "Sample files: <a download target='_blank' href='scripts/ASPIREdb/resources/samples/sampleCnv.csv'>sampleCnv.csv</a>, "
+               + "<a download target='_blank'href='scripts/ASPIREdb/resources/samples/samplePhenotype.csv'>samplePhenotype.csv</a>",
          } ],
 
          buttons : [
+                    {
+                       xtype : 'button',
+                       text : 'Help',
+                       itemId : 'helpButton',
+                       handler : function() {
+                          window
+                             .open( 'http://aspiredb.chibi.ubc.ca/data-loaders-and-admin-tools-setup/data-loaders-2/' );
+                       },
+                    },
                     {
                        text : 'Submit',
                        id : 'uploadFilesEdit',

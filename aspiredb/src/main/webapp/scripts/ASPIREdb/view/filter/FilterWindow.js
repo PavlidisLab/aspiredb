@@ -181,6 +181,15 @@ Ext
                                 items : [ {
                                    xtype : 'button',
                                    flex : 1,
+                                   text : 'Help',
+                                   itemId : 'helpButton',
+                                   handler : function() {
+                                      window.open( 'http://aspiredb.chibi.ubc.ca/manual' );
+                                   },
+                                   scope : me,
+                                }, {
+                                   xtype : 'button',
+                                   flex : 1,
                                    text : 'Preview',
                                    itemId : 'previewQueryButton',
                                    handler : me.previewQueryHandler,
@@ -452,24 +461,25 @@ Ext
             } );
             myMask.show();
 
-            QueryService.getSubjectsVariants( filterConfigs, {
-               callback : function(ret) {
+            QueryService.getSubjectsVariants( filterConfigs,
+               {
+                  callback : function(ret) {
 
-                  ASPIREdb.EVENT_BUS.fireEvent( 'construct_variant_grid', filterConfigs, ret[me.VARIANT_IDS_KEY],
-                     null );
+                     ASPIREdb.EVENT_BUS.fireEvent( 'construct_variant_grid', filterConfigs, ret[me.VARIANT_IDS_KEY],
+                        null );
 
-                  ASPIREdb.EVENT_BUS.fireEvent( 'construct_subject_grid', filterConfigs, ret[me.SUBJECT_IDS_KEY] );
-                  
-                  myMask.hide();
-                  
-               },
-               errorHandler : function(errorString, exception) {
-                  myMask.hide();
-                  alert( errorString )
-                  console.log( dwr.util.toDescriptiveString( exception, 2 ) )
-                  console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
-               }
-            } );
+                     ASPIREdb.EVENT_BUS.fireEvent( 'construct_subject_grid', filterConfigs, ret[me.SUBJECT_IDS_KEY] );
+
+                     myMask.hide();
+
+                  },
+                  errorHandler : function(errorString, exception) {
+                     myMask.hide();
+                     alert( errorString )
+                     console.log( dwr.util.toDescriptiveString( exception, 2 ) )
+                     console.log( dwr.util.toDescriptiveString( exception.stackTrace, 3 ) )
+                  }
+               } );
 
          },
 
