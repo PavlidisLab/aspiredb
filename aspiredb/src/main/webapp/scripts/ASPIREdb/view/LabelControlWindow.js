@@ -72,6 +72,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    width : 600,
    height : 400,
    renderTo : Ext.getBody(),
+   modal : true,
    config : {
       visibleLabels : {}, // holds all the LabelValueObjects in memory
       isSubjectLabel : false,
@@ -130,26 +131,6 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
       },
 
       items : [
-               // TODO: Add this back when there's a way to get labels not associated with Subjects and Variants by
-               // Project ID,
-               // ACLs? Share Labels?
-               // {
-               // xtype : 'button',
-               // region : 'north',
-               // itemId : 'createLabel',
-               // text : 'Create new label',
-               // icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
-               // tooltip : 'Create new label',
-               // margins : {
-               // top : 2,
-               // left : 2,
-               // right : 450,
-               // bottom : 2
-               // },
-               // handler : function(ref) {
-               // ref.up( '.window' ).onCreateButtonClick();
-               // }
-               // },
                {
                   xtype : 'grid',
                   region : 'center',
@@ -348,19 +329,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
 
    removeSubjectLabels : function(labels, rowIndex) {
       var me = this;
-      if ( me.selectedOwnerIds.length == 0 ) {
-         Ext.MessageBox.confirm( 'Delete Subject Label', 'Delete  <b>' + labels[0].name + '</b> from system?',
-            function(btn) {
-               if ( btn === 'yes' ) {
-                  LabelService.deleteSubjectLabels( labels, {
-                     callback : function() {
-                        ASPIREdb.EVENT_BUS.fireEvent( 'subject_label_removed', me.selectedOwnerIds, labels );
-                        me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
-                     }
-                  } );
-               }
-            } );
-      } else {
+      if ( me.selectedOwnerIds.length > 0 ) {
          Ext.MessageBox.confirm( 'Remove Subject Label', 'Remove  <b>' + labels[0].name + '</b> from '
             + me.selectedOwnerIds.length + ' selected subject(s)?', function(btn) {
             if ( btn === 'yes' ) {
@@ -372,6 +341,13 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                } );
             }
          } );
+      } else {
+         Ext.Msg.show( {
+            title : 'Remove Subject Label',
+            msg : 'Please select subject(s) to remove the label from',
+            buttons : Ext.Msg.OK,
+            minWidth : 350,
+         } );
       }
    },
 
@@ -380,22 +356,11 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
     */
    removeVariantLabels : function(labels, rowIndex) {
       if ( labels === null || rowIndex === null ) {
+
          return;
       }
       var me = this;
-      if ( me.selectedOwnerIds.length == 0 ) {
-         Ext.MessageBox.confirm( 'Delete Variant Label', 'Delete <b>' + labels[0].name + '</b> from system?', function(
-            btn) {
-            if ( btn === 'yes' ) {
-               LabelService.deleteVariantLabels( labels, {
-                  callback : function() {
-                     ASPIREdb.EVENT_BUS.fireEvent( 'variant_label_removed', me.selectedOwnerIds, labels );
-                     me.down( '#labelSettingsGrid' ).store.removeAt( rowIndex );
-                  }
-               } );
-            }
-         } );
-      } else {
+      if ( me.selectedOwnerIds.length > 0 ) {
          Ext.MessageBox.confirm( 'Remove Variant Label', 'Remove <b>' + labels[0].name + '</b> from '
             + me.selectedOwnerIds.length + ' selected variant(s)?', function(btn) {
             if ( btn === 'yes' ) {
@@ -406,6 +371,13 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                   }
                } );
             }
+         } );
+      } else {
+         Ext.Msg.show( {
+            title : 'Remove Variant Label',
+            msg : 'Please select variant(s) to remove the label from',
+            buttons : Ext.Msg.OK,
+            minWidth : 350,
          } );
       }
    },

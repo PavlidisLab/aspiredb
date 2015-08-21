@@ -18,6 +18,9 @@
  */
 Ext.require( [ 'Ext.Window', 'Ext.picker.Color', 'Ext.data.ArrayStore', 'Ext.form.ComboBox', 'Ext.button.Button' ] );
 
+/**
+ * UI for creating new labels, updating labels and applying labels to Subject(s) and Variant(s)
+ */
 Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
    /**
     * @memberOf ASPIREdb.view.CreateLabelWindow
@@ -244,6 +247,12 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
       var labelCombo = this.down( "#labelCombo" );
       var vo = this.getLabel();
       if ( vo == null ) {
+         Ext.Msg.show( {
+            title : 'Create Label',
+            msg : 'Please choose or enter a label name',
+            buttons : Ext.Msg.OK,
+            minWidth : 300,
+         } );
          return;
       }
       me.addLabelHandler( vo, me.selectedIds );
