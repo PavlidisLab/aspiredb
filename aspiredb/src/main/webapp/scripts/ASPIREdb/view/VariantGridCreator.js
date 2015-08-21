@@ -18,6 +18,19 @@ Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowMode
               'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings' ] );
 
 /**
+ * Converts invalid numerical values to NaNs so that they can be sorted properly.
+ */
+Ext.data.Types.ROBUSTFLOAT = {
+   convert : function(v, data) {
+      return isNaN( parseFloat( v ) ) ? '' : '' + parseFloat( v );
+   },
+   sortType : function(v) {
+      return isNaN( parseFloat( v ) ) ? NaN : parseFloat( v );
+   },
+   type : 'RobustFloat'
+};
+
+/**
  * This grid is created dynamically based on 'suggested properties'( see VariantService.suggestProperties) this dynamic
  * nature is why this grid is constructed this way
  */
@@ -60,7 +73,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
                || dataIndexes[i] == 'indelLength' ) {
                fieldData.push( {
                   name : dataIndexes[i],
-                  type : 'int'
+                  type : 'RobustFloat'
                } );
             } else {
                fieldData.push( {
@@ -71,10 +84,38 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
          }
 
          var characteristicNames = this.extractCharacteristicNames( vvos ).sort();
+         // determine the type by getting a single value
+         var firstCharacteristics = null;
+         if ( vvos != null && vvos.length > 0 ) {
+            firstCharacteristics = vvos[0].characteristics;
+         }
          for (var i = 0; i < characteristicNames.length; i++) {
             var characteristic = characteristicNames[i];
             if ( fieldData.indexOf( characteristic ) == -1 ) {
-               fieldData.push( characteristic );
+
+               if ( firstCharacteristics != null && firstCharacteristics[characteristic] != null ) {
+
+                  // type check
+                  var val = firstCharacteristics[characteristic].value;
+                  var type = null;
+
+                  if ( val == null ) {
+                     type = 'auto';
+                  } else if ( !isNaN( parseFloat( val ) ) ) {
+                     type = 'RobustFloat';
+                  } else {
+                     'auto'
+                  }
+
+                  fieldData.push( {
+                     'name' : characteristic,
+                     'type' : type
+                  } );
+
+               } else {
+                  fieldData.push( characteristic );
+               }
+
             }
          }
 
