@@ -55,6 +55,23 @@
 
 <script>
 
+    // Fix tooltip size in Chrome and IE10
+    // Ref: https://www.sencha.com/forum/archive/index.php/t-260106.html?s=7a9af4c0dd95c3c1c42c8c2c35acfddd
+       
+	delete Ext.tip.Tip.prototype.minWidth;
+	
+	if(Ext.isIE10 || Ext.isChrome) { 
+	   
+	   Ext.override(Ext.tip.Tip, {
+	      componentLayout: {
+	         type: 'fieldset',
+	         getDockedItems: function() { return []; }
+	      }
+	   });
+	}
+	
+	Ext.QuickTips.init();
+
 	//Basic mask:
 	var myMask = new Ext.LoadMask(Ext.getBody(), {msg:"Please wait..."});
 	myMask.show();
@@ -65,10 +82,8 @@
       enableQuickTips : true,
       
       launch : function() {
-         
-         //var win = Ext.create('ASPIREdb.view.LoginForm');
+
          var viewport = Ext.create( 'ASPIREdb.AspireDbPanel' );
-         //win.show();
          
          myMask.hide();
       }

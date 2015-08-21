@@ -17,9 +17,10 @@
 Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel',
               'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings' ] );
 
-// This grid is created dynamically based on 'suggested properties'( see VariantService.suggestProperties) this dynamic
-// nature is why this grid is constructed this way
-// TODO js documentation
+/**
+ * This grid is created dynamically based on 'suggested properties'( see VariantService.suggestProperties) this dynamic
+ * nature is why this grid is constructed this way
+ */
 Ext.define( 'ASPIREdb.view.VariantGridCreator',
    {
       /**
@@ -38,6 +39,9 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
       },
 
       /**
+       * The main function that returns a ExtJS Grid '#variantGrid' from a collection of VariantValueObjects and variant
+       * GeneValueObjects.
+       * 
        * @public
        * @param {VariantValueObject[]}
        *           vvos
@@ -82,41 +86,41 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             fields : fieldData,
             data : storeData,
             pageSize : 100,
-         // groupField : 'patientId'
 
          } );
 
+         // these are required variant properties
          var columnHeaders = [ 'Patient Id', 'Type', 'Genome Coordinates', 'Copy Number', 'CNV Type', 'CNV Length',
                               'DB SNP ID', 'Observed Base', 'Reference Base', 'Indel Length', 'Gene' ];
          var columnConfig = [];
 
          columnConfig.push( {
             text : 'Patient Id',
-            // flex : 1,
             dataIndex : 'patientId'
          } );
 
          columnConfig.push( {
             text : 'Type',
             width : 50,
-            // flex : 1,
             dataIndex : 'variantType'
          } );
 
+         /**
+          * Render clickable UCSC Genome Browser links
+          */
          columnConfig.push( {
             text : 'Genome Coordinates',
             flex : 1,
             dataIndex : 'genomeCoordinates',
             renderer : function(value) {
 
-               return "<a href='http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg19&position=chr" + value
-                  + "' target='_blank'>" + value + "</a>";
+               return value + "&nbsp;<a href='http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg19&position=chr" + value
+                  + "' target='_blank'><img src='scripts/ASPIREdb/resources/images/ucsc.png'></a>";
             },
          } );
 
          columnConfig.push( {
             text : 'Chromosome',
-            // flex : 1,
             dataIndex : 'chromosome',
             hidden : true
          } );
@@ -198,7 +202,33 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             text : 'Gene',
             flex : 2,
             dataIndex : 'gene',
-            hidden : false
+            hidden : false,
+
+            /**
+             * Render a GeneValueObject in the cell grid
+             */
+            renderer : function(value, metaData, record, rowIdx, colIdx, store) {
+               var ret = "";
+               var symbols = [];
+               var tooltip = "";
+
+               if ( value === null ) {
+                  return ret;
+               }
+               for (var i = 0; i < value.length; i++) {
+                  var g = value[i];
+                  var url = ASPIREdb.GemmaURLUtils.makeGeneUrl( g.symbol );
+
+                  symbols.push( g.symbol + "&nbsp;<a target='_blank' href='" + url
+                     + "'><img src='scripts/ASPIREdb/resources/images/gemmaTiny.gif' /></a>" );
+                  tooltip += "<p><b>" + g.symbol + "</b>&nbsp;" + g.name + "</p>"
+               }
+               ret = symbols.join( ', ' );
+
+               metaData.tdAttr = 'data-qtip="' + tooltip + '"';
+
+               return ret;
+            }
          } );
 
          for (var i = 0; i < characteristicNames.length; i++) {
@@ -228,7 +258,6 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             expires : new Date( new Date().getTime() + (1000 * 60 * 60 * 24 * 7) )
          } ) );
 
-         // TODO styling
          grid = Ext.create( 'Ext.grid.Panel', {
             store : store,
             itemId : 'variantGrid',
@@ -240,7 +269,6 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
                leadingBufferZone : 50
             // Keep 50 rows rendered in the table ahead of scroll
             },
-            // multiSelect : true,
 
             listeners : {
                cellclick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
@@ -253,7 +281,6 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
                }
             },
 
-            // selModel : Ext.create( 'Ext.selection.CellModel', {
             selModel : Ext.create( 'Ext.selection.RowModel', {
                preventFocus : true,
                mode : 'MULTI'
@@ -264,14 +291,6 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             height : 180,
             width : 500,
             title : 'Variant View',
-
-            // known Extjs bug. Disabling for now until fixed. See Bug 4063
-            // requires : [ 'Ext.grid.feature.Grouping' ],
-            // features : [ Ext.create( 'Ext.grid.feature.Grouping', {
-            // groupHeaderTpl : '{name} ({rows.length} Item{[values.rows.length > 1 ? "s" : ""]})',
-            // startCollapsed : true,
-            //
-            // } ) ],
 
             visibleLabels : visibleLabels
 
@@ -387,24 +406,19 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
                dataRow.push( "" );
             }
 
-            // Concatenate gene symbols
+            // aggregate GeneValueObjects that are 'protein_coding'
             var geneSymbols = [];
-            if ( variantGenes != null && variantGenes[vvo.id] != null ) {
-               for (var geneIdx = 0; geneIdx < variantGenes[vvo.id].length; geneIdx++) {
-                  var g = variantGenes[vvo.id][geneIdx];
-                  if ( g.geneBioType === "protein_coding" ) {
-                     geneSymbols.push( g.symbol );
-                  }
+            for (var geneIdx = 0; geneIdx < variantGenes[vvo.id].length; geneIdx++) {
+               var g = variantGenes[vvo.id][geneIdx];
+               if ( g.geneBioType === "protein_coding" ) {
+                  geneSymbols.push( g );
                }
-               dataRow.push( geneSymbols.join( ',' ) );
-            } else {
-               dataRow.push( "" );
             }
+            dataRow.push( geneSymbols );
 
+            // aggregate characteristics
             for (var j = 0; j < characteristicNames.length; j++) {
-
                var dataRowValue = "";
-
                for ( var char in vvo.characteristics) {
                   // make this comparison case insensitive since
                   // it doesn't matter in the database
@@ -414,7 +428,6 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
                      break;
                   }
                }
-
                dataRow.push( dataRowValue );
             }
 

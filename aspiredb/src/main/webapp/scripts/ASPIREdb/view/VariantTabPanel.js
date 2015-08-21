@@ -393,8 +393,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       ref.remove( 'variantGrid', true );
       ref.remove( 'geneGrid', true );
 
-      // when subjects are
-      // selected
+      // when subjects are selected
       grid.on( 'selectionchange', ref.selectionChangeHandler, ref );
 
       grid.on( 'show', function() {
@@ -406,7 +405,6 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       } );
 
       ref.add( grid );
-      // ref.add( grid2 );
    },
 
    /**
@@ -423,18 +421,9 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       ref.filterConfigs = filterConfigs;
 
-      // ref.setLoading( true );
-
       var vvos = vos;
       ref.loadedVariants = vvos;
-      // var variantPatientIds = [];
       var projectId = ASPIREdb.ActiveProjectSettings.getActiveProjectIds()[0];
-
-      // for (var i = 0; i < vvos.length; i++) {
-      // if ( variantPatientIds.indexOf( vvos[i].patientId ) == -1 )
-      // variantPatientIds.push( VariantService.getSubjectVariants( projectId, vvos[i].patientId ) );
-      //
-      // }
 
       var variantIds = [];
 
@@ -442,20 +431,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          variantIds.push( vvos[k].id );
       }
 
-      // GeneService.getGeneValueObjectsInsideVariants( variantIds, {
-      // callback : function(vos) {
-      // console.log( 'variant gene value objects' + vos );
-
-      // ASPIREdb.view.GeneHitsByVariantWindow.getComponent( 'geneHitsByVariantGrid'
-      // ).setLodedvariantvalueObjects(vos );
-      // ASPIREdb.view.GeneHitsByVariantWindow.populateGrid( vos );
-
       ProjectService.numVariants( filterConfigs[0].projectIds, {
          callback : function(NoOfVariants) {
-            /*
-             * if ( NoOfVariants > vvos.length ) { ref.setTitle( "Variant :" + vvos.length + " of " + NoOfVariants + "
-             * filtered" ); } else if ( NoOfVariants == vvos.length ) ref.setTitle( "Variant" );
-             */
             ref.down( '#statusbar' ).update( ref.loadedVariants.length + " / " + NoOfVariants + " variants loaded" );
          }
       } );

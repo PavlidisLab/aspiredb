@@ -21,14 +21,8 @@ Ext.require( [ 'ASPIREdb.MainPanel', 'ASPIREdb.EVENT_BUS', 'ASPIREdb.view.filter
               'ASPIREdb.view.LabelManagerWindow', 'ASPIREdb.view.EditProfileForm' ] );
 
 /**
- * Tooltips are too small in Chrome
+ * For sorting fractions in data grids.
  */
-if ( Ext.isChrome || Ext.IE ) {
-   Ext.tip.Tip.prototype.minWidth = 200;
-   Ext.tip.Tip.prototype.minHeight = 50;
-   Ext.Msg.minWidth = 450;
-}
-
 Ext.apply( Ext.data.SortTypes, {
    asFraction : function(fraction) {
       var tokens = fraction.split( '/' );
