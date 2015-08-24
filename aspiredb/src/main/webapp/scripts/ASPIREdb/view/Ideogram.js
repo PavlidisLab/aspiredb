@@ -466,6 +466,10 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
 
       for (var i = 0; i < variants.length; i++) {
          var variant = variants[i];
+         if ( variant == null ) {
+            console.log( "variant is null" );
+            continue;
+         }
          var chrName = variant.genomicRange.chromosome;
          /* ChromosomeIdeogram */
          var chrIdeogram = this.chromosomeIdeograms[chrName];
@@ -492,20 +496,22 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
          }
          // if variant labels
          if ( property instanceof VariantLabelProperty ) {
-            if ( variant.labels.length > 0 ) {
+            if ( variant.labels != null && variant.labels.length > 0 ) {
                // considering only the first label given to the subject
                propertyValues.push( variant.labels[0].name );
+            } else {
+               propertyValues.push( 'No Label' );
             }
-            // else propertyValues.push('No Label');
          }
          // if subject labels
          if ( property instanceof SubjectLabelProperty ) {
             subject = variant.subject;
-            if ( subject.labels.length > 0 ) {
+            if ( subject != null && subject.labels.length > 0 ) {
                propertyValues.push( subject.labels[0].name );
                console.log( 'variant label name :' + subject.labels[0].name );
+            } else {
+               propertyValues.push( 'No Label' );
             }
-            // else propertyValues.push('No Label');
 
          }
          this.displayedProperty = property;

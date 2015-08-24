@@ -271,7 +271,7 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
       if ( property instanceof SubjectLabelProperty ) {
          subject = variant.subject;
 
-         if ( subject.labels.length > 0 ) {
+         if ( subject != null && subject.labels.length > 0 ) {
             value = subject.labels[0].name;
             var color = '#' + subject.labels[0].colour;
             var pushvalue = "<font color='" + color + "'>" + value + "</font><br>\n";
