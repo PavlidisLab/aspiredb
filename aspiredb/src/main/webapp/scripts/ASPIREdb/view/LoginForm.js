@@ -1,5 +1,26 @@
+/*
+ * The aspiredb project
+ * 
+ * Copyright (c) 2013 University of British Columbia
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.RegistrationForm', 'ASPIREdb.view.ResetPasswordForm' ] );
 
+/**
+ * User login form for authenticating users.
+ */
 Ext.define( 'ASPIREdb.view.LoginForm', {
    extend : 'Ext.container.Viewport',
    title : 'Welcome, please login.',
@@ -100,26 +121,12 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
             handler : function() {
                window.open( "http://aspiredb.sites.olt.ubc.ca/", "_blank", "" );
             }
-         // }, {
-         // xtype : 'button',
-         // itemId : 'clearButton',
-         // text : 'Clear',
-         // handler : function() {
-         // var me = this.ownerCt.ownerCt;
-         // me.getComponent( 'username' ).setValue( '' );
-         // me.getComponent( 'password' ).setValue( '' );
-         //
-         // }
          }, {
             xtype : 'button',
             itemId : 'registerButton',
             text : 'Register',
             handler : function(obj) {
-               // window.location.href = '/aspiredb/register.html';
-               // obj.getEl().on( 'click', function() {
-               // var myForm = new ASPIREdb.view.RegistrationForm();
                ASPIREdb.view.RegistrationForm.initAndShow();
-               // }, this);
             }
          }, {
             xtype : 'button',
@@ -131,26 +138,6 @@ Ext.define( 'ASPIREdb.view.LoginForm', {
       } );
 
       this.add( panel );
-
-      // var textPanel = Ext.create( 'Ext.form.Panel', {
-      // id : 'aspireRegistrationForm',
-      // border : false,
-      //
-      // layout : 'hbox',
-      // defaults : {
-      // anchor : '100%'
-      // },
-      //
-      // // The fields
-      // items : [ {
-      // xtype : 'label',
-      // // padding : '5 5 30 20',
-      // html : "Are you a new user? <a href ='/aspiredb/register.html'>Register</a> to become a user",
-      //
-      // } ]
-      // } );
-      //
-      // this.add( textPanel );
 
       this.doLayout();
 

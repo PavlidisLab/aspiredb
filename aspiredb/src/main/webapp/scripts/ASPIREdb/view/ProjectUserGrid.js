@@ -27,7 +27,7 @@ var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
 } );
 
 /**
- * Create project Grid
+ * Display list of user groups who have access to projects.
  */
 Ext.define( 'ASPIREdb.view.ProjectUserGrid', {
    extend : 'Ext.grid.Panel',
@@ -63,16 +63,6 @@ Ext.define( 'ASPIREdb.view.ProjectUserGrid', {
          allowBlank : true
       }
    } ],
-
-// TODO Implement record update
-   /*plugins : [ rowEditing ], 
-   listeners : {
-      'selectionchange' : function(view, records) {
-         this.down( '#removeProject' ).setDisabled( !records.length );
-         this.selectedUser = this.getSelectionModel().getSelection();
-
-      }
-   },*/
 
    initComponent : function() {
       this.callParent();

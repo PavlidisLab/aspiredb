@@ -17,6 +17,9 @@
  *
  */
 
+/**
+ * Displays data as a tab-delimited table in a Text Area Window.
+ */
 Ext.define( 'ASPIREdb.TextDataDownloadWindow', {
    extend : 'Ext.Window',
    singleton : true,

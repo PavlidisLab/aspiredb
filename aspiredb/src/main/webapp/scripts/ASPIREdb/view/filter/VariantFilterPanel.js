@@ -1,6 +1,27 @@
+/*
+ * The aspiredb project
+ *
+ * Copyright (c) 2013 University of British Columbia
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.filter.AndFilterContainer',
               'ASPIREdb.view.filter.OrVariantFilterContainer', 'ASPIREdb.view.filter.FilterPanel' ] );
 
+/**
+ * Deals with conjunctions and disjunctions of restriction expressions.
+ */
 Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
    extend : 'ASPIREdb.view.filter.FilterPanel',
    alias : 'widget.filter_variant',
@@ -27,74 +48,11 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
 
          },
       }
-   }, /**
-       * { xtype : 'label', text : 'Variant characteristics:', padding : '5 5 5 5', }, { xtype : 'panel', itemId :
-       * 'cnvFilterPanel', bodyStyle : 'background: #FFFFC2;', title : 'CNV:', collapsible : true, collapsed : true,
-       * animCollapse : false, getRestrictionExpression : function() { var filterContainer = this.getComponent(
-       * 'cnvCharacteristicFilterContainer' );
-       * 
-       * var cnvRestrictionExpression = filterContainer.getRestrictionExpression();
-       * 
-       * var variantRestriction = new VariantTypeRestriction();
-       * 
-       * variantRestriction.type = "CNV";
-       * 
-       * cnvRestrictionExpression.restrictions.push( variantRestriction );
-       * 
-       * return cnvRestrictionExpression; }, setRestrictionExpression : function(restriction) { // and filter container
-       * var filterContainer = this.getComponent( 'cnvCharacteristicFilterContainer' );
-       * filterContainer.setRestrictionExpression( restriction ); }, items : { xtype : 'filter_and', itemId :
-       * 'cnvCharacteristicFilterContainer', suggestValuesRemoteFunction : VariantService.suggestValues, propertyStore : { //
-       * autoLoad : true, proxy : { type : 'dwr', dwrFunction : VariantService.suggestPropertiesForVariantType,
-       * dwrParams : [ 'CNV' ], model : 'ASPIREdb.model.Property', reader : { type : 'json', root : 'data',
-       * totalProperty : 'count' } } }, filterItemType : 'ASPIREdb.view.filter.PropertyFilter' } }, { xtype : 'panel',
-       * itemId : 'indelFilterPanel', bodyStyle : 'background: #FFFFC2;', title : 'Indel:', collapsible : true,
-       * collapsed : true, animCollapse : false, getRestrictionExpression : function() {
-       * 
-       * var filterContainer = this.getComponent( 'indelCharacteristicFilterContainer' );
-       * 
-       * var indelRestrictionExpression = filterContainer.getRestrictionExpression();
-       * 
-       * var variantRestriction = new VariantTypeRestriction();
-       * 
-       * variantRestriction.type = "INDEL";
-       * 
-       * indelRestrictionExpression.restrictions.push( variantRestriction );
-       * 
-       * return indelRestrictionExpression; }, setRestrictionExpression : function(restriction) { // and filter
-       * container var filterContainer = this.getComponent( 'indelCharacteristicFilterContainer' );
-       * filterContainer.setRestrictionExpression( restriction ); }, items : { xtype : 'filter_and', itemId :
-       * 'indelCharacteristicFilterContainer', suggestValuesRemoteFunction : VariantService.suggestValues, propertyStore : { //
-       * autoLoad : true, proxy : { type : 'dwr', dwrFunction : VariantService.suggestPropertiesForVariantType,
-       * dwrParams : [ 'INDEL' ], model : 'ASPIREdb.model.Property', reader : { type : 'json', root : 'data',
-       * totalProperty : 'count' } } }, filterItemType : 'ASPIREdb.view.filter.PropertyFilter' } }, { xtype : 'panel',
-       * itemId : 'snvFilterPanel', bodyStyle : 'background: #FFFFC2;', title : 'SNV:', collapsible : true, collapsed :
-       * true, animCollapse : false, getRestrictionExpression : function() { var filterContainer = this.getComponent(
-       * 'snvCharacteristicFilterContainer' );
-       * 
-       * var snvRestrictionExpression = filterContainer.getRestrictionExpression();
-       * 
-       * var variantRestriction = new VariantTypeRestriction();
-       * 
-       * variantRestriction.type = "SNV";
-       * 
-       * snvRestrictionExpression.restrictions.push( variantRestriction );
-       * 
-       * return snvRestrictionExpression; }, setRestrictionExpression : function(restriction) { // and filter container
-       * var filterContainer = this.getComponent( 'snvCharacteristicFilterContainer' );
-       * filterContainer.setRestrictionExpression( restriction ); }, items : { xtype : 'filter_and', itemId :
-       * 'snvCharacteristicFilterContainer', suggestValuesRemoteFunction : VariantService.suggestValues, propertyStore : { //
-       * autoLoad : true, proxy : { type : 'dwr', dwrFunction : VariantService.suggestPropertiesForVariantType,
-       * dwrParams : [ 'SNV' ], model : 'ASPIREdb.model.Property', reader : { type : 'json', root : 'data',
-       * totalProperty : 'count' } } }, filterItemType : 'ASPIREdb.view.filter.PropertyFilter' } }
-       */
+   },
 
    ],
 
    getFilterConfig : function() {
-      // var cnvFilterPanel = this.getComponent( 'cnvFilterPanel' );
-      // var indelFilterPanel = this.getComponent( 'indelFilterPanel' );
-      // var snvFilterPanel = this.getComponent( 'snvFilterPanel' );
       var config = new VariantFilterConfig();
       var conjunction = new Conjunction();
       conjunction.restrictions = [];
@@ -109,12 +67,6 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
       var disjunction = new Disjunction();
       disjunction.restrictions = [];
       disjunction.restrictions.push( variantFilterContainer.getRestrictionExpression() );
-
-      // disjunction.restrictions.push( cnvFilterPanel.getRestrictionExpression() );
-
-      // disjunction.restrictions.push( indelFilterPanel.getRestrictionExpression() );
-
-      // disjunction.restrictions.push( snvFilterPanel.getRestrictionExpression() );
 
       conjunction.restrictions.push( disjunction );
 
@@ -132,7 +84,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
 
          for (var i = 0; i < restrictions.length; i++) {
 
-            variantFilterContainer.setRestrictionExpression(restrictions[i]);
+            variantFilterContainer.setRestrictionExpression( restrictions[i] );
 
          }
 
@@ -155,8 +107,6 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilterPanel', {
       };
 
       var somethingElseToDoFunction = function() {
-         // Questioner: There's nothing else to do?!?!? Are you sure???? Answer: Yes, I am sure. Questioner: Do the
-         // dishes.
       };
 
       FilterUtil.traverseRidiculousObjectQueryGraphAndDoSomething( disjunctions, null,

@@ -1,3 +1,25 @@
+/*
+ * The aspiredb project
+ *
+ * Copyright (c) 2013 University of British Columbia
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+/**
+ * Filtering phenotypes.
+ */
 Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
    extend : 'Ext.Container',
    alias : 'widget.filter_phenotype_property',
@@ -8,30 +30,28 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
          right : 2,
       }
    },
-   
+
    config : {
       projectIds : ASPIREdb.ActiveProjectSettings.getActiveProjectIds(),
    },
-   
+
    // First method that gets called upon class instantiation
-   constructor : function (config) {
-       // Initializes config properties
-       this.callParent(arguments);
+   constructor : function(config) {
+      // Initializes config properties
+      this.callParent( arguments );
    },
-//   
-//   width : 850,
-   
-   updateProjectIds : function( newIds ) {
+
+   updateProjectIds : function(newIds) {
       this.projectIds = newIds;
-      this.getComponent('nameCombo').store.projectIds = newIds;
+      this.getComponent( 'nameCombo' ).store.projectIds = newIds;
    },
-   
+
    /**
     * @private
     * @override
     */
    initComponent : function() {
-      
+
       this.items = [ {
          xtype : 'combo',
          itemId : 'nameCombo',
@@ -52,7 +72,7 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
          },
          listeners : {
             select : {
-               fn : function( obj, records ) {
+               fn : function(obj, records) {
                   var record = records[0];
                   var valueCombo = this.getComponent( 'valueCombo' );
                   valueCombo.clearValue();
@@ -79,7 +99,7 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
          } ),
          listeners : {
             select : {
-               fn : function( obj, records ) {
+               fn : function(obj, records) {
                   ASPIREdb.EVENT_BUS.fireEvent( 'query_update' );
                },
                scope : this,
@@ -101,8 +121,7 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
 
       this.callParent();
 
-      this.getComponent( "removeButton" ).on( 'click', function( button, event ) {
-         // TODO: fix with custom events
+      this.getComponent( "removeButton" ).on( 'click', function(button, event) {
          var item = button.ownerCt;
          var filterContainer = item.ownerCt;
          filterContainer.remove( item );
@@ -126,15 +145,15 @@ Ext.define( 'ASPIREdb.view.filter.PhenotypeFilter', {
       return phenotypeRestriction;
    },
 
-   setRestrictionExpression : function( phenotypeRestriction ) {
+   setRestrictionExpression : function(phenotypeRestriction) {
       var nameCombo = this.getComponent( "nameCombo" );
       var valueCombo = this.getComponent( "valueCombo" );
       nameCombo.setValue( phenotypeRestriction.name );
       valueCombo.setValue( phenotypeRestriction.value );
    },
-   
-   setOperationLabel : function( operation ) {
-      this.down('#operationLabel').setText( operation );
+
+   setOperationLabel : function(operation) {
+      this.down( '#operationLabel' ).setText( operation );
    }
-   
+
 } );

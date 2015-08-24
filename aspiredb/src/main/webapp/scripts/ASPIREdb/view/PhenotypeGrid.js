@@ -21,14 +21,16 @@ Ext.require( [ 'ASPIREdb.store.PhenotypeStore', 'ASPIREdb.ActiveProjectSettings'
               'ASPIREdb.view.NeurocartaGeneWindow', 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow',
               'ASPIREdb.view.PhenotypesContigencyTableWindow' ] );
 
-// TODO js documentation
+/**
+ * Phenotype pane which displays all the phenotypes in the current project. Phenotype values are grouped together and
+ * displayed as barcharts.
+ */
 Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
    extend : 'Ext.grid.Panel',
    alias : 'widget.phenotypeGrid',
    title : 'Phenotype',
    id : 'phenotypeGrid',
    multiSelect : true,
-   // disableSelection:true,
 
    config : {
 
@@ -225,11 +227,6 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
       sortchange : function(phenotypeGrid, sortinfo) {
 
          ASPIREdb.EVENT_BUS.fireEvent( 'allPhenoSummary_sorted' );
-
-         // if ( sortinfo.dataIndex == 'allPhenoSummaryMap' )
-         // ASPIREdb.EVENT_BUS.fireEvent( 'allPhenoSummary_sorted' );
-         // if ( sortinfo.dataIndex == 'phenoSummaryMap' )
-         // ASPIREdb.EVENT_BUS.fireEvent( 'selectedPhenoSummary_sorted' );
       }
    },
 
@@ -278,8 +275,6 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
 
                   ref.phenotypeSummaryValueObjects[i] = phenSummary;
 
-                  // [ phenSummary.name, phenSummary.selectedPhenotype, subjectVal]
-                  // TODO find a more elegant way of doing this ...
                   var row = [ phenSummary, phenSummary, phenSummary, phenSummary ];
                   data.push( row );
                }

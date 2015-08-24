@@ -19,6 +19,9 @@
 
 Ext.require( [ 'Ext.Window', 'ASPIREdb.view.GeneHitsByVariantGrid', 'ASPIREdb.GemmaURLUtils' ] );
 
+/**
+ * Gene Variant Window contains a Gene Variant Grid panel.
+ */
 Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
    extend : 'Ext.Window',
    alias : 'widget.geneHitsByVariantWindow',
@@ -60,7 +63,7 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
 
             // by default, show just protein-coding genes
             var grid = ASPIREdb.view.GeneHitsByVariantWindow.getComponent( 'geneHitsByVariantGrid' );
-            grid.store.filter('geneBioType', 'protein_coding');
+            grid.store.filter( 'geneBioType', 'protein_coding' );
          }
       } );
 
@@ -82,14 +85,17 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
             }
 
             variantCounts[vo.symbol] = 1;
-            geneVos.push(vo);
+            geneVos.push( vo );
 
          }
 
       }
-      return { 'geneVos' : geneVos, 'variantCounts' : variantCounts }
+      return {
+         'geneVos' : geneVos,
+         'variantCounts' : variantCounts
+      }
    },
-   
+
    // VariantValueObject
    populateGrid : function(variantGenes) {
 
@@ -98,14 +104,14 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
 
       var grid = ASPIREdb.view.GeneHitsByVariantWindow.getComponent( 'geneHitsByVariantGrid' );
 
-      var geneInfo = this.countVariantsPerGene(variantGenes);
+      var geneInfo = this.countVariantsPerGene( variantGenes );
       var geneVos = geneInfo.geneVos;
       var variantCounts = geneInfo.variantCounts;
 
       var data = [];
       var geneSymbols = [];
-      
-      for( var i = 0; i < geneVos.length; i++ ) {
+
+      for (var i = 0; i < geneVos.length; i++) {
          var vo = geneVos[i];
          var phenName = "";
          var linkToGemma = ASPIREdb.GemmaURLUtils.makeGeneUrl( vo.symbol );
@@ -121,7 +127,7 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
          console.log( msg );
          grid.store.loadData( data.slice( 0, ROW_LIMIT ) );
       } else {
-         console.log('Found ' + data.length + ' genes that overlapped');
+         console.log( 'Found ' + data.length + ' genes that overlapped' );
          grid.store.loadData( data );
       }
 

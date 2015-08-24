@@ -19,7 +19,7 @@
 Ext.require( [] );
 
 /**
- * 
+ * Compare subject groups by variant labels
  */
 Ext.define( 'ASPIREdb.view.report.BurdenAnalysisVariantLabel', {
    extend : 'Ext.panel.Panel',

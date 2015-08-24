@@ -18,8 +18,9 @@
  */
 
 Ext.require( [ 'Ext.Window', 'ASPIREdb.view.ProjectManagerPanel' ] );
+
 /**
- * Project manager has Project Panel
+ * Project manager window a Project Panel
  */
 Ext.define( 'ASPIREdb.view.ProjectManagerWindow', {
    extend : 'Ext.Window',

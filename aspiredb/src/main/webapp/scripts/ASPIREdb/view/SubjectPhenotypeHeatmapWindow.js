@@ -19,6 +19,9 @@
 
 Ext.require( [ 'Ext.Window', 'Matrix2Viz' ] );
 
+/**
+ * Show subject-phenotype clusters in a heatmap.
+ */
 Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
    /**
     * @memberOf ASPIREdb.view.SubjectPhenotypeHeatmapWindow
@@ -34,26 +37,13 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
    layout : 'fit',
    bodyStyle : 'padding: 10px;',
    id : 'subjectPhenotypeHeatmapWindow',
-   // TODO FIXME Bug 4419. Combine labels and dendrograms with the matrix image
-   /*
-    * tbar : new Ext.Toolbar( { items : [ { xtype : 'button', itemId : 'exportButton', text : '', tooltip : 'Save
-    * heatmap as PNG', icon : 'scripts/ASPIREdb/resources/images/icons/export.png' } ] } ),
-    */
 
    initComponent : function() {
       var ref = this;
       this.callParent();
 
-      // TODO FIXME Bug 4419. Combine labels and dendrograms with the matrix image
-      // this.down( '#exportButton' ).on( 'click', function() {
-      // ref.exportButtonHandler();
-      // }, this );
-
    },
 
-   /**
-    * TODO FIXME Bug 4419. Combine labels and dendrograms with the matrix image
-    */
    exportButtonHandler : function() {
       if ( this.heatmap == null ) {
          return;
@@ -74,8 +64,6 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
       var me = this;
       var matrixColumnMetadata = [];
       var matrixRowMetadata = [];
-
-      // TODO determine values dynamically
 
       for (var i = 0; i < matrix.columnNames.length; i++) {
          var type;
@@ -218,9 +206,6 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
       };
 
       var heatmap = Ext.create( 'Matrix2Viz', {
-         // renderTo: "matrix_div",
-         // renderTo: document.body,
-         // renderTo: this.down('#matrix_div').getEl(),
          renderTo : this.el,
          width : 900,
          height : 700,
@@ -236,10 +221,7 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
             column : [ {
                name : 'Phenotype',
                size : 100
-            },
-            // {name: 'metaNumber', size: 10},
-            // {name: 'type', size: 50}
-            ]
+            }, ]
          },
          renderers : {
             cell : {
@@ -264,17 +246,11 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
                'Subject' : {
                   render : renderDefaults.text
                },
-            /*
-             * 'group': { render: renderDefaults.text }
-             */
             },
             columnMetadata : {
                'Phenotype' : {
                   render : renderDefaults.text
                },
-            /*
-             * 'metaNumber': { render: renderDefaults.metaNumber }, 'type': { render: renderDefaults.text }
-             */
             }
          },
 
@@ -312,10 +288,6 @@ Ext.define( 'ASPIREdb.view.SubjectPhenotypeHeatmapWindow', {
          handles : 'all',
          target : heatmap
       } );
-
-      // hack to fix known Extjs bug with tooltip width being too small
-      // http://stackoverflow.com/questions/15834689/extjs-4-2-tooltips-not-wide-enough-to-see-contents
-      // delete Ext.tip.Tip.prototype.minWidth;
 
       var t = new Ext.ToolTip( {
          floating : {

@@ -26,7 +26,9 @@ var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
    autoCancel : false
 } );
 
-// TODO js documentation
+/**
+ * Display list of user groups.
+ */
 Ext.define( 'ASPIREdb.view.UserGroupGrid', {
    extend : 'Ext.grid.Panel',
    alias : 'widget.userGroupGrid',
@@ -59,16 +61,7 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
          // defaults to text field if no xtype is supplied
          allowBlank : false
       }
-   }, /*
-       * { header : 'Description', dataIndex : 'groupDescription', flex : 1, editor : { // defaults to text field if no
-       * xtype is supplied allowBlank : true } }, { header : 'Size', dataIndex : 'groupSize', flex : 1, }
-       */],
-
-   // TODO Implement record update
-   /*
-    * plugins : [ rowEditing ], listeners : { 'selectionchange' : function(view, records) { this.down(
-    * '#removeUserGroup' ).setDisabled( !records.length ); } },
-    */
+   }, ],
 
    initComponent : function() {
 
@@ -83,21 +76,6 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
       this.on( 'edit', function(editor, e) {
          var record = e.record;
          var me = this;
-         /**
-          * UserUserGroupService.findUserUserGroup( me.selUserGroup[0].data.userGroupName, { callback : function(gsvo) {
-          * console.log( 'found user group name ' + gsvo.name + ' description' + gsvo.description ); gsvo.name =
-          * record.data.userGroupName; gsvo.description = record.data.geneDescription; console.log( 'AFTER UPDATE -
-          * found user group name ' + gsvo.name + ' description' + ' to string ' + gsvo.description + gsvo.id ); //
-          * /////////////////////////////// /** UserUserGroupService.updateUserUserGroup( ug, { callback : function() {
-          * console.log('testing the update user user group**********'); // me.getView().refresh();
-          * ASPIREdb.EVENT_BUS.fireEvent( 'geneset_updated' ); }, errorHandler : function(er, exception) {
-          * Ext.Msg.alert( "Update user user group Error", er + "\n" + exception.stack ); console.log( exception.stack ); } } );
-          */
-
-         /**
-          * }, errorHandler : function(er, exception) { Ext.Msg.alert( "find user user group Error", er + "\n" +
-          * exception.stack ); console.log( exception.stack ); } } );
-          */
 
       } );
 
@@ -108,7 +86,6 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
       var panel = ASPIREdb.view.GeneManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
       var geneGrid = panel.down( '#userGroupGrid' );
 
-      // TODO : refresh grid when loaded
       this.store.add( userGroupName );
       this.getView().refresh( true );
       this.setLoading( false );
@@ -179,9 +156,8 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
          text : '',
          tooltip : 'Add new user group',
          icon : 'scripts/ASPIREdb/resources/images/icons/group_add.png',
-         // TODO: Need a better workaround
+
          handler : function() {
-            // var ref=this;
 
             var newUserGroupName = ref.down( '#userGroupName' ).getValue();
 
@@ -196,27 +172,11 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
             UserManagerService.createUserGroup( newUserGroupName, {
                callback : function(status) {
                   if ( status == "Success" ) {
-                     // Ext.Msg.alert(
-                     // 'Success','You
-                     // have
-                     // successfully
-                     // created
-                     // the
-                     // group'
-                     // );
 
                      var panel = ASPIREdb.view.UserManagerWindow.down( '#ASPIREdb_UserManagerpanel' );
                      var userGroupGrid = panel.down( '#userGroupGrid' );
 
-                     // add
-                     // gene
-                     // set
-                     // name
-                     // to
-                     // geneset
-                     // grid
                      var data = [];
-                     // var row = [ newUserGroupName, '', 0 ];
                      var row = [ newUserGroupName ];
                      data.push( row );
                      userGroupGrid.store.add( data );
@@ -227,17 +187,8 @@ Ext.define( 'ASPIREdb.view.UserGroupGrid', {
                      var userGroupMemeberGrid = panel.down( '#groupMemeberGrid' );
 
                      userGroupMemeberGrid.store.removeAll( true );
-                     // userGroupMemeberGrid.getView().refresh( true );
                      ref.down( '#userGroupName' ).setValue( '' );
-                     // console.log(
-                     // 'returned
-                     // gene
-                     // value
-                     // object
-                     // : '
-                     // +
-                     // gvoId
-                     // );
+
                      ASPIREdb.view.UserManagerWindow.fireEvent( 'new_user_group' );
 
                   }

@@ -156,9 +156,6 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
          }
       };
 
-      // this.getDockedComponent('geneHitsByVariantGridToolbar').remove('viewCoexpressionNetworkButton');
-      // this.getDockedComponent('geneHitsByVariantGridToolbar').remove('saveButtonGeneHits');
-
       // make sure we don't add to any existing items
       this.getDockedComponent( 'geneHitsByVariantGridToolbar' ).removeAll();
 
@@ -181,7 +178,7 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
             } else {
                grid.store.clearFilter();
             }
-            
+
             grid.getView().refresh( true );
          }
       } );

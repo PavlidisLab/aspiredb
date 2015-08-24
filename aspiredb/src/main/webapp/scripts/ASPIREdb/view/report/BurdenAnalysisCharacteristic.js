@@ -19,7 +19,7 @@
 Ext.require( [] );
 
 /**
- * 
+ * Compare subject groups by variant characteristics
  */
 Ext.define( 'ASPIREdb.view.report.BurdenAnalysisCharacteristic', {
    extend : 'Ext.panel.Panel',

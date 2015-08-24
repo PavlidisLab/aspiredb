@@ -28,7 +28,7 @@ var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
 } );
 
 /**
- * Create Gene Grid
+ * Display list of genes that is part of a Gene Set.
  */
 Ext.define( 'ASPIREdb.view.GeneGrid', {
    extend : 'Ext.grid.Panel',

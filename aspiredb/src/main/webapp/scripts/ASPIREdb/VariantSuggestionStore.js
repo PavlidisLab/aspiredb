@@ -16,36 +16,28 @@
  * limitations under the License.
  *
  */
-Ext.require([
-    'Ext.data.Store',
-    'ASPIREdb.model.PropertyValue',
-    'ASPIREdb.ActiveProjectSettings'
-]);
+Ext.require( [ 'Ext.data.Store', 'ASPIREdb.model.PropertyValue', 'ASPIREdb.ActiveProjectSettings' ] );
 
-Ext.define('ASPIREdb.VariantSuggestionStore', {
-    extend:'Ext.data.Store',
-    model: 'ASPIREdb.model.VariantProperty',
+/**
+ * Collection of Variant Filter options like Variant Type, Variant Label, Location, Gene, etc.
+ */
+Ext.define( 'ASPIREdb.VariantSuggestionStore', {
+   extend : 'Ext.data.Store',
+   model : 'ASPIREdb.model.VariantProperty',
 
-    suggestionContext: null,
+   suggestionContext : null,
 
-    constructor: function (config) {
-        config.proxy = {
-            type: 'dwr',
-            dwrFunction: VariantService.suggestVariantLocationProperties,
-            reader: {
-                type: 'json',
-                root: 'data',
-                totalProperty: 'count'
-            }
-        };
-        this.callParent(arguments);
-    },
+   constructor : function(config) {
+      config.proxy = {
+         type : 'dwr',
+         dwrFunction : VariantService.suggestVariantLocationProperties,
+         reader : {
+            type : 'json',
+            root : 'data',
+            totalProperty : 'count'
+         }
+      };
+      this.callParent( arguments );
+   },
 
-    /**load: function(options) {
-        this.suggestionContext = new SuggestionContext();
-        this.suggestionContext.activeProjectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds() ;
-        this.suggestionContext.valuePrefix = options.params.query;
-        this.proxy.dwrParams = [this.suggestionContext];
-        this.callParent(options);
-    }*/
-});
+} );

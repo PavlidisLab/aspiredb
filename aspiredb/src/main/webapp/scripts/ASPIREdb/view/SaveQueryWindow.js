@@ -17,118 +17,119 @@
  *
  */
 
-Ext.require([ 'Ext.Window' ]);
+Ext.require( [ 'Ext.Window' ] );
 
-Ext.define('ASPIREdb.view.SaveQueryWindow', {
-	extend : 'Ext.Window',
-	alias : 'widget.saveQueryWindow',
-	singleton : true,
-	title : 'Save Query',
-	closable : true,
-	closeAction : 'hide',
-	width : 400,
-	height : 200,
-	layout : 'fit',
-	bodyStyle : 'padding: 5px;',
+/**
+ * Save user defined filters.
+ */
+Ext.define( 'ASPIREdb.view.SaveQueryWindow', {
+   extend : 'Ext.Window',
+   alias : 'widget.saveQueryWindow',
+   singleton : true,
+   title : 'Save Query',
+   closable : true,
+   closeAction : 'hide',
+   width : 400,
+   height : 200,
+   layout : 'fit',
+   bodyStyle : 'padding: 5px;',
 
-	filterConfigs : [],
+   filterConfigs : [],
 
-	items : [ {
+   items : [ {
 
-		bodyPadding : 5,
-		width : 350,
+      bodyPadding : 5,
+      width : 350,
 
-		layout : 'anchor',
-		defaults : {
-			anchor : '100%'
-		},
+      layout : 'anchor',
+      defaults : {
+         anchor : '100%'
+      },
 
-		defaultType : 'textfield',
-		items : [ {
-			fieldLabel : 'Query Name',
-			name : 'last',
-			allowBlank : false,
-			itemId : 'queryName'
-		} ],
+      defaultType : 'textfield',
+      items : [ {
+         fieldLabel : 'Query Name',
+         name : 'last',
+         allowBlank : false,
+         itemId : 'queryName'
+      } ],
 
-		buttons : [ {
-			xtype : 'button',
-			itemId : 'saveButton',
-			text : 'OK'
-		} ]
+      buttons : [ {
+         xtype : 'button',
+         itemId : 'saveButton',
+         text : 'OK'
+      } ]
 
-	} ],
+   } ],
 
-	initComponent : function() {
-		this.callParent();
+   initComponent : function() {
+      this.callParent();
 
-		var ref = this;
+      var ref = this;
 
-		this.down('#saveButton').on('click', ref.saveButtonHandler, ref);
-	},
+      this.down( '#saveButton' ).on( 'click', ref.saveButtonHandler, ref );
+   },
 
-	initAndShow : function(filters) {
+   initAndShow : function(filters) {
 
-		this.filterConfigs = filters;
-		this.show();
+      this.filterConfigs = filters;
+      this.show();
 
-	},
+   },
 
-	saveButtonHandler : function() {
-		var ref=this;
-		var queryName = this.down('#queryName').getValue();
-			
-		//check whether the query name exist in the database
-		QueryService.isQueryName(queryName,{
-			callback : function(qvoSta) {
-				if (qvoSta){
-					//Ext.Msg.alert('Status', 'Query name already exist. Choose another name');}
-					Ext.Msg.show({
-						title:'Save query overwrite',
-						msg:'Query name already exist. Do you want to overwrite it?',
-						buttons:Ext.Msg.YESNOCANCEL,
-						icon:Ext.Msg.QUESTION,
-						fn:function(btn){
-							if(btn=='cancel'){
-				            //do something
-							}
-							if(btn=='yes'){
-				        	
-								QueryService.saveQuery(queryName, ref.filterConfigs, {
-									callback : function(qvoId) {
+   saveButtonHandler : function() {
+      var ref = this;
+      var queryName = this.down( '#queryName' ).getValue();
 
-										ASPIREdb.view.SaveQueryWindow.down('#queryName').setValue('');
-										ASPIREdb.view.SaveQueryWindow.close();
-										ASPIREdb.view.SaveQueryWindow.fireEvent('new_query_saved');
+      // check whether the query name exist in the database
+      QueryService.isQueryName( queryName, {
+         callback : function(qvoSta) {
+            if ( qvoSta ) {
+               // Ext.Msg.alert('Status', 'Query name already exist. Choose another name');}
+               Ext.Msg.show( {
+                  title : 'Save query overwrite',
+                  msg : 'Query name already exist. Do you want to overwrite it?',
+                  buttons : Ext.Msg.YESNOCANCEL,
+                  icon : Ext.Msg.QUESTION,
+                  fn : function(btn) {
+                     if ( btn == 'cancel' ) {
+                        // do something
+                     }
+                     if ( btn == 'yes' ) {
 
-									}
-								});
-								ref.down('#queryName').clearValue();
-				    		
-							}
-							
-						}
-						
-					});	 
-						
-				
-				}
-				else {
-					QueryService.saveQuery(queryName, ref.filterConfigs, {
-						callback : function(qvoId) {
+                        QueryService.saveQuery( queryName, ref.filterConfigs, {
+                           callback : function(qvoId) {
 
-							ASPIREdb.view.SaveQueryWindow.down('#queryName').setValue('');
-							ASPIREdb.view.SaveQueryWindow.close();
-							ASPIREdb.view.SaveQueryWindow.fireEvent('new_query_saved');
-							ASPIREdb.view.DeleteQueryWindow.updateDeleteQueryCombo();
+                              ASPIREdb.view.SaveQueryWindow.down( '#queryName' ).setValue( '' );
+                              ASPIREdb.view.SaveQueryWindow.close();
+                              ASPIREdb.view.SaveQueryWindow.fireEvent( 'new_query_saved' );
 
-						}
-					});
-				}
-			}
-		
-		});
-		
-	}
+                           }
+                        } );
+                        ref.down( '#queryName' ).clearValue();
 
-});
+                     }
+
+                  }
+
+               } );
+
+            } else {
+               QueryService.saveQuery( queryName, ref.filterConfigs, {
+                  callback : function(qvoId) {
+
+                     ASPIREdb.view.SaveQueryWindow.down( '#queryName' ).setValue( '' );
+                     ASPIREdb.view.SaveQueryWindow.close();
+                     ASPIREdb.view.SaveQueryWindow.fireEvent( 'new_query_saved' );
+                     ASPIREdb.view.DeleteQueryWindow.updateDeleteQueryCombo();
+
+                  }
+               } );
+            }
+         }
+
+      } );
+
+   }
+
+} );

@@ -19,6 +19,9 @@
 
 Ext.require( [ 'ASPIREdb.view.LabelApplyGrid' ] );
 
+/**
+ * Displays the list of genes which have two or more mutations at unique positions in the same subject.
+ */
 Ext.define( "ASPIREdb.view.VariantCompoundHeterozygoteWindow", {
    extend : 'Ext.Window',
    layout : 'fit',

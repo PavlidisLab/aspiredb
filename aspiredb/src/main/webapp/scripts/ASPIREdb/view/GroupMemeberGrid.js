@@ -18,11 +18,7 @@
  */
 
 Ext.require( [ 'Ext.grid.*', 'ASPIREdb.store.GroupMemberStore', 'ASPIREdb.TextDataDownloadWindow', 'Ext.data.*',
-              'Ext.util.*', 'Ext.state.*', 'Ext.form.*', /**
-                                                          * 'ASPIREdb.GroupMemeberSuggestionStore',
-                                                          * 'ASPIREdb.model.GroupMemeberProperty',
-                                                          */
-              'ASPIREdb.model.PropertyValue' ] );
+              'Ext.util.*', 'Ext.state.*', 'Ext.form.*', 'ASPIREdb.model.PropertyValue' ] );
 
 var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
    // clicksToMoveEditor: 1,
@@ -31,7 +27,7 @@ var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
 } );
 
 /**
- * Create Group Memeber Grid
+ * Create user group members as a grid
  */
 Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
    extend : 'Ext.grid.Panel',
@@ -66,24 +62,7 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
          // defaults to textfield if no xtype is supplied
          allowBlank : false
       }
-   },
-   // {
-   // header : 'Email',
-   // dataIndex : 'memberEmail',
-   // flex : 1,
-   // editor : {
-   // // defaults to textfield if no xtype is supplied
-   // allowBlank : true
-   // }
-   // }
-   ],
-
-   // TODO Implement record update
-   /*
-    * plugins : [ rowEditing ], listeners : { 'selectionchange' : function(view, records) { this.down(
-    * '#removeGroupMemeber' ).setDisabled( !records.length ); this.selectedUser =
-    * this.getSelectionModel().getSelection(); } },
-    */
+   }, ],
 
    initComponent : function() {
       this.callParent();
@@ -132,9 +111,6 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
          autoSelect : true,
          forceSelection : true,
          enableKeyEvents : false,
-         // store : Ext.create( 'ASPIREdb.GroupMemeberSuggestionStore', {
-         // remoteFunction : VariantService.suggestGeneValues
-         // } ),
          listConfig : {
             loadingText : 'Searching...',
             emptyText : 'No results found.',
@@ -191,8 +167,6 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
                         data.push( row );
                         groupMemberGrid.store.add( data );
                      }
-
-                     // console.log( 'selected geneset :' + ref.selectedGeneGroup[0].data.groupName + ' deleted' );
 
                   } else {
                      Ext.Msg.alert( "Server Reply", status );

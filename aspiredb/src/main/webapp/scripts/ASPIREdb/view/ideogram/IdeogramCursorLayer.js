@@ -18,6 +18,7 @@
  */
 
 /**
+ * Highlighting regions in the chromosome.
  * 
  * @param {CanvasRenderingContext2D}
  *           ctx

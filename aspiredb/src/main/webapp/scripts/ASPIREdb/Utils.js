@@ -17,6 +17,9 @@
  *
  */
 
+/**
+ * Common utils
+ */
 Ext.define( 'ASPIREdb.Utils', {
    singleton : true,
 

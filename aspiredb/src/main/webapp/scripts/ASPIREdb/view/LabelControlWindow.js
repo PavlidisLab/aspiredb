@@ -56,7 +56,7 @@ var colorPicker = Ext.create( 'Ext.menu.ColorPicker', {
 } );
 
 /**
- * For removing and showing labels
+ * For editing, removing from Subjects / Variants, and deleting labels
  */
 Ext.define( 'ASPIREdb.view.LabelControlWindow', {
    extend : 'Ext.Window',

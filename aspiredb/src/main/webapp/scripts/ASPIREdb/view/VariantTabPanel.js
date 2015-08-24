@@ -19,10 +19,9 @@
 
 Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel',
               'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings',
-              'ASPIREdb.view.VariantGridCreator', 'ASPIREdb.view.GeneGridCreator', 'ASPIREdb.IdeogramDownloadWindow',
-              'Ext.data.ArrayStore', 'Ext.form.ComboBox', 'ASPIREdb.view.SubjectGrid',
-              'ASPIREdb.view.report.VariantReportWindow', 'ASPIREdb.view.VariantCompoundHeterozygoteWindow',
-              'ASPIREdb.Utils' ] );
+              'ASPIREdb.view.VariantGridCreator', 'ASPIREdb.IdeogramDownloadWindow', 'Ext.data.ArrayStore',
+              'Ext.form.ComboBox', 'ASPIREdb.view.SubjectGrid', 'ASPIREdb.view.report.VariantReportWindow',
+              'ASPIREdb.view.VariantCompoundHeterozygoteWindow', 'ASPIREdb.Utils' ] );
 
 /**
  * Variant Tab Panel contains both Ideogram view and Variant table view
@@ -369,8 +368,6 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       var ref = this;
 
       var grid = ASPIREdb.view.VariantGridCreator.createVariantGrid( vvos, properties, variantGenes );
-      // var grid2 = ASPIREdb.view.GeneGridCreator.createGeneGrid( vos, properties );
-
       grid.on( 'itemcontextmenu', function(view, record, item, index, e) {
          // Stop the browser getting the event
          e.preventDefault();

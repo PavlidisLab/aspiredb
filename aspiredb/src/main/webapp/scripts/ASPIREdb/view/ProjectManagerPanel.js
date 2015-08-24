@@ -19,7 +19,7 @@
 Ext.require( [ 'Ext.panel.Panel', 'ASPIREdb.view.ProjectGrid', 'ASPIREdb.view.ProjectUserGrid',
               'ASPIREdb.view.ProjectUploadGrid' ] );
 /**
- * Project panel includes ProjectSetGrid and ProjectGrid
+ * Project panel includes a ProjectGrid and ProjectUploadGrid.
  */
 Ext.define( 'ASPIREdb.ProjectManagerPanel', {
    extend : 'Ext.panel.Panel',

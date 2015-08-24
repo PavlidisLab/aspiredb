@@ -16,9 +16,11 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'Ext.Window', 'ASPIREdb.view.UploadDataManagerWindow', 'ASPIREdb.view.ProjectManagerWindow',
-              'ASPIREdb.view.UserManagerWindow' ] );
+Ext.require( [ 'Ext.Window', 'ASPIREdb.view.ProjectManagerWindow', 'ASPIREdb.view.UserManagerWindow' ] );
 
+/**
+ * Display list of projects to load.
+ */
 Ext.define( 'ASPIREdb.view.DashboardWindow', {
    extend : 'Ext.Window',
    alias : 'widget.dashboardWindow',
@@ -185,34 +187,6 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
       LoginStatusService.isUserAdministrator( {
          callback : function(admin) {
             if ( admin ) {
-               // this seems redundant since we already have a Project Manager
-               // add upload project button
-               // me.getDockedComponent( 'dashboardToolbar' ).add( {
-               // xtype : 'button',
-               // id : 'createProject',
-               // text : 'New Project',
-               // tooltip : 'Craete new Project',
-               // icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
-               // handler : function() {
-               // ASPIREdb.view.UploadDataManagerWindow.initGridAndShow();
-               //
-               // }
-               // } );
-               //
-               // me.getDockedComponent( 'dashboardToolbar' ).add( '-' );
-
-               // add project manager button
-               // me.getDockedComponent( 'dashboardToolbar' ).add( {
-               // xtype : 'button',
-               // id : 'manageProject',
-               // text : 'Manage Project',
-               // tooltip : 'Add users and upload variants or upload phenotypes',
-               // icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
-               // handler : function() {
-               // ASPIREdb.view.ProjectManagerWindow.initGridAndShow();
-               //
-               // }
-               // } );
 
                me.getDockedComponent( 'dashboardToolbar' ).add( '-' );
 

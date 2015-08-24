@@ -1,15 +1,32 @@
+/*
+ * The aspiredb project
+ *
+ * Copyright (c) 2013 University of British Columbia
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.filter.PropertyFilter' ] );
 
+/**
+ * Disjunction "OR" of variant expressions.
+ */
 Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
    extend : 'ASPIREdb.view.filter.FilterPanel',
    alias : 'widget.filter_or_variant',
    closable : true,
-   // title : 'OR Variant Filter',
    title : 'AND',
    width : 910,
-   // layout : {
-   // type : 'vbox'
-   // },
    config : {
       propertyStore : null,
       suggestValuesRemoteFunction : null
@@ -116,10 +133,7 @@ Ext.define( 'ASPIREdb.view.filter.OrVariantFilterContainer', {
          layout : {
             type : 'hbox',
             defaultMargins : {
-               // top : 5,
                right : 10,
-            // left : 5,
-            // bottom : 5
             }
          },
          items : [ {

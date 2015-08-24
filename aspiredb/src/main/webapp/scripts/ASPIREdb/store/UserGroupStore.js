@@ -28,9 +28,7 @@ Ext.define( 'ASPIREdb.store.UserGroupStore', {
    fields : [ {
       name : 'groupName',
       type : 'string'
-   }, /*
-       * { name : 'groupDescription', type : 'string' },{ name : 'groupSize', type : 'int' }
-       */],
+   }, ],
 
    storeId : 'ProjectUserStore'
 

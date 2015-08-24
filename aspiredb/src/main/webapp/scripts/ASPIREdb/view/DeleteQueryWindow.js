@@ -17,11 +17,11 @@
  * 
  */
 
-/**
- * @author Gaya Charath This is widjet is created to handler the delete query window
- */
 Ext.require( [ 'Ext.Window' ] );
 
+/**
+ * Delete user saved queries.
+ */
 Ext.define( 'ASPIREdb.view.DeleteQueryWindow', {
    extend : 'Ext.Window',
    alias : 'widget.deleteQueryWindow',

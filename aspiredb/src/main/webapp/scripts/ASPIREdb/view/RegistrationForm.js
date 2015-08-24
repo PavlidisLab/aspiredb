@@ -1,16 +1,33 @@
+/*
+ * The aspiredb project
+ * 
+ * Copyright (c) 2013 University of British Columbia
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 Ext.require( [ 'Ext.layout.container.*', 'Ext.form.*', 'Ext.Img', 'Ext.tip.QuickTipManager' ] );
 
+/**
+ * User registration form.
+ */
 Ext
    .define(
       'ASPIREdb.view.RegistrationForm',
       {
-         // extend : 'Ext.container.Viewport',
          extend : 'Ext.Window',
          title : 'Please Register!.',
          id : 'registerFormPanel',
-         // width : 1500,
-         // closable : false,
-         // resizable : false,
 
          singleton : true,
          title : 'User Registration',
@@ -32,17 +49,6 @@ Ext
                pack : 'center'
 
             },
-         // listeners : {
-         // render : function(c) {
-         // c.getEl().on( 'click', function() {
-         // window.location.href = 'home.html';
-         // }, c );
-         // }
-         // },
-         // autoEl : {
-         // tag : 'img',
-         // src : 'scripts/ASPIREdb/resources/images/aspiredb-logo-smaller.png',
-         // }
          } ],
 
          resetFields : function() {
@@ -60,7 +66,7 @@ Ext
             emailTextfield.reset();
             me.showCaptcha( reCaptcha.getEl() );
          },
-         
+
          initAndShow : function() {
             this.show();
          },
@@ -68,8 +74,8 @@ Ext
          initComponent : function() {
             this.callParent();
 
-            this.on('hide', this.resetFields);
-            
+            this.on( 'hide', this.resetFields );
+
             var ref = this;
 
             var textPanel = Ext
@@ -170,64 +176,6 @@ Ext
                   }
                },
 
-               /*
-                * { id : 'ajaxRegisterTrue', name : 'ajaxRegisterTrue', hidden : true, value : 'true' },
-                */
-
-               /*
-                * Terms of Use acceptance checkbox. Two things are special about this: 1) The boxLabel contains a HTML
-                * link to the Terms of Use page; a special click listener opens this page in a modal Ext window for
-                * convenient viewing, and the Decline and Accept buttons in the window update the checkbox's state
-                * automatically. 2) This checkbox is required, i.e. the form will not be able to be submitted unless the
-                * user has checked the box. Ext does not have this type of validation built in for checkboxes, so we add
-                * a custom getErrors method implementation.
-                */
-               // {
-               // xtype : 'checkboxfield',
-               // name : 'acceptTerms',
-               // fieldLabel : 'Terms of Use',
-               // hideLabel : true,
-               // style : 'margin-top:15px',
-               // boxLabel : 'I have read and accept the <a href="" class="terms">Terms of Use</a>.',
-               //
-               // // Listener to open the Terms of Use page link in a modal window
-               // listeners : {
-               // click : {
-               // element : 'boxLabelEl',
-               // fn : function(e) {
-               // var target = e.getTarget( '.terms' ), win;
-               // if ( target ) {
-               // win = Ext.widget( 'window', {
-               // title : 'Terms of Use',
-               // modal : true,
-               // html : '<iframe src="' + target.href
-               // + '" width="950" height="500" style="border:0"></iframe>',
-               // buttons : [ {
-               // text : 'Decline',
-               // handler : function() {
-               // this.up( 'window' ).close();
-               // formPanel.down( '[name=acceptTerms]' ).setValue( false );
-               // }
-               // }, {
-               // text : 'Accept',
-               // handler : function() {
-               // this.up( 'window' ).close();
-               // formPanel.down( '[name=acceptTerms]' ).setValue( true );
-               // }
-               // } ]
-               // } );
-               // win.show();
-               // e.preventDefault();
-               // }
-               // }
-               // }
-               // },
-               //
-               // // Custom validation logic - requires the checkbox to be checked
-               // getErrors : function() {
-               // return this.getValue() ? [] : [ 'You must accept the Terms of Use' ]
-               // }
-               // }
                ],
 
                buttons : [ {
@@ -239,17 +187,6 @@ Ext
                      window.open( "http://aspiredb.sites.olt.ubc.ca/", "_blank", "" );
                   }
                }, {
-                  // xtype : 'button',
-                  // itemId : 'clearButton',
-                  // text : 'Clear',
-                  // handler : function() {
-                  // var me = this.ownerCt.ownerCt;
-                  // me.getComponent( 'username' ).setValue( '' );
-                  // me.getComponent( 'password' ).setValue( '' );
-                  // me.getComponent( 'email' ).setValue( '' );
-                  //
-                  // }
-                  // }, {
                   xtype : 'button',
                   itemId : 'registerButton',
                   text : 'Register',
@@ -260,7 +197,7 @@ Ext
             } );
 
             this.add( panel );
-            
+
             this.doLayout();
 
          },
@@ -272,7 +209,7 @@ Ext
                callback : Recaptcha.focus_response_field
             } );
          },
-         
+
          registerHandler : function() {
 
             var me = this;
@@ -290,9 +227,6 @@ Ext
             Ext.Ajax.request( {
                url : 'signup.html',
                method : 'POST',
-               // headers : {
-               // 'Content-Type' : 'text/html'
-               // },
                scope : me,
                params : Ext.Object.toQueryString( {
                   'username' : me.down( '#username' ).value,
@@ -315,9 +249,6 @@ Ext
                   if ( json.success === 'success' ) {
                      messageLabel.setText( json.message, false );
                      messageLabel.show();
-                     // window.setTimeout( function() {
-                     // window.location.href = "home.html";
-                     // }, 6000 );
                   } else {
                      console.log( json.message );
                      messageLabel.setText( json.message, false );

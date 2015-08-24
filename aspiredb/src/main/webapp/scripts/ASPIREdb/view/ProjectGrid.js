@@ -25,7 +25,9 @@ var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
    autoCancel : false
 } );
 
-// TODO js documentation
+/**
+ * UI for creating, listing, removing and updating projects.
+ */
 Ext.define( 'ASPIREdb.view.ProjectGrid', {
    extend : 'Ext.grid.Panel',
    alias : 'widget.ProjectGrid',
@@ -57,16 +59,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
          // defaults to text field if no xtype is supplied
          allowBlank : false
       }
-   }, /*
-       * { header : 'Description', dataIndex : 'projectDescription', flex : 1, editor : { // defaults to text field if
-       * no xtype is supplied allowBlank : true } }
-       */],
-
-   // TODO Implement record update
-   /*
-    * plugins : [ rowEditing ], listeners : { 'selectionchange' : function(view, records) { this.down( '#removeProject'
-    * ).setDisabled( !records.length ); } },
-    */
+   }, ],
 
    initComponent : function() {
 
@@ -103,7 +96,6 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
       var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
       var projectGrid = panel.down( '#ProjectGrid' );
 
-      // TODO : refresh grid when loaded
       this.store.add( ProjectName );
       this.getView().refresh( true );
       this.setLoading( false );
@@ -126,7 +118,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
             if ( admin ) {
                ProjectService.getProjectUserNames( projectName, {
                   callback : function(userNames) {
-                     console.log( 'project users :' + userNames );
+                     // console.log( 'project users :' + userNames );
                      me.populateProjectGrid( userNames, projectName );
                   },
                   errorHandler : function(er, exception) {
@@ -142,13 +134,15 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
 
    },
 
-   // Populate projects in project grid
+   /**
+    * Populate projects in project grid
+    */
    populateProjectGrid : function(userNames, projectName) {
       var test = "";
 
       ProjectService.getProjectUserGroups( projectName, {
          callback : function(userGroupMap) {
-            console.log( 'project user groups :' + userGroupMap );
+            // console.log( 'project user groups :' + userGroupMap );
 
             var panel = ASPIREdb.view.ProjectManagerWindow.down( '#ASPIREdb_projectmanagerpanel' );
             var grid = panel.down( '#ProjectUserGrid' );
@@ -203,7 +197,7 @@ Ext.define( 'ASPIREdb.view.ProjectGrid', {
          tooltip : 'Add new project',
          tooltipType : 'title',
          icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
-         // TODO: Need a better workaround
+
          handler : function() {
 
             var newProjectName = ref.down( '#ProjectName' ).getValue().trim();

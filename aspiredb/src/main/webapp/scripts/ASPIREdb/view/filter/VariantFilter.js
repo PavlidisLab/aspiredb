@@ -1,6 +1,27 @@
+/*
+ * The aspiredb project
+ *
+ * Copyright (c) 2013 University of British Columbia
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.filter.multicombo.MultiValueCombobox',
               'ASPIREdb.model.Operator', 'ASPIREdb.view.filter.TextImportWindow' ] );
 
+/**
+ * UI for selecting which variant filter to use, selecting the operator and for entering filter values.
+ */
 Ext.define( 'ASPIREdb.view.filter.VariantFilter', {
    extend : 'Ext.Container',
    alias : 'widget.filter_variant_property',
@@ -172,9 +193,9 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilter', {
          },
          listeners : {
             select : {
-               fn : function( obj, records ) {
+               fn : function(obj, records) {
                   var record = records[0];
-                    
+
                   var valueCombo = this.getComponent( 'valueCombo' );
                   valueCombo.clearValue();
                   valueCombo.lastQuery = null;
@@ -183,9 +204,8 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilter', {
                },
                scope : this
             },
-         }  
-      }, 
-       {
+         }
+      }, {
          xtype : 'combo',
          itemId : 'operatorComboBox',
          emptyText : 'operator',
@@ -256,26 +276,26 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilter', {
       propertyComboBoxV.on( 'select', function(obj, records) {
          var record = records[0];
          var value = record.data.displayName;
-         if (value === "CNV Characteristics"){
+         if ( value === "CNV Characteristics" ) {
             var contextMenu = new Ext.menu.Menu( {
                items : [ {
                   text : 'Vancouver',
-                 // handler : this.makeLabelHandler,
+                  // handler : this.makeLabelHandler,
                   scope : this,
                }, {
                   text : 'Yellowknife',
-              //   handler : this.labelManagerHandler,
+                  // handler : this.labelManagerHandler,
                   scope : this,
-               },{
+               }, {
                   text : 'Okanagan',
-              //   handler : this.labelManagerHandler,
+                  // handler : this.labelManagerHandler,
                   scope : this,
                } ]
             } );
 
-            contextMenu.showAt( 255,0);
+            contextMenu.showAt( 255, 0 );
          }
-         
+
          // update examples
          var queryExample = record.data.exampleValues;
          console.log( "queryExample is " + queryExample );

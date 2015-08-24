@@ -250,13 +250,6 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
       grid.selModel.select( grid.store.find( 'id', subjectIds[0] ) );
 
-      // use just to make sure selected record is at the top
-      // grid.getView().scrollBy( {
-      // x : 0,
-      // y : 1000
-      // } );
-      // grid.getView().focusRow( grid.store.find( 'id', subjectIds[0] ) );
-
       var selectedRecords = grid.getSelectionModel().getSelection();
       grid.getView().bufferedRenderer.scrollTo( grid.store.indexOfId( selectedRecords[0].data.id ) );
 
@@ -306,10 +299,6 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
       ProjectService.numSubjects( filterConfigs[0].projectIds, {
          callback : function(NoOfSubjects) {
-            /*
-             * if ( NoOfSubjects > me.valueObjects.length ) { me.setTitle( "Subject :" + me.valueObjects.length + " of " +
-             * NoOfSubjects + " filtered" ); } else if ( NoOfSubjects == me.valueObjects.length ) me.setTitle( "Subject" );
-             */
             me.down( '#statusbar' ).update( me.valueObjects.length + " / " + NoOfSubjects + " subjects loaded" );
          }
       } );
@@ -417,8 +406,6 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
     * Remove labels from subjects in local store.
     */
    removeLabelsFromSubjects : function(subjects, labelsToRemove) {
-      // removing to visible label to show in the subject grid
-      // this.visibleLabels.pop(this.visibleLabels[labelsToRemove.id]);
 
       for (var i = 0; i < subjects.length; i++) {
          var labelIds = subjects[i].data.labelIds;

@@ -18,8 +18,9 @@
  */
 
 Ext.require( [ 'Ext.Window', 'ASPIREdb.view.GeneManagerPanel', 'ASPIREdb.GemmaURLUtils' ] );
+
 /**
- * Gene manager has Gene Panel
+ * Gene manager window has a Gene Manager Panel
  */
 Ext.define( 'ASPIREdb.view.GeneManagerWindow', {
    extend : 'Ext.Window',
@@ -65,15 +66,6 @@ Ext.define( 'ASPIREdb.view.GeneManagerWindow', {
 
       ref.genesetSize = []
 
-      /**
-       * UserGeneSetService.getSavedUserGeneSetNames( { callback : function(geneSetNames) {
-       * 
-       * for (var i=0;i<geneSetNames.length;i++){ UserGeneSetService.loadUserGeneSet( geneSetNames[i], { callback :
-       * function(gvos) {
-       * 
-       * ref.genesetSize.push(gvos.length); } } ); } } });
-       */
-      // ASPIREdb.view.GeneManagerWindow.populateGeneSetGrid(geneSetNames,ref.genesetSize);
       UserGeneSetService.getSavedUserGeneSets( {
          callback : function(gvos) {
             ASPIREdb.view.GeneManagerWindow.populateGeneSetGrid( gvos );

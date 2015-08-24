@@ -19,6 +19,9 @@
 
 Ext.require( [ 'Ext.Window', 'ASPIREdb.view.NeurocartaGeneGrid', 'ASPIREdb.GemmaURLUtils' ] );
 
+/**
+ * Window that displays the list of genes associated with a phenotype from Phenocarta.
+ */
 Ext.define( 'ASPIREdb.view.NeurocartaGeneWindow', {
    extend : 'Ext.Window',
    alias : 'widget.neurocartaGeneWindow',
@@ -64,20 +67,6 @@ Ext.define( 'ASPIREdb.view.NeurocartaGeneWindow', {
 
       } );
 
-      /**
-       * PhenotypeService.populateDescendantPhenotypes( ontologyPrefix + uri, function(pvos){
-       * 
-       * var phenotypeGeneMap= pvos; var map = new Ext.util.HashMap(); for(var key in pvos) { var pheneValueArray =
-       * pvos[key];
-       * 
-       * if (pheneValueArray.length > 0){ for ( var k = 0; k < pheneValueArray.length; k++) { map.add(key,
-       * pheneValueArray[k]); console.log('nerucarta returned decendandt phenotype'+key+ " , "+ pheneValueArray[k]); } } }
-       * ref.populateNeurocartaGrid(map,uri); grid.setLoading(false);
-       * 
-       * 
-       * });
-       */
-
    },
 
    populateGrid : function(gvos, uri) {
@@ -86,7 +75,6 @@ Ext.define( 'ASPIREdb.view.NeurocartaGeneWindow', {
 
       var data = [];
       for ( var key in gvos) {
-         console.log( 'gene value objects returned from neurocarta' + gvos[key] );
          var vo = gvos[key];
          var pname = key.split( '":"' )
 

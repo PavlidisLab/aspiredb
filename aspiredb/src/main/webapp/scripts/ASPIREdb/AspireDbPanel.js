@@ -18,7 +18,7 @@
  */
 Ext.require( [ 'ASPIREdb.MainPanel', 'ASPIREdb.EVENT_BUS', 'ASPIREdb.view.filter.FilterWindow',
               'ASPIREdb.ActiveProjectSettings', 'ASPIREdb.view.DashboardWindow', 'ASPIREdb.view.GeneManagerWindow',
-              'ASPIREdb.view.LabelManagerWindow', 'ASPIREdb.view.EditProfileForm' ] );
+              'ASPIREdb.view.EditProfileForm' ] );
 
 /**
  * For sorting fractions in data grids.
@@ -113,29 +113,17 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          aspireDbPanel.disableToolbarButtonsForDashboard( false );
       } );
 
-      // TODO: finish me
-      ASPIREdb.EVENT_BUS.on( 'logout', function(event) {
-         /*
-          * loginForm.setVisible( true ); logoutForm.setVisible( false );
-          * 
-          * toolPanel.setVisible( false ); mainPanel.setVisible( false ); dashboard.hide();
-          */
-      } );
-
       ASPIREdb.EVENT_BUS.fireEvent( 'login' );
 
       LoginStatusService.getCurrentUsername( {
          callback : function(username) {
-            // aspireDbPanel.down( '#message' ).setText( 'Hi! ' + username );
             aspireDbPanel.down( '#userBtn' ).setText( username );
          }
       } );
 
       ASPIREdb.EVENT_BUS.on( 'project_select', function(event) {
 
-         // todo :Add select the project to title bar
          var projecttitle = ASPIREdb.ActiveProjectSettings.getActiveProjectName();
-         // aspireDbPanel.down( '#projectTitle' ).setText( 'Active Project: ' + projecttitle );
          document.title = "ASPIREdb Project " + projecttitle;
       } );
 
@@ -147,13 +135,6 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
             }
 
          }
-         /**
-          * if (isFilter){ aspireDbPanel.down('#filterActivated').setText('Filter Activated');
-          * aspireDbPanel.down('#filterButton').setBorder(4); aspireDbPanel.down('#filterButton').setTooltip("Filter
-          * Activated"); } else { aspireDbPanel.down('#filterActivated').setText('');
-          * aspireDbPanel.down('#filterButton').setBorder(1); aspireDbPanel.down('#filterButton').setTooltip("Filter Not
-          * Activated"); }
-          */
       } );
 
    },
@@ -186,10 +167,9 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
             genomicRangeRestriction.operator = 'IS_IN';
             genomicRangeRestriction.value = vo.genomicRange;
             filterConfig.restriction( genomicRangeRestriction );
-
-            console.log( "filter_submit event from aspiredbpanel parseurlparameters and redirect" );
+            //
+            // console.log( "filter_submit event from aspiredbpanel parseurlparameters and redirect" );
             ASPIREdb.EVENT_BUS.fireEvent( 'filter_submit', filterConfig );
-            // mainPanel.resizeMe();
          } );
       }
    },
@@ -262,25 +242,7 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
             ASPIREdb.view.GeneManagerWindow.initGridAndShow();
 
          }
-      // }, {
-      // xtype : 'button',
-      // text : 'Label Manager',
-      // itemId : 'labelManagerButton',
-      // height : 30,
-      // margin : '5 5 5 5',
-      // handler : function() {
-      // ASPIREdb.view.LabelManagerWindow.initGridAndShow();
-      //
-      // }
-      }, /**
-          * { xtype : 'button', text : 'Subject Label Manager', itemId : 'subjectLabelManagerButton', height : 30,
-          * margin : '5 5 5 5', handler : function() { var labelControlWindow = Ext.create(
-          * 'ASPIREdb.view.LabelControlWindow', { isSubjectLabel : true, } ); labelControlWindow.show(); } }, { xtype :
-          * 'button', text : 'Variant Label Manager', itemId : 'variantLabelManagerButton', height : 30, margin : '5 5 5
-          * 5', handler : function() { var labelControlWindow = Ext.create( 'ASPIREdb.view.LabelControlWindow', {
-          * isSubjectLabel : false, } ); labelControlWindow.show(); } }
-          */
-      , {
+      }, , {
          xtype : 'button',
          text : 'Help',
          itemId : 'helpButton',
@@ -289,10 +251,6 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          handler : function() {
             window.open( "http://aspiredb.sites.olt.ubc.ca/", "_blank", "" );
          }
-      /*
-       * }, { xtype : 'label', itemId : 'projectTitle', style : 'vertical-align : middle; padding-top : 10px', height :
-       * 30, margin : '5 5 5 5', flex : 1
-       */
       }, {
          xtype : 'label',
          itemId : 'filterActivated',

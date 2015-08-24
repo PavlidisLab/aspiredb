@@ -20,7 +20,9 @@
 Ext.require( [ 'Ext.grid.Panel', 'ASPIREdb.store.GeneStore', 'ASPIREdb.TextDataDownloadWindow',
               'ASPIREdb.GemmaURLUtils', 'Ext.selection.CheckboxModel', 'ASPIREdb.view.SaveUserGeneSetWindow' ] );
 
-// TODO js documentation
+/**
+ * Data grid that displays the list of genes associated with a phenotype from Phenocarta.
+ */
 Ext.define( 'ASPIREdb.view.NeurocartaGeneGrid', {
    extend : 'Ext.grid.Panel',
    alias : 'widget.neurocartaGeneGrid',
@@ -132,10 +134,6 @@ Ext.define( 'ASPIREdb.view.NeurocartaGeneGrid', {
             href : url,
             target : '_blank',
             cn : 'View Coexpression Network in Gemma',
-         /**
-          * children:[{ tag:'img', src:'scripts/ASPIREdb/resources/images/gemmaTiny.gif', 'ext:qtip': 'View Coexpression
-          * Network in Gemma', }]
-          */
 
          }
       };
@@ -151,10 +149,6 @@ Ext.define( 'ASPIREdb.view.NeurocartaGeneGrid', {
             href : neurocartaUrl,
             target : '_blank',
             cn : 'View Phenocarta Phenotypes',
-         /**
-          * children:[{ tag:'img', src:'scripts/ASPIREdb/resources/images/icons/neurocarta.png', 'ext:qtip': 'View
-          * Phenocarta Phenotypes' }]
-          */
          }
       };
 

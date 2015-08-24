@@ -17,6 +17,9 @@
  *
  */
 
+/**
+ * Drawing of variants as pileups beside the chromosome.
+ */
 Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
    /**
     * @param {CanvasRenderingContext2D}

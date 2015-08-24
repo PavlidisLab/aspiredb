@@ -18,7 +18,7 @@
  */
 
 /**
- * Grid that displays a Make Label context menu when right-clicked
+ * Grid that displays a 'Create or apply label' context menu when right-clicked
  */
 Ext.define( 'ASPIREdb.view.LabelApplyGrid', {
    extend : 'Ext.grid.Panel',
@@ -48,7 +48,7 @@ Ext.define( 'ASPIREdb.view.LabelApplyGrid', {
 
          var contextMenu = new Ext.menu.Menu( {
             items : [ {
-               text : 'Make label',
+               text : 'Create or apply label',
                handler : function() {
                   me.makeLabelHandler( index );
                },
@@ -89,6 +89,7 @@ Ext.define( 'ASPIREdb.view.LabelApplyGrid', {
       // console.log( 'index=' + index + 'rec=' + Ext.JSON.encode( ids ) )
 
       var labelWin = Ext.create( 'ASPIREdb.view.CreateLabelWindow', {
+         title : 'Create Variant Label',
          isSubjectLabel : this.isSubjectLabel,
          selectedIds : ids,
       } );

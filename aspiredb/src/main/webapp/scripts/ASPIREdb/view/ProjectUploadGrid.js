@@ -17,8 +17,9 @@
  *
  */
 Ext.require( [ 'Ext.form.*', 'Ext.layout.container.Column', 'Ext.tab.Panel', 'Ext.ProgressBar' ] );
+
 /**
- * Upload Panel
+ * Project file upload form.
  */
 Ext
    .define(
@@ -119,17 +120,7 @@ Ext
                              // me.up( "ProjectUploadGrid" ).setLoading( true );
                              ProjectService.addSubjectVariantsPhenotypeToProject( variantfilename, phenotypefilename,
                                 false, projectName, variantTypeEdit
-                             /*
-                               * ,{ callback : function(message) { // this can be a long message, break it up with <br>
-                               * //Ext.Msg.alert( 'Result', message.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;') );
-                               * console.log( message ); Ext.Msg.alert( 'Result', '<pre>' + message + '</pre>' );
-                               * 
-                               * ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' ); me.up( "ProjectUploadGrid"
-                               * ).setLoading( false ); }, errorHandler : function(er, exception) { Ext.Msg.alert(
-                               * 'Error', er + "\n" + exception.stack ); console.log( exception.stack ); me.up(
-                               * "ProjectUploadGrid" ).setLoading( false ); }
-                               */
-                             // }
+
                              );
 
                              ASPIREdb.EVENT_BUS.fireEvent( 'project_list_updated' );

@@ -1,5 +1,26 @@
+/*
+ * The aspiredb project
+ *
+ * Copyright (c) 2013 University of British Columbia
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 Ext.require( [ 'Ext.layout.container.*', 'ASPIREdb.view.filter.OrFilterContainer' ] );
 
+/**
+ * DECIPHER special project overlap.
+ */
 Ext.define( 'ASPIREdb.view.filter.DecipherProjectOverlapFilterContainer', {
    extend : 'Ext.Container',
    alias : 'widget.filter_decipherprojectoverlap',
@@ -160,7 +181,7 @@ Ext.define( 'ASPIREdb.view.filter.DecipherProjectOverlapFilterContainer', {
       this.callParent();
 
       this.updateSpecialProjectValue();
-      
+
       var filterContainer = this.getComponent( "filterContainer" );
 
       var getNewOverlapItem = this.getNewOverlapItemFunction( VariantService.suggestPropertiesForProjectOverlap, this
@@ -193,7 +214,7 @@ Ext.define( 'ASPIREdb.view.filter.DecipherProjectOverlapFilterContainer', {
          xtype : 'filter_phenotype_property',
          itemId : 'phenRestriction',
       } );
-      
+
       filterContainer.insert( 0, {
          xtype : 'label',
          text : 'Overlap Phenotype Association: '
@@ -230,11 +251,10 @@ Ext.define( 'ASPIREdb.view.filter.DecipherProjectOverlapFilterContainer', {
 
             ref.specialProjectValueObject = pvo;
 
-            
             var filterContainer = ref.getComponent( "filterContainer" );
-            
+
             filterContainer.getComponent( 'phenRestriction' ).updateProjectIds( [ pvo.id ] );
-            
+
          }
       } );
 

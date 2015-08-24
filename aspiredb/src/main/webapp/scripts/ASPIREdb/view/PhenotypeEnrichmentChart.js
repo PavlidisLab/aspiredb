@@ -19,14 +19,15 @@
 
 Ext.require( [] );
 
-// TODO js documentation
+/**
+ * Part of Burden Analysis that shows the number of subjects across phenotypes.
+ */
 Ext.define( 'ASPIREdb.view.PhenotypeEnrichmentChart', {
    extend : 'Ext.chart.Chart',
    alias : 'widget.phenotypeEnrichmentChart',
 
    id : 'variantChart',
    width : '100%',
-   // height : 410,
    padding : '10 0 0 0', // (top, right, bottom, left).
    animate : true,
    shadow : false,
@@ -77,21 +78,13 @@ Ext.define( 'ASPIREdb.view.PhenotypeEnrichmentChart', {
    } ),
 
    insetPadding : 50,
-   items : [
-   /*
-    * { type : 'text', text : 'Project: ' + ASPIREdb.ActiveProjectSettings.getActiveProjectName(), font : '18px
-    * Helvetica', width : 100, height : 100, x : 40, // the sprite x position y : 10 // the sprite y position },
-    */
-   {
+   items : [ {
       type : 'text',
       text : 'ASPIREdb',
       font : '12px Helvetica',
       x : 12,
       y : 380
-   }, /*
-       * { type : 'text', text : varCountsText, font : '12px Helvetica', x : 40, y : 340 }
-       */
-   ],
+   }, ],
    axes : [ {
       type : 'numeric',
       position : 'left',
@@ -102,7 +95,6 @@ Ext.define( 'ASPIREdb.view.PhenotypeEnrichmentChart', {
       label : {
          renderer : function(v) {
             return v + '%';
-            // return v;
          }
       }
    }, {
@@ -156,33 +148,5 @@ Ext.define( 'ASPIREdb.view.PhenotypeEnrichmentChart', {
    initComponent : function() {
       this.callParent();
    },
-
-/**
- * Display the data in a column chart series
- * 
- * mergedFreqData = '[{"type":"LOSS","asd1":136, "asd2":200},{"type":"GAIN","asd1":97, "asd2":100}]' columnName = "type"
- * labelNames = ["asd1","asd2"]
- */
-/*
- * createChart : function(mergedFreqData, columnName, labelNames) { var me = this;
- * 
- * var countColumnName = '# of variants';
- * 
- * var seriesTitle = labelNames; // get total counts for each label var totals = {}; mergedFreqData.forEach( function(o) {
- * for ( var label in o) { if ( label === columnName ) { continue; } if ( totals[label] == undefined ) { totals[label] =
- * o[label] } else { totals[label] += o[label] } } } )
- * 
- * var title = 'Project: ' + ASPIREdb.ActiveProjectSettings.getActiveProjectName(); var varCountsText = "# of variants: " +
- * Ext.util.JSON.encode( totals ).replace( '{', '' ).replace( '}', '' ).replace( /,/g, ', ' ) .replace( /"/g, ''
- * ).replace(/:/g,' '); var xField = columnName; var yField = seriesTitle;
- * 
- * var fields = [ columnName ].concat( seriesTitle ); // insert "type" into the first position // convert to Extjs Store
- * var myDataStore = Ext.create( 'Ext.data.JsonStore', { storeId : 'reportStore', fields : fields, data :
- * mergedFreqData, } );
- * 
- * me.add( [ { xtype : 'chart', } ] );
- * 
- * me.doLayout(); me.show(); },
- */
 
 } );

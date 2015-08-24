@@ -20,6 +20,9 @@
 Ext.require( [ 'ASPIREdb.store.GeneSetStore', 'ASPIREdb.TextDataDownloadWindow', 'Ext.grid.*', 'Ext.data.*',
               'Ext.util.*', 'Ext.state.*', 'Ext.form.*' ] );
 
+/**
+ * Display list of gene sets.
+ */
 var rowEditing = Ext.create( 'Ext.grid.plugin.RowEditing', {
    // clicksToMoveEditor: 1,
    clicksToEdit : 2,
@@ -98,14 +101,6 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
                console.log( 'AFTER UPDATE - found gene set name ' + gsvo.name + '  description' + ' to string '
                   + gsvo.description + gsvo.id );
 
-               // ///////////////////////////////
-               /**
-                * UserGeneSetService.updateUserGeneSet( gvo, { callback : function() { console.log('testing the update
-                * user gene set**********'); // me.getView().refresh(); ASPIREdb.EVENT_BUS.fireEvent( 'geneset_updated' );
-                *  }, errorHandler : function(er, exception) { Ext.Msg.alert( "Update user gene set Error", er + "\n" +
-                * exception.stack ); console.log( exception.stack ); } } );
-                */
-
             },
             errorHandler : function(er, exception) {
                Ext.Msg.alert( "Find user gene set error", er + "\n" + exception.stack );
@@ -142,7 +137,7 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
             me.populateGeneGrid( gvos );
          }
       } );
-      
+
       ASPIREdb.EVENT_BUS.fireEvent( 'geneSet_selected', this.selGeneSet );
 
    },
@@ -158,16 +153,16 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
          var gvo = gvos[i];
          var row = [];
          // find the position of the fields we want to use
-         var geneStore = Ext.getStore('geneStore');
+         var geneStore = Ext.getStore( 'geneStore' );
          var fieldNames = [];
-         for ( var j = 0; j < geneStore.fields.length; j++) {
-            fieldNames.push(geneStore.fields[j].name);
+         for (var j = 0; j < geneStore.fields.length; j++) {
+            fieldNames.push( geneStore.fields[j].name );
             row[j] = '';
          }
-         row[fieldNames.indexOf('symbol')] = gvo.symbol;
-         row[fieldNames.indexOf('name')] = gvo.name;
-         
-//         var row = [ '', '', gvo.symbol, '', gvo.name, '' ];
+         row[fieldNames.indexOf( 'symbol' )] = gvo.symbol;
+         row[fieldNames.indexOf( 'name' )] = gvo.name;
+
+         // var row = [ '', '', gvo.symbol, '', gvo.name, '' ];
          data.push( row );
       }
 
@@ -249,7 +244,7 @@ Ext.define( 'ASPIREdb.view.GeneSetGrid', {
                   if ( selection ) {
                      geneSetGrid.store.remove( selection );
                   }
-                  geneSetGrid.getView().getSelectionModel().select(0);
+                  geneSetGrid.getView().getSelectionModel().select( 0 );
                   console.log( 'selected geneset :' + ref.selGeneSet[0].data.geneSetName + ' deleted' );
                }
             } );
