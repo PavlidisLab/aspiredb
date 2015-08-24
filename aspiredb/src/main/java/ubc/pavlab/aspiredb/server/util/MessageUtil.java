@@ -1,12 +1,5 @@
-package ubc.pavlab.aspiredb.server.util;
-
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 /*
- * The Gemma project
+ * The aspiredb project
  * 
  * Copyright (c) 2012 University of British Columbia
  * 
@@ -19,6 +12,12 @@ import javax.servlet.http.HttpSession;
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
+package ubc.pavlab.aspiredb.server.util;
+
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * Provides methods for putting messages to the user in the session.

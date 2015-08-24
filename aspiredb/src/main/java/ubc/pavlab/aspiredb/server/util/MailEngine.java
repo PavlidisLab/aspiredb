@@ -1,5 +1,5 @@
 /*
- * The Gemma project
+ * The aspiredb project
  * 
  * Copyright (c) 2012 University of British Columbia
  * 
@@ -15,6 +15,7 @@
 package ubc.pavlab.aspiredb.server.util;
 
 import java.util.Map;
+
 import org.springframework.mail.SimpleMailMessage;
 
 /**
