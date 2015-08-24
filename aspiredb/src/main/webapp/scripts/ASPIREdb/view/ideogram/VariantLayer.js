@@ -234,7 +234,8 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
          if ( variant.labels.length > 0 ) {
             value = variant.labels[0].name;
             var color = '#' + variant.labels[0].colour;
-            var pushvalue = "<font color='" + color + "'>" + value + "</font><br>\n";
+            // var pushvalue = "<font color='" + color + "'>" + value + "</font><br>\n";
+            var pushvalue = ASPIREdb.view.LabelControlWindow.getHtmlLabel( variant.labels[0] ) + "<br>\n";
             var vtcmStat = 'No';
 
             if ( this.self.valueToColourMap.length == 0 ) {
@@ -274,7 +275,8 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
          if ( subject != null && subject.labels.length > 0 ) {
             value = subject.labels[0].name;
             var color = '#' + subject.labels[0].colour;
-            var pushvalue = "<font color='" + color + "'>" + value + "</font><br>\n";
+            // var pushvalue = "<font color='" + color + "'>" + value + "</font><br>\n";
+            var pushvalue = ASPIREdb.view.LabelControlWindow.getHtmlLabel( subject.labels[0] ) + "<br>\n";
             var vtcmStat = 'No';
 
             if ( this.self.valueToColourMap.length == 0 ) {
