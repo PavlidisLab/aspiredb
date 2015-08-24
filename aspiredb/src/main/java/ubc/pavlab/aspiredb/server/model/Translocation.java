@@ -87,6 +87,8 @@ public class Translocation extends Variant {
         }
         vo.setCharacteristics( map );
         vo.setLabels( Label.toValueObjects( this.labels ) );
+
+        vo.setSubject( this.getSubject().convertToValueObject() );
         return vo;
     }
 

@@ -508,7 +508,7 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
             subject = variant.subject;
             if ( subject != null && subject.labels.length > 0 ) {
                propertyValues.push( subject.labels[0].name );
-               console.log( 'variant label name :' + subject.labels[0].name );
+               // console.log( 'variant label name :' + subject.labels[0].name );
             } else {
                propertyValues.push( 'No Label' );
             }
@@ -551,7 +551,7 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
          this.colourLegend.update( displayText );
       }
       // this.colourLegend.update(valuetoColourArray,this.displayedProperty);
-      console.log( 'colour legend ' + valuetoColourArray );
+      // console.log( 'colour legend ' + valuetoColourArray );
 
    },
 

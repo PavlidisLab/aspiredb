@@ -146,6 +146,8 @@ public class CNV extends Variant {
 
         vo.setLabels( Label.toValueObjects( this.getLabels() ) );
 
+        vo.setSubject( this.getSubject().convertToValueObject() );
+
         return vo;
     }
 }

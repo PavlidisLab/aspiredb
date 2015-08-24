@@ -93,6 +93,8 @@ public class SNV extends Variant {
         }
         vo.setCharacteristics( map );
         vo.setLabels( Label.toValueObjects( this.getLabels() ) );
+
+        vo.setSubject( this.getSubject().convertToValueObject() );
         return vo;
     }
 
