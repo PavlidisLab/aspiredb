@@ -136,10 +136,6 @@ public class PhenotypeDaoImpl extends DaoBaseImpl<Phenotype> implements Phenotyp
         criteria.setProjection( Projections.distinct( Projections.property( "name" ) ) );
 
         return criteria.list();
-        // Query query = currentSession().createQuery( "select distinct p.name from Phenotype as p where p.name "
-        // + (isExactMatch ? "=" : "like") + " :queryString" );
-        // query.setParameter( "queryString", queryString );
-        // return query.list();
     }
 
     @Override
@@ -191,9 +187,6 @@ public class PhenotypeDaoImpl extends DaoBaseImpl<Phenotype> implements Phenotyp
 
         Criteria criteria = session.createCriteria( Phenotype.class );
         criteria.add( Restrictions.in( "name", names ) );
-        // TODO: finish this to filter by project
-        // criteria.createAlias( "individual", "individual" );
-        // criteria.createCriteria( "individual.projects" ).add( Restrictions.in( "id", projectIds ) );
 
         return !criteria.list().isEmpty();
     }

@@ -43,7 +43,6 @@ public class GroupManagerCLI extends AbstractCLI {
 
     private static UserManager userManager;
 
-    // ShaPasswordEncoder passwordEncoder = new ShaPasswordEncoder();
     private static PasswordEncoder passwordEncoder;
 
     private boolean createUser = false;

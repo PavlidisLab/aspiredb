@@ -37,21 +37,6 @@ public abstract class DaoBaseImpl<T> extends HibernateDaoSupport implements DaoB
         this.elementClass = elementClass;
     }
 
-    // Other way we could use to access generic types at runtime in Java (might be useful later)
-    /*
-     * @SuppressWarnings("unchecked") protected AbstractDao() { Class<?> cl = getClass();
-     * 
-     * if ( Object.class.getSimpleName().equals( cl.getSuperclass().getSimpleName() ) ) { throw new
-     * IllegalArgumentException( "Default constructor does not support direct instantiation" ); }
-     * 
-     * while ( !AbstractDao.class.getSimpleName().equals( cl.getSuperclass().getSimpleName() ) ) { // case of multiple
-     * inheritance, we are trying to get the first available generic info if ( cl.getGenericSuperclass() instanceof
-     * ParameterizedType ) { break; } cl = cl.getSuperclass(); }
-     * 
-     * if ( cl.getGenericSuperclass() instanceof ParameterizedType ) { elementClass = ( Class<T> ) ( ( ParameterizedType
-     * ) cl.getGenericSuperclass() ).getActualTypeArguments()[0]; } }
-     */
-
     /*
      * (non-Javadoc)
      * 

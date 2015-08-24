@@ -225,7 +225,6 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
         // Load objects.
         Collection<Subject> results = this.load( subjectIds );
 
-        // FIXME: finish this
         // Sort results.
         List<Subject> sortedResults = new ArrayList<Subject>( results );
 
@@ -280,8 +279,6 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
 
     private void addSingleVariantFilter( RestrictionExpression restrictionExpression, Criteria criteria ) {
         criteria.createAlias( "variants", "variant" ).createAlias( "variant.location", "location" )
-        // .createAlias("labels", "subject_label", CriteriaSpecification.LEFT_JOIN)
-        // .createAlias("variant.labels", "variant_label", CriteriaSpecification.LEFT_JOIN)
                 .createAlias( "variant.characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN );
         Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
                 CriteriaBuilder.EntityType.SUBJECT );

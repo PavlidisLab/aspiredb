@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,9 +37,7 @@ import org.springframework.stereotype.Component;
 @Component("cytobandFileLoader")
 public class CytobandFileLoaderImpl implements CytobandFileLoader {
 
-    // TODO: use annotations to grab this property
-    // @Value("${aspiredb.cytoband.path}")
-    // private String filePath;
+    protected static Log log = LogFactory.getLog( CytobandFileLoaderImpl.class );
 
     private static class FileRow {
         String chromosome;
@@ -67,9 +67,9 @@ public class CytobandFileLoaderImpl implements CytobandFileLoader {
             }
 
         } catch ( FileNotFoundException e ) {
-            e.printStackTrace(); // TODO: log
+            log.error( e );
         } catch ( IOException e ) {
-            // TODO: log
+            log.error( e );
         }
 
         return chromosomes;

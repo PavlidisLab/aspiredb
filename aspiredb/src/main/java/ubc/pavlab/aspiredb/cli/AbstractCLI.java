@@ -112,11 +112,6 @@ public abstract class AbstractCLI {
      */
     protected boolean autoSeek = false;
 
-    // /**
-    // * The event type to look for the lack of, when using autoseek.
-    // */
-    // protected Class<? extends AuditEventType> autoSeekEventType = null;
-
     // needs to be concurrently modifiable.
     protected Collection<Object> errorObjects = Collections.synchronizedSet( new HashSet<Object>() );
 
@@ -567,18 +562,6 @@ public abstract class AbstractCLI {
      * Implement this to provide processing of options. It is called at the end of processCommandLine.
      */
     protected abstract void processOptions();
-
-    // /**
-    // * @return
-    // */
-    // protected Date getLimitingDate() {
-    // Date skipIfLastRunLaterThan = null;
-    // if ( StringUtils.isNotBlank( mDate ) ) {
-    // skipIfLastRunLaterThan = DateUtil.getRelativeDate( new Date(), mDate );
-    // log.info( "Analyses will be run only if last was older than " + skipIfLastRunLaterThan );
-    // }
-    // return skipIfLastRunLaterThan;
-    // }
 
     /**
      * Call in 'buildOptions' to force users to provide a user name and password.

@@ -27,8 +27,13 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
 
-//this isn't abstract because the security interceptor wasn't working quite right when this class was abstract
-//for example calling the remove method didn't remove the appropriate acls
+/**
+ * Objects that require access-control lists (ACL) must extend this class.
+ * 
+ * @author ptan
+ * @version $Id$
+ * @param <T>
+ */
 public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSupport implements SecurableDaoBase<T> {
 
     Log log = LogFactory.getLog( SecurableDaoBaseImpl.class );
@@ -41,21 +46,6 @@ public class SecurableDaoBaseImpl<T extends Securable> extends HibernateDaoSuppo
         assert elementClass.isAssignableFrom( elementClass );
         this.elementClass = elementClass;
     }
-
-    // Other way we could use to access generic types at runtime in Java (might be useful later)
-    /*
-     * @SuppressWarnings("unchecked") protected AbstractDao() { Class<?> cl = getClass();
-     * 
-     * if ( Object.class.getSimpleName().equals( cl.getSuperclass().getSimpleName() ) ) { throw new
-     * IllegalArgumentException( "Default constructor does not support direct instantiation" ); }
-     * 
-     * while ( !AbstractDao.class.getSimpleName().equals( cl.getSuperclass().getSimpleName() ) ) { // case of multiple
-     * inheritance, we are trying to get the first available generic info if ( cl.getGenericSuperclass() instanceof
-     * ParameterizedType ) { break; } cl = cl.getSuperclass(); }
-     * 
-     * if ( cl.getGenericSuperclass() instanceof ParameterizedType ) { elementClass = ( Class<T> ) ( ( ParameterizedType
-     * ) cl.getGenericSuperclass() ).getActualTypeArguments()[0]; } }
-     */
 
     /*
      * (non-Javadoc)

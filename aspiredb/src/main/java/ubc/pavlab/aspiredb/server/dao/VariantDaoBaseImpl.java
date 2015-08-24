@@ -103,9 +103,6 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
         Statistics stats = this.getSessionFactory().getStatistics();
         SecondLevelCacheStatistics secondLevelStats = stats.getSecondLevelCacheStatistics( regionName );
         log.info( "SecondLevelCache:" + regionName + "," + secondLevelStats );
-        // Map cacheEntries = secondLevelStats.getEntries();
-        // log.info( "cacheEntries=" + cacheEntries.size() + ", keyset="
-        // + StringUtils.collectionToCommaDelimitedString( cacheEntries.keySet() ) );
     }
 
     @Override
@@ -140,22 +137,6 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
     public Collection<T> findByGenomicLocation( GenomicRange range, Collection<Long> activeProjectIds ) {
         Session session = this.getSessionFactory().getCurrentSession();
 
-        // Criteria criteria = session.createCriteria( this.elementClass );
-        // criteria.createAlias( "location", "location" );
-        // criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
-        // .add( Restrictions.in( "project.id", activeProjectIds ) );
-        //
-        // criteria.add( CriteriaBuilder.buildCriteriaRestriction( restriction, CriteriaBuilder.EntityType.VARIANT ) );
-        //
-        // criteria.setProjection( Projections.distinct( Projections.id() ) );
-        // Collection<Long> variantIds = criteria.list();
-        //
-        // // load from cache if it exists
-        // Collection<T> variants = new HashSet<>();
-        // for ( Long id : variantIds ) {
-        // variants.add( ( T ) session.get( this.elementClass, id ) );
-        // }
-
         List<Integer> bins = GenomeBin.relevantBins( range.getChromosome(), range.getBaseStart(), range.getBaseEnd() );
         String hql = "select distinct variant from Variant variant inner join variant.location as location inner join variant.subject.projects as projects WHERE :projectIds in projects.id and location.bin in (:bins) and location.chromosome=:chromosome and ((location.start>=:start and location.end<=:end) or (location.start<=:start and location.end>=:start) or (location.start<=:end and location.end>=:end))";
         Query query = session.createQuery( hql );
@@ -166,7 +147,6 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
         query.setParameter( "end", range.getBaseEnd() );
         Collection<T> variants = query.list();
 
-        // List<T> variants = criteria.list();
         return variants;
     }
 
@@ -511,12 +491,6 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
             RestrictionExpression restriction = locationFilter.getRestriction();
             addSingleVariantFilter( restriction, criteria );
 
-            // This is now handled by getVariantIdsByProject() for faster performance
-            // } else if ( filter.getClass() == ProjectFilterConfig.class ) {
-            // ProjectFilterConfig projectFilter = ( ProjectFilterConfig ) filter;
-            // criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
-            // .add( Restrictions.in( "project.id", projectFilter.getProjectIds() ) );
-
         } else if ( filter.getClass() == SubjectFilterConfig.class ) {
             SubjectFilterConfig subjectFilter = ( SubjectFilterConfig ) filter;
             RestrictionExpression restrictionExpression = subjectFilter.getRestriction();
@@ -530,9 +504,6 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
 
     private void addSingleVariantFilter( RestrictionExpression restrictionExpression, Criteria criteria ) {
         criteria.createAlias( "location", "location" ).createAlias( "subject", "subject" );
-        // .createAlias("subject.labels", "subject_label", CriteriaSpecification.LEFT_JOIN)
-        // .createAlias("labels", "variant_label", CriteriaSpecification.LEFT_JOIN)
-        // .createAlias( "characteristics", "characteristic", CriteriaSpecification.LEFT_JOIN );
         Criterion junction = CriteriaBuilder.buildCriteriaRestriction( restrictionExpression,
                 CriteriaBuilder.EntityType.VARIANT );
         criteria.add( junction );
@@ -546,9 +517,8 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
             return this.getVariantIdsByProject( ( ProjectFilterConfig ) filter );
 
             // Project overlap filter requires a little more data processing than the other filters and uses
-            // precalculated
-            // database table
-            // as it doesn't quite fit the same paradigm as the other filters I am breaking it off into its own method
+            // precalculated database table as it doesn't quite fit the same paradigm as the other filters I am breaking
+            // it off into its own method
         } else if ( filter instanceof ProjectOverlapFilterConfig ) {
 
             return this.getProjectOverlapVariantIds( ( ProjectOverlapFilterConfig ) filter );
