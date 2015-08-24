@@ -833,7 +833,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       var grid = this.getComponent( 'variantGrid' );
 
       if ( grid ) {
-         ASPIREdb.TextDataDownloadWindow.showVariantsDownload( grid.getStore().getRange(), grid.columnHeaders );
+         ASPIREdb.TextDataDownloadWindow.showVariantsDownload( grid.getStore().getRange(), grid.columnHeaders,
+            grid.visibleLabels );
       }
 
    },

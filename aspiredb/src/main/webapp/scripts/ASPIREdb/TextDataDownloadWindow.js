@@ -208,7 +208,7 @@ Ext.define( 'ASPIREdb.TextDataDownloadWindow', {
 
    },
 
-   showVariantsDownload : function(data, columnHeaders) {
+   showVariantsDownload : function(data, columnHeaders, visibleLabels) {
       var text = '';
       for (var i = 0; i < columnHeaders.length; i++) {
 
@@ -240,7 +240,7 @@ Ext.define( 'ASPIREdb.TextDataDownloadWindow', {
                   }
 
                   text = text + symbols.join( ', ' );
-               } else if ( columnHeaders[j - 1].toLowerCase() == 'labels' ) {
+               } else if ( columnHeaders[j - 1].toLowerCase() == 'labels' && visibleLabels != null ) {
                   // TODO
                   var labels = vvoArray[j];
                   var names = [];
@@ -251,7 +251,7 @@ Ext.define( 'ASPIREdb.TextDataDownloadWindow', {
 
                   // it's a label, expect an array
                   for (var k = 0; k < labels.length; k++) {
-                     names.push( labels[k].name );
+                     names.push( visibleLabels[labels[k]].name );
                   }
 
                   text = text + names.join( ', ' );
