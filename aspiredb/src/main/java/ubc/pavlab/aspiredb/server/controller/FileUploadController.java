@@ -65,28 +65,7 @@ public class FileUploadController {
         if ( uploadItem.getFile().getSize() > 0 ) {
             File serverFile = null;
             try {
-                // saveFileFromInputStream( uploadItem.getFile().getInputStream(), "uploadFile", uploadItem.getFile()
-                // .getOriginalFilename() );
                 serverFile = saveFileFromInputStream( uploadItem.getFile().getInputStream() );
-
-                // Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-                //
-                // // create a connection
-                // // arg[0] is the directory in which the .csv files are held
-                // Connection conn = DriverManager.getConnection( "jdbc:relique:csv:" + UPLOAD_PATH );
-                // // String filename = uploadItem.getFile().getOriginalFilename()
-                // // .substring( 0, uploadItem.getFile().getOriginalFilename().lastIndexOf( '.' ) );
-                // String filename = serverFile.getName().substring( 0, serverFile.getName().lastIndexOf( FILE_SUFFIX )
-                // );
-                // Statement stmt = conn.createStatement();
-                // ResultSet results = stmt.executeQuery( "SELECT * FROM " + filename );
-                //
-                // // FIXME Create a new project
-                //
-                // // clean up
-                // results.close();
-                // stmt.close();
-                // conn.close();
 
                 // set extjs return - sucsess
                 extjsFormResult.setSuccess( true );
@@ -133,9 +112,6 @@ public class FileUploadController {
      */
     public File saveFileFromInputStream( InputStream stream, File serverFile ) throws IOException {
 
-        // temp.getParentFile().getAbsolutePath(), temp.getName();
-        // String csv = path + File.separator + filename;
-
         BufferedReader in = null;
         BufferedWriter out = null;
 
@@ -148,56 +124,7 @@ public class FileUploadController {
         in.close();
         out.close();
 
-        // CSVWriter writer = new CSVWriter( new FileWriter( serverFile ) );
-        // String fileContent = getStringFromInputStream( stream );
-        //
-        // String[] Outresults = fileContent.split( "\n" );
-        //
-        // for ( int i = 0; i < Outresults.length; i++ ) {
-        // String[] passedCSVFile = Outresults[i].toString().split( "," );
-        // writer.writeNext( passedCSVFile );
-        // }
-        //
-        // writer.close();
-
-        /**
-         * FileOutputStream fs=new FileOutputStream(path + "/"+ filename); byte[] buffer=new byte[1024*1024]; int
-         * bytesum = 0; int byteread = 0; while ((byteread=stream.read())!=-1) { bytesum+=byteread;
-         * fs.write(buffer,0,byteread); fs.flush(); } fs.close(); stream.close();
-         */
-
         return serverFile;
-
-    }
-
-    // convert InputStream to String
-    private static String getStringFromInputStream( InputStream is ) {
-
-        BufferedReader br = null;
-        StringBuilder sb = new StringBuilder();
-
-        String line;
-        try {
-
-            br = new BufferedReader( new InputStreamReader( is ) );
-            while ( ( line = br.readLine() ) != null ) {
-                sb.append( line );
-                sb.append( "\n" );
-            }
-
-        } catch ( IOException e ) {
-            e.printStackTrace();
-        } finally {
-            if ( br != null ) {
-                try {
-                    br.close();
-                } catch ( IOException e ) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return sb.toString();
 
     }
 

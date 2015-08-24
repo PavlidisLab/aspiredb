@@ -93,7 +93,6 @@ public class PhenotypeUploadCLI extends AbstractCLI {
         return "Upload a phenotype data file";
     }
 
-    @SuppressWarnings("static-access")
     @Override
     protected void buildOptions() {
         OptionBuilder.hasArg();

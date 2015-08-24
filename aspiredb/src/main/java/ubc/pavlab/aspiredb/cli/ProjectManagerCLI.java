@@ -90,7 +90,6 @@ public class ProjectManagerCLI extends AbstractCLI {
         return "Allow users access to projects";
     }
 
-    @SuppressWarnings("static-access")
     @Override
     protected void buildOptions() {
 

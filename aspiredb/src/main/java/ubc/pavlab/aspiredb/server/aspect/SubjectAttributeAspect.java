@@ -22,8 +22,6 @@ package ubc.pavlab.aspiredb.server.aspect;
 import gemma.gsec.SecurityService;
 import gemma.gsec.authentication.UserManager;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -43,8 +41,6 @@ import ubc.pavlab.aspiredb.server.model.SubjectAttribute;
  */
 @Aspect
 public class SubjectAttributeAspect {
-    private static Log log = LogFactory.getLog( SubjectAttributeAspect.class );
-
     @Autowired
     private SecurityService securityService;
 

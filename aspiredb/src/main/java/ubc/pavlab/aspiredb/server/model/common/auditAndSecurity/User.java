@@ -29,6 +29,11 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "USER")
 public class User implements gemma.gsec.model.User {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 901615525292087178L;
+
     @Id
     @GeneratedValue
     @Column(name = "ID")

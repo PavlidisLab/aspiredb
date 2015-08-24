@@ -294,7 +294,6 @@ public abstract class AbstractCLI {
     /**
      * You must implement the handling for this option.
      */
-    @SuppressWarnings("static-access")
     protected void addAutoOption() {
         OptionBuilder.withArgName( AUTO_OPTION_NAME );
         OptionBuilder.withDescription( "Attempt to process entities that need processing based on workflow criteria." );
@@ -303,7 +302,6 @@ public abstract class AbstractCLI {
         addOption( autoSeekOption );
     }
 
-    @SuppressWarnings("static-access")
     protected void addDateOption() {
         OptionBuilder.hasArg();
         OptionBuilder.withArgName( "mdate" );
@@ -321,7 +319,6 @@ public abstract class AbstractCLI {
      * @param hostRequired Whether the host name is required
      * @param portRequired Whether the port is required
      */
-    @SuppressWarnings("static-access")
     protected void addHostAndPortOptions( boolean hostRequired, boolean portRequired ) {
         OptionBuilder.withArgName( "host" );
         OptionBuilder.withLongOpt( "host" );
@@ -346,7 +343,6 @@ public abstract class AbstractCLI {
     /**
      * Convenience method to add an option for parallel processing option.
      */
-    @SuppressWarnings("static-access")
     protected void addThreadsOption() {
         OptionBuilder.withArgName( "numThreads" );
         OptionBuilder.hasArg();
@@ -369,7 +365,6 @@ public abstract class AbstractCLI {
      * Convenience method to add a standard pair of (required) options to intake a user name and password, optionally
      * required
      */
-    @SuppressWarnings("static-access")
     protected void addUserNameAndPasswordOptions( boolean required ) {
         OptionBuilder.withArgName( "user" );
         OptionBuilder.withLongOpt( "user" );
@@ -407,7 +402,6 @@ public abstract class AbstractCLI {
      */
     protected abstract void buildOptions();
 
-    @SuppressWarnings("static-access")
     protected void buildStandardOptions() {
         log.debug( "Creating standard options" );
         Option helpOpt = new Option( "h", "help", false, "Print this message" );

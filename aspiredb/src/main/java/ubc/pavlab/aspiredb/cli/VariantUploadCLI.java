@@ -90,7 +90,6 @@ public class VariantUploadCLI extends AbstractCLI {
         return "Upload a variant data file and create / assign it to a project";
     }
 
-    @SuppressWarnings("static-access")
     @Override
     protected void buildOptions() {
         OptionBuilder.isRequired();

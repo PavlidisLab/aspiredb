@@ -20,7 +20,6 @@ import java.util.Arrays;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Statistics;
-import net.sf.ehcache.config.CacheConfiguration;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -116,8 +115,6 @@ public class CacheMonitorImpl implements CacheMonitor {
 
         buf.append( cacheNames.length + " caches; only non-empty caches listed below." );
 
-        int count = 0;
-
         buf.append( "\n"
                 + String.format( "%50s", "CacheName" )
                 + "\tCacheHits\tCacheMisses\tCacheHitRate(%)\tObjectCount\tInMemoryHits\tInMemoryMisses\tOnDiskHits\tEvictions" );
@@ -153,9 +150,6 @@ public class CacheMonitorImpl implements CacheMonitor {
             buf.append( inMemoryMisses + "\t" );
             buf.append( onDiskHits + "\t" );
             buf.append( evictions + "\t" );
-
-            CacheConfiguration cacheConfiguration = cache.getCacheConfiguration();
-            boolean eternal = cacheConfiguration.isEternal();
         }
         return buf.toString();
 

@@ -18,7 +18,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.cli.Option;
@@ -29,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.springframework.beans.factory.BeanFactory;
 
-import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadServiceResult;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
@@ -44,7 +42,6 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 public class DGVVariantUploadCLI extends AbstractCLI {
 
     private static ProjectManager projectManager;
-    private static ProjectDao projectDao;
 
     /**
      * @param args
@@ -59,8 +56,6 @@ public class DGVVariantUploadCLI extends AbstractCLI {
         Logger.getRootLogger().addAppender( console );
 
         applicationContext = SpringContextUtil.getApplicationContext( false );
-
-        projectDao = ( ProjectDao ) applicationContext.getBean( "projectDao" );
 
         projectManager = ( ProjectManager ) applicationContext.getBean( "projectManager" );
 
@@ -100,7 +95,6 @@ public class DGVVariantUploadCLI extends AbstractCLI {
         return "Upload a variant data file and create / assign it to a project";
     }
 
-    @SuppressWarnings("static-access")
     @Override
     protected void buildOptions() {
         OptionBuilder.isRequired();

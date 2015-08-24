@@ -129,16 +129,6 @@ public class SignupController extends BaseController {
 
             userManager.reauthenticate( username, oldPassword );
 
-            UserDetailsImpl user = ( UserDetailsImpl ) userManager.loadUserByUsername( username );
-
-            /*
-             * if ( StringUtils.isNotBlank( email ) && !user.getEmail().equals( email ) ) { if ( !email.matches(
-             * "/^(\\w+)([-+.][\\w]+)*@(\\w[-\\w]*\\.){1,5}([A-Za-z]){2,4}$/;" ) ) { // if (
-             * !EmailValidator.getInstance().isValid( email ) ) { jsonText =
-             * "{\"success\":false,\"message\":\"The email address does not look valid\"}"; jsonUtil.writeToResponse(
-             * jsonText ); return; } user.setEmail( email ); changed = true; }
-             */
-
             if ( password.length() >= MIN_PASSWORD_LENGTH ) {
                 if ( !StringUtils.equals( password, passwordConfirm ) ) {
                     throw new RuntimeException( "Passwords do not match." );
@@ -216,7 +206,7 @@ public class SignupController extends BaseController {
     }
 
     /**
-     * Send an email to request signup confirmation. FIXME this is very similar to code in SignupController.
+     * Send an email to request signup confirmation.
      * 
      * @param request
      * @param u
@@ -235,20 +225,10 @@ public class SignupController extends BaseController {
             model.put( "username", username );
             model.put( "password", password );
 
-            /*
-             * FIXME: make this url configurable.
-             */
-            // String host = "www.chibi.ubc.ca";
-            // model.put( "confirmLink", "http://" + host + "/Gemma/confirmRegistration.html?key=" + token +
-            // "&username="
-            // + username );
             model.put( "confirmLink", ConfigUtils.getBaseUrl() + "confirmRegistration.html?key=" + token + "&username="
                     + username );
             model.put( "message", getText( "login.passwordReset.emailMessage", request.getLocale() ) );
 
-            /*
-             * FIXME: make the template name configurable.
-             */
             String templateName = "passwordReset.vm";
             sendEmail( username, email, getText( "login.passwordReset.emailSubject", request.getLocale() ),
                     templateName, model );

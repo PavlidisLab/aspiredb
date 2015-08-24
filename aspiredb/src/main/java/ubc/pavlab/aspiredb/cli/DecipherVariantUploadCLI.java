@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.springframework.beans.factory.BeanFactory;
 
-import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.VariantUploadServiceResult;
 import ubc.pavlab.aspiredb.server.project.ProjectManager;
@@ -41,7 +40,6 @@ import ubc.pavlab.aspiredb.server.project.ProjectManager;
 public class DecipherVariantUploadCLI extends AbstractCLI {
 
     private static ProjectManager projectManager;
-    private static ProjectDao projectDao;
 
     /**
      * @param args
@@ -56,8 +54,6 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
         Logger.getRootLogger().addAppender( console );
 
         applicationContext = SpringContextUtil.getApplicationContext( false );
-
-        projectDao = ( ProjectDao ) applicationContext.getBean( "projectDao" );
 
         projectManager = ( ProjectManager ) applicationContext.getBean( "projectManager" );
 
@@ -94,7 +90,6 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
         return "Upload a variant data file and create / assign it to a project";
     }
 
-    @SuppressWarnings("static-access")
     @Override
     protected void buildOptions() {
         OptionBuilder.isRequired();

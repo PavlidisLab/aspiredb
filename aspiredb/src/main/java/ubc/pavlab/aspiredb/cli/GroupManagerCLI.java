@@ -103,7 +103,6 @@ public class GroupManagerCLI extends AbstractCLI {
         return "Add users and groups";
     }
 
-    @SuppressWarnings("static-access")
     @Override
     protected void buildOptions() {
 

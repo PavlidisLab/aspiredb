@@ -19,8 +19,6 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Component;
 
 import ubic.basecode.ontology.model.OntologyIndividual;
@@ -41,8 +39,6 @@ import ubic.basecode.ontology.search.OntologySearch;
  */
 @Component("ontologyService")
 public class OntologyServiceImpl implements OntologyService {
-
-    private static Log log = LogFactory.getLog( OntologyServiceImpl.class.getName() );
 
     private DiseaseOntologyService diseaseOntologyService;
 

@@ -25,6 +25,11 @@ import org.directwebremoting.annotations.DataTransferObject;
  */
 @DataTransferObject(javascript = "CnvLengthProperty")
 public class CnvLengthProperty extends NumericProperty {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7134735253883688957L;
+
     public CnvLengthProperty() {
         super( "Length", "cnvLength" );
     }

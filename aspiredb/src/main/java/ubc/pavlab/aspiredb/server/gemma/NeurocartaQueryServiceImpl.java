@@ -14,7 +14,6 @@
  */
 package ubc.pavlab.aspiredb.server.gemma;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -122,7 +121,6 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
     public Map<String, GeneValueObject> findPhenotypeGenes( String phenotypeUri ) throws NeurocartaServiceException,
             BioMartServiceException {
 
@@ -143,8 +141,6 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
             JSONArray jsonArray = new JSONArray( new JSONTokener( result ) );
 
             geneSymbols = new HashSet<String>( jsonArray.length() );
-            ArrayList<String> uris = new ArrayList<String>();
-
             for ( int i = 0; i < jsonArray.length(); i++ ) {
                 JSONObject json = jsonArray.getJSONObject( i );
                 JSONArray names = json.names();
@@ -198,7 +194,6 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
         return this.neurocartaCache.hasPhenotype( phenotypeUri );
     }
 
-    @SuppressWarnings("unused")
     @PostConstruct
     private void initialize() throws NeurocartaServiceException {
         updateCacheIfExpired();

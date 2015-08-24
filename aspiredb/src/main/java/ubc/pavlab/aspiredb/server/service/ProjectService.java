@@ -26,7 +26,6 @@ import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
-import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 /**
@@ -59,10 +58,6 @@ public interface ProjectService {
     public Integer numSubjects( Collection<Long> projectIds ) throws NotLoggedInException;
 
     public Integer numVariants( Collection<Long> projectIds ) throws NotLoggedInException;
-
-    public String processUploadedFile( String projectName, String filename, VariantType v ) throws NotLoggedInException;
-
-    public String processUploadedPhenotypeFile( String projectName, String filename ) throws NotLoggedInException;
 
     public String deleteProject( String projectName ) throws NotLoggedInException;
 

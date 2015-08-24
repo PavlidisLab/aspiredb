@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.springframework.beans.factory.BeanFactory;
 
-import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadService;
 import ubc.pavlab.aspiredb.server.fileupload.PhenotypeUploadServiceResult;
 import ubc.pavlab.aspiredb.server.ontology.OntologyService;
@@ -40,8 +39,6 @@ import ubc.pavlab.aspiredb.server.project.ProjectManager;
  * @version $Id: PhenotypeUploadCLI.java $
  */
 public class DecipherPhenotypeUploadCLI extends AbstractCLI {
-
-    private static ProjectDao projectDao;
 
     private static ProjectManager projectManager;
 
@@ -62,7 +59,6 @@ public class DecipherPhenotypeUploadCLI extends AbstractCLI {
         Logger.getRootLogger().addAppender( console );
 
         applicationContext = SpringContextUtil.getApplicationContext( false );
-        projectDao = ( ProjectDao ) applicationContext.getBean( "projectDao" );
         projectManager = ( ProjectManager ) applicationContext.getBean( "projectManager" );
         phenotypeUploadService = ( PhenotypeUploadService ) applicationContext.getBean( "phenotypeUploadService" );
         os = ( OntologyService ) applicationContext.getBean( "ontologyService" );
@@ -99,7 +95,6 @@ public class DecipherPhenotypeUploadCLI extends AbstractCLI {
         return "Upload a phenotype data file";
     }
 
-    @SuppressWarnings("static-access")
     @Override
     protected void buildOptions() {
         OptionBuilder.hasArg();

@@ -27,6 +27,10 @@ import org.directwebremoting.annotations.DataTransferObject;
  */
 @DataTransferObject
 public class ChromosomeBand implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -55095710775614710L;
     private int start;
     private int end;
     private String name;

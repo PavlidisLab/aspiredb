@@ -78,9 +78,9 @@ public class CriteriaBuilder {
     public enum EntityType {
         SUBJECT(Subject.class), VARIANT(Variant.class);
 
-        protected Class clazz;
+        protected Class<?> clazz;
 
-        private EntityType( Class clazz ) {
+        private EntityType( Class<?> clazz ) {
             this.clazz = clazz;
         }
     }
