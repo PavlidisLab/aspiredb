@@ -593,7 +593,7 @@ public class VariantUploadService {
         final String propnamePredictionColumn = "aspiredb.cli.variant.functionalprediction.predictionColumn";
         final String propnameRefBase = "aspiredb.cli.variant.snv.referencebase";
         final String propnameObsBase = "aspiredb.cli.variant.snv.observedbase";
-        final String dbPrefix = "dbNSFP2.4_variant";
+        final String dbPrefix = "aspiredb.cli.variant.functionalprediction.dbPrefix";
         Collection<SNVValueObject> matched = new ArrayList<>();
         StopWatch timer = new StopWatch();
         timer.start();
