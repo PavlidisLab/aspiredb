@@ -24,7 +24,7 @@ Ext.require( [ 'ASPIREdb.view.report.BurdenAnalysisCharacteristic',
  */
 Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
    extend : 'Ext.Window',
-   width : 900,
+   width : 950,
    height : 600,
    id : 'burdenAnalysisWindow',
    title : 'Burden Analysis',
@@ -166,6 +166,15 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
          itemId : 'showChartButton',
          text : 'Show table',
          hidden : true,
+      }, {
+         xtype : 'button',
+         flex : 1,
+         text : 'Help',
+         itemId : 'helpButton',
+         handler : function() {
+            window.open( 'http://aspiredb.chibi.ubc.ca/manual/burden-analysis/' );
+         },
+         scope : me,
       } );
 
       var showChartButton = me.down( '#showChartButton' );

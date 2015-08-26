@@ -152,9 +152,11 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                              {
                                 header : 'Description',
                                 dataIndex : 'id',
+                                shrinkWrap : true,
                                 flex : 2,
                                 renderer : function(id, meta, rec, rowIndex, colIndex, store) {
                                    // meta.tdAttr = 'data-qtip="Double-click to rename label"';
+                                   meta.style = "white-space: normal;"; // wrap-text
                                    var label = this.up( '#labelControlWindow' ).visibleLabels[id];
                                    var ret = label.description;
                                    return ret;

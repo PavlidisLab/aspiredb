@@ -105,9 +105,8 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
               {
                  text : 'Name',
                  dataIndex : 'name',
-
-                 renderer : function(value) {
-
+                 renderer : function(value, meta, rec, rowIndex, colIndex, store) {
+                    meta.style = "white-space: normal;"; // wrap-text
                     var image = "";
                     if ( value.neurocartaPhenotype ) {
                        var src = 'scripts/ASPIREdb/resources/images/icons/neurocarta.png';

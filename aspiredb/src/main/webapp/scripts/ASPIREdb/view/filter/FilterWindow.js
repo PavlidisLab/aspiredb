@@ -205,7 +205,7 @@ Ext
                                    text : 'Help',
                                    itemId : 'helpButton',
                                    handler : function() {
-                                      window.open( 'http://aspiredb.chibi.ubc.ca/manual' );
+                                      window.open( 'http://aspiredb.chibi.ubc.ca/manual/expression-filter/' );
                                    },
                                    scope : me,
                                 }, {

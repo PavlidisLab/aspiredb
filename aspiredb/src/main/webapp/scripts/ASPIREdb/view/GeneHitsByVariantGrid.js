@@ -55,7 +55,11 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantGrid', {
               {
                  header : 'Gene Name',
                  dataIndex : 'name',
-                 flex : 1
+                 flex : 3,
+                 renderer : function(value, meta, rec, rowIndex, colIndex, store) {
+                    meta.style = "white-space: normal;"; // wrap-text
+                    return value;
+                 }
               },
               {
                  header : 'Variant Count',
