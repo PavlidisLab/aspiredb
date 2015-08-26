@@ -21,6 +21,8 @@ import ubc.pavlab.aspiredb.server.model.CnvType;
 import ubc.pavlab.aspiredb.server.model.Variant;
 
 /**
+ * Methods for converting variant positions to BED format.
+ * 
  * @author Michelle Ly
  * @version $Id: CnvToBed.java,v 1.15 2013/07/23 23:19:33 ptan Exp $
  */

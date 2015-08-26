@@ -58,8 +58,8 @@ public class PhenotypeRestriction implements RestrictionExpression {
             return false;
         }
 
-        return this.value.equals( PhenotypeUtil.VALUE_ABSENT ); // FIXME! We should probably have special phenotype type
-                                                                // for absent/present.
+        return this.value.equals( PhenotypeUtil.VALUE_ABSENT );
+
     }
 
     public boolean isOntologyTerm() {
@@ -71,7 +71,7 @@ public class PhenotypeRestriction implements RestrictionExpression {
             return false;
         }
 
-        return this.value.equals( PhenotypeUtil.VALUE_PRESENT ); // FIXME!
+        return this.value.equals( PhenotypeUtil.VALUE_PRESENT );
     }
 
     public void setName( String name ) {

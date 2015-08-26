@@ -23,7 +23,9 @@ import java.util.Map;
 import ubc.pavlab.aspiredb.shared.ChromosomeValueObject;
 
 /**
- * author: anton date: 19/02/13
+ * Chromsome services such as returning all the chromosomes.
+ * 
+ * @author: anton date: 19/02/13
  */
 public interface ChromosomeService {
     public Map<String, ChromosomeValueObject> getChromosomes();

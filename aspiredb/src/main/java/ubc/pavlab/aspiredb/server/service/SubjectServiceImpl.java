@@ -54,7 +54,7 @@ import ubc.pavlab.aspiredb.shared.query.TextProperty;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 /**
- * TODO Document Me TODO: Sorting needs some thought.
+ * Methods for working with Subject's labels, variants and phenotypes.
  * 
  * @author Paul
  * @version $Id: SubjectServiceImpl.java,v 1.36 2013/06/24 23:26:39 cmcdonald Exp $

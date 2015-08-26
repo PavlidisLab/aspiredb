@@ -19,18 +19,12 @@ import gemma.gsec.authentication.UserManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-
-import jsx3.app.Settings;
 
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserCache;
@@ -39,18 +33,12 @@ import org.springframework.security.core.userdetails.cache.NullUserCache;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import antlr.StringUtils;
-import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
-import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.User;
 import ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup;
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
-import ubc.pavlab.aspiredb.shared.GeneValueObject;
-import ubc.pavlab.aspiredb.shared.query.GeneProperty;
-import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 /**
- * User Gene Set Service DWR's Created to access the User Gene Set Mysql values for the client side development
+ * Manage user groups.
  * 
  * @author Gaya Charath
  * @since: 11/03/14
@@ -58,8 +46,6 @@ import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 @Service
 @RemoteProxy(name = "UserManagerService")
 public class UserManagerServiceImpl implements UserManagerService {
-
-    private static Logger log = LoggerFactory.getLogger( UserManagerServiceImpl.class );
 
     @Autowired(required = false)
     private UserCache userCache = new NullUserCache();
@@ -109,7 +95,7 @@ public class UserManagerServiceImpl implements UserManagerService {
      */
     @Override
     @Transactional
-    @RemoteMethod   
+    @RemoteMethod
     public String createUserGroup( String groupName ) {
 
         try {
@@ -119,29 +105,29 @@ public class UserManagerServiceImpl implements UserManagerService {
         }
         return "Success";
     }
-    
+
     /**
      * Remove user from the group using gsec
      */
     @Override
     @Transactional
-    @RemoteMethod   
+    @RemoteMethod
     public String deleteUserFromGroup( String groupName, String userName ) {
 
         try {
-            securityService.removeUserFromGroup( userName , groupName );
+            securityService.removeUserFromGroup( userName, groupName );
         } catch ( Exception exception ) {
             return exception.toString();
         }
         return "Success";
     }
-   
+
     @Override
     @Transactional
     @RemoteMethod
     public String deleteGroup( String groupName ) {
-                        
-        if ( !securityService.getGroupsUserCanEdit( getCurrentUsername()).contains( groupName ) ) {
+
+        if ( !securityService.getGroupsUserCanEdit( getCurrentUsername() ).contains( groupName ) ) {
             throw new IllegalArgumentException( "You don't have permission to modify that group" );
         }
         /*
@@ -150,46 +136,47 @@ public class UserManagerServiceImpl implements UserManagerService {
         try {
             userManager.deleteGroup( groupName );
         } catch ( DataIntegrityViolationException div ) {
-           // throw div;
+            // throw div;
             return div.toString();
-        } 
+        }
         return "Success";
-        
+
     }
 
     @Override
     @Transactional
-    @RemoteMethod   
+    @RemoteMethod
     public Collection<String> loadUserEditableGroups() {
 
         Collection<String> usergroups = securityService.getGroupsUserCanEdit( getCurrentUsername() );
         List<UserGroup> UserGroup = new ArrayList<UserGroup>();
 
         for ( String usergroup : usergroups ) {
-            UserGroup.add( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) userService.findGroupByName( usergroup ) );
+            UserGroup.add( ( ubc.pavlab.aspiredb.server.model.common.auditAndSecurity.UserGroup ) userService
+                    .findGroupByName( usergroup ) );
         }
         return usergroups;
     }
 
     @Override
     @Transactional
-    @RemoteMethod   
+    @RemoteMethod
     public List<String> findGroupMemebers( String groupName ) {
-        List<String> members=new ArrayList<String>();
-        
-        if (groupName == null){
+        List<String> members = new ArrayList<String>();
+
+        if ( groupName == null ) {
             return members;
         }
-        
-        members =  userManager.findUsersInGroup( groupName );
+
+        members = userManager.findUsersInGroup( groupName );
         return members;
     }
-    
+
     @Override
     @Transactional
-    @RemoteMethod   
+    @RemoteMethod
     public String addUserToGroup( String groupName, String userName ) {
-        
+
         User userTakingAction = ( User ) userManager.getCurrentUser();
 
         if ( userTakingAction == null ) {
@@ -213,53 +200,33 @@ public class UserManagerServiceImpl implements UserManagerService {
             String uname = u.getUserName();
             securityService.addUserToGroup( uname, groupName );
         } else {
-           // throw new IllegalArgumentException( "Sorry, there is no matching user." );
+            // throw new IllegalArgumentException( "Sorry, there is no matching user." );
             return "Sorry, there is no matching user.";
         }
 
-        /*
-         * send the user an email.
-         */
- /**       String emailAddress = u.getEmail();
-        if ( StringUtils.isNotBlank( emailAddress ) ) {
-            log.debug( "Sending email notification to " + emailAddress );
-            SimpleMailMessage msg = new SimpleMailMessage();
-            msg.setTo( emailAddress );
-            msg.setFrom( Settings.getAdminEmailAddress() );
-            msg.setSubject( "You have been added to a group on Gemma" );
+        // /*
+        // * send the user an email.
+        // */
+        // String emailAddress = u.getEmail();
+        // if ( StringUtils.isNotBlank( emailAddress ) ) {
+        // log.debug( "Sending email notification to " + emailAddress );
+        // SimpleMailMessage msg = new SimpleMailMessage();
+        // msg.setTo( emailAddress );
+        // msg.setFrom( Settings.getAdminEmailAddress() );
+        // msg.setSubject( "You have been added to a group on Gemma" );
+        //
+        // msg.setText( userTakingAction.getUserName() + " has added you to the group '" + groupName
+        // + "'.\nTo view groups you belong to, visit " + GROUP_MANAGER_URL
+        // + "\n\nIf you believe you received this email in error, contact " + Settings.getAdminEmailAddress()
+        // + "." );
+        //
+        // mailEngine.send( msg );
+        // }
 
-            msg.setText( userTakingAction.getUserName() + " has added you to the group '" + groupName
-                    + "'.\nTo view groups you belong to, visit " + GROUP_MANAGER_URL
-                    + "\n\nIf you believe you received this email in error, contact " + Settings.getAdminEmailAddress()
-                    + "." );
-
-            mailEngine.send( msg );
-        }
-*/
         return "Success";
-      
+
     }
-  
-    @Override
-    @RemoteMethod   
-    public Collection<User> suggestGroupMemebers( SuggestionContext suggestionContext , String groupName){
 
-        Collection<User> users = new ArrayList<User>();
-
-        String query = suggestionContext.getValuePrefix();
-        if ( query.length() >= 2 ) {
-            final Collection<String> userNames = findGroupMemebers( groupName );          
-            
-            for ( String username : userNames ) {
-                User user = new User();
-               // geneProperty.setName( gene.getName() );
-              //  geneProperty.setDisplayName( gene.getSymbol() );
-               // geneSymbols.add( geneProperty );
-            }
-        }
-
-        return users;
-    }
     /*
      * (non-Javadoc)
      * 

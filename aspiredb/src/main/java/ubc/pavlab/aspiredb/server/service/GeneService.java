@@ -29,7 +29,10 @@ import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 
 /**
- * author: anton date: 01/05/13
+ * Gene related services such as finding which genes overlap with variants, identifying compound heterozygotes, and
+ * genes associated with a phenotype.
+ * 
+ * @author: anton date: 01/05/13
  */
 public interface GeneService {
 

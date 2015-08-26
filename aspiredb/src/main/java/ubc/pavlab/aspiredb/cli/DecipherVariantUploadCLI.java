@@ -113,10 +113,6 @@ public class DecipherVariantUploadCLI extends AbstractCLI {
                 .withDescription( "The project where this data will reside. Project will be deleted if existingproject option is not specified,"
                         + "Acceptable values = 'DECIPHER" );
         // Decipher will reside in a 'Special project' and are all CNVs
-        /*
-         * Option variantType = OptionBuilder.isRequired().hasArg().withArgName( "Variant Type" ) .withDescription(
-         * "The type of variant in this file, one of: CNV, Indel, SNV, Inversion" ) .create( "variant" );
-         */
         Option project = OptionBuilder.create( "project" );
 
         addOption( "existingproject", false, "You must use this option if you are adding to an existing project" );

@@ -32,6 +32,8 @@ import ubc.pavlab.aspiredb.shared.query.CharacteristicProperty;
 /**
  * Compares the "burden" between two subject labels. "burden" can be number of genes affected, CNV length, number of
  * subjects with a pathogenic variant, etc.
+ * 
+ * @author ptan
  */
 public interface BurdenAnalysisService {
 

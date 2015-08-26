@@ -8,6 +8,12 @@ import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 
 import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
 
+/**
+ * Encapsulates filters.
+ * 
+ * @author ptan
+ * @version $Id$
+ */
 @DataTransferObject(javascript = "AspireDbPagingLoadConfig")
 public interface AspireDbPagingLoadConfig extends PagingLoadConfig {
 

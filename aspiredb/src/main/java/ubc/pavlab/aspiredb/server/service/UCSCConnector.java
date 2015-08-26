@@ -24,7 +24,7 @@ import java.util.Map;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 
 /**
- *
+ * Methods for integrating with the UCSC Genome Browser.
  */
 public interface UCSCConnector {
     public Map<String, String> constructCustomTracksUrl( GenomicRange range, Collection<Long> activeProjectIds );

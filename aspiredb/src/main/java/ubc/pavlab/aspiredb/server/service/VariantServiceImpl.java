@@ -80,7 +80,7 @@ import ubc.pavlab.aspiredb.shared.query.VariantTypeProperty;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 /**
- * TODO Document Me
+ * Methods for working with Variant labels, subjects, characteristics and locations.
  * 
  * @author ??
  * @version $Id: VariantServiceImpl.java,v 1.39 2013/07/02 18:20:21 anton Exp $
@@ -499,6 +499,16 @@ public class VariantServiceImpl implements VariantService {
                 break;
             case TRANSLOCATION:
                 properties.add( new TranslocationTypeProperty() );
+                break;
+            case DECIPHER:
+                properties.add( new CopyNumberProperty() );
+                properties.add( new CNVTypeProperty() );
+                properties.add( new CnvLengthProperty() );
+                break;
+            case DGV:
+                properties.add( new CopyNumberProperty() );
+                properties.add( new CNVTypeProperty() );
+                properties.add( new CnvLengthProperty() );
                 break;
         }
         return properties;

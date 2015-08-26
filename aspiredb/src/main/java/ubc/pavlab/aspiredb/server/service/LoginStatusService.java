@@ -15,7 +15,7 @@
 package ubc.pavlab.aspiredb.server.service;
 
 /**
- * TODO Document Me
+ * Services for determining if the user is logged in, if the user is an administrator, and the current username.
  * 
  * @author cmcdonald
  * @version $Id: LoginStatusService.java,v 1.2 2013/07/16 23:05:06 ptan Exp $

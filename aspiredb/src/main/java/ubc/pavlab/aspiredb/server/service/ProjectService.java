@@ -29,9 +29,9 @@ import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 /**
- * TODO Document Me
+ * Services for project related tasks such as adding, deleting projects, altering user permissions, adding subjects,
+ * variants and phenotypes.
  * 
- * @author ??
  * @version $Id: ProjectService.java,v 1.4 2013/06/11 22:30:38 anton Exp $
  */
 
@@ -71,11 +71,6 @@ public interface ProjectService {
 
     public Collection<Subject> getSubjects( String projectName ) throws Exception;
 
-    public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName,
-            String variantType );
-
-    public String addSubjectPhenotypeToExistingProject( String fileContent, boolean createProject, String projectName );
-
     public UserGroup findGroupByName( String name );
 
     public Collection<String> suggestUsers( SuggestionContext suggestionContext ) throws NotLoggedInException;
@@ -89,9 +84,6 @@ public interface ProjectService {
 
     public PhenotypeUploadServiceResult addSubjectPhenotypeToProject( String filename, boolean createProject,
             String projectName ) throws Exception;
-
-    public Map<String, String> addMultipleSubjectVariantsToProject( List<String> variantFiles, boolean createProject,
-            String projectName );
 
     public String addSubjectVariantsPhenotypeToProject( String variantFilename, String phenotypeFilename,
             boolean createProject, String projectName, String variantType );

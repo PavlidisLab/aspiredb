@@ -21,9 +21,9 @@ import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.shared.PhenotypeSummary;
 
 /**
- * TODO Document Me
+ * Generate phenotype summaries for each subject.
  * 
- * @author ??
+ * @author anton
  * @version $Id: PhenotypeBrowserService.java,v 1.4 2013/06/11 22:30:48 anton Exp $
  */
 

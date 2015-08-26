@@ -35,8 +35,7 @@ import ubc.pavlab.aspiredb.server.ws.CnvToBed;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 
 /**
- *
- *
+ * Methods for integrating with the UCSC Genome Browser.
  */
 @Service("ucscConnector")
 @RemoteProxy(name = "UCSCConnector")

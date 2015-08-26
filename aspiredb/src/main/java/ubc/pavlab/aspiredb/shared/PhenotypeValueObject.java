@@ -21,7 +21,7 @@ import java.util.Map;
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
- * @author ?
+ * Contains information about the Phenotype such as URI, name, value, etc.
  */
 @DataTransferObject(javascript = "PhenotypeValueObject")
 public class PhenotypeValueObject implements Comparable<PhenotypeValueObject>, Serializable {

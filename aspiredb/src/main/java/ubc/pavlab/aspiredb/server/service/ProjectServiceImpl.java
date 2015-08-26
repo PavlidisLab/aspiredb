@@ -18,7 +18,6 @@ import gemma.gsec.SecurityService;
 import gemma.gsec.authentication.UserManager;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -70,8 +69,11 @@ import ubc.pavlab.aspiredb.shared.ProjectValueObject;
 import ubc.pavlab.aspiredb.shared.VariantType;
 import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
-import au.com.bytecode.opencsv.CSVWriter;
 
+/**
+ * Services for project related tasks such as adding, deleting projects, altering user permissions, adding subjects,
+ * variants and phenotypes.
+ */
 @Service
 @RemoteProxy(name = "ProjectService")
 public class ProjectServiceImpl implements ProjectService {
@@ -127,7 +129,6 @@ public class ProjectServiceImpl implements ProjectService {
     public Collection<String> getProjectUserNames( String projectName ) {
         Collection<String> userObject = new ArrayList<String>();
 
-        // userObject =null;
         Collection<String> userNames = new ArrayList<String>();
 
         Project proj = projectDao.findByProjectName( projectName );
@@ -236,36 +237,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    /**
-     * @author gaya
-     * @param list of variantFiles
-     * @param projectName
-     * @param createProject or not
-     * @return Error String
-     */
-    @Override
-    @RemoteMethod
-    public Map<String, String> addMultipleSubjectVariantsToProject( List<String> variantFiles, boolean createProject,
-            String projectName ) {
-        Map<String, String> returnString = new HashMap<String, String>();
-        VariantUploadServiceResult variantResult = null;
-
-        for ( int i = 0; i < variantFiles.size(); i++ ) {
-            String filename = variantFiles.get( 0 );
-            String filetype = variantFiles.get( 1 );
-            String results = "";
-            try {
-                variantResult = addSubjectVariantsToProject( filename, createProject, projectName, filetype );
-                results += "Number of Variants: " + variantResult.getVariantsToAdd().size() + "\n";
-            } catch ( Exception e ) {
-                log.error( e.getLocalizedMessage(), e );
-                results += e.getLocalizedMessage() + "\n";
-            }
-            returnString.put( filename, results );
-        }
-        return returnString;
-    }
-
     @Override
     @RemoteMethod
     public VariantUploadServiceResult addSubjectVariantsToProject( String filepath, boolean createProject,
@@ -323,7 +294,6 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
 
-        VariantType VariantType = null;
         VariantUploadServiceResult result = null;
 
         if ( variantType.equalsIgnoreCase( "CNV" ) ) {
@@ -369,184 +339,7 @@ public class ProjectServiceImpl implements ProjectService {
                     + timer.getTime() + " ms" );
         }
 
-        // }
-
-        // TODO Should we delete the file???
         return result;
-    }
-
-    /**
-     * @author gaya
-     * @param fileContent
-     * @param projectName
-     * @param variantType
-     * @return Error String
-     */
-    @Override
-    @RemoteMethod
-    public String addSubjectVariantsToExistingProject( String fileContent, boolean createProject, String projectName,
-            String variantType ) {
-
-        String returnString = "";
-
-        try {
-            // Directory created
-            // boolean success = ( new File( "/uploadFile" ) ).mkdirs();
-
-            // if ( success ) {
-
-            String csv = "uploadFile/variantFile.csv";
-
-            CSVWriter writer = new CSVWriter( new FileWriter( csv ) );
-
-            String[] Outresults = fileContent.split( "\n" );
-
-            for ( int i = 0; i < Outresults.length; i++ ) {
-                String[] passedCSVFile = Outresults[i].toString().split( "," );
-                writer.writeNext( passedCSVFile );
-            }
-
-            writer.close();
-
-            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-
-            // create a connection
-            // arg[0] is the directory in which the .csv files are held
-            Properties props = new Properties();
-            props.put( "trimHeaders", "true" );
-            props.put( "trimValues", "true" );
-            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/", props );
-
-            Statement stmt = conn.createStatement( ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY );
-            ResultSet results = stmt.executeQuery( "SELECt * from variantFile" );
-
-            // check weather the project exist
-            if ( createProject ) {
-                if ( projectDao.findByProjectName( projectName ) != null ) {
-                    returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
-                }
-            }
-
-            VariantType VariantType = null;
-            VariantUploadServiceResult result = null;
-
-            if ( variantType.equalsIgnoreCase( "CNV" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.CNV );
-            } else if ( variantType.equalsIgnoreCase( "SNV" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.SNV );
-            } else if ( variantType.equalsIgnoreCase( "INDEL" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INDEL );
-            } else if ( variantType.equalsIgnoreCase( "INVERSION" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.INVERSION );
-            } else if ( variantType.equalsIgnoreCase( "DECIPHER" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DECIPHER );
-            } else if ( variantType.equalsIgnoreCase( "DGV" ) ) {
-                result = VariantUploadService.makeVariantValueObjectsFromResultSet( results, VariantType.DGV );
-            }
-
-            if ( result.getErrorMessages().isEmpty() ) {
-                projectManager.addSubjectVariantsToProject( projectName, false, result.getVariantsToAdd() );
-                returnString = "Success";
-            } else {
-                for ( String errorMessage : result.getErrorMessages() ) {
-                    returnString += errorMessage + "\n";
-                    log.error( errorMessage );
-                }
-
-            }
-            // }
-
-        } catch ( Exception e ) {
-            log.error( e.getLocalizedMessage(), e );
-            return e.toString();
-        }
-        return returnString;
-    }
-
-    /**
-     * @author gaya
-     * @param fileContent
-     * @param projectName
-     * @param variantType
-     * @return Error String
-     */
-    @Override
-    @RemoteMethod
-    public String addSubjectPhenotypeToExistingProject( String fileContent, boolean createProject, String projectName ) {
-
-        String returnString = "";
-
-        try {
-
-            os.getHumanPhenotypeOntologyService().startInitializationThread( true );
-            int c = 0;
-
-            while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
-                Thread.sleep( 10000 );
-                log.info( "Waiting for HumanPhenotypeOntology to load" );
-                if ( ++c > 10 ) {
-                    throw new Exception( "Ontology load timeout" );
-                }
-            }
-
-            // create directory in system root access denied
-            // boolean success = ( new File( "uploadFile" ) ).mkdirs();
-
-            // if ( success ) {
-            // TODO : Now admin need to create a folder uploadFile in sandbox or production to work
-            String csv = "uploadFile/phenotypeFile.csv";
-            CSVWriter writer = new CSVWriter( new FileWriter( csv ) );
-
-            // Object[] objectArray = resultsList.toArray();
-            String[] Outresults = fileContent.split( "\n" );
-
-            for ( int i = 0; i < Outresults.length; i++ ) {
-                String[] passedCSVFile = Outresults[i].toString().split( "," );
-                writer.writeNext( passedCSVFile );
-            }
-
-            writer.close();
-
-            Class.forName( "org.relique.jdbc.csv.CsvDriver" );
-
-            // create a connection
-            // arg[0] is the directory in which the .csv files are held
-            Connection conn = DriverManager.getConnection( "jdbc:relique:csv:uploadFile/" );
-
-            Statement stmt = conn.createStatement();
-            ResultSet results = stmt.executeQuery( "SELECT * FROM phenotypeFile" );
-
-            if ( createProject ) {
-                if ( projectDao.findByProjectName( projectName ) != null ) {
-                    returnString = "Project name already exists, choose a different project name or use existingproject option to add to this project.";
-                }
-            }
-
-            PhenotypeUploadServiceResult phenResult = phenotypeUploadService
-                    .getPhenotypeValueObjectsFromResultSet( results );
-
-            // clean up
-            results.close();
-            stmt.close();
-            conn.close();
-
-            projectManager.addSubjectPhenotypesToProject( projectName, createProject, phenResult.getPhenotypesToAdd() );
-
-            if ( !phenResult.getErrorMessages().isEmpty() ) {
-                for ( String errorMessage : phenResult.getErrorMessages() ) {
-                    returnString = errorMessage;
-                }
-
-            } else {
-                returnString = "Success";
-            }
-            // }
-
-        } catch ( Exception e ) {
-            return e.toString();
-        }
-
-        return returnString;
     }
 
     @Override
@@ -690,9 +483,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    /*
-     * TODO eventually we want this to work with a collection of projectIds
-     */
     @Override
     @RemoteMethod
     public Integer numSubjects( Collection<Long> projectIds ) {
@@ -730,9 +520,6 @@ public class ProjectServiceImpl implements ProjectService {
         return false;
     }
 
-    /*
-     * TODO eventually we want this to work with a collection of projectIds
-     */
     @Override
     @RemoteMethod
     public Integer numVariants( Collection<Long> projectIds ) {

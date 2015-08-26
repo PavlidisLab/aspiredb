@@ -21,7 +21,7 @@ import org.directwebremoting.annotations.RemoteProxy;
 import org.springframework.stereotype.Service;
 
 /**
- * Simple service to find out if current user is logged in
+ * Services for determining if the user is logged in, if the user is an administrator, and the current username.
  * 
  * @author cmcdonald
  * @version $Id: LoginStatusServiceImpl.java,v 1.8 2013/07/16 23:05:06 ptan Exp $

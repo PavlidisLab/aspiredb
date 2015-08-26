@@ -29,6 +29,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.ui.velocity.VelocityEngineUtils;
 
 /**
+ * Mail sending utilities.
+ * 
  * @author pavlidis
  * @author Matt Raible
  * @version $Id: MailEngineImpl.java,v 1.3 2013/09/21 01:27:50 paul Exp $

@@ -37,7 +37,9 @@ import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 /**
- * author: anton date: 10/06/13
+ * Label related services such delete, remove, and update.
+ * 
+ * @author: anton date: 10/06/13
  */
 @Component("labelService")
 @Service("labelService")

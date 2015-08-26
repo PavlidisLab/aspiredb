@@ -23,7 +23,9 @@ import java.util.Collection;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 /**
- * author: anton date: 10/06/13
+ * Label related services such delete, remove, and update.
+ * 
+ * @author: anton date: 10/06/13
  */
 public interface LabelService {
 

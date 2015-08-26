@@ -42,6 +42,12 @@ import ubic.basecode.ontology.model.OntologyResource;
 import ubic.basecode.ontology.model.OntologyTerm;
 import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
 
+/**
+ * Utilities for working with phenotype inference, converting phenotype values and resolving URIs.
+ * 
+ * @author ptan
+ * @version $Id$
+ */
 @Component("phenotypeUtil")
 public class PhenotypeUtil {
 

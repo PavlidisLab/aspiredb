@@ -30,6 +30,8 @@ import ubc.pavlab.aspiredb.shared.query.PropertyValue;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 /**
+ * Methods for working with Variant labels, subjects, characteristics and locations.
+ * 
  * @author azoubare
  * @version $Id: VariantService.java,v 1.19 2013/06/13 19:57:16 anton Exp $
  */

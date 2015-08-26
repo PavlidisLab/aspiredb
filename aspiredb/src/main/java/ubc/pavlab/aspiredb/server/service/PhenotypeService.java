@@ -28,6 +28,11 @@ import ubc.pavlab.aspiredb.shared.query.PhenotypeProperty;
 import ubc.pavlab.aspiredb.shared.query.PropertyValue;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
+/**
+ * Functions for suggesting ontology terms, phenotype enrichment, and phenotype inference.
+ * 
+ * @version $Id$
+ */
 public interface PhenotypeService {
 
     public List<PhenotypeEnrichmentValueObject> getPhenotypeEnrichmentValueObjects( Collection<Long> activeProjects,
@@ -39,11 +44,9 @@ public interface PhenotypeService {
     public Map<String, Collection<GeneValueObject>> populateDescendantPhenotypes( String phenotypeUri )
             throws NeurocartaServiceException, BioMartServiceException;
 
-    // NOT IMPLEMENTED YET
     public Collection<PhenotypeProperty> suggestPhenotypes( SuggestionContext suggestionContext )
             throws NotLoggedInException;
 
-    // NOT IMPLEMENTED YET
     public Collection<PropertyValue> suggestPhenotypeValues( PhenotypeProperty property,
             SuggestionContext suggestionContext ) throws NotLoggedInException;
 

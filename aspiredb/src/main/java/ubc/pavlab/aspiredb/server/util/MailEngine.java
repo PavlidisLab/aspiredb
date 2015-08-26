@@ -19,6 +19,8 @@ import java.util.Map;
 import org.springframework.mail.SimpleMailMessage;
 
 /**
+ * Mail sending utilities.
+ * 
  * @author paul
  * @version $Id: MailEngine.java,v 1.1 2013/07/24 00:43:21 paul Exp $
  */

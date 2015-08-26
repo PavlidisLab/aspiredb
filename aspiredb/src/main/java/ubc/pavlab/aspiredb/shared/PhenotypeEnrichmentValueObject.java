@@ -19,7 +19,8 @@ import java.io.Serializable;
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
- * TODO Document Me <<<<<<< HEAD ======= >>>>>>> 0a87450512a15eeb817865f623adcb0eefa7cc1e
+ * Information about the phenotype enrichment. Includes the phenotype URI, name, how subjects are in the in-group vs
+ * out-group and corrected and uncorrected p-value.
  * 
  * @version $Id: PhenotypeEnrichmentValueObject.java,v 1.2 2013/07/09 21:43:18 cmcdonald Exp $
  */

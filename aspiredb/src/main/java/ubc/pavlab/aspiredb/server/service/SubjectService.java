@@ -35,9 +35,8 @@ import ubc.pavlab.aspiredb.shared.query.PropertyValue;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 /**
- * TODO Document Me
+ * Methods for working with Subject's labels, variants and phenotypes.
  * 
- * @author ??
  * @version $Id: SubjectService.java,v 1.16 2013/06/24 23:26:40 cmcdonald Exp $
  */
 public interface SubjectService {

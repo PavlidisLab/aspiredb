@@ -42,7 +42,7 @@ public class LabelValueObject implements Displayable, Serializable {
     public LabelValueObject( Long id, String name ) {
         this.id = id;
         this.name = name;
-        this.colour = "E6E6FA"; // TODO: define default
+        this.colour = "E6E6FA";
     }
 
     public LabelValueObject( Long id, String name, String colour ) {
@@ -62,7 +62,7 @@ public class LabelValueObject implements Displayable, Serializable {
 
     public LabelValueObject( String name ) {
         this.name = name;
-        this.colour = "E6E6FA"; // TODO: define default
+        this.colour = "E6E6FA";
     }
 
     public LabelValueObject( String name, String colour ) {

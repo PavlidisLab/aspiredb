@@ -7,6 +7,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Captures information about a Phenotype such as the number of subjects for each phenotype value.
+ * 
+ * @author ptan
+ * @version $Id$
+ */
 public class PhenotypeSummary implements Comparable<PhenotypeSummary> {
 
     // Numeric

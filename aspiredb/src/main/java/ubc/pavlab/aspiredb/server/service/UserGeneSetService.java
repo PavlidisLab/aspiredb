@@ -22,6 +22,8 @@ import ubc.pavlab.aspiredb.shared.GeneSetValueObject;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 
 /**
+ * Methods for dealing with user gene sets.
+ * 
  * @author Gaya
  */
 public interface UserGeneSetService {

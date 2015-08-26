@@ -42,9 +42,9 @@ import ubic.basecode.ontology.model.OntologyTerm;
 import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
 
 /**
- * TODO Document Me
+ * Generate phenotype summaries for each subject.
  * 
- * @author ??
+ * @author anton
  * @version $Id: PhenotypeBrowserServiceImpl.java,v 1.23 2013/06/12 19:51:18 anton Exp $
  */
 @Component
@@ -143,7 +143,6 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService {
 
                 Collection<String> possibleValues = new ArrayList<String>();
 
-                // TODO FIXME
                 // all possible values of only large special project are HPO so this database call is unnecessary
                 if ( !containsLargeSpecialProject ) {
 
@@ -202,10 +201,6 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService {
         // Shown when phenotype grid row is expanded.
         Collection<PhenotypeSummary> descendantSummaries = phenotypeSummary.getDescendantOntologyTermSummaries();
         Collection<OntologyTerm> descendantsTerms = ontologyTerm.getChildren( false );
-        // if ( descendantsTerms.isEmpty() ) { // Is leaf term.
-        // return phenotypeSummary;
-        // }
-        // // TODO: what about inference of absence?
 
         // Add to map if phenotype is present in db.
         for ( OntologyTerm childTerm : descendantsTerms ) {
@@ -282,12 +277,8 @@ public class PhenotypeBrowserServiceImpl implements PhenotypeBrowserService {
 
         phenotypeSummary = new PhenotypeSummary( phenotype.convertToValueObject(), valueToSubjectIds );
 
-        // if ( !disableForLargeProject ) {
         phenotypeSummary.setNeurocartaPhenotype( isNeurocartaPhenotype( PhenotypeUtil.HUMAN_PHENOTYPE_URI_PREFIX
                 + phenotypeSummary.getUri() ) );
-        // } else {
-        // phenotypeSummary.setNeurocartaPhenotype( false );
-        // }
 
         return phenotypeSummary;
     }

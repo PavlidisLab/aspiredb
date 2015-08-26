@@ -57,6 +57,11 @@ import ubic.basecode.ontology.model.OntologyTerm;
 import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
 import cern.colt.list.DoubleArrayList;
 
+/**
+ * Functions for suggesting ontology terms, phenotype enrichment, and phenotype inference.
+ * 
+ * @version $Id$
+ */
 @RemoteProxy(name = "PhenotypeService")
 @Service("phenotypeService")
 public class PhenotypeServiceImpl implements PhenotypeService {
@@ -350,7 +355,6 @@ public class PhenotypeServiceImpl implements PhenotypeService {
     @Transactional(readOnly = true)
     public Collection<PhenotypeProperty> suggestPhenotypes( SuggestionContext suggestionContext )
             throws NotLoggedInException {
-        // HumanPhenotypeOntologyService HPOService = ontologyService.getHumanPhenotypeOntologyService();
 
         Collection<PhenotypeProperty> phenotypes = new ArrayList<PhenotypeProperty>();
 

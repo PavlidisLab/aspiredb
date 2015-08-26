@@ -35,7 +35,7 @@ import ubc.pavlab.aspiredb.shared.GeneSetValueObject;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 
 /**
- * User Gene Set Service DWR's Created to access the User Gene Set Mysql values for the client side development
+ * Methods for dealing with user gene sets.
  * 
  * @author Gaya Charath
  * @since: 11/03/14
@@ -128,7 +128,6 @@ public class UserGeneSetServiceImpl implements UserGeneSetService {
         }
 
         if ( geneSet.isEmpty() ) {
-            UserGeneSet userGeneSet = new UserGeneSet( geneSetName, ( Serializable ) newGeneValueObjects );
         } else if ( geneSet.size() == 1 ) {
             UserGeneSet userGeneSet = geneSet.iterator().next();
             userGeneSet.setObject( ( Serializable ) newGeneValueObjects );

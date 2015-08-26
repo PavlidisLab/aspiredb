@@ -79,7 +79,6 @@ public abstract class SearchableEhcache<T> {
         }
     }
 
-    @SuppressWarnings("unused")
     @PostConstruct
     private void initialize() {
         this.cache = this.cacheManager.getCache( getCacheName() );

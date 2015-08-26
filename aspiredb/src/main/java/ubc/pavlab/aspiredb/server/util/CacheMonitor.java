@@ -16,6 +16,8 @@
 package ubc.pavlab.aspiredb.server.util;
 
 /**
+ * Get statistics about and manage caches.
+ * 
  * @author paul
  * @version $Id: CacheMonitor.java,v 1.1 2013/02/04 18:45:06 cmcdonald Exp $
  */

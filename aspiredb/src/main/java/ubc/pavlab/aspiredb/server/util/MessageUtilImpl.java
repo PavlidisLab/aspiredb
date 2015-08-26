@@ -25,6 +25,8 @@ import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.stereotype.Component;
 
 /**
+ * Provides methods for putting messages to the user in the session.
+ * 
  * @author pavlidis
  * @version $Id: MessageUtilImpl.java,v 1.2 2013/07/24 00:43:55 paul Exp $
  */

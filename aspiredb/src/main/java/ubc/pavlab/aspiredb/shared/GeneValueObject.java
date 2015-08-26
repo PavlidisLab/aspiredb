@@ -19,7 +19,7 @@ import java.io.Serializable;
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
- * TODO Document Me
+ * Contains information about Genes such as name, symbol, etc.
  * 
  * @author Paul
  * @version $Id: GeneValueObject.java,v 1.10 2013/06/11 22:30:57 anton Exp $
