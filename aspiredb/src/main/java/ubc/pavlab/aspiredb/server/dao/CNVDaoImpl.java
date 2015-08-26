@@ -21,9 +21,8 @@ import org.springframework.stereotype.Repository;
 import ubc.pavlab.aspiredb.server.model.CNV;
 
 /**
- * TODO Document Me
+ * DAO operations for CNV variants.
  * 
- * @author ??
  * @version $Id: CNVDaoImpl.java,v 1.43 2013/06/11 22:30:45 anton Exp $
  */
 @Repository("cnvDao")

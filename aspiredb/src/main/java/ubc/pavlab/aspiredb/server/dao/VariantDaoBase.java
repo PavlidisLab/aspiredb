@@ -25,9 +25,8 @@ import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
 /**
- * TODO Document Me
+ * DAO operations for querying variants by patient ID, by genomic location, etc.
  * 
- * @author ??
  * @version $Id: VariantDaoBase.java,v 1.11 2013/06/11 22:30:43 anton Exp $
  */
 public interface VariantDaoBase<T extends Variant> extends DaoBase<T>, RemotePaging<T> {

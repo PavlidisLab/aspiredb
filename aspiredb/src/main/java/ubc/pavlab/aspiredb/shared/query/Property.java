@@ -24,10 +24,16 @@ import java.util.Collection;
 import org.directwebremoting.annotations.DataTransferObject;
 
 /**
- * author: anton date: 07/05/13 Class is concrete because I couldn't get DWR to see it when it is abstract.
+ * Class is concrete because I couldn't get DWR to see it when it is abstract.
+ * 
+ * @author: anton date: 07/05/13
  */
 @DataTransferObject(javascript = "Property")
 public class Property<D extends DataType> implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4034975395962572782L;
     protected String name;
     protected String displayName;
     protected D dataType;

@@ -21,7 +21,7 @@ import org.springframework.stereotype.Repository;
 import ubc.pavlab.aspiredb.server.model.Inversion;
 
 /**
- * TODO Document Me
+ * DAO operations for inversion variants.
  * 
  * @author ??
  * @version $Id: InversionDaoImpl.java,v 1.2 2013/06/11 22:30:44 anton Exp $

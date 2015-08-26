@@ -20,13 +20,18 @@ import ubc.pavlab.aspiredb.server.model.GenomicLocation;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 
 /**
- * TODO Document Me
+ * DAO operations for the GenomicLocation such as returning the list of IDs given a genomic location.
  * 
- * @author ??
  * @version $Id: GenomicLocationDao.java,v 1.4 2013/05/01 17:53:54 anton Exp $
  */
 public interface GenomicLocationDao extends DaoBase<GenomicLocation> {
 
+    /**
+     * Return the list of GenomicLocation IDs given a genomic location.
+     * 
+     * @param range
+     * @return
+     */
     public Collection<Long> findByGenomicLocation( GenomicRange range );
 
 }

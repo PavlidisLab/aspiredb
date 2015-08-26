@@ -25,13 +25,19 @@ import ubc.pavlab.aspiredb.shared.LabelValueObject;
 import ubc.pavlab.aspiredb.shared.query.PhenotypeFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.ProjectOverlapFilterConfig;
 
+/**
+ * DAO operations for querying variants such as finding variants by label, by phenotype.
+ * 
+ * @author ptan
+ * @version $Id$
+ */
 public interface VariantDao extends VariantDaoBase<Variant>, RemotePaging<Variant> {
 
     /**
      * Keys for {@link VariantDao#getSubjectVariantIdsByPhenotype(PhenotypeFilterConfig) }
      */
-    public static final int SUBJECT_IDS_KEY = 0;
-    public static final int VARIANT_IDS_KEY = 1;
+    public static final Integer SUBJECT_IDS_KEY = new Integer( 0 );
+    public static final Integer VARIANT_IDS_KEY = new Integer( 1 );
 
     @Secured({ "GROUP_USER", "AFTER_ACL_SUBJECT_ATTRIBUTE_COLLECTION_READ" })
     public Collection<Variant> findByLabel( LabelValueObject label );

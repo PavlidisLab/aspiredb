@@ -29,9 +29,8 @@ import ubc.pavlab.aspiredb.server.util.GenomeBin;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 
 /**
- * TODO Document Me
+ * DAO operations for the GenomicLocation.
  * 
- * @author ??
  * @version $Id: GenomicLocationDaoImpl.java,v 1.7 2013/06/11 22:30:46 anton Exp $
  */
 @Repository

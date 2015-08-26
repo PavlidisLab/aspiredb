@@ -30,7 +30,9 @@ import ubc.pavlab.aspiredb.server.service.ChromosomeService;
 import ubc.pavlab.aspiredb.shared.ChromosomeValueObject;
 
 /**
- * author: anton date: 19/02/13
+ * Chromosome operations such as getting the list of all chromosomes in the genome.
+ * 
+ * @author: anton date: 19/02/13
  */
 @RemoteProxy(name = "ChromosomeService")
 @Service("chromosomeService")

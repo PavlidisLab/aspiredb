@@ -105,6 +105,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
         log.info( "SecondLevelCache:" + regionName + "," + secondLevelStats );
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     @Transactional(readOnly = true)
     public Collection<VariantValueObject> loadByGenomicLocationIDs( Collection<Long> genomicLocIDs ) {
@@ -132,6 +133,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
         return ret;
     }
 
+    @SuppressWarnings({ "boxing", "unchecked" })
     @Override
     @Transactional(readOnly = true)
     public Collection<T> findByGenomicLocation( GenomicRange range, Collection<Long> activeProjectIds ) {
@@ -150,6 +152,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
         return variants;
     }
 
+    @SuppressWarnings({ "boxing", "unchecked" })
     @Override
     @Transactional(readOnly = true)
     public Collection<VariantValueObject> findByGenomicLocationQuick( GenomicRange range,
@@ -456,7 +459,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
         int pageSize = Math.min( limit, variants.size() );
         List<T> variantPage = variants.subList( 0, pageSize );
 
-        return new PageBean( variantPage, variantIds.size() );
+        return new PageBean<T>( variantPage, variantIds.size() );
     }
 
     private Session currentSession() {
@@ -464,7 +467,8 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
     }
 
     @Override
-    public Collection<String> suggestValuesForEntityProperty( Property property, SuggestionContext suggestionContext ) {
+    public Collection<String> suggestValuesForEntityProperty( @SuppressWarnings("rawtypes") Property property,
+            SuggestionContext suggestionContext ) {
         Session session = currentSession();
 
         Criteria criteria = session.createCriteria( this.elementClass );
@@ -578,14 +582,19 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
         return variantIds;
     }
 
-    // This restriction is of the type:
-    // "Show me variants that overlap/mutually overlap by less/greater than x bases/percentage"
-    // find overlaps for a specific variant Id that meet this restriction
-    // Note that the functionality requested by Sanja was that in the case of a "LESS THAN" ALL of a variants overlaps
-    // must meet this restriction and we return all of its overlaps
-    // however in the case of "GREATER THAN" we only return the overlaps that meet this restriction. (we don't require
-    // that "ALL OF THE VARIANTS MUST MEET THE RESTRICTION)
-    // so this means that it will either be all overlaps returned or no overlaps
+    /**
+     * This restriction is of the type:
+     * "Show me variants that overlap/mutually overlap by less/greater than x bases/percentage" find overlaps for a
+     * specific variant Id that meet this restriction Note that the functionality requested was that in the case of a
+     * "LESS THAN" ALL of a variants overlaps must meet this restriction and we return all of its overlaps however in
+     * the case of "GREATER THAN" we only return the overlaps that meet this restriction. (we don't require that "ALL OF
+     * THE VARIANTS MUST MEET THE RESTRICTION) so this means that it will either be all overlaps returned or no overlaps
+     * 
+     * @param vId
+     * @param overlapRestriction
+     * @param overlapProjectIds
+     * @return
+     */
     private Collection<Variant2VariantOverlap> getOverlapsSatisfyingInitialOverlapRestriction( Long vId,
             SimpleRestriction overlapRestriction, Collection<Long> overlapProjectIds ) {
 

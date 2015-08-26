@@ -18,6 +18,13 @@
  */
 package ubc.pavlab.aspiredb.server;
 
+/**
+ * Objects that should be converted to ValueObjects should implement this interface.
+ * 
+ * @author ptan
+ * @version $Id$
+ * @param <T>
+ */
 public interface ValueObjectConvertible<T> {
     public T toValueObject();
 }

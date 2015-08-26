@@ -16,7 +16,7 @@
 package ubc.pavlab.aspiredb.cli;
 
 /**
- * TODO Document Me
+ * Exception for things like wrong variant type.
  * 
  * @version $Id: InvalidDataException.java,v 1.1 2013/04/24 17:38:03 cmcdonald Exp $
  */

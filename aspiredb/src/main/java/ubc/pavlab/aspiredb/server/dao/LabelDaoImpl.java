@@ -33,7 +33,10 @@ import ubc.pavlab.aspiredb.server.model.Label;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
 
 /**
- * author: anton date: 25/04/13
+ * DAO operations for Subject and Variant labels.
+ * 
+ * @author: anton
+ * @date: 25/04/13
  */
 @Repository
 public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDao {

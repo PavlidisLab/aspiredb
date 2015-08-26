@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * TODO Document Me
+ * An XML dataset element which contains a list of filters and attributes.
  * 
  * @author ??
  * @version $Id: Dataset.java,v 1.4 2013/06/11 22:30:47 anton Exp $

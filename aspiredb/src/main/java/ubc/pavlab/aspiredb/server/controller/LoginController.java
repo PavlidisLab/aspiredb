@@ -31,6 +31,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/**
+ * Verifies that the user is logged in.
+ * 
+ * @author ptan
+ * @version $Id$
+ */
 @Controller
 @RemoteProxy
 public class LoginController {

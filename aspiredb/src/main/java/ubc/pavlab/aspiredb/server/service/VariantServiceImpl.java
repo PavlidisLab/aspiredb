@@ -22,8 +22,6 @@ import java.util.Map;
 
 import org.directwebremoting.annotations.RemoteMethod;
 import org.directwebremoting.annotations.RemoteProxy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,9 +79,6 @@ import ubc.pavlab.aspiredb.shared.query.VariantLabelProperty;
 import ubc.pavlab.aspiredb.shared.query.VariantTypeProperty;
 import ubc.pavlab.aspiredb.shared.suggestions.SuggestionContext;
 
-import com.sencha.gxt.data.shared.SortInfo;
-import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
-
 /**
  * TODO Document Me
  * 
@@ -93,8 +88,6 @@ import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
 @RemoteProxy(name = "VariantService")
 @Service("variantService")
 public class VariantServiceImpl implements VariantService {
-
-    private static Logger log = LoggerFactory.getLogger( VariantServiceImpl.class );
 
     @Autowired
     private SubjectDao subjectDao;
@@ -218,6 +211,7 @@ public class VariantServiceImpl implements VariantService {
         return characteristicDao.getValuesForKey( property.getName() );
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     @RemoteMethod
     @Transactional(readOnly = true)
@@ -288,13 +282,6 @@ public class VariantServiceImpl implements VariantService {
         for ( VariantType type : VariantType.values() ) {
             properties.addAll( suggestPropertiesForVariantType( type ) );
         }
-
-        // properties.add( new VariantLabelProperty() );
-
-        // Collection<String> characteristics = characteristicDao.getKeysMatching( "" );
-        // for ( String characteristic : characteristics ) {
-        // properties.add( new CharacteristicProperty( characteristic ) );
-        // }
 
         return properties;
     }
@@ -491,30 +478,6 @@ public class VariantServiceImpl implements VariantService {
         return values;
     }
 
-    private String getSortColumn( PagingLoadConfig config ) {
-        // default value
-        String property = "id";
-
-        if ( config.getSortInfo() != null && !config.getSortInfo().isEmpty() ) {
-            SortInfo sortInfo = config.getSortInfo().iterator().next();
-            property = sortInfo.getSortField();
-        }
-
-        // String columnName = propertyToColumnName.get( property );
-        return "id";
-    }
-
-    private String getSortDirection( PagingLoadConfig config ) {
-        // default value
-        String direction = "ASC";
-
-        if ( config.getSortInfo() != null && !config.getSortInfo().isEmpty() ) {
-            SortInfo sortInfo = config.getSortInfo().iterator().next();
-            direction = sortInfo.getSortDir().toString();
-        }
-        return direction;
-    }
-
     private Collection<Property> suggestEntityProperties( VariantType variantType ) {
         Collection<Property> properties = new ArrayList<Property>();
 
@@ -624,38 +587,4 @@ public class VariantServiceImpl implements VariantService {
         return result;
     }
 
-    // TODO
-    @Override
-    @RemoteMethod
-    @Transactional(readOnly = true)
-    public Collection<Map<String, Object>> createPhenotypeSummary( Collection<Long> variantIds, Long labelId ) {
-        final String NO_LABEL = "NO_LABEL";
-        Collection<Map<String, Object>> result = new ArrayList<>();
-
-        Map<String, Object> phenoSummary = new HashMap<>();
-        phenoSummary.put( "phenotype", "pheno_a" );
-        phenoSummary.put( "label_1", new Integer( 60 ) );
-        phenoSummary.put( "non_label_1", new Integer( 40 ) );
-
-        result.add( phenoSummary );
-
-        /*
-         * var mergedFreqData = [ { 'phenotype' : 'pheno_1', 'label_A' : 20, 'non_label_A' : 10 }, { 'phenotype' :
-         * 'pheno_2', 'label_A' : 40, 'non_label_A' : 60 }, ];
-         */
-
-        /*
-         * for ( Long id : variantIds ) { Variant v = variantDao.load( id ); Subject subject = subjectDao.load(
-         * v.getSubject().getId() ); Collection<Label> labels = subject.getLabels();
-         * 
-         * Collection<Phenotype> phenotypes = subject.getPhenotypes();
-         * 
-         * if ( labels.size() > 0 ) { for ( Label label : labels ) { if ( !result.containsKey( label.getName() ) ) {
-         * result.put( label.getName(), new ArrayList<VariantValueObject>() ); } result.get( label.getName() ).add(
-         * v.toValueObject() ); } } else { if ( !result.containsKey( NO_LABEL ) ) { result.put( NO_LABEL, new
-         * ArrayList<VariantValueObject>() ); } result.get( NO_LABEL ).add( v.toValueObject() ); } }
-         */
-
-        return result;
-    }
 }

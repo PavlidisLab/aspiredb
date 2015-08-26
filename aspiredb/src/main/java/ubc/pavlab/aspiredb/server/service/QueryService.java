@@ -40,6 +40,9 @@ import ubc.pavlab.aspiredb.shared.suggestions.PhenotypeSuggestion;
 import com.sencha.gxt.data.shared.loader.PagingLoadResult;
 
 /**
+ * Methods for various query operations such as querying a list of subjects and variants given a list of filters,
+ * getting a list of gene suggestions, ontology term suggestions. Also deals with saving and loading of queries.
+ * 
  * @author anton
  */
 public interface QueryService {
@@ -116,12 +119,4 @@ public interface QueryService {
      */
     public Project getProject( Set<AspireDbFilterConfig> filters );
 
-    // // TODO: To be removed
-    // @Deprecated
-    // public Collection<GeneValueObject> getGeneSuggestions(String query) throws BioMartServiceException;
-    //
-    // // TODO: To be removed
-    // @Deprecated
-    // public Collection<NeurocartaPhenotypeValueObject> getNeurocartaPhenotypeSuggestions(String query) throws
-    // NeurocartaServiceException;
 }

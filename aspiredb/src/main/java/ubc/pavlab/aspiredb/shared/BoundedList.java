@@ -23,12 +23,16 @@ import java.util.List;
 
 import org.directwebremoting.annotations.DataTransferObject;
 
+import ubc.pavlab.aspiredb.server.util.ConfigUtils;
+
 /**
+ * Sets an upper bound to the number of items to returned.
+ * 
  * @author anton
  */
 @DataTransferObject
 public class BoundedList<T> {
-    private static int MAX_SIZE = 50000;
+    private static int MAX_SIZE = ConfigUtils.getInt( "aspiredb.view.maxRecords", 50000 );
     private List<T> items = new ArrayList<T>();
     private boolean moreResultsAvailable = false;
     private int totalSize;

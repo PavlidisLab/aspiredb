@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * TODO Document Me
+ * An XML element called "Filter"
  * 
  * @author ??
  * @version $Id: Filter.java,v 1.4 2013/01/25 02:59:19 anton Exp $

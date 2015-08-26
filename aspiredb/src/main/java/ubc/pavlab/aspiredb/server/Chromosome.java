@@ -27,6 +27,8 @@ import java.util.TreeMap;
 import ubc.pavlab.aspiredb.shared.ChromosomeBand;
 
 /**
+ * Encapsulates information about a chromosome such as chromosome bands, size, and location of centromere.
+ * 
  * @author: anton
  * @version $id$
  */

@@ -35,6 +35,8 @@ import ubc.pavlab.aspiredb.server.project.ProjectManager;
 import ubc.pavlab.aspiredb.shared.VariantType;
 
 /**
+ * For uploading variants from text files and adding them to a project. Includes option for annotating SNV effect.
+ * 
  * @version $Id: VariantUploadCLI.java,v 1.12 2013/07/19 17:03:49 ptan Exp $
  */
 public class VariantUploadCLI extends AbstractCLI {

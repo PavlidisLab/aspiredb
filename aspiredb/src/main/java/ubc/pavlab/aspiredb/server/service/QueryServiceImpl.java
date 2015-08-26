@@ -80,16 +80,14 @@ import com.sencha.gxt.data.shared.loader.PagingLoadResult;
 import com.sencha.gxt.data.shared.loader.PagingLoadResultBean;
 
 /**
+ * Methods for various query operations such as querying a list of subjects and variants given a list of filters,
+ * getting a list of gene suggestions, ontology term suggestions. Also deals with saving and loading of queries.
+ * 
  * @author anton
  */
 @Service("queryService")
 @RemoteProxy(name = "QueryService")
 public class QueryServiceImpl implements QueryService {
-
-    /**
-     * 
-     */
-    private static final int MAX_VARIANTS_PAGE = 20000;
 
     private static Logger log = LoggerFactory.getLogger( QueryServiceImpl.class );
 
@@ -259,9 +257,6 @@ public class QueryServiceImpl implements QueryService {
         Set<Long> svoIds = new HashSet<Long>();
         Set<Long> vvoIds = new HashSet<Long>();
 
-        int subjectCount = 0;
-        int variantCount = 0;
-
         Set<AspireDbFilterConfig> filtersTrimmed = new HashSet<>();
         Collection<Long> subjectPhenoIds = new HashSet<>();
         Collection<Long> variantPhenoIds = new HashSet<>();
@@ -314,9 +309,6 @@ public class QueryServiceImpl implements QueryService {
             svoIds.retainAll( subjectPhenoIds );
             vvoIds.retainAll( variantPhenoIds );
         }
-
-        subjectCount = svoIds.size();
-        variantCount = vvoIds.size();
 
         Collection<Object> retSvos = new ArrayList<>();
         for ( Subject s : subjectDao.load( svoIds ) ) {
@@ -443,8 +435,9 @@ public class QueryServiceImpl implements QueryService {
 
     @Override
     @RemoteMethod
-    public List<Serializable> getVariantLocationValueObjects( Property property, List<String> text )
-            throws BioMartServiceException, NeurocartaServiceException {
+    public List<Serializable> getVariantLocationValueObjects( @SuppressWarnings("rawtypes") Property property,
+            List<String> text ) throws BioMartServiceException, NeurocartaServiceException {
+        @SuppressWarnings("rawtypes")
         final List valueObjects;
 
         if ( property instanceof GeneProperty ) {
@@ -515,19 +508,9 @@ public class QueryServiceImpl implements QueryService {
         String sortField = "id";
         String sortDir = "ASC";
 
-        // if ( config.getSortInfo() != null && !config.getSortInfo().isEmpty() ) {
-        // SortInfo sortInfo = config.getSortInfo().iterator().next();
-        // sortField = sortInfo.getSortField();
-        // sortDir = sortInfo.getSortDir().toString();
-        // }
-
         log.info( "searching for subjects" );
 
-        Page<Subject> subjects = ( Page<Subject> ) subjectDao.loadPage( 0, 20000, sortField, sortDir, filters );
-
-        Project project = getProject( filters );
-
-        subjects.getTotalCount();
+        Page<Subject> subjects = ( Page<Subject> ) subjectDao.loadPage( 0, 0, sortField, sortDir, filters );
 
         List<SubjectValueObject> vos = new ArrayList<SubjectValueObject>();
         for ( Subject subject : subjects ) {
@@ -536,16 +519,9 @@ public class QueryServiceImpl implements QueryService {
             SubjectValueObject vo = subject.convertToValueObject();
 
             Integer numVariants = subject.getVariants().size();
-            /*
-             * if ( project == null ) { numVariants = variantDao.findBySubjectPatientId( subject.getPatientId()
-             * ).size(); } else { numVariants = variantDao.findBySubjectPatientId( project.getId(),
-             * subject.getPatientId() ).size(); }
-             */
 
             vo.setVariants( numVariants != null ? numVariants : 0 );
 
-            // Integer phonetypetot=phenotypeDao.findBySubjectId( subject.getId() ).size();
-            // Integer phonetypetot = phenotypeDao.findPhenotypeCountBySubjectId( subject.getId() );
             vo.setNumOfPhenotypes( subject.getPhenotypes().size() );
 
             vos.add( vo );
@@ -553,7 +529,12 @@ public class QueryServiceImpl implements QueryService {
 
         log.info( "returning " + vos.size() + " subjects" );
 
-        return new BoundedList<SubjectValueObject>( vos );
+        BoundedList<SubjectValueObject> ret = new BoundedList<>( vos );
+        if ( ret.isMoreResultsAvailable() ) {
+            log.warn( "additional results not shown" );
+        }
+
+        return ret;
     }
 
     @Override
@@ -568,16 +549,17 @@ public class QueryServiceImpl implements QueryService {
         String sortProperty = "id";// getSortColumn( config );
         String sortDirection = "ASC";// getSortDirection( config );
 
+        log.info( "searching for variants" );
+
         StopWatch timer = new StopWatch();
         timer.start();
-        Page<? extends Variant> page = variantDao.loadPage( 0, MAX_VARIANTS_PAGE, sortProperty, sortDirection, filters );
+        Page<? extends Variant> page = variantDao.loadPage( 0, 0, sortProperty, sortDirection, filters );
 
         if ( timer.getTime() > 100 ) {
             log.info( "loading " + page.getTotalCount() + " variants took " + timer.getTime() + "ms" );
         }
 
         Collection<? extends Variant> variants = page;
-        page.getTotalCount();
 
         List<VariantValueObject> vos = convertToValueObjects( variants );
 
@@ -587,7 +569,12 @@ public class QueryServiceImpl implements QueryService {
 
         populateSubjectsIntoVariants( project, vos );
 
-        return new BoundedList<VariantValueObject>( vos );
+        BoundedList<VariantValueObject> ret = new BoundedList<>( vos );
+        if ( ret.isMoreResultsAvailable() ) {
+            log.warn( "additional results not shown" );
+        }
+
+        return ret;
     }
 
     @Override

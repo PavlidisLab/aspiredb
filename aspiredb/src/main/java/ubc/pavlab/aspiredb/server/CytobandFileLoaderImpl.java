@@ -32,7 +32,9 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * author: anton date: 19/02/13
+ * Load chromosome info from a file.
+ * 
+ * @author: anton date: 19/02/13
  */
 @Component("cytobandFileLoader")
 public class CytobandFileLoaderImpl implements CytobandFileLoader {

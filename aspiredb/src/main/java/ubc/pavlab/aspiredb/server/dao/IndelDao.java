@@ -17,9 +17,8 @@ package ubc.pavlab.aspiredb.server.dao;
 import ubc.pavlab.aspiredb.server.model.Indel;
 
 /**
- * TODO Document Me
+ * DAO operations for indel variants.
  * 
- * @author ??
  * @version $Id: IndelDao.java,v 1.1 2012/11/06 23:27:37 cmcdonald Exp $
  */
 public interface IndelDao extends VariantDaoBase<Indel>, RemotePaging<Indel> {

@@ -24,6 +24,13 @@ import org.hibernate.criterion.Projections;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * DAO operations for creating, updating, loading, and removing entities from the database.
+ * 
+ * @author ptan
+ * @version $Id$
+ * @param <T>
+ */
 public abstract class DaoBaseImpl<T> extends HibernateDaoSupport implements DaoBase<T> {
 
     Log log = LogFactory.getLog( DaoBaseImpl.class );

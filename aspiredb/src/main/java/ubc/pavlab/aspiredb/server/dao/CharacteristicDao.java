@@ -22,10 +22,35 @@ import java.util.Collection;
 
 import ubc.pavlab.aspiredb.server.model.Characteristic;
 
+/**
+ * DAO operations for Variant Characteristics.
+ * 
+ * @author ptan
+ * @version $Id$
+ */
 public interface CharacteristicDao extends DaoBase<Characteristic> {
+    /**
+     * Return those characteristic names that match the characteristic name query
+     * 
+     * @param query
+     * @return
+     */
     public Collection<String> getKeysMatching( String query );
 
+    /**
+     * Return those characteristic values that match the characteristic name query
+     * 
+     * @param key
+     * @return
+     */
     public Collection<String> getValuesForKey( String key );
 
+    /**
+     * Return those characteristic names that match the characteristic name query and project ID
+     * 
+     * @param query
+     * @param projectId
+     * @return
+     */
     public Collection<String> getKeysMatching( String query, Long projectId );
 }

@@ -17,7 +17,7 @@ package ubc.pavlab.aspiredb.server.dao;
 import ubc.pavlab.aspiredb.server.model.Inversion;
 
 /**
- * TODO Document Me
+ * DAO operations for inversion variants.
  * 
  * @author ??
  * @version $Id: InversionDao.java,v 1.1 2012/11/07 19:05:51 cmcdonald Exp $

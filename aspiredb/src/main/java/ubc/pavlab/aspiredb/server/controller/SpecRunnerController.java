@@ -28,6 +28,12 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+/**
+ * For running Jasmine unit tests. TODO
+ * 
+ * @author ptan
+ * @version $Id$
+ */
 @Controller
 @RemoteProxy
 @RequestMapping("/SpecRunner.html")

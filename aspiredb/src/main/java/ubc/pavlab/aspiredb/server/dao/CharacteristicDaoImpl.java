@@ -27,6 +27,12 @@ import org.springframework.stereotype.Repository;
 
 import ubc.pavlab.aspiredb.server.model.Characteristic;
 
+/**
+ * DAO operations for Variant Characteristics.
+ * 
+ * @author ptan
+ * @version $Id$
+ */
 @Repository
 public class CharacteristicDaoImpl extends DaoBaseImpl<Characteristic> implements CharacteristicDao {
     @Autowired

@@ -21,7 +21,7 @@ import org.springframework.stereotype.Repository;
 import ubc.pavlab.aspiredb.server.model.Indel;
 
 /**
- * TODO Document Me
+ * DAO operations for indel variants.
  * 
  * @author ??
  * @version $Id: IndelDaoImpl.java,v 1.3 2013/06/11 22:30:46 anton Exp $

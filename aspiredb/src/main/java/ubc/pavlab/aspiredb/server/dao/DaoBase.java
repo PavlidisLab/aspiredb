@@ -17,7 +17,7 @@ package ubc.pavlab.aspiredb.server.dao;
 import java.util.Collection;
 
 /**
- * TODO Document Me
+ * DAO operations for creating, updating, loading, and removing entities from the database.
  * 
  * @author ??
  * @version $Id: DaoBase.java,v 1.5 2012/09/13 22:30:49 cmcdonald Exp $

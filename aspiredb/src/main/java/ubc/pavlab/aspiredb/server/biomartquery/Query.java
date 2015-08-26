@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * TODO Document Me
+ * An XML element called "Query" which includes the client, processor and dataset.
  * 
  * @author ??
  * @version $Id: Query.java,v 1.4 2013/02/05 23:39:41 frances Exp $

@@ -43,8 +43,6 @@ public interface VariantService {
 
     public List<VariantValueObject> getSubjectVariants( Long projectId, String patientId );
 
-    // public Integer getTotalNoOfVariantsBySubjectId( String patientId );
-
     public VariantValueObject getVariant( Long variantId );
 
     public void removeLabel( Collection<Long> variantIds, LabelValueObject label );
@@ -88,15 +86,6 @@ public interface VariantService {
      * @return map containing the VariantValueObjects that matched the variantIds grouped by Subject label names
      */
     public Map<String, Collection<VariantValueObject>> groupVariantsBySubjectLabels( Collection<Long> variantIds );
-
-    /**
-     * @param variantIds
-     * @param labelId
-     * @return an array of maps where each map contains the 'phenotype' key that corresponds to the phenotype name and
-     *         the number of variants that matches the subject label and not subject label [ { 'phenotype' : 'pheno_1',
-     *         'label_A' : 20, 'non_label_A' : 10 }, { 'phenotype' : 'pheno_2', 'label_A' : 40, 'non_label_A' : 60 }, ];
-     */
-    public Collection<Map<String, Object>> createPhenotypeSummary( Collection<Long> variantIds, Long subjectLabelId );
 
     public Collection<Property> suggestPropertiesForAllVariantTypesInProject( Long projectId );
 }

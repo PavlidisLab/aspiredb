@@ -17,7 +17,7 @@ package ubc.pavlab.aspiredb.server.dao;
 import ubc.pavlab.aspiredb.server.model.CNV;
 
 /**
- * TODO Document Me
+ * DAO operations for CNV variants.
  * 
  * @author ??
  * @version $Id: CNVDao.java,v 1.32 2012/11/06 01:21:26 cmcdonald Exp $
