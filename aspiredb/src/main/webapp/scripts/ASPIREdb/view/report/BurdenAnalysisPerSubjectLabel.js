@@ -73,6 +73,14 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerSubjectLabel', {
          dataIndex : 'name',
          text : '',
          flex : 2,
+         renderer : function(value, metaData) {
+            if ( value === "Mean number of variants overlapping a gene" ) {
+               metaData.tdAttr = 'data-qtip="' + 'The average number of variants per subject group' + '"qwidth="auto"'
+            } else if ( value === "Mean number of genes overlapping a variant" ) {
+               metaData.tdAttr = 'data-qtip="' + 'The average number of genes per subject group' + '"qwidth="auto"'
+            }
+            return value;
+         }
       }, {
          dataIndex : 'group1',
          text : 'Group 1',
