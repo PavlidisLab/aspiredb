@@ -201,9 +201,15 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisPerPhenotype', {
                me.setLoading( false );
             },
             errorHandler : function(errorString, exception) {
-               var msg = 'Error calculating Burden Analysis Per Phenotype: ' + errorString;
+               var msg = 'Error calculating Burden Analysis Per Phenotype:<br/>' + errorString;
                console.log( msg, exception );
-               Ext.Msg.alert( 'Error', msg );
+               // Ext.Msg.alert( 'Error', msg );
+               Ext.Msg.show( {
+                  title : 'Phenotype Enrichment Error',
+                  msg : msg,
+                  buttons : Ext.Msg.OK,
+                  minWidth : 350,
+               } );
 
                me.setLoading( false );
             }

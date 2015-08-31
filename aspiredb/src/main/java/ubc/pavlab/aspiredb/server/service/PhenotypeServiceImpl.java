@@ -130,7 +130,10 @@ public class PhenotypeServiceImpl implements PhenotypeService {
             // this should always be true the way we are currently using this method.
             if ( p.getValue().equals( "1" ) ) {
 
-                positives++;
+                if ( subjectIds.contains( p.getSubject().getId() )
+                        || complementSubjectIds.contains( p.getSubject().getId() ) ) {
+                    positives++;
+                }
 
                 if ( subjectIds.contains( p.getSubject().getId() ) ) {
                     successes++;
@@ -193,7 +196,19 @@ public class PhenotypeServiceImpl implements PhenotypeService {
             // grabs all phenotypes in the projects for a specific uri
             // change later to grab only for subjectIds and complementSubjectIds)
             Collection<Phenotype> phenotypes = phenotypeDao.findPresentByProjectIdsAndUri( activeProjects, uri );
-            PhenotypeEnrichmentValueObject pevo = getPhenotypeEnrichment( phenotypes, subjectIds, complementSubjectIds );
+
+            PhenotypeEnrichmentValueObject pevo = null;
+            try {
+                pevo = getPhenotypeEnrichment( phenotypes, subjectIds, complementSubjectIds );
+            } catch ( Exception e ) {
+                String phenoName = "";
+                if ( phenotypes.size() > 0 ) {
+                    phenoName = phenotypes.iterator().next().getName();
+                }
+                log.warn( "Error calculating phenotype enrichment for URI " + uri + " (" + phenoName + ")" + " for "
+                        + subjectIds.size() + " subjects in the in-group and " + complementSubjectIds.size()
+                        + " in the out-group" );
+            }
 
             if ( pevo != null ) {
                 list.add( pevo );
