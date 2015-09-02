@@ -55,13 +55,13 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
       this.initConfig( cfg );
       this.callParent( arguments );
    },
-   plugins : {
-      ptype : 'bufferedrenderer',
-      trailingBufferZone : 20, // Keep 20 rows rendered in the table behind scroll
-      leadingBufferZone : 50
-   // Keep 50 rows rendered in the table ahead of scroll
-   },
-   pageSize : 100,
+   // plugins : {
+   // ptype : 'bufferedrenderer',
+   // trailingBufferZone : 20, // Keep 20 rows rendered in the table behind scroll
+   // leadingBufferZone : 50
+   // // Keep 50 rows rendered in the table ahead of scroll
+   // },
+   // pageSize : 100,
    dockedItems : [ {
       xtype : 'toolbar',
       itemId : 'phenotypeGridToolbar',
