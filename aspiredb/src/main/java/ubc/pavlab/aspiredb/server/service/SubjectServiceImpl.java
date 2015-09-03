@@ -465,6 +465,8 @@ public class SubjectServiceImpl implements SubjectService {
 
                 if ( vo != null ) {
                     text.append( vo.getDbValue() + "\t" );
+                } else {
+                    text.append( "\t" );
                 }
             }
 
