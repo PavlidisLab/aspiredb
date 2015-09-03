@@ -38,6 +38,7 @@ import org.directwebremoting.annotations.RemoteProxy;
 
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.SubjectFilterConfig;
+import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
 
 /**
  * Convenience class to access aspiredb properties defined in a resource. Methods will look in aspiredb.properties,
@@ -629,6 +630,22 @@ public class ConfigUtils {
         boolean found = false;
         for ( AspireDbFilterConfig cfg : filters ) {
             if ( cfg instanceof SubjectFilterConfig ) {
+                return true;
+            }
+        }
+        return found;
+    }
+
+    /**
+     * Returns true if filters has an instance of {@link SubjectFilterConfig}
+     * 
+     * @param filters
+     * @return
+     */
+    public static boolean hasVariantConfig( Set<AspireDbFilterConfig> filters ) {
+        boolean found = false;
+        for ( AspireDbFilterConfig cfg : filters ) {
+            if ( cfg instanceof VariantFilterConfig ) {
                 return true;
             }
         }

@@ -287,7 +287,7 @@ public class QueryServiceImpl implements QueryService {
 
         // need a separate call for Subject and Variants because
         // we can have a Subject without any Variants and those won't get counted!
-        if ( ConfigUtils.hasSubjectConfig( filters ) ) {
+        if ( ConfigUtils.hasSubjectConfig( filters ) || !ConfigUtils.hasVariantConfig( filters ) ) {
             timer = new StopWatch();
             timer.start();
             List<SubjectValueObject> svos = querySubjects( filtersTrimmed ).getItems();
