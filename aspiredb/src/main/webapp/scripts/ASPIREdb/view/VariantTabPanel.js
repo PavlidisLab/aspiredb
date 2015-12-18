@@ -126,7 +126,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       this.actionsButton = Ext.create( 'Ext.button.Split', {
          text : '<b>Actions</b>',
          itemId : 'actionsButton',
-         menu : this.actionsMenu
+         menu : this.actionsMenu,
+         tooltip : 'UCSC Genome Browser, gene overlaps, and compound heterozygotes here.',
       } );
 
       this.reportButton = Ext.create( 'Ext.Button', {
@@ -135,8 +136,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          disabled : false,
          handler : this.showReportHandler,
          scope : this,
-         tooltip : 'Generate reports on the filtered variants',
-         tooltipType : 'title',
+         tooltip : 'Generate reports on the filtered variants',         
       } );
 
       this.selectAllButton = Ext.create( 'Ext.Button', {
@@ -165,8 +165,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       this.saveButton = Ext.create( 'Ext.Button', {
          id : 'saveButton',
          text : '',
-         tooltip : 'Download table contents as text',
-         tooltipType : 'title',
+         tooltip : 'Download table contents as text',         
          icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
          hidden : true,
       } );
@@ -174,8 +173,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       this.exportButton = Ext.create( 'Ext.Button', {
          id : 'exportButton',
          text : '',
-         tooltip : 'Download ideogram as png',
-         tooltipType : 'title',
+         tooltip : 'Download ideogram as png',         
          icon : 'scripts/ASPIREdb/resources/images/icons/export.png'
 
       } );
@@ -183,8 +181,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       this.zoomInButton = Ext.create( 'Ext.Button', {
          id : 'zoomInButton',
          text : '',
-         tooltip : 'Zoom in ideogram',
-         tooltipType : 'title',
+         tooltip : 'Zoom in ideogram',         
          icon : 'scripts/ASPIREdb/resources/images/icons/zoom_in.png'
 
       } );
@@ -193,8 +190,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          id : 'zoomOutButton',
          text : '',
          hidden : true,
-         tooltip : 'Zoom out ideogram',
-         tooltipType : 'title',
+         tooltip : 'Zoom out ideogram',         
          icon : 'scripts/ASPIREdb/resources/images/icons/zoom_out.png'
 
       } );

@@ -195,8 +195,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
                                 width : 30,
                                 items : [ {
                                    id : 'deleteIcon',
-                                   icon : 'scripts/ASPIREdb/resources/images/icons/eraser.png',
-                                   tooltipType : 'title',
+                                   icon : 'scripts/ASPIREdb/resources/images/icons/eraser.png',                                   
                                    // tooltip : 'Remove label from selected items',
                                    handler : function(view, rowIndex, colIndex, item, e) {
                                       var action = 'removeLabel';
@@ -218,8 +217,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
 
                                 width : 30,
                                 items : [ {
-                                   icon : 'scripts/ASPIREdb/resources/images/icons/trash.png',
-                                   tooltipType : 'title',
+                                   icon : 'scripts/ASPIREdb/resources/images/icons/trash.png',                                   
                                    getTip : function(v, metaData, r, rowIndex, colIndex, store) {
                                       var ret = 'Delete <b>' + r.get( 'name' ) + '</b> from system?';
 

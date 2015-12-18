@@ -197,8 +197,7 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
                   header : columnNames[i],
                   dataIndex : columnNames[i],
                   width : 100,
-                  tooltip : 'Subject counts for multiple phenotypes',
-                  tooltipType : 'title',
+                  tooltip : 'Subject counts for multiple phenotypes',                  
                   renderer : function(value, metadata, record) {
                      var src = 'scripts/ASPIREdb/resources/images/icons/tag.png';
                      var tooltip = "subject counts for multiple phenotype ";

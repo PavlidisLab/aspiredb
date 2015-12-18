@@ -136,8 +136,7 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
          xtype : 'button',
          id : 'addGroupMemeber',
          text : '',
-         tooltip : 'Add users to group',
-         tooltipType : 'title',
+         tooltip : 'Add users to group',         
          icon : 'scripts/ASPIREdb/resources/images/icons/user_add.png',
          handler : function() {
 
@@ -182,8 +181,7 @@ Ext.define( 'ASPIREdb.view.GroupMemeberGrid', {
          xtype : 'button',
          id : 'removeGroupMemeber',
          text : '',
-         tooltip : 'Remove the selected user',
-         tooltipType : 'title',
+         tooltip : 'Remove the selected user',         
          icon : 'scripts/ASPIREdb/resources/images/icons/user_delete.png',
          handler : function() {
 

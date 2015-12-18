@@ -150,15 +150,13 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       }, {
          itemId : 'saveTxtButton',
          text : 'Save as TXT',
-         tooltip : 'Save as TXT',
-         tooltipType : 'title',
+         tooltip : 'Save as TXT',         
       // icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
       }, {
          xtype : 'button',
          itemId : 'savePngButton',
          text : 'Save as PNG',
-         tooltip : 'Save as PNG',
-         tooltipType : 'title',
+         tooltip : 'Save as PNG',         
          hidden : true
       // icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
       }, {

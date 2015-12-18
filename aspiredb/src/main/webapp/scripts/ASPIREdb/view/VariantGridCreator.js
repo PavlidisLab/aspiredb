@@ -335,6 +335,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             height : 180,
             width : 500,
             title : 'Variant View',
+            tooltip : 'The Variant View provides more detailed information of the variants, including the subjectid, chromosome, start and end positions, variant type, etc. To reveal additional variant details, click on the drop-down arrow on the right hand side of a column header.',
 
             visibleLabels : visibleLabels
 

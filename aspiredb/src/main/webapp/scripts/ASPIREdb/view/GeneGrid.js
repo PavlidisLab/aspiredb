@@ -223,8 +223,7 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
          xtype : 'button',
          itemId : 'addGene',
          text : '',
-         tooltip : 'Add genes to selected gene set',
-         tooltipType : 'title',
+         tooltip : 'Add genes to selected gene set',         
          icon : 'scripts/ASPIREdb/resources/images/icons/add.png',
          handler : function() {
 
@@ -264,8 +263,7 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
          xtype : 'button',
          itemId : 'removeGene',
          text : '',
-         tooltip : 'Remove the selected gene',
-         tooltipType : 'title',
+         tooltip : 'Remove the selected gene',         
          icon : 'scripts/ASPIREdb/resources/images/icons/delete.png',
          handler : function() {
             var geneSymbol = ref.selectedGene[0].data.symbol;
@@ -299,8 +297,7 @@ Ext.define( 'ASPIREdb.view.GeneGrid', {
          xtype : 'button',
          itemId : 'enterListButton',
          text : '',
-         tooltip : 'Enter list ...',
-         tooltipType : 'title',
+         tooltip : 'Enter list ...',         
          icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
          handler : function() {
             var prop = new GeneProperty();

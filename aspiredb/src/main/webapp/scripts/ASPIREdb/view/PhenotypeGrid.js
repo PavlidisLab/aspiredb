@@ -71,24 +71,21 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
          text : 'Heatmap',
          disabled : 'true',
          itemId : 'heatmapButton',
-         tooltip : 'Show subject and phenotype clusters',
-         tooltipType : 'title',
+         tooltip : 'Show subject and phenotype clusters',         
 
       }, {
          xtype : 'button',
          text : 'Contingency table',
          disabled : 'true',
          itemId : 'contingencyTableButton',
-         tooltip : 'Create subject labels based on the selected phenotype',
-         tooltipType : 'title',
+         tooltip : 'Create subject labels based on the selected phenotype',         
       }, {
          xtype : 'tbfill',
       }, {
          itemId : 'saveButton',
          xtype : 'button',
          text : '',
-         tooltip : 'Download table contents as text',
-         tooltipType : 'title',
+         tooltip : 'Download table contents as text',         
          icon : 'scripts/ASPIREdb/resources/images/icons/disk.png'
 
       } ]
@@ -205,8 +202,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
 
               {
                  text : 'Value',
-                 tooltip : 'Number of subjects for each phenotype value',
-                 tooltipType : 'title',
+                 tooltip : 'Number of subjects for each phenotype value',                 
                  dataIndex : 'allPhenoSummaryMap',
                  renderer : function(value, metadata, record) {
                     var phenSummary = value.phenoSummaryMap;

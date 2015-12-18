@@ -94,6 +94,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
    // flex : 1
    }, {
       text : "Labels",
+      tooltip : 'Labels allow the assignment of custom tags to a group of subjects or a group of variants. Labels can also be used in future queries.', 
       dataIndex : 'labelIds',
       // This is very slow we need to rethink this
       renderer : function(value, metaData, record, row, col, store, gridView) {
@@ -106,7 +107,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       text : "# of variants",
       dataIndex : 'varientNos',
       tooltip : 'Total # of unfiltered variants',
-      tooltipType : 'title',
+      
       renderer : function(value) {
          return value;
       },
@@ -115,7 +116,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       text : "# of phenotypes",
       dataIndex : 'phenotypeNos',
       tooltip : 'Total # of unfiltered phenotypes',
-      tooltipType : 'title',
+      
       flex : 1
    } ],
 
@@ -156,6 +157,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
       this.labelsButton = Ext.create( 'Ext.button.Split', {
          text : '<b>Labels</b>',
+         tooltip : 'Labels allow the assignment of custom tags to a group of subjects or a group of variants. Labels can also be used in future queries.',
          itemId : 'labelsButton',
          menu : this.labelsMenu
       } );
@@ -178,7 +180,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
          itemId : 'saveButton',
          text : '',
          tooltip : 'Download table contents as text',
-         tooltipType : 'title',
+         
          icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
       } );
 
@@ -188,7 +190,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
          handler : this.burdenAnalysisHandler,
          scope : this,
          tooltip : 'Compare mutation burden between subject groups',
-         tooltipType : 'title',
+         
       } );
 
       this.toolbar = Ext.create( 'Ext.toolbar.Toolbar', {

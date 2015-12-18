@@ -256,8 +256,7 @@ Ext.define( 'ASPIREdb.view.filter.VariantFilter', {
          itemId : 'enterListButton',
          xtype : 'button',
          text : '',
-         tooltip : 'Enter list...',
-         tooltipType : 'title',
+         tooltip : 'Enter list...',         
          icon : 'scripts/ASPIREdb/resources/images/icons/page_upload.png',
          disabled : true,
          hidden : true
