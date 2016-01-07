@@ -28,6 +28,12 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
    height : 600,
    id : 'burdenAnalysisWindow',
    title : 'Burden Analysis',
+   tools: [
+           { 
+            type: 'help',
+            tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
+           }
+          ],      
    layout : 'fit',
    resizable : true,
    tbar : [],

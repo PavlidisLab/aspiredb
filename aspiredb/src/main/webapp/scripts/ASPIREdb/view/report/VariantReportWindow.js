@@ -27,6 +27,12 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
    height : 500,
    id : 'variantReportWindow',
    title : 'Variant Report',
+   tools: [
+           { 
+            type: 'help',
+            tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
+           }
+          ],   
    layout : 'fit',
    resizable : true,
    modal : true,

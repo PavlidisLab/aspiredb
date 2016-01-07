@@ -31,7 +31,13 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
    alias : 'widget.subjectGrid',
    title : 'Subject',
    id : 'subjectGrid',
-   multiSelect : true,
+   multiSelect : true,   
+   tools: [
+           { 
+        	   type: 'help',
+        	   tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
+           }
+          ],                 
    store : Ext.create( 'ASPIREdb.store.SubjectStore' ),
    config : {
 
@@ -394,6 +400,12 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       Ext.define( 'ASPIREdb.view.CreateLabelWindowSubject', {
          isSubjectLabel : true,
          title : 'Create Subject Label',
+         tools: [
+                 { 
+                  type: 'help',
+                  tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
+                 }
+                ],   
          extend : 'ASPIREdb.view.CreateLabelWindow',
          selectedIds : ASPIREdb.Utils.getSelectedIds( me.getSelectionModel().getSelection() ),
 
@@ -505,7 +517,13 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
          visibleLabels : me.visibleLabels,
          isSubjectLabel : true,
          selectedOwnerIds : ASPIREdb.Utils.getSelectedIds( me.getSelectionModel().getSelection() ),
-         title : "Subject Label Manager"
+         title : "Subject Label Manager",
+         tools: [
+                 { 
+                  type: 'help',
+                  tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
+                 }
+                ],            
       } );
 
       labelControlWindow.show();

@@ -24,7 +24,7 @@ Ext.require( [ 'Ext.panel.Panel', 'ASPIREdb.view.GeneSetGrid', 'ASPIREdb.view.Ge
 Ext.define( 'ASPIREdb.GeneManagerPanel', {
    extend : 'Ext.panel.Panel',
    alias : 'widget.ASPIREdb_genemanagerpanel',
-   layout : 'border',
+   layout : 'border',    
    items : [ {
       region : 'west',
       xtype : 'geneSetGrid',
@@ -32,7 +32,13 @@ Ext.define( 'ASPIREdb.GeneManagerPanel', {
       width : 480,
       collapsible : true,
       split : true,
-      title : 'Gene Sets'
+      title : 'Gene Sets',
+      tools: [
+              { 
+               type: 'help',
+               tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
+              }
+             ],          
    }, {
       region : 'east',
       xtype : 'geneGrid',
@@ -40,7 +46,13 @@ Ext.define( 'ASPIREdb.GeneManagerPanel', {
       width : 480,
       collapsible : true,
       split : true,
-      title : 'Associated Genes'
+      title : 'Associated Genes',
+      tools: [
+              { 
+               type: 'help',
+               tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
+              }
+             ],    
    } ],
 
 } );

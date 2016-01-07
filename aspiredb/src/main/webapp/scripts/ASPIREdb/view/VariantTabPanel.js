@@ -33,6 +33,12 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    extend : 'Ext.tab.Panel',
    alias : 'widget.variantTabPanel',
    title : 'Variant',
+   tools: [
+           { 
+            type: 'help',
+            tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
+           }
+          ], 
 
    dockedItems : [ {
       xtype : 'toolbar',
@@ -1055,7 +1061,13 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          visibleLabels : visibleLabels,
          isSubjectLabel : false,
          selectedOwnerIds : selectedVariantIds,
-         title : 'Variant Label Manager'
+         title : 'Variant Label Manager',
+         tools: [
+                 { 
+                  type: 'help',
+                  tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
+                 }
+                ],            
       } );
 
       labelControlWindow.show();

@@ -27,6 +27,12 @@ Ext.define( 'ASPIREdb.view.ProjectManagerWindow', {
    alias : 'widget.ProjectManagerWindow',
    singleton : true,
    title : 'Project Manager',
+   tools: [
+           { 
+            type: 'help',
+            tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
+           }
+          ],     
    closable : true,
    closeAction : 'hide',
    width : 800,

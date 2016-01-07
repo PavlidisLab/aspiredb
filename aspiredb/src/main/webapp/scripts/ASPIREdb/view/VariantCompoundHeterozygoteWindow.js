@@ -27,6 +27,12 @@ Ext.define( "ASPIREdb.view.VariantCompoundHeterozygoteWindow", {
    layout : 'fit',
    itemId : 'variantCompoundHeterozygoteWindow',
    title : 'Potential compound heterozygote variants',
+   tools: [
+           { 
+            type: 'help',
+            tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
+           }
+          ],   
    width : 530,
    height : 400,
    closable : true,
