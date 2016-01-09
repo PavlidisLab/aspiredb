@@ -57,13 +57,14 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
     private static final String LOAD_PHENOTYPES_URL_SUFFIX = "/phenotype/load-all-phenotypes";
     private static final String FIND_GENES_URL_SUFFIX = "/phenotype/find-candidate-genes";
     private static final String FIND_GENESURI_URL_SUFFIX = "/phenotype/find-phenotype-genes";
+    private static final int REQUEST_TIMEOUT_SECONDS = 30;
 
     private static Log log = LogFactory.getLog( NeurocartaQueryServiceImpl.class.getName() );
 
     private static String sendRequest( String urlSuffix, MultivaluedMap<String, String> queryParams )
             throws NeurocartaServiceException {
         Client client = Client.create();
-
+        client.setReadTimeout( 1000 * REQUEST_TIMEOUT_SECONDS );
         WebResource resource = client.resource( GemmaURLUtils.makeWebServiceUrl( urlSuffix ) )
                 .queryParams( queryParams );
 

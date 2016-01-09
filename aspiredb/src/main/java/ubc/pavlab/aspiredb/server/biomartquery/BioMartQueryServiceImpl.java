@@ -62,6 +62,8 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
     private static final String BIO_MART_URL = ConfigUtils.getString( "aspiredb.biomart.url",
             "http://www.biomart.org/biomart/martservice/results" );
 
+    private static final int BIOMART_TIMEOUT_SECONDS = 30;
+
     private static Log log = LogFactory.getLog( BioMartQueryServiceImpl.class.getName() );
 
     protected AtomicBoolean cacheReady = new AtomicBoolean( false );
@@ -88,7 +90,8 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
         queryData.add( "query", xmlQueryString );
 
         WebResource resource = client.resource( BIO_MART_URL ).queryParams( queryData );
-
+        client.setReadTimeout( 1000 * BIOMART_TIMEOUT_SECONDS );
+        
         ClientResponse response = resource.type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
                 .get( ClientResponse.class );
 
