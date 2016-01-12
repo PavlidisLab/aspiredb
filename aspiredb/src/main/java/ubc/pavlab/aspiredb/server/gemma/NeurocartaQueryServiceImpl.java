@@ -65,6 +65,7 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
             throws NeurocartaServiceException {
         Client client = Client.create();
         client.setReadTimeout( 1000 * REQUEST_TIMEOUT_SECONDS );
+        client.setConnectTimeout( 1000 * REQUEST_TIMEOUT_SECONDS );
         WebResource resource = client.resource( GemmaURLUtils.makeWebServiceUrl( urlSuffix ) )
                 .queryParams( queryParams );
 
