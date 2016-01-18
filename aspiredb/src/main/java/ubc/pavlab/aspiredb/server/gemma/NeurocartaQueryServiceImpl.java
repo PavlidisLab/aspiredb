@@ -37,7 +37,6 @@ import org.springframework.stereotype.Service;
 import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
-import ubc.pavlab.aspiredb.server.util.GemmaURLUtils;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
 
@@ -66,8 +65,8 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
         Client client = Client.create();
         client.setReadTimeout( 1000 * REQUEST_TIMEOUT_SECONDS );
         client.setConnectTimeout( 1000 * REQUEST_TIMEOUT_SECONDS );
-        WebResource resource = client.resource( GemmaURLUtils.makeWebServiceUrl( urlSuffix ) )
-                .queryParams( queryParams );
+        WebResource resource = client.resource( "http://sandbox.chibi.ubc.ca/Gemma/rest" + urlSuffix ).queryParams(
+                queryParams );
 
         ClientResponse response = resource.type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
                 .get( ClientResponse.class );
