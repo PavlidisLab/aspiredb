@@ -31,12 +31,22 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
    title : 'Phenotype',
    id : 'phenotypeGrid',
    multiSelect : true,
-   tools: [
-           { 
-            type: 'help',
-            tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
-           }
-          ],    
+   header: {
+      items: [{
+          xtype: 'image',       
+          style:'right: auto; left: 0px; top: 6px;',
+          src: 'scripts/ASPIREdb/resources/images/qmark.png',          
+          listeners: {
+             afterrender: function(c) {
+                 Ext.create('Ext.tip.ToolTip', {
+                     target: c.getEl(),
+                     html: 'This panel shows the list of all phenotypes that are associated with each subject. The column after Name shows the phenotype values for the selected Subject in the Subject Panel. The Value (subject count) column shows visualization of the number of subjects for each phenotype value and tool-tip of the chart indicates the number of subjects for each phenotype value. For example, if the Value (subject count) shows F(24) M(26) for the phenotype “Gender”, it means that there are a total of 24 female and 26 male subjects that are listed in the Subjects Panel.'
+                 });
+             }
+         }
+      }],
+      layout: 'fit'
+  },
 
    config : {
 

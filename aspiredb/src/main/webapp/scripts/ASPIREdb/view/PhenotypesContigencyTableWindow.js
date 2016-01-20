@@ -26,6 +26,20 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
    alias : 'widget.phenotypescontigencytablewindow',
    singleton : true,
    title : 'Contingency Table',
+   header: {
+      items: [{
+          xtype: 'image',
+          src: 'scripts/ASPIREdb/resources/images/qmark.png',
+          listeners: {
+             afterrender: function(c) {
+                 Ext.create('Ext.tip.ToolTip', {
+                     target: c.getEl(),
+                     html: 'This shows all the possible phenotype values for the selected phenotypes and the number of subjects that meets those criteria. Clicking the tag icon beside the subject count displays the Create Subject Label window. The created subject label is applied to those subjects with matching phenotype values.'
+                 });
+             }
+         }
+      }]
+  },   
    closable : true,
    closeAction : 'hide',
    width : 900,

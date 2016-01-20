@@ -28,12 +28,20 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
    height : 600,
    id : 'burdenAnalysisWindow',
    title : 'Burden Analysis',
-   tools: [
-           { 
-            type: 'help',
-            tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
-           }
-          ],      
+   header: {
+      items: [{
+          xtype: 'image',
+          src: 'scripts/ASPIREdb/resources/images/qmark.png',
+          listeners: {
+             afterrender: function(c) {
+                 Ext.create('Ext.tip.ToolTip', {
+                     target: c.getEl(),
+                     html: 'This tool allows you to compare various mutation characteristics (such as average mutation length, number of genes affected, etc.) between two mutually exclusive groups of subjects (as marked by Subject Labels). Those subjects which have both labels are excluded from the analysis. ASPIREdb will only include those subjects and variants that remained after filtering (if any) for burden analysis. There are three types of reports to choose from: length and genes overlapped, variant label, and characteristic.'
+                 });
+             }
+         }
+      }]
+  },    
    layout : 'fit',
    resizable : true,
    tbar : [],

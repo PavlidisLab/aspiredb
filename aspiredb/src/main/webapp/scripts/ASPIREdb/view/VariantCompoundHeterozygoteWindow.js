@@ -27,12 +27,22 @@ Ext.define( "ASPIREdb.view.VariantCompoundHeterozygoteWindow", {
    layout : 'fit',
    itemId : 'variantCompoundHeterozygoteWindow',
    title : 'Potential compound heterozygote variants',
-   tools: [
-           { 
-            type: 'help',
-            tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
-           }
-          ],   
+   header: {
+      items: [{
+          xtype: 'image',       
+          style:'right: auto; left: 0px; top: 6px;',
+          src: 'scripts/ASPIREdb/resources/images/qmark.png',          
+          listeners: {
+             afterrender: function(c) {
+                 Ext.create('Ext.tip.ToolTip', {
+                     target: c.getEl(),
+                     html: 'This shows those genes where more than one variant is found. Only those variants that are currently selected are used. Note that it is assumed that variants are heterozygotes since no parental genotypes are used in the calculation. Right-click on the compound heterozygotes of interest to create a variant label for the affected variants listed in the current row.'
+                 });
+             }
+         }
+      }],
+      layout: 'fit'
+  },
    width : 530,
    height : 400,
    closable : true,

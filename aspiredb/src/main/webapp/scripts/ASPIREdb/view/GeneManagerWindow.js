@@ -34,12 +34,20 @@ Ext.define( 'ASPIREdb.view.GeneManagerWindow', {
    layout : 'fit',
    modal : true,
    bodyStyle : 'padding: 5px;',
-   tools: [
-           { 
-            type: 'help',
-            tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
-           }
-          ],    
+   header: {
+      items: [{
+          xtype: 'image',
+          src: 'scripts/ASPIREdb/resources/images/qmark.png',
+          listeners: {
+             afterrender: function(c) {
+                 Ext.create('Ext.tip.ToolTip', {
+                     target: c.getEl(),
+                     html: 'You can create gene sets here and use them with the Variant Filter feature (via the "Filter..." button). Making a gene set is a way of grouping related genes. For example, you can create an “autism genes” gene set which includes those genes that have been associated with autism spectrum disorder in the literature.'
+                 });
+             }
+         }
+      }]
+  },     
 
    items : [ {
       region : 'center',

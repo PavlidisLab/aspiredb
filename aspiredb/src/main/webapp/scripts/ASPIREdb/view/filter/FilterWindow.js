@@ -43,12 +43,27 @@ Ext
          bodyStyle : 'padding: 5px;',
          border : false,
          constrain : true,
-         tools: [
-                 { 
-                  type: 'help',
-                  tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
-                 }
-                ],    
+         header: {
+            items: [{
+                xtype: 'image',
+                src: 'scripts/ASPIREdb/resources/images/qmark.png',
+                listeners: {
+                   afterrender: function(c) {
+                       var toolTip = Ext.create('Ext.tip.ToolTip', {
+                           target: c.getEl(),
+                           html: 'The Filter dialog box lets you select a subset of subjects, variants and phenotype by constructing complex and powerful queries. There are six types of filters to choose from in the "Add new:" drop down box. Please click the "Help" button or <a href="http://aspiredb.chibi.ubc.ca/manual/expression-filter/" target="_blank">here</a> for more details.',
+                           
+                           hideDelay: 5000
+                   
+                       }); 
+                       toolTip.on('mouseover', function(){
+                          toolTip.hideDelay = 10000;
+                       });
+                       
+                   }
+               }
+            }]
+        },    
          config : {
             isOverlapedProjects : 'No',
             SUBJECT_IDS_KEY : 0,

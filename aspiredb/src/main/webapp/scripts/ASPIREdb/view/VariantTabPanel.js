@@ -33,12 +33,22 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    extend : 'Ext.tab.Panel',
    alias : 'widget.variantTabPanel',
    title : 'Variant',
-   tools: [
-           { 
-            type: 'help',
-            tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
-           }
-          ], 
+   header: {
+      items: [{
+          xtype: 'image',       
+          style:'right: auto; left: 0px; top: 6px;',
+          src: 'scripts/ASPIREdb/resources/images/qmark.png',          
+          listeners: {
+             afterrender: function(c) {
+                 Ext.create('Ext.tip.ToolTip', {
+                     target: c.getEl(),
+                     html: 'This panel shows the list of variants (CNV, SNV, indel, and inversion) for each subject. The list of variants can be displayed and selected using the Ideogram View or the Table View. Likewise, labels can also be assigned to a list of variants through the Labels menu.'
+                 });
+             }
+         }
+      }],
+      layout: 'fit'
+  },
 
    dockedItems : [ {
       xtype : 'toolbar',
@@ -88,41 +98,43 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             disabled : true,
             handler : this.makeLabelHandler,
             scope : this,
-            tooltip : 'Create or apply labels to selected Variants',
-            tooltipType : 'title'
+            tooltip : 'Create or apply labels to selected variants.',            
          }, {
             itemId : 'labelManager',
             text : 'Manage labels',
             disabled : false,
             handler : this.labelManagerHandler,
             scope : this,
-            tooltip : 'Edit, delete or remove labels from selected Variants',
-            tooltipType : 'title'
+            tooltip : 'Edit, delete or remove labels from selected variants.',            
          } ]
       } );
 
       this.labelsButton = Ext.create( 'Ext.button.Split', {
          text : '<b>Labels</b>',
          itemId : 'labelsButton',
-         menu : this.labelsMenu
+         menu : this.labelsMenu,
+         tooltip: 'Labels allow the assignment of custom tags to a group of subjects or a group of variants. Labels can also be used in future queries.'
       } );
 
       this.actionsMenu = Ext.create( 'Ext.menu.Menu', {
          items : [ {
             itemId : 'viewInUCSC',
             text : 'View in UCSC Genome Browser',
+            tooltip: 'Displays the selected variants as ASPIREdb tracks in the UCSC Genome Browser in a new window. The UCSC Genome Browser provides tracks for various biological annotations which includes RefSeq genes, common SNPs, spliced ESTs, sequence conservation, DGV structural variants and more.',
             disabled : true,
             handler : this.viewInUCSCHandler,
             scope : this
          }, {
             itemId : 'viewGenes',
             text : 'View genes',
+            tooltip: 'Opens a window with the list of genes whose positions overlap with the selected variants.',
             disabled : true,
             handler : this.viewGenesHandler,
             scope : this
          }, {
             itemId : 'viewCompoundHeterozygotes',
             text : 'View compound heterozygotes',
+            tooltip: 'Shows those genes where more than one variant is found. Only those variants that are currently selected are used.',
             disabled : true,
             handler : this.viewCompoundHeterozygotes,
             scope : this
@@ -142,7 +154,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          disabled : false,
          handler : this.showReportHandler,
          scope : this,
-         tooltip : 'Generate reports on the filtered variants',         
+         tooltip : 'Generate reports on the filtered variants.',         
       } );
 
       this.selectAllButton = Ext.create( 'Ext.Button', {
@@ -1022,6 +1034,20 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       var labelWin = Ext.create( 'ASPIREdb.view.CreateLabelWindow', {
          isSubjectLabel : false,
          title : 'Create Variant Label',
+         header: {
+            items: [{
+                xtype: 'image',
+                src: 'scripts/ASPIREdb/resources/images/qmark.png',
+                listeners: {
+                   afterrender: function(c) {
+                       Ext.create('Ext.tip.ToolTip', {
+                           target: c.getEl(),
+                           html: 'Here, you can create and apply a label to the selected group of subjects or variants. Enter a name and choose a color.'
+                       });
+                   }
+               }
+            }]
+        },         
          extend : 'ASPIREdb.view.CreateLabelWindow',
          selectedIds : me.getSelectedVariantIds( me.getVariantRecordSelection() ),
       } );
@@ -1062,12 +1088,20 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          isSubjectLabel : false,
          selectedOwnerIds : selectedVariantIds,
          title : 'Variant Label Manager',
-         tools: [
-                 { 
-                  type: 'help',
-                  tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
-                 }
-                ],            
+         header: {
+            items: [{
+                xtype: 'image',
+                src: 'scripts/ASPIREdb/resources/images/qmark.png',
+                listeners: {
+                   afterrender: function(c) {
+                       Ext.create('Ext.tip.ToolTip', {
+                           target: c.getEl(),
+                           html: 'Labels allow the assignment of custom tags to a group of subjects or a group of variants. Labels can also be used in future queries. Here, you can hide labels from the variant panel, edit labels and select new colours or edit label descriptions, remove labels from selected subjects or variants, and delete labels from the system.'
+                       });
+                   }
+               }
+            }]
+        },            
       } );
 
       labelControlWindow.show();

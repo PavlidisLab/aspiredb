@@ -27,12 +27,20 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
    height : 500,
    id : 'variantReportWindow',
    title : 'Variant Report',
-   tools: [
-           { 
-            type: 'help',
-            tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
-           }
-          ],   
+   header: {
+      items: [{
+          xtype: 'image',
+          src: 'scripts/ASPIREdb/resources/images/qmark.png',
+          listeners: {
+             afterrender: function(c) {
+                 Ext.create('Ext.tip.ToolTip', {
+                     target: c.getEl(),
+                     html: 'Reports allow you to quick visualize and download variant counts for various variant characteristics, grouped by variant labels. Hovering the mouse over a bar shows the exact variant count. Clicking the variant label in the legend shows/hides that label in the chart.'
+                 });
+             }
+         }
+      }]
+  },
    layout : 'fit',
    resizable : true,
    modal : true,

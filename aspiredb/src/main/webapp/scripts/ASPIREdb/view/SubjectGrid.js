@@ -32,12 +32,22 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
    title : 'Subject',
    id : 'subjectGrid',
    multiSelect : true,   
-   tools: [
-           { 
-        	   type: 'help',
-        	   tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
-           }
-          ],                 
+   titlePosition: '0',
+   header: {
+      items: [{
+          xtype: 'image',
+          src: 'scripts/ASPIREdb/resources/images/qmark.png',
+          listeners: {
+             afterrender: function(c) {
+                 Ext.create('Ext.tip.ToolTip', {
+                     target: c.getEl(),
+                     html: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
+                 });
+             }
+         }
+      }]
+  },
+                 
    store : Ext.create( 'ASPIREdb.store.SubjectStore' ),
    config : {
 
@@ -148,16 +158,14 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
             disabled : true,
             handler : this.makeLabelHandler,
             scope : this,
-            tooltip : 'Create or apply labels to selected Subjects',
-            tooltipType : 'title'
+            tooltip : 'Create or apply labels to selected subjects',            
          }, {
             itemId : 'labelManager',
             text : 'Manage labels',
             disabled : false,
             handler : this.labelManagerHandler,
             scope : this,
-            tooltip : 'Edit, delete or remove labels from selected Subjects',
-            tooltipType : 'title'
+            tooltip : 'Edit, delete or remove labels from selected subjects',            
          } ]
       } );
 
@@ -400,12 +408,21 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       Ext.define( 'ASPIREdb.view.CreateLabelWindowSubject', {
          isSubjectLabel : true,
          title : 'Create Subject Label',
-         tools: [
-                 { 
-                  type: 'help',
-                  tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
-                 }
-                ],   
+         header: {
+            items: [{
+                xtype: 'image',
+                src: 'scripts/ASPIREdb/resources/images/qmark.png',
+                listeners: {
+                   afterrender: function(c) {
+                       Ext.create('Ext.tip.ToolTip', {
+                           target: c.getEl(),
+                           html: 'Here, you can create and apply a label to the selected group of subjects or variants. Enter a name and choose a color.'
+                       });
+                   }
+               }
+            }]
+        },        
+   
          extend : 'ASPIREdb.view.CreateLabelWindow',
          selectedIds : ASPIREdb.Utils.getSelectedIds( me.getSelectionModel().getSelection() ),
 
@@ -518,12 +535,21 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
          isSubjectLabel : true,
          selectedOwnerIds : ASPIREdb.Utils.getSelectedIds( me.getSelectionModel().getSelection() ),
          title : "Subject Label Manager",
-         tools: [
-                 { 
-                  type: 'help',
-                  tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
-                 }
-                ],            
+         toolFirst: true,
+         header: {
+            items: [{
+                xtype: 'image',
+                src: 'scripts/ASPIREdb/resources/images/qmark.png',
+                listeners: {
+                   afterrender: function(c) {
+                       Ext.create('Ext.tip.ToolTip', {
+                           target: c.getEl(),
+                           html: 'Labels allow the assignment of custom tags to a group of subjects or a group of variants. Labels can also be used in future queries. Here, you can hide labels from the subject panel, edit labels and select new colours or edit label descriptions, remove labels from selected subjects or variants, and delete labels from the system.'
+                       });
+                   }
+               }
+            }]
+        },        
       } );
 
       labelControlWindow.show();

@@ -25,20 +25,31 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
    extend : 'Ext.Window',
    alias : 'widget.dashboardWindow',
    id : 'dashboardWindow',
-   singleton : true,
+   singleton : true,   
+   header: {
+      items: [{
+          xtype: 'image',       
+          style:'right: auto; left: 0px; top: 6px;',
+          src: 'scripts/ASPIREdb/resources/images/qmark.png',          
+          listeners: {
+             afterrender: function(c) {
+                 Ext.create('Ext.tip.ToolTip', {
+                     target: c.getEl(),
+                     html: 'Choose or create a project here.'
+                 });
+             }
+         }
+      }],
+      layout: 'fit'
+  }, 
    title : 'Dashboard',
    closable : true,
    closeAction : 'hide',
    width : 400,
    height : 250,
    modal : true,
-   closable: false,
-   tools: [
-           { 
-            type: 'help',
-            tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
-           }
-          ],    
+   closable: false,   
+   
    layout : {
       type : 'vbox',
       align : 'center'
@@ -59,7 +70,7 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
 
    initComponent : function() {
 
-      this.callParent();
+      this.callParent();      
       this.enableToolbar();
       var ref = this;
       var projectStore = Ext.create( 'Ext.data.Store', {
@@ -168,6 +179,7 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
       this.add( okButton );
 
       ASPIREdb.EVENT_BUS.on( 'project_list_updated', ref.refreshDashboardHandler, ref );
+      
 
    },
    /**
@@ -182,7 +194,7 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
          xtype : 'button',
          id : 'manageProject',
          text : 'Manage Projects',
-         tooltip : 'Upload variants or upload phenotypes',         
+         tooltip : 'Get started here.',         
          icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
          handler : function() {
             ASPIREdb.view.ProjectManagerWindow.initGridAndShow();

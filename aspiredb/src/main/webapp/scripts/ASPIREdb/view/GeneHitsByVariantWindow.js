@@ -27,12 +27,22 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
    alias : 'widget.geneHitsByVariantWindow',
    singleton : true,
    title : 'Gene Hits By Variant',
-   tools: [
-           { 
-            type: 'help',
-            tooltip: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
-           }
-          ],      
+   header: {
+      items: [{
+          xtype: 'image',       
+          style:'right: auto; left: 0px; top: 6px;',
+          src: 'scripts/ASPIREdb/resources/images/qmark.png',          
+          listeners: {
+             afterrender: function(c) {
+                 Ext.create('Ext.tip.ToolTip', {
+                     target: c.getEl(),
+                     html: 'This shows the list of genes whose positions overlap with the selected variants. The list of genes are retrieved from the Ensembl database through BioMart. It is possible to filter genes by their type (protein_coding, pseudogene, etc).'
+                 });
+             }
+         }
+      }],
+      layout: 'fit'
+  },      
    closable : true,
    closeAction : 'hide',
    width : 800,
