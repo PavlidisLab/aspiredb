@@ -37,6 +37,8 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       items: [{
           xtype: 'image',
           src: 'scripts/ASPIREdb/resources/images/qmark.png',
+          height: '14px',
+          width: '15px',
           listeners: {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {

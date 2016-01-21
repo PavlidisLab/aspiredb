@@ -29,8 +29,10 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
    header: {
       items: [{
           xtype: 'image',       
-          style:'right: auto; left: 0px; top: 6px;',
-          src: 'scripts/ASPIREdb/resources/images/qmark.png',          
+          style:'right: auto; left: 0px; top: 6px;',          
+          src: 'scripts/ASPIREdb/resources/images/qmark.png',     
+          height: '14px',
+          width: '15px',
           listeners: {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
