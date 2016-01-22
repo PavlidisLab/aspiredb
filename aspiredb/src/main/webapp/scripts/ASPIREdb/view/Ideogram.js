@@ -243,7 +243,11 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    onMouseDown : function(event) {
       if ( !this.doneDrawing )
          return;
-
+      
+      if (event.button == 2) {
+    	     return;
+      }
+      
       // Determine chromosome
       var offset = this.getOffset( event.browserEvent );
       var chromosomeIdeogram = this.findChromosomeIdeogram( offset.x, offset.y );

@@ -50,6 +50,7 @@
 <script src="scripts/ASPIREdb/view/ideogram/IdeogramCursorLayer.js"></script>
 <script src="scripts/ASPIREdb/view/ideogram/ChromosomeLayer.js"></script>
 <script src="scripts/ASPIREdb/view/ideogram/ChromosomeIdeogram.js"></script>
+<script src="scripts/ASPIREdb/view/ideogram/DragPanning.js"></script>
 <script src="scripts/ASPIREdb/view/filter/FilterUtil.js"></script>
 
 
@@ -84,6 +85,7 @@
       launch : function() {
 
          var viewport = Ext.create( 'ASPIREdb.AspireDbPanel' );
+         dragPan(Ext.ComponentQuery.query('ideogram')[0].body.dom);
          
          myMask.hide();
       }
