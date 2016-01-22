@@ -73,8 +73,7 @@
     </bean>
 
     <dwr:annotation-config id="dwrAnnotationConfig" />
-    <dwr:annotation-scan base-package="ubc.pavlab.aspiredb"
-        scanDataTransferObject="true" scanRemoteProxy="true" />
+    <dwr:annotation-scan base-package="ubc.pavlab.aspiredb" scanDataTransferObject="true" scanRemoteProxy="true" />
 
     <!-- ==================================================== -->
     <!-- Make spring aware of our i18n support files -->
