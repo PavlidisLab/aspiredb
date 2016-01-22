@@ -1,9 +1,10 @@
 function dragPan(el) {
  function startPan(event) {
-   el.style.cursor = 'move';
+   
    if (event.button != 2) {
      return;
    }
+   el.style.cursor = 'move';
    var x0 = event.screenX,
        y0 = event.screenY;
    function continuePan(event) {
