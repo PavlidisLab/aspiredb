@@ -170,7 +170,45 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
       canvasBoxOverlay.getEl().on( 'mousemove', this.onMouseMove, this );
       canvasBoxOverlay.getEl().on( 'mouseup', this.onMouseUp, this );
       canvasBoxOverlay.getEl().on( 'mousedown', this.onMouseDown, this );
+      canvasBoxOverlay.getEl().on( 'dblclick', this.onDblClick, this );
    },
+   
+   onDblClick : function(evt) {
+//	   var zoomRatio = this.zoom+1/this.zoom;
+	   
+	   this.changeZoom(this.zoom+1, this.variants);
+	   
+	   var center = this.getViewCenter(evt.browserEvent)
+	   var pt = this.getOffset(evt.browserEvent);
+	   this.body.dom.scrollTop = pt.y - center.y;
+	   this.body.dom.scrollLeft = pt.x - center.x;
+	   
+//	   console.log(this);
+	  
+	   
+//	   this.body.dom.scrollTop = Math.floor(zoomRatio*(pt.y - center.y));
+//	   this.body.dom.scrollLeft = Math.floor(zoomRatio*(pt.x - center.x));
+//	   
+//	   console.log(evt);
+//	   console.log(center);
+//	   console.log(pt);
+//	   console.log(pt.y - center.y, pt.x - center.x);
+//	   console.log(Math.floor(zoomRatio*(pt.y - center.y)), Math.floor(zoomRatio*(pt.x - center.x)));
+	   
+   },
+   
+   getOffset :  function(e) {
+	   var x = e.offsetX==undefined?e.layerX:e.offsetX;
+	   var y = e.offsetY==undefined?e.layerY:e.offsetY;
+
+	     return { x: x, y: y };
+	   },
+
+	getViewCenter : function (e) {
+	     var x = e.target.parentElement.clientWidth/2;
+	     var y = e.target.parentElement.clientHeight/2;
+	     return { x: x, y: y };
+	   },
 
    /**
     */
@@ -445,6 +483,7 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
 
       /* List<VariantValueObject> */
       var variants = variantValueObjects.slice(); // make a copy
+      this.variants = variants;
       this.sortVariantsBySize( variants );
       for (var i = 0; i < variants.length; i++) {
          var variant = variants[i];
@@ -465,7 +504,8 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    drawColouredVariants : function(variantValueObjects, repeat) {
 
       /* List<VariantValueObject> */
-      var variants = variantValueObjects.slice(); // make a copy
+	  var variants = variantValueObjects.slice(); // make a copy
+	  this.variants = variants;
       this.sortVariantsBySize( variants );
       var propertyValues = [];
 
@@ -577,7 +617,8 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
 
    drawVariantsWithSubjectHighlighted : function(subjectId, variantValueObjects) {
       // List<VariantValueObject>
-      var variants = variantValueObjects.slice(); // copy array
+	  var variants = variantValueObjects.slice(); // copy array
+	  this.variants = variants;
       this.sortVariantsBySize( variants );
 
       for (var i = 0; i < variants.length; i++) {
@@ -602,7 +643,8 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
     */
    drawVariantsWithSubjectsHighlighted : function(subjectIds, variantValueObjects) {
       /* List<VariantValueObject> */
-      var variants = variantValueObjects.slice(); // copy array
+	  var variants = variantValueObjects.slice(); // copy array
+	  this.variants = variants;
       this.sortVariantsBySize( variants );
       this.displayedProperty.displayType = null;
       this.setDisplayedProperty( this.displayedProperty );
@@ -637,6 +679,7 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    drawDimmedVariants : function(variantValueObjects) {
       /* List<VariantValueObject> */
       var variants = variantValueObjects.slice(); // make a copy
+      this.variants = variants;
       this.sortVariantsBySize( variants );
       for (var i = 0; i < variants.length; i++) {
          var variant = variants[i];
