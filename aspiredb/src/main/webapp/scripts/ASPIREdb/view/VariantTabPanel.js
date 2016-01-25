@@ -63,7 +63,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
    items : [ {
       xtype : 'ideogram',
-      itemId : 'ideogram'
+      itemId : 'ideogram',
+      id: 'ideogram',
    } ],
 
    config : {

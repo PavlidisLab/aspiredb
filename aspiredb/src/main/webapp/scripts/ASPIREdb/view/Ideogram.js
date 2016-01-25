@@ -33,6 +33,7 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    closable : false,
    // resizable : true,
    layout : 'absolute',
+   bodyCls : 'no-selection',
    config : {
       selectedView : '',
       selectedSubjectIds : [],
@@ -197,12 +198,12 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
 	   
    },
    
-   getOffset :  function(e) {
-	   var x = e.offsetX==undefined?e.layerX:e.offsetX;
-	   var y = e.offsetY==undefined?e.layerY:e.offsetY;
-
-	     return { x: x, y: y };
-	   },
+//   getOffset :  function(e) {
+//	   var x = e.offsetX==undefined?e.layerX:e.offsetX;
+//	   var y = e.offsetY==undefined?e.layerY:e.offsetY;
+//
+//	     return { x: x, y: y };
+//	   },
 
 	getViewCenter : function (e) {
 	     var x = e.target.parentElement.clientWidth/2;
