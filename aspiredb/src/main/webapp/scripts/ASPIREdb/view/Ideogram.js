@@ -61,7 +61,7 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    initComponent : function() {
       this.callParent();
 
-      this.width = Math.round( 850 * this.zoom );
+      this.width = Math.round( this.boxWidth * this.zoom );
       this.height = Math.round( this.boxHeight * this.zoom );
 
       this.colourLegend = Ext.create( 'ASPIREdb.view.ideogram.ColourLegend' );
@@ -127,6 +127,11 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
     * @private
     */
    boxHeight : 700,
+   
+   /**
+    * @private
+    */
+   boxWidth : 900,
 
    /**
     * bases per pixel
@@ -367,7 +372,7 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    // changeZoom : function(newZoom, variants, property) {
    changeZoom : function(newZoom, variants) {
       this.zoom = newZoom;
-      this.width = Math.round( 850 * this.zoom );
+      this.width = Math.round( this.boxWidth * this.zoom );
       this.height = Math.round( this.boxHeight * this.zoom );
       this.redraw( variants );
       // this.redraw(variants, property);
