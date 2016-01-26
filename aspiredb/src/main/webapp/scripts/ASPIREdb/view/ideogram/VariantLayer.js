@@ -40,8 +40,10 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
        * @type {Array.<TrackLayer>}
        */
       this.trackLayers = [];
-      this.numberOfTracks = (this.displayWidth != null) ? this.displayWidth - 5 : 2;
+      
+      this.numberOfTracks = (this.displayWidth != null) ? Math.floor((this.zoom * this.chromosomeBaseGap - this.displayWidth - 5) / (this.variantSeparationFactor * this.zoom)) : 2;
       this.createTracks( this.numberOfTracks );
+      this.missingVariants = [];
 
       return this;
    },
@@ -54,6 +56,8 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
       chromosomeLayer : null,
       // selectedVariants : [],
       displayWidth : null,
+      variantSeparationFactor : null,
+      chromosomeBaseGap : null,
    },
 
    statics : {
@@ -416,23 +420,7 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
     *           variant
     */
    drawDimmedVariant : function(variant) {
-      /* VariantSegment */
-      var segment = {
-         start : variant.genomicRange.baseStart,
-         end : variant.genomicRange.baseEnd,
-         color : "#989898", // "rgb(128,128,128)",// "rgba(0,0,0,0.4)",//grey
-         emphasize : false
-      };
-
-      // pick track layer
-      for (var trackIndex = 0; trackIndex < this.trackLayers.length; trackIndex++) {
-         var layer = this.trackLayers[trackIndex];
-         if ( layer.doesFit( segment ) ) {
-            this.drawLineSegment( layer.layerIndex, segment, this.ctx, this.displayScaleFactor );
-            layer.insert( segment );
-            break;
-         }
-      }
+	   this.renderVariant(variant, "#989898");
    },
 
    /**
@@ -444,23 +432,7 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
     */
    drawHighlightedVariant : function(variant, property) {
       this.self.selectedVariants.push( variant );
-      /* VariantSegment */
-      var segment = {
-         start : variant.genomicRange.baseStart,
-         end : variant.genomicRange.baseEnd,
-         color : this.pickColor( variant, property ),// red "rgb(255,0,0)"
-         emphasize : false
-      };
-
-      // pick track layer
-      for (var trackIndex = 0; trackIndex < this.trackLayers.length; trackIndex++) {
-         var layer = this.trackLayers[trackIndex];
-         if ( layer.doesFit( segment ) ) {
-            this.drawLineSegment( layer.layerIndex, segment, this.ctx, this.displayScaleFactor );
-            layer.insert( segment );
-            break;
-         }
-      }
+      this.renderVariant(variant, this.pickColor( variant, property ));
    },
 
    /**
@@ -471,22 +443,31 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
     *           property
     */
    drawVariant : function(variant, property) {
-      /* VariantSegment */
-      var segment = {
-         start : variant.genomicRange.baseStart,
-         end : variant.genomicRange.baseEnd,
-         color : this.pickColor( variant, property ),
-         emphasize : false
-      };
-      // pick track layer
-      for (var trackIndex = 0; trackIndex < this.trackLayers.length; trackIndex++) {
-         var layer = this.trackLayers[trackIndex];
-         if ( layer.doesFit( segment ) ) {
-            this.drawLineSegment( layer.layerIndex, segment, this.ctx, this.displayScaleFactor );
-            layer.insert( segment );
-            break;
-         }
-      }
+	   this.renderVariant(variant, this.pickColor( variant, property ));
+   },
+   
+   renderVariant : function(variant, color) {
+	      /* VariantSegment */
+	      var segment = {
+	         start : variant.genomicRange.baseStart,
+	         end : variant.genomicRange.baseEnd,
+	         color : color,
+	         emphasize : false
+	      };
+	      // pick track layer
+	      var trackFound = false;
+	      for (var trackIndex = 0; trackIndex < this.trackLayers.length; trackIndex++) {
+	         var layer = this.trackLayers[trackIndex];
+	         if ( layer.doesFit( segment ) ) {
+	            this.drawLineSegment( layer.layerIndex, segment, this.ctx, this.displayScaleFactor );
+	            layer.insert( segment );
+	            trackFound = true;
+	            break;
+	         }
+	      }
+	      if (!trackFound) {
+	    	  this.missingVariants.push(segment)
+	      }
    },
 
    /**
@@ -597,7 +578,7 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 
       // var x = this.leftX + 7;
       var x = this.leftX + this.displayWidth;
-      x += 2 * this.zoom * layerIndex + 3.5;
+      x += this.variantSeparationFactor * this.zoom * layerIndex + 3.5;
 
       var yStart = this.chromosomeLayer.convertToDisplayCoordinates( start, displayScaleFactor );
       var yEnd = this.chromosomeLayer.convertToDisplayCoordinates( end, displayScaleFactor );

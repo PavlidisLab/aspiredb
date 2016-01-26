@@ -182,6 +182,10 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    
    chromosomeOrder  : [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16",
                         "17", "18", "19", "20", "21", "22", "X", "Y" ],
+                        
+   chromosomeBaseGap : 35,
+   
+   chromosomeBaseWidth : 13,
    /**
     * @private
     */
@@ -425,7 +429,7 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
     */
    initChromosomeIdeograms : function() {
       var longestChromosome = 250000000; // longest chromosome (# bases)
-      var displayScaleFactor = Math.round( longestChromosome / (this.height - 30) );
+      this.displayScaleFactor = Math.round( longestChromosome / (this.height - 30) );
 
 //      var chromosomeOrder = [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16",
 //                             "17", "18", "19", "20", "21", "22", "X", "Y" ];
@@ -436,12 +440,9 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
          /* ChromosomeValueObject */
          var chromosomeInfo = this.chromosomeValueObjects[name];
          /* Map < String, ChromosomeBand > */
-         var size = chromosomeInfo.size;
-         var centromereLocation = chromosomeInfo.centromereLocation;
-         var leftX = Math.round( 5 + index * 35 * this.zoom );
+         var leftX = Math.round( 5 + index * this.chromosomeBaseGap * this.zoom );
          /* ChromosomeIdeogram */
-         var chromosomeIdeogram = new ChromosomeIdeogram( name, size, centromereLocation, topY, leftX,
-            displayScaleFactor, this.ctx, this.ctxOverlay, this.ctxSelection, chromosomeInfo, this.zoom );
+         var chromosomeIdeogram = new ChromosomeIdeogram( this, name, topY, leftX, chromosomeInfo );
          this.chromosomeIdeograms[name] = chromosomeIdeogram;
       }
    },
@@ -476,7 +477,7 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    findChromosomeIdeogram : function(x, y) {
       if ( x < 5 )
          return null;
-      var index = Math.round( (x - 20) / (35 * this.zoom) + 1 );
+      var index = Math.round( (x - 20) / (this.chromosomeBaseGap * this.zoom) + 1 );
       
       if (index > this.chromosomeOrder.length) {
     	  return null;

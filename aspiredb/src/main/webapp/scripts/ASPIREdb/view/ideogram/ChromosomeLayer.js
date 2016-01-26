@@ -161,14 +161,14 @@ ChromosomeLayer.prototype.drawChromosome = function() {
    this.ctx.stroke();
    this.ctx.restore();
 
-   this.drawBands( this.ctx, this.displayScaleFactor );
+   this.drawBands( this.ctx );
 };
 
-ChromosomeLayer.prototype.drawBands = function(ctx, displayScaleFactor) {
+ChromosomeLayer.prototype.drawBands = function(ctx) {
    for (/* ChromosomeBand */var bandName in this.bands) {
       var band = this.bands[bandName];
-      var yStart = this.convertToDisplayCoordinates( band.start, displayScaleFactor );
-      var yEnd = this.convertToDisplayCoordinates( band.end, displayScaleFactor );
+      var yStart = this.convertToDisplayCoordinates( band.start, this.displayScaleFactor );
+      var yEnd = this.convertToDisplayCoordinates( band.end, this.displayScaleFactor );
 
       if ( band.staining === "acen" || band.staining === "gneg" )
          continue; // skip
