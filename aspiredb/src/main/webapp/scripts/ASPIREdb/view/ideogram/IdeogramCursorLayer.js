@@ -178,8 +178,23 @@ IdeogramCursorLayer.prototype.renderCursor = function(y) {
 
    var cursorLabel = this.chromosomeData.name + ":" + getBandName( y );
 
-   this.ctx.strokeStyle = "black";
-   this.ctx.strokeText( cursorLabel, this.getLeftX() + 30, y );
+// this.ctx.strokeStyle = "black";
+// this.ctx.strokeText( cursorLabel, this.getLeftX() + 30, y );
+ 
+ var x = this.getLeftX() + 30;
+ 
+ this.ctx.strokeStyle = 'black';
+ this.ctx.fillStyle = "white";
+
+	// setup these to match your needs
+	this.ctx.miterLimit = 2;
+	this.ctx.lineJoin = 'round';
+	
+	// draw an outline, then filled
+	this.ctx.lineWidth = 4;	
+	this.ctx.strokeText(cursorLabel, x, y);
+//	this.ctx.lineWidth = 4;
+	this.ctx.fillText(cursorLabel, x, y);
 };
 
 IdeogramCursorLayer.prototype.drawCursor = function(y) {
@@ -188,7 +203,7 @@ IdeogramCursorLayer.prototype.drawCursor = function(y) {
       me.selectionBackground.restore();
 
       me.selection.setCurrent( y );
-      me.selectionBackground.save( me.selection.getTop() - 10, me.selection.getBottom() + 3 );
+      me.selectionBackground.save( me.selection.getTop() - 20, me.selection.getBottom() + 6 );
       me.selection.render();
    }
 
@@ -196,7 +211,7 @@ IdeogramCursorLayer.prototype.drawCursor = function(y) {
       drawSelection( y );
    } else {
       this.cursorBackground.restore();
-      this.cursorBackground.save( y - 10, y + 3 );
+      this.cursorBackground.save( y - 20, y + 6 );
       this.renderCursor( y );
    }
 };
