@@ -50,11 +50,20 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    }, {
       xtype : 'component',
       autoEl : 'canvas',
-      itemId : 'canvasBoxOverlay',
+      itemId : 'canvasBoxSelection',
       x : 0,
       y : 0,
       style : {
          'z-index' : '1'
+      }
+   }, {
+      xtype : 'component',
+      autoEl : 'canvas',
+      itemId : 'canvasBoxOverlay',
+      x : 0,
+      y : 0,
+      style : {
+         'z-index' : '2'
       }
    } ],
 
@@ -116,6 +125,12 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
     * @type {CanvasRenderingContext2D}
     */
    ctxOverlay : null,
+   
+   /**
+    * @private
+    * @type {CanvasRenderingContext2D}
+    */
+   ctxSelection : null,
 
    /**
     * @private
@@ -163,7 +178,10 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
     * @type {ChromosomeIdeogram}
     */
    previousChromosome : null,
-
+   
+   
+   chromosomeOrder  : [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16",
+                        "17", "18", "19", "20", "21", "22", "X", "Y" ],
    /**
     * @private
     */
@@ -409,12 +427,12 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
       var longestChromosome = 250000000; // longest chromosome (# bases)
       var displayScaleFactor = Math.round( longestChromosome / (this.height - 30) );
 
-      var chromosomeOrder = [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16",
-                             "17", "18", "19", "20", "21", "22", "X", "Y" ];
+//      var chromosomeOrder = [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16",
+//                             "17", "18", "19", "20", "21", "22", "X", "Y" ];
 
       var topY = 15;
-      for (var index = 0; index < chromosomeOrder.length; index++) {
-         var name = chromosomeOrder[index];
+      for (var index = 0; index < this.chromosomeOrder.length; index++) {
+         var name = this.chromosomeOrder[index];
          /* ChromosomeValueObject */
          var chromosomeInfo = this.chromosomeValueObjects[name];
          /* Map < String, ChromosomeBand > */
@@ -423,7 +441,7 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
          var leftX = Math.round( 5 + index * 35 * this.zoom );
          /* ChromosomeIdeogram */
          var chromosomeIdeogram = new ChromosomeIdeogram( name, size, centromereLocation, topY, leftX,
-            displayScaleFactor, this.ctx, this.ctxOverlay, chromosomeInfo, this.zoom );
+            displayScaleFactor, this.ctx, this.ctxOverlay, this.ctxSelection, chromosomeInfo, this.zoom );
          this.chromosomeIdeograms[name] = chromosomeIdeogram;
       }
    },
@@ -433,20 +451,22 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
     * @private
     */
    initCanvasSize : function() {
-      var canvasBox = this.getComponent( "canvasBox" );
-      var overlayCanvasBox = this.getComponent( "canvasBoxOverlay" );
-
-      this.ctx = canvasBox.getEl().dom.getContext( '2d' );
-      this.ctxOverlay = overlayCanvasBox.getEl().dom.getContext( '2d' );
-
-      canvasBox.getEl().dom.height = this.height; // + "px";
-      canvasBox.getEl().dom.width = this.width; // + "px";
-
-      overlayCanvasBox.getEl().dom.height = this.height;// + "px";
-      overlayCanvasBox.getEl().dom.width = this.width;// + "px";
-
-      this.ctx.clearRect( 0, 0, this.width, this.height );
-      this.ctxOverlay.clearRect( 0, 0, this.width, this.height );
+	   var me = this;
+	   function prepCanvas(itemId) {
+		   var canvasBox = me.getComponent( itemId );
+		   var ctx = canvasBox.getEl().dom.getContext( '2d' );
+		   
+	       canvasBox.getEl().dom.height = me.height; // + "px";
+	       canvasBox.getEl().dom.width = me.width; // + "px";
+	       
+	       ctx.clearRect( 0, 0, me.width, me.height );
+		   return ctx;
+	   }
+	   
+      this.ctx = prepCanvas( "canvasBox" );
+      this.ctxOverlay = prepCanvas( "canvasBoxOverlay" );
+      this.ctxSelection = prepCanvas( "canvasBoxSelection" );
+	   
    },
 
    /**
@@ -456,18 +476,24 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    findChromosomeIdeogram : function(x, y) {
       if ( x < 5 )
          return null;
-      var name;
       var index = Math.round( (x - 20) / (35 * this.zoom) + 1 );
-      if ( index > 24 )
-         return null;
-
-      if ( index == 23 ) {
-         name = "X";
-      } else if ( index == 24 ) {
-         name = "Y";
-      } else {
-         name = index;
+      
+      if (index > this.chromosomeOrder.length) {
+    	  return null;
       }
+
+      var name = this.chromosomeOrder[index - 1]   
+      
+//      if ( index > 24 )
+//         return null;
+//
+//      if ( index == 23 ) {
+//         name = "X";
+//      } else if ( index == 24 ) {
+//         name = "Y";
+//      } else {
+//         name = index;
+//      }
 
       /* ChromosomeIdeogram */
       var chromosomeIdeogram = this.chromosomeIdeograms[name];
