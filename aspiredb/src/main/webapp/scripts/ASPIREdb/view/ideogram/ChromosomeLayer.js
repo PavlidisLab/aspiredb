@@ -132,7 +132,10 @@ ChromosomeLayer.prototype.drawChromosome = function() {
 
    this.ctx.save();
    this.ctx.strokeStyle = "rgba(0,0,0,1)";
-   this.ctx.strokeText( this.name, this.xPosition, this.yPosition - 5 );
+   var textAlignBase = this.ctx.textAlign;
+   this.ctx.textAlign = "center";
+   this.ctx.strokeText( this.name, this.xPosition + this.displayWidth / 2, this.yPosition - 5 );
+   this.ctx.textAlign = textAlignBase;
 
    // this.ctx.strokeStyle = "rgba(0,0,0,0.2)";
    this.ctx.strokeStyle = "rgba(0,0,0,1)";

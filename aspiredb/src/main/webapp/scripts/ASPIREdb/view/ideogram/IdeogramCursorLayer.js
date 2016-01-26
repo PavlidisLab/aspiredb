@@ -63,21 +63,22 @@ var IdeogramCursorLayer = function(ctx, selectionCtx, leftX, chromosomeData, chr
     * @constructor
     */
    function Background(ctx) {
-      var boxWidth = 150;
+      var boxWidth;
       var boxHeight;
       var x;
       var y;
 
-      this.restore = function() {
+      this.clearActiveArea = function() {
     	  // clear active box
     	  ctx.clearRect(x, y, boxWidth, boxHeight);
       };
-
-      this.save = function(start, finish) {
+      
+      this.setActiveArea = function(leftX, topY, width, height) {
     	  // Save active box for faster clearing
-          boxHeight = Math.abs( start - finish );
-          y =  Math.min( start, finish );
-          x = getLeftX();
+          boxHeight = height;
+          boxWidth = width;
+          y = topY;
+          x = leftX;
       };
 
       this.clear = function() {
@@ -143,10 +144,18 @@ var IdeogramCursorLayer = function(ctx, selectionCtx, leftX, chromosomeData, chr
       render : function() {
          // Render selection
          me.selectionCtx.fillStyle = "rgba(0,0,255,0.1)";
-         me.selectionCtx.fillRect( getLeftX(), this.getTop(), 29, this.getBottom() - this.getTop() );
+         var x = getLeftX();
+         var y = this.getTop();
+         var yBottom = this.getBottom();
+         var width = 29;
+         var height =  yBottom - y;
+         me.selectionCtx.fillRect( x, y, width, height );
 
-         me.renderCursor( this.getTop(), me.selectionCtx );
-         me.renderCursor( this.getBottom(), me.selectionCtx );
+         var bBox = me.renderCursor( y, me.selectionCtx );
+         me.renderCursor( yBottom, me.selectionCtx );
+                 
+         // return bounding box for drawings
+         return {leftX:x, topY:bBox.topY, width:bBox.width, height: height + bBox.height }
       },
       clear : function() {
          this.start = 0;
@@ -174,18 +183,22 @@ IdeogramCursorLayer.prototype.renderCursor = function(y, ctx) {
       }
       return "";
    };
+   
+   var redLineWidth = 30;
+   var fontSizeInPixels = 12;
+   var x = this.getLeftX();
 
    ctx.fillStyle = "red";
-   ctx.fillRect( this.getLeftX(), y, 29, 1 );
+   ctx.fillRect( x, y, redLineWidth - 1, 1 );
 
    var cursorLabel = this.chromosomeData.name + ":" + getBandName( y );
 
 //   this.ctx.strokeStyle = "black";
 //   this.ctx.strokeText( cursorLabel, this.getLeftX() + 30, y );
    
-   var x = this.getLeftX() + 30;
+   var textX = x + redLineWidth;
    
-   ctx.font= '12px sans-serif';
+   ctx.font= fontSizeInPixels + 'px sans-serif';
    
    ctx.strokeStyle = 'dark grey';
    ctx.fillStyle = "white";
@@ -196,27 +209,41 @@ IdeogramCursorLayer.prototype.renderCursor = function(y, ctx) {
 	
 	// draw an outline, then filled
 	ctx.lineWidth = 3;	
-	ctx.strokeText(cursorLabel, x, y);
+	
+	var textAlignBaseline = ctx.textAlign;
+    ctx.textBaseline = "middle";
+    
+	
+	ctx.strokeText(cursorLabel, textX, y);
 //	this.ctx.lineWidth = 4;
-	ctx.fillText(cursorLabel, x, y);
+	ctx.fillText(cursorLabel, textX, y);
+	
+	ctx.textBaseline = textAlignBaseline;
+	
+	// approximate bounding box of text, 50% buffer
+	var aWidth = 1.5*(redLineWidth + ctx.measureText(cursorLabel).width);
+	var aHeight = 1.5*fontSizeInPixels;
+	
+	return {leftX:x, topY:y - aHeight/2 , width:aWidth, height: aHeight}
 };
 
 IdeogramCursorLayer.prototype.drawCursor = function(y) {
    var me = this;
    function drawSelection(y) {
-      me.selectionBackground.restore();
+      me.selectionBackground.clearActiveArea();
 
       me.selection.setCurrent( y );
-      me.selectionBackground.save( me.selection.getTop() - 20, me.selection.getBottom() + 6 );
-      me.selection.render();
+      var boundingBox = me.selection.render();
+      me.selectionBackground.setActiveArea(boundingBox.leftX, boundingBox.topY, boundingBox.width, boundingBox.height);
    }
 
    if ( this.isSelectionMode ) {
       drawSelection( y );
    } else {
-      this.cursorBackground.restore();
-      this.cursorBackground.save( y - 20, y + 6 );
-      this.renderCursor( y, this.ctx );
+      this.cursorBackground.clearActiveArea();
+      var boundingBox = this.renderCursor( y, this.ctx );
+      me.cursorBackground.setActiveArea(boundingBox.leftX, boundingBox.topY, boundingBox.width, boundingBox.height);
+
    }
 };
 
