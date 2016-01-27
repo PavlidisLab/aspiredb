@@ -857,7 +857,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       var ideogram = this.getComponent( 'ideogram' );
       var canvas = ideogram.getComponent( 'canvasBox' );
-      var imgsrc = canvas.el.dom.toDataURL( 'image/png' );
+      var imgsrc = canvas.el.dom.toDataURL( 'image/png', 1.0 );
 
       if ( imgsrc ) {
          ASPIREdb.IdeogramDownloadWindow.showIdeogramDownload( imgsrc );
