@@ -4,6 +4,7 @@ function dragPan(el) {
    if (event.button != 2) {
      return;
    }
+   var originalCursor = el.style.cursor;
    el.style.cursor = 'move';
    var x0 = event.screenX,
        y0 = event.screenY;
@@ -18,7 +19,7 @@ function dragPan(el) {
    function stopPan(event) {
      window.removeEventListener('mousemove', continuePan);
      window.removeEventListener('mouseup', stopPan);
-     el.style.cursor = 'default';
+     el.style.cursor = originalCursor;
    };
    window.addEventListener('mousemove', continuePan);
    window.addEventListener('mouseup', stopPan);

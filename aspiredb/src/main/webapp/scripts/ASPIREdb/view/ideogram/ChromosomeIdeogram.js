@@ -53,6 +53,8 @@ var ChromosomeIdeogram = function(ideogram, name, topY, leftX, chromosomeData) {
 	var zoom = ideogram.zoom;
 	var chromosomeBaseGap = ideogram.chromosomeBaseGap;
 	
+	this.name = name;
+	
 	
    this.zoom = zoom;
    this.topY = topY;

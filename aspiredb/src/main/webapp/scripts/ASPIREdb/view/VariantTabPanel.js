@@ -352,7 +352,9 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             this.deselectAllButton.hide();
             ideogram.showColourLegend();
             this.colourVariantByCombo.show();
-            this.zoomOutButton.show();
+            if (ideogram.zoom != 1) {
+            	this.zoomOutButton.show();
+            }
             this.zoomInButton.show();
             this.exportButton.show();
             this.saveButton.hide();
@@ -866,16 +868,16 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    },
 
    zoomInButtonHandler : function() {
-      this.zoomInButton.setVisible( false );
+//      this.zoomInButton.setVisible( false );
       this.zoomOutButton.setVisible( true );
       var ideogram = this.getComponent( 'ideogram' );
-      ideogram.changeZoom( 2, this.loadedVariants );
+      ideogram.changeZoom( ideogram.zoom+1, this.loadedVariants );
 
    },
 
    zoomOutButtonHandler : function() {
       this.zoomOutButton.setVisible( false )
-      this.zoomInButton.setVisible( true );
+//      this.zoomInButton.setVisible( true );
       var ideogram = this.getComponent( 'ideogram' );
       ideogram.changeZoom( 1, this.loadedVariants );
 
