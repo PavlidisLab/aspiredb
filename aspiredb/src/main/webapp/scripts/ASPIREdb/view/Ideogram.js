@@ -23,6 +23,9 @@ Ext.require( [ 'Ext.panel.Panel', 'Ext.Component', 'ASPIREdb.view.ideogram.Colou
  * Display variants in a karyotype display.
  */
 Ext.define( 'ASPIREdb.view.Ideogram', {
+	   /**
+	    * @memberOf ASPIREdb.view.Ideogram
+	    */
    extend : 'Ext.panel.Panel',
    alias : 'widget.ideogram',
    width : 600,
@@ -617,7 +620,7 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
          }
          // if subject labels
          if ( property instanceof SubjectLabelProperty ) {
-            subject = variant.subject;
+            var subject = variant.subject;
             if ( subject != null && subject.labels.length > 0 ) {
                propertyValues.push( subject.labels[0].name );
                // console.log( 'variant label name :' + subject.labels[0].name );
