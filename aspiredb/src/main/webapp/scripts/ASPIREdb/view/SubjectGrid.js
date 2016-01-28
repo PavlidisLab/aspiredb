@@ -575,6 +575,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       this.cancelBubble = true;
       this.getSelectionModel().deselectAll(); // calls selectionChangeHandler
       this.selectAllStatus = 'No';
+      ASPIREdb.EVENT_BUS.fireEvent( 'subject_selection_cleared' );
    },
 
    burdenAnalysisHandler : function() {

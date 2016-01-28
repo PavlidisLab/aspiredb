@@ -316,6 +316,9 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       // when subjects selected it is focused in variant grid
       ASPIREdb.EVENT_BUS.on( 'subject_selected', this.subjectSelectionHandler, this );
+      
+      ASPIREdb.EVENT_BUS.on( 'subject_selection_cleared', this.subjectSelectionClearedHandler, this );
+      
 
       this.saveButton.on( 'click', function() {
          ref.saveButtonHandler();
@@ -714,6 +717,12 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       this.ideogramSubjectSelection( subjectIds );
 
       grid.getView().refresh();
+   },
+   
+   subjectSelectionClearedHandler : function() {
+       var ideogram = this.getComponent( 'ideogram' );
+       ideogram.drawChromosomes();
+       ideogram.drawVariants( this.loadedVariants );
    },
 
    ideogramSubjectSelection : function(subjectIds) {
