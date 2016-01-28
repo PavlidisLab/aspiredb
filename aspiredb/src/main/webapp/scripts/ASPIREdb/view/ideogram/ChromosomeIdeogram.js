@@ -74,7 +74,8 @@ var ChromosomeIdeogram = function(ideogram, name, topY, leftX, chromosomeData) {
       zoom : zoom,
       chromosomeBaseGap : chromosomeBaseGap,
       displayWidth : this.displayWidth,
-      variantSeparationFactor : 1.2,
+      variantSeparationFactor : ideogram.variantSeparationFactor,
+      globalEmphasis : ideogram.globalVariantEmphasis,
    } );
    /* @type {IdeogramCursorLayer} */
    this.cursorLayer = new IdeogramCursorLayer( overlayCtx, selectionCtx, leftX, chromosomeData, this.chromosomeLayer );

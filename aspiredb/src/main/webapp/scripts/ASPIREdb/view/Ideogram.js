@@ -195,6 +195,10 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    chromosomeBaseGap : 35,
    
    chromosomeBaseWidth : 13,
+   
+   variantSeparationFactor : 1.2,
+   
+   globalVariantEmphasis : 1,
    /**
     * @private
     */
@@ -218,15 +222,23 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
 	       var offset = this.getOffset( event.browserEvent );
 	       var chromosomeIdeogram = this.findChromosomeIdeogram( offset.x, offset.y );
 	       
+	       if (chromosomeIdeogram == null) {
+	    	   return;
+	       }
+	       
 	       if (this.chromosomeOrder.length == 1) {
 	    	   this.chromosomeOrder = this.baseChromosomeOrder.slice();
-	    	   this.chromosomeBaseGap = (this.boxWidth - 55 - 5) / this.chromosomeOrder.length;
-	    	   this.changeZoom(1, this.variants);
+	    	   this.chromosomeBaseWidth = 13;
+	    	   this.variantSeparationFactor = 1.2;
+	    	   this.globalVariantEmphasis = 1;
 	       } else if ( chromosomeIdeogram != null ) {
-	    	   this.chromosomeOrder = [chromosomeIdeogram.name];  
-    	       this.chromosomeBaseGap = (this.boxWidth - 55 - 5) / this.chromosomeOrder.length;
-    	       this.changeZoom(1, this.variants);
+	    	   this.chromosomeOrder = [chromosomeIdeogram.name];
+    	       this.chromosomeBaseWidth = 26;
+	    	   this.variantSeparationFactor = 3;
+	    	   this.globalVariantEmphasis = 2;
 	       }  
+	       this.chromosomeBaseGap = (this.boxWidth - 55 - 5) / this.chromosomeOrder.length;
+    	   this.changeZoom(1, this.variants);
    },
    
 //   getOffset :  function(e) {

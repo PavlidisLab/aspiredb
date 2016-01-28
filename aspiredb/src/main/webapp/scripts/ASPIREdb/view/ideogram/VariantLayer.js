@@ -58,6 +58,7 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
       displayWidth : null,
       variantSeparationFactor : null,
       chromosomeBaseGap : null,
+      globalEmphasis : 1,
    },
 
    statics : {
@@ -596,15 +597,15 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 
       ctx.strokeStyle = segment.color;
       if ( segment.emphasize ) {
-         ctx.lineWidth = 5 * this.zoom;
+         ctx.lineWidth = 5 * this.zoom * this.globalEmphasis;
       } else {
-         ctx.lineWidth = 1 * this.zoom;
+         ctx.lineWidth = 1 * this.zoom * this.globalEmphasis;
       }
 
       ctx.beginPath();
       ctx.moveTo( x, yStart );
       ctx.lineTo( x, yEnd );
       ctx.stroke();
-      ctx.lineWidth = 1 * this.zoom;
+      ctx.lineWidth = 1 * this.zoom * this.globalEmphasis;
    }
 } );
