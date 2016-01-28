@@ -72,6 +72,38 @@
        });
     }
     
+    // Fix for bug EXTJS-13103, BufferedRender with shared store with hidden grid.
+    Ext.override(Ext.grid.plugin.BufferedRenderer, {
+
+
+        //listen to panel show to refresh
+        init: function(grid) {
+            var me = this;
+            me.callParent(arguments);
+            me.grid.on('show', me.onViewRefresh, me);
+        },
+
+
+        //if it is hidden do nothing
+        onViewRefresh: function() {
+            if(this.grid.isHidden()) return;
+            this.callParent(arguments);
+        },
+
+
+        //release the listener made on the override
+        destroy: function() {
+            var me = this,
+                grid = me.grid;
+
+
+            if (grid) {
+                grid.un('show', me.onViewRefresh, me);
+            }
+            this.callParent(arguments);
+        }
+    });
+    
     Ext.QuickTips.init();
 
     //Basic mask:
