@@ -862,10 +862,12 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 	   for (var k in temp) {
 		   r.push(k);
 	   }
+	   
+	   var grid = this.down( '#variantGrid' );
+	   
+	   grid.store.sort('genomeCoordinates', 'ASC');
        
        ASPIREdb.EVENT_BUS.fireEvent( 'select_subject_from_ideogram', r );
-       
-       var grid = this.down( '#variantGrid' );
        
        grid.selModel.select( records );
        
