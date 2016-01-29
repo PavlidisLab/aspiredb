@@ -362,7 +362,9 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
          chromosomeIdeogram.finishSelection( offset.y );
 
          var selection = chromosomeIdeogram.getSelection();
-         this.fireEvent( 'GenomeRegionSelectionEvent', selection );
+         if (selection!=null) {
+        	 this.fireEvent( 'GenomeRegionSelectionEvent', selection );
+         }
       }
    },
 

@@ -250,6 +250,8 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       ASPIREdb.EVENT_BUS.on( 'subject_label_updated', this.labelUpdateHandler, this );
 
       ASPIREdb.EVENT_BUS.on( 'select_subject_from_variant_grid', this.selectSubjectHandler, this );
+      
+      ASPIREdb.EVENT_BUS.on( 'select_subject_from_ideogram', this.selectSubjectHandler, this );
 
       // when subject label is shown
       ASPIREdb.EVENT_BUS.on( 'subject_label_changed', function() {
@@ -266,7 +268,11 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
       grid.getSelectionModel().deselectAll();
 
-      grid.selModel.select( grid.store.find( 'id', subjectIds[0] ) );
+      for (var i = 0; i < subjectIds.length; i++) {
+		var subj = subjectIds[i];
+		grid.selModel.select( grid.store.find( 'id', subj ), true );
+	  }
+      
 
       var selectedRecords = grid.getSelectionModel().getSelection();
       grid.getView().bufferedRenderer.scrollTo( grid.store.indexOfId( selectedRecords[0].data.id ) );

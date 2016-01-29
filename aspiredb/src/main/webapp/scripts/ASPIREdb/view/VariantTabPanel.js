@@ -848,7 +848,27 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    },
 
    ideogramSelectionChangeHandler : function(model, records) {
-
+	   var subjectStore = Ext.getStore( 'subjectStore' );
+	   var temp = {};
+	   for (var i = 0; i < records.length; i++) {
+		   var rec = records[i];
+	       var patientId = rec.get( 'patientId' );
+	       var subjectId = subjectStore.getAt( subjectStore.findExact( 'patientId', patientId ) ).get( 'id' )
+	       temp[subjectId] = true;
+	   }
+	   
+       // Unique subjects only
+	   var r = [];
+	   for (var k in temp) {
+		   r.push(k);
+	   }
+       
+       ASPIREdb.EVENT_BUS.fireEvent( 'select_subject_from_ideogram', r );
+       
+       var grid = this.down( '#variantGrid' );
+       
+       grid.selModel.select( records );
+       
       this.enableActionButtonsBySelectedRecords( records );
 
    },
