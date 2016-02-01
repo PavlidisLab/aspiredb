@@ -36,7 +36,7 @@ Ext.define( "ASPIREdb.view.VariantCompoundHeterozygoteWindow", {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'This shows those genes where more than one variant is found. Only those variants that are currently selected are used. Note that it is assumed that variants are heterozygotes since no parental genotypes are used in the calculation. Right-click on the compound heterozygotes of interest to create a variant label for the affected variants listed in the current row.'
+                     html: 'Identifies genes which have more than one variant in the same subject, which are candidates for compound heterozygosity. Only those variants that are currently selected are used. Note that it is assumed that variants are heterozygotes since no parental genotypes are used in the calculation. Right-click on the compound heterozygotes of interest to create a variant label for the affected variants listed in the current row.'
                  });
              }
          }

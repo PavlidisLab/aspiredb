@@ -51,14 +51,38 @@ Ext
                    afterrender: function(c) {
                        var toolTip = Ext.create('Ext.tip.ToolTip', {
                            target: c.getEl(),
-                           html: 'The Filter dialog box lets you select a subset of subjects, variants and phenotype by constructing complex and powerful queries. There are six types of filters to choose from in the "Add new:" drop down box. Please click the "Help" button or <a href="http://aspiredb.chibi.ubc.ca/manual/expression-filter/" target="_blank">here</a> for more details.',
+                           html: 'Select a subset of subjects and variants using flexible and powerful querying. There are six types of filters to choose from in the "Add new:" drop down box. Please click the "Help" button or <a href="http://aspiredb.chibi.ubc.ca/manual/expression-filter/" target="_blank">here</a> for more details.',
                            
-                           hideDelay: 5000
+                           dismissDelay: 0,
+                           showDelay: 0,
+                           autoHide: false
                    
                        }); 
-                       toolTip.on('mouseover', function(){
-                          toolTip.hideDelay = 10000;
-                       });
+                       toolTip.on('show', function(){
+
+                          var timeout;
+
+                          toolTip.getEl().on('mouseout', function(){
+                              timeout = window.setTimeout(function(){
+                                  toolTip.hide();
+                              }, 500);
+                          });
+
+                          toolTip.getEl().on('mouseover', function(){
+                              window.clearTimeout(timeout);
+                          });
+
+                          Ext.get(c.getEl()).on('mouseover', function(){
+                              window.clearTimeout(timeout);
+                          });
+
+                          Ext.get(c.getEl()).on('mouseout', function(){
+                              timeout = window.setTimeout(function(){
+                                  toolTip.hide();
+                              }, 500);
+                          });
+
+                      });
                        
                    }
                }
@@ -223,8 +247,9 @@ Ext
                                 items : [ {
                                    xtype : 'button',
                                    flex : 1,
-                                   text : 'Help',
+                                   text : 'Docs',
                                    itemId : 'helpButton',
+                                   tooltip: 'Navigate to the user manual (opens in a new tab).',
                                    handler : function() {
                                       window.open( 'http://aspiredb.chibi.ubc.ca/manual/expression-filter/' );
                                    },

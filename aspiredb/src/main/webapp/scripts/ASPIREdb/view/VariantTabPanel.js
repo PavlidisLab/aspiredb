@@ -44,7 +44,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'This panel shows the list of variants (CNV, SNV, indel, and inversion) for each subject. The list of variants can be displayed and selected using the Ideogram View or the Table View. Likewise, labels can also be assigned to a list of variants through the Labels menu.'
+                     html: 'Displays variants for subjects in a table and in an ideogram. The variants shown.'
                  });
              }
          }
@@ -107,7 +107,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             disabled : false,
             handler : this.labelManagerHandler,
             scope : this,
-            tooltip : 'Edit, delete or remove labels from selected variants.',            
+            tooltip : 'Edit labels for the selected variants.',            
          } ]
       } );
 
@@ -115,7 +115,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          text : '<b>Labels</b>',
          itemId : 'labelsButton',
          menu : this.labelsMenu,
-         tooltip: 'Labels allow the assignment of custom tags to a group of subjects or a group of variants. Labels can also be used in future queries.'
+         tooltip: 'Organize your subjects or variants using tags.'
       } );
 
       this.actionsMenu = Ext.create( 'Ext.menu.Menu', {
@@ -136,7 +136,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          }, {
             itemId : 'viewCompoundHeterozygotes',
             text : 'View compound heterozygotes',
-            tooltip: 'Shows those genes where more than one variant is found. Only those variants that are currently selected are used.',
+            tooltip: 'Identifies genes which have more than one variant in the same subject, which are candidates for compound heterozygosity. Only those variants that are currently selected are used.',
             disabled : true,
             handler : this.viewCompoundHeterozygotes,
             scope : this
@@ -147,7 +147,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          text : '<b>Actions</b>',
          itemId : 'actionsButton',
          menu : this.actionsMenu,
-         tooltip : 'UCSC Genome Browser, gene overlaps, and compound heterozygotes here.',
+         tooltip : 'Perform operations relating to variants.',
       } );
 
       this.reportButton = Ext.create( 'Ext.Button', {
@@ -1044,7 +1044,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                    afterrender: function(c) {
                        Ext.create('Ext.tip.ToolTip', {
                            target: c.getEl(),
-                           html: 'Here, you can create and apply a label to the selected group of subjects or variants. Enter a name and choose a color.'
+                           html: 'Create and apply a label to the selected group of subjects or variants. Enter a name and choose a color.'
                        });
                    }
                }

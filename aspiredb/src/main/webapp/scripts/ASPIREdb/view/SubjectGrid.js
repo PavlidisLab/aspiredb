@@ -43,7 +43,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'This panel shows the list of subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Ideogram view) and shows associated phenotypes (Phenoype panel).'
+                     html: 'Displays the subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Variant panel) and associated phenotypes (Phenotype panel).'
                  });
              }
          }
@@ -112,7 +112,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
    // flex : 1
    }, {
       text : "Labels",
-      tooltip : 'Labels allow the assignment of custom tags to a group of subjects or a group of variants. Labels can also be used in future queries.', 
+      tooltip : 'Organize your subjects or variants using tags.', 
       dataIndex : 'labelIds',
       // This is very slow we need to rethink this
       renderer : function(value, metaData, record, row, col, store, gridView) {
@@ -160,20 +160,20 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
             disabled : true,
             handler : this.makeLabelHandler,
             scope : this,
-            tooltip : 'Create or apply labels to selected subjects',            
+            tooltip : 'Create or apply labels to the selected subjects.',            
          }, {
             itemId : 'labelManager',
             text : 'Manage labels',
             disabled : false,
             handler : this.labelManagerHandler,
             scope : this,
-            tooltip : 'Edit, delete or remove labels from selected subjects',            
+            tooltip : 'Edit labels for the selected subjects.',            
          } ]
       } );
 
       this.labelsButton = Ext.create( 'Ext.button.Split', {
          text : '<b>Labels</b>',
-         tooltip : 'Labels allow the assignment of custom tags to a group of subjects or a group of variants. Labels can also be used in future queries.',
+         tooltip : 'Organize your subjects or variants using tags.',
          itemId : 'labelsButton',
          menu : this.labelsMenu
       } );
@@ -205,7 +205,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
          text : 'Burden analysis',
          handler : this.burdenAnalysisHandler,
          scope : this,
-         tooltip : 'Compare mutation burden between subject groups',
+         tooltip : 'Compare variant distribution in subject groups.',
          
       } );
 
@@ -418,7 +418,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
                    afterrender: function(c) {
                        Ext.create('Ext.tip.ToolTip', {
                            target: c.getEl(),
-                           html: 'Here, you can create and apply a label to the selected group of subjects or variants. Enter a name and choose a color.'
+                           html: 'Create and apply a label to the selected group of subjects or variants. Enter a name and choose a color.'
                        });
                    }
                }
@@ -546,7 +546,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
                    afterrender: function(c) {
                        Ext.create('Ext.tip.ToolTip', {
                            target: c.getEl(),
-                           html: 'Labels allow the assignment of custom tags to a group of subjects or a group of variants. Labels can also be used in future queries. Here, you can hide labels from the subject panel, edit labels and select new colours or edit label descriptions, remove labels from selected subjects or variants, and delete labels from the system.'
+                           html: 'Organize your subjects or variants using tags.'
                        });
                    }
                }

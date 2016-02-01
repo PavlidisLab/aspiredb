@@ -42,7 +42,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'This panel shows the list of all phenotypes that are associated with each subject. The column after Name shows the phenotype values for the selected Subject in the Subject Panel. The Value (subject count) column shows visualization of the number of subjects for each phenotype value and tool-tip of the chart indicates the number of subjects for each phenotype value. For example, if the Value (subject count) shows F(24) M(26) for the phenotype “Gender”, it means that there are a total of 24 female and 26 male subjects that are listed in the Subjects Panel.'
+                     html: 'Shows the phenotypes associated with each subject. If a subject is selected in the Subject Panel, the column after Name shows the phenotype values for that subject. The Value column shows the distribution of subjects for each phenotype; hover for details. For example, if the Value (subject count) shows F(24) M(26) for the phenotype “Gender”, it means that there are a total of 24 female and 26 male subjects that are listed in the Subjects Panel.'
                  });
              }
          }
@@ -96,7 +96,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
          text : 'Contingency table',
          disabled : 'true',
          itemId : 'contingencyTableButton',
-         tooltip : 'Create subject labels based on the selected phenotype',         
+         tooltip : 'Examine the relationship among up to three phenotypes.',         
       }, {
          xtype : 'tbfill',
       }, {

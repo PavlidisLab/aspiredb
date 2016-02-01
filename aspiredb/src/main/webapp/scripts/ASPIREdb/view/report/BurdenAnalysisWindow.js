@@ -36,7 +36,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'This tool allows you to compare various mutation characteristics (such as average mutation length, number of genes affected, etc.) between two mutually exclusive groups of subjects (as marked by Subject Labels). Those subjects which have both labels are excluded from the analysis. ASPIREdb will only include those subjects and variants that remained after filtering (if any) for burden analysis. There are three types of reports to choose from: length and genes overlapped, variant label, and characteristic.'
+                     html: 'Statistically compare mutation characteristics (such as average mutation length, number of genes affected, etc.) between two mutually exclusive groups of subjects (as identified by Subject Labels).'
                  });
              }
          }

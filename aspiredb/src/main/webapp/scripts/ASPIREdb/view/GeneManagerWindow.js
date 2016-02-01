@@ -42,7 +42,7 @@ Ext.define( 'ASPIREdb.view.GeneManagerWindow', {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'You can create gene sets here and use them with the Variant Filter feature (via the "Filter..." button). Making a gene set is a way of grouping related genes. For example, you can create an “autism genes” gene set which includes those genes that have been associated with autism spectrum disorder in the literature.'
+                     html: 'Create and edit gene sets. Gene sets can be used in filters.'
                  });
              }
          }

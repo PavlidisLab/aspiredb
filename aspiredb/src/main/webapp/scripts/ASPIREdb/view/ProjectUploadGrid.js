@@ -167,7 +167,26 @@ Ext
                      width : '100%',
                      bodyPadding : 5,
                      padding : '10 10 10 10',
-
+                     header: {
+                        items: [{
+                            xtype: 'image',       
+                            style:'right: auto; left: 0px; top: 6px;',          
+                            src: 'scripts/ASPIREdb/resources/images/qmark.png',     
+                            height: '14px',
+                            width: '15px',
+                            listeners: {
+                               afterrender: function(c) {
+                                   var toolTip = Ext.create('Ext.tip.ToolTip', {
+                                       target: c.getEl(),
+                                       html: 'Upload a variant file by clicking the Select button. Select the appropriate variant type, e.g. CNV, SNV, etc.',                        
+                                       showDelay: 0,                        
+                                   });                    
+                                   
+                               }
+                           }
+                        }],
+                        layout: 'fit'
+                    },
                      layout : 'anchor',
                      defaults : {
                         anchor : '100%'
@@ -328,7 +347,26 @@ Ext
                title : 'Upload phenotypes',
                bodyPadding : 5,
                padding : '10 10 10 10',
-
+               header: {
+                  items: [{
+                      xtype: 'image',       
+                      style:'right: auto; left: 0px; top: 6px;',          
+                      src: 'scripts/ASPIREdb/resources/images/qmark.png',     
+                      height: '14px',
+                      width: '15px',
+                      listeners: {
+                         afterrender: function(c) {
+                             var toolTip = Ext.create('Ext.tip.ToolTip', {
+                                 target: c.getEl(),
+                                 html: 'Upload a phenotype file by clicking the Select button.',                        
+                                 showDelay: 0,                        
+                             });                    
+                             
+                         }
+                     }
+                  }],
+                  layout: 'fit'
+              },
                layout : 'anchor',
                defaults : {
                   anchor : '100%'

@@ -193,7 +193,7 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          xtype : 'button',
          text : 'Filter...',
          itemId : 'filterButton',
-         tooltip : 'Apply expressions to filter subjects and variants',         
+         tooltip : 'Use queries to filter subjects and variants',         
          height : 30,
          margin : '5 5 5 5',
          handler : function() {
@@ -231,7 +231,7 @@ Ext.define( 'ASPIREdb.AspireDbPanel', {
          xtype : 'button',
          text : 'Gene Set Manager',
          itemId : 'geneManagerButton',
-         tooltip : 'Manage gene sets; created gene sets can be used to filter the variants with Variant Filter (via the "Filter..." button).',         
+         tooltip : 'Define or edit gene sets.',         
          height : 30,
          margin : '5 5 5 5',
          handler : function() {

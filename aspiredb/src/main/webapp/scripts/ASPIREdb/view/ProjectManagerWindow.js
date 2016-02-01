@@ -37,7 +37,7 @@ Ext.define( 'ASPIREdb.view.ProjectManagerWindow', {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'Create a project here.'
+                     html: 'Create, update, or delete projects.'
                  });
              }
          }

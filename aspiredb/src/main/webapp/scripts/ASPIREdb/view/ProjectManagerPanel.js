@@ -40,7 +40,27 @@ Ext.define( 'ASPIREdb.ProjectManagerPanel', {
       // width : '50%', // 480,
       split : true,
       collapsible : false,
-      title : 'Upload files to project'
+      title : 'Upload files to project',
+      header: {
+         items: [{
+             xtype: 'image',       
+             style:'right: auto; left: 0px; top: 6px;',          
+             src: 'scripts/ASPIREdb/resources/images/qmark.png',     
+             height: '14px',
+             width: '15px',
+             listeners: {
+                afterrender: function(c) {
+                    var toolTip = Ext.create('Ext.tip.ToolTip', {
+                        target: c.getEl(),
+                        html: 'Uploading files to existing projects will cause the uploaded data to be added to the project.',                        
+                        showDelay: 0,                        
+                    });                    
+                    
+                }
+            }
+         }],
+         layout: 'fit'
+     },
    },
 
    ],

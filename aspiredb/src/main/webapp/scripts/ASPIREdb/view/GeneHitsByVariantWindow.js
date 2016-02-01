@@ -36,7 +36,7 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'This shows the list of genes whose positions overlap with the selected variants. The list of genes are retrieved from the Ensembl database through BioMart. It is possible to filter genes by their type (protein_coding, pseudogene, etc).'
+                     html: 'The list of genes whose positions overlap with the selected variants. Uncheck "protein coding" to show more genes and use "Save as gene set" to create a set for later use.'
                  });
              }
          }

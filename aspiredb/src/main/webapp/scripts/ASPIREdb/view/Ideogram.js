@@ -29,7 +29,7 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    height : 600,
    autoScroll : true,
    title : 'Ideogram',
-   tooltip: 'A quick overview of where the variants are located in the genome.',  
+   tooltip: 'An overview of where the variants are located in the genome.',  
    closable : false,
    // resizable : true,
    layout : 'absolute',
