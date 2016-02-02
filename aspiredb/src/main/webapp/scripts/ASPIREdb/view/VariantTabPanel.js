@@ -305,20 +305,18 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       } );
 
       ASPIREdb.EVENT_BUS.on( 'property_changed', function(property) {
-         ref.property = [];
+         ref.property = []; // TODO WHY?
          ref.property = property;
       } );
 
       ASPIREdb.EVENT_BUS.on( 'subjects_loaded', function(subjectIds) {
-         ref.loadedSubjects = [];
+         ref.loadedSubjects = []; // TODO WHY?
          ref.loadedSubjects = subjectIds;
       } );
 
       // when subjects selected it is focused in variant grid
       ASPIREdb.EVENT_BUS.on( 'subject_selected', this.subjectSelectionHandler, this );
-      
-      ASPIREdb.EVENT_BUS.on( 'subject_selection_cleared', this.subjectSelectionClearedHandler, this );
-      
+            
 
       this.saveButton.on( 'click', function() {
          ref.saveButtonHandler();
@@ -455,10 +453,16 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             ref.down( '#statusbar' ).update( ref.loadedVariants.length + " / " + NoOfVariants + " variants loaded" );
          }
       } );
-
-      var ideogram = ref.getComponent( 'ideogram' );
-      ideogram.drawChromosomes();
-      ideogram.drawVariants( vvos );
+      
+      // refresh the legend (e.g. Variant Labels) in ideogram
+      if ( legendProperty == null ) {
+    	  legendProperty = new VariantTypeProperty();
+      }
+      
+      
+         ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', legendProperty );
+         ref.redrawIdeogram( legendProperty );
+      
 
       var d = new Date();
       GeneService.getGenesPerVariant( variantIds, {
@@ -495,13 +499,6 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       toolbar.add( ref.tbFill );
       toolbar.add( ref.saveButton );
       toolbar.add( ref.exportButton );
-
-      // refresh the legend (e.g. Variant Labels) in ideogram
-      if ( legendProperty != null ) {
-         ASPIREdb.EVENT_BUS.fireEvent( 'colorCoding_selected' );
-         ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', legendProperty );
-         ref.redrawIdeogram( legendProperty );
-      }
 
       // }
       // } );
@@ -609,82 +606,65 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       if ( ideogram.isVisible() ) {
          var selectedValue = records[0].data.id;
-         ASPIREdb.EVENT_BUS.fireEvent( 'colorCoding_selected' );
 
          switch (selectedValue) {
             case 'type': {
                var property = new VariantTypeProperty();
                property.name = 'type';
                property.displayName = 'Variant Type';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'cnvType': {
                var property = new CNVTypeProperty();
                property.name = 'cnvType';
                property.displayName = 'CNV Type';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'characteristics': {
                var property = new CharacteristicProperty();
                property.name = 'Characteristics';
                property.displayName = 'Characteristics';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'inheritance': {
                var property = new CharacteristicProperty();
                property.name = 'Inheritance';
                property.displayName = 'Inheritance';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'subjectLabels': {
                var property = new SubjectLabelProperty();
                property.name = 'Subject Labels';
                property.displayName = 'Subject Label';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'labels': {
                var property = new VariantLabelProperty();
                property.name = 'Labels';
                property.displayName = 'Variant Labels';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'commonCNV': {
                var property = new CharacteristicProperty();
                property.name = 'Common CNV';
                property.displayName = 'Common CNV';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'arrayReport': {
                var property = new CharacteristicProperty();
                property.name = 'Array Report';
                property.displayName = 'Array Report';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'arrayPlatform': {
                var property = new CharacteristicProperty();
                property.name = 'Array Platform';
                property.displayName = 'Array Platform';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
          }
+         ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
+         this.redrawIdeogram( property );
 
       }
 
@@ -695,10 +675,9 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
     */
    redrawIdeogram : function(property) {
       var ideogram = this.getComponent( 'ideogram' );
-
+      
       ideogram.setDisplayedProperty( property );
-      ideogram.drawChromosomes();
-      ideogram.drawColouredVariants( this.loadedVariants, false );
+      ideogram.redraw(this.loadedVariants);
       ideogram.showColourLegend();
    },
 
@@ -717,12 +696,6 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       this.ideogramSubjectSelection( subjectIds );
 
       grid.getView().refresh();
-   },
-   
-   subjectSelectionClearedHandler : function() {
-       var ideogram = this.getComponent( 'ideogram' );
-       ideogram.drawChromosomes();
-       ideogram.drawVariants( this.loadedVariants );
    },
 
    ideogramSubjectSelection : function(subjectIds) {
@@ -746,7 +719,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                subjectIDS.push( subjectValueObjects[i].id );
                patientIDS.push( subjectValueObjects[i].patientId );
             }
-            ideogram.drawVariantsWithSubjectsHighlighted( subjectIDS, ref.loadedVariants );
+            ideogram.selectedSubjectIds = subjectIDS;
+            ideogram.drawVariants(ref.loadedVariants);
 
          }
       } );
@@ -1029,7 +1003,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       var ideogram = this.getComponent( 'ideogram' );
 
-      var ideogramGenomicRange = ideogram.getSelection();
+      var ideogramGenomicRange = ideogram.getGenomicSelection();
 
       if ( ideogramGenomicRange == null ) {
          return [];

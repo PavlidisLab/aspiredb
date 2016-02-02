@@ -85,7 +85,7 @@ var ChromosomeIdeogram = function(ideogram, name, topY, leftX, chromosomeData) {
  * @public
  * @returns {*}
  */
-ChromosomeIdeogram.prototype.getSelection = function() {
+ChromosomeIdeogram.prototype.getGenomicSelection = function() {
    return this.cursorLayer.getSelectedRange();
 };
 
@@ -139,36 +139,9 @@ ChromosomeIdeogram.prototype.getDisplaySize = function() {
    return this.chromosomeLayer.getDisplaySize();
 };
 
-/**
- * @public
- * @param {VariantValueObject}
- *           variant
- * @param {PropertyValueObject}
- *           property
- */
-ChromosomeIdeogram.prototype.drawVariant = function(variant, property) {
-   this.variantLayer.drawVariant( variant, property );
-};
-
-/**
- * @public
- * @param {VariantValueObject}
- *           variant
- */
-ChromosomeIdeogram.prototype.drawDimmedVariant = function(variant) {
-   this.variantLayer.drawDimmedVariant( variant );
-};
-
-/**
- * @public
- * @param {VariantValueObject}
- *           variant
- * @param {PropertyValueObject}
- *           property
- */
-ChromosomeIdeogram.prototype.drawHighlightedVariant = function(variant, property) {
-   this.variantLayer.drawHighlightedVariant( variant, property );
-};
+ChromosomeIdeogram.prototype.betterDrawVariant = function(variant) {
+	   this.variantLayer.betterDrawVariant( variant );
+	};
 
 /**
  * @public
