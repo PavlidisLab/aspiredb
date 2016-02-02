@@ -16,8 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'Ext.panel.Panel', 'Ext.Component', 'ASPIREdb.view.ideogram.ColourLegend',
-              'ASPIREdb.view.ideogram.VariantLayer', 'ASPIREdb.ActiveProjectSettings' ] );
+Ext.require( [ 'Ext.panel.Panel', 'Ext.Component', 'ASPIREdb.view.ideogram.VariantLayer', 'ASPIREdb.ActiveProjectSettings' ] );
 
 /**
  * Display variants in a karyotype display.
@@ -67,40 +66,26 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
       x : 0,
       y : 0,
       style : {
-         'z-index' : '2'
+    	  'z-index' : '2'
       }
+   }, {
+	   xtype : 'component',
+	   autoEl : 'canvas',
+	   itemId : 'canvasBoxLegend',
+	   x : 0,
+	   y : 0,
+	   style : {
+		   'z-index' : '0'
+	   }
    } ],
 
    initComponent : function() {
       this.callParent();
 
-//      this.width = Math.round( this.boxWidth * this.zoom );
-      
-      // Default chromosomes
-      this.chromosomeOrder = this.baseChromosomeOrder.slice();
-      
-      // Scale chromosomeBaseGap for the number of chromosome being displayed
-      this.chromosomeBaseGap = (this.boxWidth - 55 - 5) / this.chromosomeOrder.length;
-      
-      this.width = Math.round( 5 + this.chromosomeBaseGap * this.chromosomeOrder.length * this.zoom + 55 );
-      this.height = Math.round( this.boxHeight * this.zoom );
-
-      this.colourLegend = Ext.create( 'ASPIREdb.view.ideogram.ColourLegend' );
-
-      this.fetchChromosomeInfo();
-
-      // deafult : set the display property to variant type property
-      this.setDisplayedProperty( new VariantTypeProperty() );
-
       this.on( 'afterrender', this.registerMouseEventListeners, this );
+      this.on( 'afterrender', this.initAfterRender, this );
 
-      var me = this;
-      ChromosomeService.getChromosomes( {
-         callback : function(chromosomeValueObjects) {
-            me.chromosomeValueObjects = chromosomeValueObjects;
-            me.drawChromosomes();
-         }
-      } );
+
       
       ASPIREdb.EVENT_BUS.on( 'property_changed', this.setDisplayedProperty, this);
 
@@ -110,6 +95,43 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
 
    },
    
+   initAfterRender : function() {
+	   this.ctx = this.getComponent( "canvasBox" ).getEl().dom.getContext( '2d' );
+	   this.ctxOverlay = this.getComponent( "canvasBoxOverlay" ).getEl().dom.getContext( '2d' );
+	   this.ctxSelection = this.getComponent( "canvasBoxSelection" ).getEl().dom.getContext( '2d' );
+	   this.ctxLegend = this.getComponent( "canvasBoxLegend" ).getEl().dom.getContext( '2d' );
+	   
+//	   this.width = Math.round( this.boxWidth * this.zoom );
+	   
+	   this.colourLegend = new ColourLegend(this.ctxLegend);
+
+	   // deafult : set the display property to variant type property
+	   this.setDisplayedProperty( new VariantTypeProperty() );
+
+	   this.colourLegend.setColourCode(this.displayedProperty);
+
+	   // Default chromosomes
+	   this.chromosomeOrder = this.baseChromosomeOrder.slice();
+
+	   // Scale chromosomeBaseGap for the number of chromosome being displayed
+	   this.chromosomeBaseGap = (this.boxWidth - 55 - 5) / this.chromosomeOrder.length;
+
+	   this.width = Math.round( 5 + this.chromosomeBaseGap * this.chromosomeOrder.length * this.zoom + 55 );
+	   this.height = Math.round( this.boxHeight * this.zoom );
+
+
+
+	   this.fetchChromosomeInfo();
+
+	   var me = this;
+	   ChromosomeService.getChromosomes( {
+		   callback : function(chromosomeValueObjects) {
+			   me.chromosomeValueObjects = chromosomeValueObjects;
+			   me.drawChromosomes();
+		   }
+	   } );
+   },
+
    subjectSelectionClearedHandler : function() {
        this.selectedSubjectIds = [];
        this.redraw();
@@ -397,21 +419,6 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    },
 
    /**
-    * @public
-    */
-   showColourLegend : function() {
-      this.colourLegend.show();
-   },
-
-   /**
-    * @public
-    */
-   hideColourLegend : function() {
-      this.colourLegend.hide();
-   },
-
-
-   /**
     * TODO: update callers (zoom() -> changeZoom())
     * 
     * @public
@@ -491,21 +498,23 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
     */
    initCanvasSize : function() {
 	   var me = this;
-	   function prepCanvas(itemId) {
-		   var canvasBox = me.getComponent( itemId );
-		   var ctx = canvasBox.getEl().dom.getContext( '2d' );
+	   function prepCanvas(ctx) {
 		   
-	       canvasBox.getEl().dom.height = me.height; // + "px";
-	       canvasBox.getEl().dom.width = me.width; // + "px";
+	       ctx.canvas.height = me.height; // + "px";
+	       ctx.canvas.width = me.width; // + "px";
 	       
 	       ctx.clearRect( 0, 0, me.width, me.height );
 		   return ctx;
 	   }
 	   
-      this.ctx = prepCanvas( "canvasBox" );
-      this.ctxOverlay = prepCanvas( "canvasBoxOverlay" );
-      this.ctxSelection = prepCanvas( "canvasBoxSelection" );
-	   
+      prepCanvas( this.ctx );
+      prepCanvas( this.ctxOverlay );
+      prepCanvas( this.ctxSelection );
+      
+      this.ctxLegend.canvas.height = 400;
+      this.ctxLegend.canvas.width = 200;
+	  this.ctxLegend.canvas.style.left = this.width;
+	  this.ctxLegend.canvas.style.top = 20;
    },
 
    /**

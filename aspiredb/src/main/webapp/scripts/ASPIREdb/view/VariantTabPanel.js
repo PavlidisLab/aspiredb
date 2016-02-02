@@ -244,6 +244,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          queryMode : 'local',
          editable : false,
          forceSelection : true,
+         value : 'type',
       } );
 
       this.colourVariantByCombo.on( 'select', this.colourVariantByHandler, this );
@@ -351,7 +352,6 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             currentlySelectedRecords = this.getIdeogramVariantRecordSelection();
             this.selectAllButton.hide();
             this.deselectAllButton.hide();
-            ideogram.showColourLegend();
             this.colourVariantByCombo.show();
             if (ideogram.zoom != 1) {
             	this.zoomOutButton.show();
@@ -365,7 +365,6 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             currentlySelectedRecords = this.getSelectedVariants();
             this.selectAllButton.show();
             this.deselectAllButton.show();
-            ideogram.hideColourLegend();
             this.colourVariantByCombo.hide();
             this.zoomOutButton.hide();
             this.zoomInButton.hide();
@@ -585,16 +584,15 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       // this.filterSubmitHandler( this.filterConfigs );
       var ideogram = this.getComponent( 'ideogram' );
 
-      if ( ideogram.colourLegend.isVisible() ) {
-         ideogram.hideColourLegend();
-
-         var property = new SubjectLabelProperty();
-         property.name = 'Subject Labels';
-         property.displayName = 'Subject Label';
-         // ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
-         this.redrawIdeogram( property );
-
-      }
+//      if ( ideogram.colourLegend.isVisible() ) {
+//
+//         var property = new SubjectLabelProperty();
+//         property.name = 'Subject Labels';
+//         property.displayName = 'Subject Label';
+//         // ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
+//         this.redrawIdeogram( property );
+//
+//      }
    },
 
    /**
@@ -678,7 +676,6 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       
       ideogram.setDisplayedProperty( property );
       ideogram.redraw(this.loadedVariants);
-      ideogram.showColourLegend();
    },
 
    /**
