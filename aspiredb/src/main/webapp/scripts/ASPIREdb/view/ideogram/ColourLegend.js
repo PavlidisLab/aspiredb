@@ -33,12 +33,13 @@ var ColourLegend = function(ctx) {
 }
 
 
-ColourLegend.prototype.assignColor = function(variantType, defaultColor){//, htmlLabel) {
+ColourLegend.prototype.assignColor = function(variantType, defaultColor, displayName){//, htmlLabel) {
 	var colour;
 	if ( this.characteristicList.length == 0 || ( ( colour = this.characteristicList[variantType] ) == undefined ) ) {
 		colour = defaultColor == undefined ? this.colors[this.nextColourIndex] : defaultColor;
+		displayName = displayName == undefined ? variantType : displayName;
 //		this.valueToColourMap.push( htmlLabel == undefined ? [ "<font color='" + colour + "'>" + variantType + "</font><br>\n" ] : [htmlLabel] );
-		this.characteristicList[variantType] = colour;
+		this.characteristicList[variantType] = {colour:colour, displayName: displayName};
 		this.nextColourIndex++;
 	}
 	return colour;
@@ -74,7 +75,7 @@ ColourLegend.prototype.setColourCode = function(property) {
 		this.baseColourPicker = function(variant) {
 			if ( variant.labels.length > 0 ) {
 				// Adding a ~ character to prevent users creating labels such as 'No Label' and screwing with the color picking
-				return me.assignColor("~" + variant.labels[0].name, '#' + variant.labels[0].colour);//, ASPIREdb.view.LabelControlWindow.getHtmlLabel( variant.labels[0] ) + "<br>\n");
+				return me.assignColor("~" + variant.labels[0].name, '#' + variant.labels[0].colour, variant.labels[0].name);//, ASPIREdb.view.LabelControlWindow.getHtmlLabel( variant.labels[0] ) + "<br>\n");
 			} else {
 				return me.assignColor('No Label', '#303030');
 			}
@@ -88,7 +89,7 @@ ColourLegend.prototype.setColourCode = function(property) {
 			var subject = variant.subject;
 			if ( subject != null && subject.labels.length > 0 ) {
 				// Adding a ~ character to prevent users creating labels such as 'No Label' and screwing with the color picking
-				return me.assignColor("~" + subject.labels[0].name, '#' + subject.labels[0].colour);//, ASPIREdb.view.LabelControlWindow.getHtmlLabel( subject.labels[0] ) + "<br>\n");
+				return me.assignColor("~" + subject.labels[0].name, '#' + subject.labels[0].colour, subject.labels[0].name);//, ASPIREdb.view.LabelControlWindow.getHtmlLabel( subject.labels[0] ) + "<br>\n");
 			} else {
 				return me.assignColor('No Label', '#303030');
 			}
@@ -125,8 +126,8 @@ ColourLegend.prototype.getColour = function(variant) {
 ColourLegend.prototype.measureWidth = function() {
 	var maxWidth = 0;
 	for (var legendEntry in this.characteristicList) {
-
-		var w = this.ctx.measureText(legendEntry).width + 45;
+		var displayName = this.characteristicList[legendEntry].displayName;
+		var w = this.ctx.measureText(displayName).width + 45;
 
 		maxWidth = w > maxWidth ? w : maxWidth;
 
@@ -151,14 +152,14 @@ ColourLegend.prototype.refresh = function() {
 	var entries = 5;
 	var entryHeight = 20;
 	i = 0;
-	for (var legendEntry in this.characteristicList) {
-
-		ctx.fillStyle = this.characteristicList[legendEntry];
+	for (var legendEntryKey in this.characteristicList) {
+		var legendEntry = this.characteristicList[legendEntryKey];
+		ctx.fillStyle = legendEntry.colour;
 		ctx.fillRect(legendX + 5,legendY + 5 + entryHeight*i, 10, 10);
 
 		ctx.fillStyle = "black";
-		ctx.fillText(legendEntry, legendX + 35, legendY + 10 + entryHeight*i);
-		var w = ctx.measureText(legendEntry).width + 35;
+		ctx.fillText(legendEntry.displayName, legendX + 35, legendY + 10 + entryHeight*i);
+		var w = ctx.measureText(legendEntry.displayName).width + 35;
 
 		maxwidth = w > maxwidth ? w : maxwidth;
 		i++;
