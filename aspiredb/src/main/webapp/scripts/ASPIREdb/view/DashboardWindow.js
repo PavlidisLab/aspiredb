@@ -17,7 +17,7 @@
  *
  */
 Ext.require( [ 'Ext.Window', 'ASPIREdb.view.ProjectManagerWindow', 'ASPIREdb.view.UserManagerWindow' ] );
-
+var projSel = 0;
 /**
  * Display list of projects to load.
  */
@@ -25,7 +25,23 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
    extend : 'Ext.Window',
    alias : 'widget.dashboardWindow',
    id : 'dashboardWindow',
-   singleton : true,   
+   singleton : true,
+   title : 'Dashboard',
+   closable : true,
+   closeAction : 'hide',
+   width : 400,
+   height : 250,
+   modal : true,   
+   layout : {
+      type : 'vbox',
+      align : 'center'
+   },
+   listeners:{
+      'hide':function(win){     
+         if(projSel==0)
+            Ext.MessageBox.alert( 'Tip', 'Click Dashboard at the top of the page to select or create a new project.', function(){});            
+       },
+   },
    header: {
       items: [{
           xtype: 'image',       
@@ -35,27 +51,17 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
           width: '15px',
           listeners: {
              afterrender: function(c) {
-                 Ext.create('Ext.tip.ToolTip', {
+                 var toolTip = Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'Choose or create a project here.'
-                 });
+                     html: 'Choose a project from the dropdown or select Manage Projects to create a new one.',
+                     dismissDelay: 0,
+                     showDelay: 0,                     
+                 });                 
              }
          }
       }],
       layout: 'fit'
-  }, 
-   title : 'Dashboard',
-   closable : true,
-   closeAction : 'hide',
-   width : 400,
-   height : 250,
-   modal : true,
-   closable: false,   
-   
-   layout : {
-      type : 'vbox',
-      align : 'center'
-   },
+  },   
    bodyStyle : 'padding: 5px;',
    border : false,
 
@@ -72,7 +78,7 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
 
    initComponent : function() {
 
-      this.callParent();      
+      this.callParent();
       this.enableToolbar();
       var ref = this;
       var projectStore = Ext.create( 'Ext.data.Store', {
@@ -136,6 +142,7 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
                projectComboBox.setActiveError( 'Please select project' );
                return;
             } else {
+               projSel = 1;
                var selectedProjectId = projectComboBox.getValue();
                // TODO : Now only one project is loaded at a time, but in future this might change
                if ( selectedProjectId != ref.activeProjectIds[0] ) {
@@ -181,7 +188,6 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
       this.add( okButton );
 
       ASPIREdb.EVENT_BUS.on( 'project_list_updated', ref.refreshDashboardHandler, ref );
-      
 
    },
    /**
@@ -196,7 +202,7 @@ Ext.define( 'ASPIREdb.view.DashboardWindow', {
          xtype : 'button',
          id : 'manageProject',
          text : 'Manage Projects',
-         tooltip : 'Get started here.',         
+         tooltip : 'Upload variants or upload phenotypes',         
          icon : 'scripts/ASPIREdb/resources/images/icons/wrench.png',
          handler : function() {
             ASPIREdb.view.ProjectManagerWindow.initGridAndShow();
