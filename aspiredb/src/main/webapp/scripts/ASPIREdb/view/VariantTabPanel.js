@@ -44,7 +44,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'Displays variants for subjects in a table and in an ideogram. The variants shown.'
+                     html: 'Displays variants associated with the subjects shown in the Subject panel.'
                  });
              }
          }
@@ -122,14 +122,14 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          items : [ {
             itemId : 'viewInUCSC',
             text : 'View in UCSC Genome Browser',
-            tooltip: 'Displays the selected variants as ASPIREdb tracks in the UCSC Genome Browser in a new window. The UCSC Genome Browser provides tracks for various biological annotations which includes RefSeq genes, common SNPs, spliced ESTs, sequence conservation, DGV structural variants and more.',
+            tooltip: 'Displays the selected variants as ASPIREdb tracks in the UCSC Genome Browser in a new window.',
             disabled : true,
             handler : this.viewInUCSCHandler,
             scope : this
          }, {
             itemId : 'viewGenes',
             text : 'View genes',
-            tooltip: 'Opens a window with the list of genes whose positions overlap with the selected variants.',
+            tooltip: 'Opens a window with the list of genes that overlap with the selected variants.',
             disabled : true,
             handler : this.viewGenesHandler,
             scope : this
@@ -1098,6 +1098,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                    afterrender: function(c) {
                        Ext.create('Ext.tip.ToolTip', {
                            target: c.getEl(),
+                           autoHide: false,
                            html: 'Labels allow the assignment of custom tags to a group of subjects or a group of variants. Labels can also be used in future queries. Here, you can hide labels from the variant panel, edit labels and select new colours or edit label descriptions, remove labels from selected subjects or variants, and delete labels from the system.'
                        });
                    }

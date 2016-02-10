@@ -36,7 +36,7 @@ Ext.define( 'ASPIREdb.view.GeneHitsByVariantWindow', {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'The list of genes whose positions overlap with the selected variants. Uncheck "protein coding" to show more genes and use "Save as gene set" to create a set for later use.'
+                     html: 'The genes that overlap with the selected variants. Protein coding genes are shown by default (uncheck the checkbox to show all). Use "Save as gene set" to create a set for later use.'
                  });
              }
          }

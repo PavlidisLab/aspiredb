@@ -42,7 +42,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'Shows the phenotypes associated with each subject. If a subject is selected in the Subject Panel, the column after Name shows the phenotype values for that subject. The Value column shows the distribution of subjects for each phenotype; hover for details. For example, if the Value (subject count) shows F(24) M(26) for the phenotype “Gender”, it means that there are a total of 24 female and 26 male subjects that are listed in the Subjects Panel.'
+                     html: 'Displays phenotypes associated with the subjects shown in the Subject panel. Selecting a subject (by clicking on it) shows the phenotype values for that subject (middle column).'
                  });
              }
          }

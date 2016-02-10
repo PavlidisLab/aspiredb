@@ -43,7 +43,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'Displays the subjects that meet currently configured query criteria (‘Filter‘ button). Selecting a row (by clicking on it) highlights variants belonging to this subject (Variant panel) and associated phenotypes (Phenotype panel).'
+                     html: 'Displays the subjects that meet current query criteria (\'Filter\' button). Selecting a subject highlights associated variants (Variant panel) and shows phenotype values (Phenotype panel).'
                  });
              }
          }
@@ -418,7 +418,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
                    afterrender: function(c) {
                        Ext.create('Ext.tip.ToolTip', {
                            target: c.getEl(),
-                           html: 'Create and apply a label to the selected group of subjects or variants. Enter a name and choose a color.'
+                           html: 'Create and apply a label to the subjects selected in the Subject panel.'
                        });
                    }
                }

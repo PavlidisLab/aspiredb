@@ -51,7 +51,7 @@ Ext
                    afterrender: function(c) {
                        var toolTip = Ext.create('Ext.tip.ToolTip', {
                            target: c.getEl(),
-                           html: 'Select a subset of subjects and variants using flexible and powerful querying. There are six types of filters to choose from in the "Add new:" drop down box. Please click the "Help" button or <a href="http://aspiredb.chibi.ubc.ca/manual/expression-filter/" target="_blank">here</a> for more details.',
+                           html: 'Choose a filter type from the \"Add new:\" drop down box. Please click the "Help" button or <a href="http://aspiredb.chibi.ubc.ca/manual/expression-filter/" target="_blank">here</a> for more details.',
                            
                            dismissDelay: 0,
                            showDelay: 0,

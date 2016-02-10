@@ -34,7 +34,7 @@ Ext.define( 'ASPIREdb.view.PhenotypesContigencyTableWindow', {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'This shows all the possible phenotype values for the selected phenotypes (up to three) and the number of subjects that meets those criteria. Use the tag icon to create a Subject Label based on any of the phenotype combinations.'
+                     html: 'This shows all the possible combinations of phenotype values for the selected phenotypes and the number of subjects that meets those criteria. Use the tag icon to create a Subject Label based on any of the phenotype combinations.'
                  });
              }
          }
