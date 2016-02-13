@@ -524,13 +524,13 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    findChromosomeIdeogram : function(x, y) {
       if ( x < 5 )
          return null;
-      var index = Math.round( (x - 20) / (this.chromosomeBaseGap * this.zoom) + 1 );
+      var index = Math.floor( (x - 5) / (this.chromosomeBaseGap * this.zoom) );
       
-      if (index > this.chromosomeOrder.length) {
+      if (index > this.chromosomeOrder.length - 1) {
     	  return null;
       }
 
-      var name = this.chromosomeOrder[index - 1]   
+      var name = this.chromosomeOrder[index]   
       
 //      if ( index > 24 )
 //         return null;
