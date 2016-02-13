@@ -34,15 +34,16 @@ var ColourLegend = function(ctx) {
 
 
 ColourLegend.prototype.assignColor = function(variantType, defaultColor, displayName){//, htmlLabel) {
-	var colour;
-	if ( this.characteristicList.length == 0 || ( ( colour = this.characteristicList[variantType] ) == undefined ) ) {
-		colour = defaultColor == undefined ? this.colors[this.nextColourIndex] : defaultColor;
+	var colourTag;
+	if ( this.characteristicList.length == 0 || ( ( colourTag = this.characteristicList[variantType] ) == undefined ) ) {
+		var colour = defaultColor == undefined ? this.colors[this.nextColourIndex] : defaultColor;
 		displayName = displayName == undefined ? variantType : displayName;
 //		this.valueToColourMap.push( htmlLabel == undefined ? [ "<font color='" + colour + "'>" + variantType + "</font><br>\n" ] : [htmlLabel] );
-		this.characteristicList[variantType] = {colour:colour, displayName: displayName};
+		colourTag = {colour:colour, displayName: displayName};
+		this.characteristicList[variantType] = colourTag;
 		this.nextColourIndex++;
 	}
-	return colour;
+	return colourTag;
 };
 
 //sets the display property and creates a baseColourPicker that will be used on each variant
@@ -117,10 +118,12 @@ ColourLegend.prototype.setColourCode = function(property) {
 
 ColourLegend.prototype.getColour = function(variant) {
 
-	if ( this.displayProperty == null || this.baseColourPicker == null )
+	if ( this.displayProperty == null || this.baseColourPicker == null ) {
+		console.log("Null DisplayProperty or baseColourPicker");
 		return this.defaultColour;
+	}
 
-	return this.baseColourPicker(variant);
+	return this.baseColourPicker(variant).colour;
 };
 
 ColourLegend.prototype.measureWidth = function() {
