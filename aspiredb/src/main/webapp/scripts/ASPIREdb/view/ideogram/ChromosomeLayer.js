@@ -99,6 +99,9 @@ ChromosomeLayer.prototype.getDisplaySize = function() {
  * @returns {number}
  */
 ChromosomeLayer.prototype.convertToDisplayCoordinates = function(baseCoordinate, displayScaleFactor) {
+	if (displayScaleFactor == undefined) {
+		displayScaleFactor = this.displayScaleFactor;
+	}
    var coordinate = baseCoordinate / displayScaleFactor;
    // is it on short or long arm?
    if ( baseCoordinate > this.centromerePosition ) {

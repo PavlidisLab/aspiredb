@@ -235,6 +235,8 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    variantSeparationFactor : 1.2,
    
    globalVariantEmphasis : 1,
+   
+   isChromosomeIsolated : false,
    /**
     * @private
     */
@@ -267,11 +269,13 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
 	    	   this.chromosomeBaseWidth = 13;
 	    	   this.variantSeparationFactor = 1.2;
 	    	   this.globalVariantEmphasis = 1;
+	    	   this.isChromosomeIsolated = false;
 	       } else if ( chromosomeIdeogram != null ) {
 	    	   this.chromosomeOrder = [chromosomeIdeogram.name];
     	       this.chromosomeBaseWidth = 26;
 	    	   this.variantSeparationFactor = 3;
 	    	   this.globalVariantEmphasis = 2;
+	    	   this.isChromosomeIsolated = true;
 	       }  
 	       this.chromosomeBaseGap = (this.boxWidth - 55 - 5) / this.chromosomeOrder.length;
     	   this.changeZoom(1, this.variants);
@@ -348,6 +352,9 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
             }
          }
          chromosomeIdeogram.drawCursor( offset.y );
+         if (this.isChromosomeIsolated) {
+        	 chromosomeIdeogram.drawVariantInfo(offset, event.browserEvent);
+         }
       } else {
          if ( this.previousChromosome !== null ) {
             this.previousChromosome.clearCursor();

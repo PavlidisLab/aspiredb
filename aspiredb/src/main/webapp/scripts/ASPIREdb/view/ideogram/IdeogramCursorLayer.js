@@ -40,6 +40,19 @@ var IdeogramCursorLayer = function(ctx, selectionCtx, leftX, chromosomeData, chr
 
    this.cursorBackground = new Background(ctx);
    this.selectionBackground = new Background(selectionCtx);
+   this.cfg = {
+		  redLineWidth : 30,
+		  fontSizeInPixels : 12,
+		  font: '12px sans-serif',
+   };
+   
+   this.previousBand = {name:""};
+   
+   var me = this;
+   
+   this.clearPreviousBand = function() {
+	   me.previousBand = {name:""};
+   }
 
    /**
     * @public
@@ -71,6 +84,7 @@ var IdeogramCursorLayer = function(ctx, selectionCtx, leftX, chromosomeData, chr
       this.clearActiveArea = function() {
     	  // clear active box
     	  ctx.clearRect(x, y, boxWidth, boxHeight);
+    	  me.clearPreviousBand();
       };
       
       this.setActiveArea = function(leftX, topY, width, height) {
@@ -84,10 +98,11 @@ var IdeogramCursorLayer = function(ctx, selectionCtx, leftX, chromosomeData, chr
       this.clear = function() {
     	  // clear entire background
     	  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    	  me.clearPreviousBand();
       };
    }
 
-   var me = this;
+   
    /**
     * @type {{}}
     */
@@ -162,6 +177,21 @@ var IdeogramCursorLayer = function(ctx, selectionCtx, leftX, chromosomeData, chr
          this.end = 0;
       }
    };
+   
+   this.getBand = function(y) {
+	      var base = this.chromosomeLayer.convertToBaseCoordinate( y );
+	      for ( var bandName in this.chromosomeData.bands) {
+	         var band = this.chromosomeData.bands[bandName];
+	         if ( band.start < base && band.end > base ) {
+	            return band;
+	         }
+	      }
+	      return {name:""};
+	   };
+   
+   this.getBandName = function(y) {
+	   return this.getBand(y).name;
+   };
 };
 
 /**
@@ -172,33 +202,21 @@ IdeogramCursorLayer.prototype.getSelectedRange = function() {
 };
 
 IdeogramCursorLayer.prototype.renderCursor = function(y, ctx) {
-   var me = this;
-   var getBandName = function(y) {
-      var base = me.chromosomeLayer.convertToBaseCoordinate( y );
-      for ( var bandName in me.chromosomeData.bands) {
-         var band = me.chromosomeData.bands[bandName];
-         if ( band.start < base && band.end > base ) {
-            return band.name;
-         }
-      }
-      return "";
-   };
    
-   var redLineWidth = 30;
-   var fontSizeInPixels = 12;
+
    var x = this.getLeftX();
 
    ctx.fillStyle = "red";
-   ctx.fillRect( x, y, redLineWidth - 1, 1 );
+   ctx.fillRect( x, y, this.cfg.redLineWidth - 1, 1 );
 
-   var cursorLabel = this.chromosomeData.name + ":" + getBandName( y );
+   var cursorLabel = this.chromosomeData.name + ":" + this.getBandName( y );
 
 //   this.ctx.strokeStyle = "black";
 //   this.ctx.strokeText( cursorLabel, this.getLeftX() + 30, y );
    
-   var textX = x + redLineWidth;
+   var textX = x + this.cfg.redLineWidth;
    
-   ctx.font= fontSizeInPixels + 'px sans-serif';
+   ctx.font= this.cfg.font;
    
    ctx.strokeStyle = 'dark grey';
    ctx.fillStyle = "white";
@@ -221,10 +239,15 @@ IdeogramCursorLayer.prototype.renderCursor = function(y, ctx) {
 	ctx.textBaseline = textAlignBaseline;
 	
 	// approximate bounding box of text, 50% buffer
-	var aWidth = 1.5*(redLineWidth + ctx.measureText(cursorLabel).width);
-	var aHeight = 1.5*fontSizeInPixels;
+	// Removed for performance reasons
+//	var aWidth = 1.5*(this.cfg.redLineWidth + ctx.measureText(cursorLabel).width);
+//	var aHeight = 1.5*this.cfg.fontSizeInPixels;
+//	var aWidth = 150;
+//	var aHeight = 18;
 	
-	return {leftX:x, topY:y - aHeight/2 , width:aWidth, height: aHeight}
+//	console.log(aWidth, aHeight);
+	
+	return {leftX: x, topY:y - 9 , width:150, height: 18}
 };
 
 IdeogramCursorLayer.prototype.drawCursor = function(y) {
@@ -240,9 +263,17 @@ IdeogramCursorLayer.prototype.drawCursor = function(y) {
    if ( this.isSelectionMode ) {
       drawSelection( y );
    } else {
-      this.cursorBackground.clearActiveArea();
-      var boundingBox = this.renderCursor( y, this.ctx );
-      me.cursorBackground.setActiveArea(boundingBox.leftX, boundingBox.topY, boundingBox.width, boundingBox.height);
+		var band = this.getBand( y );
+				
+		if ( band.name != this.previousBand.name) {
+		      this.cursorBackground.clearActiveArea();
+		      var midBand = Math.round(this.chromosomeLayer.convertToDisplayCoordinates((band.start + band.end ) / 2));
+		      var boundingBox = this.renderCursor( midBand , this.ctx );
+		      me.cursorBackground.setActiveArea(boundingBox.leftX, boundingBox.topY, boundingBox.width, boundingBox.height);
+		      
+		}
+		this.previousBand = band;
+
 
    }
 };
@@ -252,7 +283,7 @@ IdeogramCursorLayer.prototype.clearCursor = function() {
       this.clearSelection();
    } else {
 //      this.cursorBackground.restore();
-      this.cursorBackground.clear();
+      this.cursorBackground.clearActiveArea();
    }
 };
 

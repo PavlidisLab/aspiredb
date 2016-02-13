@@ -150,3 +150,7 @@ ChromosomeIdeogram.prototype.drawChromosome = function() {
    this.variantLayer.clearTracks();
    this.chromosomeLayer.drawChromosome();
 };
+
+ChromosomeIdeogram.prototype.drawVariantInfo = function(offset, event) {
+	   return this.variantLayer.drawVariantInfo(offset, event);
+};
