@@ -49,6 +49,8 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 		this.createTracks( this.numberOfTracks );
 		this.missingVariants = [];
 		this.previousEmphasizedSegment = null;
+		
+		this.self.hideTipCtx();
 
 		return this;
 	},
@@ -57,13 +59,15 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 		
 		tipCtx : null,
 		
+		tipHidden: true,
+		
 		createTipCtx : function() {
 			var ttipCanvas =  document.createElement("canvas");
 			ttipCanvas.style.position = "absolute";
 			ttipCanvas.width = 275;
 			ttipCanvas.height = 95;
 			
-			ttipCanvas.style.left = "-200px";
+			ttipCanvas.style.left = "-300px";
 			ttipCanvas.style.top = "100px";
 			ttipCanvas.style.backgroundColor = "ivory";
 			ttipCanvas.style.border = "1px solid black";
@@ -90,15 +94,18 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 		},
 		
 		hideTipCtx : function() {
-			
-			var ctx = ASPIREdb.view.ideogram.VariantLayer.getTipCtx();
-			ctx.canvas.style.left = "-300px";
+			if (!ASPIREdb.view.ideogram.VariantLayer.tipHidden) {
+				var ctx = ASPIREdb.view.ideogram.VariantLayer.getTipCtx();
+				ctx.canvas.style.left = "-300px";
+				ASPIREdb.view.ideogram.VariantLayer.tipHidden = true;
+			}
 		},
 		
 		renderTip : function(variant, x, y) {
 			var ctx = ASPIREdb.view.ideogram.VariantLayer.getTipCtx();
 			ctx.canvas.style.left = x + "px";
 			ctx.canvas.style.top = y + "px";
+			ASPIREdb.view.ideogram.VariantLayer.tipHidden = false;
 			ctx.clearRect(0,0,ctx.canvas.width, ctx.canvas.height);
 			
 			var entries = {};
@@ -185,8 +192,11 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 		
 //		this.ctx.fillStyle = '#FFFBCC';
 		this.ctx.fillStyle = variant.colour;
-
-		this.ctx.fillRect( this.leftX + 1, yStart, this.displayWidth - 1, yEnd-yStart );
+		
+//		var padding = 3;
+		var padding = 1;
+		
+		this.ctx.fillRect( this.leftX + 1 + padding, yStart, this.displayWidth - 1 - 2 * padding, yEnd-yStart );
 	},
 
 	drawVariantInfo : function(offset, event) {
