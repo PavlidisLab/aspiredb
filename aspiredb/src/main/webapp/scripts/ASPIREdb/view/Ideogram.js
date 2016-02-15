@@ -138,8 +138,31 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    },
    
    subjectsSelected : function(subjectIds) {
-	         this.selectedSubjectIds = subjectIds;
-	   },
+//	   this.selectedSubjectIds = subjectIds;
+	   this.drawChromosomes();
+	   var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
+	   var ref = this;
+
+	   // heighlight the selected subject in ideogram
+	   SubjectService.getSubjects( projectIds[0], subjectIds, {
+		   callback : function(subjectValueObjects) {
+
+			   if ( subjectValueObjects == null ) {
+				   return;
+			   }
+
+			   var subjectIDS = [];
+			   var patientIDS = [];
+			   for (var i = 0; i < subjectValueObjects.length; i++) {
+				   subjectIDS.push( subjectValueObjects[i].id );
+				   patientIDS.push( subjectValueObjects[i].patientId );
+			   }
+			   ref.selectedSubjectIds = subjectIDS;
+			   ref.redraw();
+
+		   }
+	   } );
+   },
 
    /**
     * @private

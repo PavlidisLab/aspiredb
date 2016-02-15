@@ -459,7 +459,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       }
       
       
-         ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', legendProperty );
+//         ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', legendProperty );
          ref.redrawIdeogram( legendProperty );
       
 
@@ -581,18 +581,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
     * Refresh the selected subjects in ideogram
     */
    subjectLabelUpdateHandler : function() {
-      // this.filterSubmitHandler( this.filterConfigs );
-      var ideogram = this.getComponent( 'ideogram' );
+      // Doesn't do anything for now...
 
-//      if ( ideogram.colourLegend.isVisible() ) {
-//
-//         var property = new SubjectLabelProperty();
-//         property.name = 'Subject Labels';
-//         property.displayName = 'Subject Label';
-//         // ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
-//         this.redrawIdeogram( property );
-//
-//      }
    },
 
    /**
@@ -661,7 +651,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                break;
             }
          }
-         ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
+//         ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
          this.redrawIdeogram( property );
 
       }
@@ -672,6 +662,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
     * Redraw the ideogram based on colour coding
     */
    redrawIdeogram : function(property) {
+	   ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
+	   
       var ideogram = this.getComponent( 'ideogram' );
       
       ideogram.setDisplayedProperty( property );
@@ -690,37 +682,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       grid.getSelectionModel().deselectAll();
 
       this.gridPanelSubjectSelection( subjectIds );
-      this.ideogramSubjectSelection( subjectIds );
 
       grid.getView().refresh();
-   },
-
-   ideogramSubjectSelection : function(subjectIds) {
-
-      var ideogram = this.getComponent( 'ideogram' );
-      ideogram.drawChromosomes();
-      var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
-      var ref = this;
-
-      // heighlight the selected subject in ideogram
-      SubjectService.getSubjects( projectIds[0], subjectIds, {
-         callback : function(subjectValueObjects) {
-
-            if ( subjectValueObjects == null ) {
-               return;
-            }
-
-            var subjectIDS = [];
-            var patientIDS = [];
-            for (var i = 0; i < subjectValueObjects.length; i++) {
-               subjectIDS.push( subjectValueObjects[i].id );
-               patientIDS.push( subjectValueObjects[i].patientId );
-            }
-            ideogram.selectedSubjectIds = subjectIDS;
-            ideogram.redraw(ref.loadedVariants);
-
-         }
-      } );
    },
 
    focusSelectedVariants : function() {
