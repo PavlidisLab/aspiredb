@@ -67,6 +67,7 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 			ttipCanvas.style.top = "100px";
 			ttipCanvas.style.backgroundColor = "ivory";
 			ttipCanvas.style.border = "1px solid black";
+			ttipCanvas.style.zIndex = 3;
 			
 			var body = document.getElementsByTagName("body")[0];
 			body.appendChild(ttipCanvas);
@@ -146,6 +147,9 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 
 	renderVariant : function(variant, color) {
 		/* VariantSegment */
+		if (variant.bandEmphasis) {
+			this.emphasizeBand(variant);
+		}
 		var segment = new VariantSegment(variant, color, false);
 //		var segment = {
 //				start : variant.genomicRange.baseStart,
@@ -168,9 +172,25 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 			this.missingVariants.push(segment)
 		}
 	},
+	
+	emphasizeBand : function(variant) {
+		var start = variant.genomicRange.baseStart;
+		var end = variant.genomicRange.baseEnd;
+
+		var yStart = Math.round(this.chromosomeLayer.convertToDisplayCoordinates( start, this.displayScaleFactor ));
+		var yEnd =  Math.round(this.chromosomeLayer.convertToDisplayCoordinates( end, this.displayScaleFactor ));
+		
+		// Too small?
+		yEnd = yEnd - yStart < 1 ? yEnd + 1: yEnd;
+		
+//		this.ctx.fillStyle = '#FFFBCC';
+		this.ctx.fillStyle = variant.colour;
+
+		this.ctx.fillRect( this.leftX + 1, yStart, this.displayWidth - 1, yEnd-yStart );
+	},
 
 	drawVariantInfo : function(offset, event) {
-		var trackIndex = Math.round((offset.x - 3.5 - this.leftX - this.displayWidth) / ( this.variantSeparationFactor * this.zoom ));
+		var trackIndex = this.getTrackIndex(offset.x);
 		var layer = this.trackLayers[trackIndex];
 		
 		if ( layer != undefined) {
@@ -216,9 +236,7 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 				var start = closest.segment.start;
 
 				// var x = this.leftX + 7;
-				var x = this.leftX + this.displayWidth;
-				x += this.variantSeparationFactor * this.zoom * trackIndex + 3.5;
-				x = Math.round(x);
+				var x = this.getTrackLeftX(trackIndex);
 
 				var yStart = Math.round(this.chromosomeLayer.convertToDisplayCoordinates( start, this.displayScaleFactor ));
 				
@@ -233,6 +251,14 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 			this.previousClosest = closest;
 			this.previousTrackIndex = trackIndex;
 		}
+	},
+	
+	getTrackLeftX : function(trackIndex) {
+		return Math.round(this.leftX + this.displayWidth + this.variantSeparationFactor * this.zoom * trackIndex + 3.5 + this.zoom * this.globalEmphasis / 2);
+	},
+	
+	getTrackIndex : function(x) {
+		return Math.round((x - 3.5 - this.leftX - this.displayWidth - this.zoom * this.globalEmphasis / 2) / ( this.variantSeparationFactor * this.zoom ));
 	},
 
 	/**
@@ -290,9 +316,7 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 		var end = segment.end;
 
 		// var x = this.leftX + 7;
-		var x = this.leftX + this.displayWidth;
-		x += this.variantSeparationFactor * this.zoom * layerIndex + 3.5;
-		x = Math.round(x);
+		var x = this.getTrackLeftX(layerIndex);
 
 		var yStart = Math.round(this.chromosomeLayer.convertToDisplayCoordinates( start, displayScaleFactor ));
 		var yEnd =  Math.round(this.chromosomeLayer.convertToDisplayCoordinates( end, displayScaleFactor ));

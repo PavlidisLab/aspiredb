@@ -717,7 +717,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                patientIDS.push( subjectValueObjects[i].patientId );
             }
             ideogram.selectedSubjectIds = subjectIDS;
-            ideogram.drawVariants(ref.loadedVariants);
+            ideogram.redraw(ref.loadedVariants);
 
          }
       } );

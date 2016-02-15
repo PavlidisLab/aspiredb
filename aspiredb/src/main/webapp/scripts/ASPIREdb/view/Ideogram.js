@@ -579,8 +579,10 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
 			   if (this.selectedSubjectIds.length != 0) {
 				   // apply subject selection
 				   variant.selected = ( this.selectedSubjectIds.indexOf( variant.subjectId ) != -1 );
+				   variant.bandEmphasis = variant.selected;
 			   } else {
 				   variant.selected = true;
+				   variant.bandEmphasis = false;
 			   }
 			   
 			// apply color code
