@@ -419,6 +419,11 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          }
          ref.focusSelectedVariants();
       } );
+      
+      // Fixes bug with selecting rows from the variant view before tabbing to it (read rendering the table)
+      grid.on( 'viewready', function() {
+   	   ref.focusSelectedVariants(ref.selectedVariants);
+      });
 
       ref.add( grid );
    },
@@ -686,10 +691,16 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       grid.getView().refresh();
    },
 
-   focusSelectedVariants : function() {
-
-      var grid = this.down( '#variantGrid' );
-      var selectedRecords = grid.getSelectionModel().getSelection();
+   focusSelectedVariants : function(selectedVariants) {
+	   var grid = this.down( '#variantGrid' );
+	   if (selectedVariants==undefined || selectedVariants == null || selectedVariants.length == 0 ) {
+		   var selectedRecords = grid.getSelectionModel().getSelection();
+	   } else {
+		   var selectedRecords = selectedVariants;
+		   grid.selModel.select( selectedRecords );
+	   }
+      
+      
 
       if ( selectedRecords.length > 0 ) {
          grid.getView().bufferedRenderer.scrollTo( grid.store.indexOfId( selectedRecords[0].data.id ) );
@@ -796,6 +807,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 	   for (var k in temp) {
 		   r.push(k);
 	   }
+	   
+	   this.selectedVariants = records;
 	   
 	   var grid = this.down( '#variantGrid' );
 	   
