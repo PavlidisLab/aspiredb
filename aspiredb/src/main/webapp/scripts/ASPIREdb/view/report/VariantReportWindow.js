@@ -35,7 +35,7 @@ Ext.define( 'ASPIREdb.view.report.VariantReportWindow', {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'Reports allow you to quick visualize and download variant counts for various variant characteristics, grouped by variant labels. Hovering the mouse over a bar shows the exact variant count. Clicking the variant label in the legend shows/hides that label in the chart.'
+                     html: 'Shows and allows downloading of counts for various variant characteristics. Hover over a bar to view the exact variant count. Click the variant label in the legend to show/hide that label in the chart.'
                  });
              }
          }

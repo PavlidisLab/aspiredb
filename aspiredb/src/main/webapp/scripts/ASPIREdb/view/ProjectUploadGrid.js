@@ -57,7 +57,7 @@ Ext
          buttons : [
                     {
                        xtype : 'button',
-                       text : 'Help',
+                       text : 'Docs',
                        itemId : 'helpButton',
                        handler : function() {
                           window

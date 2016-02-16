@@ -36,7 +36,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
              afterrender: function(c) {
                  Ext.create('Ext.tip.ToolTip', {
                      target: c.getEl(),
-                     html: 'Statistically compare mutation characteristics (such as average mutation length, number of genes affected, etc.) between two mutually exclusive groups of subjects (as identified by Subject Labels).'
+                     html: 'Statistically compare features of variants (from the drop down menu) associated with two mutually exclusive groups of subjects (as identified by Subject Labels).'
                  });
              }
          }
@@ -117,7 +117,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             emptyText : 'Select report type',
             editable : false,
             forceSelection : true,
-            width : 300,
+            width : 250,
             listeners : {
                'change' : me.reportComboSelectHandler,
             /*
@@ -139,7 +139,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             ueryMode : 'local',
             editable : false,
             forceSelection : true,
-            width : 300,
+            width : 100,
             listeners : {
                'change' : me.charLabelComboSelectHandler,
             /*
@@ -152,11 +152,26 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
 
       }, {
          xtype : 'tbspacer'
-      }, {
-         xtype : 'tbfill'
-      }, {
+      },
+      {
+         xtype : 'container',
+         flex : 1,
+         layout : {
+            type : 'hbox',
+            defaultMargins : {
+               top : 5,
+               right : 5,
+               left : 5,
+               bottom : 5
+            }
+         },
+         items : [{
          itemId : 'runButton',
          text : 'Analyze',
+         xtype: 'button',
+         flex : 1,
+         //style: 'margin-left: 0px;'
+         //float: 'left',
          listeners : {
             'click' : me.analyze,
          }
@@ -164,6 +179,8 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       }, {
          itemId : 'saveTxtButton',
          text : 'Save as TXT',
+         xtype: 'button',
+         flex : 1,
          tooltip : 'Save as TXT',         
       // icon : 'scripts/ASPIREdb/resources/images/icons/disk.png',
       }, {
@@ -181,13 +198,14 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
       }, {
          xtype : 'button',
          flex : 1,
-         text : 'Help',
+         text : 'Docs',
+         xtype: 'button',
          itemId : 'helpButton',
          handler : function() {
             window.open( 'http://aspiredb.chibi.ubc.ca/manual/burden-analysis/' );
          },
          scope : me,
-      } );
+      }] });
 
       var showChartButton = me.down( '#showChartButton' );
       showChartButton.on( 'click', function() {

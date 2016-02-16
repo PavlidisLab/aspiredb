@@ -16,7 +16,7 @@
 
 Ext.require( [ 'ASPIREdb.view.Ideogram', 'Ext.tab.Panel', 'Ext.selection.RowModel',
               'ASPIREdb.view.GeneHitsByVariantWindow', 'ASPIREdb.ActiveProjectSettings' ] );
-
+ 
 /**
  * Converts invalid numerical values to NaNs so that they can be sorted properly.
  */
@@ -35,7 +35,7 @@ Ext.data.Types.ROBUSTFLOAT = {
  * nature is why this grid is constructed this way
  */
 Ext.define( 'ASPIREdb.view.VariantGridCreator',
-   {
+   { 
       /**
        * @memberOf ASPIREdb.view.VariantGridCreator
        */
@@ -335,7 +335,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             height : 180,
             width : 500,
             title : 'Variant View',
-            tooltip : 'The Variant View provides more detailed information of the variants, including the subjectid, chromosome, start and end positions, variant type, etc. To reveal additional variant details, click on the drop-down arrow on the right hand side of a column header.',
+            tooltip : 'A tabular view of variant information. To reveal additional variant details, click on the drop-down arrow on the right hand side of a column header.',
 
             visibleLabels : visibleLabels
 

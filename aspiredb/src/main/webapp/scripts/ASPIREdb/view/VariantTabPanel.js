@@ -136,7 +136,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          }, {
             itemId : 'viewCompoundHeterozygotes',
             text : 'View compound heterozygotes',
-            tooltip: 'Identifies genes which have more than one variant in the same subject, which are candidates for compound heterozygosity. Only those variants that are currently selected are used.',
+            tooltip: 'For a given subject, shows those genes where more than one variant is found. Only those variants that are currently selected are used.',
             disabled : true,
             handler : this.viewCompoundHeterozygotes,
             scope : this
@@ -156,7 +156,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          disabled : false,
          handler : this.showReportHandler,
          scope : this,
-         tooltip : 'Generate reports on the filtered variants.',         
+         tooltip : 'Generate reports on all the variants in the Variant View.',         
       } );
 
       this.selectAllButton = Ext.create( 'Ext.Button', {
@@ -243,7 +243,16 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          queryMode : 'local',
          editable : false,
          forceSelection : true,
-      } );
+         listeners: {
+            afterrender: function(c) {
+               var toolTip = Ext.create('Ext.tip.ToolTip', {
+                  target: c.getEl(),
+                  html: 'Color variants based on selected features.'
+               });
+            }
+               
+            }
+      } );          
 
       this.colourVariantByCombo.on( 'select', this.colourVariantByHandler, this );
 
@@ -1096,11 +1105,36 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                 src: 'scripts/ASPIREdb/resources/images/qmark.png',
                 listeners: {
                    afterrender: function(c) {
-                       Ext.create('Ext.tip.ToolTip', {
+                       var toolTip = Ext.create('Ext.tip.ToolTip', {
                            target: c.getEl(),
                            autoHide: false,
-                           html: 'Labels allow the assignment of custom tags to a group of subjects or a group of variants. Labels can also be used in future queries. Here, you can hide labels from the variant panel, edit labels and select new colours or edit label descriptions, remove labels from selected subjects or variants, and delete labels from the system.'
+                           html: 'Use labels to assign custom tags to a group of subjects or variants. Labels can also be used in queries. Click <a href="http://aspiredb.chibi.ubc.ca/manual/labels/" target="_blank">here</a> for more details.'
                        });
+                       toolTip.on('show', function(){
+
+                          var timeout;
+
+                          toolTip.getEl().on('mouseout', function(){
+                              timeout = window.setTimeout(function(){
+                                  toolTip.hide();
+                              }, 500);
+                          });
+
+                          toolTip.getEl().on('mouseover', function(){
+                              window.clearTimeout(timeout);
+                          });
+
+                          Ext.get(c.getEl()).on('mouseover', function(){
+                              window.clearTimeout(timeout);
+                          });
+
+                          Ext.get(c.getEl()).on('mouseout', function(){
+                              timeout = window.setTimeout(function(){
+                                  toolTip.hide();
+                              }, 500);
+                          });
+
+                      });                       
                    }
                }
             }]

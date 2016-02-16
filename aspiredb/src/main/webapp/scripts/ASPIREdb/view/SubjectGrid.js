@@ -544,10 +544,39 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
                 src: 'scripts/ASPIREdb/resources/images/qmark.png',
                 listeners: {
                    afterrender: function(c) {
-                       Ext.create('Ext.tip.ToolTip', {
+                       var toolTip = Ext.create('Ext.tip.ToolTip', {
                            target: c.getEl(),
-                           html: 'Organize your subjects or variants using tags.'
-                       });
+                           html: 'Use labels to assign custom tags to a group of subjects or variants. Labels can also be used in queries. Click <a href="http://aspiredb.chibi.ubc.ca/manual/labels/" target="_blank">here</a> for more details.',
+                              dismissDelay: 0,
+                              showDelay: 0,
+                              autoHide: false
+                      
+                          }); 
+                          toolTip.on('show', function(){
+
+                             var timeout;
+
+                             toolTip.getEl().on('mouseout', function(){
+                                 timeout = window.setTimeout(function(){
+                                     toolTip.hide();
+                                 }, 500);
+                             });
+
+                             toolTip.getEl().on('mouseover', function(){
+                                 window.clearTimeout(timeout);
+                             });
+
+                             Ext.get(c.getEl()).on('mouseover', function(){
+                                 window.clearTimeout(timeout);
+                             });
+
+                             Ext.get(c.getEl()).on('mouseout', function(){
+                                 timeout = window.setTimeout(function(){
+                                     toolTip.hide();
+                                 }, 500);
+                             });
+
+                         });
                    }
                }
             }]
