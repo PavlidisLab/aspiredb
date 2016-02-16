@@ -1,0 +1,7 @@
+/* This is needed so that double click functionality does not mess with click and drag functionality */
+div.no-selection{ 
+	-webkit-user-select: none; /* webkit (safari, chrome) browsers */
+    -moz-user-select: none; /* mozilla browsers */
+    -khtml-user-select: none; /* webkit (konqueror) browsers */
+    -ms-user-select: none; /* IE10+ */
+}

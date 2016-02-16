@@ -313,6 +313,7 @@ Ext.define( 'ASPIREdb.view.PhenotypeGrid', {
       } );
 
       ASPIREdb.EVENT_BUS.on( 'select_subject_from_variant_grid', this.subjectSelectHandler, this );
+      ASPIREdb.EVENT_BUS.on( 'select_subject_from_ideogram', this.subjectSelectHandler, this );
       ASPIREdb.EVENT_BUS.on( 'subject_selected', this.subjectSelectHandler, this );
       ASPIREdb.EVENT_BUS.on( 'allPhenoSummary_sorted', this.sortAllPhenoSummary, this );
       ASPIREdb.EVENT_BUS.on( 'selectedPhenoSummary_sorted', this.sortSelectedPhenoSummary, this );

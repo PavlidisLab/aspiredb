@@ -317,11 +317,25 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             listeners : {
                cellclick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
 
-                  var rec = grid.getStore().getAt( rowIndex );
-                  var patientId = rec.get( 'patientId' );
                   var subjectStore = Ext.getStore( 'subjectStore' )
-                  var subjectId = subjectStore.getAt( subjectStore.findExact( 'patientId', patientId ) ).get( 'id' )
-                  ASPIREdb.EVENT_BUS.fireEvent( 'select_subject_from_variant_grid', [ subjectId ] );
+                  var selectedVariantRecords = grid.getSelectionModel().getSelection();
+                  
+                  var temp = {};
+                  for (var i = 0; i < selectedVariantRecords.length; i++) {
+                	  var rec = selectedVariantRecords[i];
+                	  var patientId = rec.get( 'patientId' );
+                	  var subjectId = subjectStore.getAt( subjectStore.findExact( 'patientId', patientId ) ).get( 'id' )
+                	  temp[subjectId] = true;
+                  }
+
+                  // Unique subjects only
+                  var r = [];
+                  for (var k in temp) {
+                	  r.push(k);
+                  }
+                  
+                  
+                  ASPIREdb.EVENT_BUS.fireEvent( 'select_subject_from_variant_grid', r );
                }
             },
 

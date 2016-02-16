@@ -20,48 +20,154 @@
 /**
  * Ideogram colour legend for colouring variants based on variant type, CNV type, etc.
  */
-Ext.define( 'ASPIREdb.view.ideogram.ColourLegend', {
-   extend : 'Ext.window.Window',
-   alias : 'widget.colourlegend',
-   width : 150,
-   height : 150,
-   autoScroll : true,
-   title : 'Ideogram',
-   closable : false,
-   resizable : true,
-   layout : 'absolute',
-   items : [ {
-      xtype : 'component',
-      autoEl : 'canvas',
-      itemId : 'canvasBox',
-      x : 0,
-      y : 0,
-      width : 200,
-      height : 200
-   } ],
-   tools : [ {
-      type : 'restore',
-      hidden : true,
-      handler : function(evt, toolEl, owner, tool) {
-         var window = owner.up( 'window' );
-         window.expand( '', false );
-         window.setWidth( winWidth );
-         window.center();
-         isMinimized = false;
-         this.hide();
-         this.nextSibling().show();
-      }
-   }, {
-      type : 'minimize',
-      handler : function(evt, toolEl, owner, tool) {
-         var window = owner.up( 'window' );
-         window.collapse();
-         winWidth = window.getWidth();
-         window.setWidth( 150 );
-         window.alignTo( Ext.getBody(), 'b-b' );
-         this.hide();
-         this.previousSibling().show();
-         isMinimized = true;
-      }
-   } ]
-} );
+var ColourLegend = function(ctx) {
+
+	this.displayProperty = null;
+	this.colors = [ "red", "blue", "black", "purple", "brown", "olive", "maroon", "orange" ];
+	this.defaultColour = "rgba(0,0,0,0.5)";
+	this.nextColourIndex = 0;
+//	this.valueToColourMap = [];
+	this.characteristicList = {};
+	this.ctx = ctx;
+	this.baseColourPicker = null;
+}
+
+
+ColourLegend.prototype.assignColor = function(variantType, defaultColor, displayName){//, htmlLabel) {
+	var colourTag;
+	if ( this.characteristicList.length == 0 || ( ( colourTag = this.characteristicList[variantType] ) == undefined ) ) {
+		var colour = defaultColor == undefined ? this.colors[this.nextColourIndex] : defaultColor;
+		displayName = displayName == undefined ? variantType : displayName;
+//		this.valueToColourMap.push( htmlLabel == undefined ? [ "<font color='" + colour + "'>" + variantType + "</font><br>\n" ] : [htmlLabel] );
+		colourTag = {colour:colour, displayName: displayName};
+		this.characteristicList[variantType] = colourTag;
+		this.nextColourIndex++;
+	}
+	return colourTag;
+};
+
+//sets the display property and creates a baseColourPicker that will be used on each variant
+ColourLegend.prototype.setColourCode = function(property) {
+	this.displayProperty = property;
+
+	this.nextColourIndex = 0;
+//	this.valueToColourMap = [];
+	this.characteristicList = {};
+
+	var me = this;
+
+	// if variant type property : CNV, SNV, indel, translocation, inversion
+	if ( property instanceof VariantTypeProperty ) {
+		this.baseColourPicker = function(variant) {
+			return me.assignColor(variant.variantType);
+		}
+	}
+
+	// if CNV type : LOSS, GAIN
+	else if ( property instanceof CNVTypeProperty ) {
+		this.baseColourPicker = function(variant) {
+			return me.assignColor(variant.type);
+		}
+	}
+
+	// if variant labels
+	else if ( property instanceof VariantLabelProperty ) {
+
+		this.baseColourPicker = function(variant) {
+			if ( variant.labels.length > 0 ) {
+				// Adding a ~ character to prevent users creating labels such as 'No Label' and screwing with the color picking
+				return me.assignColor("~" + variant.labels[0].name, '#' + variant.labels[0].colour, variant.labels[0].name);//, ASPIREdb.view.LabelControlWindow.getHtmlLabel( variant.labels[0] ) + "<br>\n");
+			} else {
+				return me.assignColor('No Label', '#303030');
+			}
+		}
+	}
+
+	// if subject labels
+	else if ( property instanceof SubjectLabelProperty ) {
+
+		this.baseColourPicker = function(variant) {
+			var subject = variant.subject;
+			if ( subject != null && subject.labels.length > 0 ) {
+				// Adding a ~ character to prevent users creating labels such as 'No Label' and screwing with the color picking
+				return me.assignColor("~" + subject.labels[0].name, '#' + subject.labels[0].colour, subject.labels[0].name);//, ASPIREdb.view.LabelControlWindow.getHtmlLabel( subject.labels[0] ) + "<br>\n");
+			} else {
+				return me.assignColor('No Label', '#303030');
+			}
+		}
+	}
+
+	// if Characteristic type : benign, pathogenic, unknown
+	else if ( property instanceof CharacteristicProperty ) {
+
+		var name = property.name;
+
+		this.baseColourPicker = function(variant) {
+			var characteristicValueObject = variant.characteristics[name];
+			if ( characteristicValueObject != undefined && characteristicValueObject !== null) {
+				// Adding a ~ character to prevent users creating labels such as 'No Label' and screwing with the color picking
+				return me.assignColor(characteristicValueObject.value);
+			} else {
+				return me.assignColor('No data', '#303030');
+			}
+		}
+	}
+};
+
+
+
+ColourLegend.prototype.getColour = function(variant) {
+
+	if ( this.displayProperty == null || this.baseColourPicker == null ) {
+		console.log("Null DisplayProperty or baseColourPicker");
+		return this.defaultColour;
+	}
+
+	return this.baseColourPicker(variant).colour;
+};
+
+ColourLegend.prototype.measureWidth = function() {
+	var maxWidth = 0;
+	for (var legendEntry in this.characteristicList) {
+		var displayName = this.characteristicList[legendEntry].displayName;
+		var w = this.ctx.measureText(displayName).width + 45;
+
+		maxWidth = w > maxWidth ? w : maxWidth;
+
+	}
+	return Math.round( maxWidth ) + 1;
+};
+
+ColourLegend.prototype.refresh = function() {
+
+	var ctx = this.ctx;
+
+	var legendX = 0;
+	var legendY = 0;
+
+	ctx.beginPath();
+	ctx.lineWidth=1;
+	ctx.textBaseline = "middle";
+
+	// entries
+	ctx.font = "14px Arial";
+	var maxwidth = 0;
+	var entries = 5;
+	var entryHeight = 20;
+	i = 0;
+	for (var legendEntryKey in this.characteristicList) {
+		var legendEntry = this.characteristicList[legendEntryKey];
+		ctx.fillStyle = legendEntry.colour;
+		ctx.fillRect(legendX + 5,legendY + 5 + entryHeight*i, 10, 10);
+
+		ctx.fillStyle = "black";
+		ctx.fillText(legendEntry.displayName, legendX + 35, legendY + 10 + entryHeight*i);
+		var w = ctx.measureText(legendEntry.displayName).width + 35;
+
+		maxwidth = w > maxwidth ? w : maxwidth;
+		i++;
+	}
+
+
+
+};

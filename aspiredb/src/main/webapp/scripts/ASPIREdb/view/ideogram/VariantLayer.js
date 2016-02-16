@@ -21,609 +21,407 @@
  * Drawing of variants as pileups beside the chromosome.
  */
 Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
-   /**
-    * @param {CanvasRenderingContext2D}
-    *           config.ctx
-    * @param {number}
-    *           config.leftX
-    * @param {number}
-    *           config.displayScaleFactor
-    * @param {ChromosomeLayer}
-    *           config.chromosomeLayer
-    * @param {number}
-    *           config.zoom
-    */
-   constructor : function(config) {
-      this.initConfig( config );
-
-      /**
-       * @type {Array.<TrackLayer>}
-       */
-      this.trackLayers = [];
-      this.numberOfTracks = (this.displayWidth != null) ? this.displayWidth - 5 : 2;
-      this.createTracks( this.numberOfTracks );
-
-      return this;
-   },
-
-   config : {
-      displayScaleFactor : null,
-      ctx : null,
-      zoom : null,
-      leftX : null,
-      chromosomeLayer : null,
-      // selectedVariants : [],
-      displayWidth : null,
-   },
-
-   statics : {
-      colors : [ "red", "blue", "black", "purple", "brown", "olive", "maroon", "orange" ],
-      defaultColour : "rgba(0,0,0,0.5)",
-      nextColourIndex : 0,
-      /** @type {Object.<string,string>} */
-      valueToColourMap : [],
-      characteristicList : {},
-      selectedVariants : [],
-      resetDisplayProperty : function(property) {
-         this.selectedVariants = [];
-
-         if ( property.displayType != undefined ) {
-
-            // if variant type property : CNV, SNV, indel,translocation, inversion
-            if ( property instanceof VariantTypeProperty ) {
-
-               for (var i = 0; i < property.displayType.length; i++) {
-                  var value = property.displayType[i];
-                  if ( this.characteristicList.length == 0 || this.characteristicList[value] == undefined ) {
-                     this.valueToColourMap.push( [ "<font color='" + this.colors[this.nextColourIndex] + "'>" + value
-                        + "</font><br>\n" ] );
-                     this.characteristicList[value] = this.colors[this.nextColourIndex];
-                     this.nextColourIndex++;
-                  }
-               }
-
-            }
-
-            // if CNV type : LOSS, GAIN
-            if ( property instanceof CNVTypeProperty ) {
-               for (var i = 0; i < property.displayType.length; i++) {
-                  var value = property.displayType[i];
-                  if ( this.characteristicList.length == 0 || this.characteristicList[value] == undefined ) {
-                     this.valueToColourMap.push( [ "<font color='" + this.colors[this.nextColourIndex] + "'>" + value
-                        + "</font><br>\n" ] );
-                     this.characteristicList[value] = this.colors[this.nextColourIndex];
-                     this.nextColourIndex++;
-                  }
-               }
-            }
-
-            // if Characteristic type : benign, pathogenic, unknown
-            if ( property instanceof CharacteristicProperty ) {
-
-               if ( property.name == 'Characteristics' ) {
-
-                  for (var i = 0; i < property.displayType.length; i++) {
-                     var value = property.displayType[i];
-                     if ( this.characteristicList.length == 0 || this.characteristicList[value] == undefined ) {
-                        this.valueToColourMap.push( [ "<font color='" + this.colors[this.nextColourIndex] + "'>"
-                           + value + "</font><br>\n" ] );
-                        this.characteristicList[value] = this.colors[this.nextColourIndex];
-                        this.nextColourIndex++;
-                     }
-                  }
-               }
-
-               if ( property.name == 'Inheritance' ) {
-
-                  for (var i = 0; i < property.displayType.length; i++) {
-                     var value = property.displayType[i];
-                     if ( this.characteristicList.length == 0 || this.characteristicList[value] == undefined ) {
-                        this.valueToColourMap.push( [ "<font color='" + this.colors[this.nextColourIndex] + "'>"
-                           + value + "</font><br>\n" ] );
-                        this.characteristicList[value] = this.colors[this.nextColourIndex];
-                        this.nextColourIndex++;
-                     }
-                  }
-               }
-
-               if ( property.name == 'Common CNV' ) {
-
-                  for (var i = 0; i < property.displayType.length; i++) {
-                     var value = property.displayType[i];
-                     if ( this.characteristicList.length == 0 || this.characteristicList[value] == undefined ) {
-                        this.valueToColourMap.push( [ "<font color='" + this.colors[this.nextColourIndex] + "'>"
-                           + value + "</font><br>\n" ] );
-                        this.characteristicList[value] = this.colors[this.nextColourIndex];
-                        this.nextColourIndex++;
-                     }
-                  }
-               }
-
-               if ( property.name == 'Array Report' ) {
-
-                  for (var i = 0; i < property.displayType.length; i++) {
-                     var value = property.displayType[i];
-                     if ( this.characteristicList.length == 0 || this.characteristicList[value] == undefined ) {
-                        this.valueToColourMap.push( [ "<font color='" + this.colors[this.nextColourIndex] + "'>"
-                           + value + "</font><br>\n" ] );
-                        this.characteristicList[value] = this.colors[this.nextColourIndex];
-                        this.nextColourIndex++;
-                     }
-                  }
-
-               }
-
-               if ( property.name == 'Array Platform' ) {
-
-                  for (var i = 0; i < property.displayType.length; i++) {
-                     var value = property.displayType[i];
-
-                     if ( this.characteristicList.length == 0 || this.characteristicList[value] == undefined ) {
-                        this.valueToColourMap.push( [ "<font color='" + this.colors[this.nextColourIndex] + "'>"
-                           + value + "</font><br>\n" ] );
-                        this.characteristicList[value] = this.colors[this.nextColourIndex];
-                        this.nextColourIndex++;
-                     }
-                  }
-               }
-
-            }
-
-         } else {
-            this.characteristicList = {};
-            this.valueToColourMap = [];
-            this.nextColourIndex = 0;
-         }
-
-      }
-   },
-
-   /**
-    * TODO: color legend function is broken/ not complete check getPropertyStringValue and property
-    * 
-    * @param {VariantValueObject}
-    *           variant
-    * @param {PropertyValueObject}
-    *           property
-    * @returns {string}
-    */
-   pickColor : function(variant, property) {
-      if ( property == null )
-         return this.self.defaultColour;
-
-      var value = null;
-      var colorIndex = 0;
-
-      // if variant type property : CNV, SNV, indel,translocation, inversion
-      if ( property instanceof VariantTypeProperty ) {
-         property.name = variant.variantType;
-         value = variant.variantType;
-
-         var color = this.self.characteristicList[value];
-         if ( color == null ) {
-            var pushvalue = "<font color='" + this.self.colors[this.self.nextColourIndex] + "'>" + value
-               + "</font><br>\n";
-            color = this.self.colors[this.self.nextColourIndex];
-            this.self.valueToColourMap.push( [ pushvalue ] );
-            this.self.characteristicList[value] = color;
-            this.self.nextColourIndex++;
-
-         }
-      }
-
-      // if CNV type : LOSS, GAIN
-      if ( property instanceof CNVTypeProperty ) {
-         value = variant.type;
-
-         var color = this.self.characteristicList[value];
-         if ( color == null ) {
-
-            var pushvalue = "<font color='" + this.self.colors[this.self.nextColourIndex] + "'>" + value
-               + "</font><br>\n";
-            color = this.self.colors[this.self.nextColourIndex];
-            this.self.valueToColourMap.push( [ pushvalue ] );
-            this.self.characteristicList[value] = color;
-            this.self.nextColourIndex++;
-
-         }
-      }
-
-      // if variant labels
-      if ( property instanceof VariantLabelProperty ) {
-
-         if ( variant.labels.length > 0 ) {
-            value = variant.labels[0].name;
-            var color = '#' + variant.labels[0].colour;
-            // var pushvalue = "<font color='" + color + "'>" + value + "</font><br>\n";
-            var pushvalue = ASPIREdb.view.LabelControlWindow.getHtmlLabel( variant.labels[0] ) + "<br>\n";
-            var vtcmStat = 'No';
-
-            if ( this.self.valueToColourMap.length == 0 ) {
-               this.self.valueToColourMap.push( [ pushvalue ] );
-               this.self.characteristicList[value] = color;
-            }
-
-            for (var i = 0; i < this.self.valueToColourMap.length; i++) {
-               if ( this.self.valueToColourMap[i] == pushvalue ) {
-                  vtcmStat = 'Yes';
-               }
-            }
-            if ( vtcmStat == 'No' ) {
-               this.self.valueToColourMap.push( [ pushvalue ] );
-               this.self.characteristicList[value] = color;
-            }
-
-         } else {
-            value = "No Label";
-            var color = this.self.characteristicList[value];
-            if ( color == null ) {
-               color = "#303030";
-
-               var pushvalue = "<font color=" + color + ">" + value + "</font><br>\n";
-               this.self.valueToColourMap.push( [ pushvalue ] );
-               this.self.characteristicList[value] = color;
-               console.log( 'no subject label (default) :' + color );
-            }
-
-         }
-      }
-
-      // if subject labels
-      if ( property instanceof SubjectLabelProperty ) {
-         subject = variant.subject;
-
-         if ( subject != null && subject.labels.length > 0 ) {
-            value = subject.labels[0].name;
-            var color = '#' + subject.labels[0].colour;
-            // var pushvalue = "<font color='" + color + "'>" + value + "</font><br>\n";
-            var pushvalue = ASPIREdb.view.LabelControlWindow.getHtmlLabel( subject.labels[0] ) + "<br>\n";
-            var vtcmStat = 'No';
-
-            if ( this.self.valueToColourMap.length == 0 ) {
-               this.self.valueToColourMap.push( [ pushvalue ] );
-               this.self.characteristicList[value] = color;
-            }
-
-            for (var i = 0; i < this.self.valueToColourMap.length; i++) {
-               if ( this.self.valueToColourMap[i] == pushvalue ) {
-                  vtcmStat = 'Yes';
-               }
-            }
-            if ( vtcmStat == 'No' ) {
-               this.self.valueToColourMap.push( [ pushvalue ] );
-               this.self.characteristicList[value] = color;
-            }
-
-         } else {
-            value = "No Label";
-            var color = this.self.characteristicList[value];
-            if ( color == null ) {
-               color = "#303030";
-
-               var pushvalue = "<font color=" + color + ">" + value + "</font><br>\n";
-               this.self.valueToColourMap.push( [ pushvalue ] );
-               this.self.characteristicList[value] = color;
-               console.log( 'no subject label (default) :' + color );
-            }
-
-         }
-      }
-
-      // if Characteristic type : benign, pathogenic,
-      // unknown
-      if ( property instanceof CharacteristicProperty ) {
-         var characteristicValueObject = variant.characteristics[property.name];
-
-         if ( characteristicValueObject !== null ) {
-            if ( characteristicValueObject == undefined ) {
-               console.log( 'characteristic is undefined : ' + property.name + '  !!!!!' );
-               value = 'No data';
-               var color = this.self.characteristicList[value];
-
-               if ( color == null ) {
-                  color = '#303030';
-                  var pushvalue = "<font color=" + color + ">" + value + "</font><br>\n";
-
-                  this.self.valueToColourMap.push( [ pushvalue ] );
-                  this.self.characteristicList[value] = color;
-               }
-
-            } else {
-
-               value = characteristicValueObject.value;
-
-               if ( property.name == 'Characteristics' ) {
-
-                  var color = this.self.characteristicList[value];
-
-                  if ( color == null ) {
-
-                     var pushvalue = "<font color='" + this.self.colors[this.self.nextColourIndex] + "'>" + value
-                        + "</font><br>\n";
-                     color = this.self.colors[this.self.nextColourIndex];
-                     this.self.valueToColourMap.push( [ pushvalue ] );
-                     this.self.characteristicList[value] = color;
-                     this.self.nextColourIndex++;
-
-                  }
-               }
-
-               if ( property.name == 'Inheritance' ) {
-
-                  var color = this.self.characteristicList[value];
-
-                  if ( color == null ) {
-
-                     var pushvalue = "<font color='" + this.self.colors[this.self.nextColourIndex] + "'>" + value
-                        + "</font><br>\n";
-                     color = this.self.colors[this.self.nextColourIndex];
-                     this.self.valueToColourMap.push( [ pushvalue ] );
-                     this.self.characteristicList[value] = color;
-                     this.self.nextColourIndex++;
-
-                  }
-               }
-
-               if ( property.name == 'Common CNV' ) {
-                  var color = this.self.characteristicList[value];
-                  if ( color == null ) {
-                     var pushvalue = "<font color='" + this.self.colors[this.self.nextColourIndex] + "'>" + value
-                        + "</font><br>\n";
-                     color = this.self.colors[this.self.nextColourIndex];
-                     this.self.valueToColourMap.push( [ pushvalue ] );
-                     this.self.characteristicList[value] = color;
-                     this.self.nextColourIndex++;
-                  }
-               }
-
-               if ( property.name == 'Array Report' ) {
-                  var color = this.self.characteristicList[value];
-                  if ( color == null ) {
-                     var pushvalue = "<font color='" + this.self.colors[this.self.nextColourIndex] + "'>" + value
-                        + "</font><br>\n";
-                     color = this.self.colors[this.self.nextColourIndex];
-                     this.self.valueToColourMap.push( [ pushvalue ] );
-                     this.self.characteristicList[value] = color;
-                     this.self.nextColourIndex++;
-
-                  }
-               }
-
-               if ( property.name == 'Array Platform' ) {
-
-                  var color = this.self.characteristicList[value];
-                  if ( color == null ) {
-
-                     var pushvalue = "<font color='" + this.self.colors[this.self.nextColourIndex] + "'>" + value
-                        + "</font><br>\n";
-                     color = this.self.colors[this.self.nextColourIndex];
-                     this.self.valueToColourMap.push( [ pushvalue ] );
-                     this.self.characteristicList[value] = color;
-                     this.self.nextColourIndex++;
-                  }
-               }
-            }
-         }
-
-      }
-
-      return color;
-   },
-
-   /**
-    * @public
-    * @param {VariantValueObject}
-    *           variant
-    */
-   drawDimmedVariant : function(variant) {
-      /* VariantSegment */
-      var segment = {
-         start : variant.genomicRange.baseStart,
-         end : variant.genomicRange.baseEnd,
-         color : "#989898", // "rgb(128,128,128)",// "rgba(0,0,0,0.4)",//grey
-         emphasize : false
-      };
-
-      // pick track layer
-      for (var trackIndex = 0; trackIndex < this.trackLayers.length; trackIndex++) {
-         var layer = this.trackLayers[trackIndex];
-         if ( layer.doesFit( segment ) ) {
-            this.drawLineSegment( layer.layerIndex, segment, this.ctx, this.displayScaleFactor );
-            layer.insert( segment );
-            break;
-         }
-      }
-   },
-
-   /**
-    * @public
-    * @param {VariantValueObject}
-    *           variant
-    * @param {PropertyValueObject}
-    *           property
-    */
-   drawHighlightedVariant : function(variant, property) {
-      this.self.selectedVariants.push( variant );
-      /* VariantSegment */
-      var segment = {
-         start : variant.genomicRange.baseStart,
-         end : variant.genomicRange.baseEnd,
-         color : this.pickColor( variant, property ),// red "rgb(255,0,0)"
-         emphasize : false
-      };
-
-      // pick track layer
-      for (var trackIndex = 0; trackIndex < this.trackLayers.length; trackIndex++) {
-         var layer = this.trackLayers[trackIndex];
-         if ( layer.doesFit( segment ) ) {
-            this.drawLineSegment( layer.layerIndex, segment, this.ctx, this.displayScaleFactor );
-            layer.insert( segment );
-            break;
-         }
-      }
-   },
-
-   /**
-    * @public
-    * @param {VariantValueObject}
-    *           variant
-    * @param {PropertyValueObject}
-    *           property
-    */
-   drawVariant : function(variant, property) {
-      /* VariantSegment */
-      var segment = {
-         start : variant.genomicRange.baseStart,
-         end : variant.genomicRange.baseEnd,
-         color : this.pickColor( variant, property ),
-         emphasize : false
-      };
-      // pick track layer
-      for (var trackIndex = 0; trackIndex < this.trackLayers.length; trackIndex++) {
-         var layer = this.trackLayers[trackIndex];
-         if ( layer.doesFit( segment ) ) {
-            this.drawLineSegment( layer.layerIndex, segment, this.ctx, this.displayScaleFactor );
-            layer.insert( segment );
-            break;
-         }
-      }
-   },
-
-   /**
-    * @public
-    */
-   clearTracks : function() {
-      this.trackLayers = [];
-      // this.createTracks(10);
-      this.createTracks( this.numberOfTracks );
-   },
-
-   /**
-    * numberOfTracks : the maximum variant pileup depth
-    * 
-    * @private
-    * 
-    */
-   createTracks : function(numberOfTracks) {
-      // Define helper classes
-      /**
-       * @param {number}
-       *           start
-       * @param {number}
-       *           end
-       * @param {string}
-       *           color
-       * @param {boolean}
-       *           emphasize
-       * @struct
-       */
-      var VariantSegment = {
-         start : null,
-         end : null,
-         color : null,
-         emphasize : false
-      };
-
-      var TrackLayer = function(layerIndex) {
-         /* @type {Array.<VariantSegment>} */
-         this.segments = [];
-         this.layerIndex = layerIndex;
-      };
-
-      /**
-       * @param {{start:number,
-       *           end:number}} segment
-       * @returns {boolean}
-       */
-      TrackLayer.prototype.doesFit = function(segment) {
-         /**
-          * @param {{start:number,
-          *           end:number}} segment
-          * @param {number}
-          *           point
-          * @returns {boolean}
-          */
-         function isWithin(segment, point) {
-            return (segment.start <= point && segment.end >= point);
-         }
-
-         /**
-          * @param {{start:number,
-          *           end:number}} segment
-          * @param {{start:number,
-          *           end:number}} existingSegment
-          * @returns {boolean}
-          */
-         function doesOverlap(segment, existingSegment) {
-            return (isWithin( existingSegment, segment.start ) || isWithin( existingSegment, segment.end )
-               || isWithin( segment, existingSegment.start ) || isWithin( segment, existingSegment.end ));
-         }
-
-         for (var i = 0; i < this.segments.length; i++) {
-            var existingSegment = this.segments[i];
-            if ( doesOverlap( segment, existingSegment ) )
-               return false;
-         }
-         return true;
-      };
-
-      /**
-       * @param {VariantSegment}
-       *           segment
-       */
-      TrackLayer.prototype.insert = function(segment) {
-         this.segments.push( segment );
-      };
-
-      for (var i = 0; i < numberOfTracks; i++) {
-         this.trackLayers.push( new TrackLayer( i ) );
-      }
-   },
-
-   /**
-    * 
-    * @param {number}
-    *           layerIndex
-    * @param {VariantSegment}
-    *           segment
-    * @param {CanvasRenderingContext2D}
-    *           ctx
-    * @param {number}
-    *           displayScaleFactor
-    */
-   drawLineSegment : function(layerIndex, segment, ctx, displayScaleFactor) {
-      var start = segment.start;
-      var end = segment.end;
-
-      // var x = this.leftX + 7;
-      var x = this.leftX + this.displayWidth;
-      x += 2 * this.zoom * layerIndex + 3.5;
-
-      var yStart = this.chromosomeLayer.convertToDisplayCoordinates( start, displayScaleFactor );
-      var yEnd = this.chromosomeLayer.convertToDisplayCoordinates( end, displayScaleFactor );
-
-      if ( Math.round( yStart ) === Math.round( yEnd ) ) { // Too
-         // small
-         // to
-         // display?
-         // bump
-         // to 1
-         // pixel
-         // size.
-         yEnd += 1;
-      }
-
-      ctx.strokeStyle = segment.color;
-      if ( segment.emphasize ) {
-         ctx.lineWidth = 5 * this.zoom;
-      } else {
-         ctx.lineWidth = 1 * this.zoom;
-      }
-
-      ctx.beginPath();
-      ctx.moveTo( x, yStart );
-      ctx.lineTo( x, yEnd );
-      ctx.stroke();
-      ctx.lineWidth = 1 * this.zoom;
-   }
+	   /**
+	    * @memberOf ASPIREdb.view.ideogram.VariantLayer
+	    */
+
+	constructor : function(config) {
+		/**
+		 * @param {CanvasRenderingContext2D}
+		 *           config.ctx
+		 * @param {number}
+		 *           config.leftX
+		 * @param {number}
+		 *           config.displayScaleFactor
+		 * @param {ChromosomeLayer}
+		 *           config.chromosomeLayer
+		 * @param {number}
+		 *           config.zoom
+		 */
+		this.initConfig( config );
+
+		/**
+		 * @type {Array.<TrackLayer>}
+		 */
+		this.trackLayers = [];
+
+		this.numberOfTracks = (this.displayWidth != null) ? Math.floor((this.zoom * this.chromosomeBaseGap - this.displayWidth - 5) / (this.variantSeparationFactor * this.zoom)) : 2;
+		this.createTracks( this.numberOfTracks );
+		this.missingVariants = [];
+		this.previousEmphasizedSegment = null;
+		
+		this.self.hideTipCtx();
+
+		return this;
+	},
+	
+	statics : {
+		
+		tipCtx : null,
+		
+		tipHidden: true,
+		
+		createTipCtx : function() {
+			var ttipCanvas =  document.createElement("canvas");
+			ttipCanvas.style.position = "absolute";
+			ttipCanvas.width = 275;
+			ttipCanvas.height = 95;
+			
+			ttipCanvas.style.left = "-300px";
+			ttipCanvas.style.top = "100px";
+			ttipCanvas.style.backgroundColor = "ivory";
+			ttipCanvas.style.border = "1px solid black";
+			ttipCanvas.style.zIndex = 3;
+			
+			var body = document.getElementsByTagName("body")[0];
+			body.appendChild(ttipCanvas);
+			
+			ASPIREdb.view.ideogram.VariantLayer.tipCtx = ttipCanvas.getContext("2d");
+			ASPIREdb.view.ideogram.VariantLayer.tipCtx.textBaseline = "top";
+			ASPIREdb.view.ideogram.VariantLayer.tipCtx.strokeStyle = "black";
+			ASPIREdb.view.ideogram.VariantLayer.tipCtx.fillStyle = "black";
+			ASPIREdb.view.ideogram.VariantLayer.tipCtx.font = "14px sans-serif";
+			ASPIREdb.view.ideogram.VariantLayer.tipCtx.lineWidth = 1;
+		},
+		
+		getTipCtx : function() {
+			
+			if (ASPIREdb.view.ideogram.VariantLayer.tipCtx == null ) {
+				ASPIREdb.view.ideogram.VariantLayer.createTipCtx();
+			}
+			
+			return ASPIREdb.view.ideogram.VariantLayer.tipCtx;
+		},
+		
+		hideTipCtx : function() {
+			if (!ASPIREdb.view.ideogram.VariantLayer.tipHidden) {
+				var ctx = ASPIREdb.view.ideogram.VariantLayer.getTipCtx();
+				ctx.canvas.style.left = "-300px";
+				ASPIREdb.view.ideogram.VariantLayer.tipHidden = true;
+			}
+		},
+		
+		renderTip : function(variant, x, y) {
+			var ctx = ASPIREdb.view.ideogram.VariantLayer.getTipCtx();
+			ctx.canvas.style.left = x + "px";
+			ctx.canvas.style.top = y + "px";
+			ASPIREdb.view.ideogram.VariantLayer.tipHidden = false;
+			ctx.clearRect(0,0,ctx.canvas.width, ctx.canvas.height);
+			
+			var entries = {};
+			
+			entries['Subject Id:'] = variant.patientId;
+			entries['Type:'] = variant.type;
+			entries['Variant Type:'] = variant.variantType;
+			entries['Coordinates:'] = variant.genomeCoordinates;
+			
+			var entryHeight = 20;
+			var i = 0;
+			for (var k in entries) {
+				var e = entries[k];
+				ctx.fillText(k, 5, 10 + entryHeight*i);
+				ctx.fillText(e, 100, 10 + entryHeight*i);
+				i++;
+			}
+		}
+
+	},
+
+	config : {
+		displayScaleFactor : null,
+		ctx : null,
+		zoom : null,
+		leftX : null,
+		chromosomeLayer : null,
+		displayWidth : null,
+		variantSeparationFactor : null,
+		chromosomeBaseGap : null,
+		globalEmphasis : 1,
+		previousEmphasizedSegment : null,
+		previousClosest : null,
+		mouseoverBuffer : 200000,
+		previousTrackIndex : -1,
+	},
+
+
+
+
+	betterDrawVariant : function(variant) {
+		this.renderVariant(variant, variant.colour);
+	},
+
+
+
+	renderVariant : function(variant, color) {
+		/* VariantSegment */
+		if (variant.bandEmphasis) {
+			this.emphasizeBand(variant);
+		}
+		var segment = new VariantSegment(variant, color, false);
+//		var segment = {
+//				start : variant.genomicRange.baseStart,
+//				end : variant.genomicRange.baseEnd,
+//				color : color,
+//				emphasize : false
+//		};
+		// pick track layer
+		var trackFound = false;
+		for (var trackIndex = 0; trackIndex < this.trackLayers.length; trackIndex++) {
+			var layer = this.trackLayers[trackIndex];
+			if ( layer.doesFit( segment ) ) {
+				this.drawLineSegment( layer.layerIndex, segment, this.ctx, this.displayScaleFactor );
+				layer.insert( segment );
+				trackFound = true;
+				break;
+			}
+		}
+		if (!trackFound) {
+			this.missingVariants.push(segment)
+		}
+	},
+	
+	emphasizeBand : function(variant) {
+		var start = variant.genomicRange.baseStart;
+		var end = variant.genomicRange.baseEnd;
+
+		var yStart = Math.round(this.chromosomeLayer.convertToDisplayCoordinates( start, this.displayScaleFactor ));
+		var yEnd =  Math.round(this.chromosomeLayer.convertToDisplayCoordinates( end, this.displayScaleFactor ));
+		
+		// Too small?
+		yEnd = yEnd - yStart < 1 ? yEnd + 1: yEnd;
+		
+//		this.ctx.fillStyle = '#FFFBCC';
+		this.ctx.fillStyle = variant.colour;
+		
+//		var padding = 3;
+		var padding = 1;
+		
+		this.ctx.fillRect( this.leftX + 1 + padding, yStart, this.displayWidth - 1 - 2 * padding, yEnd-yStart );
+	},
+
+	drawVariantInfo : function(offset, event) {
+		var trackIndex = this.getTrackIndex(offset.x);
+		var layer = this.trackLayers[trackIndex];
+		
+		if ( layer != undefined) {
+			
+			if (layer.segments.length == 0) {
+				return;
+			}
+			
+			// check to see if we are still within the previous segment, if so then do nothing
+			var baseY = this.chromosomeLayer.convertToBaseCoordinate( offset.y );
+			if ( this.previousClosest != null && this.previousTrackIndex == trackIndex && this.previousClosest.segment.isWithin(baseY) ) {
+//				console.log('same segment');
+				return;
+			}
+			
+			// check to see if we've moved far enough to hit something
+			if ( this.previousClosest != null && this.previousTrackIndex == trackIndex ) {
+				var moved = Math.abs(baseY - this.previousClosest.y);
+				if ( this.previousClosest.distance - moved > this.mouseoverBuffer) {
+					// Not close enough!
+					return;
+				}
+			}
+			
+			
+			var closest = layer.closestVariant(baseY);
+			
+			if (closest.distance < this.mouseoverBuffer) {
+				
+//				// Don't recolor the same segment
+//				if (this.previousEmphasizedSegment != null && this.previousEmphasizedSegment.layerIndex == trackIndex && 
+//						this.previousEmphasizedSegment.segment.start == closest.variant.start && 
+//						this.previousEmphasizedSegment.segment.end == closest.variant.end) {
+//					console.log(1);
+//					return;
+//				}
+				
+				this.deemphasizeSegment();
+				
+				this.emphasizeSegment(trackIndex, closest.segment);
+				
+				
+				var start = closest.segment.start;
+
+				// var x = this.leftX + 7;
+				var x = this.getTrackLeftX(trackIndex);
+
+				var yStart = Math.round(this.chromosomeLayer.convertToDisplayCoordinates( start, this.displayScaleFactor ));
+				
+				var tipY = Math.max(event.pageY - offset.y, event.pageY + (yStart - offset.y) - 100);
+				var tipX = event.pageX + (x - offset.x);
+				this.self.renderTip(closest.segment.variant, tipX, tipY);
+			} else {
+				this.deemphasizeSegment();
+				this.self.hideTipCtx();
+			}
+			
+			this.previousClosest = closest;
+			this.previousTrackIndex = trackIndex;
+		}
+	},
+	
+	getTrackLeftX : function(trackIndex) {
+		return Math.round(this.leftX + this.displayWidth + this.variantSeparationFactor * this.zoom * trackIndex + 3.5 + this.zoom * this.globalEmphasis / 2);
+	},
+	
+	getTrackIndex : function(x) {
+		return Math.round((x - 3.5 - this.leftX - this.displayWidth - this.zoom * this.globalEmphasis / 2) / ( this.variantSeparationFactor * this.zoom ));
+	},
+
+	/**
+	 * @public
+	 */
+	clearTracks : function() {
+		this.trackLayers = [];
+		// this.createTracks(10);
+		this.createTracks( this.numberOfTracks );
+	},
+
+	/**
+	 * numberOfTracks : the maximum variant pileup depth
+	 * 
+	 * @private
+	 * 
+	 */
+	createTracks : function(numberOfTracks) {
+		for (var i = 0; i < numberOfTracks; i++) {
+			this.trackLayers.push( new TrackLayer( i ) );
+		}
+	},
+	
+	
+	
+	emphasizeSegment : function(layerIndex, segment) {
+
+//		this.deemphasizeSegment();
+		var segmentClone = segment.clone();
+		segmentClone.color = '#00ff00';
+		this.drawLineSegment(layerIndex, segmentClone, this.ctx, this.displayScaleFactor);
+		this.previousEmphasizedSegment = {layerIndex : layerIndex, segment : segment};
+	},
+	
+	deemphasizeSegment : function() {
+		if (this.previousEmphasizedSegment != null) {
+			this.drawLineSegment(this.previousEmphasizedSegment.layerIndex, this.previousEmphasizedSegment.segment, this.ctx, this.displayScaleFactor);
+			this.previousEmphasizedSegment = null;
+		}
+	},
+
+	/**
+	 * 
+	 * @param {number}
+	 *           layerIndex
+	 * @param {VariantSegment}
+	 *           segment
+	 * @param {CanvasRenderingContext2D}
+	 *           ctx
+	 * @param {number}
+	 *           displayScaleFactor
+	 */
+	drawLineSegment : function(layerIndex, segment, ctx, displayScaleFactor) {
+		var start = segment.start;
+		var end = segment.end;
+
+		// var x = this.leftX + 7;
+		var x = this.getTrackLeftX(layerIndex);
+
+		var yStart = Math.round(this.chromosomeLayer.convertToDisplayCoordinates( start, displayScaleFactor ));
+		var yEnd =  Math.round(this.chromosomeLayer.convertToDisplayCoordinates( end, displayScaleFactor ));
+		
+		// Too small?
+		yEnd = yEnd - yStart < 1 ? yEnd + 1: yEnd;
+		
+
+		ctx.strokeStyle = segment.color;
+		if ( segment.emphasize ) {
+			ctx.lineWidth = 5 * this.zoom * this.globalEmphasis;
+		} else {
+			ctx.lineWidth = 1 * this.zoom * this.globalEmphasis;
+		}
+
+		ctx.beginPath();
+		ctx.moveTo( x, yStart );
+		ctx.lineTo( x, yEnd );
+		ctx.stroke();
+		ctx.lineWidth = 1 * this.zoom * this.globalEmphasis;
+	}
 } );
+
+var TrackLayer = function(layerIndex) {
+	
+	/* @type {Array.<VariantSegment>} */
+	this.segments = [];
+	this.layerIndex = layerIndex;
+};
+
+TrackLayer.prototype.closestVariant = function(y) {
+	var minDist = Number.MAX_VALUE;
+	var closestSegment = null;
+	for (var i = 0; i < this.segments.length; i++) {
+		var existingSegment = this.segments[i];
+		
+		if ( existingSegment.isWithin(y) ) {
+			return {segment: existingSegment, distance: 0, y: y}; 
+		}
+		
+		if ( y < existingSegment.start) {
+			dist = existingSegment.start - y;
+		} else {
+			dist = y - existingSegment.end
+		}
+		
+		if (dist < minDist) {
+			closestSegment = existingSegment;
+			minDist = dist;
+		}
+		
+	}
+	
+	return {segment: closestSegment, distance: minDist, y: y};
+};
+
+/**
+ * @param {{start:number,
+ *           end:number}} segment
+ * @returns {boolean}
+ */
+TrackLayer.prototype.doesFit = function(segment) {
+
+	for (var i = 0; i < this.segments.length; i++) {
+		var existingSegment = this.segments[i];
+		if ( segment.doesOverlap( existingSegment ) )
+			return false;
+	}
+	return true;
+};
+
+/**
+ * @param {VariantSegment}
+ *           segment
+ */
+TrackLayer.prototype.insert = function(segment) {
+	this.segments.push( segment );
+};
+
+var VariantSegment = function(variant, color, emphasize) {
+	this.start = variant.genomicRange.baseStart;
+	this.end = variant.genomicRange.baseEnd;
+	this.color = color;
+	this.emphasize = emphasize;
+	this.variant = variant;
+}
+
+VariantSegment.prototype.isWithin = function(point) {
+	return (this.start <= point && this.end >= point);
+}
+
+VariantSegment.prototype.doesOverlap = function(segment) {
+	return (this.isWithin(segment.start ) || this.isWithin( segment.end ) || segment.isWithin( this.start ) || segment.isWithin( this.end ));
+}
+
+VariantSegment.prototype.clone = function() {
+	return new VariantSegment (this.variant, this.color, this.emphasize);
+}
