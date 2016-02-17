@@ -334,19 +334,19 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 		// Too small?
 		yEnd = yEnd - yStart < 1 ? yEnd + 1: yEnd;
 		
-
+		ctx.save();
 		ctx.strokeStyle = segment.color;
-		if ( segment.emphasize ) {
-			ctx.lineWidth = 5 * this.zoom * this.globalEmphasis;
-		} else {
+//		if ( segment.emphasize ) {
+//			ctx.lineWidth = 5 * this.zoom * this.globalEmphasis;
+//		} else {
 			ctx.lineWidth = 1 * this.zoom * this.globalEmphasis;
-		}
+//		}
 
 		ctx.beginPath();
 		ctx.moveTo( x, yStart );
 		ctx.lineTo( x, yEnd );
 		ctx.stroke();
-		ctx.lineWidth = 1 * this.zoom * this.globalEmphasis;
+		ctx.restore();
 	}
 } );
 

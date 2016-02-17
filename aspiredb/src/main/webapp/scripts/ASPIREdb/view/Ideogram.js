@@ -84,8 +84,7 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
 
       this.on( 'afterrender', this.registerMouseEventListeners, this );
       this.on( 'afterrender', this.initAfterRender, this );
-
-
+      this.on( 'resize', this.afterResize, this );
       
       ASPIREdb.EVENT_BUS.on( 'property_changed', this.setDisplayedProperty, this);
 
@@ -95,6 +94,14 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
 
    },
    
+   afterResize : function() {
+	   if ( !this.doneDrawing )
+		   return;
+	   console.log('resize');
+	   this.initCanvasSize();
+	   this.redraw();
+   },
+
    initAfterRender : function() {
 	   this.ctx = this.getComponent( "canvasBox" ).getEl().dom.getContext( '2d' );
 	   this.ctxOverlay = this.getComponent( "canvasBoxOverlay" ).getEl().dom.getContext( '2d' );
@@ -113,21 +120,13 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
 	   // Default chromosomes
 	   this.chromosomeOrder = this.baseChromosomeOrder.slice();
 
-	   // Scale chromosomeBaseGap for the number of chromosome being displayed
-	   this.chromosomeBaseGap = (this.boxWidth - 55 - 5) / this.chromosomeOrder.length;
-
-	   this.width = Math.round( 5 + this.chromosomeBaseGap * this.chromosomeOrder.length * this.zoom + 55 );
-	   this.height = Math.round( this.boxHeight * this.zoom );
-
-
-
 	   this.fetchChromosomeInfo();
 
 	   var me = this;
 	   ChromosomeService.getChromosomes( {
 		   callback : function(chromosomeValueObjects) {
 			   me.chromosomeValueObjects = chromosomeValueObjects;
-			   me.drawChromosomes();
+			   me.initCanvasSize();
 		   }
 	   } );
    },
@@ -138,8 +137,6 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    },
    
    subjectsSelected : function(subjectIds) {
-//	   this.selectedSubjectIds = subjectIds;
-	   this.drawChromosomes();
 	   var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
 	   var ref = this;
 
@@ -260,6 +257,9 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    globalVariantEmphasis : 1,
    
    isChromosomeIsolated : false,
+   
+   currentTransform : {x : 0, y : 0},
+   
    /**
     * @private
     */
@@ -293,15 +293,16 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
 	    	   this.variantSeparationFactor = 1.2;
 	    	   this.globalVariantEmphasis = 1;
 	    	   this.isChromosomeIsolated = false;
-	       } else if ( chromosomeIdeogram != null ) {
+	       } else {
 	    	   this.chromosomeOrder = [chromosomeIdeogram.name];
     	       this.chromosomeBaseWidth = 26;
 	    	   this.variantSeparationFactor = 3;
 	    	   this.globalVariantEmphasis = 2;
 	    	   this.isChromosomeIsolated = true;
 	       }  
-	       this.chromosomeBaseGap = (this.boxWidth - 55 - 5) / this.chromosomeOrder.length;
-    	   this.changeZoom(1, this.variants);
+	       this.chromosomeBaseGap = (this.boxWidth - 5) / this.chromosomeOrder.length;
+    	   this.changeZoom(1, this.variants, true);
+    	   this.up().zoomOutButton.setVisible( false );
    },
    
 //   getOffset :  function(e) {
@@ -331,8 +332,8 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    getOffset : function(evt) {
       if ( evt.offsetX != undefined )
          return {
-            x : evt.offsetX,
-            y : evt.offsetY
+            x : evt.offsetX - this.currentTransform.x,
+            y : evt.offsetY - this.currentTransform.y
          };
 
       var el = evt.target;
@@ -347,8 +348,8 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
          el = el.offsetParent;
       }
 
-      offset.x = evt.pageX - offset.x;
-      offset.y = evt.pageY - offset.y;
+      offset.x = evt.pageX - offset.x - this.currentTransform.x;
+      offset.y = evt.pageY - offset.y - this.currentTransform.y;
 
       return offset;
    },
@@ -456,12 +457,23 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
     *           newZoom
     */
    // changeZoom : function(newZoom, variants, property) {
-   changeZoom : function(newZoom, variants) {
+   changeZoom : function(newZoom, variants, resetTransform) {
       this.zoom = newZoom;
-      this.width = Math.round( 5 + this.chromosomeBaseGap * this.chromosomeOrder.length * this.zoom + 55 );
-      this.height = Math.round( this.boxHeight * this.zoom );
+      this.updateLengths();
+      
+      if (resetTransform) {
+    	  this.clearTransform();
+      }
+      
       this.redraw( variants );
       // this.redraw(variants, property);
+   },
+   
+   updateLengths : function() {
+	      // Scale chromosomeBaseGap for the number of chromosome being displayed
+	   	  this.chromosomeBaseGap = (this.boxWidth - 5) / this.chromosomeOrder.length;
+	      this.width = Math.round( 5 + this.chromosomeBaseGap * this.chromosomeOrder.length * this.zoom );
+	      this.height = Math.round( this.boxHeight * this.zoom );  
    },
 
    /**
@@ -528,23 +540,34 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
     */
    initCanvasSize : function() {
 	   var me = this;
+	   this.boxHeight = this.body.lastBox.height - 20;
+	   this.boxWidth = Math.max(500, this.body.lastBox.width - 200);
+	   
 	   function prepCanvas(ctx) {
-		   
-	       ctx.canvas.height = me.height; // + "px";
-	       ctx.canvas.width = me.width; // + "px";
-	       
-	       ctx.clearRect( 0, 0, me.width, me.height );
+
+		   ctx.canvas.height = me.boxHeight; // + "px";
+		   ctx.canvas.width = me.boxWidth; // + "px";
+
 		   return ctx;
 	   }
+
+	   prepCanvas( this.ctx );
+	   prepCanvas( this.ctxOverlay );
+	   prepCanvas( this.ctxSelection );
 	   
-      prepCanvas( this.ctx );
-      prepCanvas( this.ctxOverlay );
-      prepCanvas( this.ctxSelection );
-      
-      this.ctxLegend.canvas.height = 400;
-      this.ctxLegend.canvas.width = 200;
-	  this.ctxLegend.canvas.style.left = this.width;
-	  this.ctxLegend.canvas.style.top = 20;
+	   // Setting canvas widths resets transformation matrix, put it back to where it was
+	   this.ctx.translate(this.currentTransform.x, this.currentTransform.y);
+	   this.ctxOverlay.translate(this.currentTransform.x, this.currentTransform.y);
+	   this.ctxSelection.translate(this.currentTransform.x, this.currentTransform.y);
+
+	   this.ctxLegend.canvas.height = 400;
+	   this.ctxLegend.canvas.width = 200;
+	   this.ctxLegend.canvas.style.left = this.boxWidth;
+	   this.ctxLegend.canvas.style.top = 20;
+	   
+	   this.updateLengths();
+	   
+	   
    },
 
    /**
@@ -651,10 +674,15 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
     */
    redraw : function(variants) {
 	   if (variants == undefined || variants == null) {
-		   variants = this.variants;
+		   variants = this.variants == null ? [] : this.variants;
 	   }
-      this.drawChromosomes();
-      this.drawVariants(variants);
+	   
+	   this.clear(this.ctx);
+	   this.clear(this.ctxOverlay);
+	   this.clear(this.ctxSelection);
+	   
+	   this.drawChromosomes();
+	   this.drawVariants(variants);
    },
 
    /**
@@ -663,7 +691,6 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
    drawChromosomes : function() {
       this.doneDrawing = false;
 
-      this.initCanvasSize();
       this.initChromosomeIdeograms();
 
       for ( var chromosomeName in this.chromosomeIdeograms) {
@@ -672,6 +699,23 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
       }
 
       this.doneDrawing = true;
+   },
+   
+   clearTransform : function() {
+	   this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+	   this.ctxOverlay.setTransform(1, 0, 0, 1, 0, 0);
+	   this.ctxSelection.setTransform(1, 0, 0, 1, 0, 0);
+	   this.currentTransform.x = 0;
+	   this.currentTransform.y = 0;
+   },
+   
+   clear : function(ctx) {
+	   ctx.save();
+	   ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+	   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+	   ctx.restore();
    },
 
    /**

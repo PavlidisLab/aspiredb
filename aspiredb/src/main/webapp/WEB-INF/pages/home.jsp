@@ -119,10 +119,10 @@
       launch : function() {
 
          var viewport = Ext.create( 'ASPIREdb.AspireDbPanel' );
-         var ideogramBody = Ext.getCmp('ideogram').body.dom;
+         var ideogram = Ext.getCmp('ideogram');
          
          // Drag panning javascript functionality for ideogram
-         dragPan(ideogramBody);
+         dragPan(ideogram);
          myMask.hide();
       }
    } );

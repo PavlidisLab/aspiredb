@@ -144,7 +144,10 @@ ColourLegend.prototype.refresh = function() {
 
 	var legendX = 0;
 	var legendY = 0;
+	ctx.save();
+	ctx.setTransform(1, 0, 0, 1, 0, 0);
 
+	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 	ctx.beginPath();
 	ctx.lineWidth=1;
 	ctx.textBaseline = "middle";
@@ -168,6 +171,7 @@ ColourLegend.prototype.refresh = function() {
 		i++;
 	}
 
+	ctx.restore();
 
 
 };

@@ -472,17 +472,14 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
     	  legendProperty = new VariantTypeProperty();
       }
       
-      
-//         ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', legendProperty );
-         ref.redrawIdeogram( legendProperty );
-      
 
       var d = new Date();
       GeneService.getGenesPerVariant( variantIds, {
          callback : function(variantGenes) {
             ref.createVariantGrid( vvos, properties, variantGenes )
             ref.setLoading( false );
-            console.log( 'Getting genes for ' + variantIds.length + ' variants took ' + (new Date() - d) + ' ms' )
+            console.log( 'Getting genes for ' + variantIds.length + ' variants took ' + (new Date() - d) + ' ms' );
+            ref.redrawIdeogram( legendProperty, true );
          },
          errorHandler : function(message, exception) {
             // Ext.Msg.alert( 'Error', message )
@@ -675,11 +672,14 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    /**
     * Redraw the ideogram based on colour coding
     */
-   redrawIdeogram : function(property) {
+   redrawIdeogram : function(property, redoCanvasSize) {
 	   ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
 	   
       var ideogram = this.getComponent( 'ideogram' );
       
+      if (redoCanvasSize) {
+    	  ideogram.initCanvasSize();
+      }
       ideogram.setDisplayedProperty( property );
       ideogram.redraw(this.loadedVariants);
    },
@@ -858,7 +858,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 //      this.zoomInButton.setVisible( false );
       this.zoomOutButton.setVisible( true );
       var ideogram = this.getComponent( 'ideogram' );
-      ideogram.changeZoom( ideogram.zoom+1, this.loadedVariants );
+      ideogram.changeZoom( ideogram.zoom+1, this.loadedVariants, true );
 
    },
 
@@ -866,7 +866,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       this.zoomOutButton.setVisible( false )
 //      this.zoomInButton.setVisible( true );
       var ideogram = this.getComponent( 'ideogram' );
-      ideogram.changeZoom( 1, this.loadedVariants );
+      ideogram.changeZoom( 1, this.loadedVariants, true );
 
    },
 
