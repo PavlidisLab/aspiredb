@@ -479,6 +479,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             ref.createVariantGrid( vvos, properties, variantGenes )
             ref.setLoading( false );
             console.log( 'Getting genes for ' + variantIds.length + ' variants took ' + (new Date() - d) + ' ms' );
+            ref.colourVariantByCombo.select('type');
             ref.redrawIdeogram( legendProperty, true );
          },
          errorHandler : function(message, exception) {
