@@ -348,7 +348,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             stripeRows : true,
             height : 180,
             width : 500,
-            title : 'Variant View',
+            title : 'Variant Table',
             tooltip : 'A tabular view of variant information. To reveal additional variant details, click on the drop-down arrow on the right hand side of a column header.',
 
             visibleLabels : visibleLabels
