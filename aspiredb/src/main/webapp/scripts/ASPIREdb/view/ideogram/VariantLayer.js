@@ -61,11 +61,15 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 		
 		tipHidden: true,
 		
+		tipBaseHeight : 15,
+		
+		tipBaseWidth : 100,
+		
 		createTipCtx : function() {
 			var ttipCanvas =  document.createElement("canvas");
 			ttipCanvas.style.position = "absolute";
-			ttipCanvas.width = 275;
-			ttipCanvas.height = 95;
+			ttipCanvas.width = ASPIREdb.view.ideogram.VariantLayer.tipBaseWidth;  // 275 min
+			ttipCanvas.height = ASPIREdb.view.ideogram.VariantLayer.tipBaseHeight; //115 for 5
 			
 			ttipCanvas.style.left = "-300px";
 			ttipCanvas.style.top = "100px";
@@ -96,33 +100,98 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 		hideTipCtx : function() {
 			if (!ASPIREdb.view.ideogram.VariantLayer.tipHidden) {
 				var ctx = ASPIREdb.view.ideogram.VariantLayer.getTipCtx();
-				ctx.canvas.style.left = "-300px";
+				ctx.canvas.style.left = -1 * ( ctx.canvas.width + 50 ) + "px";
 				ASPIREdb.view.ideogram.VariantLayer.tipHidden = true;
 			}
 		},
 		
 		renderTip : function(variant, x, y) {
 			var ctx = ASPIREdb.view.ideogram.VariantLayer.getTipCtx();
-			ctx.canvas.style.left = x + "px";
-			ctx.canvas.style.top = y + "px";
 			ASPIREdb.view.ideogram.VariantLayer.tipHidden = false;
-			ctx.clearRect(0,0,ctx.canvas.width, ctx.canvas.height);
+						
+			var entries = []
+
+			entries.push( new TipEntry('Subject Id:', ctx, ", ", 1, variant.patientId) );
 			
-			var entries = {};
-			
-			entries['Subject Id:'] = variant.patientId;
-			entries['Type:'] = variant.type;
-			entries['Variant Type:'] = variant.variantType;
-			entries['Coordinates:'] = variant.genomeCoordinates;
-			
-			var entryHeight = 20;
-			var i = 0;
-			for (var k in entries) {
-				var e = entries[k];
-				ctx.fillText(k, 5, 10 + entryHeight*i);
-				ctx.fillText(e, 100, 10 + entryHeight*i);
-				i++;
+			if (variant.type != undefined) {
+				entries.push( new TipEntry('Type:', ctx, ", ", 1, variant.type) );
 			}
+			
+			entries.push( new TipEntry('Variant Type:', ctx, ", ", 1, variant.variantType) );
+			
+			entries.push( new TipEntry('Coordinates:', ctx, ", ", 1, variant.genomeCoordinates) );
+
+			// Labels Section
+
+			var entry = new TipEntry('Labels:', ctx, ", ", 1);
+			for (var i = 0; i < variant.labels.length; i++) {
+				var l = variant.labels[i];
+				entry.addEntry(l.name, l.colour);
+			}
+			if (variant.labels.length > 0) {
+				entries.push( entry );
+			}
+			
+			// Genes section
+
+			entry = new TipEntry('Genes:', ctx, ", ", 4);
+			for (var i = 0; i < variant.overlappingGenes.length; i++) {
+				var g = variant.overlappingGenes[i];
+				entry.addEntry(g.symbol);				
+			}
+			
+			if (variant.overlappingGenes.length > 0) {
+				entries.push( entry );
+			}
+			
+			// Calculate canvas width
+			var maxWidth = 0;
+			var entryCount = 0;
+			for (var i = 0; i < entries.length; i++) {
+				var e = entries[i];
+				maxWidth = Math.max(maxWidth, e.maxWidth());
+				entryCount += e.groups.length;
+			}
+
+			var entryHeight = 20;
+			
+			var tipWidth = maxWidth + ASPIREdb.view.ideogram.VariantLayer.tipBaseWidth + 5;
+			var tipHeight = ASPIREdb.view.ideogram.VariantLayer.tipBaseHeight + entryCount * entryHeight;
+			
+			ctx.canvas.width = tipWidth;
+			ctx.canvas.height = tipHeight;
+
+			var cnt = 0;
+			for (var i = 0; i < entries.length; i++) {
+				var e = entries[i];
+				ctx.fillText(e.label, 5, 20 + entryHeight*cnt);
+				for (var k = 0; k < e.groups.length; k++) {
+					var group = e.groups[k];
+					
+					var xText = 100;
+					for (var m = 0; m < group.length; m++) {
+						var t = group[m];
+						
+						if (t.colour) {
+							ctx.save();
+							ctx.fillStyle = "#" + t.colour;
+							ctx.fillRect(xText, 20 + entryHeight*cnt - 10, t.width, 12);
+							ctx.fillStyle = ASPIREdb.view.LabelControlWindow.getContrastYIQ(t.colour);
+						}
+						
+						ctx.fillText(t.text + (m != group.length - 1 ? e.split : ""), xText, 20 + entryHeight*cnt);
+						xText += t.width + e.splitWidth;
+						if (t.colour) {
+							ctx.restore();
+						}
+					}
+					cnt++;
+				}
+
+			}
+
+			ctx.canvas.style.left = x + "px";
+			ctx.canvas.style.top = (y - ctx.canvas.height - 20) + "px";
 		}
 
 	},
@@ -250,7 +319,7 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 
 				var yStart = Math.round(this.chromosomeLayer.convertToDisplayCoordinates( start, this.displayScaleFactor ));
 				
-				var tipY = Math.max(event.pageY - offset.y, event.pageY + (yStart - offset.y) - 100);
+				var tipY = Math.max(event.pageY - offset.y, event.pageY + (yStart - offset.y));
 				var tipX = event.pageX + (x - offset.x);
 				this.self.renderTip(closest.segment.variant, tipX, tipY);
 			} else {
@@ -349,6 +418,60 @@ Ext.define( 'ASPIREdb.view.ideogram.VariantLayer', {
 		ctx.restore();
 	}
 } );
+
+var TipEntry = function(label, ctx, split, entriesPerLine, entry, colour) {
+	this.label = label;
+	this.entriesPerLine = entriesPerLine;
+	this.groups = [[]];
+	this.entries = 0;
+	this.split = split;
+	this.ctx = ctx;
+	this.splitWidth = ctx.measureText(split).width;
+	
+	if (entry != undefined) {
+		this.addEntry(entry, colour);
+	}
+
+}
+
+TipEntry.prototype.addEntry = function(entry, colour) {
+	if (entry.trim() == "" ) {
+		return;
+	}
+	
+	this.entries++;
+	
+	var peek = this.groups[this.groups.length - 1];
+	
+	if (peek.length == this.entriesPerLine) {
+		// Need a new group
+		peek = [];
+		this.groups.push(peek);
+	}
+	
+	peek.push({text: entry, colour: colour, width: this.ctx.measureText(entry).width});
+};
+
+TipEntry.prototype.maxWidth = function() {
+	var maxWidth = 0;
+	for (var i = 0; i < this.groups.length; i++) {
+		var g = this.groups[i];
+		var width = 0;
+		for (var k = 0; k < g.length; k++) {
+			var e = g[k];
+			width += e.width;
+			
+		}
+		
+		width += (g.length - 1) * this.splitWidth; // Account for split characters
+		
+		maxWidth = Math.max(maxWidth, width);
+		
+	}
+	return maxWidth;
+}
+
+
 
 var TrackLayer = function(layerIndex) {
 	

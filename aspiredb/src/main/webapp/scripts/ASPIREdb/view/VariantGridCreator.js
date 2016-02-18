@@ -474,6 +474,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
                }
             }
             dataRow.push( geneSymbols );
+            vvo.overlappingGenes = geneSymbols;
 
             // aggregate characteristics
             for (var j = 0; j < characteristicNames.length; j++) {
