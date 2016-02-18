@@ -493,6 +493,30 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       var toolbar = ref.getDockedComponent( 'variantTabPanelToolbar' );
 
+      toolbar.add({
+          xtype: 'image',       
+//          style:'right: auto; left: 0px; top: 6px;',
+          src: 'scripts/ASPIREdb/resources/images/qmark.png',      
+          height: '14px',
+          width: '15px',
+          listeners: {
+             afterrender: function(c) {
+                 Ext.create('Ext.tip.ToolTip', {
+                     target: c.getEl(),
+                     html: '<h3>Controls</h3>\
+                    	    <ul>\
+                    	    <li><b>Right Click + Drag:</b> Pan the ideogram</li>\
+                    	    <li><b>Left Click + Drag:</b> Select a region of a chromosome</li>\
+                    	    <li><b>Double Click:</b> Isolate/de-isolate a chromosome</li>\
+                    	    </ul>\
+                    	    While a chromosome is isolated you may hover variants for more information.'
+                 });
+             }
+         }
+      });
+      
+      toolbar.add( ref.tbSeparator );
+      
       toolbar.add( ref.actionsButton );
       toolbar.add( ref.labelsButton );
       toolbar.add( ref.reportButton );
@@ -503,12 +527,13 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       toolbar.add( ref.colourVariantByCombo );
       toolbar.add( ref.tbSpacer );
-
+      
       toolbar.add( ref.zoomInButton );
       toolbar.add( ref.zoomOutButton );
 
       toolbar.add( ref.tbFill );
       toolbar.add( ref.saveButton );
+      
       toolbar.add( ref.exportButton );
 
       // }
