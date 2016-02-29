@@ -290,13 +290,15 @@ public class VariantUploadService {
     // Quick and dirty method to grab data from DGV data file they gave us
     public static CNVValueObject makeDGVCNVFromResultSet( ResultSet results ) throws Exception {
 
-        String variantsubtype = results.getString( "variantsubtype" ).trim();
+        String variantsubtype = results.getString( "variantsubtype" ).trim().toUpperCase();
 
         // Sanja says to exclude these
-        if ( variantsubtype.equals( "Complex" ) || variantsubtype.equals( "Inversion" )
-                || variantsubtype.equals( "Insertion" ) ) {
+        if ( variantsubtype.equals( "COMPLEX" ) || variantsubtype.equals( "INVERSION" )
+                || variantsubtype.equals( "INSERTION" ) || variantsubtype.equals( "MOBILE ELEMENT INSERTION" ) 
+                || variantsubtype.equals( "NOVEL SEQUENCE INSERTION" ) || variantsubtype.equals( "SEQUENCE ALTERATION" ) 
+                || variantsubtype.equals( "TANDEM DUPLICATION" )) {
 
-            log.info( "ignored variant subtype" );
+            //log.info( "ignored variant subtype" );
             throw new Exception( "ignored variant subtype" );
         }
 
@@ -309,11 +311,11 @@ public class VariantUploadService {
         cnv.setGenomicRange( getGenomicRangeFromResultSet( results ) );
         cnv.setCnvLength( cnv.getGenomicRange().getBaseEnd() - cnv.getGenomicRange().getBaseStart() );
 
-        if ( variantsubtype.equals( "Gain" ) || variantsubtype.equals( "Duplication" ) ) {
+        if ( variantsubtype.equals( "GAIN" ) || variantsubtype.equals( "DUPLICATION" ) ) {
             cnv.setType( CnvType.GAIN.name() );
-        } else if ( variantsubtype.equals( "Loss" ) || variantsubtype.equals( "Deletion" ) ) {
+        } else if ( variantsubtype.equals( "LOSS" ) || variantsubtype.equals( "DELETION" ) ) {
             cnv.setType( CnvType.LOSS.name() );
-        } else if ( variantsubtype.equals( "Gain+Loss" ) ) {
+        } else if ( variantsubtype.equals( "GAIN+LOSS" ) ) {
             cnv.setType( CnvType.GAINLOSS.name() );
         } else if ( variantsubtype.equals( "CNV" ) ) {
             cnv.setType( CnvType.UNKNOWN.name() );
@@ -468,7 +470,7 @@ public class VariantUploadService {
                 errorMessages.add( "Invalid data format on line number: " + lineNumber + " error message:"
                         + e.getMessage() );
             } catch ( Exception e ) {
-                log.error( e );
+                log.error( e.getMessage(), e );
                 errorMessages.add( "Error on line number: " + lineNumber + " error message:" + e.getMessage() );
             }
         }

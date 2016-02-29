@@ -290,7 +290,7 @@ public class ProjectManagerImpl implements ProjectManager {
         if ( projectDao.findByProjectName( name ) != null ) {
 
             if ( deleteProject ) {
-
+            	log.info("Deleting project: " + name);
                 deleteProject( name );
 
             } else {
