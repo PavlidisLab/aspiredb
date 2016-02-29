@@ -80,8 +80,8 @@ public class Subject implements Serializable, SecuredChild {
     @OneToMany(cascade = { CascadeType.ALL }, mappedBy = "subject", orphanRemoval = true)
     private Collection<Phenotype> phenotypes = new HashSet<Phenotype>();
 
-    @OneToMany(cascade = { CascadeType.ALL }, orphanRemoval = true)
-    @JoinTable(name = "SUBJECT_VARIANT", joinColumns = { @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "VARIANT_ID", referencedColumnName = "ID") })
+    @OneToMany(cascade = { CascadeType.ALL }, orphanRemoval = true, mappedBy="subject")
+    //@JoinTable(name = "SUBJECT_VARIANT", joinColumns = { @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "VARIANT_ID", referencedColumnName = "ID") })
     private List<Variant> variants;
 
     @ManyToMany
