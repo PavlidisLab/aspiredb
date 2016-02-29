@@ -53,10 +53,10 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
-        <repository>
+<!--        <repository>
             <id>m.g.o</id>
             <url>http://maven.glassfish.org/content/groups/public/</url>
-        </repository>
+        </repository>-->
         <repository>
             <id>SourceForge</id>
             <url>http://csvjdbc.sourceforge.net/maven2</url>
