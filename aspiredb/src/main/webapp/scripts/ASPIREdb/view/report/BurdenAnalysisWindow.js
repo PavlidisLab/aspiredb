@@ -139,7 +139,7 @@ Ext.define( 'ASPIREdb.view.report.BurdenAnalysisWindow', {
             ueryMode : 'local',
             editable : false,
             forceSelection : true,
-            width : 100,
+            width : 300,
             listeners : {
                'change' : me.charLabelComboSelectHandler,
             /*
