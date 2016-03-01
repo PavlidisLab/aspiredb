@@ -317,11 +317,25 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             listeners : {
                cellclick : function(view, td, cellIndex, record, tr, rowIndex, e, eOpts) {
 
-                  var rec = grid.getStore().getAt( rowIndex );
-                  var patientId = rec.get( 'patientId' );
                   var subjectStore = Ext.getStore( 'subjectStore' )
-                  var subjectId = subjectStore.getAt( subjectStore.findExact( 'patientId', patientId ) ).get( 'id' )
-                  ASPIREdb.EVENT_BUS.fireEvent( 'select_subject_from_variant_grid', [ subjectId ] );
+                  var selectedVariantRecords = grid.getSelectionModel().getSelection();
+                  
+                  var temp = {};
+                  for (var i = 0; i < selectedVariantRecords.length; i++) {
+                	  var rec = selectedVariantRecords[i];
+                	  var patientId = rec.get( 'patientId' );
+                	  var subjectId = subjectStore.getAt( subjectStore.findExact( 'patientId', patientId ) ).get( 'id' )
+                	  temp[subjectId] = true;
+                  }
+
+                  // Unique subjects only
+                  var r = [];
+                  for (var k in temp) {
+                	  r.push(k);
+                  }
+                  
+                  
+                  ASPIREdb.EVENT_BUS.fireEvent( 'select_subject_from_variant_grid', r );
                }
             },
 
@@ -334,7 +348,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
             stripeRows : true,
             height : 180,
             width : 500,
-            title : 'Variant View',
+            title : 'Variant Table',
             tooltip : 'A tabular view of variant information. To reveal additional variant details, click on the drop-down arrow on the right hand side of a column header.',
 
             visibleLabels : visibleLabels
@@ -460,6 +474,7 @@ Ext.define( 'ASPIREdb.view.VariantGridCreator',
                }
             }
             dataRow.push( geneSymbols );
+            vvo.overlappingGenes = geneSymbols;
 
             // aggregate characteristics
             for (var j = 0; j < characteristicNames.length; j++) {

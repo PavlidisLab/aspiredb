@@ -63,7 +63,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
    items : [ {
       xtype : 'ideogram',
-      itemId : 'ideogram'
+      itemId : 'ideogram',
+      id: 'ideogram',
    } ],
 
    config : {
@@ -251,8 +252,9 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                });
             }
                
-            }
-      } );          
+            },
+         value : 'type',
+      } );
 
       this.colourVariantByCombo.on( 'select', this.colourVariantByHandler, this );
 
@@ -313,17 +315,18 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       } );
 
       ASPIREdb.EVENT_BUS.on( 'property_changed', function(property) {
-         ref.property = [];
+         ref.property = []; // TODO WHY?
          ref.property = property;
       } );
 
       ASPIREdb.EVENT_BUS.on( 'subjects_loaded', function(subjectIds) {
-         ref.loadedSubjects = [];
+         ref.loadedSubjects = []; // TODO WHY?
          ref.loadedSubjects = subjectIds;
       } );
 
       // when subjects selected it is focused in variant grid
       ASPIREdb.EVENT_BUS.on( 'subject_selected', this.subjectSelectionHandler, this );
+            
 
       this.saveButton.on( 'click', function() {
          ref.saveButtonHandler();
@@ -358,9 +361,10 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             currentlySelectedRecords = this.getIdeogramVariantRecordSelection();
             this.selectAllButton.hide();
             this.deselectAllButton.hide();
-            ideogram.showColourLegend();
             this.colourVariantByCombo.show();
-            this.zoomOutButton.show();
+            if (ideogram.zoom != 1) {
+            	this.zoomOutButton.show();
+            }
             this.zoomInButton.show();
             this.exportButton.show();
             this.saveButton.hide();
@@ -370,7 +374,6 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             currentlySelectedRecords = this.getSelectedVariants();
             this.selectAllButton.show();
             this.deselectAllButton.show();
-            ideogram.hideColourLegend();
             this.colourVariantByCombo.hide();
             this.zoomOutButton.hide();
             this.zoomInButton.hide();
@@ -425,6 +428,11 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          }
          ref.focusSelectedVariants();
       } );
+      
+      // Fixes bug with selecting rows from the variant view before tabbing to it (read rendering the table)
+      grid.on( 'viewready', function() {
+   	   ref.focusSelectedVariants(ref.selectedVariants);
+      });
 
       ref.add( grid );
    },
@@ -458,17 +466,21 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             ref.down( '#statusbar' ).update( ref.loadedVariants.length + " / " + NoOfVariants + " variants loaded" );
          }
       } );
-
-      var ideogram = ref.getComponent( 'ideogram' );
-      ideogram.drawChromosomes();
-      ideogram.drawVariants( vvos );
+      
+      // refresh the legend (e.g. Variant Labels) in ideogram
+      if ( legendProperty == null ) {
+    	  legendProperty = new VariantTypeProperty();
+      }
+      
 
       var d = new Date();
       GeneService.getGenesPerVariant( variantIds, {
          callback : function(variantGenes) {
             ref.createVariantGrid( vvos, properties, variantGenes )
             ref.setLoading( false );
-            console.log( 'Getting genes for ' + variantIds.length + ' variants took ' + (new Date() - d) + ' ms' )
+            console.log( 'Getting genes for ' + variantIds.length + ' variants took ' + (new Date() - d) + ' ms' );
+            ref.colourVariantByCombo.select('type');
+            ref.redrawIdeogram( legendProperty, true );
          },
          errorHandler : function(message, exception) {
             // Ext.Msg.alert( 'Error', message )
@@ -481,6 +493,30 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       var toolbar = ref.getDockedComponent( 'variantTabPanelToolbar' );
 
+      toolbar.add({
+          xtype: 'image',       
+//          style:'right: auto; left: 0px; top: 6px;',
+          src: 'scripts/ASPIREdb/resources/images/qmark.png',      
+          height: '14px',
+          width: '15px',
+          listeners: {
+             afterrender: function(c) {
+                 Ext.create('Ext.tip.ToolTip', {
+                     target: c.getEl(),
+                     html: '<h3>Controls</h3>\
+                    	    <ul>\
+                    	    <li><b>Right Click + Drag:</b> Pan the ideogram</li>\
+                    	    <li><b>Left Click + Drag:</b> Select a region of a chromosome</li>\
+                    	    <li><b>Double Click:</b> Isolate/de-isolate a chromosome</li>\
+                    	    </ul>\
+                    	    While a chromosome is isolated you may hover variants for more information.'
+                 });
+             }
+         }
+      });
+      
+      toolbar.add( ref.tbSeparator );
+      
       toolbar.add( ref.actionsButton );
       toolbar.add( ref.labelsButton );
       toolbar.add( ref.reportButton );
@@ -491,20 +527,14 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       toolbar.add( ref.colourVariantByCombo );
       toolbar.add( ref.tbSpacer );
-
+      
       toolbar.add( ref.zoomInButton );
       toolbar.add( ref.zoomOutButton );
 
       toolbar.add( ref.tbFill );
       toolbar.add( ref.saveButton );
+      
       toolbar.add( ref.exportButton );
-
-      // refresh the legend (e.g. Variant Labels) in ideogram
-      if ( legendProperty != null ) {
-         ASPIREdb.EVENT_BUS.fireEvent( 'colorCoding_selected' );
-         ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', legendProperty );
-         ref.redrawIdeogram( legendProperty );
-      }
 
       // }
       // } );
@@ -588,19 +618,8 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
     * Refresh the selected subjects in ideogram
     */
    subjectLabelUpdateHandler : function() {
-      // this.filterSubmitHandler( this.filterConfigs );
-      var ideogram = this.getComponent( 'ideogram' );
+      // Doesn't do anything for now...
 
-      if ( ideogram.colourLegend.isVisible() ) {
-         ideogram.hideColourLegend();
-
-         var property = new SubjectLabelProperty();
-         property.name = 'Subject Labels';
-         property.displayName = 'Subject Label';
-         // ASPIREdb.EVENT_BUS.fireEvent('property_changed',property);
-         this.redrawIdeogram( property );
-
-      }
    },
 
    /**
@@ -612,82 +631,65 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       if ( ideogram.isVisible() ) {
          var selectedValue = records[0].data.id;
-         ASPIREdb.EVENT_BUS.fireEvent( 'colorCoding_selected' );
 
          switch (selectedValue) {
             case 'type': {
                var property = new VariantTypeProperty();
                property.name = 'type';
                property.displayName = 'Variant Type';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'cnvType': {
                var property = new CNVTypeProperty();
                property.name = 'cnvType';
                property.displayName = 'CNV Type';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'characteristics': {
                var property = new CharacteristicProperty();
                property.name = 'Characteristics';
                property.displayName = 'Characteristics';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'inheritance': {
                var property = new CharacteristicProperty();
                property.name = 'Inheritance';
                property.displayName = 'Inheritance';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'subjectLabels': {
                var property = new SubjectLabelProperty();
                property.name = 'Subject Labels';
                property.displayName = 'Subject Label';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'labels': {
                var property = new VariantLabelProperty();
                property.name = 'Labels';
                property.displayName = 'Variant Labels';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'commonCNV': {
                var property = new CharacteristicProperty();
                property.name = 'Common CNV';
                property.displayName = 'Common CNV';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'arrayReport': {
                var property = new CharacteristicProperty();
                property.name = 'Array Report';
                property.displayName = 'Array Report';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
             case 'arrayPlatform': {
                var property = new CharacteristicProperty();
                property.name = 'Array Platform';
                property.displayName = 'Array Platform';
-               ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
-               this.redrawIdeogram( property );
                break;
             }
          }
+//         ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
+         this.redrawIdeogram( property );
 
       }
 
@@ -696,13 +698,16 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    /**
     * Redraw the ideogram based on colour coding
     */
-   redrawIdeogram : function(property) {
+   redrawIdeogram : function(property, redoCanvasSize) {
+	   ASPIREdb.EVENT_BUS.fireEvent( 'property_changed', property );
+	   
       var ideogram = this.getComponent( 'ideogram' );
-
+      
+      if (redoCanvasSize) {
+    	  ideogram.initCanvasSize();
+      }
       ideogram.setDisplayedProperty( property );
-      ideogram.drawChromosomes();
-      ideogram.drawColouredVariants( this.loadedVariants, false );
-      ideogram.showColourLegend();
+      ideogram.redraw(this.loadedVariants);
    },
 
    /**
@@ -717,42 +722,20 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       grid.getSelectionModel().deselectAll();
 
       this.gridPanelSubjectSelection( subjectIds );
-      this.ideogramSubjectSelection( subjectIds );
 
       grid.getView().refresh();
    },
 
-   ideogramSubjectSelection : function(subjectIds) {
-
-      var ideogram = this.getComponent( 'ideogram' );
-      ideogram.drawChromosomes();
-      var projectIds = ASPIREdb.ActiveProjectSettings.getActiveProjectIds();
-      var ref = this;
-
-      // heighlight the selected subject in ideogram
-      SubjectService.getSubjects( projectIds[0], subjectIds, {
-         callback : function(subjectValueObjects) {
-
-            if ( subjectValueObjects == null ) {
-               return;
-            }
-
-            var subjectIDS = [];
-            var patientIDS = [];
-            for (var i = 0; i < subjectValueObjects.length; i++) {
-               subjectIDS.push( subjectValueObjects[i].id );
-               patientIDS.push( subjectValueObjects[i].patientId );
-            }
-            ideogram.drawVariantsWithSubjectsHighlighted( subjectIDS, ref.loadedVariants );
-
-         }
-      } );
-   },
-
-   focusSelectedVariants : function() {
-
-      var grid = this.down( '#variantGrid' );
-      var selectedRecords = grid.getSelectionModel().getSelection();
+   focusSelectedVariants : function(selectedVariants) {
+	   var grid = this.down( '#variantGrid' );
+	   if (selectedVariants==undefined || selectedVariants == null || selectedVariants.length == 0 ) {
+		   var selectedRecords = grid.getSelectionModel().getSelection();
+	   } else {
+		   var selectedRecords = selectedVariants;
+		   grid.selModel.select( selectedRecords );
+	   }
+      
+      
 
       if ( selectedRecords.length > 0 ) {
          grid.getView().bufferedRenderer.scrollTo( grid.store.indexOfId( selectedRecords[0].data.id ) );
@@ -845,7 +828,31 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    },
 
    ideogramSelectionChangeHandler : function(model, records) {
-
+	   var subjectStore = Ext.getStore( 'subjectStore' );
+	   var temp = {};
+	   for (var i = 0; i < records.length; i++) {
+		   var rec = records[i];
+	       var patientId = rec.get( 'patientId' );
+	       var subjectId = subjectStore.getAt( subjectStore.findExact( 'patientId', patientId ) ).get( 'id' )
+	       temp[subjectId] = true;
+	   }
+	   
+       // Unique subjects only
+	   var r = [];
+	   for (var k in temp) {
+		   r.push(k);
+	   }
+	   
+	   this.selectedVariants = records;
+	   
+	   var grid = this.down( '#variantGrid' );
+	   
+	   grid.store.sort('genomeCoordinates', 'ASC');
+       
+       ASPIREdb.EVENT_BUS.fireEvent( 'select_subject_from_ideogram', r );
+       
+       grid.selModel.select( records );
+       
       this.enableActionButtonsBySelectedRecords( records );
 
    },
@@ -865,7 +872,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       var ideogram = this.getComponent( 'ideogram' );
       var canvas = ideogram.getComponent( 'canvasBox' );
-      var imgsrc = canvas.el.dom.toDataURL( 'image/png' );
+      var imgsrc = canvas.el.dom.toDataURL( 'image/png', 1.0 );
 
       if ( imgsrc ) {
          ASPIREdb.IdeogramDownloadWindow.showIdeogramDownload( imgsrc );
@@ -874,18 +881,18 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
    },
 
    zoomInButtonHandler : function() {
-      this.zoomInButton.setVisible( false );
+//      this.zoomInButton.setVisible( false );
       this.zoomOutButton.setVisible( true );
       var ideogram = this.getComponent( 'ideogram' );
-      ideogram.changeZoom( 2, this.loadedVariants );
+      ideogram.changeZoom( ideogram.zoom+1, this.loadedVariants, true );
 
    },
 
    zoomOutButtonHandler : function() {
       this.zoomOutButton.setVisible( false )
-      this.zoomInButton.setVisible( true );
+//      this.zoomInButton.setVisible( true );
       var ideogram = this.getComponent( 'ideogram' );
-      ideogram.changeZoom( 1, this.loadedVariants );
+      ideogram.changeZoom( 1, this.loadedVariants, true );
 
    },
 
@@ -1004,7 +1011,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       var ideogram = this.getComponent( 'ideogram' );
 
-      var ideogramGenomicRange = ideogram.getSelection();
+      var ideogramGenomicRange = ideogram.getGenomicSelection();
 
       if ( ideogramGenomicRange == null ) {
          return [];

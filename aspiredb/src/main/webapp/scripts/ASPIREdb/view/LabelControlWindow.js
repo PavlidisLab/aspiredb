@@ -100,11 +100,12 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
        * Source : https://24ways.org/2010/calculating-color-contrast/
        */
       getContrastYIQ : function(hexcolor) {
-         var r = parseInt( hexcolor.substr( 0, 2 ), 16 );
-         var g = parseInt( hexcolor.substr( 2, 2 ), 16 );
-         var b = parseInt( hexcolor.substr( 4, 2 ), 16 );
-         var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-         return (yiq >= 128) ? 'black' : 'white';
+    	  var bigint = parseInt(hexcolor, 16);
+    	  var r = (bigint >> 16) & 255;
+    	  var g = (bigint >> 8) & 255;
+    	  var b = bigint & 255;
+    	  var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    	  return (yiq >= 128) ? 'black' : 'white';
       },
 
       getHtmlLabel : function(label) {

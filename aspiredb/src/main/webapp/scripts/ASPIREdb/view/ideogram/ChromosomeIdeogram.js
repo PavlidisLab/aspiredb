@@ -42,18 +42,28 @@
  * @param {number}
  *           centromerePosition
  */
-var ChromosomeIdeogram = function(name, baseSize, centromerePosition, topY, leftX, displayScaleFactor, ctx, overlayCtx,
-   chromosomeData, zoom) {
+var ChromosomeIdeogram = function(ideogram, name, topY, leftX, chromosomeData) {
 
+    var baseSize = chromosomeData.size;
+	var centromerePosition = chromosomeData.centromereLocation;
+	var displayScaleFactor = ideogram.displayScaleFactor;
+	var ctx = ideogram.ctx;
+	var overlayCtx = ideogram.ctxOverlay;
+	var selectionCtx = ideogram.ctxSelection;
+	var zoom = ideogram.zoom;
+	var chromosomeBaseGap = ideogram.chromosomeBaseGap;
+	
+	this.name = name;
+	
+	
    this.zoom = zoom;
    this.topY = topY;
-   this.displayWidth = 13; // width of each ideogram
+   this.displayWidth = ideogram.chromosomeBaseWidth; // width of each chromosome ideogram
 
    /* ChromosomeLayer */
    this.chromosomeLayer = new ChromosomeLayer( name, baseSize, centromerePosition, topY, leftX, displayScaleFactor,
       ctx, chromosomeData.bands, zoom, this.displayWidth );
    this.chromosomeData = chromosomeData;
-   this.zoom = zoom;
 
    /* @type {VariantLayer} */
    this.variantLayer = Ext.create( 'ASPIREdb.view.ideogram.VariantLayer', {
@@ -62,17 +72,20 @@ var ChromosomeIdeogram = function(name, baseSize, centromerePosition, topY, left
       displayScaleFactor : displayScaleFactor,
       chromosomeLayer : this.chromosomeLayer,
       zoom : zoom,
-      displayWidth : this.displayWidth
+      chromosomeBaseGap : chromosomeBaseGap,
+      displayWidth : this.displayWidth,
+      variantSeparationFactor : ideogram.variantSeparationFactor,
+      globalEmphasis : ideogram.globalVariantEmphasis,
    } );
    /* @type {IdeogramCursorLayer} */
-   this.cursorLayer = new IdeogramCursorLayer( overlayCtx, leftX, chromosomeData, this.chromosomeLayer );
+   this.cursorLayer = new IdeogramCursorLayer( overlayCtx, selectionCtx, leftX, chromosomeData, this.chromosomeLayer );
 };
 
 /**
  * @public
  * @returns {*}
  */
-ChromosomeIdeogram.prototype.getSelection = function() {
+ChromosomeIdeogram.prototype.getGenomicSelection = function() {
    return this.cursorLayer.getSelectedRange();
 };
 
@@ -126,36 +139,9 @@ ChromosomeIdeogram.prototype.getDisplaySize = function() {
    return this.chromosomeLayer.getDisplaySize();
 };
 
-/**
- * @public
- * @param {VariantValueObject}
- *           variant
- * @param {PropertyValueObject}
- *           property
- */
-ChromosomeIdeogram.prototype.drawVariant = function(variant, property) {
-   this.variantLayer.drawVariant( variant, property );
-};
-
-/**
- * @public
- * @param {VariantValueObject}
- *           variant
- */
-ChromosomeIdeogram.prototype.drawDimmedVariant = function(variant) {
-   this.variantLayer.drawDimmedVariant( variant );
-};
-
-/**
- * @public
- * @param {VariantValueObject}
- *           variant
- * @param {PropertyValueObject}
- *           property
- */
-ChromosomeIdeogram.prototype.drawHighlightedVariant = function(variant, property) {
-   this.variantLayer.drawHighlightedVariant( variant, property );
-};
+ChromosomeIdeogram.prototype.betterDrawVariant = function(variant) {
+	   this.variantLayer.betterDrawVariant( variant );
+	};
 
 /**
  * @public
@@ -163,4 +149,8 @@ ChromosomeIdeogram.prototype.drawHighlightedVariant = function(variant, property
 ChromosomeIdeogram.prototype.drawChromosome = function() {
    this.variantLayer.clearTracks();
    this.chromosomeLayer.drawChromosome();
+};
+
+ChromosomeIdeogram.prototype.drawVariantInfo = function(offset, event) {
+	   return this.variantLayer.drawVariantInfo(offset, event);
 };

@@ -99,6 +99,9 @@ ChromosomeLayer.prototype.getDisplaySize = function() {
  * @returns {number}
  */
 ChromosomeLayer.prototype.convertToDisplayCoordinates = function(baseCoordinate, displayScaleFactor) {
+	if (displayScaleFactor == undefined) {
+		displayScaleFactor = this.displayScaleFactor;
+	}
    var coordinate = baseCoordinate / displayScaleFactor;
    // is it on short or long arm?
    if ( baseCoordinate > this.centromerePosition ) {
@@ -132,7 +135,10 @@ ChromosomeLayer.prototype.drawChromosome = function() {
 
    this.ctx.save();
    this.ctx.strokeStyle = "rgba(0,0,0,1)";
-   this.ctx.strokeText( this.name, this.xPosition, this.yPosition - 5 );
+   var textAlignBase = this.ctx.textAlign;
+   this.ctx.textAlign = "center";
+   this.ctx.strokeText( this.name, this.xPosition + this.displayWidth / 2, this.yPosition - 5 );
+   this.ctx.textAlign = textAlignBase;
 
    // this.ctx.strokeStyle = "rgba(0,0,0,0.2)";
    this.ctx.strokeStyle = "rgba(0,0,0,1)";
@@ -158,14 +164,14 @@ ChromosomeLayer.prototype.drawChromosome = function() {
    this.ctx.stroke();
    this.ctx.restore();
 
-   this.drawBands( this.ctx, this.displayScaleFactor );
+   this.drawBands( this.ctx );
 };
 
-ChromosomeLayer.prototype.drawBands = function(ctx, displayScaleFactor) {
+ChromosomeLayer.prototype.drawBands = function(ctx) {
    for (/* ChromosomeBand */var bandName in this.bands) {
       var band = this.bands[bandName];
-      var yStart = this.convertToDisplayCoordinates( band.start, displayScaleFactor );
-      var yEnd = this.convertToDisplayCoordinates( band.end, displayScaleFactor );
+      var yStart = this.convertToDisplayCoordinates( band.start, this.displayScaleFactor );
+      var yEnd = this.convertToDisplayCoordinates( band.end, this.displayScaleFactor );
 
       if ( band.staining === "acen" || band.staining === "gneg" )
          continue; // skip

@@ -60,7 +60,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 public class BioMartQueryServiceImpl implements BioMartQueryService {
 
     private static final String BIO_MART_URL = ConfigUtils.getString( "aspiredb.biomart.url",
-            "http://www.biomart.org/biomart/martservice/results" );
+            "http://grch37.ensembl.org/biomart/martservice/results" );
 
     private static final int BIOMART_TIMEOUT_SECONDS = 30;
 

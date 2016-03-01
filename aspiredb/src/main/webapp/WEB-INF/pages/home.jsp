@@ -46,10 +46,12 @@
 <link rel="icon" type="image/x-icon"
     href="scripts/ASPIREdb/resources/images/favicon.ico" />
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="scripts/ASPIREdb/resources/css/ideogram.css" />
 
 <script src="scripts/ASPIREdb/view/ideogram/IdeogramCursorLayer.js"></script>
 <script src="scripts/ASPIREdb/view/ideogram/ChromosomeLayer.js"></script>
 <script src="scripts/ASPIREdb/view/ideogram/ChromosomeIdeogram.js"></script>
+<script src="scripts/ASPIREdb/view/ideogram/ColourLegend.js"></script>
 <script src="scripts/ASPIREdb/view/ideogram/DragPanning.js"></script>
 <script src="scripts/ASPIREdb/view/filter/FilterUtil.js"></script>
 
@@ -117,8 +119,10 @@
       launch : function() {
 
          var viewport = Ext.create( 'ASPIREdb.AspireDbPanel' );
-         dragPan(Ext.ComponentQuery.query('ideogram')[0].body.dom);
+         var ideogram = Ext.getCmp('ideogram');
          
+         // Drag panning javascript functionality for ideogram
+         dragPan(ideogram);
          myMask.hide();
       }
    } );
