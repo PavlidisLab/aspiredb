@@ -18,9 +18,10 @@
  */
 package ubc.pavlab.aspiredb.server.dao;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,11 +36,14 @@ import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
 import ubc.pavlab.aspiredb.server.exceptions.NeurocartaServiceException;
 import ubc.pavlab.aspiredb.server.model.CNV;
 import ubc.pavlab.aspiredb.server.model.Label;
+import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant;
 import ubc.pavlab.aspiredb.server.service.VariantService;
 import ubc.pavlab.aspiredb.server.util.PersistentTestObjectHelper;
+import ubc.pavlab.aspiredb.shared.GenomicRange;
 import ubc.pavlab.aspiredb.shared.LabelValueObject;
+import ubc.pavlab.aspiredb.shared.VariantValueObject;
 import ubc.pavlab.aspiredb.shared.query.AspireDbFilterConfig;
 import ubc.pavlab.aspiredb.shared.query.VariantFilterConfig;
 
@@ -58,6 +62,9 @@ public class VariantDaoTest extends BaseSpringContextTest {
     private SubjectDao subjectDao;
 
     @Autowired
+    private ProjectDao projectDao;
+
+    @Autowired
     private VariantService variantService;
 
     @Autowired
@@ -66,6 +73,7 @@ public class VariantDaoTest extends BaseSpringContextTest {
     private CNV cnv;
     private Subject subject;
     private Label label;
+    private Project project;
 
     @After
     public void cleanup() {
@@ -75,6 +83,7 @@ public class VariantDaoTest extends BaseSpringContextTest {
                 variantDao.remove( cnv );
                 subjectDao.remove( subject );
                 labelDao.remove( label );
+                projectDao.remove( project );
             }
         }.execute();
     }
@@ -84,7 +93,11 @@ public class VariantDaoTest extends BaseSpringContextTest {
         new InlineTransaction() {
             @Override
             public void instructions() {
+                Project p = new Project();
+                p.setName( "VariantDaoTestProject" );
+                project = testObjectHelper.createPersistentProject( p );
                 subject = testObjectHelper.createPersistentTestIndividualObject( "testPatientId" );
+                subject = testObjectHelper.addSubjectToProject( subject, project );
                 cnv = testObjectHelper.createPersistentTestCNVObject();
                 cnv.setSubject( subject );
                 label = labelDao.findOrCreate( new LabelValueObject( "CNV_TEST_LABEL" ) );
@@ -95,14 +108,40 @@ public class VariantDaoTest extends BaseSpringContextTest {
         }.execute();
     }
 
-    // @Test
+    @Test
     public void testFindByGenomicLocation() throws Exception {
+        GenomicRange range = new GenomicRange( "8", 37885255, 37890000 );
+        // new GenomicLocation( "X", 56650362, 56729961 );
+        Collection<Variant> results = variantDao.findByGenomicLocation( range,
+                Collections.singletonList( project.getId() ) );
 
+        assertEquals( 0, results.size() );
+
+        range = new GenomicRange( "X", 56650000, 56730000 );
+
+        results = variantDao.findByGenomicLocation( range, Collections.singletonList( project.getId() ) );
+        assertEquals( 1, results.size() );
     }
 
-    // @Test
-    public void testFindBySubjectId() throws Exception {
+    @Test
+    public void testFindByGenomicLocationQuick() throws Exception {
+        GenomicRange range = new GenomicRange( "8", 37885255, 37890000 );
+        // new GenomicLocation( "X", 56650362, 56729961 );
+        Collection<VariantValueObject> results = variantDao.findByGenomicLocationQuick( range,
+                Collections.singletonList( project.getId() ) );
 
+        assertEquals( 0, results.size() );
+
+        range = new GenomicRange( "X", 56650000, 56730000 );
+
+        results = variantDao.findByGenomicLocationQuick( range, Collections.singletonList( project.getId() ) );
+        assertEquals( 1, results.size() );
+    }
+
+    @Test
+    public void testFindBySubjectPatientId() throws Exception {
+        Collection<Variant> results = variantDao.findBySubjectPatientId( project.getId(), subject.getPatientId() );
+        assertEquals( 1, results.size() );
     }
 
     @Test
