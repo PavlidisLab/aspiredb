@@ -110,8 +110,8 @@ public class ProjectDaoTest extends BaseSpringContextTest {
 
         Project p = testObjectHelper.createPersistentProject( detachedProject );
 
-        ind1.getProjects().add( p );
-        ind2.getProjects().add( p );
+        ind1.setProject(p);
+        ind2.setProject(p);
         String someUsername = RandomStringUtils.randomAlphabetic( 6 );
 
         try {

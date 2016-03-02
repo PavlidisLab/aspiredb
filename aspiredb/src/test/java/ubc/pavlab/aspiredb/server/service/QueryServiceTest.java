@@ -417,7 +417,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
             project.setName( RandomStringUtils.randomAlphabetic( 4 ) );
             project = persistentTestObjectHelper.createPersistentProject( project );
         }
-        subject.setProjects( Collections.singletonList( project ) );
+        subject.setProject( project );
         subjectDao.update( subject );
 
         CNV cnv1 = persistentTestObjectHelper.createPersistentTestCNVObject();
@@ -618,8 +618,8 @@ public class QueryServiceTest extends BaseSpringContextTest {
             project = persistentTestObjectHelper.createPersistentProject( project );
         }
 
-        List<Project> plist = new ArrayList<>();
-        plist.add( project );
+        //        List<Project> plist = new ArrayList<>();
+        //        plist.add( project );
         Collection<Long> projectIds = new ArrayList<>();
         projectIds.add( project.getId() );
         activeProjectIds = projectIds;
@@ -654,7 +654,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         }
 
         subject = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
-        subject.setProjects( plist );
+        subject.setProject( project );
         subject.addPhenotype( phenoHead );
         subject.addPhenotype( phenoFace );
         subject.addPhenotype( phenoMouth );
@@ -666,7 +666,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         phenotypeDao.update( phenoMouth );
         phenotypeDao.update( phenoNervous );
 
-        projectDao.update( project );
+        persistentTestObjectHelper.updateProject( project );
 
         return subject;
     }

@@ -885,7 +885,7 @@ public class BurdenAnalysisServiceImpl implements BurdenAnalysisService {
         }
 
         Collection<LabelValueObject> variantLabels = labelService.getVariantLabelsByProjectId( variants.iterator()
-                .next().getSubject().getProjects().iterator().next().getId() );
+                .next().getSubject().getProject().getId() );
         if ( variantLabels.size() > MAX_VARIANT_LABELS ) {
             log.warn( "There are too many (>" + MAX_VARIANT_LABELS + ") variant labels!" );
             return ret;

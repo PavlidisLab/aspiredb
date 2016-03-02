@@ -88,4 +88,6 @@ public interface PersistentTestObjectHelper {
 
     public void updateSubject( Subject subject );
 
+    public void updateProject( Project project );
+
 }

@@ -140,7 +140,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
         Session session = this.getSessionFactory().getCurrentSession();
 
         List<Integer> bins = GenomeBin.relevantBins( range.getChromosome(), range.getBaseStart(), range.getBaseEnd() );
-        String hql = "select distinct variant from Variant variant inner join variant.location as location inner join variant.subject.projects as projects WHERE :projectIds in projects.id and location.bin in (:bins) and location.chromosome=:chromosome and ((location.start>=:start and location.end<=:end) or (location.start<=:start and location.end>=:start) or (location.start<=:end and location.end>=:end))";
+        String hql = "select distinct variant from Variant variant inner join variant.location as location inner join variant.subject.project as project WHERE project.id in (:projectIds) and location.bin in (:bins) and location.chromosome=:chromosome and ((location.start>=:start and location.end<=:end) or (location.start<=:start and location.end>=:start) or (location.start<=:end and location.end>=:end))";
         Query query = session.createQuery( hql );
         query.setParameterList( "bins", bins );
         query.setParameterList( "projectIds", activeProjectIds );
@@ -160,7 +160,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
         Session session = this.getSessionFactory().getCurrentSession();
 
         List<Integer> bins = GenomeBin.relevantBins( range.getChromosome(), range.getBaseStart(), range.getBaseEnd() );
-        String hql = "select distinct variant.id, location.chromosome, location.start, location.end from Variant variant inner join variant.location as location inner join variant.subject.projects as projects WHERE :projectIds in projects.id and location.bin in (:bins) and location.chromosome=:chromosome and ((location.start>=:start and location.end<=:end) or (location.start<=:start and location.end>=:start) or (location.start<=:end and location.end>=:end))";
+        String hql = "select distinct variant.id, location.chromosome, location.start, location.end from Variant variant inner join variant.location as location inner join variant.subject.project as project WHERE project.id in (:projectIds) and location.bin in (:bins) and location.chromosome=:chromosome and ((location.start>=:start and location.end<=:end) or (location.start<=:start and location.end>=:start) or (location.start<=:end and location.end>=:end))";
         Query query = session.createQuery( hql );
         query.setParameterList( "bins", bins );
         query.setParameterList( "projectIds", activeProjectIds );
@@ -208,7 +208,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
         }
 
         List<Subject> subjects = this.getSessionFactory().getCurrentSession().createCriteria( Subject.class )
-                .add( Restrictions.eq( "patientId", id ) ).createAlias( "projects", "project" )
+                .add( Restrictions.eq( "patientId", id ) ).createAlias( "project", "project" )
                 .add( Restrictions.eq( "project.id", projectId ) ).list();
 
         if ( subjects.size() == 0 ) {
@@ -448,7 +448,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
     @Transactional(readOnly = true)
     public Page<? extends T> loadPage( int offset, int limit, String sortField, String sortDirection,
             Set<AspireDbFilterConfig> filters ) throws BioMartServiceException, NeurocartaServiceException {
-        assert ( filters != null );
+        assert( filters != null );
 
         List<Long> variantIds = getFilteredIds( filters );
         List<T> variants = new ArrayList<T>( this.load( variantIds ) );
@@ -467,8 +467,8 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
     }
 
     @Override
-    public Collection<String> suggestValuesForEntityProperty( @SuppressWarnings("rawtypes") Property property,
-            SuggestionContext suggestionContext ) {
+    public Collection<String> suggestValuesForEntityProperty( @SuppressWarnings("rawtypes" ) Property property,
+            SuggestionContext suggestionContext) {
         Session session = currentSession();
 
         Criteria criteria = session.createCriteria( this.elementClass );
@@ -480,7 +480,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
         }
         criteria.setProjection( Projections.distinct( Projections.property( property.getName() ) ) );
         if ( suggestionContext.getActiveProjectIds() != null && !suggestionContext.getActiveProjectIds().isEmpty() ) {
-            criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
+            criteria.createAlias( "subject", "subject" ).createAlias( "subject.project", "project" )
                     .add( Restrictions.in( "project.id", suggestionContext.getActiveProjectIds() ) );
         }
 
@@ -554,7 +554,7 @@ public abstract class VariantDaoBaseImpl<T extends Variant> extends DaoBaseImpl<
         Long projectId = filter.getProjectIds().iterator().next();
 
         Query query = this.getSessionFactory().getCurrentSession()
-                .createQuery( "select v.id from Variant v left join v.subject.projects p where p.id = :id" );
+                .createQuery( "select v.id from Variant v left join v.subject.project p where p.id = :id" );
 
         query.setParameter( "id", projectId );
 

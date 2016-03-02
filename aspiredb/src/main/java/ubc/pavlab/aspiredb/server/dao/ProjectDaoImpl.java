@@ -120,7 +120,7 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
                 .getSessionFactory()
                 .getCurrentSession()
                 .createQuery(
-                        "select count(*) from Subject subject join subject.projects projs where projs.id in(:ids )" );
+                        "select count(*) from Subject subject join subject.project proj where proj.id in (:ids )" );
 
         query.setParameterList( "ids", projectIds );
 
@@ -138,7 +138,7 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
                 .getSessionFactory()
                 .getCurrentSession()
                 .createQuery(
-                        "select count(*) from Variant v join v.subject subject join subject.projects projs where projs.id in(:ids )" );
+                        "select count(*) from Variant v join v.subject subject join subject.project proj where proj.id in (:ids )" );
 
         query.setParameterList( "ids", projectIds );
 
@@ -156,7 +156,7 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
                 .getSessionFactory()
                 .getCurrentSession()
                 .createQuery(
-                        "select v.location.chromosome, v.location.id from Variant v join v.subject subject join subject.projects projs where projs.id = :id" );
+                        "select v.location.chromosome, v.location.id from Variant v join v.subject subject join subject.project proj where proj.id = :id" );
 
         query.setParameter( "id", projectId );
 
@@ -170,7 +170,7 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
     @Transactional(readOnly = true)
     public Collection<Subject> getSubjects( Long projectId ) {
         Query query = this.getSessionFactory().getCurrentSession()
-                .createQuery( "select subject from Subject subject join subject.projects projs where projs.id = :id" );
+                .createQuery( "select subject from Subject subject join subject.project proj where proj.id = :id" );
 
         query.setParameter( "id", projectId );
 
@@ -183,7 +183,7 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
                 .getSessionFactory()
                 .getCurrentSession()
                 .createQuery(
-                        "select variant.id from Variant variant join variant.subject.projects projs where projs.id = :id" );
+                        "select variant.id from Variant variant join variant.subject.project proj where proj.id = :id" );
 
         query.setParameter( "id", projectId );
 

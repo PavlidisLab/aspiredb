@@ -392,7 +392,7 @@ public class ProjectManagerImpl implements ProjectManager {
         for ( Subject s : subjects ) {
             s.getPhenotypes().removeAll( phenotypes );
             s.getVariants().removeAll( variants );
-            s.getProjects().remove( project );
+            s.setProject(null);
         }
 
         // We don't need to do this anymore because we use
@@ -599,7 +599,7 @@ public class ProjectManagerImpl implements ProjectManager {
                 subject.setPatientId( vo.getExternalSubjectId() );
                 subject = subjectDao.create( subject );
                 subject.addPhenotype( p );
-                subject.getProjects().add( project );
+                subject.setProject(project);
             } else {
                 log.debug( "Adding phenotype to existing subject " + p.getUri() );
                 subject.addPhenotype( p );
@@ -694,7 +694,7 @@ public class ProjectManagerImpl implements ProjectManager {
             if ( !foundIds.contains( id ) ) {
                 Subject s = new Subject();
                 s.setPatientId( id );
-                s.getProjects().add( project );
+                s.setProject(project);
                 newEntities.add( s );
             }
         }

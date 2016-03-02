@@ -170,6 +170,12 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
     @Override
     @Transactional
+    public void updateProject( Project project ) {
+        projectDao.update( project );
+    }
+
+    @Override
+    @Transactional
     public void removeVariant( Variant variant ) {
         variantDao.remove( variant );
     }
@@ -322,7 +328,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     @Transactional
     public Subject addSubjectToProject( Subject s, Project p ) {
 
-        s.getProjects().add( p );
+        s.setProject( p );
 
         subjectDao.update( s );
 
