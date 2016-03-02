@@ -178,7 +178,7 @@ Ext
                                afterrender: function(c) {
                                    var toolTip = Ext.create('Ext.tip.ToolTip', {
                                        target: c.getEl(),
-                                       html: 'Upload a variant file by clicking the Select button. Select the appropriate variant type, e.g. CNV, SNV, etc.',                        
+                                       html: 'Upload a variant file by clicking the Select button. ASPIREdb uses reference genome GRCh37/hg19. Select the appropriate variant type, e.g. CNV, SNV, etc.',                        
                                        showDelay: 0,                        
                                    });                    
                                    
