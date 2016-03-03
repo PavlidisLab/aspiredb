@@ -15,9 +15,6 @@
 
 package ubc.pavlab.aspiredb.server;
 
-import gemma.gsec.AuthorityConstants;
-import gemma.gsec.authentication.UserManager;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,6 +46,9 @@ import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import gemma.gsec.AuthorityConstants;
+import gemma.gsec.authentication.UserManager;
+
 /**
  * subclass for tests that need the container and use the database
  * 
@@ -77,6 +77,27 @@ public abstract class BaseSpringContextTest extends AbstractJUnit4SpringContextT
 
         protected void commitTransaction() {
             transactionManager.commit( txStatus );
+        }
+
+    }
+
+    protected abstract class InlineRollbackTransaction {
+        private TransactionStatus txStatus;
+
+        public void execute() {
+            beginTransaction();
+            instructions();
+            rollbackTransaction();
+        }
+
+        public abstract void instructions();
+
+        protected void beginTransaction() {
+            txStatus = transactionManager.getTransaction( new DefaultTransactionDefinition() );
+        }
+
+        protected void rollbackTransaction() {
+            transactionManager.rollback( txStatus );
         }
 
     }

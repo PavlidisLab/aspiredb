@@ -20,9 +20,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import gemma.gsec.SecurityService;
-import gemma.gsec.authentication.UserDetailsImpl;
-import gemma.gsec.authentication.UserManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,17 +30,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import gemma.gsec.SecurityService;
+import gemma.gsec.authentication.UserDetailsImpl;
+import gemma.gsec.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.CharacteristicDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
@@ -89,16 +90,16 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
     String aDifferentUsername = RandomStringUtils.randomAlphabetic( 5 );
 
-    String patientId1 = RandomStringUtils.randomAlphabetic( 5 );
-
-    String patientId2 = RandomStringUtils.randomAlphabetic( 6 );
+    //    String patientId1 = RandomStringUtils.randomAlphabetic( 5 );
+    //
+    //    String patientId2 = RandomStringUtils.randomAlphabetic( 6 );
 
     String groupName = RandomStringUtils.randomAlphabetic( 4 );
     String anotherGroupName = RandomStringUtils.randomAlphabetic( 5 );
 
-    String projectName = RandomStringUtils.randomAlphabetic( 5 );
-    String projectDescription = RandomStringUtils.randomAlphabetic( 7 );
-    String anotherProjectName = RandomStringUtils.randomAlphabetic( 4 );
+    //    String projectName = RandomStringUtils.randomAlphabetic( 5 );
+    //    String projectDescription = RandomStringUtils.randomAlphabetic( 7 );
+    //    String anotherProjectName = RandomStringUtils.randomAlphabetic( 4 );
 
     @Before
     public void setup() throws Exception {
@@ -119,7 +120,8 @@ public class ProjectManagerTest extends BaseSpringContextTest {
         }
 
         List<GrantedAuthority> authos = new ArrayList<GrantedAuthority>();
-        authos.add( new GrantedAuthorityImpl( "GROUP_USER" ) );
+        //        authos.add( new GrantedAuthorityImpl( "GROUP_USER" ) );
+        authos.add( new SimpleGrantedAuthority( "GROUP_USER" ) );
 
         this.userManager.createGroup( groupName, authos );
 
@@ -131,13 +133,23 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
     }
 
+    @After
+    public void tearDown() throws Exception {
+        super.runAsAdmin();
+        this.userManager.deleteUser( authorizedUsername );
+        this.userManager.deleteGroup( groupName );
+
+        this.userManager.deleteUser( aDifferentUsername );
+        this.userManager.deleteGroup( anotherGroupName );
+    }
+
     @Test
     public void testAddSubjectVariantsToProjectSecurity() {
 
         super.runAsAdmin();
 
         final String patientId = RandomStringUtils.randomAlphabetic( 5 );
-        final String projectId = RandomStringUtils.randomAlphabetic( 5 );
+        final String projectName = RandomStringUtils.randomAlphabetic( 5 );
 
         CharacteristicValueObject cvo = new CharacteristicValueObject();
 
@@ -171,7 +183,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
         try {
 
-            projectManager.addSubjectVariantsToProject( projectId, true, cnvList );
+            projectManager.addSubjectVariantsToProject( projectName, true, cnvList );
 
         } catch ( Exception e ) {
             log.error( e.getLocalizedMessage(), e );
@@ -179,14 +191,14 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
         }
 
-        projectManager.alterGroupWritePermissions( projectId, groupName, true );
+        projectManager.alterGroupWritePermissions( projectName, groupName, true );
 
         TransactionTemplate tt = new TransactionTemplate( transactionManager );
         tt.execute( new TransactionCallbackWithoutResult() {
             @Override
             public void doInTransactionWithoutResult( TransactionStatus status ) {
 
-                Project project = projectDao.findByProjectName( projectId );
+                Project project = projectDao.findByProjectName( projectName );
 
                 aclTestUtils.checkHasAcl( project );
 
@@ -207,7 +219,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
                 // equals to cnvList
                 assertEquals( 2, subject.getVariants().size() );
 
-                Collection<Variant> variantCollection = variantDao.findBySubjectPatientId( patientId );
+                variantDao.findBySubjectPatientId( project.getId(), patientId );
 
                 // for ( Variant v : variantCollection ) {
                 // // aclTestUtils.checkHasAcl( v );
@@ -221,6 +233,15 @@ public class ProjectManagerTest extends BaseSpringContextTest {
             }
         } );
 
+        try {
+
+            projectManager.deleteProject( projectName );
+
+        } catch ( Exception e ) {
+            log.error( e.getLocalizedMessage(), e );
+
+        }
+
     }
 
     @Test
@@ -229,7 +250,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
         super.runAsAdmin();
 
         final String patientId = RandomStringUtils.randomAlphabetic( 5 );
-        final String projectName = RandomStringUtils.randomAlphabetic( 5 );
+        final String projectName = RandomStringUtils.randomAlphabetic( 7 );
 
         CharacteristicValueObject cvo = new CharacteristicValueObject();
 
@@ -281,7 +302,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
                 assertTrue( securityService.isViewableByUser( subject, authorizedUsername ) );
 
-                Collection<Variant> variantCollection = variantDao.findBySubjectPatientId( patientId );
+                variantDao.findBySubjectPatientId( project.getId(), patientId );
 
                 // for ( Variant v : variantCollection ) {
                 //
@@ -296,7 +317,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
         // make sure aDifferentUserName doesn't have access to stuff in project
         TransactionTemplate tt2 = new TransactionTemplate( transactionManager );
-        tt.execute( new TransactionCallbackWithoutResult() {
+        tt2.execute( new TransactionCallbackWithoutResult() {
             @Override
             public void doInTransactionWithoutResult( TransactionStatus status ) {
 
@@ -308,7 +329,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
                 assertFalse( securityService.isViewableByUser( subject, aDifferentUsername ) );
 
-                Collection<Variant> variantCollection = variantDao.findBySubjectPatientId( patientId );
+                variantDao.findBySubjectPatientId( project.getId(), patientId );
 
                 // for ( Variant v : variantCollection ) {
                 //
@@ -327,7 +348,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
         long projectId = projectDao.findByProjectName( projectName ).getId();
 
-        variantDao.findBySubjectPatientId( patientId );
+        variantDao.findBySubjectPatientId( projectId, patientId );
 
         super.runAsUser( aDifferentUsername );
 
@@ -350,7 +371,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
         // make sure authorizedUsername does not have read access to all the stuff in a project after security change
         TransactionTemplate tt3 = new TransactionTemplate( transactionManager );
-        tt.execute( new TransactionCallbackWithoutResult() {
+        tt3.execute( new TransactionCallbackWithoutResult() {
             @Override
             public void doInTransactionWithoutResult( TransactionStatus status ) {
 
@@ -362,7 +383,7 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
                 assertFalse( securityService.isViewableByUser( subject, authorizedUsername ) );
 
-                Collection<Variant> variantCollection = variantDao.findBySubjectPatientId( patientId );
+                variantDao.findBySubjectPatientId( project.getId(), patientId );
 
                 // for ( Variant v : variantCollection ) {
                 //
@@ -389,6 +410,17 @@ public class ProjectManagerTest extends BaseSpringContextTest {
 
         assertTrue( vCollection3.isEmpty() );
 
+        super.runAsAdmin();
+
+        try {
+
+            projectManager.deleteProject( projectName );
+
+        } catch ( Exception e ) {
+            log.error( e.getLocalizedMessage(), e );
+
+        }
+
     }
 
     @Test
@@ -399,13 +431,18 @@ public class ProjectManagerTest extends BaseSpringContextTest {
         final String project_name = RandomStringUtils.randomAlphabetic( 5 );
         final String project_description = RandomStringUtils.randomAlphabetic( 5 );
 
-        try {
-            Project p = projectManager.createProject( project_name, project_description );
-            aclTestUtils.checkHasAcl( p );
-        } catch ( Exception e ) {
-            // log.error( e.getMessage() );
-            fail( "projectManager.createproject threw an exception" );
-        }
+        new InlineRollbackTransaction() {
+            @Override
+            public void instructions() {
+                try {
+                    Project p = projectManager.createProject( project_name, project_description );
+                    aclTestUtils.checkHasAcl( p );
+                } catch ( Exception e ) {
+                    // log.error( e.getMessage() );
+                    fail( "projectManager.createproject threw an exception" );
+                }
+            }
+        }.execute();
 
     }
 
@@ -479,6 +516,94 @@ public class ProjectManagerTest extends BaseSpringContextTest {
                 try {
 
                     projectManager.deleteProject( projectId );
+
+                } catch ( Exception e ) {
+                    log.error( e.getLocalizedMessage(), e );
+                    fail( "projectManager.deleteProject failed" );
+
+                }
+
+                aclTestUtils.checkDeletedAcl( p );
+
+                // now let's try loading the ids that should have been removed!
+                assertEquals( null, projectDao.load( p.getId() ) );
+                assertEquals( 0, subjectDao.load( subjectIds ).size() );
+                assertEquals( 0, variantDao.load( variantIds ).size() );
+                assertEquals( 0, characteristicDao.load( characteristicIds ).size() );
+            }
+        }.execute();
+
+    }
+
+    @Test
+    public void testQuickDeleteProject() {
+
+        super.runAsAdmin();
+
+        final String patientId = RandomStringUtils.randomAlphabetic( 5 );
+        final String projectName = RandomStringUtils.randomAlphabetic( 5 );
+
+        CharacteristicValueObject cvo = new CharacteristicValueObject();
+
+        cvo.setKey( "testChar" );
+        cvo.setValue( "testcharvalue" );
+
+        Map<String, CharacteristicValueObject> charMap = new HashMap<String, CharacteristicValueObject>();
+        charMap.put( cvo.getKey(), cvo );
+
+        CNVValueObject cnv = new CNVValueObject();
+
+        cnv.setCharacteristics( charMap );
+        cnv.setType( "GAIN" );
+
+        GenomicRange gr = new GenomicRange( "X", 3, 234 );
+
+        cnv.setGenomicRange( gr );
+
+        cnv.setPatientId( patientId );
+
+        ArrayList<VariantValueObject> cnvList = new ArrayList<VariantValueObject>();
+        cnvList.add( cnv );
+
+        try {
+            // this creates a project
+            projectManager.addSubjectVariantsToProject( projectName, true, cnvList );
+
+        } catch ( Exception e ) {
+
+            fail( "projectManager.addSubjectVariantsToProject threw an exception" );
+
+        }
+
+        new InlineTransaction() {
+            @Override
+            public void instructions() {
+
+                Project p = projectDao.findByProjectName( projectName );
+                aclTestUtils.checkHasAcl( p );
+
+                // collect Ids
+                Collection<Long> subjectIds = new HashSet<>();
+                Collection<Long> variantIds = new HashSet<>();
+                Collection<Long> characteristicIds = new HashSet<>();
+                for ( Subject s : p.getSubjects() ) {
+                    assertNotNull( s.getId() );
+                    subjectIds.add( s.getId() );
+                    for ( Variant v : s.getVariants() ) {
+                        assertNotNull( v.getId() );
+                        variantIds.add( v.getId() );
+                        for ( Characteristic c : v.getCharacteristics() ) {
+                            assertNotNull( c.getId() );
+                            characteristicIds.add( c.getId() );
+                        }
+                    }
+                }
+                assertTrue( subjectIds.size() > 0 );
+                assertTrue( variantIds.size() > 0 );
+                assertTrue( characteristicIds.size() > 0 );
+                try {
+
+                    projectManager.quickDeleteProject( projectName );
 
                 } catch ( Exception e ) {
                     log.error( e.getLocalizedMessage(), e );

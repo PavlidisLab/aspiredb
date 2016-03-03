@@ -65,4 +65,14 @@ public interface ProjectDao extends SecurableDaoBase<Project> {
     @Secured({ "GROUP_USER" })
     public Collection<Long> getAllVariantsForProject( Long projectId );
 
+    /**
+     * @param projectId
+     * 
+     * Manually delete entity without use of Hibernate Cascade.
+     * To be used in CLI.
+     * Very fragile to structure changes.
+     */
+    @Secured({ "GROUP_ADMIN", "ACL_SECURABLE_EDIT" })
+    public void quickDelete( Long projectId );
+
 }

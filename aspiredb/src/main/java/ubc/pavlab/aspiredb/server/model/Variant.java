@@ -60,9 +60,8 @@ import ubc.pavlab.aspiredb.shared.VariantValueObject;
 @DiscriminatorColumn(name = "discriminator", discriminatorType = DiscriminatorType.STRING)
 public abstract class Variant implements SubjectAttribute, ValueObjectConvertible<VariantValueObject> {
 
-    @OneToMany(cascade = javax.persistence.CascadeType.ALL, orphanRemoval = true)
-    @JoinTable(name = "VARIANT_CHARACTERISTIC", joinColumns = { @JoinColumn(name = "VARIANT_FK") }, inverseJoinColumns = { @JoinColumn(name = "CHARACTERISTIC_FK") })
-    protected List<Characteristic> characteristics;
+    @OneToMany(cascade = javax.persistence.CascadeType.ALL, orphanRemoval = true, mappedBy = "variant")
+    protected List<Characteristic> characteristics = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(name = "VARIANT_LABEL", joinColumns = { @JoinColumn(name = "VARIANT_FK", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "LABEL_FK", referencedColumnName = "ID") })
