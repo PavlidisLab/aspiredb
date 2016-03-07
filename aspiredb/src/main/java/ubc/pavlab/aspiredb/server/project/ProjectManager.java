@@ -98,4 +98,7 @@ public interface ProjectManager {
     public Collection<Variant2VariantOverlap> populateProjectToProjectOverlap( String projectName,
             String specialProjectName, Collection<VariantValueObject> projectVariants ) throws Exception;
 
+    @Secured("GROUP_ADMIN")
+    public void quickDeleteProject( String name ) throws Exception;
+
 }

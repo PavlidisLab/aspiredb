@@ -19,6 +19,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,51 +51,37 @@ public class PhenotypeUploadService {
         ArrayList<PhenotypeValueObject> voList = new ArrayList<PhenotypeValueObject>();
 
         HashSet<String> unmatched = new HashSet<String>();
+        
+        String regex = "\\bHP:\\d+\\b";
+        Pattern pattern = Pattern.compile(regex);
 
         int lineNumber = 1;
         while ( results.next() ) {
 
             String html = results.getString( "html" );
+            if ( html.contains( "Phenotypes" ) ) {
+            	Matcher matcher = pattern.matcher(html);
+            	while (matcher.find()) {
+            		String s = matcher.group();
+            		s = s.replaceAll( ":", "_" );
+            		
+                    PhenotypeValueObject vo = new PhenotypeValueObject();
+                    vo.setExternalSubjectId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
+            		
+                    try {
 
-            String[] characteristicsAndPhenotypes = html.split( "<p>" );
+                        phenotypeUtil.setNameUriValueType( vo, s );
+                        phenotypeUtil.setValue( vo, "1" );
+                        voList.add( vo );
 
-            for ( String entry : characteristicsAndPhenotypes ) {
+                    } catch ( InvalidDataException e ) {
+                        errorMessages.add( "Error on line number:" + lineNumber + " phenotype string:" + s );
 
-                if ( entry.contains( "Phenotypes" ) ) {
-
-                    entry = entry.replaceAll( "Phenotypes:", "" );
-
-                    entry = entry.replaceAll( "</p>", "" );
-                    entry = entry.replaceAll( "</body></html>", "" );
-
-                    String[] phenotypeStrings = entry.split( ";" );
-
-                    for ( String s : phenotypeStrings ) {
-
-                        PhenotypeValueObject vo = new PhenotypeValueObject();
-                        vo.setExternalSubjectId( results.getString( CommonVariantColumn.SUBJECTID.key ) );
-
-                        s = s.substring( s.indexOf( ":" ) + 1 );
-                        s = s.substring( 0, s.indexOf( ")" ) );
-                        s = "HP_" + s;
-
-                        try {
-
-                            phenotypeUtil.setNameUriValueType( vo, s );
-                            phenotypeUtil.setValue( vo, "1" );
-                            voList.add( vo );
-
-                        } catch ( InvalidDataException e ) {
-                            errorMessages.add( "Error on line number:" + lineNumber + " phenotype string:" + s
-                                    + "  \nFull entry:" + entry );
-
-                            unmatched.add( s );
-                        }
-
+                        unmatched.add( s );
                     }
-
-                }
-
+            	}
+            } else {
+                errorMessages.add( "Error on line number:" + lineNumber + "  \nFull entry:" + html );
             }
 
             lineNumber++;

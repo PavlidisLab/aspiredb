@@ -18,8 +18,6 @@
  */
 package ubc.pavlab.aspiredb.server.util;
 
-import gemma.gsec.SecurityService;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,9 +26,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import gemma.gsec.SecurityService;
 import ubc.pavlab.aspiredb.server.dao.CNVDao;
+import ubc.pavlab.aspiredb.server.dao.CharacteristicDao;
 import ubc.pavlab.aspiredb.server.dao.IndelDao;
-import ubc.pavlab.aspiredb.server.dao.InversionDao;
 import ubc.pavlab.aspiredb.server.dao.LabelDao;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
@@ -78,7 +77,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     private SNVDao snvDao;
 
     @Autowired
-    private InversionDao inversionDao;
+    private CharacteristicDao characteristicDao;
 
     @Autowired
     private SubjectDao subjectDao;
@@ -116,10 +115,9 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
         snv.setObservedBase( "observedBase" );
         snv.setDbSNPID( "567id" );
 
-        List<Characteristic> characteristics = new ArrayList<Characteristic>();
-        characteristics.add( new Characteristic( "BENIGN", "YES" ) );
-
-        snv.setCharacteristics( characteristics );
+        Characteristic c = new Characteristic( "BENIGN", "YES" );
+        c.setVariant( snv );
+        snv.getCharacteristics().add( c );
 
         return snv;
     }
@@ -141,10 +139,9 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
         indel.setIndelLength( 13214124 );
 
-        List<Characteristic> characteristics = new ArrayList<Characteristic>();
-        characteristics.add( new Characteristic( "BENIGN", "YES" ) );
-
-        indel.setCharacteristics( characteristics );
+        Characteristic c = new Characteristic( "BENIGN", "YES" );
+        c.setVariant( indel );
+        indel.getCharacteristics().add( c );
 
         return indel;
     }
@@ -166,6 +163,12 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     @Transactional
     public void updateSubject( Subject subject ) {
         subjectDao.update( subject );
+    }
+
+    @Override
+    @Transactional
+    public void updateProject( Project project ) {
+        projectDao.update( project );
     }
 
     @Override
@@ -208,10 +211,9 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
         cnv.setType( CnvType.valueOf( "LOSS" ) );
 
-        List<Characteristic> characteristics = new ArrayList<Characteristic>();
-        characteristics.add( new Characteristic( "BENIGN", "YES" ) );
-
-        cnv.setCharacteristics( characteristics );
+        Characteristic c = new Characteristic( "BENIGN", "YES" );
+        c.setVariant( cnv );
+        cnv.getCharacteristics().add( c );
 
         return cnv;
     }
@@ -253,10 +255,9 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
 
         cnv.setType( CnvType.valueOf( "LOSS" ) );
 
-        List<Characteristic> characteristics = new ArrayList<Characteristic>();
-        characteristics.add( new Characteristic( "BENIGN", "YES" ) );
-
-        cnv.setCharacteristics( characteristics );
+        Characteristic c = new Characteristic( "BENIGN", "YES" );
+        c.setVariant( cnv );
+        cnv.getCharacteristics().add( c );
 
         return cnv;
     }
@@ -322,7 +323,7 @@ public class PersistentTestObjectHelperImpl implements PersistentTestObjectHelpe
     @Transactional
     public Subject addSubjectToProject( Subject s, Project p ) {
 
-        s.getProjects().add( p );
+        s.setProject( p );
 
         subjectDao.update( s );
 

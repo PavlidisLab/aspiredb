@@ -216,12 +216,12 @@ public class SubjectDaoTest extends BaseSpringContextTest {
 
                 assertNull( "Subject hasn't been created yet", subjectDao.findByPatientId( p1, patientId ) );
 
-                List<Project> projects = new ArrayList<>();
-                projects.add( p1 );
+//                List<Project> projects = new ArrayList<>();
+//                projects.add( p1 );
 
                 Subject s = new Subject();
                 s.setPatientId( patientId );
-                s.setProjects( projects );
+                s.setProject( p1 );
                 s = subjectDao.create( s );
 
                 assertNotNull( s );

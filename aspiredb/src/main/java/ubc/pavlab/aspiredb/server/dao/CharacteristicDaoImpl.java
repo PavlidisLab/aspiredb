@@ -64,7 +64,7 @@ public class CharacteristicDaoImpl extends DaoBaseImpl<Characteristic> implement
     public Collection<String> getKeysMatching( String partialName, Long projectId ) {
         return currentSession()
                 .createQuery(
-                        "select distinct c.key from Subject as s left join s.projects as p left join s.variants as v left join v.characteristics as c WHERE c.key LIKE :partialName AND p.id = :projectId" )
+                        "select distinct c.key from Subject as s left join s.project as p left join s.variants as v left join v.characteristics as c WHERE c.key LIKE :partialName AND p.id = :projectId" )
                 .setParameter( "partialName", "%" + partialName + "%" ).setParameter( "projectId", projectId ).list();
     }
 }

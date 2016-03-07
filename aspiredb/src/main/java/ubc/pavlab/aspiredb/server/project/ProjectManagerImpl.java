@@ -15,11 +15,6 @@
 
 package ubc.pavlab.aspiredb.server.project;
 
-import gemma.gsec.SecurityService;
-import gemma.gsec.acl.domain.AclService;
-import gemma.gsec.authentication.UserDetailsImpl;
-import gemma.gsec.authentication.UserManager;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,6 +29,7 @@ import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -41,8 +37,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import gemma.gsec.SecurityService;
+import gemma.gsec.acl.domain.AclService;
+import gemma.gsec.authentication.UserDetailsImpl;
+import gemma.gsec.authentication.UserManager;
 import ubc.pavlab.aspiredb.cli.InvalidDataException;
-import ubc.pavlab.aspiredb.server.dao.CharacteristicDao;
 import ubc.pavlab.aspiredb.server.dao.GenomicLocationDao;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
 import ubc.pavlab.aspiredb.server.dao.ProjectDao;
@@ -105,9 +104,6 @@ public class ProjectManagerImpl implements ProjectManager {
 
     @Autowired
     private VariantDao variantDao;
-
-    @Autowired
-    private CharacteristicDao characteristicDao;
 
     @Autowired
     private Variant2SpecialVariantOverlapDao variant2SpecialVariantOverlapDao;
@@ -290,8 +286,8 @@ public class ProjectManagerImpl implements ProjectManager {
         if ( projectDao.findByProjectName( name ) != null ) {
 
             if ( deleteProject ) {
-
-                deleteProject( name );
+                log.info( "Deleting project: " + name );
+                quickDeleteProject( name ); // Only for CLI/special projects
 
             } else {
                 return projectDao.findByProjectName( name );
@@ -366,34 +362,35 @@ public class ProjectManagerImpl implements ProjectManager {
             return;
         }
 
-        List<Subject> subjects = project.getSubjects();
+        //        List<Subject> subjects = project.getSubjects();
+        //
+        //        Collection<Characteristic> characteristics = new HashSet<>();
+        //        Collection<Variant> variants = new HashSet<>();
+        //        Collection<Phenotype> phenotypes = new HashSet<>();
+        //
+        //        for ( Subject s : subjects ) {
+        //            for ( Phenotype p : s.getPhenotypes() ) {
+        //                phenotypes.add( p );
+        //            }
+        //            for ( Variant v : s.getVariants() ) {
+        //                variants.add( v );
+        //                // not required, removed by cascade
+        //                for ( Characteristic c : v.getCharacteristics() ) {
+        //                    characteristics.add( c );
+        //                }
+        //                v.getCharacteristics().removeAll( characteristics );
+        //            }
+        //        }
 
-        Collection<Characteristic> characteristics = new HashSet<>();
-        Collection<Variant> variants = new HashSet<>();
-        Collection<Phenotype> phenotypes = new HashSet<>();
-
-        for ( Subject s : subjects ) {
-            for ( Phenotype p : s.getPhenotypes() ) {
-                phenotypes.add( p );
-            }
-            for ( Variant v : s.getVariants() ) {
-                variants.add( v );
-                // not required, removed by cascade
-                for ( Characteristic c : v.getCharacteristics() ) {
-                    characteristics.add( c );
-                }
-                v.getCharacteristics().removeAll( characteristics );
-            }
-        }
-
+        log.info( "Deleting Overlap Data" );
         variant2SpecialVariantOverlapDao.deleteByProjectId( project.getId() );
         variant2SpecialVariantOverlapDao.deleteByOverlapProjectId( project.getId() );
 
-        for ( Subject s : subjects ) {
-            s.getPhenotypes().removeAll( phenotypes );
-            s.getVariants().removeAll( variants );
-            s.getProjects().remove( project );
-        }
+        //        for ( Subject s : subjects ) {
+        //            s.getPhenotypes().removeAll( phenotypes );
+        //            s.getVariants().removeAll( variants );
+        //            s.setProject(null);
+        //        }
 
         // We don't need to do this anymore because we use
         // the hibernate annotation "orphanRemoval=true"
@@ -401,14 +398,48 @@ public class ProjectManagerImpl implements ProjectManager {
         // variantDao.remove( variants );
         // phenotypeDao.remove( phenotypes );
 
+        //        try {
+        //            subjectDao.remove( subjects );
+        //        } catch ( Exception e ) {
+        //            log.error( e );
+        //        }
+
+        log.info( "Deleting Project Data" );
         try {
-            subjectDao.remove( subjects );
+            projectDao.remove( project );
         } catch ( Exception e ) {
             log.error( e );
         }
 
+        log.info( project + " has been deleted which took " + timer.getTime() + " ms" );
+    }
+
+    @Override
+    @Transactional
+    public void quickDeleteProject( String name ) throws Exception {
+
+        StopWatch timer = new StopWatch();
+        timer.start();
+
+        Project project = projectDao.findByProjectName( name );
+
+        if ( project == null ) {
+            log.warn( "Project " + name + " doesn't exist" );
+            return;
+        }
+
+        log.info( "Deleting Overlap Data" );
+        variant2SpecialVariantOverlapDao.deleteByProjectId( project.getId() );
+        variant2SpecialVariantOverlapDao.deleteByOverlapProjectId( project.getId() );
+
+        log.info( "Deleting Project Data" );
         try {
-            projectDao.remove( project );
+            projectDao.quickDelete( project.getId() );
+
+            ObjectIdentity oi = securityService.getAcl( project ).getObjectIdentity();
+
+            aclService.deleteAcl( oi, true );
+
         } catch ( Exception e ) {
             log.error( e );
         }
@@ -533,7 +564,12 @@ public class ProjectManagerImpl implements ProjectManager {
 
     private void addCommonVariantData( Variant v, VariantValueObject vvo ) {
         v.setLocation( getGenomicLocation( vvo ) );
-        v.setCharacteristics( getCharacteristics( vvo ) );
+        for ( Characteristic c : getCharacteristics( vvo ) ) {
+            c.setVariant( v );
+            v.getCharacteristics().add( c );
+
+        }
+
         v.setDescription( vvo.getDescription() );
         v.setExternalId( vvo.getExternalId() );
     }
@@ -599,7 +635,7 @@ public class ProjectManagerImpl implements ProjectManager {
                 subject.setPatientId( vo.getExternalSubjectId() );
                 subject = subjectDao.create( subject );
                 subject.addPhenotype( p );
-                subject.getProjects().add( project );
+                subject.setProject( project );
             } else {
                 log.debug( "Adding phenotype to existing subject " + p.getUri() );
                 subject.addPhenotype( p );
@@ -694,7 +730,7 @@ public class ProjectManagerImpl implements ProjectManager {
             if ( !foundIds.contains( id ) ) {
                 Subject s = new Subject();
                 s.setPatientId( id );
-                s.getProjects().add( project );
+                s.setProject( project );
                 newEntities.add( s );
             }
         }

@@ -25,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import gemma.gsec.SecurityService;
+import gemma.gsec.acl.domain.AclService;
 import ubc.pavlab.aspiredb.server.model.Project;
 import ubc.pavlab.aspiredb.server.model.Subject;
 import ubc.pavlab.aspiredb.server.model.Variant2VariantOverlap;
@@ -36,6 +38,12 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
 
     @Autowired
     Variant2SpecialVariantOverlapDao v2vOverlapDao;
+
+    @Autowired
+    private AclService aclService;
+
+    @Autowired
+    private SecurityService securityService;
 
     @Autowired
     public ProjectDaoImpl( SessionFactory sessionFactory ) {
@@ -120,7 +128,7 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
                 .getSessionFactory()
                 .getCurrentSession()
                 .createQuery(
-                        "select count(*) from Subject subject join subject.projects projs where projs.id in(:ids )" );
+                        "select count(*) from Subject subject join subject.project proj where proj.id in (:ids )" );
 
         query.setParameterList( "ids", projectIds );
 
@@ -138,7 +146,7 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
                 .getSessionFactory()
                 .getCurrentSession()
                 .createQuery(
-                        "select count(*) from Variant v join v.subject subject join subject.projects projs where projs.id in(:ids )" );
+                        "select count(*) from Variant v join v.subject subject join subject.project proj where proj.id in (:ids )" );
 
         query.setParameterList( "ids", projectIds );
 
@@ -156,7 +164,7 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
                 .getSessionFactory()
                 .getCurrentSession()
                 .createQuery(
-                        "select v.location.chromosome, v.location.id from Variant v join v.subject subject join subject.projects projs where projs.id = :id" );
+                        "select v.location.chromosome, v.location.id from Variant v join v.subject subject join subject.project proj where proj.id = :id" );
 
         query.setParameter( "id", projectId );
 
@@ -170,7 +178,7 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
     @Transactional(readOnly = true)
     public Collection<Subject> getSubjects( Long projectId ) {
         Query query = this.getSessionFactory().getCurrentSession()
-                .createQuery( "select subject from Subject subject join subject.projects projs where projs.id = :id" );
+                .createQuery( "select subject from Subject subject join subject.project proj where proj.id = :id" );
 
         query.setParameter( "id", projectId );
 
@@ -183,11 +191,72 @@ public class ProjectDaoImpl extends SecurableDaoBaseImpl<Project> implements Pro
                 .getSessionFactory()
                 .getCurrentSession()
                 .createQuery(
-                        "select variant.id from Variant variant join variant.subject.projects projs where projs.id = :id" );
+                        "select variant.id from Variant variant join variant.subject.project proj where proj.id = :id" );
 
         query.setParameter( "id", projectId );
 
         return query.list();
+    }
+
+    @Override
+    public void quickDelete( Long projectId ) {
+        // Order of deletion is currently: Characteristic, Variant, Phenotype, Subject, Project, (orphaned labels)? 
+
+        this.getSessionFactory().getCurrentSession().flush();
+        this.getSessionFactory().getCurrentSession().clear();
+
+        // Characteristics
+        Query query = this.getSessionFactory().getCurrentSession()
+                .createQuery(
+                        "DELETE FROM Characteristic c WHERE c.variant.id IN "
+                                + "(SELECT v.id FROM Variant v "
+                                + "inner join v.subject s "
+                                + "inner join s.project proj where proj.id = :id)" );
+        query.setParameter( "id", projectId );
+        query.executeUpdate();
+
+        log.info( "Characteristics deleted" );
+
+        // Variant
+        query = this.getSessionFactory().getCurrentSession()
+                .createQuery(
+                        "DELETE FROM Variant v WHERE v.subject.id IN "
+                                + "(SELECT s.id FROM Subject s "
+                                + "inner join s.project proj where proj.id = :id)" );
+        query.setParameter( "id", projectId );
+        query.executeUpdate();
+
+        log.info( "Variants deleted" );
+
+        // Phenotype
+        query = this.getSessionFactory().getCurrentSession()
+                .createQuery(
+                        "DELETE FROM Phenotype p WHERE p.subject.id IN "
+                                + "(SELECT s.id FROM Subject s "
+                                + "inner join s.project proj where proj.id = :id)" );
+        query.setParameter( "id", projectId );
+        query.executeUpdate();
+
+        log.info( "Phenotypes deleted" );
+
+        // Subject
+        query = this.getSessionFactory().getCurrentSession()
+                .createQuery(
+                        "DELETE FROM Subject s WHERE s.project.id = :id)" );
+        query.setParameter( "id", projectId );
+        query.executeUpdate();
+
+        log.info( "Subjects deleted" );
+
+        // Project
+        query = this.getSessionFactory().getCurrentSession()
+                .createQuery(
+                        "DELETE FROM Project proj where proj.id = :id" );
+        query.setParameter( "id", projectId );
+        query.executeUpdate();
+
+        log.info( "Project deleted" );
+
     }
 
 }

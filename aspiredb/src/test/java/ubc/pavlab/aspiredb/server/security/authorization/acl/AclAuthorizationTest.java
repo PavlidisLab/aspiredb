@@ -95,7 +95,7 @@ public class AclAuthorizationTest extends BaseSpringContextTest {
         project = testObjectHelper.createPersistentProject( project );
 
         subject = testObjectHelper.createPersistentTestSubjectObjectWithCNV( patientId );
-        subject.getProjects().add( project );
+        subject.setProject(project);
         subjectDao.update( subject );
 
         try {

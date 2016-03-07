@@ -81,7 +81,7 @@ public class PhenotypeDaoImpl extends DaoBaseImpl<Phenotype> implements Phenotyp
         Session session = currentSession();
 
         Criteria criteria = session.createCriteria( Phenotype.class ).createAlias( "subject", "subject" )
-                .createAlias( "subject.projects", "project" ).add( Restrictions.in( "project.id", ids ) )
+                .createAlias( "subject.project", "project" ).add( Restrictions.in( "project.id", ids ) )
                 .add( Restrictions.eq( "valueType", "HPONTOLOGY" ) ).add( Restrictions.eq( "value", "1" ) )
                 .add( Restrictions.eq( "uri", uri ) );
 
@@ -95,7 +95,7 @@ public class PhenotypeDaoImpl extends DaoBaseImpl<Phenotype> implements Phenotyp
         Session session = currentSession();
 
         Criteria criteria = session.createCriteria( Phenotype.class ).createAlias( "subject", "subject" )
-                .createAlias( "subject.projects", "project" ).add( Restrictions.in( "project.id", activeProjects ) )
+                .createAlias( "subject.project", "project" ).add( Restrictions.in( "project.id", activeProjects ) )
                 .add( Restrictions.eq( "valueType", "HPONTOLOGY" ) );
 
         criteria.setProjection( Projections.distinct( Projections.property( "uri" ) ) );
@@ -112,7 +112,7 @@ public class PhenotypeDaoImpl extends DaoBaseImpl<Phenotype> implements Phenotyp
 
         if ( activeProjectIds != null ) {
             criteria = session.createCriteria( Phenotype.class ).createAlias( "subject", "subject" )
-                    .createAlias( "subject.projects", "project" )
+                    .createAlias( "subject.project", "project" )
                     .add( Restrictions.in( "project.id", activeProjectIds ) );
         } else {
             criteria = session.createCriteria( Phenotype.class );
@@ -130,7 +130,7 @@ public class PhenotypeDaoImpl extends DaoBaseImpl<Phenotype> implements Phenotyp
         Session session = currentSession();
 
         Criteria criteria = session.createCriteria( Phenotype.class ).createAlias( "subject", "subject" )
-                .createAlias( "subject.projects", "project" ).add( Restrictions.in( "project.id", activeProjects ) )
+                .createAlias( "subject.project", "project" ).add( Restrictions.in( "project.id", activeProjects ) )
                 .add( Restrictions.like( "name", queryString ) );
 
         criteria.setProjection( Projections.distinct( Projections.property( "name" ) ) );
@@ -160,7 +160,7 @@ public class PhenotypeDaoImpl extends DaoBaseImpl<Phenotype> implements Phenotyp
         Criteria criteria = session.createCriteria( Phenotype.class );
         criteria.add( Restrictions.eq( "name", name ) );
         criteria.setProjection( Projections.distinct( Projections.property( "value" ) ) );
-        criteria.createAlias( "subject", "subject" ).createAlias( "subject.projects", "project" )
+        criteria.createAlias( "subject", "subject" ).createAlias( "subject.project", "project" )
                 .add( Restrictions.in( "project.id", projectIds ) );
 
         return criteria.list();
@@ -174,7 +174,7 @@ public class PhenotypeDaoImpl extends DaoBaseImpl<Phenotype> implements Phenotyp
         Criteria criteria = session.createCriteria( Phenotype.class ).createAlias( "subject", "subject" );
         criteria.add( Restrictions.eq( "uri", uri ) );
 
-        criteria.createCriteria( "subject.projects" ).add( Restrictions.in( "id", projectIds ) );
+        criteria.createCriteria( "subject.project" ).add( Restrictions.in( "id", projectIds ) );
         criteria.setProjection( Projections.distinct( Projections.property( "value" ) ) );
 
         return criteria.list();
@@ -197,7 +197,7 @@ public class PhenotypeDaoImpl extends DaoBaseImpl<Phenotype> implements Phenotyp
         Session session = currentSession();
 
         Criteria criteria = session.createCriteria( Phenotype.class ).createAlias( "subject", "subject" );
-        criteria.createCriteria( "subject.projects" ).add( Restrictions.in( "id", projectIds ) );
+        criteria.createCriteria( "subject.project" ).add( Restrictions.in( "id", projectIds ) );
         criteria.setProjection( Projections.distinct( Projections.id() ) );
 
         List<Long> ids = criteria.list();

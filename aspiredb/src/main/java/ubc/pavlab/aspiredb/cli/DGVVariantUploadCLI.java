@@ -186,7 +186,8 @@ public class DGVVariantUploadCLI extends AbstractCLI {
                     batchCount++;
 
                     System.out.println( "batch: " + batchCount + ",  adding: variantsToAdd.sublist(" + start + ","
-                            + end + "), " + batched.size() + " variants" );
+                            + end + "), " + batched.size() + " variants, " + end + "/" + variantsToAdd.size()
+                            + " variants" );
 
                     projectManager.addSubjectVariantsToSpecialProject( projectName, deleteProject, batched,
                             batchCount > 1 );

@@ -21,6 +21,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import ubc.pavlab.aspiredb.shared.CharacteristicValueObject;
@@ -51,6 +53,10 @@ public class Characteristic {
 
     @Column(name = "VALUE", length = 4096)
     private String value;
+
+    @ManyToOne
+    @JoinColumn(name = "VARIANT_ID")
+    private Variant variant;
 
     public Characteristic() {
     }
@@ -86,5 +92,13 @@ public class Characteristic {
 
     public CharacteristicValueObject toValueObject() {
         return new CharacteristicValueObject( id, key, value );
+    }
+
+    public Variant getVariant() {
+        return variant;
+    }
+
+    public void setVariant( Variant variant ) {
+        this.variant = variant;
     }
 }

@@ -23,8 +23,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import gemma.gsec.authentication.UserDetailsImpl;
-import gemma.gsec.authentication.UserManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,11 +42,12 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import gemma.gsec.authentication.UserDetailsImpl;
+import gemma.gsec.authentication.UserManager;
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.dao.CNVDao;
 import ubc.pavlab.aspiredb.server.dao.GenomicLocationDao;
 import ubc.pavlab.aspiredb.server.dao.PhenotypeDao;
-import ubc.pavlab.aspiredb.server.dao.ProjectDao;
 import ubc.pavlab.aspiredb.server.dao.SubjectDao;
 import ubc.pavlab.aspiredb.server.dao.VariantDao;
 import ubc.pavlab.aspiredb.server.exceptions.BioMartServiceException;
@@ -128,8 +127,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
     @Autowired
     private PhenotypeUtil phenotypeUtil;
     private Project project;
-    @Autowired
-    private ProjectDao projectDao;
+
     @Autowired
     private QueryService queryService;
 
@@ -353,9 +351,9 @@ public class QueryServiceTest extends BaseSpringContextTest {
         cnv.setSubject( subject );
         cnv.setType( CnvType.valueOf( "LOSS" ) );
         cnv.setLocation( new GenomicLocation( chr, start, end ) );
-        List<Characteristic> characteristics = new ArrayList<Characteristic>();
-        characteristics.add( new Characteristic( "BENIGN", "YES" ) );
-        cnv.setCharacteristics( characteristics );
+        Characteristic c = new Characteristic( "BENIGN", "YES" );
+        c.setVariant( cnv );
+        cnv.getCharacteristics().add( c );
         cnv.getLocation().setBin(
                 GenomeBin.binFromRange( cnv.getLocation().getChromosome(), cnv.getLocation().getStart(), cnv
                         .getLocation().getEnd() ) );
@@ -417,7 +415,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
             project.setName( RandomStringUtils.randomAlphabetic( 4 ) );
             project = persistentTestObjectHelper.createPersistentProject( project );
         }
-        subject.setProjects( Collections.singletonList( project ) );
+        subject.setProject( project );
         subjectDao.update( subject );
 
         CNV cnv1 = persistentTestObjectHelper.createPersistentTestCNVObject();
@@ -618,8 +616,8 @@ public class QueryServiceTest extends BaseSpringContextTest {
             project = persistentTestObjectHelper.createPersistentProject( project );
         }
 
-        List<Project> plist = new ArrayList<>();
-        plist.add( project );
+        //        List<Project> plist = new ArrayList<>();
+        //        plist.add( project );
         Collection<Long> projectIds = new ArrayList<>();
         projectIds.add( project.getId() );
         activeProjectIds = projectIds;
@@ -654,7 +652,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         }
 
         subject = persistentTestObjectHelper.createPersistentTestIndividualObject( patientId );
-        subject.setProjects( plist );
+        subject.setProject( project );
         subject.addPhenotype( phenoHead );
         subject.addPhenotype( phenoFace );
         subject.addPhenotype( phenoMouth );
@@ -666,7 +664,7 @@ public class QueryServiceTest extends BaseSpringContextTest {
         phenotypeDao.update( phenoMouth );
         phenotypeDao.update( phenoNervous );
 
-        projectDao.update( project );
+        persistentTestObjectHelper.updateProject( project );
 
         return subject;
     }

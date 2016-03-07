@@ -96,7 +96,7 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
                 .getCurrentSession()
                 .createQuery(
                         "from Subject as subject"
-                                + " where subject.patientId in (:patientIds) and :project in elements(subject.projects)" );
+                                + " where subject.patientId in (:patientIds) and :project = subject.project" );
         query.setParameter( "project", project );
         // Query query = this.getSessionFactory().getCurrentSession()
         // .createQuery( "from Subject as subject where subject.patientId in (:patientIds)" );
@@ -117,7 +117,7 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
                 .getCurrentSession()
                 .createQuery(
                         "from Subject as subject"
-                                + " where subject.patientId = :patientId and :project in elements(subject.projects)" );
+                                + " where subject.patientId = :patientId and :project = subject.project" );
         query.setParameter( "patientId", patientId );
         query.setParameter( "project", project );
 
@@ -217,7 +217,7 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
     public Page<? extends Subject> loadPage( int offset, int limit, String sortProperty, String sortDirection,
             Set<AspireDbFilterConfig> filters ) throws BioMartServiceException, NeurocartaServiceException {
 
-        assert ( filters != null );
+        assert( filters != null );
 
         // Apply filters and get ids.
         List<Long> subjectIds = getFilteredIds( filters );
@@ -248,7 +248,7 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
             criteria.add( Restrictions.like( property.getName(), valueWildcard ) );
         }
         criteria.setProjection( Projections.distinct( Projections.property( property.getName() ) ) )
-                .createAlias( "projects", "project" )
+                .createAlias( "project", "project" )
                 .add( Restrictions.in( "project.id", suggestionContext.getActiveProjectIds() ) );
 
         return criteria.list();
@@ -271,7 +271,7 @@ public class SubjectDaoImpl extends SecurableDaoBaseImpl<Subject> implements Sub
             criteria.add( criterion );
         } else if ( filter.getClass() == ProjectFilterConfig.class ) {
             ProjectFilterConfig projectFilter = ( ProjectFilterConfig ) filter;
-            criteria.createAlias( "projects", "project" ).add(
+            criteria.createAlias( "project", "project" ).add(
                     Restrictions.in( "project.id", projectFilter.getProjectIds() ) );
 
         }

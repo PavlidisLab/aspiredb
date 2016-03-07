@@ -19,11 +19,13 @@ import gemma.gsec.model.SecuredNotChild;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import ubc.pavlab.aspiredb.shared.ProjectValueObject;
@@ -62,7 +64,7 @@ public class Project implements SecuredNotChild {
     @Column(name = "SPECIAL_DATA")
     private Boolean specialData;
 
-    @ManyToMany(mappedBy = "projects")
+    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = "project", orphanRemoval = true)
     private List<Subject> subjects = new ArrayList<Subject>();
 
     // currently just for DGV data, the string referring to what characteristic will define the variants 'support', for

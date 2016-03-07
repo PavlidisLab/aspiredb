@@ -83,7 +83,7 @@ public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDa
     @Transactional(readOnly = true)
     public Collection<Label> getSubjectLabelsByProjectId( Long projectId ) {
 
-        String sqlString = "select distinct LABEL_FK from SUBJECT_LABEL sl, SUBJECT_PROJECTS sp, SUBJECT s WHERE sl.SUBJECT_FK = s.ID AND sp.SUBJECT_ID = s.ID AND sp.PROJECT_ID = :projectId ";
+        String sqlString = " select distinct LABEL_FK from SUBJECT_LABEL inner join SUBJECT on SUBJECT_FK=SUBJECT.ID where project_ID= :projectId ";
         Query query = currentSession().createSQLQuery( sqlString );
         query.setLong( "projectId", projectId );
 
@@ -100,7 +100,7 @@ public class LabelDaoImpl extends SecurableDaoBaseImpl<Label> implements LabelDa
     @Transactional(readOnly = true)
     public Collection<Label> getVariantLabelsByProjectId( Long projectId ) {
 
-        String sqlString = "select distinct LABEL_FK from VARIANT_LABEL vl, SUBJECT_PROJECTS sp, SUBJECT s, VARIANT v WHERE vl.VARIANT_FK = v.ID AND v.PATIENT_ID = s.ID AND sp.SUBJECT_ID = s.ID AND sp.PROJECT_ID = :projectId ";
+        String sqlString = "select distinct LABEL_FK from VARIANT_LABEL inner join VARIANT on VARIANT_FK=VARIANT.ID inner join SUBJECT ON SUBJECT.ID=VARIANT.PATIENT_ID where project_ID = :projectId ";
         Query query = currentSession().createSQLQuery( sqlString );
         query.setLong( "projectId", projectId );
 

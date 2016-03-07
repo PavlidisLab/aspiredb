@@ -33,6 +33,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -73,15 +74,15 @@ public class Subject implements Serializable, SecuredChild {
     @Column(name = "PATIENT_ID")
     private String patientId;
 
-    @ManyToMany
-    @JoinTable(name = "SUBJECT_PROJECTS", joinColumns = { @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "PROJECT_ID", referencedColumnName = "ID") })
-    private List<Project> projects = new ArrayList<Project>();
+    @ManyToOne
+    @JoinColumn(name = "PROJECT_ID")
+    private Project project;
 
     @OneToMany(cascade = { CascadeType.ALL }, mappedBy = "subject", orphanRemoval = true)
     private Collection<Phenotype> phenotypes = new HashSet<Phenotype>();
 
-    @OneToMany(cascade = { CascadeType.ALL }, orphanRemoval = true)
-    @JoinTable(name = "SUBJECT_VARIANT", joinColumns = { @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "VARIANT_ID", referencedColumnName = "ID") })
+    @OneToMany(cascade = { CascadeType.ALL }, orphanRemoval = true, mappedBy="subject")
+    //@JoinTable(name = "SUBJECT_VARIANT", joinColumns = { @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID") }, inverseJoinColumns = { @JoinColumn(name = "VARIANT_ID", referencedColumnName = "ID") })
     private List<Variant> variants;
 
     @ManyToMany
@@ -189,8 +190,8 @@ public class Subject implements Serializable, SecuredChild {
         return phenotypes;
     }
 
-    public List<Project> getProjects() {
-        return projects;
+    public Project getProject() {
+        return project;
     }
 
     public List<Variant> getVariants() {
@@ -247,8 +248,8 @@ public class Subject implements Serializable, SecuredChild {
         this.phenotypes = phenotypes;
     }
 
-    public void setProjects( List<Project> projects ) {
-        this.projects = projects;
+    public void setProject( Project project ) {
+        this.project = project;
     }
 
     public void setVariants( List<Variant> variants ) {
