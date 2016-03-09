@@ -543,16 +543,18 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
 	   this.boxHeight = this.body.lastBox.height - 20;
 	   this.boxWidth = Math.max(500, this.body.lastBox.width - 200);
 	   
-	   function prepCanvas(ctx) {
-
+	   function prepCanvas(ctx, padding) {
+	      if (padding == undefined) {
+	         padding = 0;
+	      }
 		   ctx.canvas.height = me.boxHeight; // + "px";
-		   ctx.canvas.width = me.boxWidth; // + "px";
+		   ctx.canvas.width = me.boxWidth + padding; // + "px";
 
 		   return ctx;
 	   }
 
 	   prepCanvas( this.ctx );
-	   prepCanvas( this.ctxOverlay );
+	   prepCanvas( this.ctxOverlay, 70 );
 	   prepCanvas( this.ctxSelection );
 	   
 	   // Setting canvas widths resets transformation matrix, put it back to where it was
