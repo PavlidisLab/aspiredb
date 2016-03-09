@@ -198,6 +198,28 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
          icon : 'scripts/ASPIREdb/resources/images/icons/export.png'
 
       } );
+      
+      this.ideogramControls = Ext.create( 'Ext.Img', {
+         xtype: 'image',       
+//       style:'right: auto; left: 0px; top: 6px;',
+         src: 'scripts/ASPIREdb/resources/images/qmark.png',      
+         height: '14px',
+         width: '15px',
+         listeners: {
+            afterrender: function(c) {
+               Ext.create('Ext.tip.ToolTip', {
+                  target: c.getEl(),
+                  html: '<h3>Controls</h3>\
+                     <ul>\
+                     <li><b>Right Click + Drag:</b> Pan the ideogram</li>\
+                     <li><b>Left Click + Drag:</b> Select a region of a chromosome</li>\
+                     <li><b>Double Click:</b> Isolate/de-isolate a chromosome</li>\
+                     </ul>\
+                     While a chromosome is isolated you may hover variants for more information.'
+               });
+            }
+         }
+      } );
 
       this.zoomInButton = Ext.create( 'Ext.Button', {
          id : 'zoomInButton',
@@ -367,6 +389,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             }
             this.zoomInButton.show();
             this.exportButton.show();
+            this.ideogramControls.show();
             this.saveButton.hide();
 
          } else {
@@ -378,6 +401,7 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
             this.zoomOutButton.hide();
             this.zoomInButton.hide();
             this.exportButton.hide();
+            this.ideogramControls.hide();
             this.saveButton.show();
          }
 
@@ -493,27 +517,29 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
       var toolbar = ref.getDockedComponent( 'variantTabPanelToolbar' );
 
-      toolbar.add({
-          xtype: 'image',       
-//          style:'right: auto; left: 0px; top: 6px;',
-          src: 'scripts/ASPIREdb/resources/images/qmark.png',      
-          height: '14px',
-          width: '15px',
-          listeners: {
-             afterrender: function(c) {
-                 Ext.create('Ext.tip.ToolTip', {
-                     target: c.getEl(),
-                     html: '<h3>Controls</h3>\
-                    	    <ul>\
-                    	    <li><b>Right Click + Drag:</b> Pan the ideogram</li>\
-                    	    <li><b>Left Click + Drag:</b> Select a region of a chromosome</li>\
-                    	    <li><b>Double Click:</b> Isolate/de-isolate a chromosome</li>\
-                    	    </ul>\
-                    	    While a chromosome is isolated you may hover variants for more information.'
-                 });
-             }
-         }
-      });
+//      toolbar.add({
+//          xtype: 'image',       
+////          style:'right: auto; left: 0px; top: 6px;',
+//          src: 'scripts/ASPIREdb/resources/images/qmark.png',      
+//          height: '14px',
+//          width: '15px',
+//          listeners: {
+//             afterrender: function(c) {
+//                 Ext.create('Ext.tip.ToolTip', {
+//                     target: c.getEl(),
+//                     html: '<h3>Controls</h3>\
+//                    	    <ul>\
+//                    	    <li><b>Right Click + Drag:</b> Pan the ideogram</li>\
+//                    	    <li><b>Left Click + Drag:</b> Select a region of a chromosome</li>\
+//                    	    <li><b>Double Click:</b> Isolate/de-isolate a chromosome</li>\
+//                    	    </ul>\
+//                    	    While a chromosome is isolated you may hover variants for more information.'
+//                 });
+//             }
+//         }
+//      });
+      
+      toolbar.add( ref.ideogramControls );
       
       toolbar.add( ref.tbSeparator );
       
