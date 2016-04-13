@@ -14,8 +14,6 @@
  */
 package ubc.pavlab.aspiredb.server.service;
 
-import gemma.gsec.SecurityService;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sencha.gxt.data.shared.loader.PagingLoadResult;
+import com.sencha.gxt.data.shared.loader.PagingLoadResultBean;
+
+import gemma.gsec.SecurityService;
 import ubc.pavlab.aspiredb.server.GenomeCoordinateConverter;
 import ubc.pavlab.aspiredb.server.biomartquery.BioMartQueryService;
 import ubc.pavlab.aspiredb.server.dao.Page;
@@ -75,9 +77,6 @@ import ubc.pavlab.aspiredb.shared.query.restriction.SetRestriction;
 import ubc.pavlab.aspiredb.shared.suggestions.PhenotypeSuggestion;
 import ubic.basecode.ontology.model.OntologyTerm;
 import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
-
-import com.sencha.gxt.data.shared.loader.PagingLoadResult;
-import com.sencha.gxt.data.shared.loader.PagingLoadResultBean;
 
 /**
  * Methods for various query operations such as querying a list of subjects and variants given a list of filters,
@@ -128,13 +127,14 @@ public class QueryServiceImpl implements QueryService {
     }
 
     @Override
-    public PagingLoadResult<GeneValueObject> getGeneSuggestionLoadResult( String query ) throws BioMartServiceException {
+    public PagingLoadResult<GeneValueObject> getGeneSuggestionLoadResult( String query )
+            throws BioMartServiceException {
         if ( query.length() < 2 ) {
             return new PagingLoadResultBean<GeneValueObject>( new ArrayList<GeneValueObject>(), 0, 0 );
         }
 
-        return new PagingLoadResultBean<GeneValueObject>( new ArrayList<GeneValueObject>(
-                this.bioMartQueryService.findGenes( query ) ), 0, 0 );
+        return new PagingLoadResultBean<GeneValueObject>(
+                new ArrayList<GeneValueObject>( this.bioMartQueryService.findGenes( query ) ), 0, 0 );
     }
 
     @Override
@@ -145,8 +145,9 @@ public class QueryServiceImpl implements QueryService {
                     new ArrayList<NeurocartaPhenotypeValueObject>(), 0, 0 );
         }
 
-        return new PagingLoadResultBean<NeurocartaPhenotypeValueObject>( new ArrayList<NeurocartaPhenotypeValueObject>(
-                this.neurocartaQueryService.findPhenotypes( query ) ), 0, 0 );
+        return new PagingLoadResultBean<NeurocartaPhenotypeValueObject>(
+                new ArrayList<NeurocartaPhenotypeValueObject>( this.neurocartaQueryService.findPhenotypes( query ) ), 0,
+                0 );
     }
 
     @Override
@@ -212,8 +213,8 @@ public class QueryServiceImpl implements QueryService {
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
-    public int getSubjectCount( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException,
-            ExternalDependencyException {
+    public int getSubjectCount( Set<AspireDbFilterConfig> filters )
+            throws NotLoggedInException, ExternalDependencyException {
         return querySubjects( filters ).getTotalSize();
     }
 
@@ -344,8 +345,8 @@ public class QueryServiceImpl implements QueryService {
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
-    public Map<Integer, Integer> getSubjectGenes( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException,
-            ExternalDependencyException {
+    public Map<Integer, Integer> getSubjectGenes( Set<AspireDbFilterConfig> filters )
+            throws NotLoggedInException, ExternalDependencyException {
 
         Map<Integer, Collection<Long>> svIds = new HashMap<>();
         Map<Integer, Integer> ret = new HashMap<>();
@@ -428,8 +429,8 @@ public class QueryServiceImpl implements QueryService {
     @Override
     @Transactional(readOnly = true)
     @RemoteMethod
-    public int getVariantCount( Set<AspireDbFilterConfig> filters ) throws NotLoggedInException,
-            ExternalDependencyException {
+    public int getVariantCount( Set<AspireDbFilterConfig> filters )
+            throws NotLoggedInException, ExternalDependencyException {
         return queryVariants( filters ).getTotalSize();
     }
 
@@ -741,7 +742,9 @@ public class QueryServiceImpl implements QueryService {
         }
         for ( VariantValueObject vvo : vos ) {
             String id = vvo.getPatientId();
-            vvo.setSubject( id2subject.get( id ).convertToValueObject() );
+            if ( id2subject.containsKey( id ) ) {
+                vvo.setSubject( id2subject.get( id ).convertToValueObject() );
+            }
         }
     }
 
