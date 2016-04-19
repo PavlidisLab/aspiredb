@@ -144,3 +144,6 @@
 <script src="scripts/lib/matrix2viz/js/ClusterHelper.js"></script>
 <script src="scripts/lib/matrix2viz/js/Matrix2Viz.js"></script>
 <!--script src="scripts/lib/matrix2viz/examples/matrixviz.js"></script-->
+
+<!--  Autologout script -->
+<script src="scripts/lib/autologout.js"></script>
