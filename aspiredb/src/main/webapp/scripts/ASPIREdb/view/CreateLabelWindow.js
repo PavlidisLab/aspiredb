@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'Ext.Window', 'Ext.picker.Color', 'Ext.data.ArrayStore', 'Ext.form.ComboBox', 'Ext.button.Button' ] );
+Ext.require( [ 'Ext.Window', 'Ext.picker.Color', 'Ext.data.ArrayStore', 'Ext.form.ComboBox', 'Ext.button.Button', 'Ext.form.Text' ] );
 
 /**
  * UI for creating new labels, updating labels and applying labels to Subject(s) and Variant(s)
@@ -122,15 +122,13 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
 
       } );
 
-      var labelCombo = Ext.create( 'Ext.form.ComboBox', {
+      var labelCombo = Ext.create( 'Ext.form.Text', {
          itemId : 'labelCombo',
          store : suggestLabelStore,
-         queryMode : 'local',
-         displayField : 'display',
-         valueField : 'value',
+         value : 'value',
          renderTo : Ext.getBody(),
          fieldLabel : 'Name',
-         emptyText : 'Choose or enter a new label name',
+         emptyText : 'Enter a new label name.',
          margin : 5,
          width : 400,
       } );
@@ -181,13 +179,13 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
          items : [ colorPicker, preview ]
       }, ] );
 
-      labelCombo.on( 'change', me.labelComboSelect, this );
 
       // select "selectedLabel" in the combobox
       if ( me.selectedLabel != null && labelCombo != null ) {
          labelCombo.store.on( 'load', function(ds, records, o) {
-            var rec = labelCombo.findRecordByDisplay( me.selectedLabel.name );
-            labelCombo.setValue( rec );
+            labelCombo.setValue( me.selectedLabel.name );
+            me.down( '#colorPicker' ).select( me.selectedLabel.colour );
+            me.down( '#descriptionField' ).setValue( me.selectedLabel.description );
          } );
       }
 
@@ -207,14 +205,14 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
          return;
       }
 
-      var vo = record;
+      var vo = combo;
       me.selectedLabel = vo;
 
       // if color is found in the color pickers, then assign it, otherwise use the default
       if ( vo.colour != null && me.down( '#colorPicker' ).colors.indexOf( vo.colour ) != -1 ) {
          me.down( '#colorPicker' ).select( vo.colour );
       } else {
-         console.log( 'Warning: Label colour ' + vo.colour + ' is not available, setting to ' + defaultColour );
+         console.log( 'Warning: Label colour ' + vo.colour + ' is not available, setting to default color:' + defaultColour );
          me.down( '#colorPicker' ).select( defaultColour );
       }
 
@@ -317,7 +315,7 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
       } else {
          // user chooses an existing label
          vo.id = me.selectedLabel.id;
-         vo.name = labelCombo.getDisplayValue();
+         vo.name = labelCombo.getValue();         
       }
 
       vo.colour = colorPicker.getValue();

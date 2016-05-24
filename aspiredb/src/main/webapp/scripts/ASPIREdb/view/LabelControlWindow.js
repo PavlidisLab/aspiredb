@@ -458,14 +458,19 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
             if ( vo == null ) {
                return;
             }
+            else {               
+               this.selectedLabel = selectedLabel;
+            }
 
             LabelService.updateLabel( vo, {
                callback : function() {
                   grid.getView().refresh();
                },
                errorHandler : function(er, exception) {
-                  Ext.Msg.alert( "Update Label Error", er + "\n" + exception.stack );
-                  console.log( exception.stack );
+                  //Ext.Msg.alert( "Update Label Error", er + "\n" + exception.stack );
+                  Ext.Msg.alert( "Update Label Error", er + "\n" );
+                  console.log( "Exception: ");
+                  console.log( exception );
                }
             } );
 
