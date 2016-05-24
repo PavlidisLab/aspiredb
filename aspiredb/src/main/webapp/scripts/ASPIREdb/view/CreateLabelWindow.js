@@ -125,7 +125,7 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
       var labelText = Ext.create( 'Ext.form.Text', {
          itemId : 'labelText',
          store : suggestLabelStore,
-         value : 'value',
+         value : '',
          renderTo : Ext.getBody(),
          fieldLabel : 'Name',
          emptyText : 'Enter a new label name.',
