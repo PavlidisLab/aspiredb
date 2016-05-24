@@ -122,8 +122,8 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
 
       } );
 
-      var labelCombo = Ext.create( 'Ext.form.Text', {
-         itemId : 'labelCombo',
+      var labelText = Ext.create( 'Ext.form.Text', {
+         itemId : 'labelText',
          store : suggestLabelStore,
          value : 'value',
          renderTo : Ext.getBody(),
@@ -170,7 +170,7 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
          layout : {
             type : 'vbox'
          },
-         items : [ labelCombo, descriptionField ]
+         items : [ labelText, descriptionField ]
       }, {
          xtype : 'container',
          layout : {
@@ -180,19 +180,20 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
       }, ] );
 
 
-      // select "selectedLabel" in the combobox
-      if ( me.selectedLabel != null && labelCombo != null ) {
-         labelCombo.store.on( 'load', function(ds, records, o) {
-            labelCombo.setValue( me.selectedLabel.name );
+      // select "selectedLabel" in the text label
+      if ( me.selectedLabel != null && labelText != null ) {
+         labelText.store.on( 'load', function(ds, records, o) {
+            labelText.setValue( me.selectedLabel.name );
             me.down( '#colorPicker' ).select( me.selectedLabel.colour );
             me.down( '#descriptionField' ).setValue( me.selectedLabel.description );
          } );
       }
 
-      labelCombo.store.load();
+      labelText.store.load();
    },
 
    /**
+    * Deprecated: THIS METHOD was called with an onchange callback to update from the combo box values. Not used anymore I believe. -mbelmadani
     * This method is called when the user selects from the label combo box. Sets the component values based on
     * this.labelColour, this.labelDesc
     */
@@ -228,7 +229,7 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
    onPreviewButtonClick : function() {
       var me = this;
       var preview = me.down( "#previewLabel" );
-      var labelCombo = me.down( "#labelCombo" );
+      var labelText = me.down( "#labelText" );
       preview.setText( '', false );
       var vo = me.getLabel();
       if ( vo == null ) {
@@ -242,7 +243,7 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
     */
    onOkButtonClick : function() {
       var me = this;
-      var labelCombo = this.down( "#labelCombo" );
+      var labelText = this.down( "#labelText" );
       var vo = this.getLabel();
       if ( vo == null ) {
          Ext.Msg.show( {
@@ -295,10 +296,10 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
       var me = this;
 
       var colorPicker = me.down( "#colorPicker" );
-      var labelCombo = me.down( "#labelCombo" );
+      var labelText = me.down( "#labelText" );
       var description = me.down( '#descriptionField' );
 
-      var vo = labelCombo.getValue();
+      var vo = labelText.getValue();
 
       if ( vo === null ) {
          return;
@@ -311,11 +312,11 @@ Ext.define( 'ASPIREdb.view.CreateLabelWindow', {
       if ( vo.id == null ) {
          // user wants to create a new Label
          vo = new LabelValueObject();
-         vo.name = labelCombo.getValue();
+         vo.name = labelText.getValue();
       } else {
          // user chooses an existing label
          vo.id = me.selectedLabel.id;
-         vo.name = labelCombo.getValue();         
+         vo.name = labelText.getValue();         
       }
 
       vo.colour = colorPicker.getValue();
