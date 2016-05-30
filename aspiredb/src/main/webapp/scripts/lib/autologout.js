@@ -151,5 +151,5 @@ Ext.define('Ext.ux.ActivityMonitor', {
     
 });
 
-Ext.ux.ActivityMonitor.init({ verbose : true });
+Ext.ux.ActivityMonitor.init({ verbose : false });
 Ext.ux.ActivityMonitor.start();
