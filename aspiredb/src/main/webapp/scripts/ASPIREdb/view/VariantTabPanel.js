@@ -97,11 +97,18 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       this.labelsMenu = Ext.create( 'Ext.menu.Menu', {
          items : [ {
             itemId : 'makeLabel',
-            text : 'Create or apply label',
+            text : 'Create label',
             disabled : true,
             handler : this.makeLabelHandler,
             scope : this,
-            tooltip : 'Create or apply labels to selected variants.',            
+            tooltip : 'Create and apply a new label to the selected variants.',            
+         }, {
+            itemId : 'applyLabel',
+            text : 'Apply labels',
+            disabled : true,
+            handler : this.applyLabelHandler,
+            scope : this,
+            tooltip : 'Apply existing labels to the selected variants.', 
          }, {
             itemId : 'labelManager',
             text : 'Manage labels',
@@ -426,8 +433,12 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
 
          var contextMenu = new Ext.menu.Menu( {
             items : [ {
-               text : 'Create or apply label',
+               text : 'Create label',
                handler : ref.makeLabelHandler,
+               scope : ref,
+            }, {
+               text : 'Apply label',
+               handler : ref.applyLabelHandler,
                scope : ref,
             }, {
                text : 'Remove label',
@@ -1004,11 +1015,13 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
       if ( records.length > 0 ) {
          this.down( '#viewGenes' ).enable();
          this.down( '#makeLabel' ).enable();
+         this.down( '#applyLabel' ).enable();
          this.down( '#viewCompoundHeterozygotes' ).enable();
       } else {
          this.down( '#viewGenes' ).disable();
          this.down( '#viewInUCSC' ).disable();
          this.down( '#makeLabel' ).disable();
+         this.down( '#applyLabel' ).disable();
          this.down( '#viewCompoundHeterozygotes' ).disable();
          return;
       }
@@ -1086,13 +1099,39 @@ Ext.define( 'ASPIREdb.view.VariantTabPanel', {
                    afterrender: function(c) {
                        Ext.create('Ext.tip.ToolTip', {
                            target: c.getEl(),
-                           html: 'Create and apply a label to the selected group of subjects or variants. Enter a name and choose a color.'
+                           html: 'Create and apply a label to the selected group of variants. Enter a name and choose a color.'
                        });
                    }
                }
             }]
         },         
          extend : 'ASPIREdb.view.CreateLabelWindow',
+         selectedIds : me.getSelectedVariantIds( me.getVariantRecordSelection() ),
+      } );
+      labelWin.show();
+   },
+   
+   applyLabelHandler : function(event) {
+      var me = this;
+      
+      var labelWin = Ext.create( 'ASPIREdb.view.ApplyLabelWindow', {
+         isSubjectLabel : false,
+         title : 'Apply Variant Labels',
+         header: {
+            items: [{
+                xtype: 'image',
+                src: 'scripts/ASPIREdb/resources/images/qmark.png',
+                listeners: {
+                   afterrender: function(c) {
+                       Ext.create('Ext.tip.ToolTip', {
+                           target: c.getEl(),
+                           html: 'Apply existing labels to the selected group of variants.'
+                       });
+                   }
+               }
+            }]
+        },         
+         extend : 'ASPIREdb.view.ApplyLabelWindow',
          selectedIds : me.getSelectedVariantIds( me.getVariantRecordSelection() ),
       } );
       labelWin.show();

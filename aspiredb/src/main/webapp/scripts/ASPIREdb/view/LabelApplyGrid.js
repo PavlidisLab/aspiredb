@@ -48,11 +48,17 @@ Ext.define( 'ASPIREdb.view.LabelApplyGrid', {
 
          var contextMenu = new Ext.menu.Menu( {
             items : [ {
-               text : 'Create or apply label',
+               text : 'Create label',
                handler : function() {
                   me.makeLabelHandler( index );
                },
-               scope : me,
+               scope : this,
+            }, {
+               text : 'Apply label',
+               handler : function() {
+                  me.applyLabelHandler( index );
+               },
+               scope : this,
             } ]
          } );
 
@@ -91,6 +97,46 @@ Ext.define( 'ASPIREdb.view.LabelApplyGrid', {
       var labelWin = Ext.create( 'ASPIREdb.view.CreateLabelWindow', {
          title : 'Create Variant Label',
          isSubjectLabel : this.isSubjectLabel,
+         selectedIds : ids,
+         header: {
+            items: [{
+                xtype: 'image',
+                src: 'scripts/ASPIREdb/resources/images/qmark.png',
+                listeners: {
+                   afterrender: function(c) {
+                       Ext.create('Ext.tip.ToolTip', {
+                           target: c.getEl(),
+                           html: 'Create and apply a label to the selected group of variants. Enter a name and choose a color.'
+                       });
+                   }
+               }
+            }]
+        },
+      } );
+      labelWin.show();
+   },
+   
+   applyLabelHandler : function(index) {
+      var ids = this.getSelectedIds( index );
+      
+      var labelWin = Ext.create( 'ASPIREdb.view.ApplyLabelWindow', {
+         isSubjectLabel : false,
+         title : 'Apply Variant Labels',
+         header: {
+            items: [{
+                xtype: 'image',
+                src: 'scripts/ASPIREdb/resources/images/qmark.png',
+                listeners: {
+                   afterrender: function(c) {
+                       Ext.create('Ext.tip.ToolTip', {
+                           target: c.getEl(),
+                           html: 'Apply existing labels to the selected group of variants.'
+                       });
+                   }
+               }
+            }]
+        },         
+         extend : 'ASPIREdb.view.ApplyLabelWindow',
          selectedIds : ids,
       } );
       labelWin.show();

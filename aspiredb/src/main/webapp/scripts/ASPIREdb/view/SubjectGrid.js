@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-Ext.require( [ 'ASPIREdb.store.SubjectStore', 'ASPIREdb.view.CreateLabelWindow', 'ASPIREdb.view.LabelControlWindow',
+Ext.require( [ 'ASPIREdb.store.SubjectStore', 'ASPIREdb.view.CreateLabelWindow', 'ASPIREdb.view.ApplyLabelWindow', 'ASPIREdb.view.LabelControlWindow',
               'ASPIREdb.TextDataDownloadWindow', 'ASPIREdb.view.report.BurdenAnalysisWindow', 'ASPIREdb.Utils' ] );
 
 /**
@@ -92,8 +92,12 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
          var contextMenu = new Ext.menu.Menu( {
             items : [ {
-               text : 'Create or apply label',
+               text : 'Create label',
                handler : this.makeLabelHandler,
+               scope : this,
+            }, {
+               text : 'Apply label',
+               handler : this.applyLabelHandler,
                scope : this,
             }, {
                text : 'Remove label',
@@ -156,11 +160,18 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       this.labelsMenu = Ext.create( 'Ext.menu.Menu', {
          items : [ {
             itemId : 'makeLabel',
-            text : 'Create or apply label',
+            text : 'Create label',
             disabled : true,
             handler : this.makeLabelHandler,
             scope : this,
-            tooltip : 'Create or apply labels to the selected subjects.',            
+            tooltip : 'Create and apply a new label to the selected subjects.',            
+         }, {
+            itemId : 'applyLabel',
+            text : 'Apply labels',
+            disabled : true,
+            handler : this.applyLabelHandler,
+            scope : this,
+            tooltip : 'Apply existing labels to the selected subjects.', 
          }, {
             itemId : 'labelManager',
             text : 'Manage labels',
@@ -384,9 +395,11 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
 
       if ( this.selSubjects.length === 0 ) {
          this.down( '#makeLabel' ).disable();
-         // return;
+         this.down( '#applyLabel' ).disable();
+         return;
       } else {
          this.down( '#makeLabel' ).enable();
+         this.down( '#applyLabel' ).enable();
       }
 
       if ( this.selSubjects.length >= 1 ) {
@@ -439,6 +452,38 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
       var labelWindow = new ASPIREdb.view.CreateLabelWindowSubject();
       labelWindow.show();
 
+   },
+   
+   applyLabelHandler : function(event) {
+      var me = this;
+
+      me.selSubjects = me.getSelectionModel().getSelection();
+
+      Ext.define( 'ASPIREdb.view.ApplyLabelWindowSubject', {
+         isSubjectLabel : true,
+         title : 'Apply Subject Labels',
+         header: {
+            items: [{
+                xtype: 'image',
+                src: 'scripts/ASPIREdb/resources/images/qmark.png',
+                listeners: {
+                   afterrender: function(c) {
+                       Ext.create('Ext.tip.ToolTip', {
+                           target: c.getEl(),
+                           html: 'Apply existing labels to the subjects selected in the Subject panel.'
+                       });
+                   }
+               }
+            }]
+        },        
+   
+         extend : 'ASPIREdb.view.ApplyLabelWindow',
+         selectedIds : ASPIREdb.Utils.getSelectedIds( me.getSelectionModel().getSelection() ),
+
+      } );
+
+      var labelWindow = new ASPIREdb.view.ApplyLabelWindowSubject();
+      labelWindow.show();
    },
 
    /**
@@ -609,6 +654,7 @@ Ext.define( 'ASPIREdb.view.SubjectGrid', {
    deselectAllHandler : function() {
       this.cancelBubble = true;
       this.getSelectionModel().deselectAll(); // calls selectionChangeHandler
+      this.selectionChangeHandler();
       this.selectAllStatus = 'No';
       ASPIREdb.EVENT_BUS.fireEvent( 'subject_selection_cleared' );
    },
