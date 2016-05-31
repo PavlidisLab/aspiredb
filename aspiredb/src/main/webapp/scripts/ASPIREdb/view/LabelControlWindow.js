@@ -110,7 +110,7 @@ Ext.define( 'ASPIREdb.view.LabelControlWindow', {
 
       getHtmlLabel : function(label) {
          var fontColour = ASPIREdb.view.LabelControlWindow.getContrastYIQ( label.colour );
-         var ret = "<font color=" + fontColour + "><span style='background-color: " + label.colour + "'>&nbsp&nbsp"
+         var ret = "<font color=" + fontColour + "><span style='background-color: #" + label.colour + "'>&nbsp&nbsp"
             + label.name + "&nbsp&nbsp</span></font>&nbsp&nbsp&nbsp";
          return ret;
       },
