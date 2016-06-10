@@ -46,7 +46,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
- * Simple wrapper that calls Neurocarta REST web service.
+ * Simple wrapper that calls Phenocarta REST web service.
  * 
  * @author frances
  * @version $Id: NeurocartaQueryServiceImpl.java,v 1.8 2013/06/11 22:30:46 anton Exp $
@@ -73,7 +73,7 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
 
         // Check return code
         if ( Response.Status.fromStatusCode( response.getStatus() ).getFamily() != Response.Status.Family.SUCCESSFUL ) {
-            String errorMessage = "Error occurred when accessing Neurocarta web service: "
+            String errorMessage = "Error occurred when accessing Phenocarta web service: "
                     + response.getEntity( String.class );
             log.error( errorMessage );
 
@@ -87,7 +87,7 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
     private BioMartQueryService bioMartQueryService;
 
     @Autowired
-    private NeurocartaCache neurocartaCache;
+    private NeurocartaCache phenocartaCache;
 
     @Override
     public Collection<GeneValueObject> fetchGenesAssociatedWithPhenotype( String phenotypeUri )
@@ -112,7 +112,7 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
                 geneSymbols.add( json.getString( "officialSymbol" ) );
             }
         } catch ( JSONException e ) {
-            String errorMessage = "Cannot get genes from Neurocarta";
+            String errorMessage = "Cannot get genes from Phenocarta";
             log.error( errorMessage, e );
 
             throw new NeurocartaServiceException( errorMessage );
@@ -153,7 +153,7 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
             }
 
         } catch ( JSONException e ) {
-            String errorMessage = "Cannot get genes from Neurocarta";
+            String errorMessage = "Cannot get genes from Phenocarta";
             log.error( errorMessage, e );
 
             throw new NeurocartaServiceException( errorMessage );
@@ -178,30 +178,30 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
             throws NeurocartaServiceException {
         updateCacheIfExpired();
 
-        return this.neurocartaCache.findPhenotypes( queryString );
+        return this.phenocartaCache.findPhenotypes( queryString );
     }
 
     @Override
     public List<NeurocartaPhenotypeValueObject> getPhenotypes( List<String> names ) throws NeurocartaServiceException {
         updateCacheIfExpired();
 
-        return this.neurocartaCache.getPhenotypes( names );
+        return this.phenocartaCache.getPhenotypes( names );
     }
 
     @Override
     public boolean isNeurocartaPhenotype( String phenotypeUri ) throws NeurocartaServiceException {
         updateCacheIfExpired();
 
-        return this.neurocartaCache.hasPhenotype( phenotypeUri );
+        return this.phenocartaCache.hasPhenotype( phenotypeUri );
     }
 
     @PostConstruct
-    private void initialize() throws NeurocartaServiceException {
+    private void initialize() {
         updateCacheIfExpired();
     }
 
-    private void updateCacheIfExpired() throws NeurocartaServiceException {
-        if ( this.neurocartaCache.hasExpired() ) {
+    private void updateCacheIfExpired() {
+        if ( this.phenocartaCache.hasExpired() ) {
 
             try {
                 String result = sendRequest( LOAD_PHENOTYPES_URL_SUFFIX, new MultivaluedMapImpl() );
@@ -222,13 +222,13 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
                         neurocartaPhenotypes.add( neurocartaPhenotype );
                     }
                 } catch ( JSONException e ) {
-                    String errorMessage = "Cannot initialize phenotypes from Neurocarta";
+                    String errorMessage = "Cannot initialize phenotypes from Phenocarta";
                     log.error( errorMessage, e );
 
                     throw new NeurocartaServiceException( errorMessage );
                 }
 
-                this.neurocartaCache.putAll( neurocartaPhenotypes );
+                this.phenocartaCache.putAll( neurocartaPhenotypes );
             } catch ( Exception ex ) {
                 log.warn( ex.getLocalizedMessage(), ex );
             }
