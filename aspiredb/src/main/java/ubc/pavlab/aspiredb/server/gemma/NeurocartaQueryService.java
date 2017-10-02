@@ -31,6 +31,9 @@ import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
  */
 public interface NeurocartaQueryService {
 
+    Collection<NeurocartaPhenotypeValueObject> fetchAllPhenotypes()
+            throws NeurocartaServiceException, BioMartServiceException;
+
     public Collection<GeneValueObject> fetchGenesAssociatedWithPhenotype( String phenotypeUri )
             throws NeurocartaServiceException, BioMartServiceException;
 
