@@ -27,11 +27,11 @@ import org.directwebremoting.annotations.DataTransferObject;
 /**
  * Superclass of Disjunction (OR-expression) and Conjunction (AND-expression).
  */
-@DataTransferObject
+@DataTransferObject(javascript = "Junction")
 public abstract class Junction implements RestrictionExpression {
     private static final long serialVersionUID = 1L;
 
-    protected List<RestrictionExpression> restrictions = new ArrayList<RestrictionExpression>();
+    private List<RestrictionExpression> restrictions = new ArrayList<>();
 
     public void add( RestrictionExpression restriction ) {
         this.restrictions.add( restriction );
@@ -41,7 +41,7 @@ public abstract class Junction implements RestrictionExpression {
         this.restrictions.addAll( restrictions );
     }
 
-    public Collection<RestrictionExpression> getRestrictions() {
+    public List<RestrictionExpression> getRestrictions() {
         return this.restrictions;
     }
 
