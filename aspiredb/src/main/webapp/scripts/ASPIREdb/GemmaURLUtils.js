@@ -20,8 +20,8 @@
 Ext.define( 'ASPIREdb.GemmaURLUtils', {
    singleton : true,
 
-   GEMMA_URL : "http://chibi.ubc.ca/Gemma",
-   GEMMA_WEB_SERVICE_URL : "http://chibi.ubc.ca/Gemma/rest/v2",
+   GEMMA_URL : "https://gemma.msl.ubc.ca",
+   GEMMA_WEB_SERVICE_URL : "https://gemma.msl.ubc.ca/rest/v2",
 
    HELP_PAGE_URL : "http://aspiredb.sites.olt.ubc.ca/",
 
