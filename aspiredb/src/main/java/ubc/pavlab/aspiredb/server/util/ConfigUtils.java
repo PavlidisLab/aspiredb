@@ -164,14 +164,41 @@ public class ConfigUtils {
     }
 
     /**
-     * @return the configured base url (e.g., http://www.chibi.ubc.ca/aspiredb/). It will always end in a slash.
+     * @return the configured base url (e.g., http://aspiredb.msl.ubc.ca/). It will always end in a slash.
      */
     public static String getBaseUrl() {
-        String url = getString( "aspiredb.baseurl", "http://www.chibi.ubc.ca/aspiredb/" );
+        String url = getString( "aspiredb.baseurl", getHostUrl() + getRootContext() + "/" );
         if ( !url.endsWith( "/" ) ) {
             return url + "/";
         }
         return url;
+    }
+    /**
+     * @return host url e.g. http://aspiredb.msl.ubc.ca
+     */
+    public static String getHostUrl() {
+        String host = getString( "aspiredb.hosturl", "http://aspiredb.msl.ubc.ca" );
+        if ( host.length() > 1 && host.endsWith( "/" ) ) {
+            return host.substring(0, host.length() - 1);
+        }
+        return host;
+    }
+
+    /**
+     * @return root context e.g. /aspiredb
+     */
+    public static String getRootContext() {
+        String ctx = getString( "aspiredb.rootcontext", "" );
+        if (ctx.isEmpty() || ctx.equals( "/" ) ) {
+            return "";
+        }
+        if ( !ctx.startsWith( "/" ) ) {
+            ctx = "/" + ctx;
+        }
+        if ( ctx.length() > 1 && ctx.endsWith( "/" ) ) {
+            return ctx.substring(0, ctx.length() - 1);
+        }
+        return ctx;
     }
 
     /**
@@ -380,16 +407,9 @@ public class ConfigUtils {
     }
 
     public static String getGemmaBaseUrl() {
-        String url = getString( "gemma.base.url", "http://chibi.ubc.ca/Gemma" );
+        String url = getString( "gemma.base.url", "https://gemma.msl.ubc.ca" );
 
         return url;
-    }
-
-    /**
-     * @return host url e.g. http://www.chibi.ubc.ca
-     */
-    public static String getHostUrl() {
-        return getString( "aspiredb.hosturl", "http://www.chibi.ubc.ca/" );
     }
 
     /**
@@ -655,8 +675,8 @@ public class ConfigUtils {
     /**
      * Set an environment/application variable programatically.
      * 
-     * @param enablePropertyName
-     * @param b
+     * @param key
+     * @param value
      */
     public static void setProperty( String key, Object value ) {
         config.setProperty( key, value );
