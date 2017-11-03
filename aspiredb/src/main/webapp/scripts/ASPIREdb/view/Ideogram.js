@@ -564,8 +564,8 @@ Ext.define( 'ASPIREdb.view.Ideogram', {
 
 	   this.ctxLegend.canvas.height = 400;
 	   this.ctxLegend.canvas.width = 200;
-	   this.ctxLegend.canvas.style.left = this.boxWidth;
-	   this.ctxLegend.canvas.style.top = 20;
+	   this.ctxLegend.canvas.style.left = this.boxWidth + "px";
+	   this.ctxLegend.canvas.style.top = 20 + "px";
 	   
 	   this.updateLengths();
 	   
