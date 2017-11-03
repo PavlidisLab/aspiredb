@@ -32,9 +32,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.tanesha.recaptcha.ReCaptchaImpl;
-import net.tanesha.recaptcha.ReCaptchaResponse;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
+import ubc.pavlab.aspiredb.server.security.recaptcha.ReCaptcha;
 import ubc.pavlab.aspiredb.server.util.ConfigUtils;
 
 /**
@@ -69,7 +67,7 @@ public class SignupController extends BaseController {
     @Autowired
     private UserManager userManager;
 
-    private RecaptchaTester recaptchaTester = new DefaultRecaptchaTester();
+    private ReCaptcha reCaptcha = new ReCaptcha( ConfigUtils.getString( "aspiredb.recaptcha.privateKey" ) );
 
     @RequestMapping(value = "/ajaxLoginCheck.html")
     public void ajaxLoginCheck( HttpServletRequest request, HttpServletResponse response ) throws Exception {
@@ -209,7 +207,6 @@ public class SignupController extends BaseController {
      * Send an email to request signup confirmation.
      * 
      * @param request
-     * @param u
      */
     private String sendResetConfirmationEmail( HttpServletRequest request, String token, String username,
             String password, String email ) {
@@ -317,13 +314,9 @@ public class SignupController extends BaseController {
 
         String cPass = request.getParameter( "passwordConfirm" );
 
-        String recatpchaPvtKey = ConfigUtils.getString( "aspiredb.recaptcha.privateKey" );
+        if ( reCaptcha.isPrivateKeySet() ) {
 
-        if ( StringUtils.isNotBlank( recatpchaPvtKey ) ) {
-
-            boolean valid = recaptchaTester.validateCaptcha( request, recatpchaPvtKey );
-
-            if ( !valid ) {
+            if ( !reCaptcha.validateRequest( request ).isValid() ) {
                 jsonText = "{\"success\":false,\"message\":\"Captcha was not entered correctly.\"}";
                 jsonUtil.writeToResponse( jsonText );
                 return;
@@ -436,31 +429,7 @@ public class SignupController extends BaseController {
 
     }
 
-    public void setRecaptchaTester( RecaptchaTester recaptchaTester ) {
-        this.recaptchaTester = recaptchaTester;
-
-    }
-}
-
-interface RecaptchaTester {
-    public boolean validateCaptcha( HttpServletRequest request, String recatpchaPvtKey );
-}
-
-class DefaultRecaptchaTester implements RecaptchaTester {
-    /**
-     * @param request
-     * @param recatpchaPvtKey
-     * @return
-     */
-    @Override
-    public boolean validateCaptcha( HttpServletRequest request, String recatpchaPvtKey ) {
-        String rcChallenge = request.getParameter( "recaptcha_challenge_field" );
-        String rcResponse = request.getParameter( "recaptcha_response_field" );
-
-        String remoteAddr = request.getRemoteAddr();
-        ReCaptchaImpl reCaptcha = new ReCaptchaImpl();
-        reCaptcha.setPrivateKey( recatpchaPvtKey );
-        ReCaptchaResponse reCaptchaResponse = reCaptcha.checkAnswer( remoteAddr, rcChallenge, rcResponse );
-        return reCaptchaResponse.isValid();
+    public void setRecaptchaTester( ReCaptcha reCaptcha ) {
+        this.reCaptcha = reCaptcha;
     }
 }

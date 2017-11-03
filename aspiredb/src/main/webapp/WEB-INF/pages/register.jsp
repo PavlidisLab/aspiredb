@@ -3,7 +3,7 @@
 <script src="scripts/lib/ext-all-debug-w-comments.js"></script>
 <!-- <script type="text/javascript" src="scripts/lib/ext-theme-neptune.js"></script>-->
 <script type="text/javascript" src="scripts/lib/ext-theme-steelblue.js"></script>
-<script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
+<script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
 <script type="text/javascript" src="scripts/lib/json.js"></script>
 
 
@@ -12,6 +12,31 @@
 <!-- <link rel="stylesheet" type="text/css" href="scripts/lib/resources/css/ext-all-neptune.css">-->
 <link rel="stylesheet" type="text/css" href="scripts/lib/resources/css/ext-all-steelblue.css">
 
+<%@page
+        import="org.apache.commons.configuration.PropertiesConfiguration"%>
+<%@page import="org.apache.commons.configuration.CompositeConfiguration"%>
+<%@page import="org.apache.commons.configuration.io.FileHandler"%>
+
+<%
+    String USER_CONFIGURATION = "aspiredb.properties";
+    String DEFAULT_CONFIGURATION = "default.properties";
+
+    CompositeConfiguration localConfig = new CompositeConfiguration();
+
+    PropertiesConfiguration pc = new PropertiesConfiguration();
+    FileHandler handler = new FileHandler( pc );
+    handler.setFileName( USER_CONFIGURATION );
+    handler.load();
+    localConfig.addConfiguration( pc );
+
+    pc = new PropertiesConfiguration();
+    handler = new FileHandler( pc );
+    handler.setFileName( DEFAULT_CONFIGURATION );
+    handler.load();
+    localConfig.addConfiguration( pc );
+
+    System.setProperty( "aspiredb.recaptcha.publicKey", localConfig.getString( "aspiredb.recaptcha.publicKey" ) );
+%>
 
 
 
@@ -29,7 +54,10 @@
         }
     });
 
-   
+    Ext.define('ASPIREdb.globals', {
+        singleton: true,
+        recaptchaPublicKey: "<%=System.getProperty("aspiredb.recaptcha.publicKey")%>"
+    });
 
 </script>
 

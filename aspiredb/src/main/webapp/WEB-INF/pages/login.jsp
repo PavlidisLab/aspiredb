@@ -2,7 +2,7 @@
 <!-- <script type="text/javascript" src="scripts/lib/ext-theme-neptune.js"></script>-->
 <script type="text/javascript" src="scripts/lib/ext-theme-steelblue.js"></script>
 <script type="text/javascript" src="scripts/lib/json.js"></script>
-<script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
+<script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
 <script type="text/javascript" src="scripts/lib/json.js"></script>
 
 <!-- <link href="http://cdn.sencha.com/ext/gpl/4.2.0/resources/css/ext-all.css" rel="stylesheet" />-->
@@ -37,6 +37,7 @@
     localConfig.addConfiguration( pc );
     
     System.setProperty( "aspiredb.sslPort", localConfig.getString( "aspiredb.sslPort" ) );
+    System.setProperty( "aspiredb.recaptcha.publicKey", localConfig.getString( "aspiredb.recaptcha.publicKey" ) );
 %>
 
 <script>
@@ -65,6 +66,11 @@
          //win.show();
       }
    } );
+
+   Ext.define('ASPIREdb.globals', {
+       singleton: true,
+       recaptchaPublicKey: "<%=System.getProperty("aspiredb.recaptcha.publicKey")%>"
+   });
 </script>
 
 

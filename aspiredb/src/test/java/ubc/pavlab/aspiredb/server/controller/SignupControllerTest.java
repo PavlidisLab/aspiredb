@@ -15,6 +15,8 @@
 package ubc.pavlab.aspiredb.server.controller;
 
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,12 +31,15 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import ubc.pavlab.aspiredb.server.BaseSpringContextTest;
 import ubc.pavlab.aspiredb.server.security.authentication.UserService;
+import ubc.pavlab.aspiredb.server.security.recaptcha.ReCaptcha;
+import ubc.pavlab.aspiredb.server.security.recaptcha.ReCaptchaResponse;
 
 /**
  * Tortures the signup system by starting many threads and signing up many users, while at the same time creating a lot
@@ -53,12 +58,9 @@ public class SignupControllerTest extends BaseSpringContextTest {
 
     @Before
     public void setup() {
-        suc.setRecaptchaTester( new RecaptchaTester() {
-            @Override
-            public boolean validateCaptcha( HttpServletRequest request, String recatpchaPvtKey ) {
-                return true;
-            }
-        } );
+        ReCaptcha mockReCaptcha = Mockito.mock(ReCaptcha.class);
+        when(mockReCaptcha.validateRequest(any(HttpServletRequest.class))).thenReturn(new ReCaptchaResponse(true, ""));
+        suc.setRecaptchaTester( mockReCaptcha );
     }
 
     @Test

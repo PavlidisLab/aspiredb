@@ -64,7 +64,6 @@ Ext
             password1Textfield.reset();
             password2Textfield.reset();
             emailTextfield.reset();
-            me.showCaptcha( reCaptcha.getEl() );
          },
 
          initAndShow : function() {
@@ -164,9 +163,7 @@ Ext
                   xtype : 'panel',
                   itemId : 'reCaptcha',
                   border : true,
-                  width : 440,
-                  height : 120,
-                  style : 'margin-top:10px',
+                  style : 'margin:10px auto',
                   html : '<div id="recaptcha"></div>',
                   listeners : {
                      afterrender : function() {
@@ -203,20 +200,17 @@ Ext
          },
 
          showCaptcha : function(ele) {
-            // console.log(Ext.getDom(this.body));
-            Recaptcha.create( "6Lf4KAkAAAAAADFjpOSiyfHhlQ1pkznapAnmIvyr", Ext.getDom( ele ), {
-               theme : "clean",
-               callback : Recaptcha.focus_response_field
-            } );
+             grecaptcha.render( Ext.getElementById('recaptcha'), {
+                 'sitekey'  : ASPIREdb.globals.recaptchaPublicKey
+             });
          },
 
          registerHandler : function() {
 
             var me = this;
             var form = me.down( '#aspireRegistrationForm' ).getForm();
-            var recaptchaText = Recaptcha.get_response();
 
-            if ( !form.isValid() || recaptchaText.length == 0 ) {
+            if ( !form.isValid() || grecaptcha.getResponse().length == 0 ) {
                // Ext.Msg.alert( 'Error', 'Form is not valid' );
                var messageLabel = me.down( '#message' );
                messageLabel.setText( 'Form contains missing or invalid fields', false );
@@ -233,8 +227,7 @@ Ext
                   'password' : me.down( '#password1' ).value,
                   'passwordConfirm' : me.down( '#password2' ).value,
                   'email' : me.down( '#email' ).value,
-                  'recaptcha_challenge_field' : Recaptcha.get_challenge(),
-                  'recaptcha_response_field' : Recaptcha.get_response(),
+                  'g-recaptcha-response' : grecaptcha.getResponse(),
                   'ajaxLoginTrue' : true
                } ),
                success : function(response) {
