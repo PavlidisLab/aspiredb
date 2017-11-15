@@ -34,5 +34,6 @@
 
 <html>
 <body>
+<%@include file="/common/analytics.jsp" %>
 </body>
 </html>

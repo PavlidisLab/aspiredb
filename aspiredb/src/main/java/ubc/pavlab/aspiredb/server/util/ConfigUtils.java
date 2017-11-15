@@ -458,7 +458,7 @@ public class ConfigUtils {
      * @return
      * @see org.apache.commons.configuration.CompositeConfiguration#getKeys()
      */
-    public static Iterator<?> getKeys() {
+    public static Iterator<String> getKeys() {
         return config.getKeys();
     }
 

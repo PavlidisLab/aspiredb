@@ -35,4 +35,5 @@
 
 </head>
 <body>
+<%@include file="/common/analytics.jsp" %>
 </body>

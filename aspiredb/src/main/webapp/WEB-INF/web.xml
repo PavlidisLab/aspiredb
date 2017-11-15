@@ -15,7 +15,7 @@
     </context-param>
 
     <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+        <listener-class>ubc.pavlab.aspiredb.server.listener.StartupListener</listener-class>
     </listener>
 
 

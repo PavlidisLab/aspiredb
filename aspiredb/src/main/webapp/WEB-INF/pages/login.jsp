@@ -11,35 +11,6 @@
 <link rel="stylesheet" type="text/css"
     href="scripts/lib/resources/css/ext-all-steelblue.css">
 
-
-
-<%@page
-    import="org.apache.commons.configuration.PropertiesConfiguration"%>
-<%@page import="org.apache.commons.configuration.CompositeConfiguration"%>
-<%@page import="org.apache.commons.configuration.io.FileHandler"%>
-
-<%
-    String USER_CONFIGURATION = "aspiredb.properties";
-    String DEFAULT_CONFIGURATION = "default.properties";
-
-    CompositeConfiguration localConfig = new CompositeConfiguration();
-    
-    PropertiesConfiguration pc = new PropertiesConfiguration();
-    FileHandler handler = new FileHandler( pc );
-    handler.setFileName( USER_CONFIGURATION );
-    handler.load();
-    localConfig.addConfiguration( pc );
-    
-    pc = new PropertiesConfiguration();
-    handler = new FileHandler( pc );
-    handler.setFileName( DEFAULT_CONFIGURATION );
-    handler.load();
-    localConfig.addConfiguration( pc );
-    
-    System.setProperty( "aspiredb.sslPort", localConfig.getString( "aspiredb.sslPort" ) );
-    System.setProperty( "aspiredb.recaptcha.publicKey", localConfig.getString( "aspiredb.recaptcha.publicKey" ) );
-%>
-
 <script>
 
    Ext.application( {
@@ -48,7 +19,7 @@
 
       launch : function() {
         
-         var port = "<%=System.getProperty("aspiredb.sslPort")%>";
+         var port = "${ appConfig["aspiredb.sslPort"]}";
 
          if ( port == null ) {
             port = "";
@@ -69,7 +40,7 @@
 
    Ext.define('ASPIREdb.globals', {
        singleton: true,
-       recaptchaPublicKey: "<%=System.getProperty("aspiredb.recaptcha.publicKey")%>"
+       recaptchaPublicKey: "${ appConfig["aspiredb.recaptcha.publicKey"]}"
    });
 </script>
 
@@ -78,5 +49,6 @@
 
 <html>
 <body>
+<%@include file="/common/analytics.jsp" %>
 </body>
 </html>
