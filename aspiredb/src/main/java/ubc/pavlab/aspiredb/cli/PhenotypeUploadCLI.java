@@ -136,7 +136,7 @@ public class PhenotypeUploadCLI extends AbstractCLI {
 
         try {
 
-            os.getHumanPhenotypeOntologyService().startInitializationThread( true );
+            os.getHumanPhenotypeOntologyService().startInitializationThread( true, true );
             int c = 0;
 
             while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {

@@ -37,7 +37,7 @@ public class OntologyServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testHumanPhenotypeOntology() throws Exception {
-        os.getHumanPhenotypeOntologyService().startInitializationThread( true );
+        os.getHumanPhenotypeOntologyService().startInitializationThread( true, true );
         int c = 0;
 
         while ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
@@ -59,7 +59,7 @@ public class OntologyServiceTest extends BaseSpringContextTest {
 
     @Test
     public void testObsolete() throws Exception {
-        os.getDiseaseOntologyService().startInitializationThread( true );
+        os.getDiseaseOntologyService().startInitializationThread( true, true );
         int c = 0;
 
         while ( !os.getDiseaseOntologyService().isOntologyLoaded() ) {

@@ -362,7 +362,7 @@ public class ProjectServiceImpl implements ProjectService {
             String projectName, final boolean dryRun ) throws Exception {
 
         if ( !os.getHumanPhenotypeOntologyService().isOntologyLoaded() ) {
-            os.getHumanPhenotypeOntologyService().startInitializationThread( true );
+            os.getHumanPhenotypeOntologyService().startInitializationThread( true, true );
         }
 
         int c = 0;

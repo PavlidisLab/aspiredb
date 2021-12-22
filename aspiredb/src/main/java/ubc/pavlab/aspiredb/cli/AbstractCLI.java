@@ -725,7 +725,8 @@ public abstract class AbstractCLI {
             }
         }
         PatternLayout layout = new PatternLayout( "[Gemma %d] %p [%t] %C.%M(%L) | %m%n" );
-        ConsoleAppender cnslAppndr = new ConsoleAppender( layout );
+        ConsoleAppender cnslAppndr = new ConsoleAppender();
+        cnslAppndr.setLayout( layout );
         Logger f = LogManager.getRootLogger();
         assert f != null;
         f.addAppender( cnslAppndr );

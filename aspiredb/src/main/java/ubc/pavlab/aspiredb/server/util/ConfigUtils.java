@@ -25,12 +25,12 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.SystemConfiguration;
-import org.apache.commons.configuration.io.FileHandler;
+import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.SystemConfiguration;
+import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.directwebremoting.annotations.RemoteMethod;
@@ -204,7 +204,7 @@ public class ConfigUtils {
     /**
      * @param key
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getBigDecimal(java.lang.String)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getBigDecimal(java.lang.String)
      */
     public static BigDecimal getBigDecimal( String key ) {
         return config.getBigDecimal( key );
@@ -214,7 +214,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getBigDecimal(java.lang.String, java.math.BigDecimal)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getBigDecimal(java.lang.String, java.math.BigDecimal)
      */
     public static BigDecimal getBigDecimal( String key, BigDecimal defaultValue ) {
         return config.getBigDecimal( key, defaultValue );
@@ -223,7 +223,7 @@ public class ConfigUtils {
     /**
      * @param key
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getBigInteger(java.lang.String)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getBigInteger(java.lang.String)
      */
     public static BigInteger getBigInteger( String key ) {
         return config.getBigInteger( key );
@@ -233,7 +233,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getBigInteger(java.lang.String, java.math.BigInteger)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getBigInteger(java.lang.String, java.math.BigInteger)
      */
     public static BigInteger getBigInteger( String key, BigInteger defaultValue ) {
         return config.getBigInteger( key, defaultValue );
@@ -242,7 +242,7 @@ public class ConfigUtils {
     /**
      * @param key
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getBoolean(java.lang.String)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getBoolean(java.lang.String)
      */
     public static boolean getBoolean( String key ) {
         try {
@@ -258,7 +258,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getBoolean(java.lang.String, boolean)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getBoolean(java.lang.String, boolean)
      */
     public static boolean getBoolean( String key, boolean defaultValue ) {
         return config.getBoolean( key, defaultValue );
@@ -268,7 +268,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getBoolean(java.lang.String, java.lang.Boolean)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getBoolean(java.lang.String, java.lang.Boolean)
      */
     public static Boolean getBoolean( String key, Boolean defaultValue ) {
         return config.getBoolean( key, defaultValue );
@@ -277,7 +277,7 @@ public class ConfigUtils {
     /**
      * @param key
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getByte(java.lang.String)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getByte(java.lang.String)
      */
     public static byte getByte( String key ) {
         try {
@@ -292,7 +292,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getByte(java.lang.String, byte)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getByte(java.lang.String, byte)
      */
     public static byte getByte( String key, byte defaultValue ) {
         return config.getByte( key, defaultValue );
@@ -302,7 +302,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getByte(java.lang.String, java.lang.Byte)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getByte(java.lang.String, java.lang.Byte)
      */
     public static Byte getByte( String key, Byte defaultValue ) {
         return config.getByte( key, defaultValue );
@@ -311,7 +311,7 @@ public class ConfigUtils {
     /**
      * @param index
      * @return
-     * @see org.apache.commons.configuration.CompositeConfiguration#getConfiguration(int)
+     * @see org.apache.commons.configuration2.CompositeConfiguration#getConfiguration(int)
      */
     public static Configuration getConfiguration( int index ) {
         return config.getConfiguration( index );
@@ -329,7 +329,7 @@ public class ConfigUtils {
     /**
      * @param key
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getDouble(java.lang.String)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getDouble(java.lang.String)
      */
     public static double getDouble( String key ) {
         try {
@@ -344,7 +344,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getDouble(java.lang.String, double)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getDouble(java.lang.String, double)
      */
     public static double getDouble( String key, double defaultValue ) {
         return config.getDouble( key, defaultValue );
@@ -354,7 +354,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getDouble(java.lang.String, java.lang.Double)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getDouble(java.lang.String, java.lang.Double)
      */
     public static Double getDouble( String key, Double defaultValue ) {
         return config.getDouble( key, defaultValue );
@@ -375,7 +375,7 @@ public class ConfigUtils {
     /**
      * @param key
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getFloat(java.lang.String)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getFloat(java.lang.String)
      */
     public static float getFloat( String key ) {
         try {
@@ -390,7 +390,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getFloat(java.lang.String, float)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getFloat(java.lang.String, float)
      */
     public static float getFloat( String key, float defaultValue ) {
         return config.getFloat( key, defaultValue );
@@ -400,7 +400,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getFloat(java.lang.String, java.lang.Float)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getFloat(java.lang.String, java.lang.Float)
      */
     public static Float getFloat( String key, Float defaultValue ) {
         return config.getFloat( key, defaultValue );
@@ -414,7 +414,7 @@ public class ConfigUtils {
 
     /**
      * @return
-     * @see org.apache.commons.configuration.CompositeConfiguration#getInMemoryConfiguration()
+     * @see org.apache.commons.configuration2.CompositeConfiguration#getInMemoryConfiguration()
      */
     public static Configuration getInMemoryConfiguration() {
         return config.getInMemoryConfiguration();
@@ -423,7 +423,7 @@ public class ConfigUtils {
     /**
      * @param key
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getInt(java.lang.String)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getInt(java.lang.String)
      */
     public static int getInt( String key ) {
         try {
@@ -438,7 +438,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getInt(java.lang.String, int)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getInt(java.lang.String, int)
      */
     public static int getInt( String key, int defaultValue ) {
         return config.getInt( key, defaultValue );
@@ -448,7 +448,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getInteger(java.lang.String, java.lang.Integer)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getInteger(java.lang.String, java.lang.Integer)
      */
     public static Integer getInteger( String key, Integer defaultValue ) {
         return config.getInteger( key, defaultValue );
@@ -456,7 +456,7 @@ public class ConfigUtils {
 
     /**
      * @return
-     * @see org.apache.commons.configuration.CompositeConfiguration#getKeys()
+     * @see org.apache.commons.configuration2.CompositeConfiguration#getKeys()
      */
     public static Iterator<String> getKeys() {
         return config.getKeys();
@@ -465,7 +465,7 @@ public class ConfigUtils {
     /**
      * @param key
      * @return
-     * @see org.apache.commons.configuration.CompositeConfiguration#getKeys(java.lang.String)
+     * @see org.apache.commons.configuration2.CompositeConfiguration#getKeys(java.lang.String)
      */
     public static Iterator<?> getKeys( String key ) {
         return config.getKeys( key );
@@ -474,7 +474,7 @@ public class ConfigUtils {
     /**
      * @param key
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getList(java.lang.String)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getList(java.lang.String)
      */
     public static List<?> getList( String key ) {
 
@@ -491,7 +491,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.CompositeConfiguration#getList(java.lang.String, java.util.List)
+     * @see org.apache.commons.configuration2.CompositeConfiguration#getList(java.lang.String, java.util.List)
      */
     public static List<Object> getList( String key, List<Object> defaultValue ) {
         return config.getList( key, defaultValue );
@@ -500,7 +500,7 @@ public class ConfigUtils {
     /**
      * @param key
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getLong(java.lang.String)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getLong(java.lang.String)
      */
     public static long getLong( String key ) {
         try {
@@ -515,7 +515,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getLong(java.lang.String, long)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getLong(java.lang.String, long)
      */
     public static long getLong( String key, long defaultValue ) {
         return config.getLong( key, defaultValue );
@@ -525,7 +525,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getLong(java.lang.String, java.lang.Long)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getLong(java.lang.String, java.lang.Long)
      */
     public static Long getLong( String key, Long defaultValue ) {
         return config.getLong( key, defaultValue );
@@ -533,7 +533,7 @@ public class ConfigUtils {
 
     /**
      * @return
-     * @see org.apache.commons.configuration.CompositeConfiguration#getNumberOfConfigurations()
+     * @see org.apache.commons.configuration2.CompositeConfiguration#getNumberOfConfigurations()
      */
     public static int getNumberOfConfigurations() {
         return config.getNumberOfConfigurations();
@@ -542,7 +542,7 @@ public class ConfigUtils {
     /**
      * @param key
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getProperties(java.lang.String)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getProperties(java.lang.String)
      */
     public static Properties getProperties( String key ) {
         return config.getProperties( key );
@@ -552,7 +552,7 @@ public class ConfigUtils {
      * @param key
      * @param defaults
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getProperties(java.lang.String, java.util.Properties)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getProperties(java.lang.String, java.util.Properties)
      */
     public static Properties getProperties( String key, Properties defaults ) {
         return config.getProperties( key, defaults );
@@ -561,7 +561,7 @@ public class ConfigUtils {
     /**
      * @param key
      * @return
-     * @see org.apache.commons.configuration.CompositeConfiguration#getProperty(java.lang.String)
+     * @see org.apache.commons.configuration2.CompositeConfiguration#getProperty(java.lang.String)
      */
     public static Object getProperty( String key ) {
         return config.getProperty( key );
@@ -570,7 +570,7 @@ public class ConfigUtils {
     /**
      * @param key
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getShort(java.lang.String)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getShort(java.lang.String)
      */
     public static short getShort( String key ) {
         try {
@@ -586,7 +586,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getShort(java.lang.String, short)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getShort(java.lang.String, short)
      */
     public static short getShort( String key, short defaultValue ) {
         return config.getShort( key, defaultValue );
@@ -596,7 +596,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getShort(java.lang.String, java.lang.Short)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getShort(java.lang.String, java.lang.Short)
      */
     public static Short getShort( String key, Short defaultValue ) {
         return config.getShort( key, defaultValue );
@@ -605,7 +605,7 @@ public class ConfigUtils {
     /**
      * @param key
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getString(java.lang.String)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getString(java.lang.String)
      */
     public static String getString( String key ) {
         try {
@@ -620,7 +620,7 @@ public class ConfigUtils {
      * @param key
      * @param defaultValue
      * @return
-     * @see org.apache.commons.configuration.AbstractConfiguration#getString(java.lang.String, java.lang.String)
+     * @see org.apache.commons.configuration2.AbstractConfiguration#getString(java.lang.String, java.lang.String)
      */
     public static String getString( String key, String defaultValue ) {
         return config.getString( key, defaultValue );
@@ -629,7 +629,7 @@ public class ConfigUtils {
     /**
      * @param key
      * @return
-     * @see org.apache.commons.configuration.CompositeConfiguration#getStringArray(java.lang.String)
+     * @see org.apache.commons.configuration2.CompositeConfiguration#getStringArray(java.lang.String)
      */
     public static String[] getStringArray( String key ) {
         try {

@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Properties;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 
 /**
@@ -17,7 +17,7 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
  * 
  * @author pavlidis
  * @version $Id: CommonsConfigurationPropertyPlaceholderConfigurer.java,v 1.1 2013/07/24 00:43:22 paul Exp $
- * @see org.apache.commons.configuration.Configuration
+ * @see org.apache.commons.configuration2.Configuration
  * @see org.springframework.beans.factory.config.PropertyPlaceholderConfigurer
  */
 public class CommonsConfigurationPropertyPlaceholderConfigurer extends PropertyPlaceholderConfigurer {

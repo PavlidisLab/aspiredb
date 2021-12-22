@@ -8,10 +8,10 @@
 
     <aop:aspectj-autoproxy />
 
-    <!-- configurationPropertyConfigurer allows you to use variables like ${mail.host} in the spring bean definitions. Variables 
-        are listed in a resource. If the resource is in your classpath, list in in 'locations'. Other config files can be added by 
+    <!-- configurationPropertyConfigurer allows you to use variables like ${mail.host} in the spring bean definitions. Variables
+        are listed in a resource. If the resource is in your classpath, list in in 'locations'. Other config files can be added by
         defining PropertiesConfiguration instances -->
-    <bean id="userPropertiesFileHandler" class="org.apache.commons.configuration.io.FileHandler" init-method="load">
+    <bean id="userPropertiesFileHandler" class="org.apache.commons.configuration2.io.FileHandler" init-method="load">
         <constructor-arg index="0">
             <ref local="userProperties" />
         </constructor-arg>
@@ -20,7 +20,7 @@
         </property>
     </bean>
 
-    <bean id="userProperties" class="org.apache.commons.configuration.PropertiesConfiguration" />
+    <bean id="userProperties" class="org.apache.commons.configuration2.PropertiesConfiguration" />
 
     <bean id="configurationPropertyConfigurer" class="ubc.pavlab.aspiredb.server.util.CommonsConfigurationPropertyPlaceholderConfigurer"
         depends-on="userPropertiesFileHandler">

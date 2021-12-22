@@ -58,7 +58,7 @@ public class OntologyServiceImpl implements OntologyService {
         this.ontologyServices.add( this.humanPhenotypeOntologyService );
 
         for ( AbstractOntologyService serv : this.ontologyServices ) {
-            serv.startInitializationThread( false );
+            serv.startInitializationThread( false, false );
         }
 
     }
@@ -146,7 +146,7 @@ public class OntologyServiceImpl implements OntologyService {
     @Override
     public void reinitializeAllOntologies() {
         for ( AbstractOntologyService serv : this.ontologyServices ) {
-            serv.startInitializationThread( true );
+            serv.startInitializationThread( true, true );
         }
     }
 
