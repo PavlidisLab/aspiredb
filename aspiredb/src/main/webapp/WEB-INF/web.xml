@@ -6,7 +6,7 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-            classpath*:gemma/gsec/acl/security-bean-baseconfig.xml,
+            classpath*:gemma/gsec/applicationContext-*.xml,
             classpath*:application-context.xml,
             classpath*:applicationContext-security.xml,
             classpath*:production-data-source.xml,

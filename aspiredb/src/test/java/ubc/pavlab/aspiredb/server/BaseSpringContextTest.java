@@ -56,7 +56,7 @@ import gemma.gsec.authentication.UserManager;
  * @version $Id: BaseSpringContextTest.java,v 1.4 2013/06/12 20:18:48 cmcdonald Exp $
  */
 @ContextConfiguration(locations = { "classpath:/test-data-source.xml",
-        "classpath:gemma/gsec/acl/security-bean-baseconfig.xml", "classpath:/application-context.xml",
+        "classpath*:/gemma/gsec/applicationContext-*.xml", "classpath:/application-context.xml",
         "classpath:/applicationContext-security.xml", "classpath*:applicationContext-serviceBeans.xml" })
 public abstract class BaseSpringContextTest extends AbstractJUnit4SpringContextTests implements InitializingBean {
 
