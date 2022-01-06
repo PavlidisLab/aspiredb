@@ -88,7 +88,7 @@ public class SpringContextUtil {
      * @param paths
      */
     private static void addCommonConfig( List<String> paths ) {
-        paths.add( "classpath*:gemma/gsec/acl/security-bean-baseconfig.xml" );
+        paths.add( "classpath*:gemma/gsec/applicationContext-*.xml" );
         paths.add( "classpath*:application-context.xml" );
         paths.add( "classpath*:applicationContext-security.xml" );
         paths.add( "classpath*:applicationContext-serviceBeans.xml" );
