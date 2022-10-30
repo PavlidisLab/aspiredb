@@ -77,6 +77,7 @@ import ubc.pavlab.aspiredb.shared.query.restriction.SetRestriction;
 import ubc.pavlab.aspiredb.shared.suggestions.PhenotypeSuggestion;
 import ubic.basecode.ontology.model.OntologyTerm;
 import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
+import ubic.basecode.ontology.search.OntologySearchException;
 
 /**
  * Methods for various query operations such as querying a list of subjects and variants given a list of filters,
@@ -151,7 +152,7 @@ public class QueryServiceImpl implements QueryService {
     }
 
     @Override
-    public PagingLoadResult<OntologyTermValueObject> getOntologyTermSuggestions( String query ) {
+    public PagingLoadResult<OntologyTermValueObject> getOntologyTermSuggestions( String query ) throws OntologySearchException {
         HumanPhenotypeOntologyService HPOService = ontologyService.getHumanPhenotypeOntologyService();
         // if ( !HPOService.isOntologyLoaded() ) {
         // HPOService.startInitializationThread( true );

@@ -38,6 +38,7 @@ import ubc.pavlab.aspiredb.shared.query.Property;
 import ubc.pavlab.aspiredb.shared.suggestions.PhenotypeSuggestion;
 
 import com.sencha.gxt.data.shared.loader.PagingLoadResult;
+import ubic.basecode.ontology.search.OntologySearchException;
 
 /**
  * Methods for various query operations such as querying a list of subjects and variants given a list of filters,
@@ -53,7 +54,7 @@ public interface QueryService {
     public BoundedList<VariantValueObject> queryVariants( Set<AspireDbFilterConfig> filters )
             throws NotLoggedInException, ExternalDependencyException;
 
-    public PagingLoadResult<OntologyTermValueObject> getOntologyTermSuggestions( String query );
+    public PagingLoadResult<OntologyTermValueObject> getOntologyTermSuggestions( String query ) throws OntologySearchException;
 
     public List<String> getValuesForOntologyTerm( String ontologyTermUri );
 

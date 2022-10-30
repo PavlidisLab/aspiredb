@@ -12,7 +12,7 @@
     <parent>
         <groupId>ubc.pavlab</groupId>
         <artifactId>pavlab-starter-parent</artifactId>
-        <version>1.0</version>
+        <version>1.1.8</version>
     </parent>
 
     <properties>
@@ -21,7 +21,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <spring.version>3.2.18.RELEASE</spring.version>
         <spring.security.version>3.2.10.RELEASE</spring.security.version>
-        <gsec.version>0.0.7</gsec.version>
+        <gsec.version>0.0.8</gsec.version>
     </properties>
 
     <repositories>
@@ -209,10 +209,8 @@
         </dependency>
         <dependency>
             <!-- required by hibernate, explicitly import so we get it at runtime. -->
-            <groupId>javassist</groupId>
+            <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.12.1.GA</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -426,6 +424,17 @@
                     <check>
                         <haltOnFailure>false</haltOnFailure>
                     </check>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <quiet>true</quiet>
+                    <source>8</source>
+                    <doclint>none</doclint>
                 </configuration>
             </plugin>
 
@@ -678,16 +687,6 @@
                     <name>localDeploy</name>
                     <url>file:///space/aspiredbData</url>
                 </site>
-                <repository>
-                    <id>repo</id>
-                    <name>Pavlab</name>
-                    <url>file:///space/maven2</url>
-                </repository>
-                <snapshotRepository>
-                    <id>repo</id>
-                    <name>Pavlab</name>
-                    <url>file:///space/maven2</url>
-                </snapshotRepository>
             </distributionManagement>
         </profile>
     </profiles>

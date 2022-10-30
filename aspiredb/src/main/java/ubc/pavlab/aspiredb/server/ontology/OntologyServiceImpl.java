@@ -28,6 +28,7 @@ import ubic.basecode.ontology.providers.AbstractOntologyService;
 import ubic.basecode.ontology.providers.DiseaseOntologyService;
 import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
 import ubic.basecode.ontology.search.OntologySearch;
+import ubic.basecode.ontology.search.OntologySearchException;
 
 /**
  * Has a static method for finding out which ontologies are loaded into the system and a general purpose find method
@@ -64,7 +65,7 @@ public class OntologyServiceImpl implements OntologyService {
     }
 
     @Override
-    public Collection<OntologyIndividual> findIndividuals( String givenSearch ) {
+    public Collection<OntologyIndividual> findIndividuals( String givenSearch ) throws OntologySearchException {
 
         String query = OntologySearch.stripInvalidCharacters( givenSearch );
         Collection<OntologyIndividual> results = new HashSet<OntologyIndividual>();
@@ -80,7 +81,7 @@ public class OntologyServiceImpl implements OntologyService {
     }
 
     @Override
-    public Collection<OntologyTerm> findTerms( String search ) {
+    public Collection<OntologyTerm> findTerms( String search ) throws OntologySearchException {
 
         String query = OntologySearch.stripInvalidCharacters( search );
 

@@ -24,6 +24,7 @@ import ubic.basecode.ontology.model.OntologyResource;
 import ubic.basecode.ontology.model.OntologyTerm;
 import ubic.basecode.ontology.providers.DiseaseOntologyService;
 import ubic.basecode.ontology.providers.HumanPhenotypeOntologyService;
+import ubic.basecode.ontology.search.OntologySearchException;
 
 /**
  * @author paul
@@ -35,7 +36,7 @@ public interface OntologyService extends InitializingBean {
      * @param givenSearch
      * @return
      */
-    public Collection<OntologyIndividual> findIndividuals( String givenSearch );
+    public Collection<OntologyIndividual> findIndividuals( String givenSearch ) throws OntologySearchException;
 
     /**
      * Given a search string will look through the loaded ontologies for terms that match the search term. this a lucene
@@ -44,7 +45,7 @@ public interface OntologyService extends InitializingBean {
      * @param search
      * @return returns a collection of ontologyTerm's
      */
-    public Collection<OntologyTerm> findTerms( String search );
+    public Collection<OntologyTerm> findTerms( String search ) throws OntologySearchException;
 
     /**
      * @return the diseaseOntologyService
