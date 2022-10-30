@@ -36,7 +36,7 @@ whatever directory CATALINA_HOME is set to).
 
 the contents of aspiredb.properties should be as follows:
 
-jdbc.driverClassName=com.mysql.jdbc.Driver
+jdbc.driverClassName=com.mysql.cj.jdbc.Driver
 
 # change this value to whatever the path is to your database with the aspiredb schema
 jdbc.url=jdbc:mysql://localhost:3306/aspiredb  

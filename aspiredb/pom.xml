@@ -524,7 +524,7 @@
                         </dependencies>
                         <!-- common configuration shared by all executions -->
                         <configuration>
-                            <driver>com.mysql.jdbc.Driver</driver>
+                            <driver>com.mysql.cj.jdbc.Driver</driver>
                             <username>${aspiredb.db.build.user}</username>
                             <password>${aspiredb.db.build.password}</password>
                             <onError>abort</onError>
@@ -617,13 +617,12 @@
                             <dependency>
                                 <groupId>mysql</groupId>
                                 <artifactId>mysql-connector-java</artifactId>
-                                <!-- TODO: move this into pavlab-starter-parent -->
-                                <version>8.0.27</version>
+                                <version>${mysql.version}</version>
                             </dependency>
                         </dependencies>
                         <!-- common configuration shared by all executions -->
                         <configuration>
-                            <driver>com.mysql.jdbc.Driver</driver>
+                            <driver>com.mysql.cj.jdbc.Driver</driver>
                             <username>${aspiredb.db.build.user}</username>
                             <password>${aspiredb.db.build.password}</password>
                             <onError>abort</onError>
