@@ -15,7 +15,7 @@
     </bean>
 
     <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="driverClassName" value="${test.jdbc.driverClassName}"/>
         <property name="username" value="${test.jdbc.username}"/>
         <property name="password" value="${test.jdbc.password}"/>
         <property name="url" value="${test.jdbc.url}"/>
