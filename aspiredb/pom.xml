@@ -4,7 +4,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <name>ASPIREdb Project</name>
-    <groupId>ubc.pavlab</groupId>
     <artifactId>aspiredb</artifactId>
     <packaging>war</packaging>
     <version>1.5-SNAPSHOT</version>
