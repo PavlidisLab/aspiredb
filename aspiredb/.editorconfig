@@ -1,0 +1,4 @@
+root = true
+
+[production-data-source.xml]
+indent_style=tab

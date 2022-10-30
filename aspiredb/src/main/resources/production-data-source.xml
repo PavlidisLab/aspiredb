@@ -1,77 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-    <bean
-        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>classpath:default.properties</value>
-                <value>classpath:database.properties</value>
-                <value>file:${user.home}/aspiredb.properties</value>
-            </list>
-        </property>
-    </bean>
+	<bean
+			class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:default.properties</value>
+				<value>classpath:database.properties</value>
+				<value>file:${user.home}/aspiredb.properties</value>
+			</list>
+		</property>
+	</bean>
 
-    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
-        <property name="driverClassName" value="${jdbc.driverClassName}"/>
-        <property name="url" value="${jdbc.url}"/>
-        <property name="username" value="${jdbc.username}"/>
-        <property name="password" value="${jdbc.password}"/>
-        <property name="testOnBorrow" value="true"/>
-        <property name="validationQuery" value="SELECT 1"/>
-        <property name="validationQueryTimeout" value="2"/>
-        <property name="maxTotal" value="20"/>
-        <property name="maxIdle" value="10"/>
-        <property name="maxWaitMillis" value="5000"/>
-    </bean>
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+		<property name="testOnBorrow" value="true"/>
+		<property name="validationQuery" value="SELECT 1"/>
+		<property name="validationQueryTimeout" value="2"/>
+		<property name="maxTotal" value="20"/>
+		<property name="maxIdle" value="10"/>
+		<property name="maxWaitMillis" value="5000"/>
+	</bean>
 
-    <!-- Hibernate session factory -->
-    <bean id="sessionFactory"
-          class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+	<!-- Hibernate session factory -->
+	<bean id="sessionFactory"
+		  class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 
-        <property name="dataSource" ref="dataSource"/>
+		<property name="dataSource" ref="dataSource"/>
 
-        <property name="configLocation" value="classpath:hibernate.cfg.xml"/>
+		<property name="configLocation" value="classpath:hibernate.cfg.xml"/>
 
-        <property name="mappingLocations">
-            <list>
-                <value>classpath:gemma/gsec/model/AclEntry.hbm.xml</value>
-                <value>classpath:gemma/gsec/model/AclObjectIdentity.hbm.xml</value>
-                <value>classpath:gemma/gsec/model/AclSid.hbm.xml</value>
-            </list>
-        </property>
+		<property name="mappingLocations">
+			<list>
+				<value>classpath:gemma/gsec/model/AclEntry.hbm.xml</value>
+				<value>classpath:gemma/gsec/model/AclObjectIdentity.hbm.xml</value>
+				<value>classpath:gemma/gsec/model/AclSid.hbm.xml</value>
+			</list>
+		</property>
 
-        <property name="hibernateProperties">
-            <props>
-                <prop key="hibernate.dialect">${hibernate.dialect}</prop>
-                <prop key="hibernate.show_sql">false</prop>
-                <prop key="hibernate.cache.use_second_level_cache">true</prop>
-                <prop key="hibernate.cache.use_query_cache">false</prop>
-                <prop key="hibernate.generate_statistics">false</prop>
-                <prop key="hibernate.cache.use_structured_entries">false</prop>
-                <prop key="hibernate.cache.query_cache_factory">org.hibernate.cache.StandardQueryCacheFactory</prop>
-                <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.cache.use_second_level_cache">true</prop>
+				<prop key="hibernate.cache.use_query_cache">false</prop>
+				<prop key="hibernate.generate_statistics">false</prop>
+				<prop key="hibernate.cache.use_structured_entries">false</prop>
+				<prop key="hibernate.cache.query_cache_factory">org.hibernate.cache.StandardQueryCacheFactory</prop>
+				<prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
 
-                <prop key="hibernate.max_fetch_depth">3</prop>
-                <prop key="hibernate.jdbc.fetch_size">512</prop>
-                <prop key="hibernate.default_batch_fetch_size">512</prop>
-                <prop key="hibernate.jdbc.batch_size">256</prop>
-                <prop key="hibernate.order_inserts">true</prop>
-                <prop key="hibernate.order_updates">true</prop>
+				<prop key="hibernate.max_fetch_depth">3</prop>
+				<prop key="hibernate.jdbc.fetch_size">512</prop>
+				<prop key="hibernate.default_batch_fetch_size">512</prop>
+				<prop key="hibernate.jdbc.batch_size">256</prop>
+				<prop key="hibernate.order_inserts">true</prop>
+				<prop key="hibernate.order_updates">true</prop>
 
 
-            </props>
-        </property>
-        <property name="cacheRegionFactory" ref="externalCacheRegionFactory"/>
-    </bean>
+			</props>
+		</property>
+		<property name="cacheRegionFactory" ref="externalCacheRegionFactory"/>
+	</bean>
 
-    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-        <property name="host" value="${mail.host}"/>
-        <property name="username" value="${mail.username}"/>
-        <property name="password" value="${mail.password}"/>
-    </bean>
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${mail.host}"/>
+		<property name="username" value="${mail.username}"/>
+		<property name="password" value="${mail.password}"/>
+	</bean>
 
 </beans>
