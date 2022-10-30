@@ -22,6 +22,7 @@
         <spring.version>3.2.18.RELEASE</spring.version>
         <spring.security.version>3.2.10.RELEASE</spring.security.version>
         <gsec.version>0.0.8</gsec.version>
+        <aspectj.version>1.9.9.1</aspectj.version>
     </properties>
 
     <repositories>
@@ -69,7 +70,7 @@
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
-            <version>4.3</version>
+            <version>5.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -82,9 +83,9 @@
             <version>${spring.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-bundle</artifactId>
-            <version>1.13</version>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>3.0.8</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -104,7 +105,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-configuration2</artifactId>
-            <version>2.7</version>
+            <version>2.8.0</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -190,12 +191,12 @@
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
-            <version>1.9.7</version>
+            <version>${aspectj.version}</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>1.9.7</version>
+            <version>${aspectj.version}</version>
             <scope>runtime</scope>
         </dependency>
         <!-- GWT 2.3.0 depends on these -->
@@ -246,7 +247,7 @@
         <dependency>
             <groupId>net.sourceforge.csvjdbc</groupId>
             <artifactId>csvjdbc</artifactId>
-            <version>1.0.38</version>
+            <version>1.0.40</version>
         </dependency>
         <dependency>
             <groupId>com.sencha.gxt</groupId>
@@ -264,9 +265,9 @@
             <version>1.5.3</version>
         </dependency>
         <dependency>
-            <groupId>com.google.gwt</groupId>
+            <groupId>org.gwtproject</groupId>
             <artifactId>gwt-servlet</artifactId>
-            <version>2.9.0</version>
+            <version>2.10.0</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
