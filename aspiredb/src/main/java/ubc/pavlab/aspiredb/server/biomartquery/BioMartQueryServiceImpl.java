@@ -22,11 +22,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -37,6 +38,8 @@ import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.glassfish.jersey.client.ClientResponse;
+import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,10 +48,7 @@ import ubc.pavlab.aspiredb.server.util.ConfigUtils;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.GenomicRange;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import javax.ws.rs.client.Client;
 
 /**
  * Simple wrapper that calls BioMart REST query service.
@@ -84,27 +84,24 @@ public class BioMartQueryServiceImpl implements BioMartQueryService {
     }
 
     private static String sendRequest( String xmlQueryString ) throws BioMartServiceException {
-        Client client = Client.create();
+        Client client = JerseyClientBuilder.newBuilder()
+                .readTimeout( BIOMART_TIMEOUT_SECONDS, TimeUnit.SECONDS )
+                .build();
 
-        MultivaluedMap<String, String> queryData = new MultivaluedMapImpl();
-        queryData.add( "query", xmlQueryString );
+        WebTarget resource = client.target( BIO_MART_URL ).queryParam( "query", xmlQueryString );
 
-        WebResource resource = client.resource( BIO_MART_URL ).queryParams( queryData );
-        client.setReadTimeout( 1000 * BIOMART_TIMEOUT_SECONDS );
-        
-        ClientResponse response = resource.type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
-                .get( ClientResponse.class );
+        Response response = resource.request( MediaType.APPLICATION_FORM_URLENCODED_TYPE ).get();
 
         // Check return code
         if ( Response.Status.fromStatusCode( response.getStatus() ).getFamily() != Response.Status.Family.SUCCESSFUL ) {
             String errorMessage = "Error occurred when accessing BioMart web service: "
-                    + response.getEntity( String.class );
+                    + response.getEntity();
             log.error( errorMessage );
 
             throw new BioMartServiceException( errorMessage );
         }
 
-        return response.getEntity( String.class );
+        return ( String ) response.getEntity();
     }
 
     @Autowired
