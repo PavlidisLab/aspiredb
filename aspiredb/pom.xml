@@ -11,7 +11,7 @@
     <parent>
         <groupId>ubc.pavlab</groupId>
         <artifactId>pavlab-starter-parent</artifactId>
-        <version>1.1.8</version>
+        <version>1.1.9</version>
     </parent>
 
     <properties>
@@ -309,10 +309,14 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
-                    <argLine>-enableassertions -Xmx512m -Djava.awt.headless=true -Dlog4j.compatibility=true</argLine>
+                    <argLine>-enableassertions -Xmx512m -Djava.awt.headless=true -Dlog4j1.compatibility=true</argLine>
                     <reportsDirectory>target/surefire-reports</reportsDirectory>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <includes>
@@ -430,7 +434,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.3.2</version>
                 <configuration>
                     <quiet>true</quiet>
                     <source>8</source>
@@ -487,7 +491,7 @@
                     <!-- extract gsec sql files -->
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.2.0</version>
+                        <version>3.1.2</version>
                         <executions>
                             <execution>
                                 <phase>process-resources</phase>
@@ -586,7 +590,7 @@
                     <!-- extract gsec sql files -->
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.2.0</version>
+                        <version>3.1.2</version>
                         <executions>
                             <execution>
                                 <phase>process-resources</phase>
