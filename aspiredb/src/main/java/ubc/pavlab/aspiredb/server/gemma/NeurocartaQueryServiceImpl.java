@@ -14,9 +14,12 @@
  */
 package ubc.pavlab.aspiredb.server.gemma;
 
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,16 +32,13 @@ import ubc.pavlab.aspiredb.server.ontology.OntologyService;
 import ubc.pavlab.aspiredb.server.util.GemmaURLUtils;
 import ubc.pavlab.aspiredb.shared.GeneValueObject;
 import ubc.pavlab.aspiredb.shared.NeurocartaPhenotypeValueObject;
+import ubic.basecode.ontology.model.OntologyTerm;
 
 import javax.annotation.PostConstruct;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Simple wrapper that calls Phenocarta REST web service.
@@ -56,28 +56,25 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
 
     private static String sendRequest( String urlSuffix, MultivaluedMap<String, String> queryParams )
             throws NeurocartaServiceException {
-        Client client = JerseyClientBuilder.newBuilder()
-                .readTimeout( REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS )
-                .connectTimeout( REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS )
-                .build();
-        WebTarget webTarget = client.target( GemmaURLUtils.makeWebServiceUrl( urlSuffix ) );
-        queryParams.forEach( ( k, l ) -> {
-            webTarget.queryParam( k, l.toArray() );
-        } );
-        Response response = webTarget
-                .request( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
-                .get();
+        Client client = Client.create();
+        client.setReadTimeout( 1000 * REQUEST_TIMEOUT_SECONDS );
+        client.setConnectTimeout( 1000 * REQUEST_TIMEOUT_SECONDS );
+        WebResource resource = client.resource(  GemmaURLUtils.makeWebServiceUrl( urlSuffix ) ).queryParams(
+                queryParams );
+
+        ClientResponse response = resource.type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                .get( ClientResponse.class );
 
         // Check return code
         if ( Response.Status.fromStatusCode( response.getStatus() ).getFamily() != Response.Status.Family.SUCCESSFUL ) {
             String errorMessage = "Error occurred when accessing Phenocarta web service: (" + GemmaURLUtils.makeWebServiceUrl( urlSuffix ) + ") "
-                    + response.getEntity();
+                    + response.getEntity( String.class );
             log.error( errorMessage );
 
             throw new NeurocartaServiceException( errorMessage );
         }
 
-        return ( String ) response.getEntity();
+        return response.getEntity( String.class );
     }
 
     @Autowired
@@ -93,13 +90,13 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
     public Collection<NeurocartaPhenotypeValueObject> fetchAllPhenotypes()
             throws NeurocartaServiceException, BioMartServiceException {
 
-        String result = sendRequest( LOAD_PHENOTYPES_URL_SUFFIX, new MultivaluedHashMap<>() );
+        String result = sendRequest( LOAD_PHENOTYPES_URL_SUFFIX, new MultivaluedMapImpl() );
 
         Collection<NeurocartaPhenotypeValueObject> neurocartaPhenotypes = new HashSet<>();
 
         try {
             JSONObject jsonResult = new JSONObject( result );
-            JSONArray phenotypes = ( JSONArray ) jsonResult.get( "data" );
+            JSONArray phenotypes = (JSONArray) jsonResult.get( "data" );
 
             for ( int i = 0; i < phenotypes.length(); i++ ) {
                 JSONObject phen = phenotypes.getJSONObject( i );
@@ -124,7 +121,7 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
     @Override
     public Collection<GeneValueObject> fetchGenesAssociatedWithPhenotype( String phenotypeUri )
             throws NeurocartaServiceException, BioMartServiceException {
-        MultivaluedMap<String, String> queryParams = new MultivaluedHashMap<>();
+        MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
         queryParams.add( "editableOnly", "false" );
         queryParams.add( "phenotypes", phenotypeUri );
         // Example result :
@@ -135,7 +132,7 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
 
         try {
             JSONObject jsonResult = new JSONObject( result );
-            JSONArray genes = ( JSONArray ) jsonResult.get( "data" );
+            JSONArray genes = (JSONArray) jsonResult.get( "data" );
 
 
             geneSymbols = new HashSet<>( genes.length() );
@@ -160,7 +157,7 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
     public Map<String, GeneValueObject> findPhenotypeGenes( String phenotypeUri ) throws NeurocartaServiceException,
             BioMartServiceException {
 
-        MultivaluedMap<String, String> queryParams = new MultivaluedHashMap<>();
+        MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
         queryParams.add( "editableOnly", "false" );
         queryParams.add( "phenotypes", phenotypeUri );
 
@@ -168,7 +165,7 @@ public class NeurocartaQueryServiceImpl implements NeurocartaQueryService {
         Map<String, String> geneToURI = new HashMap<>();
         try {
             JSONObject jsonResult = new JSONObject( result );
-            JSONArray genes = ( JSONArray ) jsonResult.get( "data" );
+            JSONArray genes = (JSONArray) jsonResult.get( "data" );
 
             for ( int i = 0; i < genes.length(); i++ ) {
                 JSONObject gene = genes.getJSONObject( i );

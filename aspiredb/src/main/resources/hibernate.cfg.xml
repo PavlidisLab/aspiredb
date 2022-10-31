@@ -6,7 +6,7 @@
 <hibernate-configuration>
 	<session-factory>
 
-		<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+		<property name="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
 
 
 		<!-- We shouldn't use other options (validate is ok). We should be manually updating database schema on production. It's 

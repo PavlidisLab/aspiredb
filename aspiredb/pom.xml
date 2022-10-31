@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <name>ASPIREdb Project</name>
@@ -15,9 +15,6 @@
     </parent>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
         <spring.version>3.2.18.RELEASE</spring.version>
         <spring.security.version>3.2.10.RELEASE</spring.security.version>
         <gsec.version>0.0.8</gsec.version>
@@ -82,9 +79,9 @@
             <version>${spring.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>2.27</version>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-bundle</artifactId>
+            <version>1.13</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -280,8 +277,8 @@
             <version>1.7</version>
         </dependency>
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>javax.mail-api</artifactId>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
             <version>1.6.2</version>
         </dependency>
 
@@ -298,38 +295,19 @@
         </dependency>
 
         <!-- Jersey <dependency> <groupId>com.sun.jersey</groupId> <artifactId>jersey-server</artifactId> <version>1.8</version>
-            </dependency> <dependency> <groupId>com.sun.jersey</groupId> <artifactId>jersey-json</artifactId> <version>1.8</version>
-            </dependency> Jersey + Spring <dependency> <groupId>com.sun.jersey.contribs</groupId> <artifactId>jersey-spring</artifactId>
-            <version>1.12</version> <exclusions> <exclusion> <groupId>org.springframework</groupId> <artifactId>spring-aop</artifactId>
-            </exclusion> <exclusion> <groupId>org.springframework</groupId> <artifactId>spring-core</artifactId> </exclusion> <exclusion>
-            <groupId>org.springframework</groupId> <artifactId>spring-web</artifactId> </exclusion> <exclusion> <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId> </exclusion> <exclusion> <groupId>org.springframework</groupId> <artifactId>spring-beans</artifactId>
-            </exclusion> </exclusions> </dependency> -->
+                </dependency> <dependency> <groupId>com.sun.jersey</groupId> <artifactId>jersey-json</artifactId> <version>1.8</version>
+                </dependency> Jersey + Spring <dependency> <groupId>com.sun.jersey.contribs</groupId> <artifactId>jersey-spring</artifactId>
+                <version>1.12</version> <exclusions> <exclusion> <groupId>org.springframework</groupId> <artifactId>spring-aop</artifactId>
+                </exclusion> <exclusion> <groupId>org.springframework</groupId> <artifactId>spring-core</artifactId> </exclusion> <exclusion>
+                <groupId>org.springframework</groupId> <artifactId>spring-web</artifactId> </exclusion> <exclusion> <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId> </exclusion> <exclusion> <groupId>org.springframework</groupId> <artifactId>spring-beans</artifactId>
+        </exclusion> </exclusions> </dependency> -->
     </dependencies>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
-                <configuration>
-                    <argLine>-enableassertions -Xmx512m -Djava.awt.headless=true -Dlog4j1.compatibility=true</argLine>
-                    <reportsDirectory>target/surefire-reports</reportsDirectory>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <includes>
-                        <include>**/Test*.java</include>
-                        <include>**/*Test.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>**/AllTests.java</exclude>
-                        <exclude>**/gui/Test*.java</exclude>
-                        <exclude>**/AbstractTest*.java</exclude>
-                        <exclude>**/*$*</exclude> <!-- should not need this -->
-                    </excludes>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -351,50 +329,11 @@
                 </configuration>
             </plugin>
 
-            <!-- mvn clean compile hibernate3:hbm2ddl -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>hibernate3-maven-plugin</artifactId>
-                <version>3.0</version>
-                <executions>
-                    <execution>
-                        <id>default-cli</id>
-                        <configuration>
-                            <echo message="******* Building DDL file *******" />
-                            <components>
-                                <component>
-                                    <name>hbm2ddl</name>
-                                    <!-- if implementation is jpaconfiguration: use persistence.xml in src/main/resources/META-INF -->
-                                    <!-- if implementation is annotationconfiguration: use hibernate.cfg.xml in src/main/resources -->
-                                    <implementation>annotationconfiguration</implementation>
-                                </component>
-                            </components>
-                            <componentProperties>
-                                <configurationfile>src/main/resources/hibernate.cfg.xml</configurationfile>
-                                <drop>false</drop>
-                                <create>true</create>
-                                <format>true</format>
-                                <export>false</export>
-                                <outputfilename>schema.sql</outputfilename>
-                            </componentProperties>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- Bug 3633: aspiredbCLI.jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
@@ -411,11 +350,47 @@
                         <configuration>
                             <target>
                                 <echo append="false"
-                                    file="${project.build.directory}/${project.build.finalName}/WEB-INF/classes/version.properties">aspiredb.version=${project.version} built ${maven.build.timestamp}</echo>
+                                      file="${project.build.directory}/${project.build.finalName}/WEB-INF/classes/version.properties">aspiredb.version=${project.version} built ${maven.build.timestamp}
+                                </echo>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>schema-export</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <taskdef name="schemaexport" classname="org.hibernate.tool.hbm2ddl.SchemaExportTask"/>
+                                <mkdir dir="${project.build.directory}/hibernate3/sql"/>
+                                <schemaexport quiet="true" text="true" create="true" drop="false" delimiter=";"
+                                              output="${project.build.directory}/hibernate3/sql/schema.sql"
+                                              config="${project.basedir}/src/main/resources/hibernate.cfg.xml"/>
                             </target>
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-core</artifactId>
+                        <version>${hibernate.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>pavlab</groupId>
+                        <artifactId>gemma-gsec</artifactId>
+                        <version>${gsec.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>${project.artifactId}</artifactId>
+                        <version>${project.version}</version>
+                        <scope>system</scope>
+                        <systemPath>${project.build.directory}/${project.build.finalName}.jar</systemPath>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <!-- mvn cobertura:cobertura -->
@@ -442,12 +417,146 @@
                 </configuration>
             </plugin>
 
+            <!-- configuration for integration tests -->
+
+            <!-- extract gsec sql files -->
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.2</version>
+                <executions>
+                    <execution>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>pavlab</groupId>
+                                    <artifactId>gemma-gsec</artifactId>
+                                    <version>${gsec.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/schema</outputDirectory>
+                                    <includes>**/*.sql</includes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>sql-maven-plugin</artifactId>
+                <version>1.5</version>
+                <dependencies><!-- specify the dependent JDBC driver here -->
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <!-- TODO: move this into pavlab-starter-parent -->
+                        <version>8.0.27</version>
+                    </dependency>
+                </dependencies>
+                <!-- common configuration shared by all executions -->
+                <configuration>
+                    <driver>com.mysql.cj.jdbc.Driver</driver>
+                    <username>${aspiredb.db.build.user}</username>
+                    <password>${aspiredb.db.build.password}</password>
+                    <onError>abort</onError>
+                    <autocommit>true</autocommit>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>drop-add-testdb</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <url>${bootstrap.db.url}</url>
+                            <username>${aspiredb.db.build.user}</username>
+                            <password>${aspiredb.db.build.password}</password>
+                            <autocommit>false</autocommit>
+                            <sqlCommand>
+                                        <![CDATA[
+                                drop
+                                database if exists
+                                ${aspiredb.testdb.name};
+                                create
+                                database
+                                ${aspiredb.testdb.name}
+                                ]]>
+                                </sqlCommand>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>load-testdb-schema</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <url>${aspiredb.testdb.build.url}</url>
+                            <srcFiles>
+                                <srcFile>${project.build.directory}/hibernate3/sql/schema.sql</srcFile>
+                                <srcFile>${project.build.directory}/schema/gsec-acl-ddl.sql</srcFile>
+                                <srcFile>src/main/resources/sql/init-acls.sql</srcFile>
+                                <srcFile>src/main/resources/sql/init-entities.sql</srcFile>
+                                <srcFile>src/main/resources/sql/init-indices.sql</srcFile>
+                                <srcFile>${project.build.directory}/schema/sql/init-acl-indices.sql</srcFile>
+                            </srcFiles>
+                            <onError>abort</onError>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/Test*.java</exclude>
+                        <exclude>**/*Test.java</exclude>
+                        <exclude>**/AllTests.java</exclude>
+                        <exclude>**/gui/Test*.java</exclude>
+                        <exclude>**/AbstractTest*.java</exclude>
+                        <exclude>**/*$*</exclude> <!-- should not need this -->
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.22.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <argLine>-enableassertions -Xmx512m -Djava.awt.headless=true -Dlog4j1.compatibility=true</argLine>
+                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <includes>
+                        <include>**/Test*.java</include>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/AllTests.java</exclude>
+                        <exclude>**/gui/Test*.java</exclude>
+                        <exclude>**/AbstractTest*.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
         </plugins>
         <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
         <pluginManagement>
             <plugins>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven
-                    build itself. -->
+                build itself. -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>
@@ -465,7 +574,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore></ignore>
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
@@ -476,205 +585,7 @@
         </pluginManagement>
     </build>
 
-
     <profiles>
-        <profile>
-            <id>testdb.build</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>testdb.build</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <!-- extract gsec sql files -->
-                    <plugin>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.1.2</version>
-                        <executions>
-                            <execution>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>unpack</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>pavlab</groupId>
-                                            <artifactId>gemma-gsec</artifactId>
-                                            <version>${gsec.version}</version>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${project.build.directory}/schema</outputDirectory>
-                                            <includes>**/*.sql</includes>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>sql-maven-plugin</artifactId>
-                        <version>1.5</version>
-                        <dependencies><!-- specify the dependent JDBC driver here -->
-                            <dependency>
-                                <groupId>mysql</groupId>
-                                <artifactId>mysql-connector-java</artifactId>
-                                <!-- TODO: move this into pavlab-starter-parent -->
-                                <version>8.0.27</version>
-                            </dependency>
-                        </dependencies>
-                        <!-- common configuration shared by all executions -->
-                        <configuration>
-                            <driver>com.mysql.cj.jdbc.Driver</driver>
-                            <username>${aspiredb.db.build.user}</username>
-                            <password>${aspiredb.db.build.password}</password>
-                            <onError>abort</onError>
-                            <autocommit>true</autocommit>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>drop-add-testdb</id>
-                                <phase>initialize</phase>
-                                <goals>
-                                    <goal>execute</goal>
-                                </goals>
-                                <configuration>
-                                    <url>${bootstrap.db.url}</url>
-                                    <username>${aspiredb.db.build.user}</username>
-                                    <password>${aspiredb.db.build.password}</password>
-                                    <autocommit>false</autocommit>
-                                    <sqlCommand>
-									<![CDATA[
-                                        drop database if exists ${aspiredb.testdb.name};
-									create database ${aspiredb.testdb.name}
-                                        ]]>
-                                    </sqlCommand>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>load-testdb-schema</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>execute</goal>
-                                </goals>
-                                <configuration>
-                                    <url>${aspiredb.testdb.build.url}</url>
-                                    <srcFiles>
-                                        <srcFile>target/hibernate3/sql/schema.sql</srcFile>
-                                        <srcFile>target/schema/gsec-acl-ddl.sql</srcFile>
-                                        <srcFile>src/main/resources/sql/init-acls.sql</srcFile>
-                                        <srcFile>src/main/resources/sql/init-entities.sql</srcFile>
-                                        <srcFile>src/main/resources/sql/init-indices.sql</srcFile>
-                                        <srcFile>target/schema/sql/init-acl-indices.sql</srcFile>
-                                    </srcFiles>
-                                    <onError>abort</onError>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>db.build</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>db.build</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <!-- extract gsec sql files -->
-                    <plugin>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.1.2</version>
-                        <executions>
-                            <execution>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>unpack</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>pavlab</groupId>
-                                            <artifactId>gemma-gsec</artifactId>
-                                            <version>${gsec.version}</version>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${project.build.directory}/schema</outputDirectory>
-                                            <includes>**/*.sql</includes>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>sql-maven-plugin</artifactId>
-                        <version>1.5</version>
-                        <dependencies><!-- specify the dependent JDBC driver here -->
-                            <dependency>
-                                <groupId>mysql</groupId>
-                                <artifactId>mysql-connector-java</artifactId>
-                                <version>${mysql.version}</version>
-                            </dependency>
-                        </dependencies>
-                        <!-- common configuration shared by all executions -->
-                        <configuration>
-                            <driver>com.mysql.cj.jdbc.Driver</driver>
-                            <username>${aspiredb.db.build.user}</username>
-                            <password>${aspiredb.db.build.password}</password>
-                            <onError>abort</onError>
-                            <autocommit>true</autocommit>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>drop-add-db</id>
-                                <phase>initialize</phase>
-                                <goals>
-                                    <goal>execute</goal>
-                                </goals>
-                                <configuration>
-                                    <url>${bootstrap.db.url}</url>
-                                    <autocommit>false</autocommit>
-                                    <sqlCommand>
-                                    <![CDATA[
-                                        drop database if exists ${aspiredb.db.name};
-                                    create database ${aspiredb.db.name}
-                                        ]]>
-                                    </sqlCommand>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>load-db-schema</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>execute</goal>
-                                </goals>
-                                <configuration>
-                                    <url>${aspiredb.db.build.url}</url>
-                                    <username>${aspiredb.db.build.user}</username>
-                                    <password>${aspiredb.db.build.password}</password>
-                                    <srcFiles>
-                                        <srcFile>target/hibernate3/sql/schema.sql</srcFile>
-                                        <srcFile>target/schema/gsec-acl-ddl.sql</srcFile>
-                                        <srcFile>src/main/resources/sql/init-acls.sql</srcFile>
-                                        <srcFile>src/main/resources/sql/init-entities.sql</srcFile>
-                                        <srcFile>src/main/resources/sql/init-indices.sql</srcFile>
-                                        <srcFile>target/schema/sql/init-acl-indices.sql</srcFile>
-                                    </srcFiles>
-                                    <onError>abort</onError>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <!-- For deployment where host is local (and ssh isn't available for builder, e.g. CI) -->
             <id>local-deploy</id>
@@ -703,7 +614,5 @@
             </plugin>
         </plugins>
     </reporting>
-
-
 
 </project>
