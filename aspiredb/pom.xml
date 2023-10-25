@@ -544,8 +544,8 @@
                         <!-- common configuration shared by all executions -->
                         <configuration>
                             <driver>com.mysql.jdbc.Driver</driver>
-                            <username>${aspiredb.db.build.user}</username>
-                            <password>${aspiredb.db.build.password}</password>
+                            <username>${aspiredb.testdb.build.user}</username>
+                            <password>${aspiredb.testdb.build.password}</password>
                             <onError>abort</onError>
                             <autocommit>true</autocommit>
                         </configuration>
@@ -558,8 +558,8 @@
                                 </goals>
                                 <configuration>
                                     <url>${bootstrap.db.url}</url>
-                                    <username>${aspiredb.db.build.user}</username>
-                                    <password>${aspiredb.db.build.password}</password>
+                                    <username>${aspiredb.testdb.build.user}</username>
+                                    <password>${aspiredb.testdb.build.password}</password>
                                     <autocommit>false</autocommit>
                                     <sqlCommand>
 									<![CDATA[
@@ -644,8 +644,8 @@
                         <!-- common configuration shared by all executions -->
                         <configuration>
                             <driver>com.mysql.jdbc.Driver</driver>
-                            <username>${aspiredb.db.build.user}</username>
-                            <password>${aspiredb.db.build.password}</password>
+                            <username>${aspiredb.testdb.build.user}</username>
+                            <password>${aspiredb.testdb.build.password}</password>
                             <onError>abort</onError>
                             <autocommit>true</autocommit>
                         </configuration>
@@ -661,8 +661,8 @@
                                     <autocommit>false</autocommit>
                                     <sqlCommand>
                                     <![CDATA[
-                                        drop database if exists ${aspiredb.db.name};
-                                    create database ${aspiredb.db.name}
+                                        drop database if exists ${aspiredb.testdb.name};
+                                    create database ${aspiredb.testdb.name}
                                         ]]>
                                     </sqlCommand>
                                 </configuration>
@@ -674,9 +674,9 @@
                                     <goal>execute</goal>
                                 </goals>
                                 <configuration>
-                                    <url>${aspiredb.db.build.url}</url>
-                                    <username>${aspiredb.db.build.user}</username>
-                                    <password>${aspiredb.db.build.password}</password>
+                                    <url>${aspiredb.testdb.build.url}</url>
+                                    <username>${aspiredb.testdb.build.user}</username>
+                                    <password>${aspiredb.testdb.build.password}</password>
                                     <srcFiles>
                                         <srcFile>target/hibernate3/sql/schema.sql</srcFile>
                                         <srcFile>target/schema/gsec-acl-ddl.sql</srcFile>
