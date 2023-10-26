@@ -342,7 +342,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
 				<version>2.12</version>
 				<configuration>
-					<argLine>-enableassertions -Xmx512m -Djava.awt.headless=true -Dlog4j.compatibility=true</argLine>
+					<argLine>-Djava.awt.headless=true -Dlog4j.compatibility=true</argLine>
 					<reportsDirectory>target/surefire-reports</reportsDirectory>
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
 					<includes>
